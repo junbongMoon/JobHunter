@@ -77,7 +77,7 @@
                             <li><a href="#">직업별 채용정보</a></li>
                         </ul>
                     </li>
-                    <li><a href="#contact">면접후기</a></li>
+                    <li><a href="/reviewBoard/Allboard">면접후기</a></li>
                     <li><a href="#contact">My Page</a></li>
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
