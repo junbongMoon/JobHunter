@@ -7,5 +7,5 @@ public class ResumeDTO {
 	private int pay;
 	private String introduce;
 	private String saveType;
-	private int userPk;	
+	private int userUid;
 }
