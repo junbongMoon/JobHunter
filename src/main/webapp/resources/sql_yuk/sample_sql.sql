@@ -134,3 +134,5 @@ select loginCnt from `users` where userId = 'tester123';
 UPDATE `users` SET loginCnt = loginCnt + 1 WHERE userId = 'tester123';
 
 select * from `koreaite`.`users` where userId = 'tester123' and password = sha1(md5('tester123'));
+
+UPDATE `koreaite`.`users` SET `autoLogin` = '1' WHERE userId = 'tester123';
