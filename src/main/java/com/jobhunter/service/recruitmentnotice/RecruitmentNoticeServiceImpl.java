@@ -38,7 +38,8 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	@Override
 	public List<RecruitmentNotice> getRecruitmentByUid(int uid) throws Exception {
 		// 내가 작성한 공고(템플릿 제외)를 가져오는 메서드
-		return null;
+		
+		return recdao.selectRecuitmentByUid(uid);
 	}
 
 }
