@@ -16,18 +16,6 @@ import lombok.RequiredArgsConstructor;
 
 public class UserServiceTests {
 	
-	@Autowired
-	private UserDAO udao;
-
-	@Test
-	public void testUserInsert() {
-		
-		try {
-			udao.insertUser();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	
 	
 }

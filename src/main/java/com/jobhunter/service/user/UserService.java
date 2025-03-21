@@ -1,8 +1,13 @@
 package com.jobhunter.service.user;
 
-import com.jobhunter.model.user.User;
+import java.util.Map;
+
+import com.jobhunter.model.user.LoginDTO;
+import com.jobhunter.model.user.UserVO;
 
 public interface UserService {
 	// 유저를 저장하는
-	boolean saveUser(User user) throws Exception;
+	boolean saveUser(UserVO user) throws Exception;
+
+	Map<String, Object> loginUser(LoginDTO loginDto) throws Exception;
 }

@@ -21,7 +21,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class User {
+public class UserVO {
 	private Integer uid; // 사용자 고유 ID
     private String userName; // 사용자 이름
     private String userId; // 사용자 아이디 (고유값)

@@ -4,9 +4,40 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.usermapper">
 
-	
-	<select id="now" resultType="String">
-		select now()
+	<select id="isAuthVerifi" resultType="String">
+		select requiresVerification
+		from `users` where userId = #{userId}
 	</select>
+
+	<select id="loginUser"
+		resultType="com.jobhunter.model.user.UserVO">
+		select * from `koreaite`.`users` where userId = #{userId}
+		and password = sha1(md5(#{password}))
+	</select>
+
+	<update id="increaseFailCount" parameterType="String">
+		UPDATE users
+		SET
+		loginCnt = loginCnt + 1
+		WHERE userId = #{userId}
+	</update>
+
+	<select id="getFailCount" parameterType="String"
+		resultType="int">
+		SELECT loginCnt FROM users WHERE userId = #{userId}
+	</select>
+
+	<update id="setRequiresVerification" parameterType="map">
+		UPDATE users
+		SET requiresVerification = #{isverifi}
+		WHERE userId = #{userId}
+	</update>
+
+	<update id="resetFailCount" parameterType="String">
+		UPDATE users
+		SET loginCnt = 0
+		WHERE userId = #{userId}
+	</update>
+
 
 </mapper>
