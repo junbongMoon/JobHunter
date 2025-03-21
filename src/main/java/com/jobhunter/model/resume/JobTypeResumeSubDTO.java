@@ -14,12 +14,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ResumeDTO {
-	private int resumeNo;
-	private String title;
-	private String payType;
-	private int pay;
-	private String introduce;
-	private String saveType;
-	private int userUid;
+public class JobTypeResumeSubDTO {
+    private int jt_resume_subNo;
+    private int refResumeNo;
+    private int refSub;
 }

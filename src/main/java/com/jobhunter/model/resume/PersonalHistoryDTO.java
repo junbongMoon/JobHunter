@@ -1,5 +1,7 @@
 package com.jobhunter.model.resume;
 
+import java.sql.Date;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,12 +16,12 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ResumeDTO {
+public class PersonalHistoryDTO {
+	private int historyNo;
+	private String companyName;
+	private String position;
+	private String jobDescription;
+	private Date startDate;
+	private Date endDate;
 	private int resumeNo;
-	private String title;
-	private String payType;
-	private int pay;
-	private String introduce;
-	private String saveType;
-	private int userUid;
 }
