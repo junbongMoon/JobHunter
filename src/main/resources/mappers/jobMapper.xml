@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.JobMapper">
+
+    <insert id="insertJobCategory">
+        INSERT IGNORE INTO majorcategory (jobName)
+        VALUES (#{jobName})
+    </insert>
+    
+     <!-- 대분류의 번호 조회 -->
+    <select id="findMajorCategoryNoByName" resultType="int">
+        SELECT MajorcategoryNo FROM majorcategory WHERE jobName = #{jobName}
+    </select>
+
+    <!-- 소분류 데이터 저장 -->
+    <insert id="insertSubcategory">
+        INSERT IGNORE INTO subcategory (refMajorcategoryNo, jobName)
+        VALUES (#{refMajorcategoryNo}, #{jobName})
+    </insert>
+
+</mapper>
+
