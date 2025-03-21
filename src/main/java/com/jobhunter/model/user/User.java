@@ -1,6 +1,6 @@
 package com.jobhunter.model.user;
 
-import java.sql.Timestamp;
+import com.jobhunter.model.customenum.Gender;
 
 public class User {
 	private String userName;

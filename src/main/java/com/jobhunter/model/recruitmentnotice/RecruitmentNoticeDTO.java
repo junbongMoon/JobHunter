@@ -1,0 +1,44 @@
+package com.jobhunter.model.recruitmentnotice;
+
+import com.jobhunter.model.customenum.MilitaryService;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@Setter
+@ToString
+@Builder
+public class RecruitmentNoticeDTO {
+	// 공고 제목
+	private String title;
+	// 근무 형태
+	private String workType;
+	// 급여 타입(enum으로 할지 생각 중..)
+	private String payType;
+	// 급여 액수
+	private int pay;
+	// 근무 기간 (tt:mm~tt:mm 형태로 받을 계획.. split 써보자잇)
+	private String period;
+	// 경력
+	private String personalHistory;
+	// 병역 사항('NOT_SERVED', 'SERVED', 'EXEMPTED' : 미필, 군필, 면제)
+	private MilitaryService militaryService;
+	// 공고 상세 내용
+	private String detail;
+	// 담당자 이름(굳이 company의 userName이 아니어도 됨)
+	private String manager;
+	// 공고 임시 저장용 소제목
+	private String miniTitle;
+	// 임시저장한 상태 값, 'Y', 'N'으로 받게 해서 'N'일 경우 등록 불가로 해놓자..
+	private String status;
+	// 작성한 회사의 pk를 참조하는 값
+	private int refCompany;
+}
