@@ -20,12 +20,12 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public String isAuthVerifi(String userId) throws Exception {
-		return ses.selectOne(NS+"isAuthVerifi", userId);
+		return ses.selectOne(NS+".isAuthVerifi", userId);
 	}
 	
 	@Override
 	public UserVO loginUser(LoginDTO logindto) throws Exception {
-		return ses.selectOne(NS+"loginUser", logindto);
+		return ses.selectOne(NS+".loginUser", logindto);
 	}
 
 	@Override
