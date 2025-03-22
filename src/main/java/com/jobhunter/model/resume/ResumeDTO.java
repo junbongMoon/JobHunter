@@ -1,5 +1,7 @@
 package com.jobhunter.model.resume;
 
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,5 +23,12 @@ public class ResumeDTO {
 	private int pay;
 	private String introduce;
 	private String saveType;
-	private int userUid;
+	private int userUid = 1;
+	
+	// 고용 형태 리스트
+    private List<JobFormDTO> jobForms;
+
+    // 지역 선택 리스트 (region, sigungu)
+    private List<Integer> regionNos;   // 시/도 번호
+    private List<Integer> sigunguNos;  // 시/군/구 번호
 }
