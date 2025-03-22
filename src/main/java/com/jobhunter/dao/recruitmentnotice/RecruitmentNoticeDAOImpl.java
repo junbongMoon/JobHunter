@@ -28,7 +28,7 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	
 	// 사용자(회사) uid로 공고를 조회하는 메서드
 	@Override
-	public List<RecruitmentNotice> selectRecuitmentByUid(int uid) throws Exception {
+	public List<RecruitmentNotice> selectRecruitmentByUid(int uid) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -38,6 +38,13 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	public int insertAdvantageWithRecruitmentNotice(AdvantageDTO adv) {
 		
 		return ses.insert(NS + ".insertAdvantageWithRecruitmentnotice", adv);
+	}
+
+	// 가장 최근에 올린 공고를 조회하는 메서드
+	@Override
+	public RecruitmentNotice selectRecentRecruitment(int companyUid) {
+		
+		return ses.selectOne(NS +".", companyUid);
 	}
 
 }

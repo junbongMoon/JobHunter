@@ -34,38 +34,41 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO) throws Exception {
 		boolean result = false;
-		int CompanyUid = 0;
+		int CompanyUid = recruitmentNoticeDTO.getRefCompany();
 		
-		if(recdao.insertRecruitmentNotice(recruitmentNoticeDTO) > 0) {
-			result = true;
-		}
+//		if(recdao.insertRecruitmentNotice(recruitmentNoticeDTO) > 0) {
+//			result = true;
+//		}
 		
 		// 공고를 제출하는 메서드
-//		if(recdao.insertRecruitmentNotice(recruitmentNoticeDTO) > 0) {
+		if(recdao.insertRecruitmentNotice(recruitmentNoticeDTO) > 0) {
 			
 			
 		// 여러가지 값을 가질 수 있는 것도 저장 해야함 트랜잭션으로 묶어서 공고를 선입력하고 그 uid값을 참조하는 것으로 insert하자
-		// 여기서 공고를 조회하는 메서드로 해당 유저의 공고를 가져오자	
-		
+		// 여기서 가장 최근 공고를 조회하는 메서드로 방금 올린 유저의 공고를 가져오자	
+		RecruitmentNotice rec = recdao.selectRecentRecruitment(CompanyUid);
+		int recNo = rec.getUid();
 		// application(), advantage(우대 조건), recruitmentNoticeBoardUpfiles(저장할 파일)
 		// where_recruit_region&Sigungu(지역 대분류만도 가능), jobtype_recruit_major(직종), 
 		
 		// 우대조건을 insert하는 메서드 호출, 리스트가 비어있지 않다면 실행
-//		if(!advantageList.isEmpty()) {
-//			
-//			for(AdvantageDTO adv : advantageList) {
-//				if(recdao.insertAdvantageWithRecruitmentNotice(adv, ) > 0) {
-//					// 우대조건 저장 성공
-//				}else {
-//					// 우대조건 저장 실패
-//				}
-//			}
-//		}
-//		// 
-//		if(!applicationList.isEmpty()) {
-//			
-//		}
-//		}
+		if(!advantageList.isEmpty()) {
+			
+			for(AdvantageDTO adv : advantageList) {
+				adv.setRecruitmentNoticeUid(recNo);
+				if(recdao.insertAdvantageWithRecruitmentNotice(adv) > 0) {
+					// 우대조건 저장 성공
+					
+				}else {
+					// 우대조건 저장 실패
+				}
+			}
+		}
+		// 
+		if(!applicationList.isEmpty()) {
+			
+		}
+		}
 		return result;
 	}
 	
@@ -84,11 +87,18 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	public void saveAdvantage(AdvantageDTO advantageDTO) throws Exception {
 		
 		advantageList.add(advantageDTO);
+		System.out.println(advantageList);
 		
 	}
 	
 	
 	
+	
+	private void ListAllClear() {
+		advantageList.clear();
+		applicationList.clear();
+		
+	}
 
 	
 

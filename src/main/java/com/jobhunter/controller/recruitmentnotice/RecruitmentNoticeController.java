@@ -95,6 +95,8 @@ public class RecruitmentNoticeController {
 		// 성공, 실패 여부를 json으로 응답
 		ResponseEntity<Boolean> result = null;
 		
+		
+		
 		return result;
 	}
 	

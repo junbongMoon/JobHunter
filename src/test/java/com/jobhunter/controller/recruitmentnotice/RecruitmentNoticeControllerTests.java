@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -45,6 +44,7 @@ public class RecruitmentNoticeControllerTests {
 				.dueDate(deadlineTimestamp)
 				.detail("열심히 하겠습니다.")
 				.manager("이성실")
+				.miniTitle("제 1차 테스트")
 				.refCompany(1)
 				.build();
 		

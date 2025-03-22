@@ -10,9 +10,11 @@ public interface RecruitmentNoticeDAO {
 	// 공고를 입력하는 메서드
 	int insertRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO) throws Exception;
 
-	List<RecruitmentNotice> selectRecuitmentByUid(int uid) throws Exception;
+	List<RecruitmentNotice> selectRecruitmentByUid(int uid) throws Exception;
 
 	int insertAdvantageWithRecruitmentNotice(AdvantageDTO adv);
+
+	RecruitmentNotice selectRecentRecruitment(int companyUid);
 
 	
 
