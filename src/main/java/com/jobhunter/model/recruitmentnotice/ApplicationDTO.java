@@ -17,7 +17,7 @@ import lombok.ToString;
 @ToString
 @Builder
 public class ApplicationDTO {
-	
+	// 접수 방법
 	private Method method;
 	private String detail;
 	private int RecruitmentNoticeUid;

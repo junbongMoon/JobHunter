@@ -74,7 +74,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	
 	
 	
-	// 공고를 조회하는 메서드
+	// 내가 쓴 공고 모두를 조회하는 메서드
 	@Override
 	public List<RecruitmentNotice> getRecruitmentByUid(int uid) throws Exception {
 		// TODO Auto-generated method stub
@@ -82,7 +82,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	}
 
 
-	// 우대조건을 리스트에 저장하는 메서드
+	// 우대조건을 리스트에 저장하는 메서드(성공)
 	@Override
 	public void saveAdvantage(AdvantageDTO advantageDTO) throws Exception {
 		
@@ -93,10 +93,19 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	
 	
 	
-	
+	// 리스트를 전부 비워주는 메서드
 	private void ListAllClear() {
 		advantageList.clear();
 		applicationList.clear();
+		
+	}
+
+
+	// 접수 방식을 리스트에 저장하는 메서드
+	@Override
+	public void saveApplication(ApplicationDTO applicationDTO) {
+		applicationList.add(applicationDTO);
+		System.out.println(applicationList);
 		
 	}
 

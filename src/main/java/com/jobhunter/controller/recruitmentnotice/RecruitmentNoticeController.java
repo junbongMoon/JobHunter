@@ -91,11 +91,11 @@ public class RecruitmentNoticeController {
 	// 회사가 공고를 작성할 때 면접방식을 리스트에 넣어주는 메서드
 	@PostMapping(value ="/application/{uid}")
 	public ResponseEntity<Boolean> saveApplicationWithRecruitmentNotice(@PathVariable("uid") int uid,
-	         @RequestBody Application application){
+	         @RequestBody ApplicationDTO applicationDTO){
 		// 성공, 실패 여부를 json으로 응답
 		ResponseEntity<Boolean> result = null;
 		
-		
+		recService.saveApplication(applicationDTO);
 		
 		return result;
 	}
