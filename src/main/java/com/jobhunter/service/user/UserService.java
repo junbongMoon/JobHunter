@@ -2,7 +2,7 @@ package com.jobhunter.service.user;
 
 import java.util.Map;
 
-import com.jobhunter.model.user.LoginDTO;
+import com.jobhunter.model.account.LoginDTO;
 import com.jobhunter.model.user.UserVO;
 
 public interface UserService {

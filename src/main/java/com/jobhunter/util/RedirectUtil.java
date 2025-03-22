@@ -10,21 +10,25 @@ public class RedirectUtil {
     }
 
     public static void saveRedirectUrl(HttpServletRequest request, HttpSession session, String attributeName) {
-        if (session.getAttribute(attributeName) != null) return; // 이미 저장돼 있으면 skip
+        if (session.getAttribute(attributeName) != null) return;
 
         String method = request.getMethod();
         if ("GET".equalsIgnoreCase(method)) {
             String uri = request.getRequestURI();
             String query = request.getQueryString();
             String fullUrl = uri + (query != null ? "?" + query : "");
-            if (!uri.contains("/user/login")) {
+            if (!isLoginPage(uri)) {
                 session.setAttribute(attributeName, fullUrl);
             }
         } else {
             String referer = request.getHeader("Referer");
-            if (referer != null && !referer.contains("/user/login")) {
+            if (referer != null && !isLoginPage(referer)) {
                 session.setAttribute(attributeName, referer);
             }
         }
+    }
+    
+    private static boolean isLoginPage(String url) {
+        return url != null && url.contains("/account/login");
     }
 }

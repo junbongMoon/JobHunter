@@ -21,7 +21,7 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
         // 로그인 안 한 경우
         if (user == null) {
             RedirectUtil.saveRedirectUrl(request, session);
-            response.sendRedirect("/user/go-login");
+            response.sendRedirect("/account/login/return");
             return false;
         }
 
@@ -29,7 +29,7 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
         Boolean needsVerification = (Boolean) session.getAttribute("requiresVerification");
         if (Boolean.TRUE.equals(needsVerification)) {
             RedirectUtil.saveRedirectUrl(request, session);
-            response.sendRedirect("/user/login?requireVerification=true");
+            response.sendRedirect("/account/login?requireVerification=true");
             return false;
         }
 

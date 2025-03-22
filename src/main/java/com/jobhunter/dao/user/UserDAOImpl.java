@@ -5,8 +5,8 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
-import com.jobhunter.model.user.LoginDTO;
-import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.account.LoginDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +30,7 @@ public class UserDAOImpl implements UserDAO {
 	}
 	
 	@Override
-	public UserVO loginUser(LoginDTO logindto) throws Exception {
+	public AccountVO loginUser(LoginDTO logindto) throws Exception {
 		// 로그인 처리(아이디랑 비밀번호로 유저 찾아오기)
 		return ses.selectOne(NS+".loginUser", logindto);
 	}

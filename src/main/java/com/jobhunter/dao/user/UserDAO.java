@@ -2,14 +2,14 @@ package com.jobhunter.dao.user;
 
 import java.util.Map;
 
-import com.jobhunter.model.user.LoginDTO;
-import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.account.LoginDTO;
 
 public interface UserDAO {
 
 	String isAuthVerifi(String userId) throws Exception;
 
-	UserVO loginUser(LoginDTO logindto) throws Exception;
+	AccountVO loginUser(LoginDTO logindto) throws Exception;
 	
 	void increaseFailCount(String userId) throws Exception;
 	

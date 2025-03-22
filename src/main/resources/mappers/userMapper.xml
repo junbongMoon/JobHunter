@@ -21,12 +21,12 @@
 
 	<select id="isAuthVerifi" resultType="String">
 		select requiresVerification
-		from `users` where userId = #{userId}
+		from `users` where userId = #{id}
 	</select>
 
 	<select id="loginUser"
-		resultType="com.jobhunter.model.user.UserVO">
-		select * from `users` where userId = #{userId}
+		resultType="com.jobhunter.model.account.AccountVO">
+		select * from `users` where userId = #{id}
 		and password
 		= sha1(md5(#{password}))
 	</select>
@@ -34,7 +34,7 @@
 	<select id="existsUserId" parameterType="String"
 		resultType="boolean">
 		SELECT EXISTS (
-		SELECT 1 FROM users WHERE userId = #{userId}
+		SELECT 1 FROM users WHERE userId = #{id}
 		)
 	</select>
 
@@ -42,25 +42,25 @@
 		UPDATE users
 		SET
 		loginCnt = loginCnt + 1
-		WHERE userId = #{userId}
+		WHERE userId = #{id}
 	</update>
 
 	<select id="getFailCount" parameterType="String"
 		resultType="int">
-		SELECT loginCnt FROM users WHERE userId = #{userId}
+		SELECT loginCnt FROM users WHERE userId = #{id}
 	</select>
 
 	<update id="setRequiresVerification" parameterType="String">
 		UPDATE users
 		SET requiresVerification = 'Y'
-		WHERE userId = #{userId}
+		WHERE userId = #{id}
 	</update>
 
 	<update id="resetFailCount" parameterType="String">
 		UPDATE users
 		SET
 		loginCnt = 0
-		WHERE userId = #{userId}
+		WHERE userId = #{id}
 	</update>
 
 

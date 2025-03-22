@@ -89,7 +89,7 @@
 				<a href="/user/logout">로그아웃</a>
 			</c:if>
 			<c:if test="${empty sessionScope.user}">
-				<a href="/user/returnpagelogin">로그인</a>
+				<a href="${pageContext.request.contextPath}/account/login/return">로그인</a>
 			</c:if>
 
 		</div>

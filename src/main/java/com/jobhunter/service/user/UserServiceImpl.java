@@ -6,7 +6,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.jobhunter.dao.user.UserDAO;
-import com.jobhunter.model.user.LoginDTO;
+import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.account.LoginDTO;
 import com.jobhunter.model.user.UserVO;
 
 import lombok.RequiredArgsConstructor;
@@ -41,23 +42,23 @@ public class UserServiceImpl implements UserService {
 	    Map<String, Object> result = new HashMap<>();
 
 	    // 로그인 시도
-	    UserVO user = udao.loginUser(loginDto);
+	    AccountVO user = udao.loginUser(loginDto);
 
 	    if (user == null) {
 	        // 없는 유저거나 비밀번호 틀림
 	        // 실패 횟수 증가 전에 유저 존재 여부 확인
-	        if (udao.existsUserId(loginDto.getUserId())) {
-	            int failCount = udao.getFailCount(loginDto.getUserId());
+	        if (udao.existsUserId(loginDto.getId())) {
+	            int failCount = udao.getFailCount(loginDto.getId());
 	            
 	            // 실패횟수 증가(인증필요 체크 else로 넣으면 카운트 4일때 증가 안하거나 6되야 인증필요되니까 따로
 	            if (failCount < 5) {
 	            	
-	                udao.increaseFailCount(loginDto.getUserId());
+	                udao.increaseFailCount(loginDto.getId());
 	            }
 	            
 	            // 실패횟수 5되면 인증필요 체크하기
 	            if (failCount + 1 >= 5) {
-	            	udao.setRequiresVerification(loginDto.getUserId());
+	            	udao.setRequiresVerification(loginDto.getId());
 	                result.put("auth", true);
 	            }
 	        }
