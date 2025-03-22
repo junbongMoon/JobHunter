@@ -1,6 +1,5 @@
 package com.jobhunter.controller.user;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -25,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 	
 	private final UserService userService;
+	
 	
 	// 로그인 페이지 표시 (GET 요청)
     @GetMapping("/login")
@@ -74,6 +74,7 @@ public class UserController {
                 }
                 
                 //요청한 URL이 없을때? 아마 이런경우는 없을거같긴한데 혹시몰라서
+                //?
                 return "redirect:/"; // 기본 메인 페이지
             }
 
