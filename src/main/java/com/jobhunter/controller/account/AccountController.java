@@ -1,0 +1,13 @@
+package com.jobhunter.controller.account;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import lombok.RequiredArgsConstructor;
+
+@Controller
+@RequestMapping("/account")
+@RequiredArgsConstructor
+public class AccountController {
+
+}

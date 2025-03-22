@@ -4,6 +4,21 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.usermapper">
 
+	<update id="setVerificationFalse" parameterType="map">
+		UPDATE users
+		SET requiresVerification = 'N'
+		WHERE
+		<choose>
+			<when test="type eq 'email'">
+				email = #{value}
+			</when>
+			<when test="type eq 'mobile'">
+				mobile = #{value}
+			</when>
+		</choose>
+	</update>
+
+
 	<select id="isAuthVerifi" resultType="String">
 		select requiresVerification
 		from `users` where userId = #{userId}
@@ -11,8 +26,16 @@
 
 	<select id="loginUser"
 		resultType="com.jobhunter.model.user.UserVO">
-		select * from `koreaite`.`users` where userId = #{userId}
-		and password = sha1(md5(#{password}))
+		select * from `users` where userId = #{userId}
+		and password
+		= sha1(md5(#{password}))
+	</select>
+
+	<select id="existsUserId" parameterType="String"
+		resultType="boolean">
+		SELECT EXISTS (
+		SELECT 1 FROM users WHERE userId = #{userId}
+		)
 	</select>
 
 	<update id="increaseFailCount" parameterType="String">
@@ -27,15 +50,16 @@
 		SELECT loginCnt FROM users WHERE userId = #{userId}
 	</select>
 
-	<update id="setRequiresVerification" parameterType="map">
+	<update id="setRequiresVerification" parameterType="String">
 		UPDATE users
-		SET requiresVerification = #{isverifi}
+		SET requiresVerification = 'Y'
 		WHERE userId = #{userId}
 	</update>
 
 	<update id="resetFailCount" parameterType="String">
 		UPDATE users
-		SET loginCnt = 0
+		SET
+		loginCnt = 0
 		WHERE userId = #{userId}
 	</update>
 

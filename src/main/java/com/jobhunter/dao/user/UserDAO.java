@@ -1,5 +1,7 @@
 package com.jobhunter.dao.user;
 
+import java.util.Map;
+
 import com.jobhunter.model.user.LoginDTO;
 import com.jobhunter.model.user.UserVO;
 
@@ -13,8 +15,12 @@ public interface UserDAO {
 	
 	int getFailCount(String userId) throws Exception;
 	
-	void setRequiresVerification(String userId, String isverifi) throws Exception;
+	void setRequiresVerification(String userId) throws Exception;
 
 	void resetFailCount(String userId) throws Exception;
+	
+	void setRequiresVerificationFalse(Map<String, String> param) throws Exception;
+
+	Boolean existsUserId(String userId) throws Exception;
 
 }

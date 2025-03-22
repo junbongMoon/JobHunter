@@ -10,4 +10,6 @@ public interface UserService {
 	boolean saveUser(UserVO user) throws Exception;
 
 	Map<String, Object> loginUser(LoginDTO loginDto) throws Exception;
+	
+	void setRequiresVerificationFalse(String type, String value) throws Exception;
 }

@@ -24,52 +24,56 @@ public class UserServiceImpl implements UserService {
 
 		return result;
 	}
+	
+	
+	@Override
+	public void setRequiresVerificationFalse(String type, String value) throws Exception {
+	    Map<String, String> param = new HashMap<>();
+	    param.put("type", type);
+	    param.put("value", value);
+	    udao.setRequiresVerificationFalse(param);
+	}
 
 	// 인증 필요 여부 들고가려고 맵으로 반환_그냥 널 체크하면 5번 실패한건지도 모르니까
-	// auth 값 true면 이메일인증창 보여주기
+	// auth 값 true면 이메일/폰 인증창 보여주기
 	@Override
 	public Map<String, Object> loginUser(LoginDTO loginDto) throws Exception {
-		Map<String, Object> result = new HashMap<String, Object>();
-		// 인증필요체크
-		if ("Y".equals(udao.isAuthVerifi(loginDto.getUserId()))) {
-			result.put("auth", true);
-			return result;
-		}
-		// 로그인 시도
-		UserVO loginUser = udao.loginUser(loginDto);
-		
+	    Map<String, Object> result = new HashMap<>();
 
-		// 실패시 카운트 확인
-		// 5될거면 인증필요
-		// 성공시 카운트 0으로
+	    // 로그인 시도
+	    UserVO user = udao.loginUser(loginDto);
 
-		// 인증필요 들고가야할거같은데?
-
-		if (loginUser == null) {
-	        // 로그인 실패: 실패 카운트 증가
-			udao.increaseFailCount(loginDto.getUserId());
-			int failCount = udao.getFailCount(loginDto.getUserId());
-
-	        // 실패 횟수가 5 이상이면 인증 필요
-	        if (failCount >= 5) {
-	        	udao.setRequiresVerification(loginDto.getUserId(), "Y");
-	            result.put("auth", true);
-	            return result;
+	    if (user == null) {
+	        // 없는 유저거나 비밀번호 틀림
+	        // 실패 횟수 증가 전에 유저 존재 여부 확인
+	        if (udao.existsUserId(loginDto.getUserId())) {
+	            int failCount = udao.getFailCount(loginDto.getUserId());
+	            
+	            // 실패횟수 증가(인증필요 체크 else로 넣으면 카운트 4일때 증가 안하거나 6되야 인증필요되니까 따로
+	            if (failCount < 5) {
+	            	
+	                udao.increaseFailCount(loginDto.getUserId());
+	            }
+	            
+	            // 실패횟수 5되면 인증필요 체크하기
+	            if (failCount + 1 >= 5) {
+	            	udao.setRequiresVerification(loginDto.getUserId());
+	                result.put("auth", true);
+	            }
 	        }
-
-	        // 인증 필요는 아니지만 로그인 실패
-	        result.put("auth", false);
 	        result.put("success", false);
+	        result.put("message", "아이디 또는 비밀번호가 틀렸습니다.");
 	        return result;
 	    }
 
-	    // 로그인 성공: 실패 카운트 초기화
-	    udao.resetFailCount(loginDto.getUserId());
+	    // 유저 있음 + 로그인 성공
+	    udao.resetFailCount(user.getUserId());
 
-	    // 로그인 성공 정보 반환
-	    result.put("auth", false);  // 인증 필요 없음
+	    boolean requiresVerification = "Y".equals(user.getRequiresVerification());
+
+	    result.put("user", user);
+	    result.put("auth", requiresVerification);
 	    result.put("success", true);
-	    result.put("user", loginUser);  // 필요시 사용자 정보도 반환
 
 	    return result;
 	}

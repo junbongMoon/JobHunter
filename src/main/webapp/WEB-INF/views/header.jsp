@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -57,36 +58,41 @@
 </head>
 
 <div class="index-page">
-    <header id="header" class="header d-flex align-items-center">
-        <div class="container-fluid container-xl position-relative d-flex align-items-center header-background">
+	<header id="header" class="header d-flex align-items-center">
+		<div
+			class="container-fluid container-xl position-relative d-flex align-items-center header-background">
 
-            <a href="index.html" class="logo d-flex align-items-center me-auto">
-                <!-- Uncomment the line below if you also wish to use an image logo -->
-                <!-- <img src="assets/img/logo.webp" alt=""> -->
-                <h1 class="sitename">JobHunter</h1>
-            </a>
+			<a href="index.html" class="logo d-flex align-items-center me-auto">
+				<!-- Uncomment the line below if you also wish to use an image logo -->
+				<!-- <img src="assets/img/logo.webp" alt=""> -->
+				<h1 class="sitename">JobHunter</h1>
+			</a>
 
-            <nav id="navmenu" class="navmenu">
-                <ul>
-                    <li><a href="#hero" class="active">Home</a></li>
-                    <li class="dropdown"><a href="#"><span>채용정보</span> <i
-                                class="bi bi-chevron-down toggle-dropdown"></i></a>
-                        <ul>
-                            <li><a href="#">전체 채용정보</a></li>
-                            <li><a href="#">지역별 채용정보</a></li>
-                            <li><a href="#">직업별 채용정보</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#contact">면접후기</a></li>
-                    <li><a href="#contact">My Page</a></li>
-                </ul>
-                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-            </nav>
+			<nav id="navmenu" class="navmenu">
+				<ul>
+					<li><a href="#hero" class="active">Home</a></li>
+					<li class="dropdown"><a href="#"><span>채용정보</span> <i
+							class="bi bi-chevron-down toggle-dropdown"></i></a>
+						<ul>
+							<li><a href="#">전체 채용정보</a></li>
+							<li><a href="#">지역별 채용정보</a></li>
+							<li><a href="#">직업별 채용정보</a></li>
+						</ul></li>
+					<li><a href="#contact">면접후기</a></li>
+					<li><a href="#contact">My Page</a></li>
+				</ul>
+				<i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+			</nav>
 
-            <a class="btn-getstarted" href="#">Login</a>
+			<c:if test="${not empty sessionScope.user}">
+				<p>${sessionScope.user.userName}</p>
+				<a href="/user/logout">로그아웃</a>
+			</c:if>
+			<c:if test="${empty sessionScope.user}">
+				<a href="/user/returnpagelogin">로그인</a>
+			</c:if>
 
-        </div>
-</header>
-</body>
-
+		</div>
+	</header>
+	</body>
 </html>
