@@ -2,15 +2,19 @@ package com.jobhunter.service.recruitmentnotice;
 
 import java.util.List;
 
+import com.jobhunter.model.recruitmentnotice.Advantage;
+import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 
 public interface RecruitmentNoticeService {
 	// 공고를 입력하는 메서드
-	 boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO) throws Exception;
+	boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO) throws Exception;
 	// 내가 작성한 공고를 조회하는 메서드
-	 List<RecruitmentNotice> getRecruitmentByUid(int uid) throws Exception;
+	List<RecruitmentNotice> getRecruitmentByUid(int uid) throws Exception;
 	// 내가 작성한 공고(템플릿)을 조회하는 메서드
+	void saveAdvantage(AdvantageDTO advantageDTO) throws Exception;
+	
 	 
 	// 내가 등록한 공고를 조회하는 메서드
 	 

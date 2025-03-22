@@ -1,5 +1,7 @@
 package com.jobhunter.model.recruitmentnotice;
 
+import java.sql.Timestamp;
+
 import com.jobhunter.model.customenum.MilitaryService;
 
 import lombok.AccessLevel;
@@ -19,7 +21,7 @@ import lombok.ToString;
 public class RecruitmentNoticeDTO {
 	// 공고 제목
 	private String title;
-	// 근무 형태
+	// 근무 형태 (정규, 비정규, 프리랜서 등)
 	private String workType;
 	// 급여 타입(enum으로 할지 생각 중..)
 	private String payType;
@@ -37,6 +39,8 @@ public class RecruitmentNoticeDTO {
 	private String manager;
 	// 공고 임시 저장용 소제목
 	private String miniTitle;
+	// 마감 기한
+	private Timestamp dueDate;
 	// 임시저장한 상태 값, 'Y', 'N'으로 받게 해서 'N'일 경우 등록 불가로 해놓자..
 	private String status;
 	// 작성한 회사의 pk를 참조하는 값

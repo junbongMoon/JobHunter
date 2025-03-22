@@ -3,13 +3,31 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.testoracle.mapper.recruitmentnoticemapper">
-	
+
 	<insert id="insertRecruitmentnotice">
 		insert into recruitmentnotice
-		(title, workType, payType, pay, period, personalHistory, militaryService, detail, manager, miniTitle, status)
+		(title, workType, payType, pay, period, personalHistory, militaryService,
+		detail, manager, miniTitle, dueDate, status, refCompany)
 		values
-		(#{title}, #{workType}, #{payType}, #{pay}, #{period}, #{personalHistory}, #{militaryService}, #{detail}, #{manager}, #{miniTitle}, Y);
+		(#{title}, #{workType}, #{payType}, #{pay}, #{period}, #{personalHistory},
+		#{militaryService}, #{detail}, #{manager}, #{miniTitle}, #{dueDate,
+		jdbcType=TIMESTAMP}, 'Y', #{refCompany})
 	</insert>
-	
 
+
+	<insert id="insertApplicationWithRecruitmentnotice">
+		insert into application
+		(method, recruitmentNoticeUid)
+		values
+		(#{method}, #{recruitmentNoticeUid});
+	</insert>
+
+	<insert id="insertAdvantageWithRecruitmentnotice">
+		insert into advantage
+		(advantageType,
+		recruitmentNoticeUid)
+		values
+		(#{advantageType},
+		#{recruitmentNoticeUid});
+	</insert>
 </mapper>
