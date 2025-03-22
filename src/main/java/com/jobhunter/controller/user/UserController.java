@@ -2,9 +2,7 @@ package com.jobhunter.controller.user;
 
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
@@ -33,7 +31,7 @@ public class UserController {
     }
     
     @PostMapping("/login")
-    public String login(LoginDTO loginDto, HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+    public String login(LoginDTO loginDto, HttpSession session, HttpServletRequest request) {
         // 로그인 로직 (유저 인증)
     	try {
             Map<String, Object> result = userService.loginUser(loginDto);
@@ -52,19 +50,6 @@ public class UserController {
             if (Boolean.TRUE.equals(success)) {
                 UserVO user = (UserVO) result.get("user");
                 session.setAttribute("user", user);
-                
-                // 자동로그인 체크했으면 토큰주기
-                if (loginDto.isRemember()) {
-                    String sessionId = session.getId();  // 세션 ID를 토큰으로 사용
-
-                    userService.saveAutoLoginToken(user.getUserId(), sessionId);
-
-                    Cookie autoLoginCookie = new Cookie("autoLogin", sessionId);
-                    autoLoginCookie.setMaxAge(60 * 60 * 24 * 30); // 30일
-                    autoLoginCookie.setPath("/");
-                    response.addCookie(autoLoginCookie);
-                }
-
 
                 // 로그인 전에 요청했던 URL로 이동
                 String redirectUrl = (String) session.getAttribute("redirectUrl");

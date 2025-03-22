@@ -17,6 +17,14 @@ public class UserServiceImpl implements UserService {
 
 	private final UserDAO udao;
 
+	@Override
+	public boolean saveUser(UserVO user) throws Exception {
+		// TODO Auto-generated method stub
+		boolean result = false;
+
+		return result;
+	}
+
 	// 인증 필요 여부 들고가려고 맵으로 반환_그냥 널 체크하면 5번 실패한건지도 모르니까
 	// auth 값 true면 이메일인증창 보여주기
 	@Override
@@ -55,7 +63,6 @@ public class UserServiceImpl implements UserService {
 	        return result;
 	    }
 
-		
 	    // 로그인 성공: 실패 카운트 초기화
 	    udao.resetFailCount(loginDto.getUserId());
 
@@ -65,16 +72,6 @@ public class UserServiceImpl implements UserService {
 	    result.put("user", loginUser);  // 필요시 사용자 정보도 반환
 
 	    return result;
-	}
-
-	@Override
-	public UserVO getUserByAutoLoginToken(String token) throws Exception {
-		return udao.getUserByAutoLoginToken(token);
-	}
-
-	@Override
-	public void saveAutoLoginToken(String userId, String sessionId) throws Exception {
-		udao.saveAutoLoginToken(userId, sessionId);
 	}
 
 }

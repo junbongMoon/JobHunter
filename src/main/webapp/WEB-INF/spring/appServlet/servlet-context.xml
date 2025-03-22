@@ -22,32 +22,6 @@
 		<beans:property name="prefix" value="/WEB-INF/views/" />
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
-
-	<!-- 로그인 했는지 안했는지 검사하는 인터셉터 -->
-	<beans:bean id="authInterceptor"
-		class="com.jobhunter.interceptor.AuthLoginInterceptor">
-	</beans:bean>
-
-	<!-- 로그인 처리시 인터셉터 -->
-	<beans:bean id="loginInterceptor"
-		class="com.jobhunter.interceptor.LoginInterceptor">
-	</beans:bean>
-
-	<interceptors>
-
-		<interceptor>
-			<mapping path="/hboard/write" /> <!-- 글 작성 -->
-
-			<beans:ref bean="authInterceptor" />
-		</interceptor>
-
-		<interceptor>
-			<mapping path="/user/login" />  <!-- 로그인 -->
-			
-			<beans:ref bean="loginInterceptor" />
-		</interceptor>
-		
-	</interceptors>
 	
 	
 	<!-- controller 패키지 안에 객체로  -->

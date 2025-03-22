@@ -17,10 +17,4 @@ public interface UserDAO {
 
 	void resetFailCount(String userId) throws Exception;
 
-	void saveAutoLoginToken(String userId, String sessionId) throws Exception;
-	
-	UserVO getUserByAutoLoginToken(String sessionId) throws Exception;
-
-	void removeAutoLoginToken(String userId) throws Exception;
-
 }

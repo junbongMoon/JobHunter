@@ -35,27 +35,7 @@
 
 	<update id="resetFailCount" parameterType="String">
 		UPDATE users
-		SET
-		loginCnt = 0
-		WHERE userId = #{userId}
-	</update>
-
-	<update id="saveAutoLoginToken" parameterType="map">
-		UPDATE users
-		SET autoLogin = #{sessionId}
-		WHERE userId = #{userId}
-	</update>
-
-	<select id="getUserByAutoLoginToken" parameterType="String"
-		resultType="com.jobhunter.model.user.UserVO">
-		SELECT * FROM users
-		WHERE autoLogin = #{sessionId}
-	</select>
-
-	<!-- 자동로그인 해제 -->
-	<update id="removeAutoLoginToken" parameterType="String">
-		UPDATE users
-		SET autoLogin = NULL
+		SET loginCnt = 0
 		WHERE userId = #{userId}
 	</update>
 

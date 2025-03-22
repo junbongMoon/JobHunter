@@ -1,73 +1,51 @@
 package com.jobhunter.interceptor;
 
-import javax.servlet.http.Cookie;
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.jobhunter.model.user.UserVO;
-import com.jobhunter.service.user.UserService;
-
 public class AuthLoginInterceptor implements HandlerInterceptor {
-	
-	@Autowired
-	private UserService userService;
 
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-	    HttpSession session = request.getSession();
-	    Object user = session.getAttribute("user");
+        HttpSession session = request.getSession();
+        Object user = session.getAttribute("user");
 
-	    // 1차 로그인 체크
-	    if (user == null) {
-	        // 쿠키확인
-	        Cookie[] cookies = request.getCookies();
-	        if (cookies != null) {
-	        	//쿠키에서 자동로그인이 있냐
-	            for (Cookie cookie : cookies) {
-	                if ("autoLogin".equals(cookie.getName())) {
-	                    String autoLoginToken = cookie.getValue();
+        String requestUri = request.getRequestURI();
+        String queryString = request.getQueryString();
+        String fullUrl = requestUri + (queryString != null ? "?" + queryString : "");
 
-	                    // 자동로그인
-	                    UserVO autoUser = userService.getUserByAutoLoginToken(autoLoginToken);
+        // 요청 방식 확인 (GET 여부)
+        if ("GET".equalsIgnoreCase(request.getMethod())) {
+            // GET 요청이면 요청한 URL을 저장
+            session.setAttribute("redirectUrl", fullUrl);
+        } else {
+            // 다른 요청 방식이면 Referer 헤더를 확인 (이전 페이지의 URL 저장)
+            String referer = request.getHeader("Referer");
+            if (referer != null) {
+                session.setAttribute("redirectUrl", referer);
+            } else {
+                session.setAttribute("redirectUrl", "/"); // 기본 페이지
+            }
+        }
 
-	                    if (autoUser != null) {
-	                        session.setAttribute("user", autoUser); // 자동 로그인 성공
-	                        break;
-	                    }
-	                }
-	                // 카톡로그인 자동 추가하면 여기에 else로 카톡토큰 체크넣으면 될듯?
-	                
-	            }
-	        }
-	    }
+        // 로그인 체크
+        if (user == null) {
+            redirectToLogin(response, session);
+            return false; // 요청 중단
+        }
 
-	    user = session.getAttribute("user");
+        return true; // 요청 진행
+    }
 
-	    // 요청 URL 저장 (로그인 후 이동용)
-	    String requestUri = request.getRequestURI();
-	    String queryString = request.getQueryString();
-	    String fullUrl = requestUri + (queryString != null ? "?" + queryString : "");
-	    
-
-	    if ("GET".equalsIgnoreCase(request.getMethod())) {
-	        session.setAttribute("redirectUrl", fullUrl);
-	    } else {
-	        String referer = request.getHeader("Referer");
-	        session.setAttribute("redirectUrl", referer != null ? referer : "/");
-	    }
-
-	    // 최종에최종 로그인 체크
-	    if (user == null) {
-	        response.sendRedirect("/user/login");
-	        return false;
-	    }
-
-	    return true;
-	}
+	// 로그인 페이지로 리디렉트
+    private void redirectToLogin(HttpServletResponse response, HttpSession session) throws Exception {
+        response.sendRedirect("/login");
+    }
 
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
