@@ -23,7 +23,7 @@ import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/RecruitmentNotice/rest")
+@RequestMapping("/recruitmentnotice/rest")
 @RequiredArgsConstructor
 public class RecruitmentNoticeRestController {
 
@@ -45,9 +45,8 @@ public class RecruitmentNoticeRestController {
 		int year = Integer.parseInt(tempTimeArr[0]);
 		int month = Integer.parseInt(tempTimeArr[1]);
 		int date = Integer.parseInt(tempTimeArr[2]);
-		int time = Integer.parseInt(tempTimeArr[3]);
-		int minute = Integer.parseInt(tempTimeArr[4]);
-		Timestamp tempTime = Timestamp.valueOf(LocalDateTime.of(year, month, date, time, minute, 0));
+
+		Timestamp tempTime = Timestamp.valueOf(LocalDateTime.of(year, month, date, 0, 0, 0));
 
 		recruitmentNoticeDTO.setDueDate(tempTime);
 

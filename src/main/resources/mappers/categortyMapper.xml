@@ -11,4 +11,11 @@
 		(#{refRecNo}, #{refMajorNo})
 	</insert>
 	
+	<insert id="insertSubCategoryWithRecruitmentNotice">
+		insert into jobtype_recruit_sub
+		(refRecNo, refSubNo)
+		values
+		(#{refRecNo}, #{refSubNo})
+	</insert>
+	
 </mapper>

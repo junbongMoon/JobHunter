@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RegionDAOImpl implements RegionDAO {
 	private final SqlSession ses;
-	private final String NS = "com.testoracle.mapper.regionmapper";
+	private final String NS = "com.jobhunter.mapper.regionmapper";
 
 	@Override
 	public Region selectRegionByRegionNo(int regionNo) {
