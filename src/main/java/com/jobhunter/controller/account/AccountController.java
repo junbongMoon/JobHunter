@@ -131,7 +131,7 @@ public class AccountController {
 		return "redirect:/account/login?error=true";
 	}
 
-	@PostMapping(value = "/verify", produces = "text/plain;charset=UTF-8")
+	@PostMapping(value = "/auth", produces = "text/plain;charset=UTF-8")
 	@ResponseBody
 	public ResponseEntity<String> verify(@RequestBody VerificationRequestDTO dto, HttpSession session) {
 		String type = dto.getType();
@@ -156,7 +156,7 @@ public class AccountController {
 	}
 
 	// 이메일 코드 인증용(인증 성공했다고 반환하는거, 계정잠금 해제는 /verify)
-	@PostMapping(value = "/verify-code", produces = "text/plain;charset=UTF-8")
+	@PostMapping(value = "/auth/email/code", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> verifyCode(@RequestParam String email, @RequestParam String code,
 			HttpSession session) {
 		EmailAuth emailAuth = (EmailAuth) session.getAttribute("emailCode:" + email);
@@ -190,7 +190,7 @@ public class AccountController {
 	}
 
 	// 이메일로 코드보내기
-	@PostMapping(value = "/send-mail", produces = "text/plain;charset=UTF-8")
+	@PostMapping(value = "/auth/email", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> sendMail(@RequestParam String email, HttpSession session) {
 		// 문자인증이 6자리라서 맞추려고 메일도 6자리 코드 보내기
 

@@ -13,11 +13,14 @@
 		<input type="text" name="id" placeholder="아이디" required /> <input
 			type="password" name="password" placeholder="비밀번호" required />
 
-		<!-- 회원 유형 hidden -->
-		<input type="hidden" name="accountType" value="COMPANY" />
-		<!-- 일반 로그인이라면 NORMAL 로 바꾸면 됨 -->
-		<!-- 기업 로그인이라면 COMPANY 로 바꾸면 됨 -->
-		<div>${sessionScope.requiresVerification}</div>
+
+		<!-- 회원 유형 선택 -->
+		<div style="margin: 10px 0;">
+			<label>
+			<input type="radio" name="accountType" value="NORMAL" checked> 개인 회원 </label>
+			<label>
+			<input type="radio" name="accountType" value="COMPANY"> 기업 회원 </label>
+		</div>
 
 		<!-- 인증 필요 시 -->
 		<c:if test="${sessionScope.requiresVerification}">
@@ -61,4 +64,5 @@
 </script>
 
 <!-- 인증 성공 처리하는 모듈 선택_여기 넣어둔건 이메일이나 번호로 정지해제 -->
-<script type="module" src="${pageContext.request.contextPath}/resources/js/authBefore.js"></script>
+<script type="module"
+	src="${pageContext.request.contextPath}/resources/js/authBefore.js"></script>

@@ -51,7 +51,7 @@ export async function sendVerification() {
 async function sendEmailVerification() {
     const email = document.getElementById("authEmail").value;
     $.ajax({
-        url: "/account/send-mail",
+        url: "/account/auth/email",
         method: "POST",
         data: { email },
         success: (res) => alert(res),
@@ -98,7 +98,7 @@ export async function verifyCode() {
   } else {
     const email = document.getElementById("authEmail").value;
     $.ajax({
-      url: "/account/verify-code",
+      url: "/account/auth/email/code",
       method: "POST",
       data: { email, code },
       success: () => window.onVerificationSuccess(),

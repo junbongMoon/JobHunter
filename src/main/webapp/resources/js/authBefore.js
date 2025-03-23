@@ -6,7 +6,6 @@ import {
 
 // 로그인 페이지 전용: 인증 성공 후 정지 해제 + 리다이렉트
 window.onVerificationSuccess = () => {
-  console.log("✅ 인증 성공 오버라이드 됨");
 
   const method = getSelectedMethod();
   const userType = document.getElementById("userType").value;
@@ -26,7 +25,7 @@ window.onVerificationSuccess = () => {
   };
 
   $.ajax({
-    url: "/account/verify",
+    url: "/account/auth",
     method: "POST",
     contentType: "application/json",
     data: JSON.stringify(dto),
