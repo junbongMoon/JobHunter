@@ -84,11 +84,11 @@
 				<i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
 			</nav>
 
-			<c:if test="${not empty sessionScope.user}">
-				<p>${sessionScope.user.userName}</p>
-				<a href="/user/logout">로그아웃</a>
+			<c:if test="${not empty sessionScope.account}">
+				<p>${sessionScope.account.accountName}</p>
+				<a href="/account/logout">로그아웃</a>
 			</c:if>
-			<c:if test="${empty sessionScope.user}">
+			<c:if test="${empty sessionScope.account}">
 				<a href="${pageContext.request.contextPath}/account/login/return">로그인</a>
 			</c:if>
 

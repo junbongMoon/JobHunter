@@ -1,6 +1,6 @@
 package com.jobhunter.model.account;
 
-import com.jobhunter.model.customenum.UserType;
+import com.jobhunter.model.customenum.AccountType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,5 +20,5 @@ public class LoginDTO {
     private String password; // 비밀번호
     private boolean remember; // 자동 로그인 여부
     private String autoLogin; // 자동 로그인 세션
-    private UserType userType; // (NORMAL: 일반 사용자, COMPANY: 기업)
+    private AccountType accountType; // (NORMAL: 일반 사용자, COMPANY: 기업)
 }

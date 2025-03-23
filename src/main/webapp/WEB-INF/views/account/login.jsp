@@ -14,7 +14,7 @@
 			type="password" name="password" placeholder="비밀번호" required />
 
 		<!-- 회원 유형 hidden -->
-		<input type="hidden" name="userType" value="NORMAL" />
+		<input type="hidden" name="accountType" value="COMPANY" />
 		<!-- 일반 로그인이라면 NORMAL 로 바꾸면 됨 -->
 		<!-- 기업 로그인이라면 COMPANY 로 바꾸면 됨 -->
 		<div>${sessionScope.requiresVerification}</div>
@@ -27,7 +27,7 @@
 				value="${sessionScope.authTargetMobile}" />
 			<input type="hidden" id="authEmail"
 				value="${sessionScope.authTargetEmail}" />
-			<input type="hidden" id="userType"
+			<input type="hidden" id="accountType"
 				value="${sessionScope.user.userType}" />
 
 			<div>
@@ -53,12 +53,12 @@
 <jsp:include page="../footer.jsp" />
 
 <!-- 인증용 JS 모듈 -->
-<script type="module" src="${pageContext.request.contextPath}/resources/js/authVerification.js"></script>
+<script type="module">
+  import { sendVerification, verifyCode } from '/resources/js/authVerification.js';
 
-<!-- 인증 성공 처리하는거 선택_여기 넣어둔건 이메일이나 번호로 정지해제 -->
-<script>
-    window.onVerificationSuccess = () => {
-    	console.log("인증 성공!")
-        sendVerificationSuccess(); // 모듈의 펑션 사용
-    };
+  window.sendVerification = sendVerification;
+  window.verifyCode = verifyCode;
 </script>
+
+<!-- 인증 성공 처리하는 모듈 선택_여기 넣어둔건 이메일이나 번호로 정지해제 -->
+<script type="module" src="${pageContext.request.contextPath}/resources/js/authBefore.js"></script>

@@ -2,7 +2,58 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.testoracle.mapper.companymapper">
-	
+<mapper namespace="com.jobhunter.mapper.companymapper">
 
+    <resultMap id="accountMap" type="com.jobhunter.model.account.AccountVO">
+        <result column="companyId" property="accountId"/>
+        <result column="companyName" property="accountName"/>
+        <result column="companyPwd" property="password"/>
+        <result column="userType" property="accountType"/>
+        <!-- company 테이블에는 socialId, isSocial 없음 -->
+    </resultMap>
+
+    <update id="setVerificationFalse" parameterType="map">
+        UPDATE company
+        SET requiresVerification = 'N'
+        WHERE
+        <choose>
+            <when test="type eq 'email'">
+                email = #{value}
+            </when>
+            <when test="type eq 'mobile'">
+                mobile = #{value}
+            </when>
+        </choose>
+    </update>
+
+    <select id="isAuthVerifi" resultType="String">
+        select requiresVerification from company where companyId = #{id}
+    </select>
+
+    <select id="loginAccount" resultMap="accountMap">
+        select *, companyId as accountId, companyName as accountName, companyPwd as password, userType as accountType,
+               NULL as socialId, NULL as isSocial
+        from company
+        where companyId = #{id} and companyPwd = sha1(md5(#{password}))
+    </select>
+
+    <select id="existsAccountId" parameterType="String" resultType="boolean">
+        SELECT EXISTS (SELECT 1 FROM company WHERE companyId = #{id})
+    </select>
+
+    <update id="increaseFailCount" parameterType="String">
+        UPDATE company SET loginCnt = loginCnt + 1 WHERE companyId = #{id}
+    </update>
+
+    <select id="getFailCount" parameterType="String" resultType="int">
+        SELECT loginCnt FROM company WHERE companyId = #{id}
+    </select>
+
+    <update id="setRequiresVerification" parameterType="String">
+        UPDATE company SET requiresVerification = 'Y' WHERE companyId = #{id}
+    </update>
+
+    <update id="resetFailCount" parameterType="String">
+        UPDATE company SET loginCnt = 0 WHERE companyId = #{id}
+    </update>
 </mapper>

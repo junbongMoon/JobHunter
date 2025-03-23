@@ -2,8 +2,6 @@ package com.jobhunter.model.account;
 
 import java.sql.Timestamp;
 
-import com.jobhunter.model.customenum.UserType;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

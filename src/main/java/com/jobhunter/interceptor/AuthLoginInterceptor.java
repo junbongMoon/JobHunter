@@ -16,7 +16,7 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
             throws Exception {
 
         HttpSession session = request.getSession();
-        Object user = session.getAttribute("user");
+        Object user = session.getAttribute("account");
 
         // 로그인 안 한 경우
         if (user == null) {

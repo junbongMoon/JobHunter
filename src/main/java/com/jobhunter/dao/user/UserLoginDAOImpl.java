@@ -5,14 +5,15 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.jobhunter.dao.account.AccountLoginDAO;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
 
 import lombok.RequiredArgsConstructor;
 
-@Repository
+@Repository("userLoginDAO")
 @RequiredArgsConstructor
-public class UserDAOImpl implements UserDAO {
+public class UserLoginDAOImpl implements AccountLoginDAO {
 	
 	private final SqlSession ses;
 	private final String NS = "com.jobhunter.mapper.usermapper";
@@ -30,14 +31,14 @@ public class UserDAOImpl implements UserDAO {
 	}
 	
 	@Override
-	public AccountVO loginUser(LoginDTO logindto) throws Exception {
+	public AccountVO loginAccount(LoginDTO logindto) throws Exception {
 		// 로그인 처리(아이디랑 비밀번호로 유저 찾아오기)
-		return ses.selectOne(NS+".loginUser", logindto);
+		return ses.selectOne(NS+".loginAccount", logindto);
 	}
 	
 	@Override
-	public Boolean existsUserId(String userId) throws Exception {
-		return ses.selectOne(NS+".existsUserId", userId);
+	public Boolean existsAccountId(String userId) throws Exception {
+		return ses.selectOne(NS+".existsAccountId", userId);
 	}
 
 	@Override

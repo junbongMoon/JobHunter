@@ -13,7 +13,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession();
         Boolean needsVerification = (Boolean) session.getAttribute("requiresVerification");
         if (Boolean.TRUE.equals(needsVerification)) {
-            response.sendRedirect("/user/login?requireVerification=true");
+            response.sendRedirect("/account/login?requireVerification=true");
             return false;
         }
         return true;
