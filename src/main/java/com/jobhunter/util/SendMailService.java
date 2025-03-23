@@ -23,8 +23,8 @@ public class SendMailService {
 	}
 
 	public void send() throws IOException, MessagingException {
-		String subject = "miniproject.com에서 보내는 회원 가입 이메일 인증번호입니다";
-		String message = "회원가입을 환영합니다... 인증번호 : " + this.authCode + "를 입력하시고, 인증 버튼을 눌러 회원 가입을 완료하세요!";
+		String subject = "jobhunter.com에서 보내는 이메일 인증번호입니다";
+		String message = "인증번호 : [" + this.authCode + "]를 입력하시고, 인증 버튼을 눌러 인증을 완료해주세요.";
 
 		// SMTP(Send Mail Transfer Protocol) 설정을 위해
 		Properties props = new Properties();
@@ -42,20 +42,16 @@ public class SendMailService {
 		String mailId = PropertiesTask.getPropertiesValue("mail.properties", "mailID");
 		String mailPwd = PropertiesTask.getPropertiesValue("mail.properties", "mailPwd");
 
-//		System.out.println(mailId + ", " + mailPwd);
-
 		// 메일 서버에 로그인 할 수 잇는 세션을 얻어옴
 		Session mailServerSession = Session.getInstance(props, new Authenticator() {
 
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				// TODO Auto-generated method stub
 				return new PasswordAuthentication(mailId, mailPwd);
 			}
 
 		});
 
-//		System.out.println(mailServerSession.toString());
 
 		if (mailServerSession != null) {
 			MimeMessage mime = new MimeMessage(mailServerSession);

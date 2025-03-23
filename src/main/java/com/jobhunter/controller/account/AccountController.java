@@ -1,6 +1,8 @@
 // ✅ AccountController.java (통합 + 로그인 진입)
 package com.jobhunter.controller.account;
 
+import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,11 +20,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.account.EmailAuth;
 import com.jobhunter.model.account.LoginDTO;
 import com.jobhunter.model.account.VerificationRequestDTO;
 import com.jobhunter.model.customenum.UserType;
 import com.jobhunter.service.user.UserService;
 import com.jobhunter.util.RedirectUtil;
+import com.jobhunter.util.SendMailService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,7 +48,7 @@ public class AccountController {
 		} else {
 			RedirectUtil.saveRedirectUrl(request, session);
 		}
-		
+
 		// 로그인버튼 눌러서 들어왔을때 초기상태 유지+로그인으로 인증 건너뛰기 막는용 로그인데이터도 클린
 		// 어차피 정상적으로 로그인버튼 누르는건 로그인 안된유저뿐이니까
 		session.removeAttribute("requiresVerification");
@@ -58,29 +62,28 @@ public class AccountController {
 	// 로그인 페이지로 이동
 	@GetMapping("/login")
 	public String showLoginForm(HttpServletRequest request, HttpSession session,
-	        @RequestParam(value = "redirect", required = false) String redirect) {
+			@RequestParam(value = "redirect", required = false) String redirect) {
 
-	    String referer = request.getHeader("Referer");
+		String referer = request.getHeader("Referer");
 
-	    if (redirect != null && session.getAttribute("redirectUrl") == null) {
-	        session.setAttribute("redirectUrl", redirect);
-	    } else if (referer != null
-	    		&& !referer.matches(".*/account/(login|signup|verify|email-auth).*")
-	            && session.getAttribute("redirectUrl") == null) {
-	        session.setAttribute("redirectUrl", referer);
-	    }
-	    
-	    // 인증 성공하면 세션 정리
-	    if (session.getAttribute("user") != null) {
-	        AccountVO user = (AccountVO) session.getAttribute("user");
-	        if (!"Y".equals(user.getRequiresVerification())) {
-	            session.removeAttribute("requiresVerification");
-	            session.removeAttribute("authTargetMobile");
-	            session.removeAttribute("authTargetEmail");
-	        }
-	    }
+		if (redirect != null && session.getAttribute("redirectUrl") == null) {
+			session.setAttribute("redirectUrl", redirect);
+		} else if (referer != null && !referer.matches(".*/account/(login|signup|verify|email-auth).*")
+				&& session.getAttribute("redirectUrl") == null) {
+			session.setAttribute("redirectUrl", referer);
+		}
 
-	    return "account/login";
+		// 인증 성공하면 세션 정리
+		if (session.getAttribute("user") != null) {
+			AccountVO user = (AccountVO) session.getAttribute("user");
+			if (!"Y".equals(user.getRequiresVerification())) {
+				session.removeAttribute("requiresVerification");
+				session.removeAttribute("authTargetMobile");
+				session.removeAttribute("authTargetEmail");
+			}
+		}
+
+		return "account/login";
 	}
 
 	// 실제 로그인
@@ -166,19 +169,58 @@ public class AccountController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error");
 		}
 	}
-	
-	@PostMapping("/email-verify")
-	@ResponseBody
-	public ResponseEntity<String> sendEmailVerification(@RequestBody VerificationRequestDTO dto) {
-	    try {
-	        // TODO: 이메일 발송 로직 넣기
-	        System.out.println("📩 인증 이메일 발송 대상: " + dto.getValue() + ", 유형: " + dto.getUserType());
-	        return ResponseEntity.ok("sent");
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error");
+
+	// 이메일 코드 인증용(인증 성공했다고 반환하는거, 계정잠금 해제는 /verify)
+	@PostMapping("/verify-code")
+	public ResponseEntity<String> verifyCode(@RequestParam String email,
+	                                         @RequestParam String code,
+	                                         HttpSession session) {
+	    EmailAuth emailAuth = (EmailAuth) session.getAttribute("emailCode:" + email);
+
+	    if (emailAuth == null) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("인증 코드가 존재하지 않거나 만료되었습니다.");
 	    }
+
+	    Timestamp now = new Timestamp(System.currentTimeMillis());
+	    if (now.after(emailAuth.getExpireAt())) {
+	        session.removeAttribute("emailCode:" + email);
+	        return ResponseEntity.status(HttpStatus.GONE).body("인증 코드가 만료되었습니다.");
+	    }
+
+	    if (!emailAuth.getCode().equals(code)) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 코드가 일치하지 않습니다.");
+	    }
+
+	    // 인증 성공
+	    session.removeAttribute("emailCode:" + email);
+	    return ResponseEntity.ok("인증 성공!");
 	}
 
+	// 이메일로 코드보내기
+	@PostMapping("/send-mail")
+	public ResponseEntity<String> sendMail(@RequestParam String email, HttpSession session) {
+		// 문자인증이 6자리라서 맞추려고 메일도 6자리 코드 보내기
+		
+//	    String code = String.valueOf((int)(Math.random() * 900000) + 100000); // 6자리 숫자 (0~899999 + 100000)
+		
+		SecureRandom random = new SecureRandom(); // 똑같이 6자리 만드는건데 그냥 랜덤은 보안이 안좋다길래 시큐리티랜덤이라는게 있다그래서 넣어봄
+		int codeTmp = 100000 + random.nextInt(900000); // 소숫점 때서 6자리 정수 고정
+		String code = String.valueOf(codeTmp); // 문자열이 뷰단이랑 주고받고 비교 편해서 문자열로 변환
+		
+	    Timestamp expireAt = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000); // 5분 후
+
+	    try {
+	        SendMailService mailService = new SendMailService(email, code);
+	        mailService.send();
+
+	        EmailAuth emailAuth = new EmailAuth(code, expireAt);
+	        session.setAttribute("emailCode:" + email, emailAuth);
+
+	        return ResponseEntity.ok("인증 메일을 전송했습니다. (유효시간 5분)");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                             .body("메일 전송 실패: " + e.getMessage());
+	    }
+	}
 
 }
