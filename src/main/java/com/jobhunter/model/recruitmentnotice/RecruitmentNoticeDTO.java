@@ -39,6 +39,8 @@ public class RecruitmentNoticeDTO {
 	private String manager;
 	// 공고 임시 저장용 소제목
 	private String miniTitle;
+	// 마감 기한 (String으로 받고 변환 시키자. "2025,03,31"의 형태로 받고 split을 쓰자)
+	private String dueDateForString;
 	// 마감 기한
 	private Timestamp dueDate;
 	// 임시저장한 상태 값, 'Y', 'N'으로 받게 해서 'N'일 경우 등록 불가로 해놓자..

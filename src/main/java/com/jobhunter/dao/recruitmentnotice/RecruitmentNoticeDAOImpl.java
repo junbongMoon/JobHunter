@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
+import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	private final SqlSession ses;
-	private final String NS = "com.testoracle.mapper.recruitmentnoticemapper"; 
+	private final String NS = "com.jobhunter.mapper.recruitmentnoticemapper"; 
 	
 	// 공고(템플릿 아님)를 등록하는 메서드
 	@Override
@@ -35,9 +36,16 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 
 	// 우대조건을 입력하는 메서드
 	@Override
-	public int insertAdvantageWithRecruitmentNotice(AdvantageDTO adv) {
+	public int insertAdvantageWithRecruitmentNotice(AdvantageDTO adv) throws Exception{
 		
 		return ses.insert(NS + ".insertAdvantageWithRecruitmentnotice", adv);
+	}
+	
+	// 면접방식을 입력하는 메서드
+	@Override
+	public int insertApplicationWithRecruitmentNotice(ApplicationDTO applicationDTO) throws Exception {
+		
+		return ses.insert(NS +".insertApplicationWithRecruitmentnotice", applicationDTO);
 	}
 
 	// 가장 최근에 올린 공고를 조회하는 메서드
@@ -46,5 +54,8 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		
 		return ses.selectOne(NS +".", companyUid);
 	}
+
+
+	
 
 }
