@@ -17,5 +17,5 @@ import lombok.ToString;
 public class JobTypeResumeSubDTO {
     private int jt_resume_subNo;
     private int refResumeNo;
-    private int refSub;
+    private int refSubNo;
 }
