@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.util.RedirectUtil;
 
 public class AuthLoginInterceptor implements HandlerInterceptor {
@@ -16,20 +17,18 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
             throws Exception {
 
         HttpSession session = request.getSession();
-        Object user = session.getAttribute("account");
+        AccountVO account = (AccountVO) session.getAttribute("account");
 
         // 로그인 안 한 경우
-        if (user == null) {
+        if (account == null) {
             RedirectUtil.saveRedirectUrl(request, session);
             response.sendRedirect("/account/login/return");
             return false;
         }
 
         // 인증 필요 여부 체크
-        Boolean needsVerification = (Boolean) session.getAttribute("requiresVerification");
-        if (Boolean.TRUE.equals(needsVerification)) {
-            RedirectUtil.saveRedirectUrl(request, session);
-            response.sendRedirect("/account/login?requireVerification=true");
+        if ("Y".equals(account.getRequiresVerification())) {
+        	response.sendRedirect(request.getContextPath() + "/account/login?requireVerification=true");
             return false;
         }
 

@@ -8,14 +8,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 public class AuthenticationInterceptor implements HandlerInterceptor {
-
+	
+	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        HttpSession session = request.getSession();
-        Boolean needsVerification = (Boolean) session.getAttribute("requiresVerification");
-        if (Boolean.TRUE.equals(needsVerification)) {
-            response.sendRedirect("/account/login?requireVerification=true");
-            return false;
-        }
         return true;
     }
 

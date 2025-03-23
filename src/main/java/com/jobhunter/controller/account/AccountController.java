@@ -123,6 +123,11 @@ public class AccountController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		// 로그인 실패시 세션 청소하고 다시 로그인페이지 로딩(인증 필요한지 체크용)
+		session.removeAttribute("requiresVerification");
+		session.removeAttribute("authTargetEmail");
+		session.removeAttribute("authTargetMobile");
+		session.removeAttribute("account");
 		return "redirect:/account/login?error=true";
 	}
 
@@ -137,6 +142,8 @@ public class AccountController {
 			accountService.setRequiresVerificationFalse(type, value, accountType);
 
 			session.removeAttribute("requiresVerification");
+			session.removeAttribute("authTargetEmail");
+			session.removeAttribute("authTargetMobile");
 
 			String redirectUrl = (String) session.getAttribute("redirectUrl");
 			session.removeAttribute("redirectUrl");
@@ -169,6 +176,15 @@ public class AccountController {
 		}
 
 		// 인증 성공
+		
+		// 세션에 사용자한테도 인증성공했다고 넣어주기
+		AccountVO account = (AccountVO) session.getAttribute("account");
+		if (account != null) {
+		    account.setRequiresVerification("N");
+		    session.setAttribute("account", account); // 갱신
+		}
+		
+		// 세션 청소
 		session.removeAttribute("emailCode:" + email);
 		return ResponseEntity.ok("인증 성공!");
 	}

@@ -9,7 +9,6 @@
         <result column="companyName" property="accountName"/>
         <result column="companyPwd" property="password"/>
         <result column="userType" property="accountType"/>
-        <!-- company 테이블에는 socialId, isSocial 없음 -->
     </resultMap>
 
     <update id="setVerificationFalse" parameterType="map">
