@@ -140,7 +140,7 @@
 				<div class="card-header">희망 근무 지역</div>
 				<div class="card-body">
 					<div class="row">
-						<!-- 시/도 목록 - 스크롤 가능한 컨테이너 -->
+						<!-- 시/도 목록 -->
 						<div class="col-md-4">
 							<div class="region-list-container" style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
 								<ul class="list-group" id="regionList">
@@ -151,7 +151,7 @@
 							</div>
 						</div>
 
-						<!-- 시/군/구 목록 - 스크롤 가능한 컨테이너 -->
+						<!-- 시/군/구 목록 -->
 						<div class="col-md-4">
 							<div class="sigungu-list-container" style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
 								<ul class="list-group" id="sigunguList">
@@ -169,7 +169,7 @@
 				</div>
 			</div>
 
-			<!-- 선택된 지역을 위한 hidden input -->
+			<!-- 선택된 지역 hidden input -->
 			<div id="selectedRegionsData"></div>
 
 			<!-- 희망 업직종 -->
@@ -177,7 +177,7 @@
 				<div class="card-header">희망 업직종</div>
 				<div class="card-body">
 					<div class="row">
-						<!-- 대분류 목록 - 스크롤 가능한 컨테이너 -->
+						<!-- 대분류 목록 -->
 						<div class="col-md-4">
 							<div class="major-list-container" style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
 								<ul class="list-group" id="majorCategoryList">
@@ -188,7 +188,7 @@
 							</div>
 						</div>
 
-						<!-- 소분류 목록 - 스크롤 가능한 컨테이너 -->
+						<!-- 소분류 목록 -->
 						<div class="col-md-4">
 							<div class="sub-list-container" style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
 								<ul class="list-group" id="subCategoryList">
@@ -206,7 +206,7 @@
 				</div>
 			</div>
 
-			<!-- 선택된 업직종 hidden input 추가 위치 -->
+			<!-- 선택된 업직종 hidden input -->
 			<div id="selectedJobTypeData"></div>
 
 			<!-- 2025.03.24 ~ 할 것 Check -->
@@ -296,18 +296,15 @@
 
 <script>
 $(document).ready(function () {
-    // 시/도 클릭 이벤트 핸들러
+    // 시/도 클릭하면...
     $(".region-item").on("click", function () {
-        // 이전 선택 해제 및 현재 항목 선택 표시
+        // 기존에 누른 시/도 해제 및 현재 시/도 선택
         $(".region-item").removeClass("selected");
         $(this).addClass("selected");
         
-        // 선택된 시/도의 번호와 시/군/구 목록 요소 가져오기
+        // 선택된 시/도의 번호와 시/군/구 목록 가져오기
         let regionNo = $(this).data("region");
         let $sigunguList = $("#sigunguList");
-
-        // 시/군/구 목록 초기화 및 로딩 메시지 표시
-        $sigunguList.html('<li class="list-group-item text-muted">불러오는 중...</li>');
 
         // AJAX 요청으로 시/군/구 목록 가져오기
         $.ajax({
@@ -325,7 +322,7 @@ $(document).ready(function () {
 
                 // 시/군/구 목록 동적 생성
                 $.each(response, function (index, sigungu) {
-                    // 리스트 아이템 생성
+                    // 리스트 생성
                     let $li = $("<li>").addClass("list-group-item sigungu-item");
                     
                     // 체크박스 생성
@@ -347,10 +344,10 @@ $(document).ready(function () {
                         })
                         .text(sigungu.name);
                     
-                    // 체크박스와 라벨을 리스트 아이템에 추가
+                    // 체크박스와 라벨을 리스트에 추가
                     $li.append($checkbox).append($label);
                     
-                    // 체크박스 상태 변경 이벤트 핸들러
+                    // 체크박스 상태 변경 이벤트
                     $checkbox.on("change", function() {
                         let selectedRegions = $("#selectedRegions");
                         let sigunguNo = $(this).val();
@@ -366,7 +363,7 @@ $(document).ready(function () {
                                     .text(sigunguName)
                                     .attr("data-region", regionNo); // 시/도 정보 저장
                                 
-                                // 삭제 버튼 생성 및 이벤트 핸들러 설정
+                                // 삭제 버튼 생성 및 삭제 기능
                                 let $removeBtn = $("<button>")
                                     .addClass("btn-close ms-2")
                                     .on("click", function() {
@@ -390,11 +387,14 @@ $(document).ready(function () {
                         }
                     });
 
+					// 시/도 옮길때마다 체크박스 해제되는 문제 있음
+					// 시/도 누를때 마다 선택된 지역목록에 같은 값 있는지 확인하고 체크박스 체크
+
                     // 이미 선택된 시/군/구인 경우 체크박스 체크
                     $("#selectedRegions").find(".badge").each(function() {
                         if ($(this).text().trim() === sigungu.name && $(this).data("region") === regionNo) {
                             $checkbox.prop("checked", true);
-                            return false; // each 루프 중단
+                            return false; // each 중단
                         }
                     });
 
@@ -408,18 +408,15 @@ $(document).ready(function () {
         });
     });
 
-    // 대분류 클릭 이벤트 핸들러
+    // 대분류 클릭
     $(".major-item").on("click", function () {
         // 이전 선택 해제 및 현재 항목 선택 표시
         $(".major-item").removeClass("selected");
         $(this).addClass("selected");
         
-        // 선택된 대분류의 번호와 소분류 목록 요소 가져오기
+        // 선택된 대분류의 번호와 소분류 목록 가져오기
         let majorNo = $(this).data("major");
         let $subCategoryList = $("#subCategoryList");
-
-        // 소분류 목록 초기화 및 로딩 메시지 표시
-        $subCategoryList.html('<li class="list-group-item text-muted">불러오는 중...</li>');
 
         // AJAX 요청으로 소분류 목록 가져오기
         $.ajax({
@@ -437,7 +434,7 @@ $(document).ready(function () {
 
                 // 소분류 목록 동적 생성
                 $.each(response, function (index, sub) {
-                    // 리스트 아이템 생성
+                    // 리스트 생성
                     let $li = $("<li>").addClass("list-group-item sub-item");
                     
                     // 체크박스 생성
@@ -459,10 +456,10 @@ $(document).ready(function () {
                         })
                         .text(sub.jobName);
                     
-                    // 체크박스와 라벨을 리스트 아이템에 추가
+                    // 체크박스와 라벨을 리스트에 추가
                     $li.append($checkbox).append($label);
                     
-                    // 체크박스 상태 변경 이벤트 핸들러
+                    // 체크박스 상태 변경
                     $checkbox.on("change", function() {
                         let selectedJobTypes = $("#selectedJobTypes");
                         let subNo = $(this).val();
@@ -478,7 +475,7 @@ $(document).ready(function () {
                                     .text(subName)
                                     .attr("data-major", majorNo); // 대분류 정보 저장
                                 
-                                // 삭제 버튼 생성 및 이벤트 핸들러 설정
+                                // 삭제 버튼 생성 및 삭제 기능
                                 let $removeBtn = $("<button>")
                                     .addClass("btn-close ms-2")
                                     .on("click", function() {
@@ -506,7 +503,7 @@ $(document).ready(function () {
                     $("#selectedJobTypes").find(".badge").each(function() {
                         if ($(this).text().trim() === sub.jobName && $(this).data("major") === majorNo) {
                             $checkbox.prop("checked", true);
-                            return false; // each 루프 중단
+                            return false; // each 중단
                         }
                     });
 
