@@ -14,17 +14,17 @@ public interface ResumeDAO {
 
 	void insertResumeFinal(ResumeDTO resumeDTO);
 
-	void insertJobForm(JobFormDTO jobFormDTO);
+	void insertJobForm(JobFormDTO jobFormDTO) throws Exception;
 
 	void insertSigungu(int resumeNo, int sigunguNo);
 
 	void insertSubCategory(int resumeNo, int subcategoryNo);
 
-	List<RegionDTO> selectAllRegions();
+	List<RegionDTO> selectAllRegions() throws Exception;
 
-	List<SigunguDTO> selectSigunguByRegion(int regionNo);
+	List<SigunguDTO> selectSigunguByRegion(int regionNo) throws Exception;
 
-	List<MajorCategoryDTO> selectAllMajorCategories();
+	List<MajorCategoryDTO> selectAllMajorCategories() throws Exception;
 
-	List<SubCategoryDTO> selectSubCategoriesByMajor(int majorcategoryNo);
+	List<SubCategoryDTO> selectSubCategoriesByMajor(int majorcategoryNo) throws Exception;
 }

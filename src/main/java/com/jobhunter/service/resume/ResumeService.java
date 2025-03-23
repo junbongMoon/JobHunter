@@ -9,12 +9,12 @@ import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 
 public interface ResumeService {
-	void tempSaveResume(ResumeDTO resumeDTO);
-    void finalSaveResume(ResumeDTO resumeDTO);
+	void tempSaveResume(ResumeDTO resumeDTO) throws Exception;
+    void finalSaveResume(ResumeDTO resumeDTO) throws Exception;
 
-    List<RegionDTO> getAllRegions();
-    List<SigunguDTO> getSigunguByRegion(int regionNo);
+    List<RegionDTO> getAllRegions() throws Exception;
+    List<SigunguDTO> getSigunguByRegion(int regionNo) throws Exception;
     
-    List<MajorCategoryDTO> getAllMajorCategories();
-    List<SubCategoryDTO> getSubCategoriesByMajor(int majorcategoryNo);
+    List<MajorCategoryDTO> getAllMajorCategories() throws Exception;
+    List<SubCategoryDTO> getSubCategoriesByMajor(int majorcategoryNo) throws Exception;
 }

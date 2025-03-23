@@ -308,11 +308,16 @@ $(document).ready(function () {
             type: "GET",
             data: { regionNo: regionNo },
             dataType: "json",
-            success: function (data) {
+            success: function (response) {
+                if (response.error) {
+                    $sigunguList.html('<li class="list-group-item text-danger">' + response.error + '</li>');
+                    return;
+                }
+                
                 $sigunguList.empty(); // 목록 초기화
 
                 // 시/군/구 목록 동적 생성
-                $.each(data, function (index, sigungu) {
+                $.each(response, function (index, sigungu) {
                     // 리스트 아이템 생성
                     let $li = $("<li>").addClass("list-group-item sigungu-item");
                     
@@ -379,7 +384,7 @@ $(document).ready(function () {
                     });
 
                     // 이미 선택된 시/군/구인 경우 체크박스 체크
-                    $("#selectedRegions .badge").each(function() {
+                    $("#selectedRegions").find(".badge").each(function() {
                         if ($(this).text().trim() === sigungu.name && $(this).data("region") === regionNo) {
                             $checkbox.prop("checked", true);
                             return false; // each 루프 중단
@@ -415,11 +420,16 @@ $(document).ready(function () {
             type: "GET",
             data: { majorNo: majorNo },
             dataType: "json",
-            success: function (data) {
+            success: function (response) {
+                if (response.error) {
+                    $subCategoryList.html('<li class="list-group-item text-danger">' + response.error + '</li>');
+                    return;
+                }
+                
                 $subCategoryList.empty(); // 목록 초기화
 
                 // 소분류 목록 동적 생성
-                $.each(data, function (index, sub) {
+                $.each(response, function (index, sub) {
                     // 리스트 아이템 생성
                     let $li = $("<li>").addClass("list-group-item sub-item");
                     
@@ -486,7 +496,7 @@ $(document).ready(function () {
                     });
 
                     // 이미 선택된 소분류인 경우 체크박스 체크
-                    $("#selectedJobTypes .badge").each(function() {
+                    $("#selectedJobTypes").find(".badge").each(function() {
                         if ($(this).text().trim() === sub.jobName && $(this).data("major") === majorNo) {
                             $checkbox.prop("checked", true);
                             return false; // each 루프 중단
@@ -503,7 +513,7 @@ $(document).ready(function () {
         });
     });
 
-    // 급여 입력 활성화 / 비활성화
+    // 급여 입력 활성화 / 비활성화	
     document.querySelectorAll('input[name="payType"]').forEach(radio => {
   	  radio.addEventListener('change', function () {
   	      const payInput = document.getElementById("payAmount");
@@ -528,11 +538,11 @@ $(document).ready(function () {
                     form: $(this).val()
                 };
             }).get(),
-            sigunguNos: $('#selectedRegions .badge').map(function() {
+            sigunguNos: $('#selectedRegions').find('.badge').map(function() {
                 let sigunguName = $(this).text().trim();
                 return $('input[data-name="' + sigunguName + '"]').val();
             }).get(),
-            subcategoryNos: $('#selectedJobTypes .badge').map(function() {
+            subcategoryNos: $('#selectedJobTypes').find('.badge').map(function() {
                 let subName = $(this).text().trim();
                 return $('input[data-name="' + subName + '"]').val();
             }).get()
@@ -546,7 +556,11 @@ $(document).ready(function () {
             data: JSON.stringify(formData),
             contentType: 'application/json',
             success: function(response) {
-                window.location.href = '/resume/resumeFormList';
+                if (response.success) {
+                    window.location.href = response.redirectUrl;
+                } else {
+                    alert(response.message);
+                }
             },
             error: function(xhr, status, error) {
                 console.error('Error details:', {
@@ -571,11 +585,11 @@ $(document).ready(function () {
                     form: $(this).val()
                 };
             }).get(),
-            sigunguNos: $('#selectedRegions .badge').map(function() {
+            sigunguNos: $('#selectedRegions').find('.badge').map(function() {
                 let sigunguName = $(this).text().trim();
                 return $('input[data-name="' + sigunguName + '"]').val();
             }).get(),
-            subcategoryNos: $('#selectedJobTypes .badge').map(function() {
+            subcategoryNos: $('#selectedJobTypes').find('.badge').map(function() {
                 let subName = $(this).text().trim();
                 return $('input[data-name="' + subName + '"]').val();
             }).get()
@@ -589,7 +603,11 @@ $(document).ready(function () {
             data: JSON.stringify(formData),
             contentType: 'application/json',
             success: function(response) {
-                window.location.href = '/resume/resumeFormList';
+                if (response.success) {
+                    window.location.href = response.redirectUrl;
+                } else {
+                    alert(response.message);
+                }
             },
             error: function(xhr, status, error) {
                 console.error('Error details:', {
@@ -621,14 +639,14 @@ $(document).ready(function () {
         }
 
         // 선택된 지역 검증
-        const selectedRegions = $('#selectedRegions .badge').length;
+        const selectedRegions = $('#selectedRegions').find('.badge').length;
         if (selectedRegions === 0) {
             alert('희망 근무 지역을 하나 이상 선택해주세요.');
             return false;
         }
 
         // 선택된 업직종 검증
-        const selectedJobTypes = $('#selectedJobTypes .badge').length;
+        const selectedJobTypes = $('#selectedJobTypes').find('.badge').length;
         if (selectedJobTypes === 0) {
             alert('희망 업직종을 하나 이상 선택해주세요.');
             return false;
@@ -636,7 +654,7 @@ $(document).ready(function () {
 
         // 선택된 지역 데이터 수집
         $('#selectedRegionsData').empty();
-        $('#selectedRegions .badge').each(function() {
+        $('#selectedRegions').find('.badge').each(function() {
             let sigunguName = $(this).text().trim();
             let sigunguNo = $('input[data-name="' + sigunguName + '"]').val();
             $('#selectedRegionsData').append(
@@ -650,7 +668,7 @@ $(document).ready(function () {
 
         // 선택된 업직종 데이터 수집
         $('#selectedJobTypeData').empty();
-        $('#selectedJobTypes .badge').each(function() {
+        $('#selectedJobTypes').find('.badge').each(function() {
             let subName = $(this).text().trim();
             let subNo = $('input[data-name="' + subName + '"]').val();
             $('#selectedJobTypeData').append(

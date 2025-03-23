@@ -23,11 +23,11 @@ public class ResumeServiceImpl implements ResumeService {
 
 	@Override
 	@Transactional
-	public void tempSaveResume(ResumeDTO resumeDTO) {
+	public void tempSaveResume(ResumeDTO resumeDTO) throws Exception {
 		rdao.insertResumeTemp(resumeDTO); // resumeNo 세팅
 
 		// 고용형태 저장
-		if (resumeDTO.getJobForms() != null) {
+		if (resumeDTO.getJobForms() != null && !resumeDTO.getJobForms().isEmpty()) {
 			for (JobFormDTO jobForm : resumeDTO.getJobForms()) {
 				jobForm.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertJobForm(jobForm);
@@ -35,15 +35,14 @@ public class ResumeServiceImpl implements ResumeService {
 		}
 
 		// 지역 저장
-		if (resumeDTO.getSigunguNos() != null) {
+		if (resumeDTO.getSigunguNos() != null && !resumeDTO.getSigunguNos().isEmpty()) {
 			for (Integer sigunguNo : resumeDTO.getSigunguNos()) {
 				rdao.insertSigungu(resumeDTO.getResumeNo(), sigunguNo);
 			}
 		}
 
-
 		// 업직종 저장
-		if (resumeDTO.getSubcategoryNos() != null) {
+		if (resumeDTO.getSubcategoryNos() != null && !resumeDTO.getSubcategoryNos().isEmpty()) {
 			for (Integer subcategoryNo : resumeDTO.getSubcategoryNos()) {
 				rdao.insertSubCategory(resumeDTO.getResumeNo(), subcategoryNo);
 			}
@@ -52,11 +51,11 @@ public class ResumeServiceImpl implements ResumeService {
 
 	@Override
 	@Transactional
-	public void finalSaveResume(ResumeDTO resumeDTO) {
+	public void finalSaveResume(ResumeDTO resumeDTO) throws Exception {
 		rdao.insertResumeFinal(resumeDTO); // resumeNo 세팅
 		
 		// 고용형태 저장
-		if (resumeDTO.getJobForms() != null) {
+		if (resumeDTO.getJobForms() != null && !resumeDTO.getJobForms().isEmpty()) {
 			for (JobFormDTO jobForm : resumeDTO.getJobForms()) {
 				jobForm.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertJobForm(jobForm);
@@ -64,15 +63,14 @@ public class ResumeServiceImpl implements ResumeService {
 		}
 
 		// 지역 저장
-		if (resumeDTO.getSigunguNos() != null) {
+		if (resumeDTO.getSigunguNos() != null && !resumeDTO.getSigunguNos().isEmpty()) {
 			for (Integer sigunguNo : resumeDTO.getSigunguNos()) {
 				rdao.insertSigungu(resumeDTO.getResumeNo(), sigunguNo);
 			}
 		}
 
-
 		// 업직종 저장
-		if (resumeDTO.getSubcategoryNos() != null) {
+		if (resumeDTO.getSubcategoryNos() != null && !resumeDTO.getSubcategoryNos().isEmpty()) {
 			for (Integer subcategoryNo : resumeDTO.getSubcategoryNos()) {
 				rdao.insertSubCategory(resumeDTO.getResumeNo(), subcategoryNo);
 			}
@@ -80,22 +78,22 @@ public class ResumeServiceImpl implements ResumeService {
 	}
 
 	@Override
-	public List<RegionDTO> getAllRegions() {
+	public List<RegionDTO> getAllRegions() throws Exception {
 		return rdao.selectAllRegions();
 	}
 
 	@Override
-	public List<SigunguDTO> getSigunguByRegion(int regionNo) {
+	public List<SigunguDTO> getSigunguByRegion(int regionNo) throws Exception {
 		return rdao.selectSigunguByRegion(regionNo);
 	}
 
 	@Override
-	public List<MajorCategoryDTO> getAllMajorCategories() {
+	public List<MajorCategoryDTO> getAllMajorCategories() throws Exception {
 		return rdao.selectAllMajorCategories();
 	}
 
 	@Override
-	public List<SubCategoryDTO> getSubCategoriesByMajor(int majorcategoryNo) {
+	public List<SubCategoryDTO> getSubCategoriesByMajor(int majorcategoryNo) throws Exception {
 		return rdao.selectSubCategoriesByMajor(majorcategoryNo);
 	}
 
