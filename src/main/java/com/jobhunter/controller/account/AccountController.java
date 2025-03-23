@@ -90,9 +90,6 @@ public class AccountController {
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginDTO loginDto, HttpSession session) {
 
-		System.out.println(session.getAttribute("authTargetMobile") + "" + session.getAttribute("authTargetEmail"));
-		System.out.println("???????????????????");
-
 		// auth로그인인터셉터에서 쿼리스트링에 requireVerification=true 식으로 인증필요여부 들고옴
 		// auth로그인인터셉터에서 이전페이지나 가려던 페이지(get방식만) uri+쿼리 세션에 넣어둠
 		Map<String, Object> result = null;
@@ -176,6 +173,10 @@ public class AccountController {
 	                                         @RequestParam String code,
 	                                         HttpSession session) {
 	    EmailAuth emailAuth = (EmailAuth) session.getAttribute("emailCode:" + email);
+	    
+	    System.out.println(emailAuth);
+	    System.out.println(emailAuth);
+	    System.out.println(emailAuth);
 
 	    if (emailAuth == null) {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("인증 코드가 존재하지 않거나 만료되었습니다.");
@@ -193,6 +194,7 @@ public class AccountController {
 
 	    // 인증 성공
 	    session.removeAttribute("emailCode:" + email);
+	    System.out.println("인증 성공!");
 	    return ResponseEntity.ok("인증 성공!");
 	}
 
@@ -206,6 +208,10 @@ public class AccountController {
 		SecureRandom random = new SecureRandom(); // 똑같이 6자리 만드는건데 그냥 랜덤은 보안이 안좋다길래 시큐리티랜덤이라는게 있다그래서 넣어봄
 		int codeTmp = 100000 + random.nextInt(900000); // 소숫점 때서 6자리 정수 고정
 		String code = String.valueOf(codeTmp); // 문자열이 뷰단이랑 주고받고 비교 편해서 문자열로 변환
+		
+		System.out.println("코드저장");
+		System.out.println(code);
+		System.out.println("코드저장");
 		
 	    Timestamp expireAt = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000); // 5분 후
 

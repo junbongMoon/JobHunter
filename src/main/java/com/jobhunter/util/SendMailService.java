@@ -31,7 +31,6 @@ public class SendMailService {
 
 		props.put("mail.smtp.host", "smtp.naver.com"); // smtp 호스트 주소 등록
 		props.put("mail.smtp.port", "465"); // naver smtp의 포트번호
-		props.put("mail.smtp.starttls.required", "true"); // 동기식 전송을 위해 설정
 		props.put("mail.smtp.ssl.protocols", "TLSv1.2");
 		props.put("mail.smtp.ssl.enable", "true"); // SSL 사용
 		props.put("mail.smtp.auth", "true"); // 인증 과정을 거치겠다.
@@ -39,9 +38,9 @@ public class SendMailService {
 		// SMTP서버에 인증
 		// 메일주소, 비밀번호를 properties 파일에서 얻어오도록...
 
-		String mailId = PropertiesTask.getPropertiesValue("mail.properties", "mailID");
-		String mailPwd = PropertiesTask.getPropertiesValue("mail.properties", "mailPwd");
-
+		String mailId = PropertiesTask.getPropertiesValue("config/mail.properties", "mailID");
+		String mailPwd = PropertiesTask.getPropertiesValue("config/mail.properties", "mailPwd");
+		
 		// 메일 서버에 로그인 할 수 잇는 세션을 얻어옴
 		Session mailServerSession = Session.getInstance(props, new Authenticator() {
 
@@ -56,7 +55,7 @@ public class SendMailService {
 		if (mailServerSession != null) {
 			MimeMessage mime = new MimeMessage(mailServerSession);
 
-			mime.setFrom(new InternetAddress("mondols98@naver.com")); // 발신자 메일주소
+			mime.setFrom(new InternetAddress(mailId)); // 발신자 메일주소
 			mime.addRecipient(RecipientType.TO, new InternetAddress(mailTo)); // 수신자 메일주소
 
 			// 제목, 본문 설정
