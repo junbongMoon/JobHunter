@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.jobhunter.model.resume.MajorCategoryDTO;
-import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
@@ -49,7 +47,7 @@ public class ResumeController {
 		return resumeService.getSubCategoriesByMajor(majorNo);
 	}
 
-	// ✅ 임시 저장
+	// 임시 저장
 	@PostMapping("/submit-temp")
 	@ResponseBody
 	public String submitTempResume(@RequestBody ResumeDTO resumeDTO) {
@@ -57,7 +55,7 @@ public class ResumeController {
 		return "success";
 	}
 
-	// ✅ 최종 저장
+	// 최종 저장
 	@PostMapping("/submit-final")
 	@ResponseBody
 	public String submitFinalResume(@RequestBody ResumeDTO resumeDTO) {

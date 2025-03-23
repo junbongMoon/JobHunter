@@ -47,13 +47,6 @@ public class ResumeDAOImpl implements ResumeDAO {
 		ses.insert(NS + ".insertSigungu", map);
 	}
 
-	@Override
-	public void insertMajorCategory(int resumeNo, int majorNo) {
-		Map<String, Object> map = new HashMap<>();
-		map.put("resumeNo", resumeNo);
-		map.put("majorNo", majorNo);
-		ses.insert(NS + ".insertMajorCategory", map);
-	}
 
 	@Override
 	public void insertSubCategory(int resumeNo, int subcategoryNo) {

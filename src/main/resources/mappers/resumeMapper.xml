@@ -40,14 +40,14 @@
         WHERE regionNo = #{regionNo}
     </select>
 
-    <!-- 대분류 리스트 -->
+    <!-- 업직종 대분류 리스트 -->
     <select id="selectAllMajorCategories" resultType="com.jobhunter.model.resume.MajorCategoryDTO">
         SELECT MajorcategoryNo as majorcategoryNo, jobName
         FROM majorcategory
         ORDER BY MajorcategoryNo
     </select>
 
-    <!-- 소분류 리스트 -->
+    <!-- 업직종 소분류 리스트 -->
     <select id="selectSubCategoriesByMajor" parameterType="int" resultType="com.jobhunter.model.resume.SubCategoryDTO">
         SELECT subcategoryNo, jobName, refMajorcategoryNo as majorcategoryNo
         FROM subcategory
@@ -55,16 +55,11 @@
         ORDER BY subcategoryNo
     </select>
 
-    <!-- 업직종 소분류 저장 -->
+    <!-- 업직종 저장 -->
     <insert id="insertSubCategory" parameterType="map">
         INSERT INTO jobtype_resume_sub (refResumeNo, refSubNo)
         VALUES (#{resumeNo}, #{refSubNo});
     </insert>
 
-    <!-- 업직종 대분류 저장 -->
-    <insert id="insertMajorCategory" parameterType="map">
-        INSERT INTO jobtype_resume_major (refResumeNo, refMajorNo)
-        VALUES (#{resumeNo}, #{majorNo});
-    </insert>
 
 </mapper>

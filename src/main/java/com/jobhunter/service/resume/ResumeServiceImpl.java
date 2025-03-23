@@ -24,7 +24,7 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	@Transactional
 	public void tempSaveResume(ResumeDTO resumeDTO) {
-		rdao.insertResumeTemp(resumeDTO); // resumeNo 자동 세팅
+		rdao.insertResumeTemp(resumeDTO); // resumeNo 세팅
 
 		// 고용형태 저장
 		if (resumeDTO.getJobForms() != null) {
@@ -41,14 +41,8 @@ public class ResumeServiceImpl implements ResumeService {
 			}
 		}
 
-		// 업직종 대분류 저장
-		if (resumeDTO.getMajorcategoryNos() != null) {
-			for (Integer majorNo : resumeDTO.getMajorcategoryNos()) {
-				rdao.insertMajorCategory(resumeDTO.getResumeNo(), majorNo);
-			}
-		}
 
-		// 업직종 소분류 저장
+		// 업직종 저장
 		if (resumeDTO.getSubcategoryNos() != null) {
 			for (Integer subcategoryNo : resumeDTO.getSubcategoryNos()) {
 				rdao.insertSubCategory(resumeDTO.getResumeNo(), subcategoryNo);
@@ -59,8 +53,9 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	@Transactional
 	public void finalSaveResume(ResumeDTO resumeDTO) {
-		rdao.insertResumeFinal(resumeDTO); // resumeNo 자동 세팅
-
+		rdao.insertResumeFinal(resumeDTO); // resumeNo 세팅
+		
+		// 고용형태 저장
 		if (resumeDTO.getJobForms() != null) {
 			for (JobFormDTO jobForm : resumeDTO.getJobForms()) {
 				jobForm.setResumeNo(resumeDTO.getResumeNo());
@@ -68,20 +63,15 @@ public class ResumeServiceImpl implements ResumeService {
 			}
 		}
 
+		// 지역 저장
 		if (resumeDTO.getSigunguNos() != null) {
 			for (Integer sigunguNo : resumeDTO.getSigunguNos()) {
 				rdao.insertSigungu(resumeDTO.getResumeNo(), sigunguNo);
 			}
 		}
 
-		// 업직종 대분류 저장
-		if (resumeDTO.getMajorcategoryNos() != null) {
-			for (Integer majorNo : resumeDTO.getMajorcategoryNos()) {
-				rdao.insertMajorCategory(resumeDTO.getResumeNo(), majorNo);
-			}
-		}
 
-		// 업직종 소분류 저장
+		// 업직종 저장
 		if (resumeDTO.getSubcategoryNos() != null) {
 			for (Integer subcategoryNo : resumeDTO.getSubcategoryNos()) {
 				rdao.insertSubCategory(resumeDTO.getResumeNo(), subcategoryNo);
