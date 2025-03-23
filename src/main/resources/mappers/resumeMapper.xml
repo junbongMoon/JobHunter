@@ -58,7 +58,7 @@
     <!-- 업직종 저장 -->
     <insert id="insertSubCategory" parameterType="map">
         INSERT INTO jobtype_resume_sub (refResumeNo, refSubNo)
-        VALUES (#{resumeNo}, #{refSubNo});
+        VALUES (#{resumeNo}, #{subcategoryNo});
     </insert>
 
 
