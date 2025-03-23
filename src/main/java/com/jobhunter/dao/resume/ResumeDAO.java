@@ -18,8 +18,6 @@ public interface ResumeDAO {
 
 	void insertSigungu(int resumeNo, int sigunguNo);
 
-	void insertMajorCategory(int resumeNo, int majorNo);
-
 	void insertSubCategory(int resumeNo, int subcategoryNo);
 
 	List<RegionDTO> selectAllRegions();

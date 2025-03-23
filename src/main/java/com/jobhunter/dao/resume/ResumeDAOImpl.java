@@ -76,4 +76,5 @@ public class ResumeDAOImpl implements ResumeDAO {
 		return ses.selectList(NS + ".selectSubCategoriesByMajor", majorcategoryNo);
 	}
 
+
 }
