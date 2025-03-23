@@ -209,6 +209,13 @@
 			<!-- 선택된 업직종 hidden input 추가 위치 -->
 			<div id="selectedJobTypeData"></div>
 
+			<!-- 2025.03.24 ~ 할 것 Check -->
+			<!-- 성격 및 강점 -->
+		    <!-- 학력사항 -->
+			<!-- 경력사항 -->
+			<!-- 보유 자격증 -->
+			<!-- 자기소개란 -->
+
 			<!-- 임시 저장 버튼 -->
 			<button type="button" class="btn btn-secondary" id="tempSaveBtn">임시
 				저장</button>
