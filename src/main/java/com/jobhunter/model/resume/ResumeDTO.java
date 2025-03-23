@@ -31,4 +31,8 @@ public class ResumeDTO {
     // 지역 선택 리스트 (region, sigungu)
     private List<Integer> regionNos;   // 시/도 번호
     private List<Integer> sigunguNos;  // 시/군/구 번호
+
+    // 업직종 선택 리스트
+    private List<Integer> majorcategoryNos;  // 대분류 번호
+    private List<Integer> subcategoryNos;    // 소분류 번호
 }
