@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
+import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.SigunguDTO;
@@ -75,6 +76,13 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public List<SubCategoryDTO> selectSubCategoriesByMajor(int majorcategoryNo) {
 		return ses.selectList(NS + ".selectSubCategoriesByMajor", majorcategoryNo);
 	}
+
+	@Override
+	public void insertMerit(MeritDTO meritDTO) throws Exception {
+		ses.insert(NS + ".insertJobForm", meritDTO);
+	}
+	
+	
 
 
 }
