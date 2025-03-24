@@ -10,6 +10,8 @@ import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 
 public interface ReviewBoardService {
 
- String selectReBoard(ReviewBoardDTO reviewBoardDTO) throws Exception;
+	List<ReviewBoard> selectReBoard() throws Exception;
+
+
 
 }
