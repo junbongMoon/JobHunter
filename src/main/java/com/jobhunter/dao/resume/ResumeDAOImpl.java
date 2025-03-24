@@ -79,7 +79,7 @@ public class ResumeDAOImpl implements ResumeDAO {
 
 	@Override
 	public void insertMerit(MeritDTO meritDTO) throws Exception {
-		ses.insert(NS + ".insertJobForm", meritDTO);
+		ses.insert(NS + ".insertMerit", meritDTO);
 	}
 	
 	
