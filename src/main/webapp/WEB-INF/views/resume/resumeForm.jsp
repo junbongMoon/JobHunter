@@ -142,10 +142,12 @@
 					<div class="row">
 						<!-- 시/도 목록 -->
 						<div class="col-md-4">
-							<div class="region-list-container" style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+							<div class="region-list-container"
+								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
 								<ul class="list-group" id="regionList">
 									<c:forEach var="region" items="${regionList}">
-										<li class="list-group-item region-item" data-region="${region.regionNo}">${region.name}▶</li>
+										<li class="list-group-item region-item"
+											data-region="${region.regionNo}">${region.name}▶</li>
 									</c:forEach>
 								</ul>
 							</div>
@@ -153,7 +155,8 @@
 
 						<!-- 시/군/구 목록 -->
 						<div class="col-md-4">
-							<div class="sigungu-list-container" style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+							<div class="sigungu-list-container"
+								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
 								<ul class="list-group" id="sigunguList">
 									<li class="list-group-item text-muted">시/도를 선택하세요</li>
 								</ul>
@@ -179,10 +182,12 @@
 					<div class="row">
 						<!-- 대분류 목록 -->
 						<div class="col-md-4">
-							<div class="major-list-container" style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+							<div class="major-list-container"
+								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
 								<ul class="list-group" id="majorCategoryList">
 									<c:forEach var="major" items="${majorList}">
-										<li class="list-group-item major-item" data-major="${major.majorcategoryNo}">${major.jobName}▶</li>
+										<li class="list-group-item major-item"
+											data-major="${major.majorcategoryNo}">${major.jobName}▶</li>
 									</c:forEach>
 								</ul>
 							</div>
@@ -190,7 +195,8 @@
 
 						<!-- 소분류 목록 -->
 						<div class="col-md-4">
-							<div class="sub-list-container" style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+							<div class="sub-list-container"
+								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
 								<ul class="list-group" id="subCategoryList">
 									<li class="list-group-item text-muted">대분류를 선택하세요</li>
 								</ul>
@@ -209,9 +215,101 @@
 			<!-- 선택된 업직종 hidden input -->
 			<div id="selectedJobTypeData"></div>
 
-			<!-- 2025.03.24 ~ 할 것 Check -->
 			<!-- 성격 및 강점 -->
-		    <!-- 학력사항 -->
+			<div class="card mb-4">
+				<div
+					class="card-header d-flex justify-content-between align-items-center">
+					<span>성격 및 강점</span>
+					<button type="button" class="btn btn-primary btn-sm"
+						data-bs-toggle="modal" data-bs-target="#meritModal">추가하기
+					</button>
+				</div>
+				<div class="card-body">
+					<div id="selectedMerits" class="mt-2"></div>
+				<small class="text-muted">* 나의 성격 및 강점을 선택해 주세요(최대 5개)</small>
+				</div>
+			</div>
+
+			<!-- 성격 및 강점 선택 모달 -->
+			<div class="modal fade" id="meritModal" tabindex="-1" aria-labelledby="meritModalLabel" aria-hidden="true" data-bs-backdrop="static">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="meritModalLabel">성격 및 강점 선택</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div class="row g-2" role="group" aria-label="성격 및 강점 선택">
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="성실함" type="button">성실함</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="책임감" type="button">책임감</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="리더십" type="button">리더십</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="창의성" type="button">창의성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="의사소통" type="button">의사소통</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="문제해결" type="button">문제해결</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="팀워크" type="button">팀워크</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="적극성" type="button">적극성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="인내심" type="button">인내심</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="정확성" type="button">정확성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="분석력" type="button">분석력</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="계획성" type="button">계획성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="협동심" type="button">협동심</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="주도성" type="button">주도성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="유연성" type="button">유연성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="꼼꼼함" type="button">꼼꼼함</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="도전정신" type="button">도전정신</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="긍정성" type="button">긍정성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="배려심" type="button">배려심</button>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 선택된 성격 및 강점 hidden input -->
+			<div id="selectedMeritsData"></div>
+
+			<!-- 학력사항 -->
 			<!-- 경력사항 -->
 			<!-- 보유 자격증 -->
 			<!-- 자기소개란 -->
@@ -223,6 +321,8 @@
 			<!-- 완전 저장 버튼 -->
 			<button type="button" class="btn btn-primary" id="finalSaveBtn">완전
 				저장</button>
+
+			<button type="button" class="btn btn-secondary" id="testBtn">코드 테스트용 버튼</button>	
 		</form>
 
 	</div>
@@ -234,63 +334,58 @@
 
 <style>
 /* 스크롤바 스타일링 - 모든 리스트 컨테이너에 적용 */
-.region-list-container::-webkit-scrollbar,
-.sigungu-list-container::-webkit-scrollbar,
-.major-list-container::-webkit-scrollbar,
-.sub-list-container::-webkit-scrollbar {
-    width: 8px; /* 스크롤바 너비 */
+.region-list-container::-webkit-scrollbar, .sigungu-list-container::-webkit-scrollbar,
+	.major-list-container::-webkit-scrollbar, .sub-list-container::-webkit-scrollbar
+	{
+	width: 8px; /* 스크롤바 너비 */
 }
 
 /* 스크롤바 트랙 스타일링 */
-.region-list-container::-webkit-scrollbar-track,
-.sigungu-list-container::-webkit-scrollbar-track,
-.major-list-container::-webkit-scrollbar-track,
-.sub-list-container::-webkit-scrollbar-track {
-    background: #f1f1f1; /* 트랙 배경색 */
-    border-radius: 4px; /* 모서리 둥글게 */
+.region-list-container::-webkit-scrollbar-track, .sigungu-list-container::-webkit-scrollbar-track,
+	.major-list-container::-webkit-scrollbar-track, .sub-list-container::-webkit-scrollbar-track
+	{
+	background: #f1f1f1; /* 트랙 배경색 */
+	border-radius: 4px; /* 모서리 둥글게 */
 }
 
 /* 스크롤바 썸 스타일링 */
-.region-list-container::-webkit-scrollbar-thumb,
-.sigungu-list-container::-webkit-scrollbar-thumb,
-.major-list-container::-webkit-scrollbar-thumb,
-.sub-list-container::-webkit-scrollbar-thumb {
-    background: #888; /* 썸 배경색 */
-    border-radius: 4px; /* 모서리 둥글게 */
+.region-list-container::-webkit-scrollbar-thumb, .sigungu-list-container::-webkit-scrollbar-thumb,
+	.major-list-container::-webkit-scrollbar-thumb, .sub-list-container::-webkit-scrollbar-thumb
+	{
+	background: #888; /* 썸 배경색 */
+	border-radius: 4px; /* 모서리 둥글게 */
 }
 
 /* 스크롤바 썸 호버 효과 */
 .region-list-container::-webkit-scrollbar-thumb:hover,
-.sigungu-list-container::-webkit-scrollbar-thumb:hover,
-.major-list-container::-webkit-scrollbar-thumb:hover,
-.sub-list-container::-webkit-scrollbar-thumb:hover {
-    background: #555; /* 호버 시 배경색 */
+	.sigungu-list-container::-webkit-scrollbar-thumb:hover,
+	.major-list-container::-webkit-scrollbar-thumb:hover,
+	.sub-list-container::-webkit-scrollbar-thumb:hover {
+	background: #555; /* 호버 시 배경색 */
 }
 
 /* 리스트 아이템 스타일링 */
 .list-group-item {
-    cursor: pointer; /* 마우스 커서 포인터로 변경 */
-    transition: background-color 0.2s; /* 배경색 변경 애니메이션 */
+	cursor: pointer; /* 마우스 커서 포인터로 변경 */
+	transition: background-color 0.2s; /* 배경색 변경 애니메이션 */
 }
 
 /* 리스트 아이템 호버 효과 */
 .list-group-item:hover {
-    background-color: #f8f9fa;
+	background-color: #f8f9fa;
 }
 
 /* 선택된 시/도, 대분류 아이템 스타일링 */
-.region-item.selected,
-.major-item.selected {
-    background-color: #e9ecef;
-    font-weight: bold;
+.region-item.selected, .major-item.selected {
+	background-color: #e9ecef;
+	font-weight: bold;
 }
 
 /* 선택된 항목(뱃지) 스타일링 */
-#selectedRegions .badge,
-#selectedJobTypes .badge {
-    margin-bottom: 0.5rem; /* 뱃지 간격 */
-    display: inline-block; /* 인라인 블록으로 표시 */
-    padding: 0.5rem 0.75rem; /* 뱃지 내부 여백 */
+#selectedRegions .badge, #selectedJobTypes .badge {
+	margin-bottom: 0.5rem; /* 뱃지 간격 */
+	display: inline-block; /* 인라인 블록으로 표시 */
+	padding: 0.5rem 0.75rem; /* 뱃지 내부 여백 */
 }
 </style>
 
@@ -386,9 +481,6 @@ $(document).ready(function () {
                             $(this).prop("checked", false);
                         }
                     });
-
-					// 시/도 옮길때마다 체크박스 해제되는 문제 있음
-					// 시/도 누를때 마다 선택된 지역목록에 같은 값 있는지 확인하고 체크박스 체크
 
                     // 이미 선택된 시/군/구인 경우 체크박스 체크
                     $("#selectedRegions").find(".badge").each(function() {
@@ -530,7 +622,37 @@ $(document).ready(function () {
   	  });
 	});
 
-    // 임시 저장 버튼 클릭 이벤트
+	// 코드 테스트용 버튼 클릭 이벤트
+	$('#testBtn').on('click', function() {
+        // 폼 데이터 수집
+        const formData = {
+            title: $('#title').val(),
+            payType: $('input[name="payType"]:checked').val(),
+            pay: $('#payAmount').val(),
+            jobForms: $('input[name="jobForm"]:checked').map(function() {
+                return {
+                    form: $(this).val()
+                };
+            }).get(),
+            sigunguNos: $('#selectedRegions').find('.badge').map(function() {
+                let sigunguName = $(this).text().trim();
+                return $('input[data-name="' + sigunguName + '"]').val();
+            }).get(),
+            subcategoryNos: $('#selectedJobTypes').find('.badge').map(function() {
+                let subName = $(this).text().trim();
+                return $('input[data-name="' + subName + '"]').val();
+            }).get(),
+            merits: $('#selectedMerits').find('.badge').map(function() {
+                return {
+                    meritContent: $(this).data('merit')
+                };
+            }).get()
+        };
+
+        console.log('저장할 데이터:', formData);
+	});
+
+    // Temp 저장 버튼 클릭 이벤트
     $('#tempSaveBtn').on('click', function() {
         // 폼 데이터 수집
         const formData = {
@@ -549,6 +671,11 @@ $(document).ready(function () {
             subcategoryNos: $('#selectedJobTypes').find('.badge').map(function() {
                 let subName = $(this).text().trim();
                 return $('input[data-name="' + subName + '"]').val();
+            }).get(),
+            merits: $('#selectedMerits').find('.badge').map(function() {
+                return {
+                    meritContent: $(this).data('merit')
+                };
             }).get()
         };
 
@@ -596,6 +723,11 @@ $(document).ready(function () {
             subcategoryNos: $('#selectedJobTypes').find('.badge').map(function() {
                 let subName = $(this).text().trim();
                 return $('input[data-name="' + subName + '"]').val();
+            }).get(),
+            merits: $('#selectedMerits').find('.badge').map(function() {
+                return {
+                    meritContent: $(this).data('merit')
+                };
             }).get()
         };
 
@@ -684,8 +816,95 @@ $(document).ready(function () {
             );
         });
 
+        // 선택된 성격 및 강점 검증
+        const selectedMerits = $('#selectedMerits').find('.badge').length;
+        if (selectedMerits === 0) {
+            alert('성격 및 강점을 하나 이상 선택해주세요.');
+            return false;
+        }
+
+        // 선택된 성격 및 강점 데이터 수집
+        $('#selectedMeritsData').empty();
+        $('#selectedMerits').find('.badge').each(function() {
+            const merit = $(this).data('merit');
+            $('#selectedMeritsData').append(
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'merits',
+                    value: merit
+                })
+            );
+        });
+
         // 모든 검증을 통과하면 폼 제출
         this.submit();
+    });
+
+    // 성격 및 강점 버튼 클릭 이벤트
+    $('.merit-btn').on('click', function() {
+        const merit = $(this).data('merit');
+        const selectedMerits = $('#selectedMerits');
+        
+        // 이미 선택된 성격인지 확인 (텍스트 내용으로 비교)
+        let isDuplicate = false;
+        let $existingBadge = null;
+        selectedMerits.find('.badge').each(function() {
+            if ($(this).text().trim() === merit) {
+                isDuplicate = true;
+                $existingBadge = $(this);
+                return false; // each 루프 중단
+            }
+        });
+        
+        if (isDuplicate) {
+            // 이미 선택된 항목이면 제거
+            $existingBadge.remove();
+            // 버튼 스타일 초기화
+            $(this).removeClass('btn-primary').addClass('btn-outline-primary');
+        } else {
+            // 현재 선택된 항목 수 확인
+            const currentCount = selectedMerits.find('.badge').length;
+            if (currentCount >= 5) {
+                
+                return;
+            }
+            
+            // 새로운 뱃지 생성
+            const $badge = $('<span>')
+                .addClass('badge bg-primary me-2 mb-2')
+                .text(merit)
+                .attr('data-merit', merit);
+            
+            // 삭제 버튼 추가
+            const $removeBtn = $('<button>')
+                .addClass('btn-close ms-2')
+                .attr('aria-label', merit + ' 삭제')
+                .on('click', function() {
+                    $badge.remove();
+                    // 삭제 시 버튼 스타일 초기화
+                    $(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-primary').addClass('btn-outline-primary');
+                });
+            
+            $badge.append($removeBtn);
+            selectedMerits.append($badge);
+            
+            // 버튼 스타일 변경
+            $(this).removeClass('btn-outline-primary').addClass('btn-primary');
+        }
+    });
+
+    // 모달이 열릴 때 포커스 관리
+    $('#meritModal').on('shown.bs.modal', function () {
+        // 모달이 열릴 때 첫 번째 버튼에 포커스
+        $(this).find('.merit-btn').first().focus();
+    });
+
+    // 모달이 닫힐 때 포커스 관리
+    $('#meritModal').on('hidden.bs.modal', function () {
+        // 모달을 열었던 버튼으로 포커스 이동
+        $('[data-bs-toggle="modal"][data-bs-target="#meritModal"]').focus();
+        // 버튼 스타일 초기화
+        $('.merit-btn').removeClass('btn-primary').addClass('btn-outline-primary');
     });
 });
 

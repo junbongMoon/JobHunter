@@ -84,7 +84,7 @@ public class ResumeController {
 			resumeService.tempSaveResume(resumeDTO);
 			Map<String, Object> response = new HashMap<>();
 			response.put("success", true);
-			response.put("message", "저장 완료");
+			response.put("message", "TEMP 저장 완료");
 			response.put("redirectUrl", "/resume/resumeFormList");
 			return ResponseEntity.ok().body(response);
 		} catch (Exception e) {
@@ -103,7 +103,7 @@ public class ResumeController {
 			resumeService.finalSaveResume(resumeDTO);
 			Map<String, Object> response = new HashMap<>();
 			response.put("success", true);
-			response.put("message", "최종 저장 완료");
+			response.put("message", "FINAL 저장 완료");
 			response.put("redirectUrl", "/resume/resumeFormList");
 			return ResponseEntity.ok().body(response);
 		} catch (Exception e) {
