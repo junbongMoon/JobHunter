@@ -60,6 +60,11 @@
         INSERT INTO jobtype_resume_sub (refResumeNo, refSubNo)
         VALUES (#{resumeNo}, #{subcategoryNo});
     </insert>
-
+    
+    <!-- 성격 및 장점 저장 -->
+	<insert id="insertMerit" parameterType="map">
+        INSERT INTO where_resume_sigungu (meritContent, resumeNo)
+        VALUES (#{meritContent}, #{resumeNo});
+    </insert>
 
 </mapper>
