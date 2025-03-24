@@ -9,7 +9,7 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
 	$(function() {
-		console.log("자바 스크립트");
+		
 		getRegion();
 		getMajorCategory();
 
@@ -171,7 +171,7 @@
 				});
 	}
 
-	// 지역 임시 저장
+	// 지역 컨트롤러 필드에
 	function saveRegion(regionCode) {
 		$.ajax({
 			url : "/recruitmentnotice/rest/region/" + regionCode,
@@ -186,7 +186,7 @@
 		});
 	}
 
-	// 시군구 임시 저장
+	// 시군구 컨트롤러 필드에
 	function saveSigungu(sigunguCode) {
 		$.ajax({
 			url : "/recruitmentnotice/rest/sigungu/" + sigunguCode,
@@ -201,7 +201,7 @@
 		});
 	}
 
-	// 산업군 임시 저장
+	// 산업군 컨트롤러 필드에
 
 	function saveMajorCategory(majorCategoryNo){
 		$.ajax({
@@ -217,7 +217,7 @@
 		});
 	}
 
-	// 직업 임시 저장
+	// 직업 컨트롤러 필드에 
 	function saveSubCategory(subCategoryNo){
 		$.ajax({
 			url : "/recruitmentnotice/rest/sub/" + subCategoryNo,
@@ -231,6 +231,8 @@
 			}
 		});
 	}
+
+	// 
 
 </script>
 
@@ -391,10 +393,17 @@
 
 									<div class="col-12">
 										<div class="input-group">
-											<label for="comment">상세 내용</label>
+											<label for="detail">상세 내용</label>
 											<textarea name="detail" id="detail" rows="5"
 												placeholder="상세 내용을 적어주세요..." required=""></textarea>
-											<span class="error-text">Please enter your comment</span>
+											
+										</div>
+									</div>
+
+									<div class="col-12">
+										<div class="input-group fileArea" style="width: 50px; height: 20px; background-color: #eee;">
+											<label for="file">파일</label>
+											
 										</div>
 									</div>
 
