@@ -8,7 +8,7 @@ import {
 window.onVerificationSuccess = () => {
 
   const method = getSelectedMethod();
-  const userType = document.getElementById("userType").value;
+  const accountType = document.getElementById("accountType").value;
   let value;
 
   if (method === METHOD.PHONE) {
@@ -21,7 +21,7 @@ window.onVerificationSuccess = () => {
   const dto = {
     type: method === METHOD.PHONE ? "mobile" : "email",
     value,
-    userType
+    accountType
   };
 
   $.ajax({

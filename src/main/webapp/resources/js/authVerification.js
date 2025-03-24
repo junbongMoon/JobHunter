@@ -53,7 +53,8 @@ async function sendEmailVerification() {
     $.ajax({
         url: "/account/auth/email",
         method: "POST",
-        data: { email },
+  		contentType: "application/json",
+    data: JSON.stringify({ email }),
         success: (res) => alert(res),
         error: (xhr) => alert("메일 전송 중 오류 발생: " + xhr.responseText)
     });
@@ -68,10 +69,12 @@ async function sendPhoneVerification() {
     const phoneNumber = formatPhoneNumberForFirebase(rawPhone);
 
 // 캡챠기능 파이어베이스 기본 제공
+if (!window.recaptchaVerifier) {
     window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         size: 'invisible',
         callback: () => {}
     });
+}
 
     try {
         confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
@@ -98,9 +101,12 @@ export async function verifyCode() {
   } else {
     const email = document.getElementById("authEmail").value;
     $.ajax({
-      url: "/account/auth/email/code",
+      url: `/account/auth/email/${code}`,
       method: "POST",
-      data: { email, code },
+  	  contentType: "application/json",
+      data: JSON.stringify({
+    email: email
+  }),
       success: () => window.onVerificationSuccess(),
       error: (xhr) => alert("이메일 인증 실패: " + xhr.responseText)
     });

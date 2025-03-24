@@ -2,15 +2,16 @@ package com.jobhunter.controller.account;
 
 import java.security.SecureRandom;
 import java.sql.Timestamp;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobhunter.model.account.AccountVO;
@@ -35,6 +36,10 @@ public class AccountRestController {
 		String type = dto.getType();
 		String value = dto.getValue();
 		AccountType accountType = dto.getAccountType();
+		
+		System.out.println(type);
+		System.out.println(value);
+		System.out.println(accountType);
 
 		try {
 			accountService.setRequiresVerificationFalse(type, value, accountType);
@@ -55,8 +60,9 @@ public class AccountRestController {
 
 	// 이메일로 코드보내기
 	@PostMapping(value = "/auth/email", produces = "text/plain;charset=UTF-8")
-	public ResponseEntity<String> sendMail(@RequestParam String email, HttpSession session) {
+	public ResponseEntity<String> sendMail(@RequestBody Map<String, String> emailTmp, HttpSession session) {
 		// 문자인증이 6자리라서 맞추려고 메일도 6자리 코드 보내기
+		String email = emailTmp.get("email");
 
 //	    String code = String.valueOf((int)(Math.random() * 900000) + 100000); // 6자리 숫자 (0~899999 + 100000)
 
@@ -80,9 +86,11 @@ public class AccountRestController {
 	}
 
 	// 이메일 코드 인증용(인증 성공했다고 반환하는거, 계정잠금 해제는 /verify)
-	@PostMapping(value = "/auth/email/code", produces = "text/plain;charset=UTF-8")
-	public ResponseEntity<String> verifyCode(@RequestParam String email, @RequestParam String code,
-			HttpSession session) {
+	@PostMapping(value = "/auth/email/{code}", produces = "text/plain;charset=UTF-8")
+	public ResponseEntity<String> verifyCode(@PathVariable("code") String code, @RequestBody Map<String, String> emailTmp, HttpSession session) {
+		
+		String email = emailTmp.get("email");
+		
 		EmailAuth emailAuth = (EmailAuth) session.getAttribute("emailCode:" + email);
 
 		if (emailAuth == null) {

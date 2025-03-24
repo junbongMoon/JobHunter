@@ -31,7 +31,7 @@
 			<input type="hidden" id="authEmail"
 				value="${sessionScope.authTargetEmail}" />
 			<input type="hidden" id="accountType"
-				value="${sessionScope.user.userType}" />
+				value="${sessionScope.account.accountType}" />
 
 			<div>
 				<label> <input type="radio" name="method" value="email"
