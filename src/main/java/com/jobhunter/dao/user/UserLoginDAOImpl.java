@@ -32,6 +32,8 @@ public class UserLoginDAOImpl implements AccountLoginDAO {
 	
 	@Override
 	public AccountVO loginAccount(LoginDTO logindto) throws Exception {
+		
+		System.out.println(logindto);
 		// 로그인 처리(아이디랑 비밀번호로 유저 찾아오기)
 		return ses.selectOne(NS+".loginAccount", logindto);
 	}

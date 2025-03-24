@@ -17,7 +17,7 @@
 		<!-- 회원 유형 선택 -->
 		<div style="margin: 10px 0;">
 			<label>
-			<input type="radio" name="accountType" value="NORMAL" checked> 개인 회원 </label>
+			<input type="radio" name="accountType" value="USER" checked> 개인 회원 </label>
 			<label>
 			<input type="radio" name="accountType" value="COMPANY"> 기업 회원 </label>
 		</div>

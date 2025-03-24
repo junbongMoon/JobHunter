@@ -35,7 +35,7 @@ public class AccountServiceImpl implements AccountService {
 	    
 		switch (type) {
 		case ADMIN: // 일반유저쪽으로 통합되도록
-		case NORMAL:
+		case USER:
 			return userDAO;
 		case COMPANY:
 			return companyDAO;

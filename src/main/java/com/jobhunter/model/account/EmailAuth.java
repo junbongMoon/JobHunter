@@ -19,4 +19,5 @@ import lombok.ToString;
 public class EmailAuth {
 	private String code;
     private Timestamp expireAt;
+    // 이메일 인증코드랑 만료시간 저장해두는 객체
 }

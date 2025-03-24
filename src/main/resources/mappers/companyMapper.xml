@@ -7,8 +7,6 @@
     <resultMap id="accountMap" type="com.jobhunter.model.account.AccountVO">
         <result column="companyId" property="accountId"/>
         <result column="companyName" property="accountName"/>
-        <result column="companyPwd" property="password"/>
-        <result column="userType" property="accountType"/>
     </resultMap>
 
     <update id="setVerificationFalse" parameterType="map">
@@ -30,10 +28,10 @@
     </select>
 
     <select id="loginAccount" resultMap="accountMap">
-        select *, companyId as accountId, companyName as accountName, companyPwd as password, userType as accountType,
+        select *, companyId as accountId, companyName as accountName,
                NULL as socialId, NULL as isSocial
         from company
-        where companyId = #{id} and companyPwd = sha1(md5(#{password}))
+        where companyId = #{id} and password = sha1(md5(#{password}))
     </select>
 
     <select id="existsAccountId" parameterType="String" resultType="boolean">
@@ -55,4 +53,8 @@
     <update id="resetFailCount" parameterType="String">
         UPDATE company SET loginCnt = 0 WHERE companyId = #{id}
     </update>
+    
+    <!-- 여기까진 로그인용 -->
+    
+    
 </mapper>

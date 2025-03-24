@@ -85,7 +85,17 @@
 			</nav>
 
 			<c:if test="${not empty sessionScope.account}">
-				<p>${sessionScope.account.accountName}</p>
+				<c:choose>
+					<c:when test="${sessionScope.account.accountType == 'ADMIN'}">
+        				<a href="/account/mypage" style="color: aqua;">${sessionScope.account.accountName}</a>
+    				</c:when>
+					<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
+        				<a href="/account/mypage" style="color: aqua;">${sessionScope.account.accountName}</a>
+    				</c:when>
+					<c:otherwise>
+        				<a href="/user/mypage" style="color: aqua;">${sessionScope.account.accountName}</a>
+    				</c:otherwise>
+				</c:choose>
 				<a href="/account/logout">로그아웃</a>
 			</c:if>
 			<c:if test="${empty sessionScope.account}">

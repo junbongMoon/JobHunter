@@ -22,7 +22,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class UserVO {
+public class UserAllVO {
 	private Integer uid; // 사용자 고유 ID
     private String userName; // 사용자 이름
     private String mobile; // 전화번호
