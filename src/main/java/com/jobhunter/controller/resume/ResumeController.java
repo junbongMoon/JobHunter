@@ -76,7 +76,7 @@ public class ResumeController {
 		}
 	}
 
-	// 임시 저장
+	// TEMP저장
 	@PostMapping("/submit-temp")
 	@ResponseBody
 	public ResponseEntity<?> submitTemp(@RequestBody ResumeDTO resumeDTO) {
@@ -84,13 +84,13 @@ public class ResumeController {
 			resumeService.tempSaveResume(resumeDTO);
 			Map<String, Object> response = new HashMap<>();
 			response.put("success", true);
-			response.put("message", "임시 저장 완료");
+			response.put("message", "저장 완료");
 			response.put("redirectUrl", "/resume/resumeFormList");
 			return ResponseEntity.ok().body(response);
 		} catch (Exception e) {
 			Map<String, Object> response = new HashMap<>();
 			response.put("success", false);
-			response.put("message", "임시 저장 실패: " + e.getMessage());
+			response.put("message", "저장 실패: " + e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
