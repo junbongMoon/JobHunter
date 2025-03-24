@@ -27,6 +27,9 @@ public class ResumeDTO {
 	
 	// 고용 형태 리스트
     private List<JobFormDTO> jobForms;
+    
+    // 성격 및 강점 리스트
+    private List<MeritDTO> merits;
 
     // 지역 선택 리스트 (region, sigungu)
     private List<Integer> regionNos;   // 시/도 번호
