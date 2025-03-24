@@ -62,8 +62,8 @@
     </insert>
     
     <!-- 성격 및 장점 저장 -->
-	<insert id="insertMerit" parameterType="map">
-        INSERT INTO where_resume_sigungu (meritContent, resumeNo)
+	<insert id="insertMerit" parameterType="com.jobhunter.model.resume.MeritDTO">
+        INSERT INTO merit (meritContent, resumeNo)
         VALUES (#{meritContent}, #{resumeNo});
     </insert>
 
