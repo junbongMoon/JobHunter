@@ -7,6 +7,29 @@
 
 
 <select id="allList" resultType="com.jobhunter.model.reviewboard.ReviewBoard">
-SELECT * FROM reviewBoard  order by postDate desc;
+SELECT
+    rb.boardNo,
+    u.userId AS writer,
+   	rb.reviewType,
+    rb.content,
+    rb.companyName,
+    rb.postDate
+   
+    FROM
+    reviewBoard rb
+	left join users u ON rb.writer = u.uid
 </select>
+
+<insert id="insertReview" parameterType="int">
+    INSERT INTO reviewBoard (
+       	writer, companyName,
+        reviewResult, reviewType, reviewLevel,
+        content, category, jobType, postDate, likes, views
+    ) VALUES (
+        #{writer}, #{companyName},
+        #{reviewResult}, #{reviewType}, #{reviewLevel},
+        #{content}, #{category}, #{jobType}, NOW(), 0, 0
+    )
+</insert>
+
 </mapper>
