@@ -11,6 +11,7 @@
 	$(function() {
 		console.log("자바 스크립트");
 		getRegion();
+		getMajorCategory();
 
 		$(document).on(
 				"change",
@@ -37,7 +38,82 @@
 			}
 		});
 
+		$(document).on(
+				"change",
+				".MajorCategory",
+				function() {
+					let selectedMajorNo = $(this).val();
+					console.log("선택한 지역:", selectedMajorNo);
+
+					if (selectedMajorNo !== "-1") {
+						saveMajorCategory(selectedMajorNo); 
+						getSubCategory(selectedMajorNo);
+					} else {
+						$(".MajorCategory").empty().append(
+								'<option value="-1">산업군 선택</option>');
+					}
+				});
+
+		$(document).on("change", ".SubCategory", function() {
+			let selectedSubCategory = $(this).val();
+			console.log("선택한 직업:", selectedSubCategory);
+
+			if (selectedSubCategory !== "-1") {
+				saveSubCategory(selectedSubCategory);
+			}
+		});
+
 	});
+
+	function getMajorCategory() {
+		$.ajax({
+			url : '/Category/major',
+			type : 'get',
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log("산업군 :", data);
+				let majorSelect = $(".MajorCategory");
+				majorSelect.empty();
+
+				majorSelect.append('<option value="-1">산업군 선택</option>');
+
+				$.each(data, function(index, majorCategory) {
+					majorSelect
+							.append('<option value="' + majorCategory.majorcategoryNo + '">'
+									+ majorCategory.jobName + '</option>');
+				});
+			},
+			error : function(err) {
+				console.error("산업군 데이터 불러오기 실패", err);
+			}
+		});
+	}
+
+	function getSubCategory(majorNo) {
+		$.ajax({
+			url : '/Category/sub/' + majorNo,
+			type : 'get',
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log("산업군 :", data);
+				let subSelect = $(".SubCategory");
+				subSelect.empty();
+
+				subSelect.append('<option value="-1">산업군 선택</option>');
+
+				$.each(data, function(index, subCategory) {
+					subSelect
+							.append('<option value="' + subCategory.subcategoryNo + '">'
+									+ subCategory.jobName + '</option>');
+				});
+			},
+			error : function(err) {
+				console.error("직업 데이터 불러오기 실패", err);
+			}
+		});
+	}
 
 	function getRegion() {
 		$.ajax({
@@ -124,6 +200,38 @@
 			}
 		});
 	}
+
+	// 산업군 임시 저장
+
+	function saveMajorCategory(majorCategoryNo){
+		$.ajax({
+			url : "/recruitmentnotice/rest/major/" + majorCategoryNo,
+			type : "POST",
+			dataType : "json",
+			success : function(response) {
+				console.log("산업군 저장 성공:", response);
+			},
+			error : function(err) {
+				console.error("산업군 저장 실패", err);
+			}
+		});
+	}
+
+	// 직업 임시 저장
+	function saveSubCategory(subCategoryNo){
+		$.ajax({
+			url : "/recruitmentnotice/rest/sub/" + subCategoryNo,
+			type : "POST",
+			dataType : "json",
+			success : function(response) {
+				console.log("직업 저장 성공:", response);
+			},
+			error : function(err) {
+				console.error("직업 저장 실패", err);
+			}
+		});
+	}
+
 </script>
 
 </head>
@@ -173,8 +281,8 @@
 
 					<div class="col-12">
 						<div class="input-group">
-							<label for="website">산업군</label> <select class="majorCategory"
-								id="majorCategory">
+							<label for="website">산업군</label> <select class="MajorCategory"
+								id="MajorCategory">
 
 							</select>
 						</div>
@@ -210,12 +318,21 @@
 												name="workType" id="workType" placeholder="정규, 비정규, 프리랜서 등등">
 										</div>
 									</div>
+									
 
 									<div class="col-12">
 										<div class="input-group">
-											<label for="website">급여</label> <input type="text"
-												name="payType" id="payType"
-												placeholder="급여방식을 입력해 주세요 radio로 바꾸자">
+											<label for="website">급여</label> 
+												<span>시급</span><input type="radio" name="payType"
+												value="HOUR">
+												<span>일급</span><input type="radio" name="payType"
+												value="DATE">
+												<span>주급</span><input type="radio" name="payType"
+												value="WEEK">
+												<span>월급</span><input type="radio" name="payType"
+												value="MONTH">
+												<span>연봉</span><input type="radio" name="payType"
+												value="YEAR">
 										</div>
 									</div>
 

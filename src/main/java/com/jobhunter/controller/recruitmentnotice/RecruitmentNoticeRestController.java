@@ -33,13 +33,14 @@ public class RecruitmentNoticeRestController {
 	private final RecruitmentNoticeService recService;
 	private static final Logger logger = LoggerFactory.getLogger(RecruitmentNoticeRestController.class);
 
-	// 임시저장 할 List, 코드들
+	// 양식을 저장 할 List, 코드들
 	private final List<AdvantageDTO> advantageList = new ArrayList<>();
 	private final List<ApplicationDTO> applicationList = new ArrayList<>();
 	private String regionCode;
 	private String sigunguCode;
 	private final List<RecruitmentnoticeBoardUpfiles> newFileList = new ArrayList<>();
 	private String majorCategoryCode;
+	private String subCategoryCode;
 
 	// 회사가 공고를 등록하는 메서드
 	@PostMapping(value = "/{uid}", produces = "application/json; charset=utf-8")
@@ -62,13 +63,17 @@ public class RecruitmentNoticeRestController {
 		recruitmentNoticeDTO.setDueDate(tempTime);
 
 		try {
-			if (recService.saveRecruitmentNotice(recruitmentNoticeDTO)) {
+			if (recService.saveRecruitmentNotice(recruitmentNoticeDTO, advantageList, applicationList, regionCode,
+					sigunguCode, newFileList, majorCategoryCode, subCategoryCode)) {
 				result = ResponseEntity.ok(true);
 			}
 		} catch (Exception e) {
 			result = ResponseEntity.badRequest().body(false);
 			e.printStackTrace();
 		}
+		
+		// 리스트 필드 다 비워주기
+		ListAllClear();
 
 		return result;
 
@@ -163,7 +168,7 @@ public class RecruitmentNoticeRestController {
 	}
 
 	// 회사가 공고를 작성할 때 산업군 추가
-	@PostMapping(value = "/major/{majorcategoryNo}")
+	@PostMapping(value = "/major/{majorCategoryNo}")
 	public ResponseEntity<String> saveMajorCategoryWithRecruitmentNotice(
 			@PathVariable("majorCategoryNo") String majorCategoryNo) {
 		// 성공, 실패 여부를 json으로 응답
@@ -174,13 +179,33 @@ public class RecruitmentNoticeRestController {
 
 		if (StringUtils.hasText(this.majorCategoryCode)) {
 			result = ResponseEntity.ok(this.majorCategoryCode);
+
 		} else {
 			result = ResponseEntity.badRequest().body(this.majorCategoryCode);
 		}
 
 		return result;
 	}
+
 	// 회사가 공고를 작성할 때 직업 추가
+	@PostMapping(value = "/sub/{subCategoryNo}")
+	public ResponseEntity<String> saveSubCategoryWithRecruitmentNotice(
+			@PathVariable("subCategoryNo") String subCategoryNo) {
+		// 성공, 실패 여부를 json으로 응답
+		ResponseEntity<String> result = null;
+
+		this.subCategoryCode = subCategoryNo;
+		System.out.println(this.subCategoryCode);
+
+		if (StringUtils.hasText(this.subCategoryCode)) {
+			result = ResponseEntity.ok(this.subCategoryCode);
+
+		} else {
+			result = ResponseEntity.badRequest().body(this.subCategoryCode);
+		}
+
+		return result;
+	}
 
 	// 내가 작성한(템플릿 제외) 공고 불러오는 메서드
 	// 아직 미완
@@ -214,6 +239,7 @@ public class RecruitmentNoticeRestController {
 		this.regionCode = null;
 		this.sigunguCode = null;
 		this.majorCategoryCode = null;
+		this.subCategoryCode = null;
 
 	}
 }
