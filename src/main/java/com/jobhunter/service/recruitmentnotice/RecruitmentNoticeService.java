@@ -24,6 +24,8 @@ public interface RecruitmentNoticeService {
 	boolean saveSigungu(String sigunguCode);
 	// 서비스단 필드에 선택한 직업 대분류 저장하는 메서드
 	boolean saveMajorCetegory(String majorCategoryNo);
+	// 서비스단 필드에 선택한 우대조건 리스트에서 지우는 메서드 
+	boolean deleteAdvantage(String advantageType);
 	
 	// 내가 등록한 공고를 조회하는 메서드
 	 

@@ -90,6 +90,11 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 			int majorCategoryForInt = Integer.parseInt(this.majorCategoryCode);
 			
 		}
+		// 파일 아직 대기중 
+		
+		
+		// 리스트 비우기
+		ListAllClear();
 		
 		return result;
 	}
@@ -113,8 +118,20 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		
 	}
 	
-	
+	// 우대조건을 리스트에서 삭제하는 메서드
+	@Override
+	public boolean deleteAdvantage(String advantageType) {
+	    boolean result = false;
 
+	    // 리스트에서 해당 우대조건을 찾아 삭제
+	    result = advantageList.removeIf(adv -> adv.getAdvantageType().equals(advantageType));
+
+	    System.out.println("우대조건 삭제 : " + advantageList);
+
+	    return result;
+	}
+	
+	
 
 	// 접수 방식을 리스트에 저장하는 메서드
 	@Override
@@ -134,9 +151,11 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		this.regionCode = regionCode;
 		System.out.println(this.regionCode);
 		
-		if(StringUtils.hasText(this.regionCode)) {
+		if(StringUtils.hasText(this.regionCode) && !this.regionCode.equals("-1")) {
 			result = true;
 		}
+		
+		this.sigunguCode = null;
 		
 		return result;
 	}
@@ -151,7 +170,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		this.sigunguCode = sigunguCode;
 		System.out.println(this.sigunguCode);
 		
-		if(StringUtils.hasText(this.sigunguCode)) {
+		if(StringUtils.hasText(this.sigunguCode) && !this.sigunguCode.equals("-1")) {
 			result = true;
 		}
 		

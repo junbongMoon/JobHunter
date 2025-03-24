@@ -81,6 +81,20 @@ public class RecruitmentNoticeRestController {
 
 		return result;
 	}
+	
+	// 회사가 공고를 작성할 때 우대조건을 리스트에서 삭제 해주는 메서드
+	@PostMapping(value = "/advantage/delete/{advantageType}")
+	public ResponseEntity<Boolean> deleteAdvantage(@PathVariable("advantageType") String advantageType) {
+	    ResponseEntity<Boolean> result;
+
+	    if (recService.deleteAdvantage(advantageType)) {
+	        result = ResponseEntity.ok(true);
+	    } else {
+	        result = ResponseEntity.badRequest().body(false);
+	    }
+
+	    return result;
+	}
 
 	// 회사가 공고를 작성할 때 지역을 필드에 임시저장하는 메서드
 	@PostMapping(value = "/region/{regionCode}")
