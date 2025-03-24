@@ -373,6 +373,13 @@
 										</div>
 									</div>
 
+									<div class="col-12">
+										<div class="input-group">
+											<label for="advantage">우대조건</label> <input type="text"
+												id="advantage" placeholder="우대조건을 입력하고 저장 버튼을 눌러주세요..">
+												<button class="addAdvantageBtn">저장하기</button>
+										</div>
+									</div>
 
 									<div class="col-md-6">
 										<div class="input-group">
