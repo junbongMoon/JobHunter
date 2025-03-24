@@ -120,4 +120,11 @@ public class AccountController {
 		return "redirect:/account/login?error=true";
 	}
 
+	@GetMapping("/logout")
+	public String logout(HttpSession session) {
+		session.invalidate();
+
+		return "redirect:/";
+	}
+
 }
