@@ -49,7 +49,7 @@
 
 			<!-- 고용 형태 -->
 			<div class="card mb-4">
-				<div class="card-header">고용 형태</div>
+				<div class="card-header jobTypeBox">고용 형태</div>
 				<div class="card-body">
 					<div class="row g-3">
 						<div class="col-md-12">
@@ -137,7 +137,7 @@
 
 			<!-- 근무 지역 선택 -->
 			<div class="card mb-4">
-				<div class="card-header">희망 근무 지역</div>
+				<div class="card-header wishRegionBox">희망 근무 지역</div>
 				<div class="card-body">
 					<div class="row">
 						<!-- 시/도 목록 -->
@@ -177,7 +177,7 @@
 
 			<!-- 희망 업직종 -->
 			<div class="card mb-4">
-				<div class="card-header">희망 업직종</div>
+				<div class="card-header wishJobBox">희망 업직종</div>
 				<div class="card-body">
 					<div class="row">
 						<!-- 대분류 목록 -->
@@ -226,81 +226,104 @@
 				</div>
 				<div class="card-body">
 					<div id="selectedMerits" class="mt-2"></div>
-				<small class="text-muted">* 나의 성격 및 강점을 선택해 주세요(최대 5개)</small>
+					<small class="text-muted">* 나의 성격 및 강점을 선택해 주세요(최대 5개)</small>
 				</div>
 			</div>
 
 			<!-- 성격 및 강점 선택 모달 -->
-			<div class="modal fade" id="meritModal" tabindex="-1" aria-labelledby="meritModalLabel" aria-hidden="true" data-bs-backdrop="static">
+			<div class="modal fade" id="meritModal" tabindex="-1"
+				aria-labelledby="meritModalLabel" aria-hidden="true"
+				data-bs-backdrop="static">
 				<div class="modal-dialog modal-lg">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title" id="meritModalLabel">성격 및 강점 선택</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							<h5 class="modal-title myMerits" id="meritModalLabel">성격 및 강점 선택</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal"
+								aria-label="Close"></button>
 						</div>
 						<div class="modal-body">
 							<div class="row g-2" role="group" aria-label="성격 및 강점 선택">
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="성실함" type="button">성실함</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="성실함" type="button">성실함</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="책임감" type="button">책임감</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="책임감" type="button">책임감</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="리더십" type="button">리더십</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="리더십" type="button">리더십</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="창의성" type="button">창의성</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="창의성" type="button">창의성</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="의사소통" type="button">의사소통</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="의사소통" type="button">의사소통</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="문제해결" type="button">문제해결</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="문제해결" type="button">문제해결</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="팀워크" type="button">팀워크</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="팀워크" type="button">팀워크</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="적극성" type="button">적극성</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="적극성" type="button">적극성</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="인내심" type="button">인내심</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="인내심" type="button">인내심</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="정확성" type="button">정확성</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="정확성" type="button">정확성</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="분석력" type="button">분석력</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="분석력" type="button">분석력</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="계획성" type="button">계획성</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="계획성" type="button">계획성</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="협동심" type="button">협동심</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="협동심" type="button">협동심</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="주도성" type="button">주도성</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="주도성" type="button">주도성</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="유연성" type="button">유연성</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="유연성" type="button">유연성</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="꼼꼼함" type="button">꼼꼼함</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="꼼꼼함" type="button">꼼꼼함</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="도전정신" type="button">도전정신</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="도전정신" type="button">도전정신</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="긍정성" type="button">긍정성</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="긍정성" type="button">긍정성</button>
 								</div>
 								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="배려심" type="button">배려심</button>
+									<button class="btn btn-outline-primary w-100 merit-btn"
+										data-merit="배려심" type="button">배려심</button>
 								</div>
 							</div>
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+							<button type="button" class="btn btn-secondary"
+								data-bs-dismiss="modal">닫기</button>
 						</div>
 					</div>
 				</div>
@@ -322,8 +345,23 @@
 			<button type="button" class="btn btn-primary" id="finalSaveBtn">완전
 				저장</button>
 
-			<button type="button" class="btn btn-secondary" id="testBtn">코드 테스트용 버튼</button>	
+			<button type="button" class="btn btn-secondary" id="testBtn">코드
+				테스트용 버튼</button>
 		</form>
+
+		<!-- 공용 경고 모달 -->
+		<div class="modal fade" id="alertModal" tabindex="-1"
+			aria-hidden="true" data-bs-backdrop="static">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content text-center">
+					<div class="modal-body">
+						<p id="alertModalMessage" class="fs-5 mt-2">알림 메시지</p>
+						<button type="button" class="btn btn-primary mt-3"
+							data-bs-dismiss="modal" id="alertModalOkBtn">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
 	</div>
 	<!-- 풋터 -->
@@ -624,6 +662,40 @@ $(document).ready(function () {
 
 	// 코드 테스트용 버튼 클릭 이벤트
 	$('#testBtn').on('click', function() {
+		// 유효성 검사
+		const title = $('#title').val().trim();
+		const titleLength = $('#title').val().length;
+	    if (!title || titleLength < 30) {
+	        showValidationModal("이력서 제목을 확인해주세요.", "#title");
+	        return;
+	    }
+
+	    const jobFormCount = $('input[name="jobForm"]:checked').length;
+	    if (jobFormCount === 0) {
+	        showValidationModal("희망 고용형태를 하나 이상 선택해주세요.", ".jobTypeBox");
+	        return;
+	    }
+
+	    const regionCount = $('#selectedRegions .badge').length;
+	    if (regionCount === 0) {
+	        showValidationModal("희망 근무지를 선택해 주세요", ".wishRegionBox");
+	        return;
+	    }
+
+	    const jobTypeCount = $('#selectedJobTypes .badge').length;
+	    if (jobTypeCount === 0) {
+	        showValidationModal("희망 업직종을 선택해 주세요", ".wishJobBox");
+	        return;
+	    }
+
+	    const meritCount = $('#selectedMerits .badge').length;
+	    if (meritCount === 0) {
+	        showValidationModal("성격 및 강점을 선택해 주세요", ".myMerits");
+	        return;
+	    }
+
+	    console.log("유효성 검사 통과");
+		
         // 폼 데이터 수집
         const formData = {
             title: $('#title').val(),
