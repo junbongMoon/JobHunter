@@ -2,7 +2,15 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.testoracle.mapper.categorymapper">
+<mapper namespace="com.jobhunter.mapper.categorymapper">
+
+	<select id="selectAllMajorCategory" resultType="com.jobhunter.model.category.MajorCategory">
+		select * from majorcategory
+	</select>
+	
+	<select id="selectSubCategoryByRefmajorcategoryNo" resultType="com.jobhunter.model.category.SubCategory">
+		select * from subcategory where refMajorcategoryNo = #{refMajorcategoryNo}
+	</select>
 	
 	<insert id="insertMajorCategoryWithRecruitmentNotice">
 		insert into jobtype_recruit_major
