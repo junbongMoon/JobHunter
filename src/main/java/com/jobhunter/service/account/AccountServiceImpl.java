@@ -6,10 +6,11 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.account.AccountLoginDAO;
-import com.jobhunter.dao.company.CompanyLoginDAOImpl;
-import com.jobhunter.dao.user.UserLoginDAOImpl;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
 import com.jobhunter.model.customenum.AccountType;
@@ -54,6 +55,7 @@ public class AccountServiceImpl implements AccountService {
 	// 인증 필요 여부 들고가려고 맵으로 반환_그냥 널 체크하면 5번 실패한건지도 모르니까
 	// auth 값 true면 이메일/폰 인증창 보여주기
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public Map<String, Object> loginAccount(LoginDTO loginDto) throws Exception {
 		Map<String, Object> result = new HashMap<>();
 
