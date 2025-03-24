@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jobhunter.dao.resume.ResumeDAO;
 import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
+import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.SigunguDTO;
@@ -33,6 +34,14 @@ public class ResumeServiceImpl implements ResumeService {
 				rdao.insertJobForm(jobForm);
 			}
 		}
+		
+		// 성격 및 장점 저장
+		if (resumeDTO.getMerits() != null && !resumeDTO.getMerits().isEmpty()) {
+			for (MeritDTO merit : resumeDTO.getMerits()) {
+				merit.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertMerit(merit);
+			}
+		}
 
 		// 지역 저장
 		if (resumeDTO.getSigunguNos() != null && !resumeDTO.getSigunguNos().isEmpty()) {
@@ -53,12 +62,20 @@ public class ResumeServiceImpl implements ResumeService {
 	@Transactional
 	public void finalSaveResume(ResumeDTO resumeDTO) throws Exception {
 		rdao.insertResumeFinal(resumeDTO); // resumeNo 세팅
-		
+
 		// 고용형태 저장
 		if (resumeDTO.getJobForms() != null && !resumeDTO.getJobForms().isEmpty()) {
 			for (JobFormDTO jobForm : resumeDTO.getJobForms()) {
 				jobForm.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertJobForm(jobForm);
+			}
+		}
+
+		// 성격 및 장점 저장
+		if (resumeDTO.getMerits() != null && !resumeDTO.getMerits().isEmpty()) {
+			for (MeritDTO merit : resumeDTO.getMerits()) {
+				merit.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertMerit(merit);
 			}
 		}
 
@@ -77,6 +94,7 @@ public class ResumeServiceImpl implements ResumeService {
 		}
 	}
 
+	// 카테고리 가져오기
 	@Override
 	public List<RegionDTO> getAllRegions() throws Exception {
 		return rdao.selectAllRegions();
