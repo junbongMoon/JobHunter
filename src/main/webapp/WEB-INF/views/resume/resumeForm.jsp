@@ -172,9 +172,6 @@
 				</div>
 			</div>
 
-			<!-- 선택된 지역 hidden input -->
-			<div id="selectedRegionsData"></div>
-
 			<!-- 희망 업직종 -->
 			<div class="card mb-4">
 				<div class="card-header wishJobBox">희망 업직종</div>
@@ -212,9 +209,6 @@
 				</div>
 			</div>
 
-			<!-- 선택된 업직종 hidden input -->
-			<div id="selectedJobTypeData"></div>
-
 			<!-- 성격 및 강점 -->
 			<div class="card mb-4">
 				<div
@@ -237,7 +231,8 @@
 				<div class="modal-dialog modal-lg">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title myMerits" id="meritModalLabel">성격 및 강점 선택</h5>
+							<h5 class="modal-title myMerits" id="meritModalLabel">성격 및
+								강점 선택</h5>
 							<button type="button" class="btn-close" data-bs-dismiss="modal"
 								aria-label="Close"></button>
 						</div>
@@ -350,18 +345,20 @@
 		</form>
 
 		<!-- 공용 경고 모달 -->
-		<div class="modal fade" id="alertModal" tabindex="-1"
-			aria-hidden="true" data-bs-backdrop="static">
+		<!-- 재사용 경고 모달창 -->
+		<div class="modal fade" id="validationModal" tabindex="-1"
+			aria-labelledby="validationModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content text-center">
 					<div class="modal-body">
-						<p id="alertModalMessage" class="fs-5 mt-2">알림 메시지</p>
-						<button type="button" class="btn btn-primary mt-3"
-							data-bs-dismiss="modal" id="alertModalOkBtn">확인</button>
+						<p id="validationMessage" class="mb-3">알림 메시지</p>
+						<button type="button" class="btn btn-primary" id="validationCheckBtn"
+							data-bs-dismiss="modal">확인</button>
 					</div>
 				</div>
 			</div>
 		</div>
+
 
 	</div>
 	<!-- 풋터 -->
@@ -659,26 +656,40 @@ $(document).ready(function () {
    	     }
   	  });
 	});
+    
+    
 
 	// 코드 테스트용 버튼 클릭 이벤트
 	$('#testBtn').on('click', function() {
 		// 유효성 검사
 		const title = $('#title').val().trim();
 		const titleLength = $('#title').val().length;
-	    if (!title || titleLength < 30) {
-	        showValidationModal("이력서 제목을 확인해주세요.", "#title");
+	    if (!title) {
+	        showValidationModal("이력서 제목을 입력해주세요.", "#title");
 	        return;
 	    }
 
-	    const jobFormCount = $('input[name="jobForm"]:checked').length;
-	    if (jobFormCount === 0) {
-	        showValidationModal("희망 고용형태를 하나 이상 선택해주세요.", ".jobTypeBox");
+		if (titleLength > 30) {
+	        showValidationModal("이력서 제목은 30자 이내로 작성해주세요.", "#title");
 	        return;
 	    }
+		
+	    const jobFormCount = $('input[name="jobForm"]:checked').length;
+	    if (jobFormCount === 0) {
+	        showValidationModal("희망 고용형태를 하나 이상 선택해주세요.", "#fullTime");
+	        return;
+	    }
+
+		const payType = $('input[name="payType"]:checked').val();
+        const payAmount = $('#payAmount').val().trim();
+        if (payType !== '협의 후 결정' && (!payAmount || payAmount <= 0)) {
+            showValidationModal("희망 금액을 입력해주세요", "#payAmount");
+            return;
+        }
 
 	    const regionCount = $('#selectedRegions .badge').length;
 	    if (regionCount === 0) {
-	        showValidationModal("희망 근무지를 선택해 주세요", ".wishRegionBox");
+	        showValidationModal("희망 근무지를 선택해 주세요", ".region-item");
 	        return;
 	    }
 
@@ -827,90 +838,19 @@ $(document).ready(function () {
             }
         });
     });
+    
+    // 유효성 검사 모달
+    function showValidationModal(message, focusSelector) {
+    	  $('#validationMessage').text(message); // 메시지 설정
+    	  $('#validationModal').modal('show');   // 모달 띄우기
 
-    // 폼 제출 전 데이터 검증
-    $('#resumeForm').on('submit', function(e) {
-        e.preventDefault();
-        
-        // 필수 필드 검증
-        const title = $('#title').val();
-        if (!title) {
-            alert('이력서 제목을 입력해주세요.');
-            return false;
-        }
-
-        // 선택된 고용 형태 검증
-        const jobForms = $('input[name="jobForm"]:checked').length;
-        if (jobForms === 0) {
-            alert('희망하는 고용 형태를 하나 이상 선택해주세요.');
-            return false;
-        }
-
-        // 선택된 지역 검증
-        const selectedRegions = $('#selectedRegions').find('.badge').length;
-        if (selectedRegions === 0) {
-            alert('희망 근무 지역을 하나 이상 선택해주세요.');
-            return false;
-        }
-
-        // 선택된 업직종 검증
-        const selectedJobTypes = $('#selectedJobTypes').find('.badge').length;
-        if (selectedJobTypes === 0) {
-            alert('희망 업직종을 하나 이상 선택해주세요.');
-            return false;
-        }
-
-        // 선택된 지역 데이터 수집
-        $('#selectedRegionsData').empty();
-        $('#selectedRegions').find('.badge').each(function() {
-            let sigunguName = $(this).text().trim();
-            let sigunguNo = $('input[data-name="' + sigunguName + '"]').val();
-            $('#selectedRegionsData').append(
-                $('<input>').attr({
-                    type: 'hidden',
-                    name: 'sigunguNos',
-                    value: sigunguNo
-                })
-            );
-        });
-
-        // 선택된 업직종 데이터 수집
-        $('#selectedJobTypeData').empty();
-        $('#selectedJobTypes').find('.badge').each(function() {
-            let subName = $(this).text().trim();
-            let subNo = $('input[data-name="' + subName + '"]').val();
-            $('#selectedJobTypeData').append(
-                $('<input>').attr({
-                    type: 'hidden',
-                    name: 'subcategoryNos',
-                    value: subNo
-                })
-            );
-        });
-
-        // 선택된 성격 및 강점 검증
-        const selectedMerits = $('#selectedMerits').find('.badge').length;
-        if (selectedMerits === 0) {
-            alert('성격 및 강점을 하나 이상 선택해주세요.');
-            return false;
-        }
-
-        // 선택된 성격 및 강점 데이터 수집
-        $('#selectedMeritsData').empty();
-        $('#selectedMerits').find('.badge').each(function() {
-            const merit = $(this).data('merit');
-            $('#selectedMeritsData').append(
-                $('<input>').attr({
-                    type: 'hidden',
-                    name: 'merits',
-                    value: merit
-                })
-            );
-        });
-
-        // 모든 검증을 통과하면 폼 제출
-        this.submit();
-    });
+    	  // 모달이 닫히면 해당 요소로 포커스 이동
+    	  $('#validationCheckBtn').off('click').on('click', function () {
+    	    if (focusSelector) {
+    	      $(focusSelector).focus();
+    	    }
+    	  });
+    	}
 
     // 성격 및 강점 버튼 클릭 이벤트
     $('.merit-btn').on('click', function() {
@@ -965,7 +905,7 @@ $(document).ready(function () {
         }
     });
 
-    // 모달이 열릴 때 포커스 관리
+    // 성격 및 강점 선택 모달이 열릴 때 포커스 관리
     $('#meritModal').on('shown.bs.modal', function () {
         // 모달이 열릴 때 첫 번째 버튼에 포커스
         $(this).find('.merit-btn').first().focus();
@@ -978,6 +918,9 @@ $(document).ready(function () {
         // 버튼 스타일 초기화
         $('.merit-btn').removeClass('btn-primary').addClass('btn-outline-primary');
     });
+    
+
+    
 });
 
 </script>
