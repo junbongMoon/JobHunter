@@ -11,6 +11,7 @@ import com.jobhunter.model.resume.SubCategoryDTO;
 public interface ResumeService {
 	void tempSaveResume(ResumeDTO resumeDTO) throws Exception;
     void finalSaveResume(ResumeDTO resumeDTO) throws Exception;
+    
 
     List<RegionDTO> getAllRegions() throws Exception;
     List<SigunguDTO> getSigunguByRegion(int regionNo) throws Exception;

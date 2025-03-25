@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.resume.ResumeDAO;
+import com.jobhunter.model.resume.EducationDTO;
 import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
@@ -56,6 +57,14 @@ public class ResumeServiceImpl implements ResumeService {
 				rdao.insertSubCategory(resumeDTO.getResumeNo(), subcategoryNo);
 			}
 		}
+
+		// 학력 저장
+		if (resumeDTO.getEducations() != null && !resumeDTO.getEducations().isEmpty()) {
+			for (EducationDTO education : resumeDTO.getEducations()) {
+				education.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertEducation(education);
+			}
+		}
 	}
 
 	@Override
@@ -90,6 +99,14 @@ public class ResumeServiceImpl implements ResumeService {
 		if (resumeDTO.getSubcategoryNos() != null && !resumeDTO.getSubcategoryNos().isEmpty()) {
 			for (Integer subcategoryNo : resumeDTO.getSubcategoryNos()) {
 				rdao.insertSubCategory(resumeDTO.getResumeNo(), subcategoryNo);
+			}
+		}
+
+		// 학력 저장
+		if (resumeDTO.getEducations() != null && !resumeDTO.getEducations().isEmpty()) {
+			for (EducationDTO education : resumeDTO.getEducations()) {
+				education.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertEducation(education);
 			}
 		}
 	}
