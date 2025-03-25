@@ -67,4 +67,10 @@
         VALUES (#{meritContent}, #{resumeNo});
     </insert>
 
+    <!-- 학력 저장 -->
+    <insert id="insertEducation" parameterType="com.jobhunter.model.resume.EducationDTO">
+        INSERT INTO education (educationLevel, educationStatus, customInput, resumeNo)
+        VALUES (#{educationLevel}, #{educationStatus}, #{customInput}, #{resumeNo});
+    </insert>
+
 </mapper>
