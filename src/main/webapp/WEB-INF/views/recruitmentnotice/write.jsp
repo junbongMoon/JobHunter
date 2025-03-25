@@ -295,13 +295,14 @@ $(document).on("click", ".save-method-btn", function () {
 	
 
 	function removeAdvantage(deleteBtn) {
-		advantageType = $(this).prev().val();
+    let advantageType = $(deleteBtn).siblings("input[type='hidden']").val();
+
     $.ajax({
         url: "/recruitmentnotice/rest/advantage/" + advantageType,
         type: "DELETE",
         success: function (response) {
             console.log("삭제 성공", response);
-            renderAdvantageList(response);
+            $(deleteBtn).closest(".advantage-item").remove();
         },
         error: function (err) {
             console.error("삭제 실패", err);
@@ -310,6 +311,8 @@ $(document).on("click", ".save-method-btn", function () {
 }
 
 	function addAdvantage() {
+		
+		let advVal = $("#advantage").val();
     let advantageValue = $("#advantage").val();
 
     if (!advantageValue) {
@@ -326,7 +329,16 @@ $(document).on("click", ".save-method-btn", function () {
         success: function (response) {
             console.log("우대조건 저장 성공", response);
             $("#advantage").val("");
-            renderAdvantageList(response);
+
+            // DOM에 추가할 HTML 구성
+            let output = `
+                <div class="d-flex align-items-center mb-2 advantage-item">
+                    <input type="hidden" value="\${advantageValue}">
+                    <span class="me-2">\${advantageValue}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeAdvantage(this)">X</button>
+                </div>
+            `;
+            $(".advantageArea").append(output);
         },
         error: function (err) {
             console.error("우대조건 저장 실패", err);
@@ -334,6 +346,7 @@ $(document).on("click", ".save-method-btn", function () {
     });
 
 	// append 시키자
+	output += ``
 
 }
 
@@ -543,12 +556,13 @@ $(document).on("click", ".save-method-btn", function () {
 												id="advantage" placeholder="우대조건을 입력하고 저장 버튼을 눌러주세요..">
 												<button type="button" class="addAdvantageBtn" onclick="addAdvantage()">저장하기</button>
 										</div>
+										<div class="advantageArea"></div>
 									</div>
 
 									<div class="col-md-6">
 										<div class="input-group">
 											<label for="date">마감 기한</label> <input type="date" id="date"
-												max="2025-12-30" min="2077-06-05" value="2077-06-15">
+												max="2025-12-30" min="2025-03-30" value="2025-03-27">
 
 										</div>
 									</div>
