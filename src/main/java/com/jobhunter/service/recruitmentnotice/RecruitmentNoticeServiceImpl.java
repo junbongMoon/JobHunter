@@ -26,14 +26,14 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	private final RecruitmentNoticeDAO recdao;
 	private final RegionDAO regiondao;
 
-	// 임시저장 할 List, 코드들
+	
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO, List<AdvantageDTO> advantageList, List<ApplicationDTO> applicationList, String regionCode, String sigunguCode, List<RecruitmentnoticeBoardUpfiles> fileList, String majorCategortCode, String subCategoryCode) throws Exception {
 		boolean result = false;
 		int CompanyUid = recruitmentNoticeDTO.getRefCompany();
-		
+		int recNo = 0;
 
 //		if(recdao.insertRecruitmentNotice(recruitmentNoticeDTO) > 0) {
 //			result = true;
@@ -45,7 +45,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 			// 여러가지 값을 가질 수 있는 것도 저장 해야함 트랜잭션으로 묶어서 공고를 선입력하고 그 uid값을 참조하는 것으로 insert하자
 			// 여기서 가장 최근 공고를 조회하는 메서드로 방금 올린 유저의 공고를 가져오자
 			RecruitmentNotice rec = recdao.selectRecentRecruitment(CompanyUid);
-			int recNo = rec.getUid();
+			recNo = rec.getUid();
 
 			// 파일 아직 대기중
 
@@ -54,19 +54,26 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		if(!advantageList.isEmpty()) {
 			// advantageList에서 하나씩 꺼내서 insert
 			for(AdvantageDTO advDTO : advantageList) {
+				advDTO.setRecruitmentNoticeUid(recNo);
 				// 여기서 insert
+				recdao.insertAdvantageWithRecruitmentNotice(advDTO);
 			}
 		}
 		if(!applicationList.isEmpty()) {
 			for(ApplicationDTO aplDTO : applicationList) {
+				aplDTO.setRecruitmentNoticeUid(recNo);
 				// 여기서 insert
+				recdao.insertApplicationWithRecruitmentNotice(aplDTO);
 			}
 		}
 		if(StringUtils.hasText(regionCode)) {
 			// 여기서 insert
+			
+			regiondao.insertRegionWithRecruitmentNotice(recNo, Integer.parseInt(regionCode));
 		}
 		if(StringUtils.hasText(sigunguCode)) {
 			// 여기서 insert
+			regiondao.insertSigunguWithRecruitmentNotice(recNo, Integer.parseInt(regionCode));
 		}
 		if(!fileList.isEmpty()) {
 			for(RecruitmentnoticeBoardUpfiles file : fileList) {
@@ -75,6 +82,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		}
 		if(StringUtils.hasText(majorCategortCode)) {
 			// 여기서 insert
+			
 		}
 		if(StringUtils.hasText(subCategoryCode)) {
 			// 여기서 insert
