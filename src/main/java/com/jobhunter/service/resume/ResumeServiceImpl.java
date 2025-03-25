@@ -10,6 +10,7 @@ import com.jobhunter.model.resume.EducationDTO;
 import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
+import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.SigunguDTO;
@@ -65,6 +66,14 @@ public class ResumeServiceImpl implements ResumeService {
 				rdao.insertEducation(education);
 			}
 		}
+
+		// 경력 저장
+		if (resumeDTO.getHistories() != null && !resumeDTO.getHistories().isEmpty()) {
+			for (PersonalHistoryDTO history : resumeDTO.getHistories()) {
+				history.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertHistory(history);
+			}
+		}
 	}
 
 	@Override
@@ -107,6 +116,14 @@ public class ResumeServiceImpl implements ResumeService {
 			for (EducationDTO education : resumeDTO.getEducations()) {
 				education.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertEducation(education);
+			}
+		}
+
+		// 경력 저장
+		if (resumeDTO.getHistories() != null && !resumeDTO.getHistories().isEmpty()) {
+			for (PersonalHistoryDTO history : resumeDTO.getHistories()) {
+				history.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertHistory(history);
 			}
 		}
 	}
