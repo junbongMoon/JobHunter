@@ -2,6 +2,7 @@ package com.jobhunter.dao.resume;
 
 import java.util.List;
 
+import com.jobhunter.model.resume.EducationDTO;
 import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
@@ -30,4 +31,6 @@ public interface ResumeDAO {
 	List<SubCategoryDTO> selectSubCategoriesByMajor(int majorcategoryNo) throws Exception;
 	
 	void insertMerit(MeritDTO meritDTO) throws Exception;
+
+	void insertEducation(EducationDTO educationDTO) throws Exception;
 }

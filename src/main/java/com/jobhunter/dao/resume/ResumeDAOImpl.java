@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.jobhunter.model.resume.EducationDTO;
 import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
@@ -81,6 +82,12 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public void insertMerit(MeritDTO meritDTO) throws Exception {
 		ses.insert(NS + ".insertMerit", meritDTO);
 	}
+
+	@Override
+	public void insertEducation(EducationDTO educationDTO) throws Exception {
+		ses.insert(NS + ".insertEducation", educationDTO);
+	}
+	
 	
 	
 
