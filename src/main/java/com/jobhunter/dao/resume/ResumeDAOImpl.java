@@ -15,6 +15,7 @@ import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
+import com.jobhunter.model.resume.PersonalHistoryDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -86,6 +87,11 @@ public class ResumeDAOImpl implements ResumeDAO {
 	@Override
 	public void insertEducation(EducationDTO educationDTO) throws Exception {
 		ses.insert(NS + ".insertEducation", educationDTO);
+	}
+
+	@Override
+	public void insertHistory(PersonalHistoryDTO historyDTO) throws Exception {
+		ses.insert(NS + ".insertHistory", historyDTO);
 	}
 	
 	

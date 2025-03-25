@@ -10,6 +10,7 @@ import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
+import com.jobhunter.model.resume.PersonalHistoryDTO;
 
 public interface ResumeDAO {
 	void insertResumeTemp(ResumeDTO resumeDTO);
@@ -33,4 +34,6 @@ public interface ResumeDAO {
 	void insertMerit(MeritDTO meritDTO) throws Exception;
 
 	void insertEducation(EducationDTO educationDTO) throws Exception;
+
+	void insertHistory(PersonalHistoryDTO historyDTO) throws Exception;
 }
