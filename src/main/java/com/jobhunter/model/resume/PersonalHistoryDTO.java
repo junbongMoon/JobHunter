@@ -19,9 +19,8 @@ import lombok.ToString;
 public class PersonalHistoryDTO {
 	private int historyNo;
 	private String companyName;
-	private String position;
 	private String jobDescription;
-	private Date startDate;
-	private Date endDate;
+	private String startDate;
+	private String endDate;
 	private int resumeNo;
 }
