@@ -65,6 +65,7 @@ public class RecruitmentNoticeRestController {
 		try {
 			if (recService.saveRecruitmentNotice(recruitmentNoticeDTO, advantageList, applicationList, regionCode,
 					sigunguCode, newFileList, majorCategoryCode, subCategoryCode)) {
+				// service 단도 바꿔주자
 				result = ResponseEntity.ok(true);
 			}
 		} catch (Exception e) {

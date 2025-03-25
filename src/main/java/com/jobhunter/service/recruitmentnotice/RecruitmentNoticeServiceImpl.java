@@ -6,11 +6,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.jobhunter.dao.recruitmentnotice.RecruitmentNoticeDAO;
 import com.jobhunter.dao.region.RegionDAO;
+import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
+import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,10 +29,11 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	// 임시저장 할 List, 코드들
 
 	@Override
-	@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-	public boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO) throws Exception {
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO, List<AdvantageDTO> advantageList, List<ApplicationDTO> applicationList, String regionCode, String sigunguCode, List<RecruitmentnoticeBoardUpfiles> fileList, String majorCategortCode, String subCategoryCode) throws Exception {
 		boolean result = false;
 		int CompanyUid = recruitmentNoticeDTO.getRefCompany();
+		
 
 //		if(recdao.insertRecruitmentNotice(recruitmentNoticeDTO) > 0) {
 //			result = true;
@@ -45,12 +50,55 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 			// 파일 아직 대기중
 
 		}
+		// 우대 조건을 입력하는 메서드 호출
+		if(!advantageList.isEmpty()) {
+			// advantageList에서 하나씩 꺼내서 insert
+			for(AdvantageDTO advDTO : advantageList) {
+				// 여기서 insert
+			}
+		}
+		if(!applicationList.isEmpty()) {
+			for(ApplicationDTO aplDTO : applicationList) {
+				// 여기서 insert
+			}
+		}
+		if(StringUtils.hasText(regionCode)) {
+			// 여기서 insert
+		}
+		if(StringUtils.hasText(sigunguCode)) {
+			// 여기서 insert
+		}
+		if(!fileList.isEmpty()) {
+			for(RecruitmentnoticeBoardUpfiles file : fileList) {
+				// 여기서 insert
+			}
+		}
+		if(StringUtils.hasText(majorCategortCode)) {
+			// 여기서 insert
+		}
+		if(StringUtils.hasText(subCategoryCode)) {
+			// 여기서 insert
+		}
+			
+			
 		return result;
 	}
 
 	// 내가 쓴 공고 모두를 조회하는 메서드
 	@Override
 	public List<RecruitmentNotice> getRecruitmentByUid(int uid) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	// 내가 쓴 공고 템플릿을 조회하는 메서드
+	@Override
+	public List<RecruitmentNotice> getRecruitmenTempByUid(int uid) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<RecruitmentNotice> getEntireRecruitment() throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
