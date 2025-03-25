@@ -9,12 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
 import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
@@ -22,6 +24,7 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
+import com.jobhunter.util.FileProcess;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +35,7 @@ public class RecruitmentNoticeRestController {
 
 	private final RecruitmentNoticeService recService;
 	private static final Logger logger = LoggerFactory.getLogger(RecruitmentNoticeRestController.class);
+	private final FileProcess fp;
 
 	// 양식을 저장 할 List, 코드들
 	private final List<AdvantageDTO> advantageList = new ArrayList<>();
@@ -65,6 +69,7 @@ public class RecruitmentNoticeRestController {
 		try {
 			if (recService.saveRecruitmentNotice(recruitmentNoticeDTO, advantageList, applicationList, regionCode,
 					sigunguCode, newFileList, majorCategoryCode, subCategoryCode)) {
+				// service 단도 바꿔주자
 				result = ResponseEntity.ok(true);
 			}
 		} catch (Exception e) {
@@ -97,18 +102,17 @@ public class RecruitmentNoticeRestController {
 	}
 
 	// 회사가 공고를 작성할 때 우대조건을 리스트에서 삭제 해주는 메서드
-	@PostMapping(value = "/advantage/delete/{advantageType}")
+	@DeleteMapping(value = "/advantage/{advantageType}")
 	public ResponseEntity<List<AdvantageDTO>> deleteAdvantage(@PathVariable("advantageType") String advantageType) {
 		ResponseEntity<List<AdvantageDTO>> result = null;
 
 		// 대기
 		if (this.advantageList.removeIf(adv -> adv.getAdvantageType().equals(advantageType))) {
 			System.out.println("우대조건 삭제 : " + advantageList);
-			result = ResponseEntity.ok(this.advantageList);
-		} else {
-			result = ResponseEntity.badRequest().body(this.advantageList);
-		}
-
+			
+		} 
+		result = ResponseEntity.ok(this.advantageList);
+		
 		return result;
 	}
 
@@ -206,7 +210,33 @@ public class RecruitmentNoticeRestController {
 
 		return result;
 	}
-
+	
+	@PostMapping("/file")
+	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> savefileWithRecruitmentNotice(MultipartFile file){
+		ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> result = null;
+		
+		// 파일 처리 일단 대기
+		
+		return result;
+	}
+	
+	// 공고를 작성할 때 면접방식을 삭제하는 메서드
+	@DeleteMapping("/application")
+	public ResponseEntity<List<ApplicationDTO>> deleteApplicationWithRecruitmentNotice(@RequestBody ApplicationDTO applicationDTO){
+		ResponseEntity<List<ApplicationDTO>> result = null;
+		
+		for(int i = 0; i < applicationList.size(); i++) {
+			if(applicationList.get(i).getMethod() == applicationDTO.getMethod()) {
+				applicationList.remove(i);
+			}
+		}
+		result = ResponseEntity.ok(applicationList);
+		
+		return result;
+	}
+	
+	
+	
 	// 내가 작성한(템플릿 제외) 공고 불러오는 메서드
 	// 아직 미완
 	@GetMapping(value = "/company/{uid}")
@@ -225,6 +255,9 @@ public class RecruitmentNoticeRestController {
 		return result;
 
 	}
+	
+	
+	
 
 	// 내가 작성한 공고 수정하는 메서드
 

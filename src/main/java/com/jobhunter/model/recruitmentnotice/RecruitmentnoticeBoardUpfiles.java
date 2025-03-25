@@ -1,5 +1,7 @@
 package com.jobhunter.model.recruitmentnotice;
 
+import com.jobhunter.model.util.FileStatus;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,9 +20,11 @@ public class RecruitmentnoticeBoardUpfiles {
 	private int boardUpFileNo;
 	private String originalFileName;
 	private String newFileName;
+	private String fileType;
 	private String ext;
-	private int size;
+	private long size;
 	private String base64Image;
 	private int refrecruitmentnoticeNo;
+	private FileStatus status;
 	
 }
