@@ -839,7 +839,6 @@
 					const educationItems = $('.education-item');
 					if (educationItems.length > 0) {
 						let isValid = true;
-						let focusElement = null;
 
 						educationItems.each(function () {
 							const educationLevel = $(this).find('.education-level').val();
@@ -848,7 +847,6 @@
 
 							if (!educationLevel || !educationStatus || !customInput) {
 								isValid = false;
-								focusElement = $(this).find(':input[value=""]:first');
 								return false; // each 중단
 							}
 						});
@@ -864,7 +862,6 @@
 					const historyItems = $('.history-item');
 					if (historyItems.length > 0) {
 						let isValid = true;
-						let focusElement = null;
 
 						historyItems.each(function () {
 							const companyName = $(this).find('.company-name').val().trim();
@@ -882,7 +879,6 @@
 							// 재직중이 아닌 경우에만 종료일 체크
 							if (!isCurrentlyEmployed && !endDate) {
 								isValid = false;
-								focusElement = $(this).find('.end-date');
 								return false;
 							}
 						});
