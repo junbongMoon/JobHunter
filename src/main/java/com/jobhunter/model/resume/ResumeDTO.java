@@ -30,6 +30,9 @@ public class ResumeDTO {
     
     // 성격 및 강점 리스트
     private List<MeritDTO> merits;
+    
+    // 학력 리스트
+    private List<EducationDTO> educations;
 
     // 지역 선택 리스트 (region, sigungu)
     private List<Integer> regionNos;   // 시/도 번호
