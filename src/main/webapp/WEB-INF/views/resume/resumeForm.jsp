@@ -345,7 +345,10 @@
 
 			<!-- 학력사항 템플릿 (추가 버튼 눌러야 나옴) -->
 			<template id="educationTemplate">
-				<div class="education-item border rounded p-3 mb-3">
+				<div class="education-item border rounded p-3 mb-3 position-relative">
+					<!-- 삭제 버튼 (X) -->
+					<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-education" 
+						aria-label="삭제"></button>
 					<div class="row g-3">
 						<!-- 학력 구분 -->
 						<div class="col-md-3">
@@ -377,20 +380,74 @@
 								class="form-control custom-input" name="customInput"
 								placeholder="학교명을 입력하세요">
 						</div>
+					</div>
+				</div>
+			</template>
 
-						<!-- 삭제 버튼 -->
-						<div class="col-md-2 d-flex align-items-end">
-							<button type="button"
-								class="btn btn-danger btn-sm remove-education">삭제</button>
+			<!-- 경력사항 -->
+			<div class="card mb-4">
+				<div
+					class="card-header d-flex justify-content-between align-items-center"
+					id="myHistoryBox">
+					<span>경력사항</span>
+					<button type="button" class="btn btn-primary btn-sm"
+						id="addHistoryBtn">추가하기</button>
+				</div>
+				<div class="card-body">
+					<div id="historyContainer">
+						<!-- 경력 항목 -->
+					</div>
+					<small class="text-muted">* 경력사항이 있는 경우에만 작성해 주세요.</small>
+				</div>
+			</div>
+
+			<!-- 경력사항 템플릿 (추가 버튼 눌러야 나옴) -->
+			<template id="historyTemplate">
+				<div class="history-item border rounded p-3 mb-3 position-relative">
+					<!-- 삭제 버튼 (X) -->
+					<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-history" 
+						aria-label="삭제"></button>
+					<div class="row g-3">
+						<!-- 회사명 입력 -->
+						<div class="col-md-6">
+							<label class="form-label">회사명</label>
+							<input type="text" class="form-control company-name" 
+								name="companyName" placeholder="회사명을 입력하세요" maxlength="20">
+						</div>
+
+						<!-- 근무기간 -->
+						<div class="col-md-4">
+							<label class="form-label">근무기간</label>
+							<div class="row g-2">
+								<div class="col-md-4">
+									<input type="date" class="form-control start-date" name="startDate">
+								</div>
+								<div class="col-md-1 text-center d-flex align-items-center justify-content-center">
+									<span>~</span>
+								</div>
+								<div class="col-md-4">
+									<input type="date" class="form-control end-date" name="endDate">
+								</div>
+							</div>
+							<div class="form-check mt-2">
+								<input type="checkbox" class="form-check-input currently-employed" id="currentlyEmployed">
+								<label class="form-check-label" for="currentlyEmployed">재직중</label>
+							</div>
+						</div>
+
+						<!-- 담당업무 입력 -->
+						<div class="col-md-12">
+							<label class="form-label">담당업무</label>
+							<input type="text" class="form-control job-description" 
+								name="jobDescription" placeholder="담당업무를 입력하세요" maxlength="100">
 						</div>
 					</div>
 				</div>
 			</template>
 
-
-			<!-- 경력사항 -->
 			<!-- 보유 자격증 -->
 			<!-- 자기소개란 -->
+			<!-- 파일 첨부 -->
 
 			<!-- 임시 저장 버튼 -->
 			<button type="button" class="btn btn-secondary" id="tempSaveBtn">임시
@@ -803,7 +860,39 @@
 						}
 					}
 
+					// 경력사항 유효성 검사 -> 학력과 유사한 형식
+					const historyItems = $('.history-item');
+					if (historyItems.length > 0) {
+						let isValid = true;
+						let focusElement = null;
 
+						historyItems.each(function () {
+							const companyName = $(this).find('.company-name').val().trim();
+							const jobDescription = $(this).find('.job-description').val().trim();
+							const startDate = $(this).find('.start-date').val();
+							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
+							const endDate = $(this).find('.end-date').val();
+
+							if (!companyName || !jobDescription || !startDate) {
+								isValid = false;
+								focusElement = $(this).find(':input[value=""]:first');
+								return false; // each 중단
+							}
+
+							// 재직중이 아닌 경우에만 종료일 체크
+							if (!isCurrentlyEmployed && !endDate) {
+								isValid = false;
+								focusElement = $(this).find('.end-date');
+								return false;
+							}
+						});
+
+						if (!isValid) {
+							showValidationModal("경력사항에 입력사항이 누락되었습니다.");
+							$("#myHistoryBox").attr("tabindex", -1).focus();
+							return;
+						}
+					}
 
 					console.log("유효성 검사 통과");
 
@@ -835,6 +924,16 @@
 								educationLevel: $(this).find('.education-level').val(),
 								educationStatus: $(this).find('.education-status').val(),
 								customInput: $(this).find('.custom-input').val()
+							};
+						}).get(),
+						histories: $('.history-item').map(function () {
+							const $endDate = $(this).find('.end-date');
+							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
+							return {
+								companyName: $(this).find('.company-name').val(),
+								jobDescription: $(this).find('.job-description').val(),
+								startDate: $(this).find('.start-date').val(),
+								endDate: isCurrentlyEmployed ? null : $endDate.val()
 							};
 						}).get()
 					};
@@ -872,6 +971,16 @@
 								educationLevel: $(this).find('.education-level').val(),
 								educationStatus: $(this).find('.education-status').val(),
 								customInput: $(this).find('.custom-input').val()
+							};
+						}).get(),
+						histories: $('.history-item').map(function () {
+							const $endDate = $(this).find('.end-date');
+							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
+							return {
+								companyName: $(this).find('.company-name').val(),
+								jobDescription: $(this).find('.job-description').val(),
+								startDate: $(this).find('.start-date').val(),
+								endDate: isCurrentlyEmployed ? null : $endDate.val()
 							};
 						}).get()
 					};
@@ -931,6 +1040,16 @@
 								educationLevel: $(this).find('.education-level').val(),
 								educationStatus: $(this).find('.education-status').val(),
 								customInput: $(this).find('.custom-input').val()
+							};
+						}).get(),
+						histories: $('.history-item').map(function () {
+							const $endDate = $(this).find('.end-date');
+							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
+							return {
+								companyName: $(this).find('.company-name').val(),
+								jobDescription: $(this).find('.job-description').val(),
+								startDate: $(this).find('.start-date').val(),
+								endDate: isCurrentlyEmployed ? null : $endDate.val()
 							};
 						}).get()
 					};
@@ -1043,6 +1162,28 @@
 				// 학력 삭제 버튼 클릭 이벤트
 				$(document).on('click', '.remove-education', function () {
 					$(this).closest('.education-item').remove();
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 경력 추가 버튼 클릭 이벤트
+				$('#addHistoryBtn').on('click', function () {
+					const template = document.querySelector('#historyTemplate');
+					const clone = template.content.cloneNode(true);
+					$('#historyContainer').append(clone);
+				});
+
+				// 경력 삭제 버튼 클릭 이벤트
+				$(document).on('click', '.remove-history', function () {
+					$(this).closest('.history-item').remove();
+				});
+
+				// 재직중 체크박스 이벤트
+				$(document).on('change', '.currently-employed', function() {
+					const $endDate = $(this).closest('.history-item').find('.end-date');
+					if ($(this).is(':checked')) {
+						$endDate.val('').prop('disabled', true);
+					} else {
+						$endDate.prop('disabled', false);
+					}
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
 
