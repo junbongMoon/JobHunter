@@ -11,6 +11,9 @@ public interface ReviewBoardDAO {
 
 	int insertBoard(ReviewBoardDTO reviewBoardDTO) throws Exception;
 
+	ReviewBoard selectDetailBoard(int boardNo)throws Exception;
+
+
 	
 
 }

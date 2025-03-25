@@ -50,4 +50,13 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 	    return result;
 	}
+
+
+
+
+	@Override
+	public ReviewBoard getBoardDetail(int boardNo) throws Exception {
+		
+		return Rdao.selectDetailBoard(boardNo);
+	}
 }

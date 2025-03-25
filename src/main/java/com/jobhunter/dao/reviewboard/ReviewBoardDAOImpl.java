@@ -43,4 +43,12 @@ import lombok.extern.log4j.Log4j;
 		
 		return ses.insert(NS + ".insertReview",reviewBoardDTO);
 	}
+
+
+
+	@Override
+	public ReviewBoard selectDetailBoard(int boardNo) throws Exception {
+		
+		return ses.selectOne(NS +".detailAll", boardNo);
+	}
 }

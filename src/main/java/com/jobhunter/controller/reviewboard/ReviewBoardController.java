@@ -9,7 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jobhunter.model.reviewboard.ReviewBoard;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
@@ -74,6 +77,21 @@ public class ReviewBoardController {
         return returnPage;
     }
 	
-	
+	@GetMapping("/detail")
+	public String detailinfo(@RequestParam("boardNo") int boardNo, Model model) {
+	    String returnPage = "";
+	    
+	    try {
+	        ReviewBoard board = service.getBoardDetail(boardNo);
+	        model.addAttribute("board", board);
+	        System.out.println(board);
+	        returnPage = "reviewBoard/detail"; // JSP 경로 반환
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        returnPage = "redirect:/reviewBoard/allBoard?status=error";
+	    }
+
+	    return returnPage;
+	}
 	
 }

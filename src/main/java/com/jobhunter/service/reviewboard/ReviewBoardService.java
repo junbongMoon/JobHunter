@@ -14,6 +14,9 @@ public interface ReviewBoardService {
 	List<ReviewBoard> selectReBoard() throws Exception;
 	// 게시글 저장 
 	boolean saveReview(ReviewBoardDTO reviewBoardDTO)throws Exception;
+	
+	//상세페이지 조회 
+	ReviewBoard getBoardDetail(int boardNo) throws Exception;
 
 	
 
