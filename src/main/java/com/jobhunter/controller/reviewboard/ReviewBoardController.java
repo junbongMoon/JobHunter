@@ -28,13 +28,14 @@ public class ReviewBoardController {
 	@GetMapping("/allBoard")
 	public String listBoard (Model model) {
 		
-		
+
+
 		String resultPage = "reviewBoard/allBoard";
 		//String 타입으 뷰로 반환할 경로 지정   
 		List<ReviewBoard> blist = null; // 초기값세팅   
 			try {
 				blist = service.selectReBoard();
-			
+			System.out.println(blist);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -54,11 +55,25 @@ public class ReviewBoardController {
 		return "reviewBoard/write";
 	}
 
-	@PostMapping("/write")
-	public String savereviewBoard(@ModelAttribute ReviewBoardDTO reviewBoardDTO) {
-		logger.info("저장좀 해봐라... : " + reviewBoardDTO.toString());
-		
-		return service.saved(reviewBoardDTO);
-	}
+	@PostMapping("/write") 
+    public String saveReviewBoard(@ModelAttribute ReviewBoardDTO newReview) {
+        logger.info("리뷰 게시글 저장 시도: " + newReview.toString());
+
+        String returnPage = "redirect:./allBoard"; // 기본 리디렉션 경로
+        
+        
+        try {
+            if (service.saveReview(newReview)) {
+                returnPage += "?status=success";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnPage += "?status=fail";
+        }
+
+        return returnPage;
+    }
+	
+	
 	
 }

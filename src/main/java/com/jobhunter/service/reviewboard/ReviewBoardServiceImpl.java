@@ -26,7 +26,28 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 	@Override
 	public List<ReviewBoard> selectReBoard() throws Exception {
-		// TODO Auto-generated method stub
+
+
 		return Rdao.selectListBoard();
+	}
+
+
+
+
+	@Override
+	public boolean saveReview(ReviewBoardDTO reviewBoardDTO) throws Exception {
+	    boolean result = false;
+	    int boardInt = Rdao.insertBoard(reviewBoardDTO);
+
+	    System.out.println("insertBoard() 결과: " + boardInt);
+
+	    if (boardInt > 0) {
+	        System.out.println("리뷰 등록 성공");
+	        result = true;
+	    } else {
+	        System.out.println("리뷰 등록 실패");
+	    }
+
+	    return result;
 	}
 }

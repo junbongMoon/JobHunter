@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.reviewboard.ReviewBoard;
+import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -27,7 +28,19 @@ import lombok.extern.log4j.Log4j;
 	
 	@Override
 	public List<ReviewBoard> selectListBoard() throws Exception {
+	
+		
 		
 		return ses.selectList(NS +".allList");
+		
+	
+	}
+
+
+
+	@Override
+	public int insertBoard(ReviewBoardDTO reviewBoardDTO) throws Exception {
+		
+		return ses.insert(NS + ".insertReview",reviewBoardDTO);
 	}
 }
