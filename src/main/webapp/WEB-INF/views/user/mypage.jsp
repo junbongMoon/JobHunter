@@ -9,21 +9,25 @@
 	<div>마이페이지</div>
 	<!-- /Contact Section -->
 
-	<!-- 인증 대상 -->
+	 <!-- 인증 대상 -->
+	 <input type="hidden" id="authMobile"
+	 value="${sessionScope.authTargetMobile}" />
+ <input type="hidden" id="authEmail"
+	 value="${sessionScope.authTargetEmail}" />
+ <input type="hidden" id="uid"
+	 value="${sessionScope.account.uid}" />
+ <input type="hidden" id="method" />
+
 	<div>
-		<input type="radio" name="method" value="email" checked /> 이메일 인증 <input
-			type="radio" name="method" value="phone" /> 전화번호 인증
+		<div>기존 전화번호_ 바꾸기누르면 숨겨짐</div> <button>전화번호 바꾸기</button>
+		<input type="text" id="authMobile" placeholder="바꿀 번호"><button type="button" onclick="sendVerification(`phone`)">인증번호 발송</button>
+		<input type="text" id="phoneCode" placeholder="인증번호"><button type="button" onclick="verifyCode(`phone`, `end`)">인증</button>
 	</div>
 
 	<div>
-		<input type="email" id="newEmail" placeholder="새 이메일 입력" /> <input
-			type="text" id="newPhone" placeholder="새 전화번호 입력" />
-		<button type="button" onclick="sendVerification()">인증 코드 전송</button>
-	</div>
-
-	<div>
-		<input type="text" id="code" placeholder="인증 코드 입력" />
-		<button type="button" onclick="verifyCode()">인증 확인</button>
+		<div>기존 이메일_ 바꾸기누르면 숨겨짐</div> <button>이메일 바꾸기</button>
+		<input type="text" id="authEmail" placeholder="바꿀 이메일"><button type="button" onclick="sendVerification(`email`)">인증번호 발송</button>
+		<input type="text" id="emailCode" placeholder="인증번호"><button type="button" onclick="verifyCode(`email`, `end`)">인증</button>
 	</div>
 
 	<!-- firebase캡챠 -->
@@ -34,8 +38,9 @@
 <jsp:include page="/WEB-INF/views/footer.jsp"></jsp:include>
 
 <script>
-console.log("?")
+
 window.onload=()=>{
+	// 내정보 불러오기
 	$.ajax({
 	    url: "/user/info/${sessionScope.account.uid}",
 	    method: "GET", // 또는 그대로 POST 유지
@@ -45,6 +50,8 @@ window.onload=()=>{
 	    error: (xhr) => alert("실패")
 	});
 }
+
+
 </script>
 <script type="module">
   import { sendVerification, verifyCode } from '/resources/js/authVerification.js';

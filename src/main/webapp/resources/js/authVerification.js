@@ -1,5 +1,11 @@
 // 이메일/전화번호 인증 모듈
 
+// 필요한거
+// document.getElementById("authMobile").value;
+// document.getElementById("authEmail").value;
+// document.getElementById("phoneCode").value;
+// document.getElementById("emailCode").value;
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
@@ -37,19 +43,22 @@ export function formatToKoreanPhoneNumber(internationalNumber) {
 }
 
 // 인증 코드 전송
-export async function sendVerification() {
-  const method = getSelectedMethod();
+export async function sendVerification(method) {
   // 고른 타입 체크해서 각각 실제 전송하는 메서드 호출
   if (method === METHOD.PHONE) {
-    await sendPhoneVerification();
+    const rawPhone = document.getElementById("authMobile").value;
+    // firebase 국제번호형식으로 받아서 바꾸는용도
+    const phoneNumber = formatPhoneNumberForFirebase(rawPhone);
+    await sendPhoneVerification(phoneNumber);
   } else {
-    await sendEmailVerification();
+    const email = document.getElementById("authEmail").value;
+    await sendEmailVerification(email);
   }
 }
 
 // 이메일 인증 코드 전송
-async function sendEmailVerification() {
-    const email = document.getElementById("authEmail").value;
+async function sendEmailVerification(email) {
+    
     $.ajax({
         url: "/account/auth/email",
         method: "POST",
@@ -61,12 +70,8 @@ async function sendEmailVerification() {
 }
 
 // 전화번호 인증 코드 전송
-async function sendPhoneVerification() {
+async function sendPhoneVerification(phoneNumber) {
 // firebase에서 해줌
-
-    const rawPhone = document.getElementById("authMobile").value;
-    // firebase 국제번호형식으로 받아서 바꾸는용도
-    const phoneNumber = formatPhoneNumberForFirebase(rawPhone);
 
 // 캡챠기능 파이어베이스 기본 제공
 if (!window.recaptchaVerifier) {
@@ -86,34 +91,38 @@ if (!window.recaptchaVerifier) {
 }
 
 // 인증 코드 확인(성공하면 onVerificationSuccess 호출)
-export async function verifyCode() {
-  const method = getSelectedMethod();
-  const code = document.getElementById("code").value;
+export async function verifyCode(method, end) {
 
   if (method === METHOD.PHONE) {
+    const code = document.getElementById("phoneCode").value;
+    verifyPhoneCode(code, end)
+  } else {
+    const code = document.getElementById("emailCode").value;
+    verifyEmailCode(code, end)
+  }
+}
+
+async function verifyPhoneCode(code, end) {
     try {
       await confirmationResult.confirm(code);
-      window.onVerificationSuccess(); // 성공 후 콜백 실행
+      window.onVerificationSuccess(METHOD.PHONE, end); // 성공 후 콜백 실행
     } catch (error) {
       console.error("코드 인증 실패:", error);
       alert("잘못된 인증 코드입니다.");
     }
-  } else {
+}
+
+async function verifyEmailCode(code, end) {
+
     const email = document.getElementById("authEmail").value;
     $.ajax({
       url: `/account/auth/email/${code}`,
       method: "POST",
   	  contentType: "application/json",
       data: JSON.stringify({
-    email: email
+      email: email
   }),
-      success: () => window.onVerificationSuccess(),
+      success: () => window.onVerificationSuccess(METHOD.EMAIL, end),
       error: (xhr) => alert("이메일 인증 실패: " + xhr.responseText)
     });
-  }
-}
-
-// 선택한 인증수단(번호, 이메일) 가져오기
-export function getSelectedMethod() {
-  return document.querySelector('input[name="method"]:checked').value;
 }

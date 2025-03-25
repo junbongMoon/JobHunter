@@ -1,13 +1,11 @@
 import {
-  getSelectedMethod,
   formatToKoreanPhoneNumber,
   METHOD
 } from "/resources/js/authVerification.js";
 
 // 로그인 페이지 전용: 인증 성공 후 정지 해제 + 리다이렉트
-window.onVerificationSuccess = (importmethod) => {
+window.onVerificationSuccess = (method, end) => {
 
-  const method = getSelectedMethod();
   const accountType = document.getElementById("accountType").value;
   let value;
 

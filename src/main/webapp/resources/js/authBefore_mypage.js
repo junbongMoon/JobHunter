@@ -1,59 +1,41 @@
-import { sendVerification, verifyCode } from '/resources/js/authVerification.js';
+import {
+  formatToKoreanPhoneNumber,
+  METHOD
+} from "/resources/js/authVerification.js";
 
-window.toggleEmailChange = () => {
-  document.getElementById("emailChangeBox").style.display = 'block';
-};
+// 로그인 페이지 전용: 인증 성공 후 정지 해제 + 리다이렉트
+window.onVerificationSuccess = (method, end) => {
 
-window.togglePhoneChange = () => {
-  document.getElementById("phoneChangeBox").style.display = 'block';
-};
+  console.log(method)
 
-window.sendVerificationEmail = () => {
-  const email = document.getElementById('newEmail').value;
-  if (!email) return alert("이메일을 입력하세요");
-  sendVerification('email', email);
-};
+  const uid = document.getElementById("uid").value;
 
-window.sendVerificationPhone = () => {
-  const phone = document.getElementById('newPhone').value;
-  if (!phone) return alert("전화번호를 입력하세요");
-  sendVerification('phone', phone);
-};
+  let value;
 
-window.verifyEmailCode = async () => {
-  const code = document.getElementById('emailCode').value;
-  const email = document.getElementById('newEmail').value;
-  const result = await verifyCode('email', code);
-
-  if (result.success) {
-    const res = await fetch('/account/updateEmail', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-    const json = await res.json();
-    alert(json.success ? '이메일이 변경되었습니다.' : '이메일 변경 실패: ' + json.message);
-    if (json.success) location.reload();
+  if (method === METHOD.PHONE) {
+    const intlPhone = document.getElementById("authMobile").value;
+    value = formatToKoreanPhoneNumber(intlPhone);
   } else {
-    alert('인증 실패');
+    value = document.getElementById("authEmail").value;
   }
-};
 
-window.verifyPhoneCode = async () => {
-  const code = document.getElementById('phoneCode').value;
-  const phone = document.getElementById('newPhone').value;
-  const result = await verifyCode('phone', code);
+  const dto = {
+    type: method === METHOD.PHONE ? "mobile" : "email",
+    value,
+    uid
+  };
 
-  if (result.success) {
-    const res = await fetch('/account/updatePhone', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone })
-    });
-    const json = await res.json();
-    alert(json.success ? '전화번호가 변경되었습니다.' : '전화번호 변경 실패: ' + json.message);
-    if (json.success) location.reload();
-  } else {
-    alert('인증 실패');
-  }
+  $.ajax({
+    url: "/user/auth",
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify(dto),
+    success: (redirectUrl) => {
+      alert("변경이 완료되었습니다.");
+    },
+    error: (xhr) => {
+      alert("인증 처리 중 오류가 발생했습니다.");
+      console.error(xhr.responseText);
+    }
+  });
 };

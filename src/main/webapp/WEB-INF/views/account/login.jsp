@@ -16,10 +16,11 @@
 
 		<!-- 회원 유형 선택 -->
 		<div style="margin: 10px 0;">
-			<label>
-			<input type="radio" name="accountType" value="USER" checked> 개인 회원 </label>
-			<label>
-			<input type="radio" name="accountType" value="COMPANY"> 기업 회원 </label>
+			<label> <input type="radio" name="accountType" value="USER"
+				checked> 개인 회원
+			</label> <label> <input type="radio" name="accountType"
+				value="COMPANY"> 기업 회원
+			</label>
 		</div>
 
 		<!-- 인증 필요 시 -->
@@ -32,6 +33,7 @@
 				value="${sessionScope.authTargetEmail}" />
 			<input type="hidden" id="accountType"
 				value="${sessionScope.account.accountType}" />
+			<input type="hidden" id="method" />
 
 			<div>
 				<label> <input type="radio" name="method" value="email"
@@ -39,10 +41,14 @@
 				</label> <label> <input type="radio" name="method" value="phone" />
 					전화번호 인증
 				</label>
+				
+				<button type="button" onclick="sendVerification(`email`)">이메일전송</button>
+				<input type="text" id="code" name="emailCode" placeholder="이메일인증코드 입력" />
+				<button type="button" onclick="verifyCode(`email`, `end`)">이메일인증</button>
 
-				<button type="button" onclick="sendVerification()">인증 코드 전송</button>
-				<input type="text" id="code" name="code" placeholder="인증코드 입력" />
-				<button type="button" onclick="verifyCode()">인증 확인</button>
+				<button type="button" onclick="sendVerification(`phone`)">문자전송</button>
+				<input type="text" id="code" name="phoneCode" placeholder="문자인증코드 입력" />
+				<button type="button" onclick="verifyCode(`phone`, `end`)">문자인증</button>
 			</div>
 		</c:if>
 
@@ -54,7 +60,9 @@
 </main>
 
 <jsp:include page="../footer.jsp" />
-
+<script>
+	console.log("jstest")
+</script>
 <!-- 인증용 JS 모듈 -->
 <script type="module">
   import { sendVerification, verifyCode } from '/resources/js/authVerification.js';
