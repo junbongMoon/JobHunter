@@ -1,10 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>공고 등록</title>
+
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
@@ -12,6 +8,8 @@
 		
 		getRegion();
 		getMajorCategory();
+
+		$('.method-detail, .save-method-btn').hide();
 
 		$(document).on(
 				"change",
@@ -63,7 +61,69 @@
 			}
 		});
 
+		$(document).on("change", ".application-checkbox", function () {
+  const method = $(this).val();
+  const checked = $(this).is(":checked");
+
+  if (checked) {
+    $(".method-detail[data-method='" + method + "']").show();
+    $(".save-method-btn[data-method='" + method + "']").show();
+  } else {
+    $(".method-detail[data-method='" + method + "']").hide().val('');
+    $(".save-method-btn[data-method='" + method + "']").hide();
+    deleteApplication(method);
+  }
+});
+
+$(document).on("click", ".save-method-btn", function () {
+  const method = $(this).data("method");
+  const detail = $(".method-detail[data-method='" + method + "']").val();
+
+  // 상세 정보는 입력하지 않아도 된다.
+
+  saveApplication(method, detail);
+});
+		
+
+
 	});
+
+	// 면접타입 저장 함수
+	function saveApplication(method, detail) {
+    $.ajax({
+      url: "/recruitmentnotice/rest/application",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        method: method,
+        detail: detail,
+        recruitmentNoticeUid: -1
+      }),
+      success: function (data) {
+        console.log(data)
+      },
+      error: function () {
+        alert(`${method} 방식 저장 실패`);
+      }
+    });
+  }
+
+		 // 면접 타입 삭제 함수
+		 function deleteApplication(method) {
+    $.ajax({
+      url: "/recruitmentnotice/rest/application",
+      type: "DELETE",
+      contentType: "application/json",
+      data: JSON.stringify({ method: method }),
+      success: function () {
+        console.log(`${method} 방식 삭제 완료`);
+      },
+      error: function () {
+        console.error(`${method} 방식 삭제 실패`);
+      }
+    });
+  }
+
 
 	function getMajorCategory() {
 		$.ajax({
@@ -232,11 +292,54 @@
 		});
 	}
 
-	// 
+	
+
+	function removeAdvantage(deleteBtn) {
+		advantageType = $(this).prev().val();
+    $.ajax({
+        url: "/recruitmentnotice/rest/advantage/" + advantageType,
+        type: "DELETE",
+        success: function (response) {
+            console.log("삭제 성공", response);
+            renderAdvantageList(response);
+        },
+        error: function (err) {
+            console.error("삭제 실패", err);
+        }
+    });
+}
+
+	function addAdvantage() {
+    let advantageValue = $("#advantage").val();
+
+    if (!advantageValue) {
+        alert("우대조건을 입력하세요");
+		// 알럿 대신 모달창으로 바꾸자..
+        return;
+    }
+
+    $.ajax({
+        url: "/recruitmentnotice/rest/advantage",
+        type: "POST",
+        data: JSON.stringify({ advantageType: advantageValue }),
+        contentType: "application/json",
+        success: function (response) {
+            console.log("우대조건 저장 성공", response);
+            $("#advantage").val("");
+            renderAdvantageList(response);
+        },
+        error: function (err) {
+            console.error("우대조건 저장 실패", err);
+        }
+    });
+
+	// append 시키자
+
+}
 
 </script>
 
-</head>
+
 <body>
 	<!-- 헤더 -->
 	<jsp:include page="../header.jsp"></jsp:include>
@@ -362,24 +465,83 @@
 
 									<div class="col-12">
 										<div class="input-group">
-											<label>접수 방법 (Application)</label>
-											<div class="application-container">
-												<label><input type="checkbox"
-													name="applicationMethod" value="ONLINE"> 온라인</label> <label><input
-													type="checkbox" name="applicationMethod" value="EMAIL">
-													이메일</label> <label><input type="checkbox"
-													name="applicationMethod" value="PHONE"> 전화</label> <label><input
-													type="checkbox" name="applicationMethod" value="TEXT">
-													문자</label>
+											<label class="form-label w-100 mb-3">접수 방법</label>
+											
+											<div class="row">
+												<!-- ONLINE -->
+												<div class="col-12 mb-3">
+													<div class="d-flex align-items-center">
+														<div class="form-check me-3 d-flex align-items-center">
+															<input class="form-check-input application-checkbox" type="checkbox" value="ONLINE" id="ONLINE">
+															<label class="form-check-label ms-2" for="applyOnline">온라인</label>
+														</div>
+														<div class="flex-grow-1">
+															<div class="input-group">
+																<input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="ONLINE" style="display: none;">
+																<button type="button" class="btn btn-primary save-method-btn" data-method="ONLINE" style="display: none;">저장</button>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												<!-- EMAIL -->  
+												<div class="col-12 mb-3">
+													<div class="d-flex align-items-center">
+														<div class="form-check me-3 d-flex align-items-center">
+															<input class="form-check-input application-checkbox" type="checkbox" value="EMAIL" id="EMAIL">
+															<label class="form-check-label ms-2" for="applyEmail">이메일</label>
+														</div>
+														<div class="flex-grow-1">
+															<div class="input-group">
+																<input type="email" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="EMAIL" style="display: none;">
+																<button type="button" class="btn btn-primary save-method-btn" data-method="EMAIL" style="display: none;">저장</button>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												<!-- PHONE -->
+												<div class="col-12 mb-3">
+													<div class="d-flex align-items-center">
+														<div class="form-check me-3 d-flex align-items-center">
+															<input class="form-check-input application-checkbox" type="checkbox" value="PHONE" id="PHONE">
+															<label class="form-check-label ms-2" for="applyPhone">전화</label>
+														</div>
+														<div class="flex-grow-1">
+															<div class="input-group">
+																<input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="PHONE" style="display: none;">
+																<button type="button" class="btn btn-primary save-method-btn" data-method="PHONE" style="display: none;">저장</button>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												<!-- TEXT -->
+												<div class="col-12 mb-3">
+													<div class="d-flex align-items-center">
+														<div class="form-check me-3 d-flex align-items-center">
+															<input class="form-check-input application-checkbox" type="checkbox" value="TEXT" id="TEXT">
+															<label class="form-check-label ms-2" for="applyText">문자</label>
+														</div>
+														<div class="flex-grow-1">
+															<div class="input-group">
+																<input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="TEXT" style="display: none;">
+																<button type="button" class="btn btn-primary save-method-btn" data-method="TEXT" style="display: none;">저장</button>
+															</div>
+														</div>
+													</div>
+												</div>
 											</div>
+
 										</div>
 									</div>
+									
 
 									<div class="col-12">
 										<div class="input-group">
 											<label for="advantage">우대조건</label> <input type="text"
 												id="advantage" placeholder="우대조건을 입력하고 저장 버튼을 눌러주세요..">
-												<button class="addAdvantageBtn">저장하기</button>
+												<button type="button" class="addAdvantageBtn" onclick="addAdvantage()">저장하기</button>
 										</div>
 									</div>
 

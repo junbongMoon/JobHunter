@@ -91,30 +91,19 @@ public class RecruitmentNoticeRestController {
 		// 성공, 실패 여부를 json으로 응답
 		ResponseEntity<List<AdvantageDTO>> result = null;
 
-		System.out.println(advantageList);
+		
 		if (advantageDTO != null) {
 			advantageList.add(advantageDTO);
 			result = ResponseEntity.ok(this.advantageList);
 		} else {
 			result = ResponseEntity.badRequest().body(this.advantageList);
 		}
-		return result;
-	}
-
-	// 회사가 공고를 작성할 때 우대조건을 리스트에서 삭제 해주는 메서드
-	@DeleteMapping(value = "/advantage/{advantageType}")
-	public ResponseEntity<List<AdvantageDTO>> deleteAdvantage(@PathVariable("advantageType") String advantageType) {
-		ResponseEntity<List<AdvantageDTO>> result = null;
-
-		// 대기
-		if (this.advantageList.removeIf(adv -> adv.getAdvantageType().equals(advantageType))) {
-			System.out.println("우대조건 삭제 : " + advantageList);
-			
-		} 
-		result = ResponseEntity.ok(this.advantageList);
 		
+		System.out.println(advantageList);
 		return result;
 	}
+
+	
 
 	// 회사가 공고를 작성할 때 지역을 필드에 임시저장하는 메서드
 	@PostMapping(value = "/region/{regionCode}")
@@ -221,6 +210,7 @@ public class RecruitmentNoticeRestController {
 	}
 	
 	// 공고를 작성할 때 면접방식을 삭제하는 메서드
+	// 같은 면접방식이 중복 저장되는 문제가 생겼다... 해결해보자
 	@DeleteMapping("/application")
 	public ResponseEntity<List<ApplicationDTO>> deleteApplicationWithRecruitmentNotice(@RequestBody ApplicationDTO applicationDTO){
 		ResponseEntity<List<ApplicationDTO>> result = null;
@@ -232,9 +222,26 @@ public class RecruitmentNoticeRestController {
 		}
 		result = ResponseEntity.ok(applicationList);
 		
+		System.out.println(applicationList);
+		
 		return result;
 	}
 	
+	
+	// 회사가 공고를 작성할 때 우대조건을 리스트에서 삭제 해주는 메서드
+		@DeleteMapping(value = "/advantage/{advantageType}")
+		public ResponseEntity<List<AdvantageDTO>> deleteAdvantage(@PathVariable("advantageType") String advantageType) {
+			ResponseEntity<List<AdvantageDTO>> result = null;
+
+			// 대기
+			if (this.advantageList.removeIf(adv -> adv.getAdvantageType().equals(advantageType))) {
+				System.out.println("우대조건 삭제 : " + advantageList);
+				
+			} 
+			result = ResponseEntity.ok(this.advantageList);
+			
+			return result;
+		}
 	
 	
 	// 내가 작성한(템플릿 제외) 공고 불러오는 메서드
