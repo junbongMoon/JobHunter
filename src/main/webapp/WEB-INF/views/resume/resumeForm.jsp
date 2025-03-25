@@ -778,6 +778,7 @@
 						return;
 					}
 
+					// 학력을 추가하였는가 확인하고 추가하였다면 값을 입력하지 않았을 시 학력사항에 입력사항이 누락되었음을 알리고 입력을 하도록 유도
 					const educationItems = $('.education-item');
 					if (educationItems.length > 0) {
 						let isValid = true;
@@ -791,7 +792,7 @@
 							if (!educationLevel || !educationStatus || !customInput) {
 								isValid = false;
 								focusElement = $(this).find(':input[value=""]:first');
-								return false; // each 루프 중단
+								return false; // each 중단
 							}
 						});
 
@@ -829,7 +830,7 @@
 								meritContent: $(this).data('merit')
 							};
 						}).get(),
-						educationData: $('.education-item').map(function () {
+						educations: $('.education-item').map(function () {
 							return {
 								educationLevel: $(this).find('.education-level').val(),
 								educationStatus: $(this).find('.education-status').val(),
@@ -864,6 +865,13 @@
 						merits: $('#selectedMerits').find('.badge').map(function () {
 							return {
 								meritContent: $(this).data('merit')
+							};
+						}).get(),
+						educations: $('.education-item').map(function () {
+							return {
+								educationLevel: $(this).find('.education-level').val(),
+								educationStatus: $(this).find('.education-status').val(),
+								customInput: $(this).find('.custom-input').val()
 							};
 						}).get()
 					};
@@ -916,6 +924,13 @@
 						merits: $('#selectedMerits').find('.badge').map(function () {
 							return {
 								meritContent: $(this).data('merit')
+							};
+						}).get(),
+						educations: $('.education-item').map(function () {
+							return {
+								educationLevel: $(this).find('.education-level').val(),
+								educationStatus: $(this).find('.education-status').val(),
+								customInput: $(this).find('.custom-input').val()
 							};
 						}).get()
 					};
@@ -1017,13 +1032,6 @@
 					$(this).find('.merit-btn').first().focus();
 				});
 
-				// 모달이 닫힐 때 포커스 관리
-				$('#meritModal').on('hidden.bs.modal', function () {
-					// 모달을 열었던 버튼으로 포커스 이동
-					$('[data-bs-toggle="modal"][data-bs-target="#meritModal"]').focus();
-					// 버튼 스타일 초기화
-					$('.merit-btn').removeClass('btn-primary').addClass('btn-outline-primary');
-				});
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 학력 추가 버튼 클릭 이벤트
 				$('#addEducationBtn').on('click', function () {
