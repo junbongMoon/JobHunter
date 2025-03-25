@@ -576,9 +576,10 @@ $(document).on("click", ".save-method-btn", function () {
 										</div>
 									</div>
 
+									<label for="detail">아래의 박스에 파일을 올려주세요</label>
 									<div class="col-12">
-										<div class="input-group fileArea" style="width: 50px; height: 20px; background-color: #eee;">
-											<label for="file">파일</label>
+										<div class="input-group fileUploadArea" style="width: 800px; height: 100px; background-color: #eee; border-radius: 10px;">
+											
 											
 										</div>
 									</div>

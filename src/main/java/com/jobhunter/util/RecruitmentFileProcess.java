@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 import com.jobhunter.model.util.BoardUpFilesVODTO;
 
 /**
@@ -30,7 +31,7 @@ import com.jobhunter.model.util.BoardUpFilesVODTO;
  * 
  */
 @Component // 스프링의 빈으로 등록 되도록 하는 어노테이션
-public class FileProcess {
+public class RecruitmentFileProcess {
 
 	private String realPath;
 	private String saveFilePath;
@@ -38,7 +39,7 @@ public class FileProcess {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
-	public FileProcess() {
+	public RecruitmentFileProcess() {
 		this.os = System.getProperty("os.name").toLowerCase();
 	}
 
@@ -114,15 +115,15 @@ public class FileProcess {
 	 * @throws IOException
 	 * @returnType BoardUpFilesVODTO
 	 */
-	public BoardUpFilesVODTO saveFileToRealPath(MultipartFile file, HttpServletRequest request, String saveFileDir)
+	public RecruitmentnoticeBoardUpfiles saveFileToRealPath(MultipartFile file, HttpServletRequest request, String saveFileDir)
 			throws IOException {
-		BoardUpFilesVODTO result = null;
+		RecruitmentnoticeBoardUpfiles result = null;
 
 		String originalFileName = file.getOriginalFilename();
 		String fileType = file.getContentType();
 		String ext = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
 		long size = file.getSize();
-		String thumbFileName = null;
+		
 		String base64Image = null;
 
 //      System.out.println(Arrays.toString(file.getBytes()));
@@ -146,20 +147,17 @@ public class FileProcess {
 
 			// 이미지 파일이냐?
 			if (ImageMimeType.isImage(ext)) {
-				// -> 썸네일 이미지를 만들어 저장
-				thumbFileName = makeThumbnailImage(newFileName);
-//            logger.info("썸네일 이미지 파일 이름 : " + thumbFileName);
 
 				// base64문자열 만들어 저장
-				base64Image = makeBase64Encoding(thumbFileName);
+				base64Image = makeBase64Encoding(newFileName);
 //            logger.info("base64 문자열" + base64Image);
 				// 과제(?) : base64 문자열로 디코딩하여 파일로 저장해보기
 
 			}
 
-			result = BoardUpFilesVODTO.builder().originalFileName(originalFileName)
+			result = RecruitmentnoticeBoardUpfiles.builder().originalFileName(originalFileName)
 					.newFileName(ymd[ymd.length - 1].replace("\\", "/") + "/" + newFileName)
-					.thumbFileName(ymd[ymd.length - 1].replace("\\", "/") + "/" + thumbFileName).fileType(fileType)
+					.fileType(fileType)
 					.ext(ext).size(size).base64Image(base64Image).build();
 
 			logger.info("업로드 된 파일의 정보 : " + result);
@@ -178,43 +176,20 @@ public class FileProcess {
 	 * @throws IOException
 	 * @returnType String : base64로 인코딩된 문자열
 	 */
-	private String makeBase64Encoding(String thumbFileName) throws IOException {
+	private String makeBase64Encoding(String FileName) throws IOException {
 		// Base64인코딩 : 이진 데이터를 text로 만드는 인코딩의 한가지
 		// 특징 : 별도 파일을 저장할 공간이 필요하지 않다.(장점), 실제 파일을 저장하는 것보다 더 크기가 클 수 있다(단점)
 		// 특징 : 인코딩에 따른 부하가 있다.
 
 		String result = null;
-		File thumb = new File(this.saveFilePath + File.separator + thumbFileName);
+		File base64 = new File(this.saveFilePath + File.separator + FileName);
 
-		byte[] thumbFile = FileUtils.readFileToByteArray(thumb);
+		byte[] base64File = FileUtils.readFileToByteArray(base64);
 
-		return Base64.getEncoder().encodeToString(thumbFile);
+		return Base64.getEncoder().encodeToString(base64File);
 	}
 
-	/**
-	 * @author Administrator
-	 * @data 2025. 2. 11.
-	 * @enclosing_method makeThumbnailImage
-	 * @todo imgscalr라이브러리를 이용해 newFileName의 이미지를 읽어와, 사이즈를 줄이고 새로운 파일이름으로 저장
-	 * @param
-	 * @throws IOException
-	 * @returnType thumbNailImageFileName : 저장된 썸네일 파일 이름
-	 */
-	private String makeThumbnailImage(String newFileName) throws IOException {
-		System.out.println(newFileName);
-		BufferedImage originalImage = ImageIO.read(new File(this.saveFilePath + File.separator + newFileName));
-		BufferedImage thumbnail = Scalr.resize(originalImage, Mode.FIT_TO_WIDTH, 50);
-
-		String thumbNailImageFileName = "thumb_" + newFileName; // 새롭게 저장될 썸네일 이미지 파일이름
-
-		File saveThumbImg = new File(this.saveFilePath + File.separator + thumbNailImageFileName);
-		String ext = newFileName.substring(newFileName.lastIndexOf(".") + 1);
-
-		ImageIO.write(thumbnail, ext, saveThumbImg); // 파일저장
-
-		return thumbNailImageFileName;
-
-	}
+	
 
 	/**
 	 * @author Administrator

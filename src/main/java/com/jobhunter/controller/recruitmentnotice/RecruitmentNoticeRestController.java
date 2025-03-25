@@ -25,6 +25,7 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 import com.jobhunter.util.FileProcess;
+import com.jobhunter.util.RecruitmentFileProcess;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +36,7 @@ public class RecruitmentNoticeRestController {
 
 	private final RecruitmentNoticeService recService;
 	private static final Logger logger = LoggerFactory.getLogger(RecruitmentNoticeRestController.class);
-	private final FileProcess fp;
+	private final RecruitmentFileProcess fp;
 
 	// 양식을 저장 할 List, 코드들
 	private final List<AdvantageDTO> advantageList = new ArrayList<>();
