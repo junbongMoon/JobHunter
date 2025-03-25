@@ -337,7 +337,7 @@
 				</div>
 				<div class="card-body">
 					<div id="educationContainer">
-						<!-- 학력 항목들이 여기에 동적으로 추가됨 -->
+						<!-- 학력 항목 -->
 					</div>
 					<small class="text-muted">* 원하는 학력만 선택하여 작성이 가능해요.</small>
 				</div>
