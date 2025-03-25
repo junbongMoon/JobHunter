@@ -73,4 +73,10 @@
         VALUES (#{educationLevel}, #{educationStatus}, #{customInput}, #{resumeNo});
     </insert>
 
+    <!-- 경력 저장 -->
+    <insert id="insertHistory" parameterType="com.jobhunter.model.resume.PersonalHistoryDTO">
+        INSERT INTO personalhistory (companyName, jobDescription, startDate, endDate, resumeNo)
+        VALUES (#{companyName}, #{jobDescription}, #{startDate}, #{endDate}, #{resumeNo});
+    </insert>
+
 </mapper>
