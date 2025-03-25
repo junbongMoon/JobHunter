@@ -18,15 +18,17 @@ import lombok.ToString;
 @ToString
 public class ReviewBoardDTO {
 	private int boardNo;
-	private String gonggrioUid;
-	private int writer;
+	private String writer;   
+	private String userId; 
 	private String companyName;
-	private ReviewResult reviewResult;
-	private ReviewType reviewType;
+	private String reviewResult;
+	private String reviewType;
 	private int reviewLevel;
 	private String content;
 	private String category;
-	private JobType jobType;
+	private String jobType;
+	
+
 	
 	
 	

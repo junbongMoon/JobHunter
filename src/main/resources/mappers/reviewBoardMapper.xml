@@ -8,22 +8,27 @@
 
 	<select id="allList"
 		resultType="com.jobhunter.model.reviewboard.ReviewBoard">
-		SELECT
-		rb.boardNo,
-		u.userId AS writer,
-		rb.reviewType,
-		rb.content,
-		rb.companyName,
-		rb.postDate
-
-		FROM
-		reviewBoard rb
-		left join users u ON rb.writer = u.uid
+	SELECT
+    rb.boardNo,
+    rb.writer,        
+    u.userId,   
+    rb.companyName,
+    rb.reviewResult,
+    rb.reviewType,
+    rb.reviewLevel,
+    rb.content,
+    rb.category,
+    rb.jobType,
+    rb.postDate,
+    rb.likes,
+    rb.views
+    FROM
+    reviewBoard rb
+    LEFT JOIN users u ON rb.writer = u.uid
 	</select>
 
-	<insert id="insertReview" useGeneratedKeys="true"
-      keyProperty="boardNo">
-		INSERT INTO reviewBoard (
+	<insert id="insertReview" useGeneratedKeys="true" keyProperty="boardNo">
+		INSERT  INTO reviewBoard (
 		writer,companyName,reviewResult,reviewType,
 		reviewLevel,content,category,jobType
 		)

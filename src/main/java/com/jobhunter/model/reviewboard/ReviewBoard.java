@@ -18,8 +18,7 @@ import lombok.ToString;
 @ToString
 public class ReviewBoard {
 	private int boardNo;
-	private String gonggrioUid;
-	private int writer;
+	private String writer;
 	private String companyName;
 	private ReviewResult reviewResult;
 	private ReviewType reviewType;
