@@ -91,7 +91,7 @@ tr:hover {
 			<c:forEach var="reviewBoard" items="${board}">
 				<tr>
 					<td>${reviewBoard.boardNo}</td>
-					<td><a href="/review/detail?boardNo=${reviewBoard.boardNo}">
+					<td><a href="/reviewBoard/detail?boardNo=${reviewBoard.boardNo}">
 							${reviewBoard.companyName} </a></td>
 					<td>${reviewBoard.reviewType}</td>
 					<td class="writer">${reviewBoard.writer}</td>
