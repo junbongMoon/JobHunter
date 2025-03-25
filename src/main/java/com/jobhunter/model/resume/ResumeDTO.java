@@ -34,6 +34,9 @@ public class ResumeDTO {
     // 학력 리스트
     private List<EducationDTO> educations;
 
+    // 경력 리스트
+    private List<PersonalHistoryDTO> histories;
+
     // 지역 선택 리스트 (region, sigungu)
     private List<Integer> regionNos;   // 시/도 번호
     private List<Integer> sigunguNos;  // 시/군/구 번호
