@@ -65,4 +65,4 @@
 
 <!-- 인증 성공 처리하는 모듈 선택_여기 넣어둔건 이메일이나 번호로 정지해제 -->
 <script type="module"
-	src="${pageContext.request.contextPath}/resources/js/authBefore.js"></script>
+	src="${pageContext.request.contextPath}/resources/js/authBefore_login.js"></script>

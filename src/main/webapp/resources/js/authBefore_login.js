@@ -5,7 +5,7 @@ import {
 } from "/resources/js/authVerification.js";
 
 // 로그인 페이지 전용: 인증 성공 후 정지 해제 + 리다이렉트
-window.onVerificationSuccess = () => {
+window.onVerificationSuccess = (importmethod) => {
 
   const method = getSelectedMethod();
   const accountType = document.getElementById("accountType").value;
