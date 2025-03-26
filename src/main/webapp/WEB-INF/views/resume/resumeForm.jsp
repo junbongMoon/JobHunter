@@ -23,14 +23,17 @@
 
 			<!-- 이력서 제목 -->
 			<div class="mb-4">
-				<label for="title" class="form-label fw-bold">이력서 제목</label> <input
-					type="text" class="form-control" id="title" name="title"
+				<label for="title" class="form-label fw-bold">이력서 제목<span
+					class="essentialPoint">*</span></label> <input type="text"
+					class="form-control" id="title" name="title"
 					placeholder="예: 자바 개발자 지원" required />
 			</div>
 
 			<!-- 기본 정보 (users 테이블에서 가져올 예정) -->
 			<div class="card mb-4">
-				<div class="card-header">기본 정보</div>
+				<div class="card-header">
+					기본 정보<span class="essentialPoint">*</span>
+				</div>
 				<div class="card-body">
 					<div class="row g-3">
 						<div class="col-md-4">
@@ -51,7 +54,9 @@
 
 			<!-- 고용 형태 -->
 			<div class="card mb-4">
-				<div class="card-header jobTypeBox">고용 형태</div>
+				<div class="card-header jobTypeBox">
+					고용 형태<span class="essentialPoint">*</span>
+				</div>
 				<div class="card-body">
 					<div class="row g-3">
 						<div class="col-md-12">
@@ -94,7 +99,9 @@
 
 			<!-- 희망 급여 -->
 			<div class="card mb-4">
-				<div class="card-header">희망 급여</div>
+				<div class="card-header">
+					희망 급여<span class="essentialPoint">*</span>
+				</div>
 				<div class="card-body">
 					<div class="row g-3 align-items-center">
 						<div class="col-md-8">
@@ -139,8 +146,9 @@
 
 			<!-- 근무 지역 선택 -->
 			<div class="card mb-4">
-				<div class="card-header wishRegionBox" id="wishRegion">희망 근무
-					지역</div>
+				<div class="card-header wishRegionBox" id="wishRegion">
+					희망 근무 지역<span class="essentialPoint">*</span>
+				</div>
 				<div class="card-body">
 					<div class="row">
 						<!-- 시/도 목록 -->
@@ -177,7 +185,9 @@
 
 			<!-- 희망 업직종 -->
 			<div class="card mb-4">
-				<div class="card-header" id="wishJobBox">희망 업직종</div>
+				<div class="card-header" id="wishJobBox">
+					희망 업직종<span class="essentialPoint">*</span>
+				</div>
 				<div class="card-body">
 					<div class="row">
 						<!-- 대분류 목록 -->
@@ -216,7 +226,7 @@
 			<div class="card mb-4">
 				<div
 					class="card-header d-flex justify-content-between align-items-center">
-					<span id=myMerits>성격 및 강점</span>
+					<span id=myMerits>성격 및 강점<span class="essentialPoint">*</span></span>
 					<button type="button" class="btn btn-primary btn-sm"
 						data-bs-toggle="modal" data-bs-target="#meritModal">추가하기
 					</button>
@@ -345,14 +355,17 @@
 
 			<!-- 학력사항 템플릿 (추가 버튼 눌러야 나옴) -->
 			<template id="educationTemplate">
-				<div class="education-item border rounded p-3 mb-3 position-relative">
+				<div
+					class="education-item border rounded p-3 mb-3 position-relative">
 					<!-- 삭제 버튼 (X) -->
-					<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-education" 
+					<button type="button"
+						class="btn-close position-absolute top-0 end-0 m-3 remove-education"
 						aria-label="삭제"></button>
 					<div class="row g-3">
 						<!-- 학력 구분 -->
 						<div class="col-md-3">
-							<label class="form-label">학력 구분</label> <select
+							<label class="form-label">학력 구분<span
+								class="essentialPoint">*</span></label> <select
 								class="form-select education-level" name="educationLevel">
 								<option value="">선택하세요</option>
 								<option value="HIGH_SCHOOL">고등학교</option>
@@ -364,7 +377,8 @@
 
 						<!-- 졸업 상태 -->
 						<div class="col-md-3">
-							<label class="form-label">졸업 상태</label> <select
+							<label class="form-label">졸업 상태<span
+								class="essentialPoint">*</span></label> <select
 								class="form-select education-status" name="educationStatus">
 								<option value="">선택하세요</option>
 								<option value="GRADUATED">졸업</option>
@@ -376,9 +390,9 @@
 
 						<!-- 학교명 입력 -->
 						<div class="col-md-4">
-							<label class="form-label">학교명</label> <input type="text"
-								class="form-control custom-input" name="customInput"
-								placeholder="학교명을 입력하세요">
+							<label class="form-label">학교명<span class="essentialPoint">*</span></label>
+							<input type="text" class="form-control custom-input"
+								name="customInput" placeholder="학교명을 입력하세요">
 						</div>
 					</div>
 				</div>
@@ -405,24 +419,28 @@
 			<template id="historyTemplate">
 				<div class="history-item border rounded p-3 mb-3 position-relative">
 					<!-- 삭제 버튼 (X) -->
-					<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-history" 
+					<button type="button"
+						class="btn-close position-absolute top-0 end-0 m-3 remove-history"
 						aria-label="삭제"></button>
 					<div class="row g-3">
 						<!-- 회사명 입력 -->
 						<div class="col-md-6">
-							<label class="form-label">회사명</label>
-							<input type="text" class="form-control company-name" 
+							<label class="form-label">회사명<span class="essentialPoint">*</span></label>
+							<input type="text" class="form-control company-name"
 								name="companyName" placeholder="회사명을 입력하세요" maxlength="20">
 						</div>
 
 						<!-- 근무기간 -->
 						<div class="col-md-4">
-							<label class="form-label">근무기간</label>
+							<label class="form-label">근무기간<span
+								class="essentialPoint">*</span></label>
 							<div class="row g-2">
 								<div class="col-md-4">
-									<input type="date" class="form-control start-date" name="startDate">
+									<input type="date" class="form-control start-date"
+										name="startDate">
 								</div>
-								<div class="col-md-1 text-center d-flex align-items-center justify-content-center">
+								<div
+									class="col-md-1 text-center d-flex align-items-center justify-content-center">
 									<span>~</span>
 								</div>
 								<div class="col-md-4">
@@ -430,22 +448,41 @@
 								</div>
 							</div>
 							<div class="form-check mt-2">
-								<input type="checkbox" class="form-check-input currently-employed" id="currentlyEmployed">
-								<label class="form-check-label" for="currentlyEmployed">재직중</label>
+								<input type="checkbox"
+									class="form-check-input currently-employed"
+									id="currentlyEmployed"> <label class="form-check-label"
+									for="currentlyEmployed">재직중</label>
 							</div>
 						</div>
 
 						<!-- 담당업무 입력 -->
 						<div class="col-md-12">
-							<label class="form-label">담당업무</label>
-							<input type="text" class="form-control job-description" 
-								name="jobDescription" placeholder="담당업무를 입력하세요" maxlength="100">
+							<label class="form-label">담당업무<span
+								class="essentialPoint">*</span></label> <input type="text"
+								class="form-control job-description" name="jobDescription"
+								placeholder="담당업무를 입력하세요" maxlength="100">
 						</div>
 					</div>
 				</div>
 			</template>
 
 			<!-- 보유 자격증 -->
+			<div class="card mb-4">
+				<div
+					class="card-header d-flex justify-content-between align-items-center"
+					id="myHistoryBox">
+					<span>경력사항</span>
+					<button type="button" class="btn btn-primary btn-sm"
+						id="addHistoryBtn">추가하기</button>
+				</div>
+				<div class="card-body">
+					<div id="historyContainer">
+						<!-- 경력 항목 -->
+					</div>
+					<small class="text-muted">* 경력사항이 있는 경우에만 작성해 주세요.</small>
+				</div>
+			</div>
+			
 			<!-- 자기소개란 -->
 			<!-- 파일 첨부 -->
 
@@ -485,6 +522,11 @@
 </html>
 
 <style>
+/* 필수 입력 항목 스타일링 */
+.essentialPoint {
+	color: red;
+}
+
 /* 스크롤바 스타일링 - 모든 리스트 컨테이너에 적용 */
 .region-list-container::-webkit-scrollbar, .sigungu-list-container::-webkit-scrollbar,
 	.major-list-container::-webkit-scrollbar, .sub-list-container::-webkit-scrollbar
@@ -1173,7 +1215,7 @@
 				});
 
 				// 재직중 체크박스 이벤트
-				$(document).on('change', '.currently-employed', function() {
+				$(document).on('change', '.currently-employed', function () {
 					const $endDate = $(this).closest('.history-item').find('.end-date');
 					if ($(this).is(':checked')) {
 						$endDate.val('').prop('disabled', true);
