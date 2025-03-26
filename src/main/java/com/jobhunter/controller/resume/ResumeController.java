@@ -48,7 +48,7 @@ public class ResumeController {
 		return "resume/resumeFormList";
 	}
 
-	// 희망 근무 지역: 시/군/구 가져오기 (AJAX)
+	// 희망 근무 지역: 시/군/구 가져오기
 	@GetMapping("/getSigungu")
 	@ResponseBody
 	public ResponseEntity<?> getSigungu(@RequestParam("regionNo") int regionNo) {
@@ -62,7 +62,7 @@ public class ResumeController {
 		}
 	}
 
-	// 희망 업직종: 소분류 가져오기 (AJAX)
+	// 희망 업직종: 소분류 가져오기
 	@GetMapping("/getSubCategory")
 	@ResponseBody
 	public ResponseEntity<?> getSubCategory(@RequestParam("majorNo") int majorNo) {
