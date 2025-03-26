@@ -1,23 +1,10 @@
 package com.jobhunter.model.resume;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
-@AllArgsConstructor
-@Builder
-@Getter
-@Setter
-@ToString
+@Data
 public class JobFormDTO {
-	private int jobFormNo;
-	private String form;
-	private int resumeNo;
-
-	public JobFormDTO() {
-		super();
-	}
-
+	private Integer jobFormNo;
+	private JobForm form;
+	private Integer resumeNo;
 }
