@@ -1,7 +1,5 @@
 package com.jobhunter.model.resume;
 
-import java.sql.Date;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,9 +14,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class LicenceDTO {
-	private int licenceNo;
-    private String licenceName;
-    private Date licencecol; // 자격증 취득일
+public class LicenseDTO {
+	private int licenseNo;
+    private String licenseName;
+    private String acquisitionDate;
     private int resumeNo;
 }
