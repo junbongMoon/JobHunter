@@ -19,6 +19,11 @@ import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.service.resume.ResumeService;
+import com.jobhunter.model.resume.JobForm;
+import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.MajorCategoryDTO;
+import com.jobhunter.model.resume.EducationLevel;
+import com.jobhunter.model.resume.EducationStatus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,14 +37,29 @@ public class ResumeController {
 	// 이력서 작성 폼 연결
 	@GetMapping("/form")
 	public String resumeForm(Model model) {
+		
 		try {
-			model.addAttribute("regionList", resumeService.getAllRegions());
-			model.addAttribute("majorList", resumeService.getAllMajorCategories());
-			return "resume/resumeForm"; // JSP 파일명
+			// 지역 목록 조회
+			List<RegionDTO> regionList = resumeService.getAllRegions();
+			model.addAttribute("regionList", regionList);
+			// 업직종 대분류 목록 조회
+			List<MajorCategoryDTO> majorList = resumeService.getAllMajorCategories();
+			model.addAttribute("majorList", majorList);
 		} catch (Exception e) {
 			model.addAttribute("error", "데이터를 불러오는 중 오류가 발생했습니다.");
 			return "error";
 		}
+		
+		// 고용형태 ENUM 목록 추가
+		model.addAttribute("jobFormList", JobForm.values());
+		
+		// 학력 레벨 ENUM 목록 추가
+		model.addAttribute("educationLevelList", EducationLevel.values());
+		
+		// 학력 상태 ENUM 목록 추가
+		model.addAttribute("educationStatusList", EducationStatus.values());
+
+		return "resume/resumeForm";
 	}
 
 	// 이력서 목록 페이지
