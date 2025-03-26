@@ -4,60 +4,93 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.usermapper">
 
-    <resultMap id="accountMap" type="com.jobhunter.model.account.AccountVO">
-        <result column="userId" property="accountId"/>
-        <result column="userName" property="accountName"/>
-        <result column="accountType" property="accountType"/>
-        <!-- 나머지는 동일 컬럼이므로 자동 매핑 -->
-    </resultMap>
+	<resultMap id="accountMap"
+		type="com.jobhunter.model.account.AccountVO">
+		<result column="userId" property="accountId" />
+		<result column="userName" property="accountName" />
+		<result column="accountType" property="accountType" />
+		<!-- 나머지는 동일 컬럼이므로 자동 매핑 -->
+	</resultMap>
 
-    <update id="setVerificationFalse" parameterType="map">
-        UPDATE users
-        SET requiresVerification = 'N'
-        WHERE
-        <choose>
-            <when test="type eq 'email'">
-                email = #{value}
-            </when>
-            <when test="type eq 'mobile'">
-                mobile = #{value}
-            </when>
-        </choose>
-    </update>
+	<update id="setVerificationFalse" parameterType="map">
+		UPDATE users
+		SET requiresVerification = 'N'
+		WHERE
+		<choose>
+			<when test="type eq 'email'">
+				email = #{value}
+			</when>
+			<when test="type eq 'mobile'">
+				mobile = #{value}
+			</when>
+		</choose>
+	</update>
 
-    <select id="isAuthVerifi" resultType="String">
-        select requiresVerification from users where userId = #{id}
-    </select>
+	<select id="isAuthVerifi" resultType="String">
+		select requiresVerification
+		from users where userId = #{id}
+	</select>
 
-    <select id="loginAccount" resultMap="accountMap">
-        select *, userId as accountId, userName as accountName
-        from users
-        where userId = #{id} and password = sha1(md5(#{password}))
-    </select>
+	<select id="loginAccount" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where userId = #{id} and
+		password = sha1(md5(#{password}))
+	</select>
 
-    <select id="existsAccountId" parameterType="String" resultType="boolean">
-        SELECT EXISTS (SELECT 1 FROM users WHERE userId = #{id})
-    </select>
+	<select id="existsAccountId" parameterType="String"
+		resultType="boolean">
+		SELECT EXISTS (SELECT 1 FROM users WHERE userId = #{id})
+	</select>
 
-    <update id="increaseFailCount" parameterType="String">
-        UPDATE users SET loginCnt = loginCnt + 1 WHERE userId = #{id}
-    </update>
+	<update id="increaseFailCount" parameterType="String">
+		UPDATE users SET
+		loginCnt = loginCnt + 1 WHERE userId = #{id}
+	</update>
 
-    <select id="getFailCount" parameterType="String" resultType="int">
-        SELECT loginCnt FROM users WHERE userId = #{id}
-    </select>
+	<select id="getFailCount" parameterType="String"
+		resultType="int">
+		SELECT loginCnt FROM users WHERE userId = #{id}
+	</select>
 
-    <update id="setRequiresVerification" parameterType="String">
-        UPDATE users SET requiresVerification = 'Y' WHERE userId = #{id}
-    </update>
+	<update id="setRequiresVerification" parameterType="String">
+		UPDATE users
+		SET requiresVerification = 'Y' WHERE userId = #{id}
+	</update>
 
-    <update id="resetFailCount" parameterType="String">
-        UPDATE users SET loginCnt = 0 WHERE userId = #{id}
-    </update>
-    
-    <!-- 여기까진 로그인용 -->
-    
-    <select id="getUserInfo" parameterType="String" resultType="com.jobhunter.model.user.UserVO">
-    	SELECT * FROM users where uid = #{uid};
-    </select>
+	<update id="resetFailCount" parameterType="String">
+		UPDATE users SET
+		loginCnt = 0 WHERE userId = #{id}
+	</update>
+
+	<!-- 여기까진 로그인용 -->
+
+	<select id="getUserInfo" parameterType="String"
+		resultType="com.jobhunter.model.user.UserVO">
+		SELECT * FROM users where uid = #{uid};
+	</select>
+
+	<select id="checkPassword" parameterType="map"
+		resultType="boolean">
+		SELECT COUNT(*) > 0
+		FROM users
+		WHERE uid = #{uid}
+		AND password
+		= SHA1(MD5(#{password}))
+	</select>
+
+	<update id="updatePassword" parameterType="map">
+		UPDATE users SET
+		password = SHA1(MD5(#{password})) WHERE uid = #{uid};
+	</update>
+
+	<update id="updateEmail" parameterType="map">
+		UPDATE users SET email = #{email} WHERE uid = #{uid}
+	</update>
+
+	<update id="updateMobile" parameterType="map">
+		UPDATE users SET mobile = #{mobile} WHERE uid = #{uid}
+	</update>
+	
 </mapper>

@@ -3,11 +3,15 @@ package com.jobhunter.controller.user;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jobhunter.model.user.ContactUpdateDTO;
+import com.jobhunter.model.user.PasswordDTO;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.service.user.UserService;
 
@@ -30,5 +34,40 @@ public class UserRestController {
 	    }
 
 	    return ResponseEntity.status(HttpStatus.OK).body(userVO);
+	}
+	
+	@PostMapping(value = "/password", consumes = "application/json")
+	public ResponseEntity<Boolean> checkPassword(@RequestBody PasswordDTO dto) {
+	    boolean isMatch = false;
+		try {
+			isMatch = service.checkPassword(dto.getUid(), dto.getPassword());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    return ResponseEntity.ok(isMatch);
+	}
+	
+	@PatchMapping(value = "/password", consumes = "application/json")
+	public ResponseEntity<Void> changePassword(@RequestBody PasswordDTO dto) {
+	    try {
+			service.updatePassword(dto.getUid(), dto.getPassword());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	    return ResponseEntity.ok().build();
+	}
+	
+	@PatchMapping(value = "/contact", consumes = "application/json")
+	public ResponseEntity<String> changeContact(@RequestBody ContactUpdateDTO dto) {
+	    try {
+	        String updatedValue = service.updateContact(dto.getUid(), dto.getType(), dto.getValue());
+	        return ResponseEntity.ok(updatedValue);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                             .body("연락처 변경 중 오류 발생");
+	    }
 	}
 }

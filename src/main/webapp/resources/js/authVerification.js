@@ -91,28 +91,28 @@ if (!window.recaptchaVerifier) {
 }
 
 // 인증 코드 확인(성공하면 onVerificationSuccess 호출)
-export async function verifyCode(method, end) {
+export async function verifyCode(method, actionType) {
 
   if (method === METHOD.PHONE) {
     const code = document.getElementById("phoneCode").value;
-    verifyPhoneCode(code, end)
+    verifyPhoneCode(code, actionType)
   } else {
     const code = document.getElementById("emailCode").value;
-    verifyEmailCode(code, end)
+    verifyEmailCode(code, actionType)
   }
 }
 
-async function verifyPhoneCode(code, end) {
+async function verifyPhoneCode(code, actionType) {
     try {
       await confirmationResult.confirm(code);
-      window.onVerificationSuccess(METHOD.PHONE, end); // 성공 후 콜백 실행
+      window.onVerificationSuccess(METHOD.PHONE, actionType); // 성공 후 콜백 실행
     } catch (error) {
       console.error("코드 인증 실패:", error);
       alert("잘못된 인증 코드입니다.");
     }
 }
 
-async function verifyEmailCode(code, end) {
+async function verifyEmailCode(code, actionType) {
 
     const email = document.getElementById("authEmail").value;
     $.ajax({
@@ -122,7 +122,7 @@ async function verifyEmailCode(code, end) {
       data: JSON.stringify({
       email: email
   }),
-      success: () => window.onVerificationSuccess(METHOD.EMAIL, end),
+      success: () => window.onVerificationSuccess(METHOD.EMAIL, actionType),
       error: (xhr) => alert("이메일 인증 실패: " + xhr.responseText)
     });
 }

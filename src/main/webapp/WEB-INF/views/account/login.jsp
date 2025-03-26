@@ -44,11 +44,11 @@
 				
 				<button type="button" onclick="sendVerification(`email`)">이메일전송</button>
 				<input type="text" id="code" name="emailCode" placeholder="이메일인증코드 입력" />
-				<button type="button" onclick="verifyCode(`email`, `end`)">이메일인증</button>
+				<button type="button" onclick="verifyCode(`email`, `auth`)">이메일인증</button>
 
 				<button type="button" onclick="sendVerification(`phone`)">문자전송</button>
 				<input type="text" id="code" name="phoneCode" placeholder="문자인증코드 입력" />
-				<button type="button" onclick="verifyCode(`phone`, `end`)">문자인증</button>
+				<button type="button" onclick="verifyCode(`phone`, `auth`)">문자인증</button>
 			</div>
 		</c:if>
 

@@ -9,25 +9,42 @@
 	<div>마이페이지</div>
 	<!-- /Contact Section -->
 
-	 <!-- 인증 대상 -->
-	 <input type="hidden" id="authMobile"
-	 value="${sessionScope.authTargetMobile}" />
- <input type="hidden" id="authEmail"
-	 value="${sessionScope.authTargetEmail}" />
- <input type="hidden" id="uid"
-	 value="${sessionScope.account.uid}" />
- <input type="hidden" id="method" />
+	<!-- 인증 대상 -->
+	<input type="hidden" id="authMobile" />
+	<input type="hidden" id="phoneCode" />
+	<input type="hidden" id="authEmail" />
+	<input type="hidden" id="emailCode" />
+	<input type="hidden" id="uid" value="${sessionScope.account.uid}" />
 
-	<div>
-		<div>기존 전화번호_ 바꾸기누르면 숨겨짐</div> <button>전화번호 바꾸기</button>
-		<input type="text" id="authMobile" placeholder="바꿀 번호"><button type="button" onclick="sendVerification(`phone`)">인증번호 발송</button>
-		<input type="text" id="phoneCode" placeholder="인증번호"><button type="button" onclick="verifyCode(`phone`, `end`)">인증</button>
+	<div>비밀번호 변경
+		<button>변경</button>
+		<input type="text" id="nowPassword" placeholder="현재 비밀번호"><button type="button" onclick="checkPassword()">확인</button>
+		<button type="button" onclick="startVerifi(`phone`,`pwd`)">전화로 인증</button>
+		<input type="text" id="pwdToPhoneCode" placeholder="인증번호"><button type="button" onclick="endVerifi(`phone`, `pwd`)">인증</button>
+		<button type="button" onclick="startVerifi(`email`,`pwd`)">이메일로 인증</button>
+		<input type="text" id="pwdToEmailCode" placeholder="인증번호"><button type="button" onclick="endVerifi(`email`, `pwd`)">인증</button>
+
+		<span id="changePwdTap" style="display:none;">
+			<input type="text" id="changePassword" placeholder="바꿀 비밀번호">
+			<input type="text" id="checkPassword" placeholder="비밀번호 확인">
+			<button type="button" onclick="changePassword()">변경</button>
+		</span>
 	</div>
 
 	<div>
-		<div>기존 이메일_ 바꾸기누르면 숨겨짐</div> <button>이메일 바꾸기</button>
-		<input type="text" id="authEmail" placeholder="바꿀 이메일"><button type="button" onclick="sendVerification(`email`)">인증번호 발송</button>
-		<input type="text" id="emailCode" placeholder="인증번호"><button type="button" onclick="verifyCode(`email`, `end`)">인증</button>
+		<div id="nowMobile">기존 전화번호_ 바꾸기누르면 숨겨짐</div> <button>전화번호 바꾸기</button>
+		<div id="startPhoneVerifiTap">
+			<input type="text" id="changeMobile" placeholder="바꿀 번호"><button type="button" onclick="startVerifi(`phone`,`pne`)">인증번호 발송</button>
+		</div>
+		<div id="endPhoneVerifiTap">
+			<input type="text" id="pneToPhoneCode" placeholder="인증번호"><button type="button" onclick="endVerifi(`phone`,`pne`)">인증</button>
+		</div>
+	</div>
+
+	<div>
+		<div id="nowEmail">기존 이메일_ 바꾸기누르면 숨겨짐</div> <button>이메일 바꾸기</button>
+		<input type="text" id="changeEmail" placeholder="바꿀 이메일"><button type="button" onclick="startVerifi(`email`,`pne`)">인증번호 발송</button>
+		<input type="text" id="pneToEmailCode" placeholder="인증번호"><button type="button" onclick="endVerifi(`email`,`pne`)">인증</button>
 	</div>
 
 	<!-- firebase캡챠 -->
@@ -40,15 +57,113 @@
 <script>
 
 window.onload=()=>{
-	// 내정보 불러오기
+	getInfo()
+}
+
+function getInfo() {
 	$.ajax({
 	    url: "/user/info/${sessionScope.account.uid}",
-	    method: "GET", // 또는 그대로 POST 유지
-	    success: (res) => {
-	        console.log(res); // 전체 JSON 출력
+	    method: "GET",
+	    success: (result) => {
+	        console.log(result); // 전체 JSON 출력
 	    },
 	    error: (xhr) => alert("실패")
 	});
+}
+
+function checkPassword() {
+	uid = document.getElementById('uid').value
+	nowPassword = document.getElementById('nowPassword').value
+
+	$.ajax({
+  url: "/user/password",
+  method: "POST",
+  contentType: "application/json",
+  data: JSON.stringify({ uid, password: nowPassword }),
+  success: (result) => {
+    if (result === true) {
+      alert("비밀번호 확인 완료. 인증을 진행해주세요.");
+    } else {
+      alert("비밀번호가 틀렸습니다.");
+    }
+  },
+  error: (xhr) => {
+    alert("비밀번호 확인 중 오류 발생");
+  }
+});
+
+	
+}
+
+function startVerifi(type, method) {
+
+	if (type === 'phone') {
+        const authTargetMobile = method === 'pne'
+            ? document.getElementById('changeMobile').value
+            : "${sessionScope.account.mobile}";
+        document.getElementById('authMobile').value = authTargetMobile;
+    } else if (type === 'email') {
+        const authTargetEmail = method === 'pne'
+            ? document.getElementById('changeEmail').value
+            : "${sessionScope.account.email}";
+        document.getElementById('authEmail').value = authTargetEmail;
+    }
+
+	sendVerification(type);
+}
+
+function endVerifi(type, method) {
+	if (type === 'phone') {
+        const mobileCode = method === 'pne'
+		?document.getElementById('pneToPhoneCode').value
+		:document.getElementById('pwdToPhoneCode').value
+        document.getElementById('phoneCode').value = mobileCode;
+    } else if (type === 'email') {
+        const emailCode = method === 'pne'
+		?document.getElementById('pneToEmailCode').value
+		:document.getElementById('pwdToPhoneCode').value
+        document.getElementById('emailCode').value = emailCode;
+    }
+
+	if (method === 'pne') {
+		verifyCode(type, `changePnE`);
+	} else {
+		verifyCode(type, `changePwd`);
+	}
+}
+
+function viewChangePassword() {
+	document.getElementById("changePwdTap").style.display = "block";
+}
+
+function changePassword() {
+	const changePassword =document.getElementById('changePassword').value
+	const checkPassword = document.getElementById('checkPassword').value
+	if (changePassword !== checkPassword) {
+    alert("비밀번호가 일치하지 않습니다.");
+    return;
+  }
+
+  const uid = document.getElementById('uid').value;
+
+  $.ajax({
+    url: "/user/password",
+    method: "patch",
+    contentType: "application/json",
+    data: JSON.stringify({ uid, password: changePassword }),
+    success: () => {
+      alert("비밀번호가 성공적으로 변경되었습니다.");
+      // 입력 필드 초기화
+      document.getElementById('changePassword').value = "";
+      document.getElementById('checkPassword').value = "";
+      document.getElementById('nowPassword').value = "";
+      document.getElementById('changePwdTap').style.display = "none";
+    },
+    error: (xhr) => {
+      alert("비밀번호 변경 중 오류가 발생했습니다.");
+      console.error(xhr.responseText);
+    }
+  });
 }
 
 
