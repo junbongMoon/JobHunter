@@ -8,27 +8,20 @@
 
 	<select id="allList"
 		resultType="com.jobhunter.model.reviewboard.ReviewBoard">
-	SELECT
-    rb.boardNo,
-    rb.writer,        
-    u.userId,   
-    rb.companyName,
-    rb.reviewResult,
-    rb.reviewType,
-    rb.reviewLevel,
-    rb.content,
-    rb.category,
-    rb.jobType,
-    rb.postDate,
-    rb.likes,
-    rb.views
-    FROM
-    reviewBoard rb
-    LEFT JOIN users u ON rb.writer = u.uid
+		SELECT
+		r.boardNo,u.userId,r.content, c.companyName, r.likes
+		,r.views
+		FROM reviewBoard r
+		INNER JOIN users u ON r.writer = u.uid
+		INNER
+		JOIN recruitmentnotice rn ON r.gonggoUid = rn.uid
+		INNER JOIN company c
+		ON rn.refCompany = c.uid
 	</select>
 
-	<insert id="insertReview" useGeneratedKeys="true" keyProperty="boardNo">
-		INSERT  INTO reviewBoard (
+	<insert id="insertReview" useGeneratedKeys="true"
+		keyProperty="boardNo">
+		INSERT INTO reviewBoard (
 		writer,companyName,reviewResult,reviewType,
 		reviewLevel,content,category,jobType
 		)
@@ -36,26 +29,53 @@
 		#{writer},#{companyName},#{reviewResult},#{reviewType},
 		#{reviewLevel},#{content},#{category},#{jobType})
 	</insert>
-		
-		
-		<select id="detailAll" parameterType="int"
-        resultType="com.jobhunter.model.reviewboard.ReviewBoard">
-    SELECT
-        rb.boardNo,
-        u.userId AS writer,
-        rb.companyName,
-        rb.reviewResult,
-        rb.reviewType,
-        rb.reviewLevel,
-        rb.content,
-        rb.category,
-        rb.jobType,
-        rb.postDate,
-        rb.likes,
-        rb.views
-    FROM reviewBoard rb
-    LEFT JOIN users u ON rb.writer = u.uid
-    WHERE rb.boardNo = #{boardNo}
-</select>
-		
+
+
+	<select id="detailAll"
+		resultMap="userReviewInfoMap">
+		SELECT
+		rn.title,
+		rn.detail,
+		c.companyName,
+		u.userName,
+		r.content,
+		r.reviewLevel,
+		r.reviewResult,
+		r.reviewType,
+		r.likes
+		FROM users
+		u
+		JOIN resume res ON u.uid = res.userUid
+		JOIN registration reg ON
+		res.resumeNo = reg.resumePk
+		JOIN recruitmentnotice rn ON
+		reg.recruitmentNoticePk = rn.uid
+		JOIN company c ON rn.refCompany =
+		c.uid
+		LEFT JOIN reviewBoard r ON r.writer = u.uid AND r.gonggoUid =
+		rn.uid
+		WHERE u.uid = #{uid}
+	</select>
+
+<resultMap id="userReviewInfoMap" type="com.jobhunter.model.ReviewDetailViewDTO">
+  
+  <!-- recruitmentNotice -->
+  <result column="title" property="title" javaType="String"/>
+  <result column="detail" property="detail" javaType="String"/>
+  
+  <!-- company -->
+  <result column="companyName" property="companyName" javaType="String"/>
+  
+  <!-- users -->
+  <result column="userName" property="userName" javaType="String"/>
+  
+  <!-- reviewBoard -->
+  <result column="content" property="content" javaType="String"/>
+  <result column="reviewLevel" property="reviewLevel" javaType="String"/>
+  <result column="reviewResult" property="reviewResult" javaType="String"/>
+  <result column="reviewType" property="reviewType" javaType="String"/>
+  <result column="likes" property="likes" javaType="int"/>
+
+</resultMap>
+
 </mapper>
