@@ -61,36 +61,13 @@
 					<div class="row g-3">
 						<div class="col-md-12">
 							<div class="d-flex flex-wrap">
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="checkbox" name="jobForm"
-										value="FULL_TIME" id="fullTime"> <label
-										class="form-check-label" for="fullTime">정규직</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="checkbox" name="jobForm"
-										value="CONTRACT" id="contract"> <label
-										class="form-check-label" for="contract">계약직</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="checkbox" name="jobForm"
-										value="DISPATCH" id="dispatch"> <label
-										class="form-check-label" for="dispatch">파견직</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="checkbox" name="jobForm"
-										value="PART_TIME" id="partTime"> <label
-										class="form-check-label" for="partTime">아르바이트</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="checkbox" name="jobForm"
-										value="COMMISSION" id="commission"> <label
-										class="form-check-label" for="commission">위촉직</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="checkbox" name="jobForm"
-										value="FREELANCE" id="freelance"> <label
-										class="form-check-label" for="freelance">프리랜서</label>
-								</div>
+								<c:forEach var="jobForm" items="${jobFormList}">
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" name="jobForm"
+											value="${jobForm.name()}" id="${jobForm.name()}">
+										<label class="form-check-label" for="${jobForm.name()}">${jobForm.displayName}</label>
+									</div>
+								</c:forEach>
 							</div>
 						</div>
 					</div>
@@ -355,44 +332,38 @@
 
 			<!-- 학력사항 템플릿 (추가 버튼 눌러야 나옴) -->
 			<template id="educationTemplate">
-				<div
-					class="education-item border rounded p-3 mb-3 position-relative">
+				<div class="education-item border rounded p-3 mb-3 position-relative">
 					<!-- 삭제 버튼 (X) -->
-					<button type="button"
-						class="btn-close position-absolute top-0 end-0 m-3 remove-education"
+					<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-education"
 						aria-label="삭제"></button>
 					<div class="row g-3">
-						<!-- 학력 구분 -->
-						<div class="col-md-3">
-							<label class="form-label">학력 구분<span
-								class="essentialPoint">*</span></label> <select
-								class="form-select education-level" name="educationLevel">
+						<!-- 학력 레벨 선택 -->
+						<div class="col-md-4">
+							<label class="form-label">학력 구분<span class="essentialPoint">*</span></label>
+							<select class="form-select education-level" name="educationLevel">
 								<option value="">선택하세요</option>
-								<option value="HIGH_SCHOOL">고등학교</option>
-								<option value="JUNIOR_COLLEGE">전문대학</option>
-								<option value="UNIVERSITY">대학교</option>
-								<option value="GRADUATE">대학원</option>
+								<c:forEach var="level" items="${educationLevelList}">
+									<option value="${level.name()}">${level.displayName}</option>
+								</c:forEach>
 							</select>
 						</div>
 
-						<!-- 졸업 상태 -->
-						<div class="col-md-3">
-							<label class="form-label">졸업 상태<span
-								class="essentialPoint">*</span></label> <select
-								class="form-select education-status" name="educationStatus">
+						<!-- 학력 상태 선택 -->
+						<div class="col-md-4">
+							<label class="form-label">학력 상태<span class="essentialPoint">*</span></label>
+							<select class="form-select education-status" name="educationStatus">
 								<option value="">선택하세요</option>
-								<option value="GRADUATED">졸업</option>
-								<option value="ENROLLED">재학중</option>
-								<option value="ON_LEAVE">휴학중</option>
-								<option value="DROPPED_OUT">중퇴</option>
+								<c:forEach var="status" items="${educationStatusList}">
+									<option value="${status.name()}">${status.displayName}</option>
+								</c:forEach>
 							</select>
 						</div>
 
 						<!-- 학교명 입력 -->
 						<div class="col-md-4">
 							<label class="form-label">학교명<span class="essentialPoint">*</span></label>
-							<input type="text" class="form-control custom-input"
-								name="customInput" placeholder="학교명을 입력하세요">
+							<input type="text" class="form-control custom-input" name="customInput"
+								placeholder="학교명을 입력하세요" maxlength="190">
 						</div>
 					</div>
 				</div>
