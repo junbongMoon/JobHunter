@@ -143,13 +143,22 @@ public class RecruitmentNoticeRestController {
 	}
 
 	// 회사가 공고를 작성할 때 면접방식을 리스트에 누적 해주는 메서드
+	// 같은 면접방식이 중복 저장되는 문제가 생겼다... 해결해보자
 	@PostMapping(value = "/application")
 	public ResponseEntity<List<ApplicationDTO>> saveApplicationWithRecruitmentNotice(
 			@RequestBody ApplicationDTO applicationDTO) {
 		// 성공, 실패 여부를 json으로 응답
 		ResponseEntity<List<ApplicationDTO>> result = null;
-
-		if (applicationDTO != null) {
+		
+		boolean isDuplicate = false;
+		for(ApplicationDTO appl : applicationList) {
+			if(appl.getMethod() == applicationDTO.getMethod()) {
+				isDuplicate = true;
+			}
+		}
+		
+		// 같은 이름의 method가 들어올 경우 방지
+		if (applicationDTO != null && !isDuplicate) {
 			applicationList.add(applicationDTO);
 			result = ResponseEntity.ok(this.applicationList);
 		} else {
@@ -211,7 +220,7 @@ public class RecruitmentNoticeRestController {
 	}
 	
 	// 공고를 작성할 때 면접방식을 삭제하는 메서드
-	// 같은 면접방식이 중복 저장되는 문제가 생겼다... 해결해보자
+	
 	@DeleteMapping("/application")
 	public ResponseEntity<List<ApplicationDTO>> deleteApplicationWithRecruitmentNotice(@RequestBody ApplicationDTO applicationDTO){
 		ResponseEntity<List<ApplicationDTO>> result = null;

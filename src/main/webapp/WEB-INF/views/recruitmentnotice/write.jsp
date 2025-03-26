@@ -84,7 +84,27 @@ $(document).on("click", ".save-method-btn", function () {
   saveApplication(method, detail);
 });
 		
+function isValidApplication() {
+  let result = true;
 
+  $(".application-checkbox:checked").each(function () {
+    let method = $(this).val();
+    let detailInput = $(".method-detail[data-method='" + method + "']");
+    let detailValue = detailInput.val();
+
+    if (!detailValue || detailValue.trim() === "") {
+      alert(`'${method}' 방식의 상세 정보를 입력하고 저장 버튼을 눌러주세요.`);
+      detailInput.focus();
+      result = false;
+      return false; // .each 루프 중단
+    }
+
+    // 저장을 누르지 않았을 가능성을 고려하여 저장 처리
+    saveApplication(method, detailValue);
+  });
+
+  return result;
+}
 
 	});
 
@@ -149,7 +169,7 @@ $(document).on("click", ".save-method-btn", function () {
 			}
 		});
 	}
-
+	
 	function getSubCategory(majorNo) {
 		$.ajax({
 			url : '/Category/sub/' + majorNo,
@@ -201,34 +221,23 @@ $(document).on("click", ".save-method-btn", function () {
 	}
 
 	function getSigungu(regionNo) {
-		$
-				.ajax({
-					url : '/region/sigungu/' + regionNo,
-					type : 'get',
-					dataType : 'json',
-					async : false,
-					success : function(data) {
-						console.log("시군구 데이터:", data);
-						let sigunguSelect = $(".Sigungu");
-						sigunguSelect.empty();
-
-						sigunguSelect
-								.append('<option value="-1">시군구 선택</option>');
-
-						$
-								.each(
-										data,
-										function(index, sigungu) {
-											sigunguSelect
-													.append('<option value="' + sigungu.sigunguNo + '">'
-															+ sigungu.name
-															+ '</option>');
-										});
+		$.ajax({
+			url : '/region/sigungu/' + regionNo,
+			type : 'get',
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				console.log("시군구 데이터:", data);
+				let sigunguSelect = $(".Sigungu");
+				sigunguSelect.empty();
+				sigunguSelect.append('<option value="-1">시군구 선택</option>');
+						$.each(data, function(index, sigungu) 
+						{sigunguSelect.append('<option value="' + sigungu.sigunguNo + '">' + sigungu.name + '</option>');});
 					},
-					error : function(err) {
-						console.error("시군구 데이터 불러오기 실패", err);
+			error : function(err) {
+				console.error("시군구 데이터 불러오기 실패", err);
 					}
-				});
+			});
 	}
 
 	// 지역 컨트롤러 필드에
@@ -345,11 +354,74 @@ $(document).on("click", ".save-method-btn", function () {
         }
     });
 
-	// append 시키자
-	output += ``
+
 
 }
 
+function submitRecruitmentNotice() {
+  if (!isValidRecruitmentForm()) return;
+
+  const dto = {
+    title: $("#title").val(),
+    workType: $("#workType").val(),
+    payType: $("input[name='payType']:checked").val(),
+    pay: $("#email").val(),
+    militaryService: $("input[name='militaryService']:checked").val(),
+    dueDateForString: $("#date").val(),
+    detail: $("#detail").val()
+  };
+
+  $.ajax({
+    url: "/recruitmentnotice/rest/1", // 회사 UID 동적으로 처리 가능
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify(dto),
+    success: function (response) {
+      alert("공고 등록 성공!");
+      location.href = "/recruitmentnotice/list";
+    },
+    error: function (err) {
+      console.error("공고 등록 실패", err);
+      alert("등록 중 오류가 발생했습니다.");
+    }
+  });
+}
+
+function isValidRecruitmentForm() {
+  const title = $("#title").val();
+  const workType = $("#workType").val();
+  const payType = $("input[name='payType']:checked").val();
+  const payAmount = $("#email").val();
+  const militaryService = $("input[name='militaryService']:checked").val();
+  const dueDate = $("#date").val();
+  const detail = $("#detail").val();
+  const sigungu = $(".Sigungu").val();
+  const subCategory = $(".SubCategory").val();
+
+  if (!title || !workType || !payType || !payAmount || !militaryService || !dueDate || !detail) {
+    alert("모든 필수 항목을 입력해주세요.");
+    return false;
+  }
+
+  if (!sigungu || sigungu === "-1") {
+    alert("시군구를 선택해주세요.");
+    $(".Sigungu").focus();
+    return false;
+  }
+
+  if (!subCategory || subCategory === "-1") {
+    alert("직업(세부직종)을 선택해주세요.");
+    $(".SubCategory").focus();
+    return false;
+  }
+
+  // 면접 방식 유효성 검사도 포함
+  if (!isValidApplication()) {
+    return false;
+  }
+
+  return true;
+}
 </script>
 
 
@@ -362,7 +434,7 @@ $(document).on("click", ".save-method-btn", function () {
 	<section id="blog-comment-form" class="blog-comment-form section">
 
 		<div class="container" data-aos="fade-up" data-aos-delay="100">
-
+			<!-- 일단 /recruitmentnotice/rest/ 뒤의 값을 1번으로 해둠 나중 되면 el표현식으로 sessionScope.loginmember.uid로 바꾸자.. -->
 			<form method="post" role="form">
 
 				<div class="form-header">
@@ -458,7 +530,7 @@ $(document).on("click", ".save-method-btn", function () {
 										<div class="input-group">
 											<label for="email">급여 액수</label> <input type="text"
 												name="email" id="email" placeholder="금액을 입력해주세요.."
-												required="">
+												>
 
 										</div>
 									</div>
@@ -571,7 +643,7 @@ $(document).on("click", ".save-method-btn", function () {
 										<div class="input-group">
 											<label for="detail">상세 내용</label>
 											<textarea name="detail" id="detail" rows="5"
-												placeholder="상세 내용을 적어주세요..." required=""></textarea>
+												placeholder="상세 내용을 적어주세요..." ></textarea>
 											
 										</div>
 									</div>
@@ -588,7 +660,7 @@ $(document).on("click", ".save-method-btn", function () {
 
 									<div class="col-12 text-center">
 										<button type="submit" id="writeTemplate">템플릿 저장</button>
-										<button type="submit" id="write">작성</button>
+										<button type="button" id="write" onclick="submitRecruitmentNotice()">작성</button>
 									</div>
 								</div>
 			</form>
