@@ -9,13 +9,14 @@ import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.resume.EducationDTO;
 import com.jobhunter.model.resume.JobFormDTO;
+import com.jobhunter.model.resume.LicenseDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
+import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
-import com.jobhunter.model.resume.PersonalHistoryDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -93,6 +94,13 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public void insertHistory(PersonalHistoryDTO historyDTO) throws Exception {
 		ses.insert(NS + ".insertHistory", historyDTO);
 	}
+
+	@Override
+	public void insertLicense(LicenseDTO licenseDTO) throws Exception {
+		ses.insert(NS + ".insertLicense", licenseDTO);
+	}
+	
+	
 	
 	
 	

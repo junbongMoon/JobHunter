@@ -4,13 +4,14 @@ import java.util.List;
 
 import com.jobhunter.model.resume.EducationDTO;
 import com.jobhunter.model.resume.JobFormDTO;
+import com.jobhunter.model.resume.LicenseDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
+import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
-import com.jobhunter.model.resume.PersonalHistoryDTO;
 
 public interface ResumeDAO {
 	void insertResumeTemp(ResumeDTO resumeDTO);
@@ -36,4 +37,6 @@ public interface ResumeDAO {
 	void insertEducation(EducationDTO educationDTO) throws Exception;
 
 	void insertHistory(PersonalHistoryDTO historyDTO) throws Exception;
+
+	void insertLicense(LicenseDTO licenseDTO) throws Exception;
 }
