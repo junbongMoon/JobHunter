@@ -1,23 +1,12 @@
 package com.jobhunter.model.resume;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-@Getter
-@Setter
-@ToString
+@Data
 public class EducationDTO {
-	private int educationNo;
-    private String educationLevel;
-    private String educationStatus;
+	private Integer educationNo;
+    private EducationLevel educationLevel;
+    private EducationStatus educationStatus;
     private String customInput;
-    private int resumeNo;
+    private Integer resumeNo;
 }
