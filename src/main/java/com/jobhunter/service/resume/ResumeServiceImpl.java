@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jobhunter.dao.resume.ResumeDAO;
 import com.jobhunter.model.resume.EducationDTO;
 import com.jobhunter.model.resume.JobFormDTO;
+import com.jobhunter.model.resume.LicenseDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
@@ -74,6 +75,14 @@ public class ResumeServiceImpl implements ResumeService {
 				rdao.insertHistory(history);
 			}
 		}
+
+		// 자격증 저장
+		if (resumeDTO.getLicenses() != null && !resumeDTO.getLicenses().isEmpty()) {
+			for (LicenseDTO license : resumeDTO.getLicenses()) {
+				license.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertLicense(license);
+			}
+		}
 	}
 
 	@Override
@@ -124,6 +133,14 @@ public class ResumeServiceImpl implements ResumeService {
 			for (PersonalHistoryDTO history : resumeDTO.getHistories()) {
 				history.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertHistory(history);
+			}
+		}
+
+		// 자격증 저장
+		if (resumeDTO.getLicenses() != null && !resumeDTO.getLicenses().isEmpty()) {
+			for (LicenseDTO license : resumeDTO.getLicenses()) {
+				license.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertLicense(license);
 			}
 		}
 	}
