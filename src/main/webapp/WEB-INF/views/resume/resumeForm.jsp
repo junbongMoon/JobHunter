@@ -1302,6 +1302,11 @@
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 자격증 추가 버튼 클릭 이벤트
 				$('#addLicenseBtn').on('click', function () {
+					const licenseBoxCount = $('.license-item').length;
+					if (licenseBoxCount >= 10) {
+						showValidationModal("자격증은 최대 10개까지 저장 가능합니다.");
+						return;
+					}
 					const template = document.querySelector('#licenseTemplate');
 					const clone = template.content.cloneNode(true);
 					$('#licenseContainer').append(clone);
