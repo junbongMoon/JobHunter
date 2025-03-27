@@ -4,16 +4,16 @@ import java.util.List;
 
 import com.jobhunter.model.reviewboard.ReviewBoard;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
+import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
+
 
 public interface ReviewBoardDAO {
 
-	List<ReviewBoard> selectListBoard() throws Exception;
+	List<ReviewBoardDTO> selectListBoard() throws Exception;
 
 	int insertBoard(ReviewBoardDTO reviewBoardDTO) throws Exception;
 
-	ReviewBoard selectDetailBoard(int boardNo)throws Exception;
-
-
+	ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception;
 	
 
 }

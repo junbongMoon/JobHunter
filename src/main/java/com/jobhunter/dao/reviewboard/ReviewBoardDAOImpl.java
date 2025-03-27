@@ -8,8 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.jobhunter.model.reviewboard.ReviewBoard;
+
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
+import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -27,7 +28,7 @@ import lombok.extern.log4j.Log4j;
 
 	
 	@Override
-	public List<ReviewBoard> selectListBoard() throws Exception {
+	public List<ReviewBoardDTO> selectListBoard() throws Exception {
 	
 		
 		
@@ -47,8 +48,9 @@ import lombok.extern.log4j.Log4j;
 
 
 	@Override
-	public ReviewBoard selectDetailBoard(int boardNo) throws Exception {
-		
-		return ses.selectOne(NS +".detailAll", boardNo);
-	}
+	public ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception {
+        return ses.selectOne(NS + ".detailAll", boardNo);
+}
+
+
 }

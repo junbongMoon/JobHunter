@@ -7,16 +7,23 @@
 
 
 	<select id="allList"
-		resultType="com.jobhunter.model.reviewboard.ReviewBoard">
+		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
 		SELECT
-		r.boardNo,u.userId,r.content, c.companyName, r.likes
-		,r.views
-		FROM reviewBoard r
-		INNER JOIN users u ON r.writer = u.uid
-		INNER
-		JOIN recruitmentnotice rn ON r.gonggoUid = rn.uid
-		INNER JOIN company c
-		ON rn.refCompany = c.uid  order by r.boardNo desc
+		r.boardNo,
+		u.userId AS writer,
+		c.companyName,
+		r.likes,
+		r.views
+		FROM
+		reviewBoard r
+		JOIN
+		users u ON r.writer = u.uid
+		JOIN
+		recruitmentnotice rn ON r.gonggoUid = rn.uid
+		JOIN
+		company c ON rn.refCompany = c.uid
+		ORDER BY
+		r.boardNo DESC;
 	</select>
 
 	<insert id="insertReview" useGeneratedKeys="true"
@@ -44,12 +51,15 @@
 		r.content,
 		r.likes
 		from reviewBoard r
-		left join users u on r.writer = u.uid
+		left join users u on
+		r.writer = u.uid
 		left join
 		resume res on u.uid = res.userUid
-		left join recruitmentnotice rec on
+		left join
+		recruitmentnotice rec on
 		rec.uid = res.resumeNo
-		inner join company com on rec.refCompany =
+		inner join company com
+		on rec.refCompany =
 		com.uid
 		where r.boardNo=#{r.boardNo}
 	</select>

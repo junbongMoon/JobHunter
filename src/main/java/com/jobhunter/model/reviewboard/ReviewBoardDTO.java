@@ -17,20 +17,16 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ReviewBoardDTO {
-	private int boardNo;
-	private String writer;   
-	private String userId; 
-	private String companyName;
-	private String reviewResult;
-	private String reviewType;
-	private int reviewLevel;
-	private String content;
-	private String category;
-	private String jobType;
-	
+
+	    private int boardNo;
+	    private String writer;
+	    private String companyName;
+	    private int likes;
+	    private int views;
+}
 
 	
 	
 	
 	
-}
+
