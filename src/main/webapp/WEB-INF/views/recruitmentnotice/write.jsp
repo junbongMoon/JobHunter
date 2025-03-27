@@ -10,7 +10,8 @@
 		getMajorCategory();
 
 		$('.method-detail, .save-method-btn').hide();
-
+		
+		// class = "Region" 값이 바뀌면.. 
 		$(document).on(
 				"change",
 				".Region",
@@ -35,7 +36,8 @@
 				saveSigungu(selectedSigungu);
 			}
 		});
-
+		
+		// class = "MajorCategory" 값이 바뀌면.. 
 		$(document).on(
 				"change",
 				".MajorCategory",
@@ -51,7 +53,8 @@
 								'<option value="-1">산업군 선택</option>');
 					}
 				});
-
+		
+		// class = "SubCategory" 값이 바뀌면.. 
 		$(document).on("change", ".SubCategory", function() {
 			let selectedSubCategory = $(this).val();
 			console.log("선택한 직업:", selectedSubCategory);
@@ -60,24 +63,25 @@
 				saveSubCategory(selectedSubCategory);
 			}
 		});
-
+		
+		// class = ".application-checkbox" 값이 바뀌면.. 
 		$(document).on("change", ".application-checkbox", function () {
-  const method = $(this).val();
-  const checked = $(this).is(":checked");
+  let method = $(this).val();
+  let checked = $(this).is(":checked");
 
   if (checked) {
-    $(".method-detail[data-method='" + method + "']").show();
-    $(".save-method-btn[data-method='" + method + "']").show();
+    $(".method-detail[data-method='\${method}']").show();
+    $(".save-method-btn[data-method='\${method}']").show();
   } else {
-    $(".method-detail[data-method='" + method + "']").hide().val('');
-    $(".save-method-btn[data-method='" + method + "']").hide();
+    $(".method-detail[data-method='\${method}']").hide().val('');
+    $(".save-method-btn[data-method='\${method}']").hide();
     deleteApplication(method);
   }
 });
-
+// 저장버튼을 누르면
 $(document).on("click", ".save-method-btn", function () {
   const method = $(this).data("method");
-  const detail = $(".method-detail[data-method='" + method + "']").val();
+  const detail = $(".method-detail[data-method='\${method}']").val();
 
   // 상세 정보는 입력하지 않아도 된다.
 
@@ -89,11 +93,11 @@ function isValidApplication() {
 
   $(".application-checkbox:checked").each(function () {
     let method = $(this).val();
-    let detailInput = $(".method-detail[data-method='" + method + "']");
+    let detailInput = $(".method-detail[data-method='\${method}']");
     let detailValue = detailInput.val();
 
     if (!detailValue || detailValue.trim() === "") {
-      alert(`'${method}' 방식의 상세 정보를 입력하고 저장 버튼을 눌러주세요.`);
+      alert(`'\${method}' 방식의 상세 정보를 입력하고 저장 버튼을 눌러주세요.`);
       detailInput.focus();
       result = false;
       return false; // .each 루프 중단
@@ -160,8 +164,8 @@ function isValidApplication() {
 
 				$.each(data, function(index, majorCategory) {
 					majorSelect
-							.append('<option value="' + majorCategory.majorcategoryNo + '">'
-									+ majorCategory.jobName + '</option>');
+							.append(`<option value="\${majorCategory.majorcategoryNo}">
+									\${majorCategory.jobName} </option>`);
 				});
 			},
 			error : function(err) {
@@ -185,8 +189,8 @@ function isValidApplication() {
 
 				$.each(data, function(index, subCategory) {
 					subSelect
-							.append('<option value="' + subCategory.subcategoryNo + '">'
-									+ subCategory.jobName + '</option>');
+							.append(`<option value="\${subCategory.subcategoryNo}">
+									\${subCategory.jobName}</option>`);
 				});
 			},
 			error : function(err) {
@@ -232,7 +236,7 @@ function isValidApplication() {
 				sigunguSelect.empty();
 				sigunguSelect.append('<option value="-1">시군구 선택</option>');
 						$.each(data, function(index, sigungu) 
-						{sigunguSelect.append('<option value="' + sigungu.sigunguNo + '">' + sigungu.name + '</option>');});
+						{sigunguSelect.append(`<option value="\${sigungu.sigunguNo} ">\${sigungu.name} </option>`);});
 					},
 			error : function(err) {
 				console.error("시군구 데이터 불러오기 실패", err);

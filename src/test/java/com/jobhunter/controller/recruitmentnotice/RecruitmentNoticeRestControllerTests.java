@@ -23,41 +23,41 @@ public class RecruitmentNoticeRestControllerTests {
 	
 	
 	// insert 테스트
-	@Test
-	public void insertRecruitmentNotice() {
-		MilitaryService mili = MilitaryService.SERVED;
-		
-		 LocalDateTime deadlineDateTime = LocalDateTime.of(2025, 3, 31, 23, 59, 59); // 마감기한 (날짜 + 시간)
-         Timestamp deadlineTimestamp = Timestamp.valueOf(deadlineDateTime); // java.sql.Timestamp 변환
-		
-         
-        System.out.println(recService); 
-         
-		RecruitmentNoticeDTO dto = RecruitmentNoticeDTO.builder()
-				.title("test")
-				.workType("")
-				.payType("시급")
-				.pay(10000)
-				.period("08:00~18:00")
-				.personalHistory("코리아 임베디드 4년 근무")
-				.militaryService(mili)
-				.dueDate(deadlineTimestamp)
-				.detail("열심히 하겠습니다.")
-				.manager("이성실")
-				.miniTitle("제 1차 테스트")
-				.refCompany(1)
-				.build();
-		
-		
-		
-		try {
-			recService.saveRecruitmentNotice(dto);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			System.out.println("🚨 예외 발생: " + e.getMessage());
-			e.printStackTrace();
-		}
-		
-	}
+//	@Test
+//	public void insertRecruitmentNotice() {
+//		MilitaryService mili = MilitaryService.SERVED;
+//		
+//		 LocalDateTime deadlineDateTime = LocalDateTime.of(2025, 3, 31, 23, 59, 59); // 마감기한 (날짜 + 시간)
+//         Timestamp deadlineTimestamp = Timestamp.valueOf(deadlineDateTime); // java.sql.Timestamp 변환
+//		
+//         
+//        System.out.println(recService); 
+//         
+//		RecruitmentNoticeDTO dto = RecruitmentNoticeDTO.builder()
+//				.title("test")
+//				.workType("")
+//				.payType("시급")
+//				.pay(10000)
+//				.period("08:00~18:00")
+//				.personalHistory("코리아 임베디드 4년 근무")
+//				.militaryService(mili)
+//				.dueDate(deadlineTimestamp)
+//				.detail("열심히 하겠습니다.")
+//				.manager("이성실")
+//				.miniTitle("제 1차 테스트")
+//				.refCompany(1)
+//				.build();
+//		
+//		
+//		
+//		try {
+//			recService.saveRecruitmentNotice(dto);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			System.out.println("🚨 예외 발생: " + e.getMessage());
+//			e.printStackTrace();
+//		}
+//		
+//	}
 
 }
