@@ -1030,7 +1030,8 @@
 								acquisitionDate: $(this).find('.acquisition-date').val()
 							};
 						}).get(),
-						introduce: $('#selfIntroTextarea').val()
+						introduce: $('#selfIntroTextarea').val(),
+						files: uploadedFiles
 					};
 
 					console.log('저장할 데이터:', formData);
@@ -1350,44 +1351,104 @@
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 첨부파일 드래그 & 드롭
+
+				const upfiles = [];         // 실제 드래그한 파일
+				const uploadedFiles = [];   // 서버 업로드 완료된 파일 정보
+
 				$('#fileContainer').on('dragenter dragover', function (evt) {
 					evt.preventDefault();
 				});
 
 				$('#fileContainer').on('drop', function (evt) {
-					evt.preventDefault(); // 웹 실행 방지
+					evt.preventDefault();
 					for (let file of evt.originalEvent.dataTransfer.files) {
 						let isDuplicate = false;
+
 						$.each(upfiles, function (index, e) {
-							// 업로드된 파일이 이미 있는지
-							if (file.name == e.name) {
+							if (file.name === e.name) {
 								isDuplicate = true;
+								return false; // 반복 중단
 							}
 						});
 
-						if (file.size == 0 && file.type == '') {
+						if (file.size === 0 && file.type === '') {
 							showValidationModal("폴더는 업로드 할 수 없습니다.");
 							return;
 						}
 						if (file.size > 10485760 || isDuplicate) {
 							if (isDuplicate) {
-								showValidationModal("업로드된 같은 파일이 이미 있습니다.");
-								return;
+								showValidationModal("같은 파일이 이미 업로드되었습니다.");
 							} else {
-								showValidationModal("파일 사이즈가 너무 큽니다.");
-								return;
+								showValidationModal("파일 크기가 10MB를 초과합니다.");
 							}
-						} else {
-							upfiles.push(file);
-							// 업로드 파일 미리보기
-							showPreview(file);
-							fileUpload(file);
+							return;
 						}
-					}
 
-					// 파일 업로드 처리
+						// 업로드 처리
+						upfiles.push(file);
+						fileUpload(file);
+					}
 				});
 
+				// AJAX 파일 업로드
+				function fileUpload(file) {
+					const formData = new FormData();
+					formData.append("file", file);
+
+					$.ajax({
+						url: "/resume/uploadFile",
+						type: "POST",
+						data: formData,
+						processData: false,
+						contentType: false,
+						success: function (result) {
+							if (result.success) {
+								// 업로드된 파일 정보 저장
+								uploadedFiles.push({
+									originalFileName: result.originalFileName,
+									newFileName: result.newFileName,
+									ext: result.ext,
+									size: result.size,
+									base64Image: result.base64Image
+								});
+
+								// 미리보기 출력
+								showPreview(result);
+							} else {
+								showValidationModal(result.message || "파일 업로드 실패");
+							}
+						},
+						error: function () {
+							showValidationModal("파일 업로드 중 오류가 발생했습니다.");
+						}
+					});
+				}
+
+				function showPreview(fileInfo) {
+					const $fileContainer = $('#fileContainer');
+					const $fileText = $fileContainer.find('.fileText');
+
+					// 안내 문구 숨기기 (파일이 하나라도 있으면)
+					if ($fileText.length) {
+						$fileText.hide();
+					}
+
+					// 파일 이름만 출력
+					const $preview = $('<div>')
+						.addClass('d-inline-block m-2')
+						.css({
+							fontSize: '13px',
+							padding: '6px 10px',
+							border: '1px solid #ccc',
+							borderRadius: '6px',
+							backgroundColor: '#f8f9fa',
+							maxWidth: '200px',
+							wordBreak: 'break-word'
+						})
+						.text(fileInfo.originalFileName);
+
+					$fileContainer.append($preview);
+				}
 
 
 			});
