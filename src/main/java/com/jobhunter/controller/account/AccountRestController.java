@@ -32,6 +32,87 @@ public class AccountRestController {
 
 	private final AccountService accountService;
 
+	
+	// =================================권한체커========================================
+	
+	// resources/js 폴더에 있는 accountStatus.js 파일 보면 설명서 첨부 (상단 주석)
+	// Rest방식/Post등 뷰단 반환 안하는 ajax같은거 전용이고 페이지 넘어가는건 인터셉터 (servlet-context.xml 참고) 사용해주세요
+
+	// 본인 여부 확인
+	@GetMapping("/owner/{type}/{uid}")
+	public ResponseEntity<?> isOwner(@PathVariable String type, @PathVariable int uid, HttpSession session) {
+	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+
+		if (account == null)
+			return ResponseEntity.ok(false);
+
+		AccountType targetType;
+		try {
+			targetType = AccountType.valueOf(type.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.badRequest().body(false);
+		}
+
+		boolean isOwner = account.getUid() == uid && account.getAccountType() == targetType;
+		return ResponseEntity.ok(isOwner);
+	}
+
+	// 계정 타입(기업/일반) 확인
+	@GetMapping("/role/{type}")
+	public ResponseEntity<?> hasRole(@PathVariable String type, HttpSession session) {
+	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+		if (account == null)
+			return ResponseEntity.ok(false);
+
+		AccountType required = AccountType.valueOf(type.toUpperCase());
+		return ResponseEntity.ok(account.getAccountType() == required);
+	}
+
+	// 정지 상태인지 확인
+	@GetMapping("/blocked")
+	public ResponseEntity<?> isNotBlocked(HttpSession session) {
+	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+	    if (account == null) return ResponseEntity.ok(false);
+
+	    Timestamp deadline = account.getBlockDeadline();
+	    boolean notBlocked = (deadline == null || deadline.toInstant().isBefore(Instant.now()));
+	    return ResponseEntity.ok(notBlocked);
+	}
+	
+	// 삭제 대기 상태인지 확인
+	@GetMapping("/deleted")
+	public ResponseEntity<?> isNotDeleted(HttpSession session) {
+	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+	    if (account == null) return ResponseEntity.ok(false);
+
+	    Timestamp deadline = account.getDeleteDeadline();
+	    boolean notDeleted = (deadline == null);
+	    return ResponseEntity.ok(notDeleted);
+	}
+	
+	
+	// 로그인된 계정 새로고침
+	private AccountVO refreshAccount(AccountVO sessionAccount) {
+	    if (sessionAccount == null) {
+	    	return null;
+	    }
+
+	    int uid = sessionAccount.getUid();
+	    AccountType type = sessionAccount.getAccountType();
+
+	    try {
+	    	return accountService.refreshAccount(uid, type);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return sessionAccount;
+		}
+	}
+	
+	
+	// =======================여기까지 권한체커===========================
+	
+	
 	// 인증 성공하고 계정 잠금 해제해주는 api
 	@PostMapping(value = "/auth", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> verify(@RequestBody VerificationRequestDTO dto, HttpSession session) {
@@ -124,74 +205,4 @@ public class AccountRestController {
 
 	// 이 아래 권한체커
 
-	// 본인 여부 확인
-	@GetMapping("/owner/{type}/{uid}")
-	public ResponseEntity<?> isOwner(@PathVariable String type, @PathVariable int uid, HttpSession session) {
-	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
-
-		if (account == null)
-			return ResponseEntity.ok(false);
-
-		AccountType targetType;
-		try {
-			targetType = AccountType.valueOf(type.toUpperCase());
-		} catch (IllegalArgumentException e) {
-			return ResponseEntity.badRequest().body(false);
-		}
-
-		boolean isOwner = account.getUid() == uid && account.getAccountType() == targetType;
-		return ResponseEntity.ok(isOwner);
-	}
-
-	// 특정 권한 이상 여부 확인
-	@GetMapping("/role/{type}")
-	public ResponseEntity<?> hasRole(@PathVariable String type, HttpSession session) {
-	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
-		if (account == null)
-			return ResponseEntity.ok(false);
-
-		AccountType required = AccountType.valueOf(type.toUpperCase());
-		return ResponseEntity.ok(account.getAccountType() == required);
-	}
-
-	// 정지 상태인지 확인
-	@GetMapping("/blocked")
-	public ResponseEntity<?> isNotBlocked(HttpSession session) {
-	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
-	    if (account == null) return ResponseEntity.ok(false);
-
-	    Timestamp deadline = account.getBlockDeadline();
-	    boolean notBlocked = (deadline == null || deadline.toInstant().isBefore(Instant.now()));
-	    return ResponseEntity.ok(notBlocked);
-	}
-	
-	// 삭제 대기 상태인지 확인
-	@GetMapping("/deleted")
-	public ResponseEntity<?> isNotDeleted(HttpSession session) {
-	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
-	    if (account == null) return ResponseEntity.ok(false);
-
-	    Timestamp deadline = account.getDeleteDeadline();
-	    boolean notDeleted = (deadline == null);
-	    return ResponseEntity.ok(notDeleted);
-	}
-	
-	
-	// 로그인된 계정 새로고침
-	private AccountVO refreshAccount(AccountVO sessionAccount) {
-	    if (sessionAccount == null) {
-	    	return null;
-	    }
-
-	    int uid = sessionAccount.getUid();
-	    AccountType type = sessionAccount.getAccountType();
-
-	    try {
-	    	return accountService.refreshAccount(uid, type);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return sessionAccount;
-		}
-	}
 }
