@@ -69,10 +69,16 @@ async function sendEmailVerification(email) {
     });
 }
 
+function resetRecaptcha() {
+  if (window.recaptchaVerifier) {
+    window.recaptchaVerifier.clear(); // 기존 캡차 해제
+    delete window.recaptchaVerifier;
+  }
+}
 // 전화번호 인증 코드 전송
 async function sendPhoneVerification(phoneNumber) {
 // firebase에서 해줌
-
+resetRecaptcha();
 // 캡챠기능 파이어베이스 기본 제공
 if (!window.recaptchaVerifier) {
     window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
