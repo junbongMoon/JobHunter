@@ -18,33 +18,48 @@
 
 	<div>비밀번호 변경
 		<button>변경</button>
-		<input type="text" id="nowPassword" placeholder="현재 비밀번호"><button type="button" onclick="checkPassword()">확인</button>
-		<button type="button" onclick="startVerifi(`phone`,`pwd`)">전화로 인증</button>
-		<input type="text" id="pwdToPhoneCode" placeholder="인증번호"><button type="button" onclick="endVerifi(`phone`, `pwd`)">인증</button>
-		<button type="button" onclick="startVerifi(`email`,`pwd`)">이메일로 인증</button>
-		<input type="text" id="pwdToEmailCode" placeholder="인증번호"><button type="button" onclick="endVerifi(`email`, `pwd`)">인증</button>
-
-		<span id="changePwdTap" style="display:none;">
-			<input type="text" id="changePassword" placeholder="바꿀 비밀번호">
-			<input type="text" id="checkPassword" placeholder="비밀번호 확인">
-			<button type="button" onclick="changePassword()">변경</button>
-		</span>
 	</div>
 
 	<div>
-		<div id="nowMobile">기존 전화번호_ 바꾸기누르면 숨겨짐</div> <button>전화번호 바꾸기</button>
-		<div id="startPhoneVerifiTap">
+		<div><!--변경 누르면 모달창으로 나옴-->
+		<input type="text" id="nowPassword" placeholder="현재 비밀번호"><button type="button" onclick="checkPassword()">확인</button>
+		</div>
+
+		<div><!--비번확인 성공하면 모달창에 대신 띄움-->
+			<div><!--전화/이메일 선택하는 버튼 만들고 이거 나옴-->
+		<button type="button" onclick="startVerifi(`phone`,`pwd`)">전화로 인증</button>
+		<input type="text" id="pwdToPhoneCode" placeholder="인증번호"><button type="button" onclick="endVerifi(`phone`, `pwd`)">인증</button>
+	</div>
+	<div><!--전화/이메일 선택하는 버튼 만들고 이거 나옴-->
+		<button type="button" onclick="startVerifi(`email`,`pwd`)">이메일로 인증</button>
+		<input type="text" id="pwdToEmailCode" placeholder="인증번호"><button type="button" onclick="endVerifi(`email`, `pwd`)">인증</button>
+	</div>
+	</div>
+
+		<span id="changePwdTap" style="display:none;"><!--전화/이메일 인증 성공하면 이거 모달창에 대신 띄움-->
+			<input type="text" id="changePassword" placeholder="바꿀 비밀번호">
+			<input type="text" id="checkPassword" placeholder="비밀번호 확인">
+			<button type="button" onclick="changePassword()">변경</button><!--변경 성공하면 모달창 지움-->
+		</span></div>
+
+	<div>
+		<div id="Mobile"><div id="nowMobile">기존 전화번호 </div> <button>전화번호 바꾸기</button></div><!--바꾸기누르면 숨겨짐 인증끝나면 다시 나옴-->
+		<div id="startPhoneVerifiTap"><!--바꾸기누르면 나오고 인증번호 발송하면 숨겨짐-->
 			<input type="text" id="changeMobile" placeholder="바꿀 번호"><button type="button" onclick="startVerifi(`phone`,`pne`)">인증번호 발송</button>
 		</div>
-		<div id="endPhoneVerifiTap">
+		<div id="endPhoneVerifiTap"><!--인증번호 발송하면 나오고 인증하면 숨겨짐-->
 			<input type="text" id="pneToPhoneCode" placeholder="인증번호"><button type="button" onclick="endVerifi(`phone`,`pne`)">인증</button>
 		</div>
 	</div>
 
 	<div>
-		<div id="nowEmail">기존 이메일_ 바꾸기누르면 숨겨짐</div> <button>이메일 바꾸기</button>
+		<div id="Email"><div id="nowEmail">기존 이메일 </div> <button>이메일 바꾸기</button></div><!--바꾸기누르면 숨겨짐 인증끝나면 다시 나옴-->
+		<div id="startEmailVerifiTap"><!--바꾸기누르면 나오고 인증번호 발송하면 숨겨짐-->
 		<input type="text" id="changeEmail" placeholder="바꿀 이메일"><button type="button" onclick="startVerifi(`email`,`pne`)">인증번호 발송</button>
+	</div>
+	<div id="endEmailVerifiTap"><!--인증번호 발송하면 나오고 인증하면 숨겨짐-->
 		<input type="text" id="pneToEmailCode" placeholder="인증번호"><button type="button" onclick="endVerifi(`email`,`pne`)">인증</button>
+	</div>
 	</div>
 
 	<!-- firebase캡챠 -->
@@ -121,7 +136,7 @@ function endVerifi(type, method) {
     } else if (type === 'email') {
         const emailCode = method === 'pne'
 		?document.getElementById('pneToEmailCode').value
-		:document.getElementById('pwdToPhoneCode').value
+		:document.getElementById('pwdToEmailCode').value
         document.getElementById('emailCode').value = emailCode;
     }
 
