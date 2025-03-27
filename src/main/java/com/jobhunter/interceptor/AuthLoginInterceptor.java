@@ -4,12 +4,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.util.RedirectUtil;
 
+@Component
 public class AuthLoginInterceptor implements HandlerInterceptor {
 
 	@Override

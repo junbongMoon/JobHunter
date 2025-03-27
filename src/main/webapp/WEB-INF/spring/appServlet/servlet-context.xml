@@ -24,15 +24,20 @@
 	</beans:bean>
 	
 	<!-- 로그인 했는지 안했는지 검사하는 인터셉터 -->
-   <beans:bean id="authInterceptor"
+   <beans:bean id="authLoginInterceptor"
       class="com.jobhunter.interceptor.AuthLoginInterceptor">
+   </beans:bean>
+   
+   <!-- 정지+삭제대기 막는 인터셉터(get요청용_rest방식등은 AccountRestController 참조) -->
+   <beans:bean id="authInterceptor"
+      class="com.jobhunter.interceptor.AccountStatInterceptor">
    </beans:bean>
    
    <interceptors>
    
       <interceptor>
          <mapping path="/user/mypage" />
-         <beans:ref bean="authInterceptor" />
+         <beans:ref bean="authLoginInterceptor" />
       </interceptor>
 
    </interceptors>
