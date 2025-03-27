@@ -21,6 +21,7 @@ import com.jobhunter.model.account.EmailAuth;
 import com.jobhunter.model.account.VerificationRequestDTO;
 import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.service.account.AccountService;
+import com.jobhunter.util.AccountUtil;
 import com.jobhunter.util.SendMailService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class AccountRestController {
 
 	private final AccountService accountService;
+	
+	private final AccountUtil accUtils;
 
 	
 	// =================================권한체커========================================
@@ -41,7 +44,7 @@ public class AccountRestController {
 	// 본인 여부 확인
 	@GetMapping("/owner/{type}/{uid}")
 	public ResponseEntity<?> isOwner(@PathVariable String type, @PathVariable int uid, HttpSession session) {
-	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+	    AccountVO account = accUtils.refreshAccount((AccountVO) session.getAttribute("account"));
 
 		if (account == null)
 			return ResponseEntity.ok(false);
@@ -60,7 +63,7 @@ public class AccountRestController {
 	// 계정 타입(기업/일반) 확인
 	@GetMapping("/role/{type}")
 	public ResponseEntity<?> hasRole(@PathVariable String type, HttpSession session) {
-	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+	    AccountVO account = accUtils.refreshAccount((AccountVO) session.getAttribute("account"));
 		if (account == null)
 			return ResponseEntity.ok(false);
 
@@ -71,7 +74,7 @@ public class AccountRestController {
 	// 정지 상태인지 확인
 	@GetMapping("/blocked")
 	public ResponseEntity<?> isNotBlocked(HttpSession session) {
-	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+	    AccountVO account = accUtils.refreshAccount((AccountVO) session.getAttribute("account"));
 	    if (account == null) return ResponseEntity.ok(false);
 
 	    Timestamp deadline = account.getBlockDeadline();
@@ -82,35 +85,18 @@ public class AccountRestController {
 	// 삭제 대기 상태인지 확인
 	@GetMapping("/deleted")
 	public ResponseEntity<?> isNotDeleted(HttpSession session) {
-	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+	    AccountVO account = accUtils.refreshAccount((AccountVO) session.getAttribute("account"));
 	    if (account == null) return ResponseEntity.ok(false);
 
 	    Timestamp deadline = account.getDeleteDeadline();
 	    boolean notDeleted = (deadline == null);
 	    return ResponseEntity.ok(notDeleted);
 	}
-	
-	
-	// 로그인된 계정 새로고침
-	private AccountVO refreshAccount(AccountVO sessionAccount) {
-	    if (sessionAccount == null) {
-	    	return null;
-	    }
 
-	    int uid = sessionAccount.getUid();
-	    AccountType type = sessionAccount.getAccountType();
-
-	    try {
-	    	return accountService.refreshAccount(uid, type);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return sessionAccount;
-		}
-	}
-	
 	
 	// =======================여기까지 권한체커===========================
+	
+	
 	
 	
 	// 인증 성공하고 계정 잠금 해제해주는 api
@@ -202,7 +188,5 @@ public class AccountRestController {
 		session.removeAttribute("emailCode:" + email);
 		return ResponseEntity.ok("인증 성공!");
 	}
-
-	// 이 아래 권한체커
 
 }

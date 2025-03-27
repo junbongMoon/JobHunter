@@ -13,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.service.account.AccountService;
+import com.jobhunter.util.AccountUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,19 +21,8 @@ import lombok.RequiredArgsConstructor;
 public class AccountStatInterceptor implements HandlerInterceptor {
 	
 	@Autowired
-	private  AccountService accountService;
-
-	// 세션 로그인 계정 정보 새로고침 
-    private AccountVO refreshAccount(AccountVO sessionAccount) {
-        if (sessionAccount == null) return null;
-        try {
-            return accountService.refreshAccount(sessionAccount.getUid(), sessionAccount.getAccountType());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return sessionAccount; // 실패하면 원래 세션 값 그대로
-        }
-    }
-
+	private  AccountUtil accUtils;
+	
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
@@ -49,7 +39,7 @@ public class AccountStatInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession();
         
         // 일단 계정 상태 서버에있는걸로 갱신좀 해서 그사이 정지먹진않았나 체크해주고
-        AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+        AccountVO account = accUtils.refreshAccount((AccountVO) session.getAttribute("account"));
 
         // 상태 확인
         boolean isBlocked = account.getBlockDeadline() != null &&
