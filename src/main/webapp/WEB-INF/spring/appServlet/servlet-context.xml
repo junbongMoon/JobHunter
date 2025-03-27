@@ -29,8 +29,14 @@
    </beans:bean>
    
    <!-- 정지+삭제대기 막는 인터셉터(get요청용_rest방식등은 AccountRestController 참조) -->
-   <beans:bean id="authInterceptor"
+   <beans:bean id="accountTypeInterceptor"
       class="com.jobhunter.interceptor.AccountStatInterceptor">
+   </beans:bean>
+   
+   <!-- 본인확인 인터셉터_쿼리스트링으로 "?uid=101&accountType=company" 처럼 붙여놓고 걸면 동작
+   (get요청용_rest방식등은 AccountRestController 참조) -->
+   <beans:bean id="OwnerInterceptor"
+      class="com.jobhunter.interceptor.OwnerInterceptor">
    </beans:bean>
    
    <interceptors>
