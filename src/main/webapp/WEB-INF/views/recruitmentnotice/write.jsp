@@ -4,6 +4,9 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
+	let errorMessage = "";
+	let focusElement = null;
+
 	$(function() {
 		
 		getRegion();
@@ -86,31 +89,92 @@ $(document).on("click", ".save-method-btn", function () {
   // 상세 정보는 입력하지 않아도 된다.
 
   saveApplication(method, detail);
+ 
+
+});
+
+//모달이 닫힐 때 focus 처리
+$("#MyModal").on("hidden.bs.modal", function () {
+  if (focusElement) {
+    setTimeout(() => {
+      focusElement.focus();
+    }, 100); // 살짝 delay 주는 게 안정적입니다.
+  }
+});
+
+// 모달 닫기 버튼들 이벤트 연결 (이미 부트스트랩의 data-bs-dismiss가 있지만 focus 처리를 위해 명시적으로 선언)
+$(".returnList, .btn-close, .btn-secondary").on("click", function () {
+  // 닫기 전에 외부 포커스로 옮기기
+  if (focusElement) {
+    focusElement.focus();
+  }
+
+  $("#MyModal").modal("hide");
 });
 		
-function isValidApplication() {
-  let result = true;
+	$(document).on("blur", "#title", function() {
+		const titleLength = $(this).val().length;
+		if(titleLength <= 0 || titleLength >= 190) {
+			$(this).focus();
+		}
+	});
 
-  $(".application-checkbox:checked").each(function () {
-    let method = $(this).val();
-    let detailInput = $(`.method-detail[data-method='\${method}']`);
-    let detailValue = detailInput.val();
+	$(document).on("blur", ".MajorCategory", function() {
+		if($(this).val() == -1) {
+			$(this).focus();
+		}
+	});
 
-    if (!detailValue || detailValue.trim() === "") {
-      alert(`'\${method}' 방식의 상세 정보를 입력하고 저장 버튼을 눌러주세요.`);
-      detailInput.focus();
-      result = false;
-      return false; // .each 루프 중단
-    }
+	$(document).on("blur", ".SubCategory", function() {
+		if($(this).val() == -1) {
+			$(this).focus();
+		}
+	});
 
-    // 저장을 누르지 않았을 가능성을 고려하여 저장 처리
-    saveApplication(method, detailValue);
-  });
+	$(document).on("blur", ".Region", function() {
+		if($(this).val() == -1) {
+			$(this).focus();
+		}
+	});	
 
-  return result;
-}
+	$(document).on("blur", ".Sigungu", function() {
+		if($(this).val() == -1) {
+			$(this).focus();
+		}
+	});	
+
+	$(document).on("blur", "#pay", function() {
+		if($(this).val() <= 0) {
+			$(this).focus();
+		}
+	});
+
+	
+	
 
 	});
+	// 면접타입 유효성 검사
+	function isValidApplication() {
+		  let result = true;
+
+		  $(".application-checkbox:checked").each(function () {
+		    let method = $(this).val();
+		    let detailInput = $(`.method-detail[data-method='\${method}']`);
+		    let detailValue = detailInput.val();
+
+		    if (!detailValue || detailValue.trim() === "") {
+		      alert(`'\${method}' 방식의 상세 정보를 입력하고 저장 버튼을 눌러주세요.`);
+		      detailInput.focus();
+		      result = false;
+		      return false; // .each 루프 중단
+		    }
+
+		    // 저장을 누르지 않았을 가능성을 고려하여 저장 처리
+		    saveApplication(method, detailValue);
+		  });
+
+		  return result;
+		}
 
 	// 면접타입 저장 함수
 	function saveApplication(method, detail) {
@@ -362,118 +426,9 @@ function isValidApplication() {
 
 }
 
-function submitRecruitmentNotice() {
-  if (!isValidRecruitmentForm()) return;
-
-  const dto = {
-    title: $("#title").val(),
-    workType: $("#workType").val(),
-    payType: $("input[name='payType']:checked").val(),
-    pay: $("#email").val(),
-    militaryService: $("input[name='militaryService']:checked").val(),
-    dueDateForString: $("#date").val(),
-    detail: $("#detail").val()
-  };
-
-  $.ajax({
-    url: "/recruitmentnotice/rest/1", // 회사 UID 동적으로 처리 가능
-    type: "POST",
-    contentType: "application/json",
-    data: JSON.stringify(dto),
-    success: function (response) {
-      alert("공고 등록 성공!");
-      location.href = "/recruitmentnotice/list";
-    },
-    error: function (err) {
-      console.error("공고 등록 실패", err);
-      alert("등록 중 오류가 발생했습니다.");
-    }
-  });
-}
-
-function isValidRecruitmentForm() {
-	let result = true;
-
-  const title = $("#title").val();
-  const workType = $("input[name='workType']:checked").val();
-  const payType = $("input[name='payType']:checked").val();
-  const pay = $("#pay").val();
-  const militaryService = $("input[name='militaryService']:checked").val();
-  const dueDate = $("#date").val();
-  const detail = $("#detail").val();
-  const sigungu = $(".Sigungu").val();
-  const subCategory = $(".SubCategory").val();
-  const majorCategory = $(".MajorCategory").val();
-  const region = $(".Region").val();
-  const period = $("#startTime").val() + "~" + $("#endTime").val();
-
-  console.log(period);
-
-  let errorMessage = "";
-  let focusElement = null;
-
-  if (!title || title.length > 190) { // 완
-    errorMessage = "공고 제목을 입력해주세요.";
-    focusElement = $("#title");
-	result = false;
-  } else if (!majorCategory || majorCategory === "-1") { // 완
-    errorMessage = "산업군을 선택해주세요.";
-    focusElement = $(".MajorCategory");
-	result = false;
-  } else if (!region || region === "-1") { // 완
-    errorMessage = "도시를 선택해주세요.";
-    focusElement = $(".Region");
-	result = false;
-  } else if (!workType) { // 완
-    errorMessage = "근무형태를 입력해주세요.";
-    focusElement = $("#workType");
-	result = false;
-  } else if (!payType) { // 완
-    errorMessage = "급여 유형을 선택해주세요.";
-	result = false;
-  } else if (!pay || pay <= 0) { // 완
-    errorMessage = "급여 금액을 입력해주세요.";
-    focusElement = $("#email");
-	result = false;
-  } else if (!militaryService) { // 완
-    errorMessage = "병역 사항을 선택해주세요.";
-	result = false;
-  } else if (!dueDate) { // 알아서 된다...
-    errorMessage = "마감 기한을 선택해주세요.";
-    focusElement = $("#date");
-	result = false;
-  } else if (!detail || detail.length > 21000) { // 완
-    errorMessage = "상세 내용을 입력해주세요.";
-    focusElement = $("#detail");
-	result = false;
-  } else if (!sigungu || sigungu === "-1") { // 완
-    errorMessage = "시군구를 선택해주세요.";
-    focusElement = $(".Sigungu");
-	result = false;
-  } else if (!subCategory || subCategory === "-1") { // 완
-    errorMessage = "직업(세부직종)을 선택해주세요.";
-    focusElement = $(".SubCategory");
-	result = false;
-  } else if(!isValidApplication()) {
-	errorMessage = "면접방식을 선택해주세요.";
-    focusElement = $(".SubCategory");
-	result = false;
-  }
-
-  if (errorMessage) {
-    $(".modal-body").text(errorMessage);
-    $("#MyModal").modal('show');
-    if (focusElement) {
-      focusElement.focus();
-    }
-    result = false;
-  }
-
-  // 면접 방식 유효성 검사도 포함
-  
-  if(result){
-  $.ajax({
-      url: "/recruitmentnotice/rest/" + "-1", // 일단 대충 -1 나중에 input hidden에 sessionScope.loginmember.uid 
+function submitRecruitmentNotice(title, workType, payType, pay, period, militaryService, dueDate, detail, personalHistory, manager, refCompany) {
+	$.ajax({
+      url: "/recruitmentnotice/rest/" + refCompany, // 일단 대충 1 나중에 input hidden에 sessionScope.loginmember.uid 
       type: "POST",
       contentType: "application/json",
       data: JSON.stringify({
@@ -481,8 +436,14 @@ function isValidRecruitmentForm() {
 		"workType" : workType,
 		"payType" : payType,
 		"pay" : pay,
-		"period" : period
-
+		"period" : period,
+		"personalHistory" : personalHistory,
+		"militaryService" : militaryService,
+		"detail" : detail,
+		"manager" : manager,
+		"dueDate" : dueDate,
+		"refCompany" : refCompany
+		
       }),
       success: function (data) {
         console.log(data)
@@ -493,6 +454,116 @@ function isValidRecruitmentForm() {
 
  
  });
+}
+
+function isValidRecruitmentForm() {
+	let result = true;
+
+ 	 const title = $("#title").val();
+ 	 const workType = $("input[name='workType']:checked").val();
+ 	 const payType = $("input[name='payType']:checked").val();
+ 	 const pay = $("#pay").val();
+ 	 const militaryService = $("input[name='militaryService']:checked").val();
+  	const dueDate = $("#date").val();
+  	const detail = $("#detail").val();
+  	const sigungu = $(".Sigungu").val();
+  	const subCategory = $(".SubCategory").val();
+  	const majorCategory = $(".MajorCategory").val();
+  	const region = $(".Region").val();
+  	const period = $("#startTime").val() + "~" + $("#endTime").val();
+  	const startTime = $("#startTime").val();
+  	const endTime = $("#endTime").val();
+  	const personalHistory = $("#personalHistory").val();
+ 	const manager = $("#manager").val();
+  	const refCompany = $("#refCompany").val();
+ 
+
+  console.log(period);
+
+  
+
+  if (!title || title.length > 190) { // 완
+    errorMessage = "공고 제목을 입력해주세요.";
+    focusElement = $("#title");
+	result = false;
+  } else if (!majorCategory || majorCategory === "-1") { // 완
+    errorMessage = "산업군을 선택해주세요.";
+    focusElement = $(".MajorCategory");
+	result = false;
+  } else if (!subCategory || subCategory === "-1") { // 완
+    errorMessage = "직업(세부직종)을 선택해주세요.";
+    focusElement = $(".SubCategory");
+	result = false;
+  } else if (!region || region === "-1") { // 완
+    errorMessage = "도시를 선택해주세요.";
+    focusElement = $(".Region");
+	result = false;
+  } else if (!sigungu || sigungu === "-1") { // 완
+    errorMessage = "시군구를 선택해주세요.";
+    focusElement = $(".Sigungu");
+	result = false;
+  } else if (!$("input[name='workType']:checked").length) {
+    errorMessage = "근무형태를 선택해주세요.";
+    focusElement = $("input[name='workType']").first();
+    result = false;
+  } else if (!$("input[name='payType']:checked").length) {
+    errorMessage = "급여 유형을 선택해주세요.";
+    focusElement = $("input[name='payType']").first();
+    result = false;
+  } else if (!pay || pay <= 0) { // 완
+    errorMessage = "급여 금액을 입력해주세요.";
+    focusElement = $("#email");
+	result = false;
+  } else if (!startTime || !endTime) {  // 완
+    errorMessage = "근무시간을 입력해주세요.";
+    if(!startTime) {	
+		focusElement = $("#startTime");
+	} else {
+		focusElement = $("#endTime");
+	}
+	result = false;
+  } else if (!personalHistory || personalHistory.length > 45) { // 완
+	errorMessage = "경력사항을 입력해주세요.";
+    focusElement = $("#personalHistory");
+	result = false;
+  } else if (!militaryService) { // 완
+    errorMessage = "병역 사항을 선택해주세요.";
+	result = false;
+  } else if (!dueDate) { // 알아서 된다...
+    errorMessage = "마감 기한을 선택해주세요.";
+    focusElement = $("#date");
+	result = false;
+  } else if (!manager || manager.length > 10) { // 완
+    errorMessage = "담당자를 입력해주세요.";
+    focusElement = $("#manager");
+	result = false;
+  } else if (!detail || detail.length > 21000) { // 완
+    errorMessage = "상세 내용을 입력해주세요.";
+    focusElement = $("#detail");
+	result = false;
+  } else if(!isValidApplication()) {
+	errorMessage = "면접방식을 선택해주세요."; 
+    focusElement = $(".SubCategory");
+	result = false;
+  } 
+
+  if (errorMessage) {
+  $(".modal-body").text(errorMessage);
+
+  // 모달이 다 보여진 후에 focus 실행
+  $("#MyModal").on("shown.bs.modal", function () {
+    if (focusElement) {
+      focusElement.focus();
+    }
+  });
+  result = false;
+  $("#MyModal").modal("show");
+}
+
+  // 면접 방식 유효성 검사도 포함
+  
+  if(result){
+	submitRecruitmentNotice(title, workType, payType, pay, period, militaryService, dueDate, detail, personalHistory, manager, refCompany);
 }
 
 }
@@ -536,7 +607,7 @@ function isValidRecruitmentForm() {
 
 						</div>
 					</div>
-
+					<input type="hidden" id="refCompany" value="1">
 					<div class="col-12">
 						<div class="input-group">
 							<label for="website">공고 제목</label> <input type="text"
@@ -547,8 +618,8 @@ function isValidRecruitmentForm() {
 
 					<div class="col-12">
 						<div class="input-group">
-							<label for="majorCategory">산업군</label> <select class="MajorCategory"
-								id="MajorCategory">
+							<label for="majorCategory">산업군</label> <select
+								class="MajorCategory" id="MajorCategory">
 
 							</select>
 						</div>
@@ -577,64 +648,53 @@ function isValidRecruitmentForm() {
 										</select>
 									</div>
 									<input type="hidden" id="sigungu">
-									
+
 									<div class="col-12">
 										<div class="input-group">
-											<label for="workType">근무형태</label> 
+											<label for="workType">근무형태</label>
 											<div class="row">
 												<span>정규직</span><input type="radio" name="workType"
-												value="FULLTIME">
-												<span>비정규직</span><input type="radio" name="workType"
-												value="NONREGULAR">
-												<span>위촉직</span><input type="radio" name="workType"
-												value="APPOINT">
-												<span>아르바이트</span><input type="radio" name="workType"
-												value="PARTTIME">
-												<span>프리랜서</span><input type="radio" name="workType"
-												value="FREELANCER">
-												</div>
+													value="FULLTIME"> <span>비정규직</span><input
+													type="radio" name="workType" value="NONREGULAR"> <span>위촉직</span><input
+													type="radio" name="workType" value="APPOINT"> <span>아르바이트</span><input
+													type="radio" name="workType" value="PARTTIME"> <span>프리랜서</span><input
+													type="radio" name="workType" value="FREELANCER">
+											</div>
 										</div>
 									</div>
 
-									
-									
+
+
 
 									<div class="col-12">
 										<div class="input-group">
-											<label for="payType">급여형태</label> 
+											<label for="payType">급여형태</label>
 											<div class="row">
 												<span>시급</span><input type="radio" name="payType"
-												value="HOUR">
-												<span>일급</span><input type="radio" name="payType"
-												value="DATE">
-												<span>주급</span><input type="radio" name="payType"
-												value="WEEK">
-												<span>월급</span><input type="radio" name="payType"
-												value="MONTH">
-												<span>연봉</span><input type="radio" name="payType"
-												value="YEAR">
+													value="HOUR"> <span>일급</span><input type="radio"
+													name="payType" value="DATE"> <span>주급</span><input
+													type="radio" name="payType" value="WEEK"> <span>월급</span><input
+													type="radio" name="payType" value="MONTH"> <span>연봉</span><input
+													type="radio" name="payType" value="YEAR">
 											</div>
 										</div>
 									</div>
 
 									<div class="col-md-6">
 										<div class="input-group">
-											<label for="pay">급여 액수</label> <input type="number"
-												name="pay" id="pay" placeholder="금액을 입력해주세요.."
-												>
+											<label for="pay">급여 액수</label> <input type="number" id="pay" maxlength="11" min="1" max="2000000000">
 
 										</div>
-									</div>1
+									</div>
 
 									<div class="col-md-6">
 										<div class="input-group">
-											
-												<label for="endWorkTime">근무시간</label> 
-												<input type="time" min="09:00" max="18:00" id="startTime">
-												<input type="time" min="09:00" max="18:00" id="endTime" >
+
+											<label for="endWorkTime">근무시간</label> <input type="time"
+												id="startTime"> <input type="time" id="endTime">
 										</div>
 									</div>
-									
+
 
 									<div class="col-12">
 										<div class="input-group">
@@ -652,35 +712,45 @@ function isValidRecruitmentForm() {
 									<div class="col-12">
 										<div class="input-group">
 											<label class="form-label w-100 mb-3">접수 방법</label>
-											
+
 											<div class="row">
 												<!-- ONLINE -->
 												<div class="col-12 mb-3">
 													<div class="d-flex align-items-center">
 														<div class="form-check me-3 d-flex align-items-center">
-															<input class="form-check-input application-checkbox" type="checkbox" value="ONLINE" id="ONLINE">
-															<label class="form-check-label ms-2" for="applyOnline">온라인</label>
+															<input class="form-check-input application-checkbox"
+																type="checkbox" value="ONLINE" id="ONLINE"> <label
+																class="form-check-label ms-2" for="applyOnline">온라인</label>
 														</div>
 														<div class="flex-grow-1">
 															<div class="input-group">
-																<input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="ONLINE" style="display: none;">
-																<button type="button" class="btn btn-primary save-method-btn" data-method="ONLINE" style="display: none;">저장</button>
+																<input type="text" class="form-control method-detail"
+																	placeholder="상세 정보를 입력해주세요..." data-method="ONLINE"
+																	style="display: none;">
+																<button type="button"
+																	class="btn btn-primary save-method-btn"
+																	data-method="ONLINE" style="display: none;">저장</button>
 															</div>
 														</div>
 													</div>
 												</div>
 
-												<!-- EMAIL -->  
+												<!-- EMAIL -->
 												<div class="col-12 mb-3">
 													<div class="d-flex align-items-center">
 														<div class="form-check me-3 d-flex align-items-center">
-															<input class="form-check-input application-checkbox" type="checkbox" value="EMAIL" id="EMAIL">
-															<label class="form-check-label ms-2" for="applyEmail">이메일</label>
+															<input class="form-check-input application-checkbox"
+																type="checkbox" value="EMAIL" id="EMAIL"> <label
+																class="form-check-label ms-2" for="applyEmail">이메일</label>
 														</div>
 														<div class="flex-grow-1">
 															<div class="input-group">
-																<input type="email" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="EMAIL" style="display: none;">
-																<button type="button" class="btn btn-primary save-method-btn" data-method="EMAIL" style="display: none;">저장</button>
+																<input type="email" class="form-control method-detail"
+																	placeholder="상세 정보를 입력해주세요..." data-method="EMAIL"
+																	style="display: none;">
+																<button type="button"
+																	class="btn btn-primary save-method-btn"
+																	data-method="EMAIL" style="display: none;">저장</button>
 															</div>
 														</div>
 													</div>
@@ -690,13 +760,18 @@ function isValidRecruitmentForm() {
 												<div class="col-12 mb-3">
 													<div class="d-flex align-items-center">
 														<div class="form-check me-3 d-flex align-items-center">
-															<input class="form-check-input application-checkbox" type="checkbox" value="PHONE" id="PHONE">
-															<label class="form-check-label ms-2" for="applyPhone">전화</label>
+															<input class="form-check-input application-checkbox"
+																type="checkbox" value="PHONE" id="PHONE"> <label
+																class="form-check-label ms-2" for="applyPhone">전화</label>
 														</div>
 														<div class="flex-grow-1">
 															<div class="input-group">
-																<input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="PHONE" style="display: none;">
-																<button type="button" class="btn btn-primary save-method-btn" data-method="PHONE" style="display: none;">저장</button>
+																<input type="text" class="form-control method-detail"
+																	placeholder="상세 정보를 입력해주세요..." data-method="PHONE"
+																	style="display: none;">
+																<button type="button"
+																	class="btn btn-primary save-method-btn"
+																	data-method="PHONE" style="display: none;">저장</button>
 															</div>
 														</div>
 													</div>
@@ -706,13 +781,18 @@ function isValidRecruitmentForm() {
 												<div class="col-12 mb-3">
 													<div class="d-flex align-items-center">
 														<div class="form-check me-3 d-flex align-items-center">
-															<input class="form-check-input application-checkbox" type="checkbox" value="TEXT" id="TEXT">
-															<label class="form-check-label ms-2" for="applyText">문자</label>
+															<input class="form-check-input application-checkbox"
+																type="checkbox" value="TEXT" id="TEXT"> <label
+																class="form-check-label ms-2" for="applyText">문자</label>
 														</div>
 														<div class="flex-grow-1">
 															<div class="input-group">
-																<input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="TEXT" style="display: none;">
-																<button type="button" class="btn btn-primary save-method-btn" data-method="TEXT" style="display: none;">저장</button>
+																<input type="text" class="form-control method-detail"
+																	placeholder="상세 정보를 입력해주세요..." data-method="TEXT"
+																	style="display: none;">
+																<button type="button"
+																	class="btn btn-primary save-method-btn"
+																	data-method="TEXT" style="display: none;">저장</button>
 															</div>
 														</div>
 													</div>
@@ -721,13 +801,21 @@ function isValidRecruitmentForm() {
 
 										</div>
 									</div>
-									
+
+									<div class="col-12">
+										<div class="input-group">
+											<label for="personalHistory">경력사항</label> <input type="text"
+												name="personalHistory" id="personalHistory" placeholder="경력을 입력해 주세요">
+										</div>
+									</div>
+
 
 									<div class="col-12">
 										<div class="input-group">
 											<label for="advantage">우대조건</label> <input type="text"
 												id="advantage" placeholder="우대조건을 입력하고 저장 버튼을 눌러주세요..">
-												<button type="button" class="addAdvantageBtn" onclick="addAdvantage()">저장하기</button>
+											<button type="button" class="addAdvantageBtn"
+												onclick="addAdvantage()">저장하기</button>
 										</div>
 										<div class="advantageArea"></div>
 									</div>
@@ -744,46 +832,58 @@ function isValidRecruitmentForm() {
 										<div class="input-group">
 											<label for="detail">상세 내용</label>
 											<textarea name="detail" id="detail" rows="5"
-												placeholder="상세 내용을 적어주세요..." ></textarea>
-											
+												placeholder="상세 내용을 적어주세요..."></textarea>
+
+										</div>
+									</div>
+
+									<div class="col-md-6">
+										<div class="input-group">
+											<label for="manager">담당자</label> <input type="text" id="manager"
+												placeholder="담당자를 입력해주세요">
+				
 										</div>
 									</div>
 
 									<label for="detail">아래의 박스에 파일을 올려주세요</label>
 									<div class="col-12">
-										<div class="input-group fileUploadArea" style="width: 800px; height: 100px; background-color: #eee; border-radius: 10px;">
-											
-											
+										<div class="input-group fileUploadArea"
+											style="width: 800px; height: 100px; background-color: #eee; border-radius: 10px;">
+
+
 										</div>
 									</div>
 
 
 
 									<div class="col-12 text-center">
-										<button type="button" id="writeTemplate" onclick="">템플릿 저장</button>
-										<button type="button" id="write" onclick="submitRecruitmentNotice()">작성</button>
+										<button type="button" id="writeTemplate" onclick="">템플릿
+											저장</button>
+										<button type="button" id="write"
+											onclick="submitRecruitmentNotice()">작성</button>
 									</div>
 								</div>
 			</form>
 
-		<!-- Modal -->
-		<div class="modal fade" id="MyModal" tabindex="-1" aria-labelledby="MyModal" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="recruitmentModalLabel">채용공고</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						채용공고가 등록되었습니다.
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-						<button type="button" class="btn btn-primary">확인</button>
+			<!-- Modal -->
+			<div class="modal fade" id="MyModal" tabindex="-1"
+				aria-labelledby="MyModal" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="recruitmentModalLabel">채용공고</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal"
+								aria-label="Close"></button>
+						</div>
+						<div class="modal-body">채용공고가 등록되었습니다.</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary"
+								data-bs-dismiss="modal">닫기</button>
+							<button type="button" class="btn btn-primary returnList" data-bs-dismiss="modal">확인</button>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 
 
 		</div>
