@@ -63,6 +63,13 @@
 		UPDATE users SET
 		loginCnt = 0 WHERE userId = #{id}
 	</update>
+	
+	<select id="getAccountByUid" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where uid = #{uid}
+	</select>
 
 	<!-- 여기까진 로그인용 -->
 

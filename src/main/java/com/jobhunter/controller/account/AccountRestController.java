@@ -2,12 +2,14 @@ package com.jobhunter.controller.account;
 
 import java.security.SecureRandom;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,13 +35,11 @@ public class AccountRestController {
 	// 인증 성공하고 계정 잠금 해제해주는 api
 	@PostMapping(value = "/auth", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> verify(@RequestBody VerificationRequestDTO dto, HttpSession session) {
+
+		// type들 통일
 		String type = dto.getType();
 		String value = dto.getValue();
 		AccountType accountType = dto.getAccountType();
-		
-		System.out.println(type);
-		System.out.println(value);
-		System.out.println(accountType);
 
 		try {
 			accountService.setRequiresVerificationFalse(type, value, accountType);
@@ -87,10 +87,11 @@ public class AccountRestController {
 
 	// 이메일 코드 인증용(인증 성공했다고 반환하는거, 계정잠금 해제는 /verify)
 	@PostMapping(value = "/auth/email/{code}", produces = "text/plain;charset=UTF-8")
-	public ResponseEntity<String> verifyCode(@PathVariable("code") String code, @RequestBody Map<String, String> emailTmp, HttpSession session) {
-		
+	public ResponseEntity<String> verifyCode(@PathVariable("code") String code,
+			@RequestBody Map<String, String> emailTmp, HttpSession session) {
+
 		String email = emailTmp.get("email");
-		
+
 		EmailAuth emailAuth = (EmailAuth) session.getAttribute("emailCode:" + email);
 
 		if (emailAuth == null) {
@@ -119,5 +120,78 @@ public class AccountRestController {
 		// 세션 청소
 		session.removeAttribute("emailCode:" + email);
 		return ResponseEntity.ok("인증 성공!");
+	}
+
+	// 이 아래 권한체커
+
+	// 본인 여부 확인
+	@GetMapping("/owner/{type}/{uid}")
+	public ResponseEntity<?> isOwner(@PathVariable String type, @PathVariable int uid, HttpSession session) {
+	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+
+		if (account == null)
+			return ResponseEntity.ok(false);
+
+		AccountType targetType;
+		try {
+			targetType = AccountType.valueOf(type.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.badRequest().body(false);
+		}
+
+		boolean isOwner = account.getUid() == uid && account.getAccountType() == targetType;
+		return ResponseEntity.ok(isOwner);
+	}
+
+	// 특정 권한 이상 여부 확인
+	@GetMapping("/role/{type}")
+	public ResponseEntity<?> hasRole(@PathVariable String type, HttpSession session) {
+	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+		if (account == null)
+			return ResponseEntity.ok(false);
+
+		AccountType required = AccountType.valueOf(type.toUpperCase());
+		return ResponseEntity.ok(account.getAccountType() == required);
+	}
+
+	// 정지 상태인지 확인
+	@GetMapping("/blocked")
+	public ResponseEntity<?> isNotBlocked(HttpSession session) {
+	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+	    if (account == null) return ResponseEntity.ok(false);
+
+	    Timestamp deadline = account.getBlockDeadline();
+	    boolean notBlocked = (deadline == null || deadline.toInstant().isBefore(Instant.now()));
+	    return ResponseEntity.ok(notBlocked);
+	}
+	
+	// 삭제 대기 상태인지 확인
+	@GetMapping("/deleted")
+	public ResponseEntity<?> isNotDeleted(HttpSession session) {
+	    AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
+	    if (account == null) return ResponseEntity.ok(false);
+
+	    Timestamp deadline = account.getDeleteDeadline();
+	    boolean notDeleted = (deadline == null);
+	    return ResponseEntity.ok(notDeleted);
+	}
+	
+	
+	// 로그인된 계정 새로고침
+	private AccountVO refreshAccount(AccountVO sessionAccount) {
+	    if (sessionAccount == null) {
+	    	return null;
+	    }
+
+	    int uid = sessionAccount.getUid();
+	    AccountType type = sessionAccount.getAccountType();
+
+	    try {
+	    	return accountService.refreshAccount(uid, type);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return sessionAccount;
+		}
 	}
 }

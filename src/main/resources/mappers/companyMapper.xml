@@ -54,6 +54,13 @@
         UPDATE company SET loginCnt = 0 WHERE companyId = #{id}
     </update>
     
+    <select id="getAccountByUid" resultMap="accountMap">
+        select *, companyId as accountId, companyName as accountName,
+               NULL as socialId, NULL as isSocial
+        from company
+        where uid = #{uid}
+    </select>
+    
     <!-- 여기까진 로그인용 -->
     
     

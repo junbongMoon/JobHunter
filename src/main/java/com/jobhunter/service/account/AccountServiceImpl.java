@@ -101,4 +101,9 @@ public class AccountServiceImpl implements AccountService {
 		return result;
 	}
 
+	@Override
+	public AccountVO refreshAccount(int uid, AccountType type) throws Exception {
+		return getDAO(type).getAccountByUid(uid);
+	}
+
 }

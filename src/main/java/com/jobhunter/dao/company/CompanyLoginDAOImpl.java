@@ -66,5 +66,10 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 		ses.update(NS + ".resetFailCount", companyId);
 	}
 
+	@Override
+	public AccountVO getAccountByUid(int uid) throws Exception {
+		return ses.selectOne(NS + ".getAccountByUid", uid);
+	}
+
 
 }

@@ -68,5 +68,10 @@ public class UserLoginDAOImpl implements AccountLoginDAO {
 		ses.update(NS + ".resetFailCount", userId);
 	}
 
+	@Override
+	public AccountVO getAccountByUid(int uid) throws Exception {
+		return ses.selectOne(NS + ".getAccountByUid", uid);
+	}
+
 
 }

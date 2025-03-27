@@ -23,4 +23,6 @@ public interface AccountLoginDAO {
 
 	Boolean existsAccountId(String accountId) throws Exception;
 
+	AccountVO getAccountByUid(int uid) throws Exception;
+
 }
