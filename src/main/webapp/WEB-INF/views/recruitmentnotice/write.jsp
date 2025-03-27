@@ -6,6 +6,7 @@
 <script>
 	let errorMessage = "";
 	let focusElement = null;
+	let upfiles = [];
 
 	$(function() {
 		
@@ -13,6 +14,38 @@
 		getMajorCategory();
 
 		$('.method-detail, .save-method-btn').hide();
+
+		$('.fileUploadArea').on('dragenter dragover', function (evt) {
+			  evt.preventDefault();
+			});
+
+		$('.fileUploadArea').on('drop', function (evt) {
+			  evt.preventDefault();
+			  const files = evt.originalEvent.dataTransfer.files;
+
+			  for (let file of files) {
+			    let isDuplicate = upfiles.some(f => f.name === file.name);
+
+			    if (file.size === 0 && file.type === '') {
+			      $('.modal-body').html('폴더는 업로드 할 수 없습니다!');
+			      $('#MyModal').modal('show');
+			      continue;
+			    }
+			    if (file.size > 10485760 || isDuplicate) {
+			      if (isDuplicate) {
+			        $('.modal-body').html('업로드된 같은 파일이 이미 있습니다!');
+			      } else {
+			        $('.modal-body').html('파일 사이즈가 너무 큽니다!');
+			      }
+			      $('#MyModal').modal('show');
+			      continue;
+			    }
+
+			    upfiles.push(file);
+			    showPreview(file);
+			    uploadFile(file);
+			  }
+			});
 		
 		// class = "Region" 값이 바뀌면.. 
 		$(document).on(
@@ -149,10 +182,86 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 		}
 	});
 
-	
-	
 
+
+
+	
 	});
+
+	function uploadFile(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    $.ajax({
+        url: "/recruitmentnotice/rest/file",
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            console.log("업로드 성공", response);
+            
+        },
+        error: function() {
+            alert("파일 업로드 실패");
+        }
+    });
+}
+
+	function showPreview(file) {
+		  const imageTypes = ['image/png', 'image/jpeg', 'image/gif'];
+		  const isImage = imageTypes.includes(file.type.toLowerCase());
+
+		  if (isImage) {
+		    const reader = new FileReader();
+		    reader.onload = function (e) {
+		      const base64 = e.target.result;
+		      outputPreview(base64, file);
+		    };
+		    reader.readAsDataURL(file);
+		  } else {
+		    let html = `<tr><td><img src='/resources/images/noimage.png' width='40px'></td>` +
+		               `<td class='uploadFileName'>${file.name}</td>` +
+		               `<td><img src='/resources/images/remove.png' width='25px' onclick='remFile("${file.name}", this);'/></td></tr>`;
+		    $('.preview').append(html);
+		  }
+		}
+
+	function outputPreview(base64, file) {
+		  let html = `<tr id='${file.name}'><td><img src='${base64}' width='40px'></td>` +
+		             `<td class='uploadFileName'>${file.name}</td>` +
+		             `<td><img src='/resources/images/remove.png' width='25px' onclick='remFile("${file.name}", this);'/></td></tr>`;
+		  $('.preview').append(html);
+		}
+
+
+function removeFile(fileName, obj) {
+	  for (let i = 0; i < upfiles.length; i++) {
+	    if (upfiles[i].name == fileName) {
+	      $.ajax({
+	        url: '/recruitmentnotice/rest/file',
+	        type: 'DELETE',
+	        data: { removeFileName: fileName },
+	        dataType: 'json',
+	        success: function (data) {
+	          if (data) {
+	            upfiles.splice(i, 1);
+	            $(obj).closest('tr').remove();
+	          }
+	        },
+	        error: function (err) {
+	          console.log("파일 삭제 실패", err);
+	        }
+	      });
+	      break;
+	    }
+	  }
+	}
+
+
+
+
+
 	// 면접타입 유효성 검사
 	function isValidApplication() {
 		  let result = true;
@@ -681,7 +790,8 @@ function isValidRecruitmentForm() {
 
 									<div class="col-md-6">
 										<div class="input-group">
-											<label for="pay">급여 액수</label> <input type="number" id="pay" maxlength="11" min="1" max="2000000000">
+											<label for="pay">급여 액수</label> <input type="number" id="pay"
+												maxlength="11" min="1" max="2000000000">
 
 										</div>
 									</div>
@@ -804,7 +914,8 @@ function isValidRecruitmentForm() {
 									<div class="col-12">
 										<div class="input-group">
 											<label for="personalHistory">경력사항</label> <input type="text"
-												name="personalHistory" id="personalHistory" placeholder="경력을 입력해 주세요">
+												name="personalHistory" id="personalHistory"
+												placeholder="경력을 입력해 주세요">
 										</div>
 									</div>
 
@@ -838,9 +949,9 @@ function isValidRecruitmentForm() {
 
 									<div class="col-md-6">
 										<div class="input-group">
-											<label for="manager">담당자</label> <input type="text" id="manager"
-												placeholder="담당자를 입력해주세요">
-				
+											<label for="manager">담당자</label> <input type="text"
+												id="manager" placeholder="담당자를 입력해주세요">
+
 										</div>
 									</div>
 
@@ -850,6 +961,11 @@ function isValidRecruitmentForm() {
 											style="width: 800px; height: 100px; background-color: #eee; border-radius: 10px;">
 
 
+										</div>
+										<div class="previewArea">
+											<table class="table table-hover">
+												<tbody class="preview"></tbody>
+											</table>
 										</div>
 									</div>
 
@@ -878,7 +994,8 @@ function isValidRecruitmentForm() {
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary"
 								data-bs-dismiss="modal">닫기</button>
-							<button type="button" class="btn btn-primary returnList" data-bs-dismiss="modal">확인</button>
+							<button type="button" class="btn btn-primary returnList"
+								data-bs-dismiss="modal">확인</button>
 						</div>
 					</div>
 				</div>

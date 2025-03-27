@@ -1,12 +1,16 @@
 package com.jobhunter.controller.recruitmentnotice;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,8 +28,8 @@ import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
+import com.jobhunter.model.util.FileStatus;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
-import com.jobhunter.util.FileProcess;
 import com.jobhunter.util.RecruitmentFileProcess;
 
 import lombok.RequiredArgsConstructor;
@@ -43,9 +48,12 @@ public class RecruitmentNoticeRestController {
 	private final List<ApplicationDTO> applicationList = new ArrayList<>();
 	private String regionCode;
 	private String sigunguCode;
-	private final List<RecruitmentnoticeBoardUpfiles> newFileList = new ArrayList<>();
 	private String majorCategoryCode;
 	private String subCategoryCode;
+	// 게시글 작성시 업로드한 파일객체들을 임시로 저장
+	private List<RecruitmentnoticeBoardUpfiles> fileList = new ArrayList<RecruitmentnoticeBoardUpfiles>();
+	   // 게시글 수정시 업로한 파일 객체들을 임식로 저장
+	private List<RecruitmentnoticeBoardUpfiles> modifyFileList;
 
 	// 회사가 공고를 등록하는 메서드
 	@PostMapping(value = "/{uid}", produces = "application/json; charset=utf-8")
@@ -66,7 +74,7 @@ public class RecruitmentNoticeRestController {
 
 		try {
 			if (recService.saveRecruitmentNotice(recruitmentNoticeDTO, advantageList, applicationList, regionCode,
-					sigunguCode, newFileList, majorCategoryCode, subCategoryCode)) {
+					sigunguCode, fileList, majorCategoryCode, subCategoryCode)) {
 				// service 단도 바꿔주자
 				result = ResponseEntity.ok(true);
 			}
@@ -207,14 +215,7 @@ public class RecruitmentNoticeRestController {
 		return result;
 	}
 	
-	@PostMapping("/file")
-	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> savefileWithRecruitmentNotice(MultipartFile file){
-		ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> result = null;
-		
-		// 파일 처리 일단 대기
-		
-		return result;
-	}
+	
 	
 	// 공고를 작성할 때 면접방식을 삭제하는 메서드
 	
@@ -240,7 +241,7 @@ public class RecruitmentNoticeRestController {
 		public ResponseEntity<List<AdvantageDTO>> deleteAdvantage(@PathVariable("advantageType") String advantageType) {
 			ResponseEntity<List<AdvantageDTO>> result = null;
 
-			// 대기
+			
 			if (this.advantageList.removeIf(adv -> adv.getAdvantageType().equals(advantageType))) {
 				System.out.println("우대조건 삭제 : " + advantageList);
 				
@@ -270,6 +271,34 @@ public class RecruitmentNoticeRestController {
 
 	}
 	
+	 @PostMapping("/file")
+	    public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadFile(@RequestParam("file") MultipartFile file,
+	                                                                          HttpServletRequest request) {
+	        try {
+	            RecruitmentnoticeBoardUpfiles uploadedFile = fp.saveFileToRealPath(file, request, "/resources/recruitmentFiles");
+	            uploadedFile.setStatus(FileStatus.NEW);
+	            fileList.add(uploadedFile);
+	            System.out.println(fileList);
+	            return ResponseEntity.ok(fileList);
+	        } catch (IOException e) {
+	            logger.error("파일 업로드 실패", e);
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	        }
+	    }
+
+	    @DeleteMapping("/file")
+	    public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> removeFile(@RequestParam("removeFileName") String removeFileName) {
+	        fileList.removeIf(f -> {
+	            if (f.getOriginalFileName().equals(removeFileName)) {
+	                fp.removeFile(f);
+	                System.out.println(fileList);
+	                return true;
+	            }
+	            return false;
+	        });
+	        return ResponseEntity.ok(fileList);
+	    }
+	
 	
 	
 
@@ -282,7 +311,7 @@ public class RecruitmentNoticeRestController {
 	private void ListAllClear() {
 		this.advantageList.clear();
 		this.applicationList.clear();
-		this.newFileList.clear();
+		this.fileList.clear();
 		this.regionCode = null;
 		this.sigunguCode = null;
 		this.majorCategoryCode = null;

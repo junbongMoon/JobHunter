@@ -20,6 +20,7 @@ public class RecruitmentnoticeBoardUpfiles {
 	private int boardUpFileNo;
 	private String originalFileName;
 	private String newFileName;
+	private String thumbFileName;
 	private String fileType;
 	private String ext;
 	private long size;
