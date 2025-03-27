@@ -23,6 +23,20 @@
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
 	
+	<!-- 로그인 했는지 안했는지 검사하는 인터셉터 -->
+   <beans:bean id="authInterceptor"
+      class="com.jobhunter.interceptor.AuthLoginInterceptor">
+   </beans:bean>
+   
+   <interceptors>
+   
+      <interceptor>
+         <mapping path="/user/mypage" />
+         <beans:ref bean="authInterceptor" />
+      </interceptor>
+
+   </interceptors>
+	
 	
 	<!-- controller 패키지 안에 객체로  -->
 	<context:component-scan base-package="com.jobhunter.controller"></context:component-scan>	
