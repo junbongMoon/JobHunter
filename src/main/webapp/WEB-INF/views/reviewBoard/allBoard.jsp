@@ -103,7 +103,8 @@ th {
 			<tr>
 				<td>${board.boardNo}</td>
 				<td>${board.writer}</td>
-				<td>${board.companyName}</td>
+				<td><a href="/reviewBoard/detail?boardNo=${reviewBoard.boardNo}">
+				${board.companyName}</a></td>
 				<td>${board.likes}</td>
 				<td>${board.views}</td>
 			</tr>

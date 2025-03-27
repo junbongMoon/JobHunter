@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.jobhunter.model.reviewboard.GonggoContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoard;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -53,7 +54,18 @@ public class ReviewBoardController {
 
 	
 	@GetMapping("/write")
-	public String reviewBoardWrite() {
+	public String reviewBoardWrite(Model model) {
+		List<GonggoContentDTO> goggoList;
+		try {
+			goggoList = service.selectgoggo();
+			model.addAttribute("gonggoList", goggoList);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		
 		return "reviewBoard/write";
 	}
 
