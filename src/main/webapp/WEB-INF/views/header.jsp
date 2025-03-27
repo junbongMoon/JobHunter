@@ -90,10 +90,10 @@
         				<a href="#" style="color: aqua;">${sessionScope.account.accountName}</a>
     				</c:when>
 					<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
-        				<a href="#" style="color: aqua;">${sessionScope.account.accountName}</a>
+        				<a href="/company/companyHome?uid=${sessionScope.account.uid}&accountType=company">${sessionScope.account.accountName}</a>
     				</c:when>
 					<c:otherwise>
-        				<a href="/user/mypage" style="color: aqua;">${sessionScope.account.accountName}</a>
+        				<a href="/user/mypage?uid=${sessionScope.account.uid}&accountType=user">${sessionScope.account.accountName}</a>
     				</c:otherwise>
 				</c:choose>
 				<a href="/account/logout">로그아웃</a>

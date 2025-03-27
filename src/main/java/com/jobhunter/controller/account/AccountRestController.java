@@ -188,5 +188,7 @@ public class AccountRestController {
 		session.removeAttribute("emailCode:" + email);
 		return ResponseEntity.ok("인증 성공!");
 	}
+	
+	
 
 }

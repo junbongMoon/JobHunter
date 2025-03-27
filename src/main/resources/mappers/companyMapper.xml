@@ -63,5 +63,31 @@
     
     <!-- 여기까진 로그인용 -->
     
+    <select id="getCompanyInfo" parameterType="String"
+		resultType="com.jobhunter.model.company.CompanyVO">
+		SELECT * FROM company where uid = #{uid};
+	</select>
+
+	<select id="checkPassword" parameterType="map"
+		resultType="boolean">
+		SELECT COUNT(*) > 0
+		FROM company
+		WHERE uid = #{uid}
+		AND password
+		= SHA1(MD5(#{password}))
+	</select>
+
+	<update id="updatePassword" parameterType="map">
+		UPDATE company SET
+		password = SHA1(MD5(#{password})) WHERE uid = #{uid};
+	</update>
+
+	<update id="updateEmail" parameterType="map">
+		UPDATE company SET email = #{email} WHERE uid = #{uid}
+	</update>
+
+	<update id="updateMobile" parameterType="map">
+		UPDATE company SET mobile = #{mobile} WHERE uid = #{uid}
+	</update>
     
 </mapper>
