@@ -16,7 +16,7 @@
 		INNER
 		JOIN recruitmentnotice rn ON r.gonggoUid = rn.uid
 		INNER JOIN company c
-		ON rn.refCompany = c.uid
+		ON rn.refCompany = c.uid  order by r.boardNo desc
 	</select>
 
 	<insert id="insertReview" useGeneratedKeys="true"
@@ -31,51 +31,55 @@
 	</insert>
 
 
-	<select id="detailAll"
-		resultMap="userReviewInfoMap">
-		SELECT
-		rn.title,
-		rn.detail,
-		c.companyName,
-		u.userName,
-		r.content,
-		r.reviewLevel,
+	<select id="detailAll" resultMap="ReviewDetailViewDTOMap">
+		select
+		res.title,
+		u.userId,
+		res.payType,
+		rec.detail,
+		com.companyName,
 		r.reviewResult,
 		r.reviewType,
+		r.reviewLevel,
+		r.content,
 		r.likes
-		FROM users
-		u
-		JOIN resume res ON u.uid = res.userUid
-		JOIN registration reg ON
-		res.resumeNo = reg.resumePk
-		JOIN recruitmentnotice rn ON
-		reg.recruitmentNoticePk = rn.uid
-		JOIN company c ON rn.refCompany =
-		c.uid
-		LEFT JOIN reviewBoard r ON r.writer = u.uid AND r.gonggoUid =
-		rn.uid
-		WHERE u.uid = #{uid}
+		from reviewBoard r
+		left join users u on r.writer = u.uid
+		left join
+		resume res on u.uid = res.userUid
+		left join recruitmentnotice rec on
+		rec.uid = res.resumeNo
+		inner join company com on rec.refCompany =
+		com.uid
+		where r.boardNo=#{r.boardNo}
 	</select>
 
-<resultMap id="userReviewInfoMap" type="com.jobhunter.model.ReviewDetailViewDTO">
-  
-  <!-- recruitmentNotice -->
-  <result column="title" property="title" javaType="String"/>
-  <result column="detail" property="detail" javaType="String"/>
-  
-  <!-- company -->
-  <result column="companyName" property="companyName" javaType="String"/>
-  
-  <!-- users -->
-  <result column="userName" property="userName" javaType="String"/>
-  
-  <!-- reviewBoard -->
-  <result column="content" property="content" javaType="String"/>
-  <result column="reviewLevel" property="reviewLevel" javaType="String"/>
-  <result column="reviewResult" property="reviewResult" javaType="String"/>
-  <result column="reviewType" property="reviewType" javaType="String"/>
-  <result column="likes" property="likes" javaType="int"/>
+	<resultMap id="ReviewDetailViewDTOMap"
+		type="com.jobhunter.model.reviewboard.ReviewDetailViewDTO">
 
-</resultMap>
+		<!-- resume -->
+		<result column="title" property="title" javaType="String" />
+		<result column="payType" property="payType" javaType="String" />
+
+		<!-- users -->
+		<result column="userId" property="userId" javaType="String" />
+
+		<!-- recruitmentNotice -->
+		<result column="detail" property="detail" javaType="String" />
+
+		<!-- company -->
+		<result column="companyName" property="companyName"
+			javaType="String" />
+
+		<!-- reviewBoard -->
+		<result column="reviewResult" property="reviewResult"
+			javaType="String" />
+		<result column="reviewType" property="reviewType"
+			javaType="String" />
+		<result column="reviewLevel" property="reviewLevel"
+			javaType="String" />
+		<result column="content" property="content" javaType="String" />
+		<result column="likes" property="likes" javaType="int" />
+	</resultMap>
 
 </mapper>
