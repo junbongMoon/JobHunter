@@ -1252,17 +1252,20 @@
 				$('#addHistoryBtn').on('click', function () {
 					const template = document.querySelector('#historyTemplate');
 					const clone = template.content.cloneNode(true) // 깊은 복제 -> 자식 요소까지 복사
-					$('#historyContainer').append(clone);
+					const $clone = $(clone);
 
-					$('#jobDescription').on('input', function () {
-						const currentLength = $(this).val().length;
-						const maxLength = 100;
-						const remainingLength = maxLength - currentLength;
-						$('#jobDescriptionCount').text(currentLength + ' / ' + '100');
-					});
+					count++;
+
+					const newItemId = 'jobDescription' + count;
+					const newCountId = 'jobDescriptionCount' + count;
+					// 
 
 
-					// // 담당업무 입력란 몇글자 썻는지 알 수 있게 하기
+
+					// $('#historyContainer').append(clone);
+
+
+
 					// $('#jobDescription').on('input', function () {
 					// 	const currentLength = $(this).val().length;
 					// 	const maxLength = 100;
