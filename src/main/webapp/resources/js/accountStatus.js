@@ -1,10 +1,14 @@
 /*
+import 는 쓸것만 가져가기
+이 아래쪽 자기 javascript영역에 붙여놓고 자유롭게 사용하면 됩니다
+
 import {
   isLoggedIn,
   isOwner,
   hasRole,
   isBlocked,
-  isDeleted
+  isDeleted,
+
   ACCOUNTTYPE
 } from '/resources/js/accountStatus.js';
 
@@ -29,6 +33,7 @@ import {
 
   if (await hasRole(type)) {
     // 써놓은 권한이랑 본인 권한 맞으면 여기 작동
+    // admin도 같이 작동시키고싶다 하면 or연산자같은걸로 붙이면 됩니다
   }
 */
 
