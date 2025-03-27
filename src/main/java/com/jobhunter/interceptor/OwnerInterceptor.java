@@ -48,20 +48,27 @@ public class OwnerInterceptor implements HandlerInterceptor {
         // 일단 계정 상태 서버에있는걸로 갱신좀 해서 그사이 정지먹진않았나 체크해주고
         AccountVO account = refreshAccount((AccountVO) session.getAttribute("account"));
         
-        // 쿼리스트링으로부터 파라미터 추출
-        int uid = Integer.parseInt(request.getParameter("uid"));
-        AccountType type = AccountType.valueOf(request.getParameter("accountType").toUpperCase());
-        
         String errorParam = "accessFail=notOwner";
         
         try {
-        	// 이상없으면 그냥 그대로 진행
-            if (account.getUid() == uid && account.getAccountType() == type) {
+            // 쿼리 파라미터 추출
+            int uid = Integer.parseInt(request.getParameter("uid"));
+            AccountType type = AccountType.valueOf(request.getParameter("accountType").toUpperCase());
+            
+            // 본인 아니라 어드민도 볼수있게할거냐? 체크용
+            String allowAdminParam = request.getParameter("allowAdmin");
+
+            // 일단 진짜 본인만 체크하는거
+            boolean isOwner = account.getUid() == uid && account.getAccountType() == type;
+            // 어드민 허용 페이지고 내가 어드민인지 체크
+            boolean isAdminAllowed = "true".equalsIgnoreCase(allowAdminParam) && account.getAccountType() == AccountType.ADMIN;
+
+            if (isOwner || isAdminAllowed) {
                 return true;
             }
+
         } catch (Exception e) {
-            // 파라미터 누락/형변환 실패 등
-        	errorParam = "accessFail=checkFail";
+            errorParam = "accessFail=checkFail";
         }
 
         // 문제있으면 기존페이지 링크 저장하고 쿼리스트링에 에러붙여서 돌려보내기

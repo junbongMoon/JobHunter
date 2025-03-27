@@ -33,7 +33,8 @@
       class="com.jobhunter.interceptor.AccountStatInterceptor">
    </beans:bean>
    
-   <!-- 본인확인 인터셉터_쿼리스트링으로 "?uid=101&accountType=company" 처럼 붙여놓고 걸면 동작
+   <!-- 본인확인 인터셉터_쿼리스트링으로 [ ?uid=101&accountType=company ] 처럼 붙여놓고 걸면 동작
+   [ &allowAdmin=true ] 추가로 붙이면 본인 아니라도 어드민도 볼수있는 페이지됩니다
    (get요청용_rest방식등은 AccountRestController 참조) -->
    <beans:bean id="OwnerInterceptor"
       class="com.jobhunter.interceptor.OwnerInterceptor">
