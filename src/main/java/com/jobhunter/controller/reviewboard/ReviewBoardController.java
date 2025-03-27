@@ -60,7 +60,7 @@ public class ReviewBoardController {
 	@PostMapping("/write") 
     public String saveReviewBoard(@ModelAttribute ReviewBoardDTO newReview) {
         logger.info("리뷰 게시글 저장 시도: " + newReview.toString());
-
+        	
         String returnPage = "redirect:./allBoard"; // 기본 리디렉션 경로
         
         

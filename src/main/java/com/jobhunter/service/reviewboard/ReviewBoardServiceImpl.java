@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.jobhunter.dao.reviewboard.ReviewBoardDAO;
+import com.jobhunter.model.reviewboard.GonggoContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoard;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -49,6 +50,12 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	public ReviewDetailViewDTO getReviewDetail(int boardNo)throws Exception {
 		// TODO Auto-generated method stub
 		return Rdao.selectReviewInfo(boardNo);
+	}
+
+	@Override
+	public List<GonggoContentDTO> selectgoggo() throws Exception {
+		
+		return Rdao.selectWriteGonggo();
 	}
 }
 

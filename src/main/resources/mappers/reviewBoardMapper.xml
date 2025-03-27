@@ -21,9 +21,25 @@
 		JOIN
 		recruitmentnotice rn ON r.gonggoUid = rn.uid
 		JOIN
-		company c ON rn.refCompany = c.uid
+		company c ON
+		rn.refCompany = c.uid
 		ORDER BY
 		r.boardNo DESC;
+	</select>
+
+	<select id="gonggoAll"
+	resultType="com.jobhunter.model.reviewboard.GonggoContentDTO">
+		SELECT
+		rn.uid AS gonggoNo,
+		rn.title,
+		c.companyName,
+		rn.workType,
+		rn.payType
+		FROM
+		resume r
+		JOIN recruitmentnotice rn ON rn.refCompany = r.resumeNo
+		JOIN company c ON rn.refCompany = c.uid;
+
 	</select>
 
 	<insert id="insertReview" useGeneratedKeys="true"
