@@ -61,8 +61,8 @@
 										<c:forEach var="jobForm" items="${jobFormList}">
 											<div class="form-check form-check-inline">
 												<input class="form-check-input" type="checkbox" name="jobForm"
-													value="${jobForm.name()}" id="${jobForm.name()}">
-												<label class="form-check-label"
+													value="${jobForm.name()}" id="${jobForm.name()}"> <label
+													class="form-check-label"
 													for="${jobForm.name()}">${jobForm.displayName}</label>
 											</div>
 										</c:forEach>
@@ -326,8 +326,8 @@
 							<div class="row g-3">
 								<!-- 학력 레벨 선택 -->
 								<div class="col-md-4">
-									<label class="form-label">학력 구분<span class="essentialPoint">*</span></label>
-									<select class="form-select education-level" name="educationLevel">
+									<label class="form-label">학력 구분<span class="essentialPoint">*</span></label> <select
+										class="form-select education-level" name="educationLevel">
 										<option value="">선택하세요</option>
 										<c:forEach var="level" items="${educationLevelList}">
 											<option value="${level.name()}">${level.displayName}</option>
@@ -337,8 +337,8 @@
 
 								<!-- 학력 상태 선택 -->
 								<div class="col-md-4">
-									<label class="form-label">학력 상태<span class="essentialPoint">*</span></label>
-									<select class="form-select education-status" name="educationStatus">
+									<label class="form-label">학력 상태<span class="essentialPoint">*</span></label> <select
+										class="form-select education-status" name="educationStatus">
 										<option value="">선택하세요</option>
 										<c:forEach var="status" items="${educationStatusList}">
 											<option value="${status.name()}">${status.displayName}</option>
@@ -482,6 +482,17 @@
 
 
 					<!-- 파일 첨부 -->
+					<div class="card mb-4">
+						<div class="card-header d-flex justify-content-between align-items-center">
+							<span>첨부파일</span>
+						</div>
+						<div class="card-body">
+							<div id="fileContainer">
+								<!-- 첨부파일 항목 -->
+								<div class="text-center text-muted fileText">여기에 첨부파일을 넣어주세요.</div>
+							</div>
+						</div>
+					</div>
 
 
 					<!-- 임시 저장 버튼 -->
@@ -520,6 +531,20 @@
 		</html>
 
 		<style>
+			/* 파일 첨부 텍스트 폰트 크기 + 폰트 위치 아래로*/
+			.fileText {
+				font-size: 1.1rem;
+				margin-top: 45px;
+			}
+
+			/* 첨부파일 드래그 & 드롭 하는 곳 */
+			#fileContainer {
+				border: 2px dashed #ccc;
+				border-radius: 8px;
+				padding: 20px;
+				min-height: 150px;
+			}
+
 			/* 필수 입력 항목 스타일링 */
 			.essentialPoint {
 				color: red;
@@ -881,7 +906,7 @@
 					}
 
 					// 학력을 추가하였는가 확인하고 추가하였다면 값을 입력하지 않았을 시 학력사항에 입력사항이 누락되었음을 알리고 입력을 하도록 유도
-					const educationItems = $('.education-item');
+					const educationItems = $('.education-item'); // each -> 
 					if (educationItems.length > 0) {
 						let isValid = true;
 
@@ -1082,7 +1107,7 @@
 								error: error,
 								response: xhr.responseText
 							});
-							alert('저장 중 오류가 발생했습니다. 콘솔을 확인해주세요.');
+							alert('저장 중 오류가 발생했습니다.');
 						}
 					});
 				});
@@ -1158,7 +1183,7 @@
 								error: error,
 								response: xhr.responseText
 							});
-							alert('저장 중 오류가 발생했습니다. 콘솔을 확인해주세요.');
+							alert('저장 중 오류가 발생했습니다.');
 						}
 					});
 				});
@@ -1249,33 +1274,39 @@
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 경력 추가 버튼 클릭 이벤트
+				let count = 0; // id 중복 방지 만들기 위한 count
 				$('#addHistoryBtn').on('click', function () {
 					const template = document.querySelector('#historyTemplate');
 					const clone = template.content.cloneNode(true) // 깊은 복제 -> 자식 요소까지 복사
-					const $clone = $(clone);
 
 					count++;
 
 					const newItemId = 'jobDescription' + count;
 					const newCountId = 'jobDescriptionCount' + count;
-					// 
 
+					$(clone).find('.job-description').attr('id', newItemId);
+					$(clone).find('#jobDescriptionCount').attr('id', newCountId);
 
+					$(clone).find('.job-description').on('input', function () {
+						const currentLength = $(this).val().length;
+						const maxLength = 100;
+						const remainingLength = maxLength - currentLength;
+						$(this).closest('.history-item').find('#' + newCountId).text(currentLength + ' / ' + '100');
+					});
 
-					// $('#historyContainer').append(clone);
-
-
-
-					// $('#jobDescription').on('input', function () {
-					// 	const currentLength = $(this).val().length;
-					// 	const maxLength = 100;
-					// 	const remainingLength = maxLength - currentLength;
-					// 	$('#jobDescriptionCount').text(currentLength + ' / ' + '100');
-					// });
-
-
-
+					$('#historyContainer').append($(clone));
 				});
+
+				// $('#historyContainer').append(clone);
+
+
+				// $('#jobDescription').on('input', function () {
+				// 	const currentLength = $(this).val().length;
+				// 	const maxLength = 100;
+				// 	const remainingLength = maxLength - currentLength;
+				// 	$('#jobDescriptionCount').text(currentLength + ' / ' + '100');
+				// });
+
 
 				// 경력 삭제 버튼 클릭 이벤트
 				$(document).on('click', '.remove-history', function () {
@@ -1317,6 +1348,46 @@
 					const remainingLength = maxLength - currentLength;
 					$('#charCount').text(currentLength + ' / ' + '1000');
 				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 첨부파일 드래그 & 드롭
+				$('#fileContainer').on('dragenter dragover', function (evt) {
+					evt.preventDefault();
+				});
+
+				$('#fileContainer').on('drop', function (evt) {
+					evt.preventDefault(); // 웹 실행 방지
+					for (let file of evt.originalEvent.dataTransfer.files) {
+						let isDuplicate = false;
+						$.each(upfiles, function (index, e) {
+							// 업로드된 파일이 이미 있는지
+							if (file.name == e.name) {
+								isDuplicate = true;
+							}
+						});
+
+						if (file.size == 0 && file.type == '') {
+							showValidationModal("폴더는 업로드 할 수 없습니다.");
+							return;
+						}
+						if (file.size > 10485760 || isDuplicate) {
+							if (isDuplicate) {
+								showValidationModal("업로드된 같은 파일이 이미 있습니다.");
+								return;
+							} else {
+								showValidationModal("파일 사이즈가 너무 큽니다.");
+								return;
+							}
+						} else {
+							upfiles.push(file);
+							// 업로드 파일 미리보기
+							showPreview(file);
+							fileUpload(file);
+						}
+					}
+
+					// 파일 업로드 처리
+				});
+
 
 
 			});
