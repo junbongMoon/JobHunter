@@ -87,10 +87,10 @@
 			<c:if test="${not empty sessionScope.account}">
 				<c:choose>
 					<c:when test="${sessionScope.account.accountType == 'ADMIN'}">
-        				<a href="/account/mypage" style="color: aqua;">${sessionScope.account.accountName}</a>
+        				<a href="#" style="color: aqua;">${sessionScope.account.accountName}</a>
     				</c:when>
 					<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
-        				<a href="/account/mypage" style="color: aqua;">${sessionScope.account.accountName}</a>
+        				<a href="#" style="color: aqua;">${sessionScope.account.accountName}</a>
     				</c:when>
 					<c:otherwise>
         				<a href="/user/mypage" style="color: aqua;">${sessionScope.account.accountName}</a>
