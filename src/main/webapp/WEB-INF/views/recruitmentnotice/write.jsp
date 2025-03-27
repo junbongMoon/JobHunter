@@ -169,8 +169,7 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 		      return false; // .each 루프 중단
 		    }
 
-		    // 저장을 누르지 않았을 가능성을 고려하여 저장 처리
-		    saveApplication(method, detailValue);
+		    
 		  });
 
 		  return result;
@@ -442,7 +441,7 @@ function submitRecruitmentNotice(title, workType, payType, pay, period, military
 		"detail" : detail,
 		"manager" : manager,
 		"dueDate" : dueDate,
-		"refCompany" : refCompany
+		
 		
       }),
       success: function (data) {
@@ -860,7 +859,7 @@ function isValidRecruitmentForm() {
 										<button type="button" id="writeTemplate" onclick="">템플릿
 											저장</button>
 										<button type="button" id="write"
-											onclick="submitRecruitmentNotice()">작성</button>
+											onclick="isValidRecruitmentForm()">작성</button>
 									</div>
 								</div>
 			</form>

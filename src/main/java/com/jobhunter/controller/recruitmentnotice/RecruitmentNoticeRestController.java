@@ -58,14 +58,11 @@ public class RecruitmentNoticeRestController {
 		// 현재 작성한 작성회사의 pk를 넣어준다.
 		recruitmentNoticeDTO.setRefCompany(uid);
 		// String으로 받은 값을 int로 바꾸자..
-		String[] tempTimeArr = recruitmentNoticeDTO.getDueDateForString().split("-"); // "YYYY-MM-DD-TT-mm"형태로 받는다.
-		int year = Integer.parseInt(tempTimeArr[0]);
-		int month = Integer.parseInt(tempTimeArr[1]);
-		int date = Integer.parseInt(tempTimeArr[2]);
+		 Timestamp dueDate = recruitmentNoticeDTO.getDueDate();
+	        LocalDateTime onlyDate = dueDate.toLocalDateTime().withHour(0).withMinute(0).withSecond(0);
+	        recruitmentNoticeDTO.setDueDate(Timestamp.valueOf(onlyDate));
 
-		Timestamp tempTime = Timestamp.valueOf(LocalDateTime.of(year, month, date, 0, 0, 0));
-
-		recruitmentNoticeDTO.setDueDate(tempTime);
+		
 
 		try {
 			if (recService.saveRecruitmentNotice(recruitmentNoticeDTO, advantageList, applicationList, regionCode,

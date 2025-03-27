@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	private final SqlSession ses;
-	private final String NS = "com.jobhunter.mapper.recruitmentnoticemapper"; 
+	private final String NS = "com.jobhunter.mapper.recruitmentNoticeMapper"; 
 	
 	// 공고(템플릿 아님)를 등록하는 메서드
 	@Override
