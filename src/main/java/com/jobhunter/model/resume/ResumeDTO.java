@@ -39,6 +39,9 @@ public class ResumeDTO {
 
     // 자격증 리스트
     private List<LicenseDTO> licenses;
+    
+    // 첨부파일 리스트
+    private List<ResumeUpfileDTO> files;
 
     // 지역 선택 리스트 (region, sigungu)
     private List<Integer> regionNos;   // 시/도 번호
