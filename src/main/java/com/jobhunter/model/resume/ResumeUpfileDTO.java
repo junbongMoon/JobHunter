@@ -16,7 +16,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ResumeboardUpfilesDTO {
+public class ResumeUpfileDTO {
 	private int boardUpFileNo;
     private String originalFileName;
     private String newFileName;
