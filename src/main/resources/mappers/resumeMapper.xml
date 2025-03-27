@@ -6,14 +6,14 @@
 
     <!-- 이력서 TEMP 저장 -->
     <insert id="insertResumeTemp" parameterType="com.jobhunter.model.resume.ResumeDTO" useGeneratedKeys="true" keyProperty="resumeNo">
-        INSERT INTO resume (title, payType, pay, userUid, saveType)
-        VALUES (#{title}, #{payType}, #{pay}, #{userUid}, 'TEMP');
+        INSERT INTO resume (title, payType, pay, introduce, userUid, saveType)
+        VALUES (#{title}, #{payType}, #{pay}, #{introduce}, #{userUid}, 'TEMP');
     </insert>
 
     <!-- 이력서 FINAL 저장 -->
     <insert id="insertResumeFinal" parameterType="com.jobhunter.model.resume.ResumeDTO" useGeneratedKeys="true" keyProperty="resumeNo">
-        INSERT INTO resume (title, payType, pay, userUid, saveType)
-        VALUES (#{title}, #{payType}, #{pay}, #{userUid}, 'FINAL');
+        INSERT INTO resume (title, payType, pay, introduce, userUid, saveType)
+        VALUES (#{title}, #{payType}, #{pay}, #{introduce}, #{userUid}, 'FINAL');
     </insert>
 
     <!-- 고용 형태 저장 -->
