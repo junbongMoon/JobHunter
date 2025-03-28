@@ -3,6 +3,14 @@
 
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	
+	<!-- include summernote css/js -->
+<link
+   href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css"
+   rel="stylesheet">
+<script
+   src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
+	
 <script>
 	let errorMessage = "";
 	let focusElement = null;
@@ -10,6 +18,8 @@
 
 	$(function() {
 		
+		$('#summernote').summernote();
+
 		getRegion();
 		getMajorCategory();
 
@@ -552,7 +562,7 @@ function isValidRecruitmentForm() {
  	 const pay = getRawPay();
  	 const militaryService = $("input[name='militaryService']:checked").val();
   	const dueDate = $("#date").val();
-  	const detail = $("#detail").val();
+  	const detail = $("#summernote").val();
   	const sigungu = $(".Sigungu").val();
   	const subCategory = $(".SubCategory").val();
   	const majorCategory = $(".MajorCategory").val();
@@ -666,12 +676,6 @@ function isValidRecruitmentForm() {
     margin-bottom: 0 !important;
   }
   .form-check-label {
-    margin-bottom: 0;
-    line-height: 1.5;
-  }
-
-
-  .form-check-label {
     margin-bottom: 0 !important;
     line-height: 1.5;
   }
@@ -698,7 +702,7 @@ function isValidRecruitmentForm() {
 				<div class="row gy-3">
 					<div class="col-md-6">
 						<div class="input-group">
-							<label for="name">회사명</label> <input type="text" id="Companyname"
+							<label for="name" class="form-check-label">회사명</label> <input type="text" id="Companyname"
 								placeholder="Enter your full name" required="" readonly="true">
 
 						</div>
@@ -706,7 +710,7 @@ function isValidRecruitmentForm() {
 
 					<div class="col-md-6">
 						<div class="input-group">
-							<label for="email">작성자*</label> <input type="email" id="writer"
+							<label for="email" class="form-check-label">작성자*</label> <input type="email" id="writer"
 								placeholder="Enter your email address" required=""
 								readonly="true">
 
@@ -715,7 +719,7 @@ function isValidRecruitmentForm() {
 					<input type="hidden" id="refCompany" value="1">
 					<div class="col-12">
 						<div class="input-group">
-							<label for="website">공고 제목</label> <input type="text"
+							<label for="website" class="form-check-label">공고 제목</label> <input type="text"
 								name="title" id="title" placeholder="게시글 제목을 입력해 주세요">
 						</div>
 					</div>
@@ -723,7 +727,7 @@ function isValidRecruitmentForm() {
 
 					<div class="col-12">
 						<div class="input-group">
-							<label for="majorCategory">산업군</label> <select
+							<label for="majorCategory" class="form-check-label">산업군</label> <select
 								class="MajorCategory form-select" id="MajorCategory">
 
 							</select>
@@ -731,7 +735,7 @@ function isValidRecruitmentForm() {
 
 						<div class="col-12">
 							<div class="input-group">
-								<label for="subCategory">직종</label> <select class="SubCategory form-select"
+								<label for="subCategory" class="form-check-label">직종</label> <select class="SubCategory form-select"
 									id="SubCategory">
 
 								</select>
@@ -739,7 +743,7 @@ function isValidRecruitmentForm() {
 
 							<div class="col-12">
 								<div class="input-group">
-									<label for="region">도시</label> <select class="Region form-select"
+									<label for="region" class="form-check-label">도시</label> <select class="Region form-select"
 										id="regionList">
 
 									</select>
@@ -747,7 +751,7 @@ function isValidRecruitmentForm() {
 								<input type="hidden" id="region">
 								<div class="col-12">
 									<div class="input-group">
-										<label for="sigungu">시군구</label> <select class="Sigungu form-select"
+										<label for="sigungu" class="form-check-label">시군구</label> <select class="Sigungu form-select"
 											id="sigunguList">
 
 										</select>
@@ -759,23 +763,23 @@ function isValidRecruitmentForm() {
 										<div class="d-flex flex-wrap gap-3">
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="workType" id="workType1" value="FULLTIME">
-											<label class="form-check-label" for="workType1">정규직</label>
+											<label class="form-check-label mb-2" for="workType1">정규직</label>
 										  </div>
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="workType" id="workType2" value="NONREGULAR">
-											<label class="form-check-label" for="workType2">비정규직</label>
+											<label class="form-check-label mb-2" for="workType2">비정규직</label>
 										  </div>
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="workType" id="workType3" value="APPOINT">
-											<label class="form-check-label" for="workType3">위촉직</label>
+											<label class="form-check-label mb-2" for="workType3">위촉직</label>
 										  </div>
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="workType" id="workType4" value="PARTTIME">
-											<label class="form-check-label" for="workType4">아르바이트</label>
+											<label class="form-check-label mb-2" for="workType4">아르바이트</label>
 										  </div>
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="workType" id="workType5" value="FREELANCER">
-											<label class="form-check-label" for="workType5">프리랜서</label>
+											<label class="form-check-label mb-2" for="workType5">프리랜서</label>
 										  </div>
 										</div>
 									  </div>
@@ -785,33 +789,33 @@ function isValidRecruitmentForm() {
 
 									  <div class="col-12">
 										<label for="payType">급여형태</label>
-										<div class="d-flex flex-wrap gap-3">
+										<div class="d-flex flex-wrap gap-3 payType">
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="payType" id="payType1" value="HOUR">
-											<label class="form-check-label" for="payType1">시급</label>
+											<label class="form-check-label mb-2" for="payType1">시급</label>
 										  </div>
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="payType" id="payType2" value="DATE">
-											<label class="form-check-label" for="payType2">일급</label>
+											<label class="form-check-label mb-2" for="payType2">일급</label>
 										  </div>
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="payType" id="payType3" value="WEEK">
-											<label class="form-check-label" for="payType3">주급</label>
+											<label class="form-check-label mb-2" for="payType3">주급</label>
 										  </div>
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="payType" id="payType4" value="MONTH">
-											<label class="form-check-label" for="payType4">월급</label>
+											<label class="form-check-label mb-2" for="payType4">월급</label>
 										  </div>
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="payType" id="payType5" value="YEAR">
-											<label class="form-check-label" for="payType5">연봉</label>
+											<label class="form-check-label mb-2" for="payType5">연봉</label>
 										  </div>
 										</div>
 									  </div>
 
 									  <div class="col-md-6">
 										<div class="input-group">
-										  <label for="pay">급여 액수</label>
+										  <label for="pay" class="form-check-label mb-2">급여 액수</label>
 										  <input type="text" id="pay" maxlength="15" placeholder="숫자만 입력" oninput="formatPay(this)">
 										</div>
 									  </div>
@@ -819,7 +823,7 @@ function isValidRecruitmentForm() {
 									<div class="col-md-6">
 										<div class="input-group">
 
-											<label for="endWorkTime">근무시간</label> <input type="time"
+											<label for="endTime" class="form-check-label mb-2">근무시간</label> <input type="time"
 												id="startTime"> <input type="time" id="endTime">
 										</div>
 									</div>
@@ -827,18 +831,18 @@ function isValidRecruitmentForm() {
 
 									<div class="col-12">
 										<label for="militaryService">병역 사항</label>
-										<div class="d-flex flex-wrap gap-3">
+										<div class="d-flex flex-wrap gap-3" id="militaryService">
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="militaryService" id="military1" value="NOT_SERVED">
-											<label class="form-check-label" for="military1">미필 이상</label>
+											<label class="form-check-label mb-2" for="military1">미필 이상</label>
 										  </div>
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="militaryService" id="military2" value="SERVED">
-											<label class="form-check-label" for="military2">군필 이상</label>
+											<label class="form-check-label mb-2" for="military2">군필 이상</label>
 										  </div>
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="militaryService" id="military3" value="EXEMPTED">
-											<label class="form-check-label" for="military3">면제 이상</label>
+											<label class="form-check-label mb-2" for="military3">면제 이상</label>
 										  </div>
 										</div>
 									  </div>
@@ -852,7 +856,7 @@ function isValidRecruitmentForm() {
 											<div class="d-flex align-items-center">
 											  <div class="form-check me-3 d-flex align-items-center">
 												<input class="form-check-input application-checkbox" type="checkbox" id="ONLINE" value="ONLINE">
-												<label class="form-check-label ms-2 mb-0" for="ONLINE">온라인</label>
+												<label class="form-check-label ms-2" for="ONLINE">온라인</label>
 											  </div>
 											  <div class="flex-grow-1">
 												<div class="input-group">
@@ -868,7 +872,7 @@ function isValidRecruitmentForm() {
 											<div class="d-flex align-items-center">
 											  <div class="form-check me-3 d-flex align-items-center">
 												<input class="form-check-input application-checkbox" type="checkbox" id="EMAIL" value="EMAIL">
-												<label class="form-check-label ms-2 mb-0" for="EMAIL">이메일</label>
+												<label class="form-check-label ms-2" for="EMAIL">이메일</label>
 											  </div>
 											  <div class="flex-grow-1">
 												<div class="input-group">
@@ -884,7 +888,7 @@ function isValidRecruitmentForm() {
 											<div class="d-flex align-items-center">
 											  <div class="form-check me-3 d-flex align-items-center">
 												<input class="form-check-input application-checkbox" type="checkbox" id="PHONE" value="PHONE">
-												<label class="form-check-label ms-2 mb-0" for="PHONE">전화</label>
+												<label class="form-check-label ms-2" for="PHONE">전화</label>
 											  </div>
 											  <div class="flex-grow-1">
 												<div class="input-group">
@@ -900,7 +904,7 @@ function isValidRecruitmentForm() {
 											<div class="d-flex align-items-center">
 											  <div class="form-check me-3 d-flex align-items-center">
 												<input class="form-check-input application-checkbox" type="checkbox" id="TEXT" value="TEXT">
-												<label class="form-check-label ms-2 mb-0" for="TEXT">문자</label>
+												<label class="form-check-label ms-2" for="TEXT">문자</label>
 											  </div>
 											  <div class="flex-grow-1">
 												<div class="input-group">
@@ -916,7 +920,7 @@ function isValidRecruitmentForm() {
 
 									<div class="col-12">
 										<div class="input-group">
-											<label for="personalHistory">경력사항</label> <input type="text"
+											<label for="personalHistory" class="form-check-label mb-2">경력사항</label> <input type="text"
 												name="personalHistory" id="personalHistory" placeholder="경력을 입력해 주세요">
 										</div>
 									</div>
@@ -924,7 +928,7 @@ function isValidRecruitmentForm() {
 
 									<div class="col-12">
 										<div class="input-group">
-											<label for="advantage">우대조건</label> <input type="text"
+											<label for="advantage" class="form-check-label mb-2">우대조건</label> <input type="text"
 												id="advantage" placeholder="우대조건을 입력하고 저장 버튼을 눌러주세요..">
 											<button type="button" class="addAdvantageBtn"
 												onclick="addAdvantage()">저장하기</button>
@@ -934,33 +938,31 @@ function isValidRecruitmentForm() {
 
 									<div class="col-md-6">
 										<div class="input-group">
-											<label for="date">마감 기한</label> <input type="date" id="date"
+											<label for="date" class="form-check-label mb-2">마감 기한</label> <input type="date" id="date"
 												max="2025-12-30" min="2025-03-30" value="2025-03-27">
 
 										</div>
 									</div>
 
 									<div class="col-12">
-										<div class="input-group">
-											<label for="detail">상세 내용</label>
-											<textarea name="detail" id="detail" rows="5"
-												placeholder="상세 내용을 적어주세요..."></textarea>
-
+										<div class="input-group flex-column">
+										  <label for="summernote" class="form-check-label mb-2">상세 내용</label>
+										  <textarea id="summernote" name="detail"></textarea>
 										</div>
-									</div>
+									  </div>
 
 									<div class="col-md-6">
 										<div class="input-group">
-											<label for="manager">담당자</label> <input type="text" id="manager"
+											<label for="manager" class="form-check-label">담당자</label> <input type="text" id="manager"
 												placeholder="담당자를 입력해주세요">
 				
 										</div>
 									</div>
 
-									<label for="detail">아래의 박스에 파일을 올려주세요</label>
+									<label for="files">박스에 파일을 드래그 드롭하면 파일이 저장 됩니다.</label>
 									<div class="col-12">
-										<div class="input-group fileUploadArea"
-											style="width: 800px; height: 100px; background-color: #eee; border-radius: 10px;">
+										<div class="input-group fileUploadArea" id="files"
+											style="width: 800px; height: 80px; background-color: #eee; border-radius: 10px;">
 
 
 										</div>
