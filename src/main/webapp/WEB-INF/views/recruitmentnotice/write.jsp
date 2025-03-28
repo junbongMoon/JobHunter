@@ -975,7 +975,7 @@ function isValidRecruitmentForm() {
 										</div>
 									</div>
 
-									<label for="files">박스에 파일을 드래그 드롭하면 파일이 저장 됩니다.</label>
+									<label for="files">추가로 올릴 자료가 있으면 하단의 박스에 드래그드롭 하세요.</label>
 									<div class="col-12">
 										<div class="input-group fileUploadArea" id="files"
 											style="width: 800px; height: 80px; background-color: #eee; border-radius: 10px;">
@@ -987,8 +987,7 @@ function isValidRecruitmentForm() {
 
 
 									<div class="col-12 text-center">
-										<button type="button" id="writeTemplate" onclick="">템플릿
-											저장</button>
+										
 										<button type="button" id="write"
 											onclick="isValidRecruitmentForm()">작성</button>
 									</div>
