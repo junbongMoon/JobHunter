@@ -106,8 +106,8 @@
 									</div>
 								</div>
 								<div class="col-md-4 d-flex align-items-center">
-									<input type="number" class="form-control text-end" id="payAmount" name="pay"
-										placeholder="금액 입력" disabled> <span class="ms-2">원</span>
+									<input type="text" class="form-control text-end" id="payAmount" name="pay"
+										placeholder="금액 입력(숫자만 입력 가능해요)" disabled> <span class="ms-2">원</span>
 								</div>
 							</div>
 							<small class="text-muted">* 시급, 일급, 월급, 연봉의 경우 금액을 입력해 주세요.</small>
@@ -489,7 +489,8 @@
 						<div class="card-body">
 							<div id="fileContainer">
 								<!-- 첨부파일 항목 -->
-								<div class="text-center text-muted fileText">여기에 첨부파일을 넣어주세요.</div>
+								<div class="text-center text-muted fileText">여기에 첨부파일을
+									넣어주세요.</div>
 							</div>
 						</div>
 					</div>
@@ -1351,7 +1352,6 @@
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 첨부파일 드래그 & 드롭
-
 				const upfiles = [];         // 실제 드래그한 파일
 				const uploadedFiles = [];   // 서버 업로드 완료된 파일 정보
 
@@ -1449,6 +1449,25 @@
 
 					$fileContainer.append($preview);
 				}
+
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 금액 입력에 숫자외 다른 문자를 입력하면 입력 못하게 하고 모달띄우기 ','는 가능
+				$('#payAmount').on('input', function () {
+					const value = $(this).val();
+					if (!/^\d*$/.test(value) && value !== '') {
+						showValidationModal("숫자만 입력 가능해요");
+						$(this).val('');
+					}
+				});
+
+				// 금액 입력에 숫자만 입력하면 3자리 콤마 추가
+				$('#payAmount').on('input', function () {
+					const value = $(this).val();
+					const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+					$(this).val(formattedValue);
+				});
+
+
 
 
 			});
