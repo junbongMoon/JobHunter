@@ -74,6 +74,7 @@ public class AccountStatInterceptor implements HandlerInterceptor {
         // 문제있으면 기존페이지 링크 저장하고 쿼리스트링에 에러붙여서 돌려보내기
         String referer = request.getHeader("Referer");
         String fallback = request.getContextPath() + "/";
+        String errorParam = "error=account_" + reason;
 
         if (referer != null && !referer.contains("/account/login")) {
             response.sendRedirect(referer + (referer.contains("?") ? "&" : "?") + errorParam);
