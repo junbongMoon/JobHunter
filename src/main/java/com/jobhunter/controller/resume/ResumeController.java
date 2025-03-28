@@ -140,6 +140,7 @@ public class ResumeController {
 		}
 	}
 	
+	// status추가해야함!!!!!! 그걸로 파일삭제 수정처리 할 예정
 	@PostMapping("/uploadFile")
 	@ResponseBody
 	public Map<String, Object> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
