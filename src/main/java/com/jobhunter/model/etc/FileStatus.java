@@ -1,4 +1,4 @@
-package com.jobhunter.model.util;
+package com.jobhunter.model.etc;
 
 //enum 타입은 열거형 데이터 타입으로, 
 //서로 연관된 상수들을 한 곳에 모아서 정의할 때 사용합니다. 
