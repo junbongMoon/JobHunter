@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+<beans:beans
+	xmlns="http://www.springframework.org/schema/mvc"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
@@ -7,25 +8,78 @@
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
-	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
-	
-	
+	<!-- DispatcherServlet Context: defines this servlet's request-processing 
+		infrastructure -->
+
+
 	<!-- Enables the Spring MVC @Controller programming model -->
 	<!-- 이게 적용이 안됨... -->
 	<annotation-driven />
+	
+	<!-- 수신된 Multipart 데이터를 순서대로 재조립하는 객체 -->
+   <beans:bean id="multipartResolver"
+      class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+      <beans:property name="maxUploadSize" value="10485760"></beans:property>
+   </beans:bean>
 
-	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving 
+		up static resources in the ${webappRoot}/resources directory -->
 	<resources mapping="/resources/**" location="/resources/" />
 
-	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
-	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
+		in the /WEB-INF/views directory -->
+	<beans:bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<beans:property name="prefix" value="/WEB-INF/views/" />
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
+
+	
+	<!-- 수신된 Multipart 데이터를 순서대로 재조립하는 객체 -->
+   <beans:bean id="multipartResolver"
+      class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+      <beans:property name="maxUploadSize" value="10485760"></beans:property>
+   </beans:bean>
 	
 	
 	<!-- controller 패키지 안에 객체로  -->
 	<context:component-scan base-package="com.jobhunter.controller"></context:component-scan>	
 	<context:component-scan base-package="com.jobhunter.interceptor"></context:component-scan>
 	
+
+
+	<!-- 로그인 했는지 안했는지 검사하는 인터셉터 -->
+	<beans:bean id="authLoginInterceptor"
+		class="com.jobhunter.interceptor.AuthLoginInterceptor">
+	</beans:bean>
+
+	<!-- 정지+삭제대기 막는 인터셉터(get요청용_rest방식등은 AccountRestController 참조) [ ?checkStatType=BLOCK 
+		] 혹은 [ ?checkStatType=DELETE ] 붙이면 그것만 검사 가능 둘다쓸거면 그냥 인터셉터 걸기만 하면 됩니다. -->
+	<beans:bean id="accountTypeInterceptor"
+		class="com.jobhunter.interceptor.AccountStatInterceptor">
+	</beans:bean>
+
+	<!-- 본인확인 인터셉터_쿼리스트링으로 [ ?uid=101&accountType=company ] 처럼 uid랑 accountType 
+		붙여놓고 걸면 동작 accountType은 com.jobhunter.model.customenum.AccountType 참고(대소문자 
+		구분 없음) [ &allowAdmin=true ] 추가로 붙이면 본인 아니라도 어드민도 볼수있는 페이지됩니다 (get요청용_rest방식등은 
+		AccountRestController 참조) -->
+	<beans:bean id="OwnerInterceptor"
+		class="com.jobhunter.interceptor.OwnerInterceptor">
+	</beans:bean>
+
+	<interceptors>
+
+		<interceptor>
+			<mapping path="/user/mypage" />
+			<beans:ref bean="authLoginInterceptor" />
+		</interceptor>
+
+		<interceptor>
+			<mapping path="/user/mypage" />
+			<beans:ref bean="OwnerInterceptor" />
+		</interceptor>
+
+	</interceptors>
+
+
 </beans:beans>

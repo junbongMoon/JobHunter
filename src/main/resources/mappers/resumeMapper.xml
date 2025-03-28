@@ -2,7 +2,87 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.testoracle.mapper.resumemapper">
-	
+<mapper namespace="com.jobhunter.mapper.resumemapper">
+
+    <!-- 이력서 TEMP 저장 -->
+    <insert id="insertResumeTemp" parameterType="com.jobhunter.model.resume.ResumeDTO" useGeneratedKeys="true" keyProperty="resumeNo">
+        INSERT INTO resume (title, payType, pay, introduce, userUid, saveType)
+        VALUES (#{title}, #{payType}, #{pay}, #{introduce}, #{userUid}, 'TEMP');
+    </insert>
+
+    <!-- 이력서 FINAL 저장 -->
+    <insert id="insertResumeFinal" parameterType="com.jobhunter.model.resume.ResumeDTO" useGeneratedKeys="true" keyProperty="resumeNo">
+        INSERT INTO resume (title, payType, pay, introduce, userUid, saveType)
+        VALUES (#{title}, #{payType}, #{pay}, #{introduce}, #{userUid}, 'FINAL');
+    </insert>
+
+    <!-- 고용 형태 저장 -->
+    <insert id="insertJobForm" parameterType="com.jobhunter.model.resume.JobFormDTO">
+        INSERT INTO jobform (Form, resumeNo)
+        VALUES (#{form}, #{resumeNo});
+    </insert>
+
+    <!-- 지역 저장 -->
+    <insert id="insertSigungu" parameterType="map">
+        INSERT INTO where_resume_sigungu (refResumeNo, refSigunguNo)
+        VALUES (#{resumeNo}, #{sigunguNo});
+    </insert>
+
+    <!-- 시/도 리스트 -->
+    <select id="selectAllRegions" resultType="com.jobhunter.model.resume.RegionDTO">
+        SELECT regionNo, code, name FROM region
+    </select>
+
+    <!-- 시/군/구 리스트 -->
+    <select id="selectSigunguByRegion" parameterType="int" resultType="com.jobhunter.model.resume.SigunguDTO">
+        SELECT sigunguNo, code, name, regionNo
+        FROM sigungu
+        WHERE regionNo = #{regionNo}
+    </select>
+
+    <!-- 업직종 대분류 리스트 -->
+    <select id="selectAllMajorCategories" resultType="com.jobhunter.model.resume.MajorCategoryDTO">
+        SELECT MajorcategoryNo as majorcategoryNo, jobName
+        FROM majorcategory
+        ORDER BY MajorcategoryNo
+    </select>
+
+    <!-- 업직종 소분류 리스트 -->
+    <select id="selectSubCategoriesByMajor" parameterType="int" resultType="com.jobhunter.model.resume.SubCategoryDTO">
+        SELECT subcategoryNo, jobName, refMajorcategoryNo as majorcategoryNo
+        FROM subcategory
+        WHERE refMajorcategoryNo = #{majorcategoryNo}
+        ORDER BY subcategoryNo
+    </select>
+
+    <!-- 업직종 저장 -->
+    <insert id="insertSubCategory" parameterType="map">
+        INSERT INTO jobtype_resume_sub (refResumeNo, refSubNo)
+        VALUES (#{resumeNo}, #{subcategoryNo});
+    </insert>
+    
+    <!-- 성격 및 장점 저장 -->
+	<insert id="insertMerit" parameterType="com.jobhunter.model.resume.MeritDTO">
+        INSERT INTO merit (meritContent, resumeNo)
+        VALUES (#{meritContent}, #{resumeNo});
+    </insert>
+
+    <!-- 학력 저장 -->
+    <insert id="insertEducation" parameterType="com.jobhunter.model.resume.EducationDTO">
+        INSERT INTO education (educationLevel, educationStatus, customInput, resumeNo)
+        VALUES (#{educationLevel}, #{educationStatus}, #{customInput}, #{resumeNo});
+    </insert>
+
+    <!-- 경력 저장 -->
+    <insert id="insertHistory" parameterType="com.jobhunter.model.resume.PersonalHistoryDTO">
+        INSERT INTO personalhistory (companyName, jobDescription, startDate, endDate, resumeNo)
+        VALUES (#{companyName}, #{jobDescription}, #{startDate}, #{endDate}, #{resumeNo});
+    </insert>
+
+    <!-- 자격증 저장 -->
+    <insert id="insertLicense" parameterType="com.jobhunter.model.resume.LicenseDTO">
+        INSERT INTO license (licenseName, acquisitionDate, resumeNo)
+        VALUES (#{licenseName}, #{acquisitionDate}, #{resumeNo});
+    </insert>
 
 </mapper>

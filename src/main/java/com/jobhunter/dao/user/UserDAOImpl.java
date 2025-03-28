@@ -1,9 +1,12 @@
 package com.jobhunter.dao.user;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
-import com.jobhunter.model.user.User;
+import com.jobhunter.model.user.UserVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,12 +16,41 @@ public class UserDAOImpl implements UserDAO {
 	
 	private final SqlSession ses;
 	private final String NS = "com.jobhunter.mapper.usermapper";
-
+	
 	@Override
-	public void insertUser() throws Exception {
-		String a = ses.selectOne(NS + ".now");
-		
-		System.out.println(a); 
+	public UserVO getUserInfo(String uid) throws Exception {
+		return ses.selectOne(NS+".getUserInfo", uid);
 	}
 
+	@Override
+	public Boolean findByUidAndPassword(String uid, String password) throws Exception {
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("uid", uid);
+		paramMap.put("password", password);
+
+		return ses.selectOne(NS + ".checkPassword", paramMap);
+	}
+	
+	@Override
+	public void updatePassword(String uid, String newPassword) throws Exception {
+	    Map<String, Object> paramMap = new HashMap<>();
+	    paramMap.put("uid", uid);
+	    paramMap.put("password", newPassword);
+	    
+	    ses.update(NS + ".updatePassword", paramMap);
+	}
+	
+	@Override
+	public void updateEmail(Map<String, String> paramMap) throws Exception {
+	    
+	    ses.update(NS + ".updateEmail", paramMap);
+	}
+	
+	@Override
+	public void updateMobile(Map<String, String> paramMap) throws Exception {
+	    
+	    ses.update(NS + ".updateMobile", paramMap);
+	}
+	
+	
 }

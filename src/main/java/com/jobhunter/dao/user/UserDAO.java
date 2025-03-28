@@ -1,9 +1,19 @@
 package com.jobhunter.dao.user;
 
-import com.jobhunter.model.user.User;
+import java.util.Map;
+
+import com.jobhunter.model.user.UserVO;
 
 public interface UserDAO {
 
-	void insertUser() throws Exception;
+	UserVO getUserInfo(String uid) throws Exception;
+
+	Boolean findByUidAndPassword(String uid, String password) throws Exception;
+
+	void updatePassword(String uid, String newPassword) throws Exception;
+
+	void updateEmail(Map<String, String> paramMap) throws Exception;
+
+	void updateMobile(Map<String, String> paramMap) throws Exception;
 
 }

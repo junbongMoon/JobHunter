@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -57,14 +58,16 @@
 </head>
 
 <div class="index-page">
-    <header id="header" class="header d-flex align-items-center">
-        <div class="container-fluid container-xl position-relative d-flex align-items-center header-background">
+	<header id="header" class="header d-flex align-items-center">
+		<div
+			class="container-fluid container-xl position-relative d-flex align-items-center header-background">
 
-            <a href="index.html" class="logo d-flex align-items-center me-auto">
-                <!-- Uncomment the line below if you also wish to use an image logo -->
-                <!-- <img src="assets/img/logo.webp" alt=""> -->
-                <h1 class="sitename">JobHunter</h1>
-            </a>
+			<a href="index.html" class="logo d-flex align-items-center me-auto">
+				<!-- Uncomment the line below if you also wish to use an image logo -->
+				<!-- <img src="assets/img/logo.webp" alt=""> -->
+				<h1 class="sitename">JobHunter</h1>
+			</a>
+
 
             <nav id="navmenu" class="navmenu">
                 <ul>
@@ -83,10 +86,26 @@
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
 
-            <a class="btn-getstarted" href="#">Login</a>
 
-        </div>
-</header>
-</body>
+			<c:if test="${not empty sessionScope.account}">
+				<c:choose>
+					<c:when test="${sessionScope.account.accountType == 'ADMIN'}">
+        				<a href="#" style="color: aqua;">${sessionScope.account.accountName}</a>
+    				</c:when>
+					<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
+        				<a href="/company/companyHome?uid=${sessionScope.account.uid}&accountType=company">${sessionScope.account.accountName}</a>
+    				</c:when>
+					<c:otherwise>
+        				<a href="/user/mypage?uid=${sessionScope.account.uid}&accountType=user">${sessionScope.account.accountName}</a>
+    				</c:otherwise>
+				</c:choose>
+				<a href="/account/logout">로그아웃</a>
+			</c:if>
+			<c:if test="${empty sessionScope.account}">
+				<a href="${pageContext.request.contextPath}/account/login/return">로그인</a>
+			</c:if>
 
+		</div>
+	</header>
+	</body>
 </html>
