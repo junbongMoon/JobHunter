@@ -25,9 +25,27 @@
 
 		$('.method-detail, .save-method-btn').hide();
 
-		$('.fileUploadArea').on('dragenter dragover drop', function(evt) {
-    		evt.preventDefault();
-		});
+		$(".fileUploadArea").on("dragover", function (e) {
+    e.preventDefault();
+    $(this).css("background-color", "#ccc");
+});
+
+$(".fileUploadArea").on("dragleave", function (e) {
+    e.preventDefault();
+    $(this).css("background-color", "#eee");
+});
+
+$(".fileUploadArea").on("drop", function (e) {
+    e.preventDefault();
+    $(this).css("background-color", "#eee");
+
+    let files = e.originalEvent.dataTransfer.files;
+    for (let i = 0; i < files.length; i++) {
+        let file = files[i];
+        uploadFileAndShowPreview(file);
+    }
+});
+
 		
 
 		$(document).on("change", "input[name='workType']", function () {
@@ -211,14 +229,11 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 			$(this).focus();
 		}
 	});
-
-
-
-
 	
 	});
 
-	function uploadFile(file) {
+// 파일 업로드 + 썸네일 표시
+function uploadFileAndShowPreview(file) {
     const formData = new FormData();
     formData.append("file", file);
 
@@ -230,7 +245,7 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
         processData: false,
         success: function(response) {
             console.log("업로드 성공", response);
-            markUploadSuccess(file.name);
+            showThumbnail(file);
         },
         error: function() {
             alert("파일 업로드 실패");
@@ -238,19 +253,44 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
     });
 }
 
-function showPreview(file) {
+// 썸네일 출력 함수
+function showThumbnail(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
-        const base64 = e.target.result;
         const isImage = file.type.startsWith("image/");
-        let html = `<tr id="\${file.name}">
-                      <td><img src="\${isImage ? base64 : '/resources/images/noimage.png'}" width="40"></td>
-                      <td class="uploadFileName">\${file.name}</td>
-                      <td><button onclick="removeFile('\${file.name}', this)">X</button></td>
-                    </tr>`;
+        const base64 = e.target.result;
+
+        const safeId = file.name.replace(/[^a-zA-Z0-9]/g, "_");
+
+        let html = `
+            <tr id="thumb_\${safeId}">
+                <td><img src="\${isImage ? base64 : '/resources/images/noimage.png'}" width="60" /></td>
+                <td\>${file.name}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeFile('\${file.name}')">X</button>
+                </td>
+            </tr>
+        `;
         $(".preview").append(html);
-    }
+    };
     reader.readAsDataURL(file);
+}
+
+// 파일 삭제 함수
+function removeFile(fileName) {
+    $.ajax({
+        url: "/recruitmentnotice/rest/file",
+        type: "DELETE",
+        data: { removeFileName: fileName },
+        success: function(response) {
+            console.log("삭제 성공", response);
+            const safeId = fileName.replace(/[^a-zA-Z0-9]/g, "_");
+            $(`#thumb_${safeId}`).remove();
+        },
+        error: function() {
+            alert("파일 삭제 실패");
+        }
+    });
 }
 
 function markUploadSuccess(fileName) {
@@ -260,23 +300,6 @@ function markUploadSuccess(fileName) {
       "<td><img src='/resources/images/success.png' width='20'></td>"
     );
 }
-
-function removeFile(fileName, btn) {
-    $.ajax({
-        url: "/recruitmentnotice/rest/file",
-        type: "DELETE",
-        data: { removeFileName: fileName },
-        success: function() {
-            $(btn).closest("tr").remove();
-            upfiles = upfiles.filter(f => f.name !== fileName);
-        },
-        error: function() {
-            alert("파일 삭제 실패");
-        }
-    });
-}
-
-
 
 
 	// 면접타입 유효성 검사
@@ -1000,15 +1023,15 @@ function isValidRecruitmentForm() {
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title" id="recruitmentModalLabel">채용공고</h5>
+							<h5 class="modal-title" id="recruitmentModalLabel"></h5>
 							<button type="button" class="btn-close" data-bs-dismiss="modal"
 								aria-label="Close"></button>
 						</div>
-						<div class="modal-body">채용공고가 등록되었습니다.</div>
+						<div class="modal-body"></div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary"
 								data-bs-dismiss="modal">닫기</button>
-							<button type="button" class="btn btn-primary returnList" data-bs-dismiss="modal">확인</button>
+							<button type="button" class="btn btn-primary returnList" data-bs-dismiss="modal"></button>
 						</div>
 					</div>
 				</div>
