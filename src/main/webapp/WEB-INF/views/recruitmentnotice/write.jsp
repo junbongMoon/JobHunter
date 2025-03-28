@@ -15,7 +15,7 @@
 
 		$('.method-detail, .save-method-btn').hide();
 
-		$('.fileUploadArea').on('dragenter dragover', function(evt) {
+		$('.fileUploadArea').on('dragenter dragover drop', function(evt) {
     		evt.preventDefault();
 		});
 
@@ -525,13 +525,31 @@ function submitRecruitmentNotice(title, workType, payType, pay, period, military
  });
 }
 
+function formatPay(input) {
+    // 숫자만 추출
+    let value = input.value.replace(/[^0-9]/g, '');
+    
+    // 최대 2,000,000,000 제한
+    if (parseInt(value) > 2000000000) {
+      value = "2000000000";
+    }
+
+    // 쉼표 추가
+    input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  // 숫자 데이터 전송을 위해 쉼표 제거 함수 (폼 제출 시 사용)
+  function getRawPay() {
+    return document.getElementById("pay").value.replaceAll(",", "");
+  }
+
 function isValidRecruitmentForm() {
 	let result = true;
 
  	 const title = $("#title").val();
  	 const workType = $("input[name='workType']:checked").val();
  	 const payType = $("input[name='payType']:checked").val();
- 	 const pay = $("#pay").val();
+ 	 const pay = getRawPay();
  	 const militaryService = $("input[name='militaryService']:checked").val();
   	const dueDate = $("#date").val();
   	const detail = $("#detail").val();
@@ -640,6 +658,24 @@ function isValidRecruitmentForm() {
 
 </script>
 
+<style>
+  .form-check-input {
+    width: 18px;
+    height: 18px;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .form-check-label {
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
+
+
+  .form-check-label {
+    margin-bottom: 0 !important;
+    line-height: 1.5;
+  }
+  </style>
 
 <body>
 	<!-- 헤더 -->
@@ -688,14 +724,14 @@ function isValidRecruitmentForm() {
 					<div class="col-12">
 						<div class="input-group">
 							<label for="majorCategory">산업군</label> <select
-								class="MajorCategory" id="MajorCategory">
+								class="MajorCategory form-select" id="MajorCategory">
 
 							</select>
 						</div>
 
 						<div class="col-12">
 							<div class="input-group">
-								<label for="subCategory">직종</label> <select class="SubCategory"
+								<label for="subCategory">직종</label> <select class="SubCategory form-select"
 									id="SubCategory">
 
 								</select>
@@ -703,7 +739,7 @@ function isValidRecruitmentForm() {
 
 							<div class="col-12">
 								<div class="input-group">
-									<label for="region">도시</label> <select class="Region"
+									<label for="region">도시</label> <select class="Region form-select"
 										id="regionList">
 
 									</select>
@@ -711,7 +747,7 @@ function isValidRecruitmentForm() {
 								<input type="hidden" id="region">
 								<div class="col-12">
 									<div class="input-group">
-										<label for="sigungu">시군구</label> <select class="Sigungu"
+										<label for="sigungu">시군구</label> <select class="Sigungu form-select"
 											id="sigunguList">
 
 										</select>
@@ -719,42 +755,66 @@ function isValidRecruitmentForm() {
 									<input type="hidden" id="sigungu">
 
 									<div class="col-12">
-										<div class="input-group">
-											<label for="workType">근무형태</label>
-											<div class="row">
-												<span>정규직</span><input type="radio" name="workType"
-													value="FULLTIME"> <span>비정규직</span><input
-													type="radio" name="workType" value="NONREGULAR"> <span>위촉직</span><input
-													type="radio" name="workType" value="APPOINT"> <span>아르바이트</span><input
-													type="radio" name="workType" value="PARTTIME"> <span>프리랜서</span><input
-													type="radio" name="workType" value="FREELANCER">
-											</div>
+										<label for="workType">근무형태</label>
+										<div class="d-flex flex-wrap gap-3">
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="workType" id="workType1" value="FULLTIME">
+											<label class="form-check-label" for="workType1">정규직</label>
+										  </div>
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="workType" id="workType2" value="NONREGULAR">
+											<label class="form-check-label" for="workType2">비정규직</label>
+										  </div>
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="workType" id="workType3" value="APPOINT">
+											<label class="form-check-label" for="workType3">위촉직</label>
+										  </div>
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="workType" id="workType4" value="PARTTIME">
+											<label class="form-check-label" for="workType4">아르바이트</label>
+										  </div>
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="workType" id="workType5" value="FREELANCER">
+											<label class="form-check-label" for="workType5">프리랜서</label>
+										  </div>
 										</div>
-									</div>
+									  </div>
 
 
 
 
-									<div class="col-12">
-										<div class="input-group">
-											<label for="payType">급여형태</label>
-											<div class="row">
-												<span>시급</span><input type="radio" name="payType"
-													value="HOUR"> <span>일급</span><input type="radio"
-													name="payType" value="DATE"> <span>주급</span><input
-													type="radio" name="payType" value="WEEK"> <span>월급</span><input
-													type="radio" name="payType" value="MONTH"> <span>연봉</span><input
-													type="radio" name="payType" value="YEAR">
-											</div>
+									  <div class="col-12">
+										<label for="payType">급여형태</label>
+										<div class="d-flex flex-wrap gap-3">
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="payType" id="payType1" value="HOUR">
+											<label class="form-check-label" for="payType1">시급</label>
+										  </div>
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="payType" id="payType2" value="DATE">
+											<label class="form-check-label" for="payType2">일급</label>
+										  </div>
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="payType" id="payType3" value="WEEK">
+											<label class="form-check-label" for="payType3">주급</label>
+										  </div>
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="payType" id="payType4" value="MONTH">
+											<label class="form-check-label" for="payType4">월급</label>
+										  </div>
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="payType" id="payType5" value="YEAR">
+											<label class="form-check-label" for="payType5">연봉</label>
+										  </div>
 										</div>
-									</div>
+									  </div>
 
-									<div class="col-md-6">
+									  <div class="col-md-6">
 										<div class="input-group">
-											<label for="pay">급여 액수</label> <input type="number" id="pay" maxlength="11" min="1" max="2000000000">
-
+										  <label for="pay">급여 액수</label>
+										  <input type="text" id="pay" maxlength="15" placeholder="숫자만 입력" oninput="formatPay(this)">
 										</div>
-									</div>
+									  </div>
 
 									<div class="col-md-6">
 										<div class="input-group">
@@ -766,110 +826,93 @@ function isValidRecruitmentForm() {
 
 
 									<div class="col-12">
-										<div class="input-group">
-											<label for="militaryService"><div>병역 사항</div></label>
-											<div class="container militaryService">
-												<span>미필 이상</span><input type="radio" name="militaryService"
-													value="NOT_SERVED"> <span>군필 이상</span><input
-													type="radio" name="militaryService" value="SERVED"><span>면제
-													이상</span><input type="radio" name="militaryService"
-													value="EXEMPTED">
-											</div>
+										<label for="militaryService">병역 사항</label>
+										<div class="d-flex flex-wrap gap-3">
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="militaryService" id="military1" value="NOT_SERVED">
+											<label class="form-check-label" for="military1">미필 이상</label>
+										  </div>
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="militaryService" id="military2" value="SERVED">
+											<label class="form-check-label" for="military2">군필 이상</label>
+										  </div>
+										  <div class="form-check">
+											<input class="form-check-input" type="radio" name="militaryService" id="military3" value="EXEMPTED">
+											<label class="form-check-label" for="military3">면제 이상</label>
+										  </div>
 										</div>
-									</div>
+									  </div>
 
-									<div class="col-12">
-										<div class="input-group">
-											<label class="form-label w-100 mb-3">접수 방법</label>
-
-											<div class="row">
-												<!-- ONLINE -->
-												<div class="col-12 mb-3">
-													<div class="d-flex align-items-center">
-														<div class="form-check me-3 d-flex align-items-center">
-															<input class="form-check-input application-checkbox"
-																type="checkbox" value="ONLINE" id="ONLINE"> <label
-																class="form-check-label ms-2" for="applyOnline">온라인</label>
-														</div>
-														<div class="flex-grow-1">
-															<div class="input-group">
-																<input type="text" class="form-control method-detail"
-																	placeholder="상세 정보를 입력해주세요..." data-method="ONLINE"
-																	style="display: none;">
-																<button type="button"
-																	class="btn btn-primary save-method-btn"
-																	data-method="ONLINE" style="display: none;">저장</button>
-															</div>
-														</div>
-													</div>
+									<div class="col-12 mb-3">
+										<label class="form-label w-100 mb-3">접수 방법</label>
+										<div class="row" id="application-methods">
+									  
+										  
+										  <div class="col-12 mb-2">
+											<div class="d-flex align-items-center">
+											  <div class="form-check me-3 d-flex align-items-center">
+												<input class="form-check-input application-checkbox" type="checkbox" id="ONLINE" value="ONLINE">
+												<label class="form-check-label ms-2 mb-0" for="ONLINE">온라인</label>
+											  </div>
+											  <div class="flex-grow-1">
+												<div class="input-group">
+												  <input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="ONLINE" style="display: none;">
+												  <button type="button" class="btn btn-primary save-method-btn" data-method="ONLINE" style="display: none;">저장</button>
 												</div>
-
-												<!-- EMAIL -->
-												<div class="col-12 mb-3">
-													<div class="d-flex align-items-center">
-														<div class="form-check me-3 d-flex align-items-center">
-															<input class="form-check-input application-checkbox"
-																type="checkbox" value="EMAIL" id="EMAIL"> <label
-																class="form-check-label ms-2" for="applyEmail">이메일</label>
-														</div>
-														<div class="flex-grow-1">
-															<div class="input-group">
-																<input type="email" class="form-control method-detail"
-																	placeholder="상세 정보를 입력해주세요..." data-method="EMAIL"
-																	style="display: none;">
-																<button type="button"
-																	class="btn btn-primary save-method-btn"
-																	data-method="EMAIL" style="display: none;">저장</button>
-															</div>
-														</div>
-													</div>
-												</div>
-
-												<!-- PHONE -->
-												<div class="col-12 mb-3">
-													<div class="d-flex align-items-center">
-														<div class="form-check me-3 d-flex align-items-center">
-															<input class="form-check-input application-checkbox"
-																type="checkbox" value="PHONE" id="PHONE"> <label
-																class="form-check-label ms-2" for="applyPhone">전화</label>
-														</div>
-														<div class="flex-grow-1">
-															<div class="input-group">
-																<input type="text" class="form-control method-detail"
-																	placeholder="상세 정보를 입력해주세요..." data-method="PHONE"
-																	style="display: none;">
-																<button type="button"
-																	class="btn btn-primary save-method-btn"
-																	data-method="PHONE" style="display: none;">저장</button>
-															</div>
-														</div>
-													</div>
-												</div>
-
-												<!-- TEXT -->
-												<div class="col-12 mb-3">
-													<div class="d-flex align-items-center">
-														<div class="form-check me-3 d-flex align-items-center">
-															<input class="form-check-input application-checkbox"
-																type="checkbox" value="TEXT" id="TEXT"> <label
-																class="form-check-label ms-2" for="applyText">문자</label>
-														</div>
-														<div class="flex-grow-1">
-															<div class="input-group">
-																<input type="text" class="form-control method-detail"
-																	placeholder="상세 정보를 입력해주세요..." data-method="TEXT"
-																	style="display: none;">
-																<button type="button"
-																	class="btn btn-primary save-method-btn"
-																	data-method="TEXT" style="display: none;">저장</button>
-															</div>
-														</div>
-													</div>
-												</div>
+											  </div>
 											</div>
-
+										  </div>
+									  
+										  <!-- 2. 이메일 -->
+										  <div class="col-12 mb-2">
+											<div class="d-flex align-items-center">
+											  <div class="form-check me-3 d-flex align-items-center">
+												<input class="form-check-input application-checkbox" type="checkbox" id="EMAIL" value="EMAIL">
+												<label class="form-check-label ms-2 mb-0" for="EMAIL">이메일</label>
+											  </div>
+											  <div class="flex-grow-1">
+												<div class="input-group">
+												  <input type="email" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="EMAIL" style="display: none;">
+												  <button type="button" class="btn btn-primary save-method-btn" data-method="EMAIL" style="display: none;">저장</button>
+												</div>
+											  </div>
+											</div>
+										  </div>
+									  
+										  <!-- 3. 전화 -->
+										  <div class="col-12 mb-2">
+											<div class="d-flex align-items-center">
+											  <div class="form-check me-3 d-flex align-items-center">
+												<input class="form-check-input application-checkbox" type="checkbox" id="PHONE" value="PHONE">
+												<label class="form-check-label ms-2 mb-0" for="PHONE">전화</label>
+											  </div>
+											  <div class="flex-grow-1">
+												<div class="input-group">
+												  <input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="PHONE" style="display: none;">
+												  <button type="button" class="btn btn-primary save-method-btn" data-method="PHONE" style="display: none;">저장</button>
+												</div>
+											  </div>
+											</div>
+										  </div>
+									  
+										  <!-- 4. 문자 -->
+										  <div class="col-12 mb-2">
+											<div class="d-flex align-items-center">
+											  <div class="form-check me-3 d-flex align-items-center">
+												<input class="form-check-input application-checkbox" type="checkbox" id="TEXT" value="TEXT">
+												<label class="form-check-label ms-2 mb-0" for="TEXT">문자</label>
+											  </div>
+											  <div class="flex-grow-1">
+												<div class="input-group">
+												  <input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="TEXT" style="display: none;">
+												  <button type="button" class="btn btn-primary save-method-btn" data-method="TEXT" style="display: none;">저장</button>
+												</div>
+											  </div>
+											</div>
+										  </div>
+									  
 										</div>
-									</div>
+									  </div>
 
 									<div class="col-12">
 										<div class="input-group">
