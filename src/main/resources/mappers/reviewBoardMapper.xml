@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jobhunter.mapper.reviewboardmapper">
+
+
+
+	<select id="allList"
+		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
+		SELECT
+		r.boardNo,
+		u.userId AS writer,
+		c.companyName,
+		r.likes,
+		r.views
+		FROM
+		reviewBoard r
+		JOIN
+		users u ON r.writer = u.uid
+		JOIN
+		recruitmentnotice rn ON r.gonggoUid = rn.uid
+		JOIN
+		company c ON
+		rn.refCompany = c.uid
+		ORDER BY
+		r.boardNo DESC;
+	</select>
+
+	<select id="gonggoAll"
+	resultType="com.jobhunter.model.reviewboard.GonggoContentDTO">
+		SELECT
+		rn.uid AS gonggoNo,
+		rn.title,
+		c.companyName,
+		rn.workType,
+		rn.payType
+		FROM
+		resume r
+		JOIN recruitmentnotice rn ON rn.refCompany = r.resumeNo
+		JOIN company c ON rn.refCompany = c.uid;
+
+	</select>
+
+	<insert id="insertReview" useGeneratedKeys="true"
+		keyProperty="boardNo">
+		INSERT INTO reviewBoard (
+		writer,companyName,reviewResult,reviewType,
+		reviewLevel,content,category,jobType
+		)
+		VALUES (
+		#{writer},#{companyName},#{reviewResult},#{reviewType},
+		#{reviewLevel},#{content},#{category},#{jobType})
+	</insert>
+
+
+	<select id="detailAll" resultMap="ReviewDetailViewDTOMap">
+		select
+		res.title,
+		u.userId,
+		res.payType,
+		rec.detail,
+		com.companyName,
+		r.reviewResult,
+		r.reviewType,
+		r.reviewLevel,
+		r.content,
+		r.likes
+		from reviewBoard r
+		left join users u on
+		r.writer = u.uid
+		left join
+		resume res on u.uid = res.userUid
+		left join
+		recruitmentnotice rec on
+		rec.uid = res.resumeNo
+		inner join company com
+		on rec.refCompany =
+		com.uid
+		where r.boardNo=#{r.boardNo}
+	</select>
+
+	<resultMap id="ReviewDetailViewDTOMap"
+		type="com.jobhunter.model.reviewboard.ReviewDetailViewDTO">
+
+		<!-- resume -->
+		<result column="title" property="title" javaType="String" />
+		<result column="payType" property="payType" javaType="String" />
+
+		<!-- users -->
+		<result column="userId" property="userId" javaType="String" />
+
+		<!-- recruitmentNotice -->
+		<result column="detail" property="detail" javaType="String" />
+
+		<!-- company -->
+		<result column="companyName" property="companyName"
+			javaType="String" />
+
+		<!-- reviewBoard -->
+		<result column="reviewResult" property="reviewResult"
+			javaType="String" />
+		<result column="reviewType" property="reviewType"
+			javaType="String" />
+		<result column="reviewLevel" property="reviewLevel"
+			javaType="String" />
+		<result column="content" property="content" javaType="String" />
+		<result column="likes" property="likes" javaType="int" />
+	</resultMap>
+
+</mapper>

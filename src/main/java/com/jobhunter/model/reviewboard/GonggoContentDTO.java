@@ -1,7 +1,5 @@
 package com.jobhunter.model.reviewboard;
 
-import java.sql.Timestamp;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,17 +14,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ReviewBoard {
-	private int boardNo;
-	private String writer;
-	private String companyName;
-	private ReviewResult reviewResult;
-	private ReviewType reviewType;
-	private int reviewLevel;
-	private String content;
-	private String category;
-	private JobType jobType;
-	private Timestamp postDate;
-	private int likes;
-	private int views;
+public class GonggoContentDTO {
+	  private int gonggoNo;
+	    private String gonggoTitle;
+	    private String detail;
+	    private String companyName;
 }

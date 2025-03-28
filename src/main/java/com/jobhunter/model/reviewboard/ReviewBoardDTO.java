@@ -16,17 +16,17 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ReviewBoard {
-	private int boardNo;
-	private String writer;
-	private String companyName;
-	private ReviewResult reviewResult;
-	private ReviewType reviewType;
-	private int reviewLevel;
-	private String content;
-	private String category;
-	private JobType jobType;
-	private Timestamp postDate;
-	private int likes;
-	private int views;
+public class ReviewBoardDTO {
+
+	    private int boardNo;
+	    private String writer;
+	    private String companyName;
+	    private int likes;
+	    private int views;
 }
+
+	
+	
+	
+	
+

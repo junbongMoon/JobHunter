@@ -68,21 +68,24 @@
 				<h1 class="sitename">JobHunter</h1>
 			</a>
 
-			<nav id="navmenu" class="navmenu">
-				<ul>
-					<li><a href="#hero" class="active">Home</a></li>
-					<li class="dropdown"><a href="#"><span>채용정보</span> <i
-							class="bi bi-chevron-down toggle-dropdown"></i></a>
-						<ul>
-							<li><a href="#">전체 채용정보</a></li>
-							<li><a href="#">지역별 채용정보</a></li>
-							<li><a href="#">직업별 채용정보</a></li>
-						</ul></li>
-					<li><a href="#contact">면접후기</a></li>
-					<li><a href="#contact">My Page</a></li>
-				</ul>
-				<i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-			</nav>
+
+            <nav id="navmenu" class="navmenu">
+                <ul>
+                    <li><a href="#hero" class="active">Home</a></li>
+                    <li class="dropdown"><a href="#"><span>채용정보</span> <i
+                                class="bi bi-chevron-down toggle-dropdown"></i></a>
+                        <ul>
+                            <li><a href="#">전체 채용정보</a></li>
+                            <li><a href="#">지역별 채용정보</a></li>
+                            <li><a href="#">직업별 채용정보</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/reviewBoard/allBoard">면접후기</a></li>
+                    <li><a href="#contact">My Page</a></li>
+                </ul>
+                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+            </nav>
+
 
 			<c:if test="${not empty sessionScope.account}">
 				<c:choose>
