@@ -33,6 +33,14 @@
 		(#{advantageType},
 		#{recruitmentNoticeUid})
 	</insert>
+	
+	<insert id="insertFileWithRecruitmentnotice">
+	insert into recruitmentnoticeboardupfiles
+	(originalFileName, newFileName, thumbFileName, fileType, ext, size, base64Image, status, refrecruitmentnoticeNo)
+	values
+	(#{originalFileName},#{newFileName}, #{thumbFileName}, #{fileType}, #{ext}, #{size}, #{base64Image}, #{status}, #{refrecruitmentnoticeNo})
+	
+	</insert>
 
 	<select id="selectMostRecentRecruitmentnoticeByrefCompany">
 		select * from recruitmentnotice where refCompany = #{companyUid} order by uid

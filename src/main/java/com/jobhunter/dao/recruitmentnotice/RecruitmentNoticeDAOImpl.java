@@ -9,6 +9,7 @@ import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
 import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,7 +53,14 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	@Override
 	public RecruitmentNotice selectRecentRecruitment(int companyUid) {
 		
-		return ses.selectOne(NS +".", companyUid);
+		return ses.selectOne(NS +".selectMostRecentRecruitmentnoticeByrefCompany", companyUid);
+	}
+
+
+	@Override
+	public int insertRecruitmentFile(RecruitmentnoticeBoardUpfiles file) throws Exception {
+		
+		return ses.insert(NS +".insertFileWithRecruitmentnotice", file);
 	}
 
 

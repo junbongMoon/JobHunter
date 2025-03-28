@@ -18,6 +18,8 @@ public interface RecruitmentNoticeService {
 	List<RecruitmentNotice> getRecruitmenTempByUid(int uid) throws Exception;	 
 	// 공고 전체를 조회하는 메서드(템플릿 제외)
 	List<RecruitmentNotice> getEntireRecruitment() throws Exception;
+	// 파일을 실제 db에 저장하는 메서드
+	
 	// 공고를 수정하는 메서드 
 	
 	// 공고를 삭제하는 메서드

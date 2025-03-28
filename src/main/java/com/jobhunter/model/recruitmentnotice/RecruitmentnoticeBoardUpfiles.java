@@ -25,7 +25,8 @@ public class RecruitmentnoticeBoardUpfiles {
 	private String ext;
 	private long size;
 	private String base64Image;
-	private int refrecruitmentnoticeNo;
 	private FileStatus status;
+	private int refrecruitmentnoticeNo;
+	
 	
 }

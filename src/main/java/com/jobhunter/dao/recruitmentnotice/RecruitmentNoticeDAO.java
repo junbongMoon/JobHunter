@@ -6,6 +6,7 @@ import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
 import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 
 public interface RecruitmentNoticeDAO {
 	// 공고를 입력하는 메서드
@@ -18,6 +19,8 @@ public interface RecruitmentNoticeDAO {
 	int insertApplicationWithRecruitmentNotice(ApplicationDTO applicationDTO) throws Exception;
 
 	RecruitmentNotice selectRecentRecruitment(int companyUid);
+
+	int insertRecruitmentFile(RecruitmentnoticeBoardUpfiles file) throws Exception;
 
 	
 

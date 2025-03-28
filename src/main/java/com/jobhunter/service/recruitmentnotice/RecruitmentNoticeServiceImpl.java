@@ -75,9 +75,11 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 			// 여기서 insert
 			regiondao.insertSigunguWithRecruitmentNotice(recNo, Integer.parseInt(regionCode));
 		}
-		if(!fileList.isEmpty()) {
+		if(fileList.size() > 0) {
 			for(RecruitmentnoticeBoardUpfiles file : fileList) {
 				// 여기서 insert
+				file.setRefrecruitmentnoticeNo(recNo);
+				recdao.insertRecruitmentFile(file);
 			}
 		}
 		if(StringUtils.hasText(majorCategortCode)) {
