@@ -703,10 +703,6 @@ function isValidRecruitmentForm() {
     errorMessage = "담당자를 입력해주세요.";
     focusElement = $("#manager");
 	result = false;
-  } else if (!detail || detail.length > 21000) { // 완
-    errorMessage = "상세 내용을 입력해주세요.";
-    focusElement = $("#detail");
-	result = false;
   } else if(!isValidApplication()) {
 	errorMessage = "면접방식을 선택해주세요."; 
     focusElement = $(".SubCategory");
@@ -1006,7 +1002,9 @@ function isValidRecruitmentForm() {
 
 										</div>
 									</div>
-
+									<div class="col-12 text-center">
+										<table class="preview mt-3"></table>
+									</div>
 
 
 									<div class="col-12 text-center">
