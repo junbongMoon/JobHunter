@@ -28,6 +28,52 @@
 		$('.fileUploadArea').on('dragenter dragover drop', function(evt) {
     		evt.preventDefault();
 		});
+		
+
+		$(document).on("change", "input[name='workType']", function () {
+  const selectedWorkType = $("input[name='workType']:checked").val();
+  const phoneAndTextHtml = `
+    
+    <div class="col-12 mb-2 parttime-only" id="phoneOption">
+      <div class="d-flex align-items-center">
+        <div class="form-check me-3 d-flex align-items-center">
+          <input class="form-check-input application-checkbox" type="checkbox" id="PHONE" value="PHONE">
+          <label class="form-check-label ms-2" for="PHONE">전화</label>
+        </div>
+        <div class="flex-grow-1">
+          <div class="input-group">
+            <input type="text" class="form-control method-detail" placeholder="전화 면접에 대한 추가내용이 있다면 작성하세요..." data-method="PHONE" style="display: none;">
+            <button type="button" class="btn btn-primary save-method-btn" data-method="PHONE" style="display: none;">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="col-12 mb-2 parttime-only" id="textOption">
+      <div class="d-flex align-items-center">
+        <div class="form-check me-3 d-flex align-items-center">
+          <input class="form-check-input application-checkbox" type="checkbox" id="TEXT" value="TEXT">
+          <label class="form-check-label ms-2" for="TEXT">문자</label>
+        </div>
+        <div class="flex-grow-1">
+          <div class="input-group">
+            <input type="text" class="form-control method-detail" placeholder="" data-method="TEXT" style="display: none;">
+            <button type="button" class="btn btn-primary save-method-btn" data-method="TEXT" style="display: none;">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (selectedWorkType === "PARTTIME") {
+    if ($("#phoneOption").length === 0 && $("#textOption").length === 0) {
+      $("#application-methods").append(phoneAndTextHtml);
+    }
+  } else {
+    $(".parttime-only").remove();
+  }
+});
 
 		
 		
@@ -762,23 +808,23 @@ function isValidRecruitmentForm() {
 										<label for="workType">근무형태</label>
 										<div class="d-flex flex-wrap gap-3">
 										  <div class="form-check">
-											<input class="form-check-input" type="radio" name="workType" id="workType1" value="FULLTIME">
+											<input class="form-check-input workType" type="radio" name="workType" id="workType1" value="FULLTIME">
 											<label class="form-check-label mb-2" for="workType1">정규직</label>
 										  </div>
 										  <div class="form-check">
-											<input class="form-check-input" type="radio" name="workType" id="workType2" value="NONREGULAR">
+											<input class="form-check-input workType" type="radio" name="workType" id="workType2" value="NONREGULAR">
 											<label class="form-check-label mb-2" for="workType2">비정규직</label>
 										  </div>
 										  <div class="form-check">
-											<input class="form-check-input" type="radio" name="workType" id="workType3" value="APPOINT">
+											<input class="form-check-input workType" type="radio" name="workType" id="workType3" value="APPOINT">
 											<label class="form-check-label mb-2" for="workType3">위촉직</label>
 										  </div>
 										  <div class="form-check">
-											<input class="form-check-input" type="radio" name="workType" id="workType4" value="PARTTIME">
+											<input class="form-check-input workType" type="radio" name="workType" id="workType4" value="PARTTIME">
 											<label class="form-check-label mb-2" for="workType4">아르바이트</label>
 										  </div>
 										  <div class="form-check">
-											<input class="form-check-input" type="radio" name="workType" id="workType5" value="FREELANCER">
+											<input class="form-check-input workType" type="radio" name="workType" id="workType5" value="FREELANCER">
 											<label class="form-check-label mb-2" for="workType5">프리랜서</label>
 										  </div>
 										</div>
@@ -816,7 +862,7 @@ function isValidRecruitmentForm() {
 									  <div class="col-md-6">
 										<div class="input-group">
 										  <label for="pay" class="form-check-label mb-2">급여 액수</label>
-										  <input type="text" id="pay" maxlength="15" placeholder="숫자만 입력" oninput="formatPay(this)">
+										  <input type="text" id="pay" maxlength="15" placeholder="숫자만 입력할 수 있습니다." oninput="formatPay(this)">
 										</div>
 									  </div>
 
@@ -825,6 +871,7 @@ function isValidRecruitmentForm() {
 
 											<label for="endTime" class="form-check-label mb-2">근무시간</label> <input type="time"
 												id="startTime"> <input type="time" id="endTime">
+												<!-- 해야할 것 : 격일, 격주, 2교대 등 근무 시간에 대한 상세 내용 -->
 										</div>
 									</div>
 
@@ -860,7 +907,7 @@ function isValidRecruitmentForm() {
 											  </div>
 											  <div class="flex-grow-1">
 												<div class="input-group">
-												  <input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="ONLINE" style="display: none;">
+												  <input type="text" class="form-control method-detail" placeholder="온라인 면접에 대한 추가내용이 있다면 작성하세요..." data-method="ONLINE" style="display: none;">
 												  <button type="button" class="btn btn-primary save-method-btn" data-method="ONLINE" style="display: none;">저장</button>
 												</div>
 											  </div>
@@ -876,44 +923,13 @@ function isValidRecruitmentForm() {
 											  </div>
 											  <div class="flex-grow-1">
 												<div class="input-group">
-												  <input type="email" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="EMAIL" style="display: none;">
+												  <input type="email" class="form-control method-detail" placeholder="이메일 면접에 대한 추가내용이 있다면 작성하세요..." data-method="EMAIL" style="display: none;">
 												  <button type="button" class="btn btn-primary save-method-btn" data-method="EMAIL" style="display: none;">저장</button>
 												</div>
 											  </div>
 											</div>
 										  </div>
 									  
-										  <!-- 3. 전화 -->
-										  <div class="col-12 mb-2">
-											<div class="d-flex align-items-center">
-											  <div class="form-check me-3 d-flex align-items-center">
-												<input class="form-check-input application-checkbox" type="checkbox" id="PHONE" value="PHONE">
-												<label class="form-check-label ms-2" for="PHONE">전화</label>
-											  </div>
-											  <div class="flex-grow-1">
-												<div class="input-group">
-												  <input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="PHONE" style="display: none;">
-												  <button type="button" class="btn btn-primary save-method-btn" data-method="PHONE" style="display: none;">저장</button>
-												</div>
-											  </div>
-											</div>
-										  </div>
-									  
-										  <!-- 4. 문자 -->
-										  <div class="col-12 mb-2">
-											<div class="d-flex align-items-center">
-											  <div class="form-check me-3 d-flex align-items-center">
-												<input class="form-check-input application-checkbox" type="checkbox" id="TEXT" value="TEXT">
-												<label class="form-check-label ms-2" for="TEXT">문자</label>
-											  </div>
-											  <div class="flex-grow-1">
-												<div class="input-group">
-												  <input type="text" class="form-control method-detail" placeholder="상세 정보를 입력해주세요..." data-method="TEXT" style="display: none;">
-												  <button type="button" class="btn btn-primary save-method-btn" data-method="TEXT" style="display: none;">저장</button>
-												</div>
-											  </div>
-											</div>
-										  </div>
 									  
 										</div>
 									  </div>
