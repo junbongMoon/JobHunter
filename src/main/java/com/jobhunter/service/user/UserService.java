@@ -1,8 +1,15 @@
 package com.jobhunter.service.user;
 
-import com.jobhunter.model.user.User;
+import com.jobhunter.model.user.UserVO;
 
 public interface UserService {
-	// 유저를 저장하는
-	boolean saveUser(User user) throws Exception;
+
+	UserVO showMypage(String uid) throws Exception;
+
+	boolean checkPassword(String uid, String password) throws Exception;
+
+	void updatePassword(String uid, String password) throws Exception;
+
+	String updateContact(String uid, String type, String value) throws Exception;
+
 }
