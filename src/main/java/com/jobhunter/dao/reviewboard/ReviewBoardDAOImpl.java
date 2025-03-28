@@ -8,12 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.jobhunter.model.reviewboard.GonggoContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import com.jobhunter.model.reviewboard.recruitmentnoticContentDTO;
 
 
 @Repository
@@ -37,7 +34,7 @@ import lombok.extern.log4j.Log4j;
 	}
 	
 	@Override
-	public List<GonggoContentDTO> selectWriteGonggo()throws Exception{
+	public List<recruitmentnoticContentDTO> selectWriteGonggo()throws Exception{
 		
 		return ses.selectList(NS+".gonggoAll");
 	}

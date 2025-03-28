@@ -2,12 +2,9 @@ package com.jobhunter.service.reviewboard;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
-import com.jobhunter.model.reviewboard.GonggoContentDTO;
-import com.jobhunter.model.reviewboard.ReviewBoard;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
+import com.jobhunter.model.reviewboard.recruitmentnoticContentDTO;
 
 
 
@@ -17,7 +14,7 @@ public interface ReviewBoardService {
 	List<ReviewBoardDTO> selectReBoard() throws Exception;
 
 	//작성 페이지에 공고정보 조회  
-	List<GonggoContentDTO> selectgoggo()throws Exception;
+	List<recruitmentnoticContentDTO> selectgoggo()throws Exception;
 	
 	
 	// 게시글 저장 --

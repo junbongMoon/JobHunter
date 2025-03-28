@@ -28,17 +28,19 @@
 	</select>
 
 	<select id="gonggoAll"
-	resultType="com.jobhunter.model.reviewboard.GonggoContentDTO">
+		resultType="com.jobhunter.model.reviewboard.recruitmentnoticContentDTO">
 		SELECT
 		rn.uid AS gonggoNo,
-		rn.title,
+		r.title,
 		c.companyName,
 		rn.workType,
 		rn.payType
 		FROM
-		resume r
+		users u
+		INNER JOIN resume r on u.uid = userUid
 		JOIN recruitmentnotice rn ON rn.refCompany = r.resumeNo
-		JOIN company c ON rn.refCompany = c.uid;
+		JOIN company c ON rn.refCompany = c.uid
+		WHERE r.userUid = userUid;
 
 	</select>
 

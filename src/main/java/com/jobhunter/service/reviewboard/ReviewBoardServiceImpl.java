@@ -7,10 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.jobhunter.dao.reviewboard.ReviewBoardDAO;
-import com.jobhunter.model.reviewboard.GonggoContentDTO;
-import com.jobhunter.model.reviewboard.ReviewBoard;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
+import com.jobhunter.model.reviewboard.recruitmentnoticContentDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,11 +30,11 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	@Override
 	public boolean saveReview(ReviewBoardDTO reviewBoardDTO) throws Exception {
 		boolean result = false;
-		int boardInt = Rdao.insertBoard(reviewBoardDTO);
+		int boardInsert = Rdao.insertBoard(reviewBoardDTO);
 
-		System.out.println("insertBoard() 결과: " + boardInt);
+		System.out.println("insertBoard() 결과: " + boardInsert);
 
-		if (boardInt > 0) {
+		if (boardInsert > 0) {
 			System.out.println("리뷰 등록 성공");
 			result = true;
 		} else {
@@ -53,7 +52,7 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	}
 
 	@Override
-	public List<GonggoContentDTO> selectgoggo() throws Exception {
+	public List<recruitmentnoticContentDTO> selectgoggo() throws Exception {
 		
 		return Rdao.selectWriteGonggo();
 	}
