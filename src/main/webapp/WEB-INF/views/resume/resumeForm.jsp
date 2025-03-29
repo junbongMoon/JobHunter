@@ -107,7 +107,7 @@
 								</div>
 								<div class="col-md-4 d-flex align-items-center">
 									<input type="text" class="form-control text-end" id="payAmount" name="pay"
-										placeholder="금액 입력(숫자만 입력 가능해요)" disabled> <span class="ms-2">원</span>
+										placeholder="금액 입력(숫자만 입력 가능해요)" maxlength="11" disabled> <span class="ms-2">원</span>
 								</div>
 							</div>
 							<small class="text-muted">* 시급, 일급, 월급, 연봉의 경우 금액을 입력해 주세요.</small>
@@ -989,7 +989,7 @@
 					const formData = {
 						title: $('#title').val(),
 						payType: $('input[name="payType"]:checked').val(),
-						pay: $('#payAmount').val(),
+						pay: $('#payAmount').val().replace(/,/g, ''),
 						jobForms: $('input[name="jobForm"]:checked').map(function () {
 							return {
 								form: $(this).val()
@@ -1453,21 +1453,22 @@
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 금액 입력에 숫자외 다른 문자를 입력하면 입력 못하게 하고 모달띄우기 ','는 가능
 				$('#payAmount').on('input', function () {
-					const value = $(this).val();
-					if (!/^\d*$/.test(value) && value !== '') {
+					let value = $(this).val();
+
+					// 콤마 제거하고 숫자만 남긴 값 추출
+					let payOnlyNumber = value.replace(/,/g, '');
+
+					// 숫자만 입력되었는지 확인
+					if (!/^\d*$/.test(payOnlyNumber) && value !== '') {
 						showValidationModal("숫자만 입력 가능해요");
 						$(this).val('');
+						return;
 					}
+
+					// 숫자가 맞다면 3자리 콤마 형식으로 변경
+					let result = Number(payOnlyNumber).toLocaleString();
+					$(this).val(result);
 				});
-
-				// 금액 입력에 숫자만 입력하면 3자리 콤마 추가
-				$('#payAmount').on('input', function () {
-					const value = $(this).val();
-					const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-					$(this).val(formattedValue);
-				});
-
-
 
 
 			});
