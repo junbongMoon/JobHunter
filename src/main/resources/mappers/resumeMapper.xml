@@ -85,4 +85,9 @@
         VALUES (#{licenseName}, #{acquisitionDate}, #{resumeNo});
     </insert>
 
+    <!-- 파일 저장 -->
+    <insert id="insertResumeUpfile" parameterType="com.jobhunter.model.resume.ResumeUpfileDTO">
+        INSERT INTO resumeupfiles (originalFileName, newFileName, ext, size, base64Image, resumeNo)
+        VALUES (#{originalFileName}, #{newFileName}, #{ext}, #{size}, #{base64Image}, #{resumeNo});
+    </insert>
 </mapper>

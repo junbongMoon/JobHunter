@@ -10,6 +10,7 @@ import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
+import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 
@@ -39,4 +40,6 @@ public interface ResumeDAO {
 	void insertHistory(PersonalHistoryDTO historyDTO) throws Exception;
 
 	void insertLicense(LicenseDTO licenseDTO) throws Exception;
+
+	void insertResumeUpfile(ResumeUpfileDTO resumeUpfileDTO) throws Exception;
 }

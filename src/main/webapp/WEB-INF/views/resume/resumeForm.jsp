@@ -1044,7 +1044,7 @@
 					const formData = {
 						title: $('#title').val(),
 						payType: $('input[name="payType"]:checked').val(),
-						pay: $('#payAmount').val(),
+						pay: $('#payAmount').val().replace(/,/g, ''),
 						jobForms: $('input[name="jobForm"]:checked').map(function () {
 							return {
 								form: $(this).val()
@@ -1086,7 +1086,8 @@
 								acquisitionDate: $(this).find('.acquisition-date').val()
 							};
 						}).get(),
-						introduce: $('#selfIntroTextarea').val()
+						introduce: $('#selfIntroTextarea').val(),
+						files: uploadedFiles
 					};
 
 					console.log('저장할 데이터:', formData);

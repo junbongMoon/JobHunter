@@ -14,6 +14,7 @@ import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
+import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 
@@ -81,6 +82,14 @@ public class ResumeServiceImpl implements ResumeService {
 			for (LicenseDTO license : resumeDTO.getLicenses()) {
 				license.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertLicense(license);
+			}
+		}
+
+		// 파일 저장
+		if (resumeDTO.getFiles() != null && !resumeDTO.getFiles().isEmpty()) {
+			for (ResumeUpfileDTO upfile : resumeDTO.getFiles()) {
+				upfile.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertResumeUpfile(upfile);
 			}
 		}
 	}

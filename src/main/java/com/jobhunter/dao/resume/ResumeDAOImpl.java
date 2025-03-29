@@ -15,6 +15,7 @@ import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
+import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 
@@ -98,6 +99,11 @@ public class ResumeDAOImpl implements ResumeDAO {
 	@Override
 	public void insertLicense(LicenseDTO licenseDTO) throws Exception {
 		ses.insert(NS + ".insertLicense", licenseDTO);
+	}
+	
+	@Override
+	public void insertResumeUpfile(ResumeUpfileDTO resumeUpfileDTO) throws Exception {
+		ses.insert(NS + ".insertResumeUpfile", resumeUpfileDTO);
 	}
 	
 	
