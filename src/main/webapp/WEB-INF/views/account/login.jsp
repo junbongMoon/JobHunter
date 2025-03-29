@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!-- 헤더 -->
 <jsp:include page="../header.jsp" />
@@ -64,7 +64,6 @@
 </main>
 
 <script>
-
 const firebaseConfig = {
     apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
     authDomain: "jobhunter-672dd.firebaseapp.com",
@@ -74,23 +73,19 @@ const firebaseConfig = {
     appId: "1:686284302067:web:30c6bc60e91aeea963b986",
     measurementId: "G-RHVS9BGBQ7"
 };
-
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 let confirmationResult = null;
-
 // JS에서 enum타입처럼 쓰는거
 const METHOD = {
   EMAIL: "email",
   PHONE: "phone"
 };
-
 // 국제번호로 변환 (Firebase 용)
 function formatPhoneNumberForFirebase(koreanNumber) {
   const cleaned = koreanNumber.replace(/-/g, '');
   return cleaned.startsWith('0') ? '+82' + cleaned.substring(1) : cleaned;
 }
-
 // 국제번호를 한국 형식으로 되돌림 (서버 전송용)
 function formatToKoreanPhoneNumber(internationalNumber) {
   return internationalNumber.startsWith("+82")
@@ -111,23 +106,26 @@ async function sendEmailVerification(email) {
     });
 }
 
-function resetRecaptcha() {
-  if (window.recaptchaVerifier) {
-    window.recaptchaVerifier.clear(); // 기존 캡차 해제
-    delete window.recaptchaVerifier;
-  }
+//캡챠기능 파이어베이스 기본 제공 (1회용이라 초기화)
+function firebaseCaptcha() {
+    // firebase에서 해줌
+    if (window.recaptchaVerifier) {
+      window.recaptchaVerifier.clear(); // 기존 캡차 해제
+      delete window.recaptchaVerifier;
+    }
+    // 캡챠기능 파이어베이스 기본 제공
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+          size: 'invisible',
+          callback: () => {}
+        });
+    }
 }
+
 // 전화번호 인증 코드 전송
 async function sendPhoneVerification(phoneNumber) {
-// firebase에서 해줌
-resetRecaptcha();
-// 캡챠기능 파이어베이스 기본 제공
-if (!window.recaptchaVerifier) {
-	window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-		  size: 'invisible',
-		  callback: () => {}
-		});
-}
+    // firebase에서 해줌
+    firebaseCaptcha() 
 
     try {
     	confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
