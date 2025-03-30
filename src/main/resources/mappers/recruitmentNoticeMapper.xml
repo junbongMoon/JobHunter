@@ -42,8 +42,8 @@
 	
 	</insert>
 
-	<select id="selectMostRecentRecruitmentnoticeByrefCompany">
-		select * from recruitmentnotice where refCompany = #{companyUid} order by uid
+	<select id="selectMostRecentRecruitmentnoticeByrefCompany" resultType="int">
+		select r.uid from recruitmentnotice r where refCompany = #{companyUid} order by uid
 		desc limit 1;
 	</select>
 </mapper>

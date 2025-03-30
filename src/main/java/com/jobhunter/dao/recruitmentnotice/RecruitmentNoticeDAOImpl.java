@@ -51,7 +51,7 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 
 	// 가장 최근에 올린 공고를 조회하는 메서드
 	@Override
-	public RecruitmentNotice selectRecentRecruitment(int companyUid) {
+	public int selectRecentRecruitment(int companyUid) {
 		
 		return ses.selectOne(NS +".selectMostRecentRecruitmentnoticeByrefCompany", companyUid);
 	}

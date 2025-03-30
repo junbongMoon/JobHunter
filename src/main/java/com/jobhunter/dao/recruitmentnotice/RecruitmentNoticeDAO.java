@@ -18,7 +18,7 @@ public interface RecruitmentNoticeDAO {
 	
 	int insertApplicationWithRecruitmentNotice(ApplicationDTO applicationDTO) throws Exception;
 
-	RecruitmentNotice selectRecentRecruitment(int companyUid);
+	int selectRecentRecruitment(int companyUid);
 
 	int insertRecruitmentFile(RecruitmentnoticeBoardUpfiles file) throws Exception;
 

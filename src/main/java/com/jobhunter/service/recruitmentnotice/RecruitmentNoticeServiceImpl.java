@@ -44,8 +44,8 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 			// 여러가지 값을 가질 수 있는 것도 저장 해야함 트랜잭션으로 묶어서 공고를 선입력하고 그 uid값을 참조하는 것으로 insert하자
 			// 여기서 가장 최근 공고를 조회하는 메서드로 방금 올린 유저의 공고를 가져오자
-			RecruitmentNotice rec = recdao.selectRecentRecruitment(CompanyUid);
-			recNo = rec.getUid();
+			 
+			recNo = recdao.selectRecentRecruitment(CompanyUid);
 
 			// 파일 아직 대기중
 
