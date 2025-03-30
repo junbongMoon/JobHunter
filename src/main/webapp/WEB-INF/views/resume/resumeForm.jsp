@@ -34,18 +34,20 @@
 						<div class="card-body">
 							<div class="row g-3">
 								<div class="col-md-4">
-									<label class="form-label">이름</label> <input type="text" class="form-control"
-										value="임시 사용자" readonly />
+									<label class="form-label">이름</label>
+									<input type="text" class="form-control" value="${account.accountName}" readonly />
 								</div>
 								<div class="col-md-4">
-									<label class="form-label">이메일</label> <input type="email" class="form-control"
-										value="test@example.com" readonly />
+									<label class="form-label">이메일</label>
+									<input type="email" class="form-control" value="${account.email}" readonly />
 								</div>
 								<div class="col-md-4">
-									<label class="form-label">연락처</label> <input type="tel" class="form-control"
-										value="010-0000-0000" readonly />
+									<label class="form-label">연락처</label>
+									<input type="tel" class="form-control" value="${account.mobile}" readonly />
 								</div>
-							</div>
+								<!-- userUid -->
+								<input type="hidden" id="userUid" name="userUid" value="${account.uid}" />
+							</div> 
 						</div>
 					</div>
 
@@ -1033,7 +1035,8 @@
 							};
 						}).get(),
 						introduce: $('#selfIntroTextarea').val(),
-						files: uploadedFiles
+						files: uploadedFiles,
+						userUid: $('#userUid').val()
 					};
 
 					console.log('저장할 데이터:', formData);
@@ -1088,7 +1091,8 @@
 							};
 						}).get(),
 						introduce: $('#selfIntroTextarea').val(),
-						files: uploadedFiles
+						files: uploadedFiles,
+						userUid: $('#userUid').val()
 					};
 
 					console.log('저장할 데이터:', formData);

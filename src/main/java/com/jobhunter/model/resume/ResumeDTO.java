@@ -23,7 +23,7 @@ public class ResumeDTO {
 	private int pay;
 	private String introduce;
 	private String saveType;
-	private int userUid = 1;
+	private int userUid;
 	
 	// 고용 형태 리스트
     private List<JobFormDTO> jobForms;
