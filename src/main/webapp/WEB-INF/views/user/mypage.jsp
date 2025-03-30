@@ -445,7 +445,8 @@
 
   <div id="mypageContainer">
     <div class="sections-grid">
-      <!-- 👤 기본 정보 -->
+
+      <!-- 기본 정보 -->
       <section data-aos="fade-up" data-aos-delay="100">
         <div class="section-title">
           <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
@@ -471,7 +472,7 @@
         </div>
       </section>
 
-      <!-- 📄 이력서 영역 -->
+      <!-- 이력서 영역 -->
       <section data-aos="fade-up" data-aos-delay="200">
         <div class="section-title">
           <h2><i class="bi bi-file-earmark-text section-icon"></i>내 이력서</h2>
@@ -482,7 +483,7 @@
         </div>
       </section>
 
-      <!-- 📝 리뷰 영역 -->
+      <!-- 리뷰 영역 -->
       <section data-aos="fade-up" data-aos-delay="300">
         <div class="section-title">
           <h2><i class="bi bi-star section-icon"></i>내가 작성한 리뷰</h2>
@@ -493,7 +494,7 @@
         </div>
       </section>
 
-      <!-- ❤️ 관심 공고 -->
+      <!-- 관심 공고 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
           <h2><i class="bi bi-heart section-icon"></i>관심 공고 목록</h2>
@@ -599,7 +600,7 @@
       payText = userInfo.payType + ' ' + userInfo.pay + '원';
     }
 
-    let introduceSection = '자기소개를 입력해 주세요';
+    let introduceSection = '자기소개가 아직 없습니다.';
     if (userInfo.introduce) {
       introduceSection = userInfo.introduce;
     }
@@ -742,7 +743,6 @@
           <button id="passwordBtn" class="btn-confirm">확인</button>
           </div>
       </div>
-      <input type="hidden" id="uid" value="${sessionScope.account.uid}">
     `;
     
     modalButtons.innerHTML = `
@@ -860,7 +860,7 @@
       return;
     }
   
-    const uid = document.getElementById('uid').value;
+    const uid = "${sessionScope.account.uid}";
   
     $.ajax({
       url: "/user/password",
@@ -917,13 +917,14 @@
   }
 
   function successModal() {
+    getInfo()
     const modalBody = document.querySelector('.modal-body');
     const modalButtons = document.querySelector('.modal-buttons');
       modalBody.innerHTML = `
         <h2>변경 완료!</h2>
       `;
       modalButtons.innerHTML = `
-      <button onclick="closeModal()" class="btn-cancel">확인</button>
+      <button onclick="closeModal()" class="btn-confirm">확인</button>
     `;
   }
   
@@ -940,7 +941,6 @@
           <label>새 비밀번호 확인</label>
           <input type="password" id="checkPassword" placeholder="새 비밀번호를 다시 입력하세요">
       </div>
-      <input type="hidden" id="uid" value="${sessionScope.account.uid}">
     `;
     
     modalButtons.innerHTML = `
@@ -1001,352 +1001,66 @@
     `;
   }
 
-  async function startVerifiPhonePne() {
-    const rawPhone = document.getElementById('changeMobile').value;
-    if (!rawPhone) {
-      alert('새 전화번호를 입력해주세요.');
-      return;
-    }
-    document.getElementById('authMobile').value = rawPhone;
-  
-    // firebase 국제번호형식으로 받아서 바꾸는용도
-    const phoneNumber = formatPhoneNumberForFirebase(rawPhone);
-  
-    firebaseCaptcha()
-    try {
-        confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-          alert("인증 코드가 전송되었습니다.");
-      } catch (error) {
-          console.error("전화번호 인증 실패:", error);
-          alert("전화번호 인증 중 오류 발생.");
-      }
-  }
-  async function endVerifiPneMobile() {
-    const mobileCode = document.getElementById('pneToPhoneCode').value
-    try {
-      await confirmationResult.confirm(mobileCode); // 코드 틀렸으면 여기서  catch로 넘어감감
-  
-      const uid = document.getElementById("uid").value;
-      const intlPhone = document.getElementById("authMobile").value;
-      const value = formatToKoreanPhoneNumber(intlPhone);
-  
-      const dto = {
-        type: "mobile",
-        value,
-        uid
-      };
-  
-      $.ajax({
-        url: "/user/contact",
-        method: "patch",
-        contentType: "application/json",
-        data: JSON.stringify(dto),
-        success: (val) => {
-          alert("전화번호가 변경되었습니다.");
-          document.getElementById("nowMobile").innerText = `\${val}`;
-          document.getElementById("changeMobile").value = "";
-          document.getElementById("pneToPhoneCode").value = "";
-          document.getElementById("authMobile").value = "";
-        },
-        error: (xhr) => {
-        alert("인증 처리 중 오류가 발생했습니다.");
-        console.error(xhr.responseText);
-        }
-      });
-  
-    } catch (error) {
-      console.error("코드 인증 실패:", error);
-      alert("잘못된 인증 코드입니다.");
-    }
-  
-  }
-  async function startVerifiEmailPne() {
-  
-  const email = document.getElementById('changeEmail').value;
-
-  document.getElementById('authEmail').value = email;
-
-  $.ajax({
-    url: "/account/auth/email",
-    method: "POST",
-    contentType: "application/json",
-    data: JSON.stringify({email}),
-    async: false,
-    success: (res) => {alert("메일 전송 성공: " + res)},
-    error: (xhr) => {alert("메일 전송 중 오류 발생: " + xhr.responseText)}
-  });
-
-}
-  async function endVerifiPneEmail() {
-    const email = document.getElementById("authEmail").value;
-
-        const emailCode = document.getElementById('pneToEmailCode').value
-
-    $.ajax({
-        url: `/account/auth/email/${emailCode}`,
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({ email: email }),
-        async: false,
-        success: () => {
-          const uid = document.getElementById("uid").value;
-
-          const dto = {
-            type: "email",
-            email,
-            uid
-          };
-
-          $.ajax({
-            url: "/user/contact",
-            method: "patch",
-            contentType: "application/json",
-            data: JSON.stringify(dto),
-            success: (val) => {
-              alert("이메일이 변경되었습니다.");
-              document.getElementById("nowEmail").innerText = `\${val}`;
-              document.getElementById("changeEmail").value = "";
-              document.getElementById("pneToEmailCode").value = "";
-              document.getElementById("authEmail").value = "";
-            },
-            error: (xhr) => {
-            alert("인증 처리 중 오류가 발생했습니다.");
-            console.error(xhr.responseText);
-            }
-          });
-        },
-        error: (xhr) =>{alert("이메일 인증 실패: " + xhr.responseText)}
-      });
-    
-}
-
-  </script>
-<!--
-<script>
-
-  $(() => {
-    getInfo()
-
-    $(document).on('click', '#passwordBtn', () => {
-      checkPassword()
-    });
-
-    $(document).on('click', '#startMobileVerifiBtn', () => {
-      startVerifiPhonePwd()
-    });
-    $(document).on('click', '#startEmailVerifiBtn', () => {
-      startVerifiEmailPwd()
-    });
-    $(document).on('click', '#endVerifiPwdToPhoneBtn', () => {
-      endVerifiPwdMobile()
-    });
-    $(document).on('click', '#endVerifiPwdToEmailBtn', () => {
-      endVerifiPwdEmail()
-    });
-    $(document).on('click', '#changeMobileStartVerifiBtn', () => {
-      startVerifiPhonePne()
-    });
-    $(document).on('click', '#changeEmailStartVerifiBtn', () => {
-      startVerifiEmailPne()
-    });
-    $(document).on('click', '#changeMobileEndVerifiBtn', () => {
-      endVerifiPneMobile()
-    });
-    $(document).on('click', '#changeEmailEndVerifiBtn', () => {
-      endVerifiPneEmail()
-    });
-  })
-
-  async function startVerifiPhonePne() {
-    const rawPhone = document.getElementById('changeMobile').value;
-    if (!rawPhone) {
-      alert('새 전화번호를 입력해주세요.');
-      return;
-    }
-
-    document.getElementById('authMobile').value = rawPhone;
-    const phoneNumber = formatPhoneNumberForFirebase(rawPhone);
-
-    firebaseCaptcha();
-    try {
-      confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-      document.getElementById('phoneInputGroup').style.display = 'none';
-      document.getElementById('phoneVerificationGroup').style.display = 'block';
-      document.getElementById('displayMobile').value = rawPhone;
-      alert("인증번호가 전송되었습니다.");
-    } catch (error) {
-      console.error("전화번호 인증 실패:", error);
-      alert("전화번호 인증 중 오류 발생.");
-    }
-  }
-  async function endVerifiPneMobile() {
-    const mobileCode = document.getElementById('pneToPhoneCode').value;
-    if (!mobileCode) {
-      alert('인증번호를 입력해주세요.');
-      return;
-    }
-
-    try {
-      await confirmationResult.confirm(mobileCode);
-      const uid = document.getElementById("uid").value;
-      const intlPhone = document.getElementById("authMobile").value;
-      const value = formatToKoreanPhoneNumber(intlPhone);
-
-      const dto = {
-        type: "mobile",
-        value,
-        uid
-      };
-
-      $.ajax({
-        url: "/user/contact",
-        method: "patch",
-        contentType: "application/json",
-        data: JSON.stringify(dto),
-        success: (val) => {
-          const modalBody = document.querySelector('.modal-body');
-          modalBody.innerHTML = `
-            <div class="form-group">
-              <div style="text-align: center; padding: 20px;">
-                <i class="bi bi-check-circle-fill" style="color: #47b2e4; font-size: 48px;"></i>
-                <h3 style="margin: 20px 0;">전화번호가 성공적으로 변경되었습니다.</h3>
-                <p>새 전화번호: ${val}</p>
-              </div>
-            </div>
-          `;
-          const modalButtons = document.querySelector('.modal-buttons');
-          modalButtons.innerHTML = `
-            <button onclick="closeModal()" class="btn-confirm">확인</button>
-          `;
-        },
-        error: (xhr) => {
-          alert("전화번호 변경 중 오류가 발생했습니다.");
-          console.error(xhr.responseText);
-        }
-      });
-    } catch (error) {
-      console.error("코드 인증 실패:", error);
-      alert("잘못된 인증 코드입니다.");
-      showPhoneVerification(); // 인증 실패 시 다시 입력 폼으로
-    }
-  }
-
-  async function startVerifiEmailPne() {
-    const email = document.getElementById('changeEmail').value;
-    if (!email) {
-      alert('새 이메일을 입력해주세요.');
-      return;
-    }
-
-    document.getElementById('authEmail').value = email;
-
-    $.ajax({
-      url: "/account/auth/email",
-      method: "POST",
-      contentType: "application/json",
-      data: JSON.stringify({ email }),
-      success: (res) => {
-        document.getElementById('emailInputGroup').style.display = 'none';
-        document.getElementById('emailVerificationGroup').style.display = 'block';
-        document.getElementById('displayEmail').value = email;
-        alert("인증번호가 전송되었습니다.");
-      },
-      error: (xhr) => {
-        alert("메일 전송 중 오류 발생: " + xhr.responseText);
-      }
-    });
-  }
-
-  async function endVerifiPneEmail() {
-    const email = document.getElementById("authEmail").value;
-    const emailCode = document.getElementById('pneToEmailCode').value;
-
-    if (!emailCode) {
-      alert('인증번호를 입력해주세요.');
-      return;
-    }
-
-    try {
-      // 이메일 인증 코드 확인
-      const response = await $.ajax({
-        url: `/account/auth/email/${emailCode}`,
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({ email: email })
-      });
-
-      if (response === true) {
-        // 이메일 변경 API 호출
-        const uid = document.getElementById("uid").value;
-        const dto = {
-          type: "email",
-          email: email,
-          uid: uid
-        };
-
-        $.ajax({
-          url: "/user/contact",
-          method: "patch",
-          contentType: "application/json",
-          data: JSON.stringify(dto),
-          success: (val) => {
-            const modalBody = document.querySelector('.modal-body');
-            modalBody.innerHTML = `
-              <div class="form-group">
-                <div style="text-align: center; padding: 20px;">
-                  <i class="bi bi-check-circle-fill" style="color: #47b2e4; font-size: 48px;"></i>
-                  <h3 style="margin: 20px 0;">이메일이 성공적으로 변경되었습니다.</h3>
-                  <p>새 이메일: ${val}</p>
-                </div>
-              </div>
-            `;
-            const modalButtons = document.querySelector('.modal-buttons');
-            modalButtons.innerHTML = `
-              <button onclick="closeModal()" class="btn-confirm">확인</button>
-            `;
-          },
-          error: (xhr) => {
-            alert("이메일 변경 중 오류가 발생했습니다.");
-            console.error(xhr.responseText);
-          }
-        });
-      } else {
-        alert("잘못된 인증 코드입니다.");
-      }
-    } catch (error) {
-      console.error("이메일 인증 실패:", error);
-      alert("이메일 인증에 실패했습니다. 다시 시도해주세요.");
-      showEmailVerification(); // 인증 실패 시 다시 입력 폼으로
-    }
-  }
-
-  function viewChangePassword() {
-    document.getElementById("changePwdTap").style.display = "block";
-  }
-
   function openContactModal() {
     const modal = document.getElementById('basicModal');
     const modalTitle = modal.querySelector('.modal-title');
     const modalBody = modal.querySelector('.modal-body');
     const modalButtons = modal.querySelector('.modal-buttons');
+
+    const mobile = "${sessionScope.account.mobile}";
+    const email = "${sessionScope.account.email}";
+
+    let mobileText = "연결된 연락처가 없습니다.";
+    if (mobile) {
+      mobileText = mobile;
+    }
+    
+    let emailText = "연결된 연락처가 없습니다.";
+    if (email) {
+      emailText = email;
+    }
     
     modalTitle.textContent = '연락처 수정';
     modalBody.innerHTML = `
       <div class="form-group">
-          <label>인증 방법 선택</label>
+          <label>수정할 연락처</label>
           <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div id="phoneInputGroup">
               <div class="verification-option">
-                  <button onclick="showPhoneVerification()" class="btn-edit">
-                      <i class="bi bi-telephone"></i> 전화번호 인증
-                  </button>
-                  <div class="contact-info">${sessionScope.account.mobile}</div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <input type="text" id="changeMobile" placeholder="변경할 전화번호를 입력해 주세요" style="flex: 1;">
+                  <button id="changeMobileStartVerifiBtn" class="btn-confirm">확인</button>
+                </div>
               </div>
+            </div>
+
+            <div id="phoneVerificationGroup" style="display: none;">
               <div class="verification-option">
-                  <button onclick="showEmailVerification()" class="btn-edit">
-                      <i class="bi bi-envelope"></i> 이메일 인증
-                  </button>
-                  <div class="contact-info">${sessionScope.account.email}</div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <input type="text" id="pneToPhoneCode" placeholder="인증번호를 입력해 주세요" style="flex: 1;">
+                  <button id="changeMobileEndVerifiBtn" class="btn-confirm">인증완료</button>
+                </div>
               </div>
+            </div>
+
+            <div id="emailInputGroup">
+              <div class="verification-option">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <input type="text" id="changeEmail" placeholder="변경할 이메일을 입력해 주세요" style="flex: 1;">
+                  <button id="changeEmailStartVerifiBtn" class="btn-confirm">확인</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="emailVerificationGroup" style="display: none;">
+              <div class="verification-option">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <input type="text" id="pneToEmailCode" placeholder="인증번호를 입력해 주세요" style="flex: 1;">
+                  <button id="changeEmailEndVerifiBtn" class="btn-confirm">인증완료</button>
+                </div>
+              </div>
+            </div>
+
           </div>
       </div>
       <div id="verificationContent" style="display: none;"></div>
@@ -1360,71 +1074,120 @@
     document.getElementById('basicModalOverlay').style.display = 'block';
   }
 
-  function showPhoneVerification() {
-    const verificationContent = document.getElementById('verificationContent');
-    verificationContent.innerHTML = `
-      <div class="form-group" id="phoneInputGroup">
-          <label>현재 전화번호</label>
-          <input type="text" id="nowMobile" value="${sessionScope.account.mobile}" readonly>
-          <div class="form-group">
-              <label>새 전화번호</label>
-              <div class="verification-group">
-                  <input type="text" id="changeMobile" placeholder="새 전화번호를 입력하세요">
-                  <button onclick="startVerifiPhonePne()" class="btn-confirm">인증번호 전송</button>
-              </div>
-          </div>
-      </div>
-      <div class="form-group" id="phoneVerificationGroup" style="display: none;">
-          <label>현재 전화번호</label>
-          <input type="text" id="nowMobile" value="${sessionScope.account.mobile}" readonly>
-          <div class="form-group">
-              <label>새 전화번호</label>
-              <input type="text" id="displayMobile" readonly>
-          </div>
-          <div class="verification-group">
-              <input type="text" id="pneToPhoneCode" placeholder="인증번호 입력">
-              <button onclick="endVerifiPneMobile()" class="btn-confirm">인증 완료</button>
-          </div>
-      </div>
-      <input type="hidden" id="uid" value="${sessionScope.account.uid}">
-      <input type="hidden" id="authMobile" value="">
-    `;
-    verificationContent.style.display = 'block';
+  async function startVerifiPhonePne() {
+    console.log("전화번호");
+    const rawPhone = document.getElementById('changeMobile').value;
+    if (!rawPhone) {
+      alert('새 전화번호를 입력해주세요.');
+      return;
+    }
+    // firebase 국제번호형식으로 받아서 바꾸는용도
+    const phoneNumber = formatPhoneNumberForFirebase(rawPhone);
+  
+    firebaseCaptcha()
+    try {
+        confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
+          alert("인증 코드가 전송되었습니다.");
+          document.getElementById('phoneInputGroup').style.display = 'none';
+          document.getElementById('phoneVerificationGroup').style.display = 'block';
+      } catch (error) {
+          console.error("전화번호 인증 실패:", error);
+          alert("전화번호 인증 중 오류 발생.");
+      }
   }
+  async function startVerifiEmailPne() {
+  
+    const email = document.getElementById('changeEmail').value;
 
-  function showEmailVerification() {
-    const verificationContent = document.getElementById('verificationContent');
-    verificationContent.innerHTML = `
-      <div class="form-group" id="emailInputGroup">
-          <label>현재 이메일</label>
-          <input type="email" id="nowEmail" value="${sessionScope.account.email}" readonly>
-          <div class="form-group">
-              <label>새 이메일</label>
-              <div class="verification-group">
-                  <input type="email" id="changeEmail" placeholder="새 이메일을 입력하세요">
-                  <button onclick="startVerifiEmailPne()" class="btn-confirm">인증번호 전송</button>
-              </div>
-          </div>
-      </div>
-      <div class="form-group" id="emailVerificationGroup" style="display: none;">
-          <label>현재 이메일</label>
-          <input type="email" id="nowEmail" value="${sessionScope.account.email}" readonly>
-          <div class="form-group">
-              <label>새 이메일</label>
-              <input type="email" id="displayEmail" readonly>
-          </div>
-          <div class="verification-group">
-              <input type="text" id="pneToEmailCode" placeholder="인증번호 입력">
-              <button onclick="endVerifiPneEmail()" class="btn-confirm">인증 완료</button>
-          </div>
-      </div>
-      <input type="hidden" id="uid" value="${sessionScope.account.uid}">
-      <input type="hidden" id="authEmail" value="">
-    `;
-    verificationContent.style.display = 'block';
+    $.ajax({
+      url: "/account/auth/email",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({email}),
+      async: false,
+      success: (res) => {
+        alert("메일 전송 성공: " + res)
+        document.getElementById('emailInputGroup').style.display = 'none';
+        document.getElementById('emailVerificationGroup').style.display = 'block';
+      },
+      error: (xhr) => {alert("메일 전송 중 오류 발생: " + xhr.responseText)}
+    });
+
   }
+  async function endVerifiPneMobile() {
+    const mobileCode = document.getElementById('pneToPhoneCode').value
 
-</script>
--->
+    console.log(mobileCode);
+    try {
+      await confirmationResult.confirm(mobileCode); // 코드 틀렸으면 여기서  catch로 넘어감감
+  
+      const uid = "${sessionScope.account.uid}";
+      const mobile = document.getElementById("changeMobile").value;
+  
+      const dto = {
+        type: "mobile",
+        value: mobile,
+        uid
+      };
+  
+      $.ajax({
+        url: "/user/contact",
+        method: "patch",
+        contentType: "application/json",
+        data: JSON.stringify(dto),
+        success: (val) => {
+          successModal();
+        },
+        error: (xhr) => {
+        alert("인증 처리 중 오류가 발생했습니다.");
+        console.error(xhr.responseText);
+        }
+      });
+  
+    } catch (error) {
+      console.error("코드 인증 실패:", error);
+      alert("잘못된 인증 코드입니다.");
+    }
+  
+  }
+  async function endVerifiPneEmail() {
+    const email = document.getElementById('changeEmail').value;
+    const emailCode = document.getElementById('pneToEmailCode').value
+    const uid = "${sessionScope.account.uid}"
+    $.ajax({
+        url: `/account/auth/email/\${emailCode}`,
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ email: email }),
+        async: false,
+        success: () => {
+          
+
+          const dto = {
+  type: "email",
+  value: email,
+  uid
+};
+
+          $.ajax({
+            url: "/user/contact",
+            method: "patch",
+            contentType: "application/json",
+            data: JSON.stringify(dto),
+            success: (val) => {
+              successModal();
+            },
+            error: (xhr) => {
+            alert("인증 처리 중 오류가 발생했습니다.");
+            console.error(xhr.responseText);
+            }
+          });
+        },
+        error: (xhr) =>{alert("이메일 인증 실패: " + xhr.responseText)}
+      });
+    
+}
+
+  </script>
 <!-- 풋터 -->
 <jsp:include page="/WEB-INF/views/footer.jsp"></jsp:include>
