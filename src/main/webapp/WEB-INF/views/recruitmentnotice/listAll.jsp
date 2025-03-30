@@ -11,7 +11,7 @@
 		<div class="container" data-aos="fade-up" data-aos-delay="100">
 
 			<div class="row gy-4">
-
+				<div>${boardList} </div>
 				<div class="col-lg-6">
 					<!--col-lg-6 가 카드 하나 -->
 					<article>
