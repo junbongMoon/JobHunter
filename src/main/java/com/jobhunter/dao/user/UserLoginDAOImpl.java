@@ -78,4 +78,9 @@ public class UserLoginDAOImpl implements AccountLoginDAO {
 		ses.update(NS + ".setAutoLogin", loginDto);
 	}
 
+	@Override
+	public void setLoginTime(LoginDTO loginDto) throws Exception {
+		ses.update(NS + ".setLastLoginDate", loginDto);
+	}
+
 }

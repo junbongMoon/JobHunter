@@ -94,9 +94,13 @@ public class AccountServiceImpl implements AccountService {
 
 		boolean requiresVerification = "Y".equals(account.getRequiresVerification());
 		
-		// 자동로그인
-		if (!requiresVerification && loginDto.getAutoLogin() != null) {
-			dao.setAutoLogin(loginDto);
+		if (!requiresVerification) { // 로그인 성공
+			// 마지막 로그인일자 갱신
+			dao.setLoginTime(loginDto);
+			
+			if (loginDto.getAutoLogin() != null) { // 자동로그인
+				dao.setAutoLogin(loginDto);
+			}
 		}
 		
 		// 결과 정리

@@ -27,4 +27,6 @@ public interface AccountLoginDAO {
 
 	void setAutoLogin(LoginDTO loginDto) throws Exception;
 
+	void setLoginTime(LoginDTO loginDto) throws Exception;
+
 }

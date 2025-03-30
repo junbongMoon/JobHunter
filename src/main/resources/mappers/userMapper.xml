@@ -39,6 +39,13 @@
 		password = sha1(md5(#{password}))
 	</select>
 	
+	<update id="setLastLoginDate">
+	    UPDATE users
+	    SET lastLoginDate = NOW()
+	    where userId = #{id} and
+		password = sha1(md5(#{password}))
+	</update>
+	
 	<update id="setAutoLogin">
 		UPDATE users SET autoLogin = #{autoLogin} 
 		where userId = #{id} and

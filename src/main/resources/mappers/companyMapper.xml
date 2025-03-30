@@ -34,6 +34,13 @@
         where companyId = #{id} and password = sha1(md5(#{password}))
     </select>
     
+    <update id="setLastLoginDate">
+	    UPDATE company
+	    SET lastLoginDate = NOW()
+	    where userId = #{id} and
+		password = sha1(md5(#{password}))
+	</update>
+    
     <update id="setAutoLogin">
 		UPDATE company SET autoLogin = #{autoLogin} 
 		where userId = #{id} and
