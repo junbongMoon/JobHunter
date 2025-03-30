@@ -25,4 +25,6 @@ public interface AccountLoginDAO {
 
 	AccountVO getAccountByUid(int uid) throws Exception;
 
+	void setAutoLogin(LoginDTO loginDto) throws Exception;
+
 }

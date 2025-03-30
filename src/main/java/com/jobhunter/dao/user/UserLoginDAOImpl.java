@@ -73,5 +73,9 @@ public class UserLoginDAOImpl implements AccountLoginDAO {
 		return ses.selectOne(NS + ".getAccountByUid", uid);
 	}
 
+	@Override
+	public void setAutoLogin(LoginDTO loginDto) throws Exception {
+		ses.update(NS + ".setAutoLogin", loginDto);
+	}
 
 }

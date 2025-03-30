@@ -70,6 +70,10 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 	public AccountVO getAccountByUid(int uid) throws Exception {
 		return ses.selectOne(NS + ".getAccountByUid", uid);
 	}
-
+	
+	@Override
+	public void setAutoLogin(LoginDTO loginDto) throws Exception {
+		ses.update(NS + ".setAutoLogin", loginDto);
+	}
 
 }

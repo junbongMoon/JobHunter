@@ -2,7 +2,9 @@ package com.jobhunter.controller.account;
 
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.service.account.AccountService;
 import com.jobhunter.util.RedirectUtil;
 
@@ -76,10 +79,14 @@ public class AccountController {
 
 	// 실제 로그인
 	@PostMapping("/login")
-	public String login(@ModelAttribute LoginDTO loginDto, HttpSession session) {
+	public String login(@ModelAttribute LoginDTO loginDto, HttpSession session, HttpServletResponse response) {
 
 		System.out.println(loginDto);
 
+		String sessionId = session.getId();
+		if (loginDto.getAutoLogin() != null && loginDto.getAutoLogin().equals("on")) {
+			loginDto.setAutoLogin(sessionId);
+		}
 		// auth로그인인터셉터에서 쿼리스트링에 requireVerification=true 식으로 인증필요여부 들고옴
 		// auth로그인인터셉터에서 이전페이지나 가려던 페이지(get방식만) uri+쿼리 세션에 넣어둠
 		Map<String, Object> result = null;
@@ -96,6 +103,7 @@ public class AccountController {
 			// 그거 꺼내기
 
 			if (Boolean.TRUE.equals(success)) { // 로그인까지 성공했으면 세션에 바인딩
+
 				session.setAttribute("account", account);
 
 				if (Boolean.TRUE.equals(auth)) { // 로그인은 했는데 인증이 필요
@@ -107,6 +115,18 @@ public class AccountController {
 				}
 
 				// 진짜진짜 성공했고 인증까지 필요없으면 원래 가려던 페이지로 이동
+
+				if (loginDto.getAutoLogin() != null) {
+
+					String keyName = (loginDto.getAccountType() == AccountType.USER) 
+							? "userAutoLogin"
+							: "companyAutoLogin";
+					Cookie autoLoginCookie = new Cookie(keyName, sessionId);
+					autoLoginCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
+					autoLoginCookie.setPath("/");
+					response.addCookie(autoLoginCookie);
+				}
+
 				String redirectUrl = (String) session.getAttribute("redirectUrl");
 				session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
 				return "redirect:" + (redirectUrl != null ? redirectUrl : "/");

@@ -32,7 +32,7 @@ public class AccountServiceImpl implements AccountService {
 
 	// DAO 선택 (return했으니까 break 굳이 안넣음)
 	private AccountLoginDAO getDAO(AccountType type) {
-	    
+
 		switch (type) {
 		case ADMIN: // 일반유저쪽으로 통합되도록
 		case USER:
@@ -93,7 +93,13 @@ public class AccountServiceImpl implements AccountService {
 		dao.resetFailCount(account.getAccountId());
 
 		boolean requiresVerification = "Y".equals(account.getRequiresVerification());
-
+		
+		// 자동로그인
+		if (!requiresVerification && loginDto.getAutoLogin() != null) {
+			dao.setAutoLogin(loginDto);
+		}
+		
+		// 결과 정리
 		result.put("account", account);
 		result.put("auth", requiresVerification);
 		result.put("success", true);

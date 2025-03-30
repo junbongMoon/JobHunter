@@ -64,6 +64,7 @@
 
 		<interceptor>
 			<mapping path="/user/mypage" />
+			<mapping path="/account/login/return" />
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
 

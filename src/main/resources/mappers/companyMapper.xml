@@ -33,6 +33,12 @@
         from company
         where companyId = #{id} and password = sha1(md5(#{password}))
     </select>
+    
+    <update id="setAutoLogin">
+		UPDATE company SET autoLogin = #{autoLogin} 
+		where userId = #{id} and
+		password = sha1(md5(#{password}))
+	</update>
 
     <select id="existsAccountId" parameterType="String" resultType="boolean">
         SELECT EXISTS (SELECT 1 FROM company WHERE companyId = #{id})

@@ -38,6 +38,12 @@
 		where userId = #{id} and
 		password = sha1(md5(#{password}))
 	</select>
+	
+	<update id="setAutoLogin">
+		UPDATE users SET autoLogin = #{autoLogin} 
+		where userId = #{id} and
+		password = sha1(md5(#{password}))
+	</update>
 
 	<select id="existsAccountId" parameterType="String"
 		resultType="boolean">
