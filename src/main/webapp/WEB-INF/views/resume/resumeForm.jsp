@@ -48,7 +48,7 @@
 								</div>
 								<!-- userUid -->
 								<input type="hidden" id="userUid" name="userUid" value="${account.uid}" />
-							</div> 
+							</div>
 						</div>
 					</div>
 
@@ -393,19 +393,26 @@
 										placeholder="회사명을 입력하세요" maxlength="20">
 								</div>
 
+								<!-- 직위 입력 -->
+								<div class="col-md-6">
+									<label class="form-label">직위<span class="essentialPoint">*</span></label>
+									<input type="text" class="form-control position" name="position"
+										placeholder="직위를 입력하세요" maxlength="45">
+								</div>
+
 								<!-- 근무기간 -->
 								<div class="col-md-4">
 									<label class="form-label">근무기간<span class="essentialPoint">*</span></label>
 									<div class="row g-2">
 										<div class="col-md-4">
-											<input type="date" class="form-control start-date" name="startDate">
+											<input type="date" class="form-control start-date" name="startDate" max="${today}">
 										</div>
 										<div
 											class="col-md-1 text-center d-flex align-items-center justify-content-center">
 											<span>~</span>
 										</div>
 										<div class="col-md-4">
-											<input type="date" class="form-control end-date" name="endDate">
+											<input type="date" class="form-control end-date" name="endDate" max="${today}">
 										</div>
 									</div>
 									<div class="form-check mt-2">
@@ -496,10 +503,11 @@
 							<div id="fileContainer" class="border rounded p-3">
 								<div class="text-center text-muted fileText">
 									여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br>
-									(최대 10MB, 최대 5개 파일)
+									(최대 10MB)
 								</div>
 								<div id="previewContainer" class="mt-3"></div>
 							</div>
+							<small class="text-muted">* 자격증명서, 졸업증명서 등 첨부 가능합니다.</small>
 						</div>
 					</div>
 
@@ -711,6 +719,7 @@
 									let sigunguNo = $(this).val();
 									let sigunguName = $(this).data("name");
 									let currentRegion = $(this).data("region");
+									let regionName = $(".region-item.selected").text().replace("▶", "").trim();
 
 									// 현재 선택된 시/도의 체크박스만 처리
 									if (currentRegion === regionNo) {
@@ -718,7 +727,7 @@
 											// 체크박스가 체크되면 선택된 지역 목록에 추가
 											let $badge = $("<span>")
 												.addClass("badge bg-primary me-2")
-												.text(sigunguName)
+												.text(regionName + " " + sigunguName)
 												.attr("data-region", regionNo); // 시/도 정보 저장
 
 											// 삭제 버튼 생성 및 삭제 기능
@@ -734,7 +743,7 @@
 										} else {
 											// 체크박스가 해제되면 선택된 지역 목록에서 제거
 											selectedRegions.find(".badge").each(function () {
-												if ($(this).text().trim() === sigunguName && $(this).data("region") === regionNo) {
+												if ($(this).text().trim() === regionName + " " + sigunguName && $(this).data("region") === regionNo) {
 													$(this).remove();
 												}
 											});
@@ -1048,6 +1057,7 @@
 							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
 							return {
 								companyName: $(this).find('.company-name').val(),
+								position: $(this).find('.position').val(),
 								jobDescription: $(this).find('.job-description').val(),
 								startDate: $(this).find('.start-date').val(),
 								endDate: isCurrentlyEmployed ? null : $endDate.val()
@@ -1104,6 +1114,7 @@
 							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
 							return {
 								companyName: $(this).find('.company-name').val(),
+								position: $(this).find('.position').val(),
 								jobDescription: $(this).find('.job-description').val(),
 								startDate: $(this).find('.start-date').val(),
 								endDate: isCurrentlyEmployed ? null : $endDate.val()
@@ -1182,6 +1193,7 @@
 							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
 							return {
 								companyName: $(this).find('.company-name').val(),
+								position: $(this).find('.position').val(),
 								jobDescription: $(this).find('.job-description').val(),
 								startDate: $(this).find('.start-date').val(),
 								endDate: isCurrentlyEmployed ? null : $endDate.val()
@@ -1361,7 +1373,6 @@
 				$(document).on('click', '.remove-license', function () {
 					$(this).closest('.license-item').remove();
 				});
-
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 자기소개 입력란 몇글자 썻는지 알 수 있게 하기
 				$('#selfIntroTextarea').on('input', function () {
@@ -1370,35 +1381,54 @@
 					const remainingLength = maxLength - currentLength;
 					$('#charCount').text(currentLength + ' / ' + '1000');
 				});
+
+				// 금액 입력에 숫자외 다른 문자를 입력하면 입력 못하게 하고 모달띄우기 ','는 가능
+				$('#payAmount').on('input', function () {
+					let value = $(this).val();
+
+					// 콤마 제거하고 숫자만 남긴 값 추출
+					let payOnlyNumber = value.replace(/,/g, '');
+
+					// 숫자만 입력되었는지 확인
+					if (!/^\d*$/.test(payOnlyNumber) && value !== '') {
+						showValidationModal("숫자만 입력 가능해요");
+						$(this).val('');
+						return;
+					}
+
+					// 숫자가 맞다면 3자리 콤마 형식으로 변경
+					let result = Number(payOnlyNumber).toLocaleString();
+					$(this).val(result);
+				});
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 파일 업로드 관련 변수
 				let uploadedFiles = [];
 				const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-				const MAX_FILES = 5;
+				const MAX_FILES = 30;
 
 				// 파일 입력 이벤트
-				$('#fileInput').on('change', function(e) {
+				$('#fileInput').on('change', function (e) {
 					handleFiles(e.target.files);
 				});
 
 				// 드래그 앤 드롭 이벤트
-				$('#fileContainer').on('dragenter dragover', function(e) {
+				$('#fileContainer').on('dragenter dragover', function (e) {
 					e.preventDefault();
 					e.stopPropagation();
 					$(this).addClass('border-primary');
 				});
 
-				$('#fileContainer').on('dragleave', function(e) {
+				$('#fileContainer').on('dragleave', function (e) {
 					e.preventDefault();
 					e.stopPropagation();
 					$(this).removeClass('border-primary');
 				});
 
-				$('#fileContainer').on('drop', function(e) {
+				$('#fileContainer').on('drop', function (e) {
 					e.preventDefault();
 					e.stopPropagation();
 					$(this).removeClass('border-primary');
-					
+
 					const files = e.originalEvent.dataTransfer.files;
 					handleFiles(files);
 				});
@@ -1406,7 +1436,7 @@
 				// 파일 처리 함수
 				function handleFiles(files) {
 					if (uploadedFiles.length + files.length > MAX_FILES) {
-						showValidationModal("최대 5개의 파일만 업로드할 수 있습니다.");
+						showValidationModal("최대 30개의 파일만 업로드할 수 있습니다.");
 						return;
 					}
 
@@ -1438,7 +1468,7 @@
 						data: formData,
 						processData: false,
 						contentType: false,
-						success: function(result) {
+						success: function (result) {
 							if (result.success) {
 								uploadedFiles.push({
 									originalFileName: result.originalFileName,
@@ -1452,7 +1482,7 @@
 								showValidationModal(result.message || "파일 업로드에 실패했습니다.");
 							}
 						},
-						error: function() {
+						error: function () {
 							showValidationModal("파일 업로드 중 오류가 발생했습니다.");
 						}
 					});
@@ -1461,17 +1491,17 @@
 				// 파일 미리보기 표시
 				function showFilePreview(fileInfo) {
 					const $previewContainer = $('#previewContainer');
-					
+
 					const $preview = $('<div>')
 						.addClass('file-preview d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded')
 						.attr('data-filename', fileInfo.newFileName);
 
 					// 파일 정보 표시
 					const $fileInfo = $('<div>').addClass('d-flex align-items-center');
-					
+
 					// 파일 아이콘 (확장자에 따라 다르게 표시 가능)
 					const $icon = $('<i>').addClass('bi bi-file-earmark me-2');
-					
+
 					// 파일명과 크기
 					const $details = $('<div>');
 					$details.append($('<div>').text(fileInfo.originalFileName).css('word-break', 'break-all'));
@@ -1484,7 +1514,7 @@
 						.addClass('btn btn-sm btn-danger ms-2')
 						.attr('type', 'button')  // type 속성 추가
 						.html('<i class="bi bi-trash"></i>')
-						.on('click', function(e) {
+						.on('click', function (e) {
 							e.preventDefault();  // 기본 동작 방지
 							e.stopPropagation();  // 이벤트 전파 중단
 							deleteFile(fileInfo.newFileName, $preview);
@@ -1506,7 +1536,7 @@
 							size: 0
 						}),
 						contentType: "application/json",
-						success: function(result) {
+						success: function (result) {
 							if (result.success) {
 								uploadedFiles = uploadedFiles.filter(f => f.newFileName !== fileName);
 								$preview.remove();
@@ -1515,7 +1545,7 @@
 								showValidationModal(result.message || "파일 삭제에 실패했습니다.");
 							}
 						},
-						error: function() {
+						error: function () {
 							showValidationModal("파일 삭제 중 오류가 발생했습니다.");
 						}
 					});

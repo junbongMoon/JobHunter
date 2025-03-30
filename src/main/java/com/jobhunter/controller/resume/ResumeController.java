@@ -3,8 +3,11 @@ package com.jobhunter.controller.resume;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +67,10 @@ public class ResumeController {
 		
 		// 학력 상태 ENUM 목록 추가
 		model.addAttribute("educationStatusList", EducationStatus.values());
+
+		// 현재 날짜를 YYYY-MM-DD 형식으로 추가
+		String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		model.addAttribute("today", today);
 
 		return "resume/resumeForm";
 	}
