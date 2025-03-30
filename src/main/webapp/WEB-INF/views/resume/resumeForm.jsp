@@ -7,6 +7,7 @@
 			<meta charset="UTF-8">
 			<title>이력서 작성</title>
 			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		</head>
 
@@ -488,12 +489,16 @@
 					<div class="card mb-4">
 						<div class="card-header d-flex justify-content-between align-items-center">
 							<span>첨부파일</span>
+							<label for="fileInput" class="btn btn-primary btn-sm mb-0">파일 선택</label>
+							<input type="file" id="fileInput" style="display: none;" multiple>
 						</div>
 						<div class="card-body">
-							<div id="fileContainer">
-								<!-- 첨부파일 항목 -->
-								<div class="text-center text-muted fileText">여기에 첨부파일을
-									넣어주세요.</div>
+							<div id="fileContainer" class="border rounded p-3">
+								<div class="text-center text-muted fileText">
+									여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br>
+									(최대 10MB, 최대 5개 파일)
+								</div>
+								<div id="previewContainer" class="mt-3"></div>
 							</div>
 						</div>
 					</div>
@@ -623,6 +628,26 @@
 				/* 인라인 블록으로 표시 */
 				padding: 0.5rem 0.75rem;
 				/* 뱃지 내부 여백 */
+			}
+
+			#fileContainer {
+				min-height: 150px;
+				transition: all 0.3s ease;
+				position: relative;
+			}
+
+			#fileContainer.border-primary {
+				border-color: #0d6efd !important;
+				background-color: rgba(13, 110, 253, 0.05);
+			}
+
+			.file-preview {
+				border: 1px solid #dee2e6;
+				transition: all 0.2s ease;
+			}
+
+			.file-preview:hover {
+				background-color: #e9ecef !important;
 			}
 		</style>
 
@@ -1305,17 +1330,6 @@
 					$('#historyContainer').append($(clone));
 				});
 
-				// $('#historyContainer').append(clone);
-
-
-				// $('#jobDescription').on('input', function () {
-				// 	const currentLength = $(this).val().length;
-				// 	const maxLength = 100;
-				// 	const remainingLength = maxLength - currentLength;
-				// 	$('#jobDescriptionCount').text(currentLength + ' / ' + '100');
-				// });
-
-
 				// 경력 삭제 버튼 클릭 이벤트
 				$(document).on('click', '.remove-history', function () {
 					$(this).closest('.history-item').remove();
@@ -1357,47 +1371,64 @@
 					$('#charCount').text(currentLength + ' / ' + '1000');
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
-				// 첨부파일 드래그 & 드롭
-				const upfiles = [];         // 실제 드래그한 파일
-				const uploadedFiles = [];   // 서버 업로드 완료된 파일 정보
+				// 파일 업로드 관련 변수
+				let uploadedFiles = [];
+				const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+				const MAX_FILES = 5;
 
-				$('#fileContainer').on('dragenter dragover', function (evt) {
-					evt.preventDefault();
+				// 파일 입력 이벤트
+				$('#fileInput').on('change', function(e) {
+					handleFiles(e.target.files);
 				});
 
-				$('#fileContainer').on('drop', function (evt) {
-					evt.preventDefault();
-					for (let file of evt.originalEvent.dataTransfer.files) {
-						let isDuplicate = false;
+				// 드래그 앤 드롭 이벤트
+				$('#fileContainer').on('dragenter dragover', function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+					$(this).addClass('border-primary');
+				});
 
-						$.each(upfiles, function (index, e) {
-							if (file.name === e.name) {
-								isDuplicate = true;
-								return false; // 반복 중단
-							}
-						});
+				$('#fileContainer').on('dragleave', function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+					$(this).removeClass('border-primary');
+				});
 
-						if (file.size === 0 && file.type === '') {
-							showValidationModal("폴더는 업로드 할 수 없습니다.");
-							return;
-						}
-						if (file.size > 10485760 || isDuplicate) {
-							if (isDuplicate) {
-								showValidationModal("같은 파일이 이미 업로드되었습니다.");
-							} else {
-								showValidationModal("파일 크기가 10MB를 초과합니다.");
-							}
-							return;
-						}
+				$('#fileContainer').on('drop', function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+					$(this).removeClass('border-primary');
+					
+					const files = e.originalEvent.dataTransfer.files;
+					handleFiles(files);
+				});
 
-						// 업로드 처리
-						upfiles.push(file);
-						fileUpload(file);
+				// 파일 처리 함수
+				function handleFiles(files) {
+					if (uploadedFiles.length + files.length > MAX_FILES) {
+						showValidationModal("최대 5개의 파일만 업로드할 수 있습니다.");
+						return;
 					}
-				});
 
-				// AJAX 파일 업로드
-				function fileUpload(file) {
+					Array.from(files).forEach(file => {
+						// 파일 크기 체크
+						if (file.size > MAX_FILE_SIZE) {
+							showValidationModal(`${file.name}의 크기가 10MB를 초과합니다.`);
+							return;
+						}
+
+						// 중복 체크
+						if (uploadedFiles.some(f => f.name === file.name)) {
+							showValidationModal(`${file.name}은(는) 이미 업로드되었습니다.`);
+							return;
+						}
+
+						uploadFile(file);
+					});
+				}
+
+				// 파일 업로드 함수
+				function uploadFile(file) {
 					const formData = new FormData();
 					formData.append("file", file);
 
@@ -1407,114 +1438,106 @@
 						data: formData,
 						processData: false,
 						contentType: false,
-						success: function (result) {
+						success: function(result) {
 							if (result.success) {
-								// 업로드된 파일 정보 저장
 								uploadedFiles.push({
 									originalFileName: result.originalFileName,
 									newFileName: result.newFileName,
 									ext: result.ext,
-									size: result.size,
-									base64Image: result.base64Image
+									size: result.size
 								});
-
-								// 미리보기 출력
-								showPreview(result);
+								showFilePreview(result);
+								updateFileText();
 							} else {
-								showValidationModal(result.message || "파일 업로드 실패");
+								showValidationModal(result.message || "파일 업로드에 실패했습니다.");
 							}
 						},
-						error: function () {
+						error: function() {
 							showValidationModal("파일 업로드 중 오류가 발생했습니다.");
 						}
 					});
 				}
 
-				function showPreview(fileInfo) {
-					const $fileContainer = $('#fileContainer');
-					const $fileText = $fileContainer.find('.fileText');
-
-					// 안내 문구 숨기기 (파일이 하나라도 있으면)
-					if ($fileText.length) {
-						$fileText.hide();
-					}
-
-					// 파일 이름만 출력
+				// 파일 미리보기 표시
+				function showFilePreview(fileInfo) {
+					const $previewContainer = $('#previewContainer');
+					
 					const $preview = $('<div>')
-						.addClass('d-inline-block position-relative m-2')
-						.css({
-							display: 'flex',           // 버튼과 파일 이름을 가로로 배치
-							alignItems: 'center',       // 수직 가운데 정렬
-							justifyContent: 'space-between', // 버튼을 오른쪽으로 밀기
-							padding: '6px 10px',
-							border: '1px solid #ccc',
-							borderRadius: '6px',
-							backgroundColor: '#f8f9fa',
-							maxWidth: '250px',
-							wordBreak: 'break-word',
-							position: 'relative'
-						})
+						.addClass('file-preview d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded')
 						.attr('data-filename', fileInfo.newFileName);
 
-					// 파일 이름 표시
-					const $fileName = $('<span>')
-						.text(fileInfo.originalFileName)
-						.css({
-							overflow: 'hidden',
-							textOverflow: 'ellipsis',
-							whiteSpace: 'nowrap',
-							maxWidth: '180px'
+					// 파일 정보 표시
+					const $fileInfo = $('<div>').addClass('d-flex align-items-center');
+					
+					// 파일 아이콘 (확장자에 따라 다르게 표시 가능)
+					const $icon = $('<i>').addClass('bi bi-file-earmark me-2');
+					
+					// 파일명과 크기
+					const $details = $('<div>');
+					$details.append($('<div>').text(fileInfo.originalFileName).css('word-break', 'break-all'));
+					$details.append($('<small>').addClass('text-muted').text(formatFileSize(fileInfo.size)));
+
+					$fileInfo.append($icon).append($details);
+
+					// 삭제 버튼
+					const $deleteBtn = $('<button>')
+						.addClass('btn btn-sm btn-danger ms-2')
+						.attr('type', 'button')  // type 속성 추가
+						.html('<i class="bi bi-trash"></i>')
+						.on('click', function(e) {
+							e.preventDefault();  // 기본 동작 방지
+							e.stopPropagation();  // 이벤트 전파 중단
+							deleteFile(fileInfo.newFileName, $preview);
 						});
 
-					// 삭제 버튼 추가
-					const $removeBtn = $('<button>')
-						.addClass('btn-close')
-						.attr('aria-label', '삭제')
-						.css({
-							marginLeft: '10px',
-							cursor: 'pointer'
-						})
-						.on('click', function () {
-							// 미리보기 요소 삭제
-							$preview.remove();
-
-							// uploadedFiles 배열에서도 삭제
-							const index = uploadedFiles.findIndex(function (f) {
-								return f.newFileName === fileInfo.newFileName;
-							});
-							if (index !== -1) uploadedFiles.splice(index, 1);
-
-							// 모든 파일이 삭제되면 안내 문구 다시 표시
-							if (uploadedFiles.length === 0) {
-								$fileText.show();
-							}
-						});
-
-					$preview.append($fileName).append($removeBtn);
-					$fileContainer.append($preview);
+					$preview.append($fileInfo).append($deleteBtn);
+					$previewContainer.append($preview);
 				}
 
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// 금액 입력에 숫자외 다른 문자를 입력하면 입력 못하게 하고 모달띄우기 ','는 가능
-				$('#payAmount').on('input', function () {
-					let value = $(this).val();
+				// 파일 삭제 함수
+				function deleteFile(fileName, $preview) {
+					$.ajax({
+						url: "/resume/deleteFile",
+						type: "POST",
+						data: JSON.stringify({
+							originalFileName: fileName,
+							newFileName: fileName,
+							ext: fileName.split('.').pop(),
+							size: 0
+						}),
+						contentType: "application/json",
+						success: function(result) {
+							if (result.success) {
+								uploadedFiles = uploadedFiles.filter(f => f.newFileName !== fileName);
+								$preview.remove();
+								updateFileText();
+							} else {
+								showValidationModal(result.message || "파일 삭제에 실패했습니다.");
+							}
+						},
+						error: function() {
+							showValidationModal("파일 삭제 중 오류가 발생했습니다.");
+						}
+					});
+				}
 
-					// 콤마 제거하고 숫자만 남긴 값 추출
-					let payOnlyNumber = value.replace(/,/g, '');
+				// 파일 크기 포맷팅
+				function formatFileSize(bytes) {
+					if (bytes === 0) return '0 Bytes';
+					const k = 1024;
+					const sizes = ['Bytes', 'KB', 'MB'];
+					const i = Math.floor(Math.log(bytes) / Math.log(k));
+					return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+				}
 
-					// 숫자만 입력되었는지 확인
-					if (!/^\d*$/.test(payOnlyNumber) && value !== '') {
-						showValidationModal("숫자만 입력 가능해요");
-						$(this).val('');
-						return;
+				// 파일 텍스트 업데이트
+				function updateFileText() {
+					const $fileText = $('.fileText');
+					if (uploadedFiles.length > 0) {
+						$fileText.hide();
+					} else {
+						$fileText.show();
 					}
-
-					// 숫자가 맞다면 3자리 콤마 형식으로 변경
-					let result = Number(payOnlyNumber).toLocaleString();
-					$(this).val(result);
-				});
-
-
+				}
 			});
-
 		</script>

@@ -141,7 +141,7 @@ public class ResumeController {
 	}
 	
 	// status추가해야함!!!!!! 그걸로 파일삭제 수정처리 할 예정
-	@PostMapping("/uploadFile")
+	@PostMapping(value = "/uploadFile", produces = "application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		Map<String, Object> result = new HashMap<>();
@@ -161,6 +161,21 @@ public class ResumeController {
 		} catch (Exception e) {
 			result.put("success", false);
 			result.put("message", "파일 업로드 중 오류 발생: " + e.getMessage());
+		}
+		return result;
+	}
+
+	@PostMapping(value = "/deleteFile", produces = "application/json; charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> deleteFile(@RequestBody ResumeUpfileDTO fileDTO, HttpServletRequest request) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			fileProcessForResume.removeFile(fileDTO);
+			result.put("success", true);
+			result.put("message", "파일이 성공적으로 삭제되었습니다.");
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("message", "파일 삭제 중 오류 발생: " + e.getMessage());
 		}
 		return result;
 	}
