@@ -78,6 +78,8 @@ public class AccountController {
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginDTO loginDto, HttpSession session) {
 
+		System.out.println(loginDto);
+
 		// auth로그인인터셉터에서 쿼리스트링에 requireVerification=true 식으로 인증필요여부 들고옴
 		// auth로그인인터셉터에서 이전페이지나 가려던 페이지(get방식만) uri+쿼리 세션에 넣어둠
 		Map<String, Object> result = null;
@@ -117,13 +119,25 @@ public class AccountController {
 		session.removeAttribute("authTargetEmail");
 		session.removeAttribute("authTargetMobile");
 		session.removeAttribute("account");
-		return "redirect:/account/login?error=true";
+		return "redirect:/account/login?error=true&accountType=" + loginDto.getAccountType();
 	}
 
 	@GetMapping("/logout")
 	public String logout(HttpSession session) {
 		session.invalidate();
 
+		return "redirect:/";
+	}
+
+	@GetMapping("/find/id")
+	public String findId() {
+		System.out.println("미구현");
+		return "redirect:/";
+	}
+
+	@GetMapping("/find/password")
+	public String findPassword() {
+		System.out.println("미구현");
 		return "redirect:/";
 	}
 
