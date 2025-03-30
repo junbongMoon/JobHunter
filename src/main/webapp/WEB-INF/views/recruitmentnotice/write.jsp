@@ -731,6 +731,8 @@ function isValidRecruitmentForm() {
 }
 
 
+
+
 </script>
 
 <style>
@@ -824,7 +826,7 @@ function isValidRecruitmentForm() {
 									<input type="hidden" id="sigungu">
 
 									<div class="col-12">
-										<label for="workType">근무형태</label>
+										<label for="workType1" class="form-check-label mb-2" style="color: #37517e;">근무형태</label>
 										<div class="d-flex flex-wrap gap-3">
 										  <div class="form-check">
 											<input class="form-check-input workType" type="radio" name="workType" id="workType1" value="FULLTIME">
@@ -853,7 +855,7 @@ function isValidRecruitmentForm() {
 
 
 									  <div class="col-12">
-										<label for="payType">급여형태</label>
+										<label for="payType1" class="form-check-label mb-2" style="color: #37517e;">급여형태</label>
 										<div class="d-flex flex-wrap gap-3 payType">
 										  <div class="form-check">
 											<input class="form-check-input" type="radio" name="payType" id="payType1" value="HOUR">
@@ -896,14 +898,14 @@ function isValidRecruitmentForm() {
 
 
 									<div class="col-12">
-										<label for="militaryService">병역 사항</label>
+										<label for="military1" class="form-check-label mb-2" style="color: #37517e;">병역 사항</label>
 										<div class="d-flex flex-wrap gap-3" id="militaryService">
 										  <div class="form-check">
-											<input class="form-check-input" type="radio" name="militaryService" id="military1" value="NOT_SERVED">
+											<input class="form-check-input" type="radio" name="militaryService" id="military1" value="NOT_COMPLETED">
 											<label class="form-check-label mb-2" for="military1">미필 이상</label>
 										  </div>
 										  <div class="form-check">
-											<input class="form-check-input" type="radio" name="militaryService" id="military2" value="SERVED">
+											<input class="form-check-input" type="radio" name="militaryService" id="military2" value="COMPLETED">
 											<label class="form-check-label mb-2" for="military2">군필 이상</label>
 										  </div>
 										  <div class="form-check">
@@ -914,7 +916,7 @@ function isValidRecruitmentForm() {
 									  </div>
 
 									<div class="col-12 mb-3">
-										<label class="form-label w-100 mb-3">접수 방법</label>
+										<label class="form-label w-100 mb-3" style="color: #37517e;">접수 방법</label>
 										<div class="row" id="application-methods">
 									  
 										  
