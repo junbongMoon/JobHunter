@@ -81,8 +81,8 @@
 
     <!-- 자격증 저장 -->
     <insert id="insertLicense" parameterType="com.jobhunter.model.resume.LicenseDTO">
-        INSERT INTO license (licenseName, acquisitionDate, resumeNo)
-        VALUES (#{licenseName}, #{acquisitionDate}, #{resumeNo});
+        INSERT INTO license (licenseName, acquisitionDate, institution, resumeNo)
+        VALUES (#{licenseName}, #{acquisitionDate}, #{institution}, #{resumeNo});
     </insert>
 
     <!-- 파일 저장 -->

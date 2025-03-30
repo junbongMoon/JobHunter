@@ -462,6 +462,12 @@
 										type="text" class="form-control license-name" name="licenseName"
 										placeholder="자격증명을 입력하세요" maxlength="30">
 								</div>
+								<!-- 발급기관 입력 -->
+								<div class="col-md-6">
+									<label class="form-label">발급기관<span class="essentialPoint">*</span></label> <input
+										type="text" class="form-control institution" name="institution"
+										placeholder="발급기관을 입력하세요" maxlength="45">
+								</div>
 								<!-- 취득날짜 -->
 								<div class="col-md-4">
 									<label class="form-label">취득날짜<span class="essentialPoint">*</span></label>
@@ -1006,8 +1012,9 @@
 						licenseItems.each(function () {
 							const licenseName = $(this).find('.license-name').val().trim();
 							const acquisitionDate = $(this).find('.acquisition-date').val();
+							const institution = $(this).find('.institution').val();
 
-							if (!licenseName || !acquisitionDate) {
+							if (!licenseName || !acquisitionDate || !institution) {
 								isValid = false;
 								return false; // each 중단
 							}
@@ -1066,7 +1073,8 @@
 						licenses: $('.license-item').map(function () {
 							return {
 								licenseName: $(this).find('.license-name').val(),
-								acquisitionDate: $(this).find('.acquisition-date').val()
+								acquisitionDate: $(this).find('.acquisition-date').val(),
+								institution: $(this).find('.institution').val()
 							};
 						}).get(),
 						introduce: $('#selfIntroTextarea').val(),
@@ -1123,7 +1131,8 @@
 						licenses: $('.license-item').map(function () {
 							return {
 								licenseName: $(this).find('.license-name').val(),
-								acquisitionDate: $(this).find('.acquisition-date').val()
+								acquisitionDate: $(this).find('.acquisition-date').val(),
+								institution: $(this).find('.institution').val()
 							};
 						}).get(),
 						introduce: $('#selfIntroTextarea').val(),
@@ -1202,7 +1211,8 @@
 						licenses: $('.license-item').map(function () {
 							return {
 								licenseName: $(this).find('.license-name').val(),
-								acquisitionDate: $(this).find('.acquisition-date').val()
+								acquisitionDate: $(this).find('.acquisition-date').val(),
+								institution: $(this).find('.institution').val()
 							};
 						}).get(),
 						introduce: $('#selfIntroTextarea').val()
