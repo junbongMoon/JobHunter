@@ -8,10 +8,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.jobhunter.dao.jobtype.JobDAO;
 import com.jobhunter.dao.recruitmentnotice.RecruitmentNoticeDAO;
 import com.jobhunter.dao.region.RegionDAO;
+import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
 import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
@@ -25,6 +29,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	// DAO단
 	private final RecruitmentNoticeDAO recdao;
 	private final RegionDAO regiondao;
+	private final JobDAO jobdao;
 
 	
 
@@ -84,10 +89,12 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		}
 		if(StringUtils.hasText(majorCategortCode)) {
 			// 여기서 insert
+			jobdao.insertMajorCategoryWithRecruitmentnotice(recNo, Integer.parseInt(majorCategortCode));
 			
 		}
 		if(StringUtils.hasText(subCategoryCode)) {
 			// 여기서 insert
+			jobdao.insertSubCategoryWithRecruitmentnotice(recNo, Integer.parseInt(subCategoryCode));
 		}
 			
 			
@@ -100,17 +107,15 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	// 내가 쓴 공고 템플릿을 조회하는 메서드
+	
+	// 공고 전체를 조회하는 메서드
 	@Override
-	public List<RecruitmentNotice> getRecruitmenTempByUid(int uid) throws Exception {
+	public PageResponseDTO<RecruitmentDetailInfo> getEntireRecruitment(PageRequestDTO pageRequestDTO) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
 
-	@Override
-	public List<RecruitmentNotice> getEntireRecruitment() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 }

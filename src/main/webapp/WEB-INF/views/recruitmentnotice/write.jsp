@@ -47,7 +47,7 @@ $(".fileUploadArea").on("drop", function (e) {
 });
 
 $(document).on("click", "#goToListBtn", function () {
-  window.location.href = "list.jsp";
+  location.href = "./list";
 });
 
 		
@@ -169,7 +169,7 @@ $(document).on("click", "#goToListBtn", function () {
 // 저장버튼을 누르면
 $(document).on("click", ".save-method-btn", function () {
   const method = $(this).data("method");
-  const detail = $(`.method-detail[data-method='${method}']`).val() || "";
+  const detail = $(`.method-detail[data-method='\${method}']`).val() || "";
 
   // 상세 정보는 입력하지 않아도 된다.
 

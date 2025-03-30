@@ -32,4 +32,27 @@ public class JobDAOImpl implements JobDAO {
         params.put("jobName", jobName);
         sqlSession.insert(NAMESPACE + ".insertSubcategory", params);
     }
+    
+    // 공고에 산업군 넣어주는 메서드
+	@Override
+	public int insertMajorCategoryWithRecruitmentnotice(int refRecNo, int refMajorNo) throws Exception {
+		Map<String, Integer> param = new HashMap<>();
+		param.put("refRecNo", refRecNo);
+		param.put("refMajorNo", refMajorNo);
+		
+		
+		return sqlSession.insert(NAMESPACE + ".insertMajorJobTypeWithRecruitmentnotice", param);
+	}
+	
+	// 공고에 직업 입력해주는 메서드
+	@Override
+	public int insertSubCategoryWithRecruitmentnotice(int refRecNo, int refSubNo) throws Exception {
+		
+		Map<String, Integer> param = new HashMap<>();
+		param.put("refRecNo", refRecNo);
+		param.put("refSubNo", refSubNo);
+		
+		
+		return sqlSession.insert(NAMESPACE + ".insertSubJobTypeWithRecruitmentnotice", param);
+	}
 }
