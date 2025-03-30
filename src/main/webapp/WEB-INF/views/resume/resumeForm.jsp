@@ -107,7 +107,8 @@
 								</div>
 								<div class="col-md-4 d-flex align-items-center">
 									<input type="text" class="form-control text-end" id="payAmount" name="pay"
-										placeholder="금액 입력(숫자만 입력 가능해요)" maxlength="11" disabled> <span class="ms-2">원</span>
+										placeholder="금액 입력(숫자만 입력 가능해요)" maxlength="11" disabled> <span
+										class="ms-2">원</span>
 								</div>
 							</div>
 							<small class="text-muted">* 시급, 일급, 월급, 연봉의 경우 금액을 입력해 주세요.</small>
@@ -1436,18 +1437,56 @@
 
 					// 파일 이름만 출력
 					const $preview = $('<div>')
-						.addClass('d-inline-block m-2')
+						.addClass('d-inline-block position-relative m-2')
 						.css({
-							fontSize: '13px',
+							display: 'flex',           // 버튼과 파일 이름을 가로로 배치
+							alignItems: 'center',       // 수직 가운데 정렬
+							justifyContent: 'space-between', // 버튼을 오른쪽으로 밀기
 							padding: '6px 10px',
 							border: '1px solid #ccc',
 							borderRadius: '6px',
 							backgroundColor: '#f8f9fa',
-							maxWidth: '200px',
-							wordBreak: 'break-word'
+							maxWidth: '250px',
+							wordBreak: 'break-word',
+							position: 'relative'
 						})
-						.text(fileInfo.originalFileName);
+						.attr('data-filename', fileInfo.newFileName);
 
+					// 파일 이름 표시
+					const $fileName = $('<span>')
+						.text(fileInfo.originalFileName)
+						.css({
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							whiteSpace: 'nowrap',
+							maxWidth: '180px'
+						});
+
+					// 삭제 버튼 추가
+					const $removeBtn = $('<button>')
+						.addClass('btn-close')
+						.attr('aria-label', '삭제')
+						.css({
+							marginLeft: '10px',
+							cursor: 'pointer'
+						})
+						.on('click', function () {
+							// 미리보기 요소 삭제
+							$preview.remove();
+
+							// uploadedFiles 배열에서도 삭제
+							const index = uploadedFiles.findIndex(function (f) {
+								return f.newFileName === fileInfo.newFileName;
+							});
+							if (index !== -1) uploadedFiles.splice(index, 1);
+
+							// 모든 파일이 삭제되면 안내 문구 다시 표시
+							if (uploadedFiles.length === 0) {
+								$fileText.show();
+							}
+						});
+
+					$preview.append($fileName).append($removeBtn);
 					$fileContainer.append($preview);
 				}
 
