@@ -438,6 +438,93 @@
       padding: 20px;
     }
   }
+
+  /* 알럿 모달 스타일 */
+  .alert-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 9998;
+  }
+
+  .alert-modal-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    text-align: center;
+  }
+
+  .alert-modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .alert-modal-message {
+    font-size: 16px;
+    color: #2c3e50;
+    line-height: 1.5;
+  }
+
+  .alert-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .alert-modal-button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .alert-modal-button.confirm {
+    background: #47b2e4;
+    color: white;
+  }
+
+  .alert-modal-button.cancel {
+    background: #f8f9fa;
+    color: #666;
+  }
+
+  .alert-modal-button:hover {
+    opacity: 0.9;
+  }
+
+  /* 전화번호 입력 스타일 */
+  .phone-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .phone-input-group input {
+    width: 80px;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .phone-input-group span {
+    color: #666;
+    font-size: 16px;
+  }
+
+  .phone-input-group input:focus {
+    border-color: #47b2e4;
+    outline: none;
+  }
 </style>
 
 <main class="main" data-aos="fade-up">
@@ -527,6 +614,15 @@
   </div>
   <!-- 모달 창 -->
 
+  <!-- 알럿 모달 -->
+  <div id="alertModalOverlay" class="alert-modal-overlay" style="display: none;"></div>
+  <div id="alertModal" class="alert-modal-box" style="display: none;">
+    <div class="alert-modal-content">
+      <div class="alert-modal-message"></div>
+      <div class="alert-modal-buttons"></div>
+    </div>
+  </div>
+
   <!-- firebase캡챠 -->
   <div id="recaptcha-container"></div>
 </main>
@@ -557,12 +653,18 @@
       isSocial = true;
     }
 
+    let introduceSection = '자기소개가 아직 없습니다.';
+    if (userInfo.introduce) {
+      introduceSection = userInfo.introduce;
+    }
+
     basicInfo.innerHTML =
       '<div>이름</div><div><strong>' + userInfo.userName + '</strong></div>' +
       '<div>전화번호</div><div id="nowMobile">' + (userInfo.mobile || '등록된 전화번호 없음') + '</div>' +
       '<div>이메일</div><div id="nowEmail">' + (userInfo.email || '등록된 이메일 없음') + '</div>' +
       '<div>가입일</div><div>' + formatDate(userInfo.regDate) + '</div>' +
       '<div>최근 로그인</div><div>' + formatDateTime(userInfo.lastLoginDate) + '</div>' +
+      '<div class="introduce-section"><div class="introduce-content">' + introduceSection + '</div></div>' +
       '<div class="edit-buttons">' +
       '<button id="openContactModalBtn" class="btn-edit"><i class="bi bi-pencil-square"></i> 연락처 수정</button>' +
       '<button id="openPasswordModalBtn" class="btn-edit"><i class="bi bi-key"></i> 비밀번호 변경</button>' +
@@ -600,11 +702,6 @@
       payText = userInfo.payType + ' ' + userInfo.pay + '원';
     }
 
-    let introduceSection = '자기소개가 아직 없습니다.';
-    if (userInfo.introduce) {
-      introduceSection = userInfo.introduce;
-    }
-
     userDetailInfo.innerHTML =
       '<div>주소</div><div>' + (userInfo.addr || '등록된 주소 없음') + '</div>' +
       '<div>성별</div><div>' + genderText + '</div>' +
@@ -612,7 +709,6 @@
       '<div>병역사항</div><div>' + militaryServiceText + '</div>' +
       '<div>국적</div><div>' + nationalityText + '</div>' +
       '<div>희망급여</div><div>' + payText + '</div>' +
-      `<div class="introduce-section"><div>자기소개</div><div class="introduce-content">` + introduceSection + `</div></div>` + 
       '<div class="edit-buttons">' +
       '<button id="chanegeDetailInfoBtn" class="btn-edit"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>' +
       '</div>';
@@ -670,11 +766,6 @@
   }
   //캡챠기능 파이어베이스 기본 제공 (1회용이라 초기화)
   function firebaseCaptcha() {
-      // firebase에서 해줌
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear(); // 기존 캡차 해제
-        delete window.recaptchaVerifier;
-      }
       // 캡챠기능 파이어베이스 기본 제공
       if (!window.recaptchaVerifier) {
         window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
@@ -770,9 +861,8 @@
     const uid = "${sessionScope.account.uid}"
     const nowPassword = document.getElementById('nowPassword').value
 
-
     if (!nowPassword) {
-      alert('현재 비밀번호를 입력해주세요.');
+      alertUtils.show('현재 비밀번호를 입력해주세요.');
       return;
     }
 
@@ -785,11 +875,11 @@
         if (result === true) {
           showVerificationOptions();
         } else {
-        alert("비밀번호가 틀렸습니다.");
+          alertUtils.show("비밀번호가 틀렸습니다.");
         }
       },
       error: (xhr) => {
-        alert("비밀번호 확인 중 오류 발생");
+        alertUtils.show("비밀번호 확인 중 오류 발생");
       }
     });
   }
@@ -797,71 +887,70 @@
   async function startVerifiPhonePwd() {
     const rawPhone = "${sessionScope.account.mobile}";
     if (!rawPhone) {
-      alert('새 전화번호를 입력해주세요.');
+      alertUtils.show('새 전화번호를 입력해주세요.');
       return;
     }
-    // firebase 국제번호형식으로 받아서 바꾸는용도
     const phoneNumber = formatPhoneNumberForFirebase(rawPhone);
   
     firebaseCaptcha()
     try {
-        confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-          alert("인증 코드가 전송되었습니다.");
-          showEndVerifiPwdMobileModal()
-      } catch (error) {
-          console.error("전화번호 인증 실패:", error);
-          alert("전화번호 인증 중 오류 발생.");
-      }
+      confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
+      alertUtils.show("인증 코드가 전송되었습니다.");
+      showEndVerifiPwdMobileModal()
+    } catch (error) {
+      console.error("전화번호 인증 실패:", error);
+      alertUtils.show("전화번호 인증 중 오류 발생.");
+    }
   }
   async function endVerifiPwdMobile() {
-      const mobileCode = document.getElementById('pwdToPhoneCode').value
+    const mobileCode = document.getElementById('pwdToPhoneCode').value
   
     try {
-         await confirmationResult.confirm(mobileCode);
-         showNewPasswordForm(); // 성공 후 콜백 실행
-     } catch (error) {
-          failedVerifiModal()
-     }
+      await confirmationResult.confirm(mobileCode);
+      showNewPasswordForm();
+    } catch (error) {
+      failedVerifiModal()
+    }
   }
   async function startVerifiEmailPwd() {
     const email = "${sessionScope.account.email}"
     if (!email) {
-      alert('새 이메일을 입력해주세요.');
+      alertUtils.show('새 이메일을 입력해주세요.');
       return;
     }
-      $.ajax({
-        url: "/account/auth/email",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({email}),
-        async: false,
-        success: (res) => {showEndVerifiPwdEmailModal()},
-        error: (xhr) => {alert("메일 전송 중 오류 발생: " + xhr.responseText)}
-      });
+    $.ajax({
+      url: "/account/auth/email",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({email}),
+      async: false,
+      success: (res) => {showEndVerifiPwdEmailModal()},
+      error: (xhr) => {alertUtils.show("메일 전송 중 오류 발생: " + xhr.responseText)}
+    });
   }
   async function endVerifiPwdEmail() {
     const emailCode = document.getElementById('pwdToEmailCode').value
     $.ajax({
-        url: `/account/auth/email/${emailCode}`,
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({ email: "${sessionScope.account.email}" }),
-        async: false,
-        success: () => {showNewPasswordForm()},
-        error: (xhr) =>{alert("이메일 인증 실패: " + xhr.responseText)}
-      });
+      url: `/account/auth/email/${emailCode}`,
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({ email: "${sessionScope.account.email}" }),
+      async: false,
+      success: () => {showNewPasswordForm()},
+      error: (xhr) => {alertUtils.show("이메일 인증 실패: " + xhr.responseText)}
+    });
   }
   
   function changePassword() {
-    const changePassword =document.getElementById('changePassword').value
-    const checkPassword = document.getElementById('checkPassword').value
+    const changePassword = document.getElementById('changePassword').value;
+    const checkPassword = document.getElementById('checkPassword').value;
+    
     if (changePassword !== checkPassword) {
-      alert("비밀번호가 일치하지 않습니다.");
+      alertUtils.show("비밀번호가 일치하지 않습니다.");
       return;
     }
-  
+
     const uid = "${sessionScope.account.uid}";
-  
     $.ajax({
       url: "/user/password",
       method: "patch",
@@ -871,8 +960,8 @@
         successModal();
       },
       error: (xhr) => {
-      alert("비밀번호 변경 중 오류가 발생했습니다.");
-      console.error(xhr.responseText);
+        alertUtils.show("비밀번호 변경 중 오류가 발생했습니다.");
+        console.error(xhr.responseText);
       }
     });
   }
@@ -1001,6 +1090,40 @@
     `;
   }
 
+  // 전화번호 입력 처리 함수
+  function handlePhoneInput(input, nextInput) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+    if (input.value.length >= 3 && nextInput) {
+      nextInput.focus();
+    }
+  }
+
+  // 전화번호 포맷팅 함수
+  function formatPhoneNumber(input1, input2, input3) {
+    const num1 = input1.value;
+    const num2 = input2.value;
+    const num3 = input3.value;
+    
+    if (num1.length === 3 && num2.length === 4 && num3.length === 4) {
+      return `\${num1}-\${num2}-\${num3}`;
+    }
+    return null;
+  }
+
+  // 전화번호 입력 HTML 템플릿
+  function getPhoneInputHTML() {
+    return `
+      <div class="phone-input-group">
+        <input type="text" maxlength="3" placeholder="000" oninput="handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
+        <span>-</span>
+        <input type="text" maxlength="4" placeholder="0000" oninput="if(this.value.length >= 4) handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
+        <span>-</span>
+        <input type="text" maxlength="4" placeholder="0000" oninput="handlePhoneInput(this, null)">
+      </div>
+    `;
+  }
+
+  // 연락처 수정 모달 수정
   function openContactModal() {
     const modal = document.getElementById('basicModal');
     const modalTitle = modal.querySelector('.modal-title');
@@ -1027,8 +1150,8 @@
           <div style="display: flex; flex-direction: column; gap: 15px;">
             <div id="phoneInputGroup">
               <div class="verification-option">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <input type="text" id="changeMobile" placeholder="변경할 전화번호를 입력해 주세요" style="flex: 1;">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  \${getPhoneInputHTML()}
                   <button id="changeMobileStartVerifiBtn" class="btn-confirm">확인</button>
                 </div>
               </div>
@@ -1060,7 +1183,6 @@
                 </div>
               </div>
             </div>
-
           </div>
       </div>
       <div id="verificationContent" style="display: none;"></div>
@@ -1075,25 +1197,29 @@
   }
 
   async function startVerifiPhonePne() {
-    console.log("전화번호");
-    const rawPhone = document.getElementById('changeMobile').value;
-    if (!rawPhone) {
-      alert('새 전화번호를 입력해주세요.');
+    const phoneInputs = document.querySelectorAll('.phone-input-group input');
+    console.log(phoneInputs);
+    const formattedNumber = formatPhoneNumber(phoneInputs[0], phoneInputs[1], phoneInputs[2]);
+    console.log(formattedNumber);
+
+
+    if (!formattedNumber) {
+      alertUtils.show('올바른 전화번호를 입력해주세요.');
       return;
     }
-    // firebase 국제번호형식으로 받아서 바꾸는용도
-    const phoneNumber = formatPhoneNumberForFirebase(rawPhone);
+
+    const phoneNumber = formatPhoneNumberForFirebase(formattedNumber);
   
-    firebaseCaptcha()
+    firebaseCaptcha();
     try {
-        confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-          alert("인증 코드가 전송되었습니다.");
-          document.getElementById('phoneInputGroup').style.display = 'none';
-          document.getElementById('phoneVerificationGroup').style.display = 'block';
-      } catch (error) {
-          console.error("전화번호 인증 실패:", error);
-          alert("전화번호 인증 중 오류 발생.");
-      }
+      confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
+      alertUtils.show("인증 코드가 전송되었습니다.");
+      document.getElementById('phoneInputGroup').style.display = 'none';
+      document.getElementById('phoneVerificationGroup').style.display = 'block';
+    } catch (error) {
+      console.error("전화번호 인증 실패:", error);
+      alertUtils.show("전화번호 인증 중 오류 발생.");
+    }
   }
   async function startVerifiEmailPne() {
   
@@ -1106,11 +1232,11 @@
       data: JSON.stringify({email}),
       async: false,
       success: (res) => {
-        alert("메일 전송 성공: " + res)
+        alertUtils.show("메일 전송 성공: " + res)
         document.getElementById('emailInputGroup').style.display = 'none';
         document.getElementById('emailVerificationGroup').style.display = 'block';
       },
-      error: (xhr) => {alert("메일 전송 중 오류 발생: " + xhr.responseText)}
+      error: (xhr) => {alertUtils.show("메일 전송 중 오류 발생: " + xhr.responseText)}
     });
 
   }
@@ -1122,7 +1248,8 @@
       await confirmationResult.confirm(mobileCode); // 코드 틀렸으면 여기서  catch로 넘어감감
   
       const uid = "${sessionScope.account.uid}";
-      const mobile = document.getElementById("changeMobile").value;
+      const phoneInputs = document.querySelectorAll('.phone-input-group input');
+      const mobile = formatPhoneNumber(phoneInputs[0], phoneInputs[1], phoneInputs[2]);
   
       const dto = {
         type: "mobile",
@@ -1139,14 +1266,14 @@
           successModal();
         },
         error: (xhr) => {
-        alert("인증 처리 중 오류가 발생했습니다.");
+        alertUtils.show("인증 처리 중 오류가 발생했습니다.");
         console.error(xhr.responseText);
         }
       });
   
     } catch (error) {
       console.error("코드 인증 실패:", error);
-      alert("잘못된 인증 코드입니다.");
+      alertUtils.show("잘못된 인증 코드입니다.");
     }
   
   }
@@ -1178,16 +1305,65 @@
               successModal();
             },
             error: (xhr) => {
-            alert("인증 처리 중 오류가 발생했습니다.");
+            alertUtils.show("인증 처리 중 오류가 발생했습니다.");
             console.error(xhr.responseText);
             }
           });
         },
-        error: (xhr) =>{alert("이메일 인증 실패: " + xhr.responseText)}
+        error: (xhr) =>{alertUtils.show("이메일 인증 실패: " + xhr.responseText)}
       });
     
 }
 
-  </script>
+  // 알럿 모달 유틸리티
+  const alertUtils = {
+    show: (message, options = {}) => {
+      const {
+        confirmText = '확인',
+        cancelText = null,
+        onConfirm = null,
+        onCancel = null
+      } = options;
+
+      const overlay = document.getElementById('alertModalOverlay');
+      const modal = document.getElementById('alertModal');
+      const messageEl = modal.querySelector('.alert-modal-message');
+      const buttonsEl = modal.querySelector('.alert-modal-buttons');
+
+      messageEl.textContent = message;
+      
+      let buttonsHTML = '';
+      if (cancelText) {
+        buttonsHTML += `<button class="alert-modal-button cancel">\${cancelText}</button>`;
+      }
+      buttonsHTML += `<button class="alert-modal-button confirm">\${confirmText}</button>`;
+      
+      buttonsEl.innerHTML = buttonsHTML;
+
+      overlay.style.display = 'block';
+      modal.style.display = 'block';
+
+      const confirmBtn = modal.querySelector('.alert-modal-button.confirm');
+      const cancelBtn = modal.querySelector('.alert-modal-button.cancel');
+
+      confirmBtn.onclick = () => {
+        if (onConfirm) onConfirm();
+        alertUtils.hide();
+      };
+
+      if (cancelBtn) {
+        cancelBtn.onclick = () => {
+          if (onCancel) onCancel();
+          alertUtils.hide();
+        };
+      }
+    },
+    hide: () => {
+      document.getElementById('alertModalOverlay').style.display = 'none';
+      document.getElementById('alertModal').style.display = 'none';
+    }
+  };
+
+</script>
 <!-- 풋터 -->
 <jsp:include page="/WEB-INF/views/footer.jsp"></jsp:include>
