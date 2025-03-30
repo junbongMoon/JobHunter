@@ -1,5 +1,7 @@
 package com.jobhunter.controller.user;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,10 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.user.ContactUpdateDTO;
 import com.jobhunter.model.user.PasswordDTO;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.service.user.UserService;
+import com.jobhunter.util.AccountUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserRestController {
 	private final UserService service;
+	private final AccountUtil accUtil;
 	
 	@GetMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<UserVO> myinfo(@PathVariable("uid") String uid) {
@@ -60,9 +65,10 @@ public class UserRestController {
 	}
 	
 	@PatchMapping(value = "/contact", consumes = "application/json")
-	public ResponseEntity<String> changeContact(@RequestBody ContactUpdateDTO dto) {
+	public ResponseEntity<String> changeContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
 	    try {
 	        String updatedValue = service.updateContact(dto.getUid(), dto.getType(), dto.getValue());
+	        accUtil.refreshAccount((AccountVO) session.getAttribute("account"));
 	        return ResponseEntity.ok(updatedValue);
 	    } catch (Exception e) {
 	        e.printStackTrace();
