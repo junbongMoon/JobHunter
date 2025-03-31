@@ -3,6 +3,7 @@ package com.jobhunter.controller.recruitmentnotice;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jobhunter.model.page.PageRequestDTO;
@@ -49,6 +50,11 @@ public class RecruitmentNoticeController {
 		
 	}
 	
+	// 상세 보기 페이지를 출력
+	@GetMapping("/detail")
+	public void showDetailRecruitment(@PathVariable("uid") int uid) {
+		System.out.println(uid);
+	}
 	
 	
 	// 공고를 수정하는 페이지를 출력하는 메서드
