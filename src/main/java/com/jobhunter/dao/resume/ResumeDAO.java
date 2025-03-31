@@ -42,4 +42,11 @@ public interface ResumeDAO {
 	void insertLicense(LicenseDTO licenseDTO) throws Exception;
 
 	void insertResumeUpfile(ResumeUpfileDTO resumeUpfileDTO) throws Exception;
+
+	// 이력서 목록 조회
+	List<ResumeDTO> selectResumeList(int userUid) throws Exception;
+
+	List<SigunguDTO> selectResumeSigungu(int resumeNo) throws Exception;
+
+	List<SubCategoryDTO> selectResumeSubCategory(int resumeNo) throws Exception;
 }

@@ -24,7 +24,7 @@
 					<div class="mb-4">
 						<label for="title" class="form-label fw-bold">이력서 제목<span
 								class="essentialPoint">*</span></label> <input type="text" class="form-control"
-							id="title" name="title" placeholder="예: 자바 개발자 지원" required />
+							id="title" name="title" placeholder="예: 자바 개발자 지원" maxlength="30" />
 					</div>
 
 					<!-- 기본 정보 (users 테이블에서 가져올 예정) -->
@@ -35,16 +35,16 @@
 						<div class="card-body">
 							<div class="row g-3">
 								<div class="col-md-4">
-									<label class="form-label">이름</label>
-									<input type="text" class="form-control" value="${account.accountName}" readonly />
+									<label class="form-label">이름</label> <input type="text" class="form-control"
+										value="${account.accountName}" readonly />
 								</div>
 								<div class="col-md-4">
-									<label class="form-label">이메일</label>
-									<input type="email" class="form-control" value="${account.email}" readonly />
+									<label class="form-label">이메일</label> <input type="email" class="form-control"
+										value="${account.email}" readonly />
 								</div>
 								<div class="col-md-4">
-									<label class="form-label">연락처</label>
-									<input type="tel" class="form-control" value="${account.mobile}" readonly />
+									<label class="form-label">연락처</label> <input type="tel" class="form-control"
+										value="${account.mobile}" readonly />
 								</div>
 								<!-- userUid -->
 								<input type="hidden" id="userUid" name="userUid" value="${account.uid}" />
@@ -405,14 +405,16 @@
 									<label class="form-label">근무기간<span class="essentialPoint">*</span></label>
 									<div class="row g-2">
 										<div class="col-md-4">
-											<input type="date" class="form-control start-date" name="startDate" max="${today}">
+											<input type="date" class="form-control start-date" name="startDate"
+												max="${today}">
 										</div>
 										<div
 											class="col-md-1 text-center d-flex align-items-center justify-content-center">
 											<span>~</span>
 										</div>
 										<div class="col-md-4">
-											<input type="date" class="form-control end-date" name="endDate" max="${today}">
+											<input type="date" class="form-control end-date" name="endDate"
+												max="${today}">
 										</div>
 									</div>
 									<div class="form-check mt-2">
@@ -501,15 +503,13 @@
 					<!-- 파일 첨부 -->
 					<div class="card mb-4">
 						<div class="card-header d-flex justify-content-between align-items-center">
-							<span>첨부파일</span>
-							<label for="fileInput" class="btn btn-primary btn-sm mb-0">파일 선택</label>
+							<span>첨부파일</span> <label for="fileInput" class="btn btn-primary btn-sm mb-0">파일 선택</label>
 							<input type="file" id="fileInput" style="display: none;" multiple>
 						</div>
 						<div class="card-body">
 							<div id="fileContainer" class="border rounded p-3">
 								<div class="text-center text-muted fileText">
-									여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br>
-									(최대 10MB)
+									여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br> (최대 10MB)
 								</div>
 								<div id="previewContainer" class="mt-3"></div>
 							</div>

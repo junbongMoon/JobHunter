@@ -175,4 +175,20 @@ public class ResumeServiceImpl implements ResumeService {
 		return rdao.selectSubCategoriesByMajor(majorcategoryNo);
 	}
 
+	@Override
+	public List<ResumeDTO> getResumeList(int userUid) throws Exception {
+		System.out.println("###############t서비스단");
+		return rdao.selectResumeList(userUid);
+	}
+
+	@Override
+	public List<SigunguDTO> getResumeSigungu(int resumeNo) throws Exception {
+		return rdao.selectResumeSigungu(resumeNo);
+	}
+
+	@Override
+	public List<SubCategoryDTO> getResumeSubCategory(int resumeNo) throws Exception {
+		return rdao.selectResumeSubCategory(resumeNo);
+	}
+
 }

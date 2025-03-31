@@ -1,10 +1,10 @@
 package com.jobhunter.controller.resume;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.resume.EducationLevel;
 import com.jobhunter.model.resume.EducationStatus;
 import com.jobhunter.model.resume.JobForm;
@@ -76,9 +77,31 @@ public class ResumeController {
 	}
 
 	// 이력서 목록 페이지
-	@GetMapping("/resumeFormList")
-	public String resumeFormList() {
-		return "resume/resumeFormList";
+	@GetMapping("/list")
+	public String resumeFormList(HttpSession session, Model model) {
+		try {
+			AccountVO account = (AccountVO) session.getAttribute("account");
+			if (account == null || account.getUid() == 0) {
+				return "redirect:/account/login";
+			}
+			
+			int userUid = account.getUid();
+			List<ResumeDTO> resumeList = resumeService.getResumeList(userUid);
+			
+			// 각 이력서별로 희망 근무 지역과 업직종 정보 조회
+			for (ResumeDTO resume : resumeList) {
+				List<SigunguDTO> sigunguList = resumeService.getResumeSigungu(resume.getResumeNo());
+				List<SubCategoryDTO> subCategoryList = resumeService.getResumeSubCategory(resume.getResumeNo());
+				resume.setSigunguList(sigunguList);
+				resume.setSubcategoryList(subCategoryList);
+			}
+			
+			model.addAttribute("resumeList", resumeList);
+			return "resume/resumeFormList";
+		} catch (Exception e) {
+			model.addAttribute("error", "이력서 목록을 불러오는 중 오류가 발생했습니다.");
+			return "error";
+		}
 	}
 
 	// 희망 근무 지역: 시/군/구 가져오기
@@ -118,7 +141,7 @@ public class ResumeController {
 			Map<String, Object> response = new HashMap<>();
 			response.put("success", true);
 			response.put("message", "TEMP 저장 완료");
-			response.put("redirectUrl", "/resume/resumeFormList");
+			response.put("redirectUrl", "/resume/list");
 			return ResponseEntity.ok().body(response);
 		} catch (Exception e) {
 			Map<String, Object> response = new HashMap<>();
@@ -137,7 +160,7 @@ public class ResumeController {
 			Map<String, Object> response = new HashMap<>();
 			response.put("success", true);
 			response.put("message", "FINAL 저장 완료");
-			response.put("redirectUrl", "/resume/resumeFormList");
+			response.put("redirectUrl", "/resume/list");
 			return ResponseEntity.ok().body(response);
 		} catch (Exception e) {
 			Map<String, Object> response = new HashMap<>();
