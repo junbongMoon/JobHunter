@@ -80,7 +80,7 @@ $(".fileUploadArea").on("drop", function (e) {
 });
 
 $(document).on("click", "#goToListBtn", function () {
-  location.href = "./list";
+  location.href = "./listAll";
 });
 
 		
@@ -663,13 +663,17 @@ function isValidRecruitmentForm() {
   	const subCategory = $(".SubCategory").val();
   	const majorCategory = $(".MajorCategory").val();
   	const region = $(".Region").val();
-  	const period = $("#startTime").val() + "~" + $("#endTime").val();
+  	const workDetailType = $("#workDetailType").val();
+
   	const startTime = $("#startTime").val();
   	const endTime = $("#endTime").val();
   	const personalHistory = $("input[name='personalHistory']:checked").val();
  	const manager = $("#manager").val();
   	const refCompany = $("#refCompany").val();
- 
+	  let period = startTime + "~" + endTime;
+if (workDetailType) {
+  period += " (" + workDetailType + ")";
+}
 
   console.log(period);
 
@@ -799,7 +803,8 @@ function isValidRecruitmentForm() {
 						<div class="input-group">
 							<label for="name" class="form-check-label">회사명</label> <input
 								type="text" id="Companyname" placeholder="Enter your full name"
-								required="" readonly="true" value="${sessionScope.account.accountName}">
+								required="" readonly="true"
+								value="${sessionScope.account.accountName}">
 
 						</div>
 					</div>
@@ -808,7 +813,8 @@ function isValidRecruitmentForm() {
 						<div class="input-group">
 							<label for="email" class="form-check-label">작성자*</label> <input
 								type="email" id="writer" placeholder="Enter your email address"
-								required="" readonly="true" value="${sessionScope.account.accountId}"> 
+								required="" readonly="true"
+								value="${sessionScope.account.accountId}">
 
 						</div>
 					</div>
@@ -940,6 +946,21 @@ function isValidRecruitmentForm() {
 										</div>
 									</div>
 
+									<div class="col-md-6">
+										<div class="input-group">
+											<label for="workDetailType" class="form-check-label mb-2">근무시간
+												상세</label> <select class="form-select" id="workDetailType">
+												<option value="">선택 없음</option>
+												<option value="2교대">2교대</option>
+												<option value="3교대">3교대</option>
+												<option value="격일근무">격일 근무</option>
+												<option value="격주근무">격주 근무</option>
+												<option value="야간근무">야간 근무</option>
+												<option value="주말근무">주말 근무</option>
+											</select>
+										</div>
+									</div>
+
 
 									<div class="col-12">
 										<label for="military1" class="form-check-label mb-2"
@@ -1060,7 +1081,7 @@ function isValidRecruitmentForm() {
 										<div class="input-group">
 											<label for="date" class="form-check-label mb-2">마감 기한</label>
 											<input type="date" id="date">
-										  </div>
+										</div>
 									</div>
 
 									<div class="col-12">
