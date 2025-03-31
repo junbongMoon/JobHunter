@@ -734,7 +734,8 @@
 											let $badge = $("<span>")
 												.addClass("badge bg-primary me-2")
 												.text(regionName + " " + sigunguName)
-												.attr("data-region", regionNo); // 시/도 정보 저장
+												.attr("data-region", regionNo)
+												.attr("data-sigungu", sigunguNo); // 시/군/구 번호 저장
 
 											// 삭제 버튼 생성 및 삭제 기능
 											let $removeBtn = $("<button>")
@@ -749,7 +750,7 @@
 										} else {
 											// 체크박스가 해제되면 선택된 지역 목록에서 제거
 											selectedRegions.find(".badge").each(function () {
-												if ($(this).text().trim() === regionName + " " + sigunguName && $(this).data("region") === regionNo) {
+												if ($(this).data("sigungu") === sigunguNo) {
 													$(this).remove();
 												}
 											});
@@ -762,7 +763,7 @@
 
 								// 이미 선택된 시/군/구인 경우 체크박스 체크
 								$("#selectedRegions").find(".badge").each(function () {
-									if ($(this).text().trim() === sigungu.name && $(this).data("region") === regionNo) {
+									if ($(this).data("sigungu") === sigungu.sigunguNo) {
 										$checkbox.prop("checked", true);
 										return false; // each 중단
 									}
@@ -1040,8 +1041,7 @@
 							};
 						}).get(),
 						sigunguNos: $('#selectedRegions').find('.badge').map(function () {
-							let sigunguName = $(this).text().trim();
-							return $('input[data-name="' + sigunguName + '"]').val();
+							return $(this).data("sigungu");
 						}).get(),
 						subcategoryNos: $('#selectedJobTypes').find('.badge').map(function () {
 							let subName = $(this).text().trim();
@@ -1098,8 +1098,7 @@
 							};
 						}).get(),
 						sigunguNos: $('#selectedRegions').find('.badge').map(function () {
-							let sigunguName = $(this).text().trim();
-							return $('input[data-name="' + sigunguName + '"]').val();
+							return $(this).data("sigungu");
 						}).get(),
 						subcategoryNos: $('#selectedJobTypes').find('.badge').map(function () {
 							let subName = $(this).text().trim();
@@ -1178,8 +1177,7 @@
 							};
 						}).get(),
 						sigunguNos: $('#selectedRegions').find('.badge').map(function () {
-							let sigunguName = $(this).text().trim();
-							return $('input[data-name="' + sigunguName + '"]').val();
+							return $(this).data("sigungu");
 						}).get(),
 						subcategoryNos: $('#selectedJobTypes').find('.badge').map(function () {
 							let subName = $(this).text().trim();
