@@ -33,7 +33,7 @@
 										</li>
 										<li class="d-flex align-items-center"><i
 											class="bi bi-clock"></i> <a href="#"><time>
-													<fmt:formatDate value="${bo.dueDate}" pattern="yyyy-MM-dd" />
+													<fmt:formatDate value="${rec.dueDate}" pattern="yyyy-MM-dd" />
 												</time></a></li>
 									</ul>
 								</div>
