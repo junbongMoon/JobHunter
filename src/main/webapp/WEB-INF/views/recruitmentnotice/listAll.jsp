@@ -41,25 +41,26 @@
 								<div class="content">
 									<p class="rectext">
 										<strong>지역:</strong>
-										<c:out value="${rec.region.name}" default="-" />
-										/ <strong>시군구:</strong>
-										<c:out value="${rec.sigungu.name}" default="-" />
-										<br /> <strong>산업군:</strong>
-										<c:out value="${rec.majorCategory.jobName}" default="-" />
-										/ <strong>직업:</strong>
-										<c:out value="${rec.subcategory.jobName}" default="-" />
-										<br /> <strong>우대조건:</strong>
-										<c:forEach var="adv" items="${rec.advantage}"
-											varStatus="status">
+										<span class="badge bg-primary me-2"><c:out value="${rec.region.name}" default="-" /></span>
+										<strong>시군구:</strong>
+										<span class="badge bg-info me-2"><c:out value="${rec.sigungu.name}" default="-" /></span>
+										<br /> 
+										<strong>산업군:</strong>
+										<span class="badge bg-success me-2"><c:out value="${rec.majorCategory.jobName}" default="-" /></span>
+										<strong>직업:</strong>
+										<span class="badge bg-warning text-dark me-2"><c:out value="${rec.subcategory.jobName}" default="-" /></span>
+										<br /> 
+										<strong>우대조건:</strong>
+										<c:forEach var="adv" items="${rec.advantage}" varStatus="status">
 											<c:if test="${status.index < 2}">
-												<span>${adv.advantageType}</span>
+												<span class="badge bg-danger me-2">${adv.advantageType}</span>
 											</c:if>
 										</c:forEach>
-										<br /> <strong>면접방식:</strong>
-										<c:forEach var="app" items="${rec.application}"
-											varStatus="status">
+										<br /> 
+										<strong>면접방식:</strong>
+										<c:forEach var="app" items="${rec.application}" varStatus="status">
 											<c:if test="${status.index < 2}">
-												<span>${app.method}</span>
+												<span class="badge bg-secondary me-2">${app.method}</span>
 											</c:if>
 										</c:forEach>
 									</p>
