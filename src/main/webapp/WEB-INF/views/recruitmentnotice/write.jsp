@@ -15,8 +15,41 @@
 	let errorMessage = "";
 	let focusElement = null;
 	let upfiles = [];
+	
 
 	$(function() {
+
+		const today = new Date();
+		today.setHours(0,0,0,0); // 오늘 자정으로 설정
+    const nextMonth = new Date();
+    nextMonth.setMonth(today.getMonth() + 1);
+
+    // yyyy-MM-dd 포맷으로 변환
+    function formatDate(date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    const minDate = formatDate(today);
+    const maxDate = formatDate(nextMonth);
+
+    // 오늘 날짜를 기본값으로 설정하고 min 속성 적용
+    const dateInput = $("#date");
+    dateInput.attr("min", minDate);
+    dateInput.attr("max", maxDate);
+    dateInput.val(minDate);
+    
+    // 과거 날짜 선택 방지
+    dateInput.on('change', function() {
+        const selectedDate = new Date(this.value);
+        if(selectedDate < today) {
+            $(".modal-body").text("오늘 이전 날짜는 선택할 수 없습니다.");
+            $("#MyModal").modal("show");
+            $(this).val(minDate);
+        }
+    });
 		
 		$('#summernote').summernote();
 
@@ -766,7 +799,7 @@ function isValidRecruitmentForm() {
 						<div class="input-group">
 							<label for="name" class="form-check-label">회사명</label> <input
 								type="text" id="Companyname" placeholder="Enter your full name"
-								required="" readonly="true">
+								required="" readonly="true" value="${sessionScope.account.accountName}">
 
 						</div>
 					</div>
@@ -775,7 +808,7 @@ function isValidRecruitmentForm() {
 						<div class="input-group">
 							<label for="email" class="form-check-label">작성자*</label> <input
 								type="email" id="writer" placeholder="Enter your email address"
-								required="" readonly="true">
+								required="" readonly="true" value="${sessionScope.account.accountId}"> 
 
 						</div>
 					</div>
@@ -1023,13 +1056,11 @@ function isValidRecruitmentForm() {
 										<div class="advantageArea"></div>
 									</div>
 
-									<div class="col-md-6">
+									<div class="col-md-6 dueDate">
 										<div class="input-group">
 											<label for="date" class="form-check-label mb-2">마감 기한</label>
-											<input type="date" id="date" max="2025-12-30"
-												min="2025-03-30" value="2025-03-27">
-
-										</div>
+											<input type="date" id="date">
+										  </div>
 									</div>
 
 									<div class="col-12">
