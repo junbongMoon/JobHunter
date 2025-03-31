@@ -23,7 +23,7 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
-	min-height: 250px;
+	min-height: 350px;
 }
 
 .resume-card:hover {
@@ -44,7 +44,7 @@
 }
 
 .resume-title {
-	color: var(- -heading-color, #37517e);
+	color: var(--heading-color, #37517e);
 	font-size: 1.5rem;
 	font-weight: 600;
 	margin-bottom: 15px;
@@ -52,6 +52,8 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	max-width: 90%;
+	display: block;
 }
 
 .resume-info {
@@ -77,6 +79,9 @@
 	gap: 8px;
 	min-height: 35px;
 	align-items: flex-start;
+	max-height: 80px;
+	overflow: hidden;
+	position: relative;
 }
 
 .info-value {
@@ -94,6 +99,18 @@
 	display: inline-flex;
 	align-items: center;
 	height: 32px;
+	margin-bottom: 4px;
+}
+
+.more-indicator {
+	position: absolute;
+	right: 10px;
+	bottom: 5px;
+	background-color: #f8f9fa;
+	padding: 0 5px;
+	color: #6c757d;
+	font-size: 0.9rem;
+	border-radius: 25px;
 }
 
 .info-empty {
@@ -193,7 +210,7 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 2rem;
+	margin-bottom: 10px;
 }
 
 .resume-count {
@@ -287,9 +304,13 @@
 														<span class="info-empty">등록된 희망근무지역이 없습니다</span>
 													</c:when>
 													<c:otherwise>
-														<c:forEach items="${resume.sigunguList}" var="sigungu">
-															<span class="info-value">${sigungu.regionName} >
-																${sigungu.name}</span>
+														<c:forEach items="${resume.sigunguList}" var="sigungu" varStatus="status">
+															<c:if test="${status.index < 4}">
+																<span class="info-value">${sigungu.regionName} ${sigungu.name}</span>
+															</c:if>
+															<c:if test="${status.index == 4}">
+																<span class="more-indicator">...</span>
+															</c:if>
 														</c:forEach>
 													</c:otherwise>
 												</c:choose>
@@ -303,10 +324,13 @@
 														<span class="info-empty">등록된 희망업직종이 없습니다</span>
 													</c:when>
 													<c:otherwise>
-														<c:forEach items="${resume.subcategoryList}"
-															var="subcategory">
-															<span class="info-value">${subcategory.majorCategoryName}
-																${subcategory.jobName}</span>
+														<c:forEach items="${resume.subcategoryList}" var="subcategory" varStatus="status">
+															<c:if test="${status.index < 4}">
+																<span class="info-value">${subcategory.majorCategoryName} ${subcategory.jobName}</span>
+															</c:if>
+															<c:if test="${status.index == 4}">
+																<span class="more-indicator">...</span>
+															</c:if>
 														</c:forEach>
 													</c:otherwise>
 												</c:choose>
