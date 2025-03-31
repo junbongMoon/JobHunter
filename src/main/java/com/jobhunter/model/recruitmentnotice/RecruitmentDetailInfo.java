@@ -40,6 +40,9 @@ public class RecruitmentDetailInfo {
 	private int count;
 	// 작성한 회사 uid
 	private int refCompany;
+	// 작성자
+	private String companyName;
+	
 	
 	// 면접 방식 리스트
 	private List<Application> application;

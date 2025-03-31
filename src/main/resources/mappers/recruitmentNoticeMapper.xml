@@ -85,7 +85,7 @@
 	<select id="selectRecruitmentWithPaging"
 		resultMap="RecruitmentDetailMap">
 		SELECT
-		r.*,
+		r.*, c.companyName,
 
 		rg.regionNo,
 		rg.name AS regionName, rg.code,
@@ -114,6 +114,8 @@
 		rsb.refRecNo
 		LEFT JOIN subcategory sj ON rsb.refSubNo =
 		sj.subcategoryNo
+		
+		LEFT JOIN company c ON c.uid = r.refCompany
 
 		<where>
 			r.status = 'Y'
@@ -164,6 +166,7 @@
 		<result property="status" column="status" />
 		<result property="count" column="count" />
 		<result property="refCompany" column="refCompany" />
+		<result property="companyName" column="companyName" />
 
 		<!-- Region (도시) -->
 		<association property="region"
