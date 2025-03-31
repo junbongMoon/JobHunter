@@ -90,7 +90,7 @@
 										Page</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
 								<ul>
 									<li><a href="/resume/form">이력서 쓰기</a></li>
-									<li><a href="/resume/resumeFormList">이력서 조회</a></li>
+									<li><a href="/resume/list">이력서 조회</a></li>
 								</ul>
 								</c:otherwise>
 								</c:choose>
