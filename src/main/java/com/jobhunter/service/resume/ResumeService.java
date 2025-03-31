@@ -5,8 +5,11 @@ import java.util.List;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
+import com.jobhunter.model.resume.ResumeVO;
 import com.jobhunter.model.resume.SigunguDTO;
+import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
+import com.jobhunter.model.resume.SubCategoryVO;
 
 public interface ResumeService {
 	void tempSaveResume(ResumeDTO resumeDTO) throws Exception;
@@ -20,7 +23,7 @@ public interface ResumeService {
     List<SubCategoryDTO> getSubCategoriesByMajor(int majorcategoryNo) throws Exception;
 
     // 이력서 목록 조회
-    List<ResumeDTO> getResumeList(int userUid) throws Exception;
-    List<SigunguDTO> getResumeSigungu(int resumeNo) throws Exception;
-    List<SubCategoryDTO> getResumeSubCategory(int resumeNo) throws Exception;
+    List<ResumeVO> getResumeList(int userUid) throws Exception;
+    List<SigunguVO> getResumeSigungu(int resumeNo) throws Exception;
+    List<SubCategoryVO> getResumeSubCategory(int resumeNo) throws Exception;
 }

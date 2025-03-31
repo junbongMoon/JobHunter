@@ -31,6 +31,7 @@ import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
+import com.jobhunter.model.resume.ResumeVO;
 import com.jobhunter.service.resume.ResumeService;
 import com.jobhunter.util.resume.FileProcessForResume;
 
@@ -86,17 +87,10 @@ public class ResumeController {
 			}
 			
 			int userUid = account.getUid();
-			List<ResumeDTO> resumeList = resumeService.getResumeList(userUid);
-			
-			// 각 이력서별로 희망 근무 지역과 업직종 정보 조회
-			for (ResumeDTO resume : resumeList) {
-				List<SigunguDTO> sigunguList = resumeService.getResumeSigungu(resume.getResumeNo());
-				List<SubCategoryDTO> subCategoryList = resumeService.getResumeSubCategory(resume.getResumeNo());
-				resume.setSigunguList(sigunguList);
-				resume.setSubcategoryList(subCategoryList);
-			}
+			List<ResumeVO> resumeList = resumeService.getResumeList(userUid);
 			
 			model.addAttribute("resumeList", resumeList);
+			model.addAttribute("account", account);
 			return "resume/resumeFormList";
 		} catch (Exception e) {
 			model.addAttribute("error", "이력서 목록을 불러오는 중 오류가 발생했습니다.");

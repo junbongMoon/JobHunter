@@ -15,8 +15,11 @@ import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
+import com.jobhunter.model.resume.ResumeVO;
 import com.jobhunter.model.resume.SigunguDTO;
+import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
+import com.jobhunter.model.resume.SubCategoryVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -175,19 +178,29 @@ public class ResumeServiceImpl implements ResumeService {
 		return rdao.selectSubCategoriesByMajor(majorcategoryNo);
 	}
 
+	// 이력서 리스트 조회
 	@Override
-	public List<ResumeDTO> getResumeList(int userUid) throws Exception {
-		System.out.println("###############t서비스단");
-		return rdao.selectResumeList(userUid);
+	public List<ResumeVO> getResumeList(int userUid) throws Exception {
+		List<ResumeVO> resumeList = rdao.selectResumeList(userUid);
+		
+		// 각 이력서에 대해 시군구와 업직종 정보를 설정
+		for (ResumeVO resume : resumeList) {
+			List<SigunguVO> sigunguList = rdao.selectResumeSigungu(resume.getResumeNo());
+			List<SubCategoryVO> subCategoryList = rdao.selectResumeSubCategory(resume.getResumeNo());
+			resume.setSigunguList(sigunguList);
+			resume.setSubcategoryList(subCategoryList);
+		}
+		
+		return resumeList;
 	}
 
 	@Override
-	public List<SigunguDTO> getResumeSigungu(int resumeNo) throws Exception {
+	public List<SigunguVO> getResumeSigungu(int resumeNo) throws Exception {
 		return rdao.selectResumeSigungu(resumeNo);
 	}
 
 	@Override
-	public List<SubCategoryDTO> getResumeSubCategory(int resumeNo) throws Exception {
+	public List<SubCategoryVO> getResumeSubCategory(int resumeNo) throws Exception {
 		return rdao.selectResumeSubCategory(resumeNo);
 	}
 

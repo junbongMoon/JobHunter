@@ -92,39 +92,31 @@
     </insert>
 
     <!-- 이력서 기본 정보 조회 -->
-    <select id="selectResumeList" parameterType="int" resultType="com.jobhunter.model.resume.ResumeDTO">
+    <select id="selectResumeList" parameterType="int" resultType="com.jobhunter.model.resume.ResumeVO">
         SELECT 
             resumeNo,
             title,
             userUid,
-            payType,
-            pay,
-            introduce,
             saveType
         FROM resume
         WHERE userUid = #{userUid}
         ORDER BY resumeNo DESC
     </select>
 
-    <!-- 이력서별 희망 근무 지역 조회 -->
-    <select id="selectResumeSigungu" parameterType="int" resultType="com.jobhunter.model.resume.SigunguDTO">
+    <!-- 이력서별 시군구 정보 조회 -->
+    <select id="selectResumeSigungu" parameterType="int" resultType="com.jobhunter.model.resume.SigunguVO">
         SELECT 
-            sg.sigunguNo,
             sg.name,
-            sg.code,
-            sg.regionNo,
             r.name as regionName
         FROM where_resume_sigungu wrs
         JOIN sigungu sg ON wrs.refSigunguNo = sg.sigunguNo
         JOIN region r ON sg.regionNo = r.regionNo
         WHERE wrs.refResumeNo = #{resumeNo}
-        ORDER BY r.regionNo, sg.sigunguNo
     </select>
 
-    <!-- 이력서별 희망 업직종 조회 -->
-    <select id="selectResumeSubCategory" parameterType="int" resultType="com.jobhunter.model.resume.SubCategoryDTO">
+    <!-- 이력서별 업직종 정보 조회 -->
+    <select id="selectResumeSubCategory" parameterType="int" resultType="com.jobhunter.model.resume.SubCategoryVO">
         SELECT 
-            sc.subcategoryNo,
             sc.jobName,
             sc.refMajorcategoryNo as majorcategoryNo
         FROM jobtype_resume_sub jrs

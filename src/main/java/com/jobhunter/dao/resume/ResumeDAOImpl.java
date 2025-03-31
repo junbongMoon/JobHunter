@@ -16,8 +16,11 @@ import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
+import com.jobhunter.model.resume.ResumeVO;
 import com.jobhunter.model.resume.SigunguDTO;
+import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
+import com.jobhunter.model.resume.SubCategoryVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -107,18 +110,18 @@ public class ResumeDAOImpl implements ResumeDAO {
 	}
 
 	@Override
-	public List<ResumeDTO> selectResumeList(int userUid) throws Exception {
+	public List<ResumeVO> selectResumeList(int userUid) throws Exception {
 		System.out.println("###############다오단");
 		return ses.selectList(NS + ".selectResumeList", userUid);
 	}
 
 	@Override
-	public List<SigunguDTO> selectResumeSigungu(int resumeNo) throws Exception {
+	public List<SigunguVO> selectResumeSigungu(int resumeNo) throws Exception {
 		return ses.selectList(NS + ".selectResumeSigungu", resumeNo);
 	}
 
 	@Override
-	public List<SubCategoryDTO> selectResumeSubCategory(int resumeNo) throws Exception {
+	public List<SubCategoryVO> selectResumeSubCategory(int resumeNo) throws Exception {
 		return ses.selectList(NS + ".selectResumeSubCategory", resumeNo);
 	}
 }

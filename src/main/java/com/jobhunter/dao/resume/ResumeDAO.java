@@ -11,8 +11,11 @@ import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
+import com.jobhunter.model.resume.ResumeVO;
 import com.jobhunter.model.resume.SigunguDTO;
+import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
+import com.jobhunter.model.resume.SubCategoryVO;
 
 public interface ResumeDAO {
 	void insertResumeTemp(ResumeDTO resumeDTO);
@@ -44,9 +47,9 @@ public interface ResumeDAO {
 	void insertResumeUpfile(ResumeUpfileDTO resumeUpfileDTO) throws Exception;
 
 	// 이력서 목록 조회
-	List<ResumeDTO> selectResumeList(int userUid) throws Exception;
+	List<ResumeVO> selectResumeList(int userUid) throws Exception;
 
-	List<SigunguDTO> selectResumeSigungu(int resumeNo) throws Exception;
+	List<SigunguVO> selectResumeSigungu(int resumeNo) throws Exception;
 
-	List<SubCategoryDTO> selectResumeSubCategory(int resumeNo) throws Exception;
+	List<SubCategoryVO> selectResumeSubCategory(int resumeNo) throws Exception;
 }
