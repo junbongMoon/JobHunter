@@ -264,7 +264,7 @@
 			<div class="section-header">
 				<h2>이력서 목록</h2>
 				<div class="nameWithGoodDay">
-					<h4>${account.accountName}님의하루를응원합니다</h4>
+					<h4>${account.accountName}님의하루를응원합니다!</h4>
 				</div>
 			</div>
 			<!-- End Section Title -->
@@ -360,6 +360,7 @@
 				function deleteResume(resumeNo) {
 					if (confirm('정말로 이 이력서를 삭제하시겠습니까?')) {
 						// TODO: 이력서 삭제 API 호출
+						console.log(resumeNo);
 						alert('삭제 기능은 아직 준비중입니다.');
 					}
 				}
