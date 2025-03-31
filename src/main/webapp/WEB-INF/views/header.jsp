@@ -85,10 +85,15 @@
 												Page</a>
 										</c:when>
 										<c:otherwise>
-											<a href="/user/mypage?uid=${sessionScope.account.uid}&accountType=user">My
-												Page</a>
-										</c:otherwise>
-									</c:choose>
+							<li class="dropdown"><a
+									href="/user/mypage?uid=${sessionScope.account.uid}&accountType=user"><span>My
+										Page</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+								<ul>
+									<li><a href="/resume/form">이력서 쓰기</a></li>
+									<li><a href="/resume/resumeFormList">이력서 조회</a></li>
+								</ul>
+								</c:otherwise>
+								</c:choose>
 								</c:if>
 							</li>
 
