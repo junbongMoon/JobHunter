@@ -3,6 +3,7 @@ package com.jobhunter.dao.recruitmentnotice;
 import java.util.List;
 
 import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.Advantage;
 import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
 import com.jobhunter.model.recruitmentnotice.Application;
@@ -35,15 +36,20 @@ public interface RecruitmentNoticeDAO {
 	int selectRecruitmentTotalCount(PageRequestDTO pageRequestDTO) throws Exception;
 	
 	// 키워드에 따라 페이징 된 공고를 가져오는 메서드
-	List<RecruitmentDetailInfo> selectRecruitmentWithKeyword(PageRequestDTO pageRequestDTO);
+	List<RecruitmentDetailInfo> selectRecruitmentWithKeyword(PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO);
 	
 	// uid를 가지고 면접타입들을 조회하는 메서드
 	List<Application> getApplications(int recruitmentNoticeUid) throws Exception;
 	
 	// uid를 가지고 우대조건들을 조회하는 메서드
 	List<Advantage> getAdvantages(int recruitmentNoticeUid) throws Exception;
-
+	
+	// 검색어에 따라 list를 조회하는 메서드
 	int getSearchResultRowCount(PageRequestDTO pageRequestDTO) throws Exception;
 	
-	int getTotalCountRow(PageRequestDTO pageRequestDTO) throws Exception;
+	// 총 row의 갯수 얻어오는 메서드
+	int getTotalCountRow() throws Exception;
+	
+	// 공고의 uid를 매개변수로 RecruitmentnoticeBoardUpfiles를 조회하는 메서드
+	List<RecruitmentnoticeBoardUpfiles> getFileList(int uid);
 }

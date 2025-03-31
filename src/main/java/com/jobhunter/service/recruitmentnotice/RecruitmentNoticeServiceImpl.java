@@ -123,7 +123,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		
 
 		// 전체 검색어에 따라 공고를 가져오는 메서드
-		List<RecruitmentDetailInfo> boardList = recdao.selectRecruitmentWithKeyword(pageRequestDTO);
+		List<RecruitmentDetailInfo> boardList = recdao.selectRecruitmentWithKeyword(pageResponseDTO);
 		System.out.println(boardList);
 
 		if (boardList == null) {
@@ -137,9 +137,11 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 					List<Application> applications = recdao.getApplications(uid);
 					List<Advantage> advantages = recdao.getAdvantages(uid);
-
+					List<RecruitmentnoticeBoardUpfiles> fileList = recdao.getFileList(uid);
+					
 					info.setApplication(applications != null ? applications : Collections.emptyList());
 					info.setAdvantage(advantages != null ? advantages : Collections.emptyList());
+					info.setFileList(fileList != null ? fileList : Collections.emptyList());
 				}
 			}
 		}
@@ -156,15 +158,15 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO = new PageResponseDTO<RecruitmentDetailInfo>(pageRequestDTO.getPageNo(), pageRequestDTO.getRowCntPerPage());
 		
 		 // 기본 페이징
-	      if (StringUtils.isNullOrEmpty(pageRequestDTO.getSearchType())) {
+	      if (StringUtils.hasText(pageRequestDTO.getSearchType())) {
 	         // 검색 안함
-	         pageResponseDTO.setTotalRowCnt(hdao.getTotalCountRow()); // 전체  데이터 수
-	      } else if (!StringUtils.isNullOrEmpty(pageRequestDTO.getSearchType())) {
+	         pageResponseDTO.setTotalRowCnt(recdao.getTotalCountRow()); // 전체  데이터 수
+	      } else if (!StringUtils.hasText(pageRequestDTO.getSearchType())) {
 	         // 검색 함
 	         pageResponseDTO.setSearchType(pageRequestDTO.getSearchType());
 	         pageResponseDTO.setSearchWord(pageRequestDTO.getSearchWord());
 	         
-	         pageResponseDTO.setTotalRowCnt(hdao.getSearchResultRowCount(pageRequestDTO));
+	         pageResponseDTO.setTotalRowCnt(recdao.getSearchResultRowCount(pageRequestDTO));
 	      }
 	      
 	      pageResponseDTO.setTotalPageCnt(); // 전체 페이지 수

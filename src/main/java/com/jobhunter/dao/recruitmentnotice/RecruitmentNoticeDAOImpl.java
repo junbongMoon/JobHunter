@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.Advantage;
 import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
 import com.jobhunter.model.recruitmentnotice.Application;
@@ -76,10 +77,10 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 
 	// 키워드에 따라 공고를 가져오는 메서드
 	@Override
-	public List<RecruitmentDetailInfo> selectRecruitmentWithKeyword(PageRequestDTO pageRequestDTO) {
+	public List<RecruitmentDetailInfo> selectRecruitmentWithKeyword(PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO) {
 		// TODO Auto-generated method stub
 		
-		return ses.selectList(NS + ".selectRecruitmentWithPaging", pageRequestDTO);
+		return ses.selectList(NS + ".selectRecruitmentWithPaging", pageResponseDTO);
 	}
 
 	// 면접타입을 가져오는 메서드
@@ -96,18 +97,25 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		return ses.selectList(NS + ".getAdvantages", recruitmentNoticeUid);
 	}
 
-
+	// 검색어에 따라 row 총 갯수 조회
 	@Override
 	public int getSearchResultRowCount(PageRequestDTO pageRequestDTO) throws Exception {
 		// TODO Auto-generated method stub
-		return 0;
+		return ses.selectOne(NS + ".getSearchResultCountRow", pageRequestDTO);
 	}
 
-
+	// row 총 개수 조회
 	@Override
-	public int getTotalCountRow(PageRequestDTO pageRequestDTO) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getTotalCountRow() throws Exception {
+		
+		return ses.selectOne(NS + ".getTotalCountRow");
+	}
+
+	// 파일 조회하는 메서드
+	@Override
+	public List<RecruitmentnoticeBoardUpfiles> getFileList(int uid) {
+		
+		return ses.selectList(NS + ".getFileWithRecruitment", uid);
 	}
 
 

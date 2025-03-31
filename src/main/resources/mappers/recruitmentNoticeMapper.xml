@@ -52,28 +52,27 @@
 	<select id="getApplications"
 		resultType="com.jobhunter.model.recruitmentnotice.Application">
 		SELECT
-		application_no AS applicationNo,
+		applicationNo,
 		method,
 		detail,
-		recruitment_notice_uid AS recruitmentNoticeUid
+		recruitmentNoticeUid
 		FROM
 		application
 		WHERE
-		recruitment_notice_uid = #{recruitmentNoticeUid}
+		recruitmentNoticeUid = #{recruitmentNoticeUid}
 	</select>
 
 	<!-- advantage 조회 -->
 	<select id="getAdvantages"
 		resultType="com.jobhunter.model.recruitmentnotice.Advantage">
 		SELECT
-		advantage_no AS advantageNo,
-		advantage_type AS
+		advantageNo,
 		advantageType,
-		recruitment_notice_uid AS recruitmentNoticeUid
+		recruitmentNoticeUid
 		FROM
 		advantage
 		WHERE
-		recruitment_notice_uid = #{recruitmentNoticeUid}
+		recruitmentNoticeUid = #{recruitmentNoticeUid}
 	</select>
 
 	<select id="selectMostRecentRecruitmentnoticeByrefCompany"
@@ -86,16 +85,14 @@
 	<select id="selectRecruitmentWithPaging"
 		resultMap="RecruitmentDetailMap">
 		SELECT
-		r.uid, r.title, r.workType, r.payType, r.pay, r.period,
-		r.personalHistory, r.militaryService, r.detail, r.manager,
-		r.miniTitle, r.dueDate, r.status, r.count, r.refCompany,
+		r.*,
 
 		rg.regionNo,
-		rg.name AS regionName,
-		sg.sigunguNo, sg.name AS sigunguName,
+		rg.name AS regionName, rg.code,
+		sg.sigunguNo, sg.name AS sigunguName, sg.regionNo,
 
 		mj.majorcategoryNo AS majorNo, mj.jobName AS majorJobName,
-		sj.subcategoryNo AS subNo, sj.jobName AS subJobName
+		sj.subcategoryNo AS subNo, sj.jobName AS subJobName, sj.refMajorcategoryNo
 
 		FROM
 		recruitmentnotice r
@@ -143,7 +140,7 @@
 			</if>
 		</where>
 		ORDER BY r.uid DESC
-		LIMIT #{rowCntPerPage}, #{pageNo}
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
 	</select>
 
 	<resultMap id="RecruitmentDetailMap"
@@ -218,6 +215,10 @@
       </choose>
    </select>
 
-
+	<select id="getFileWithRecruitment" resultType="com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles">
+		select *
+		from recruitmentnoticeboardupfiles
+		where refrecruitmentnoticeNo = #{uid}
+	</select>
 
 </mapper>
