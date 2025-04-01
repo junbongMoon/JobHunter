@@ -52,7 +52,7 @@ public class RecruitmentNoticeRestController {
 	private String subCategoryCode;
 	// 게시글 작성시 업로드한 파일객체들을 임시로 저장
 	private List<RecruitmentnoticeBoardUpfiles> fileList = new ArrayList<RecruitmentnoticeBoardUpfiles>();
-	   // 게시글 수정시 업로한 파일 객체들을 임식로 저장
+	// 게시글 수정시 업로한 파일 객체들을 임식로 저장
 	private List<RecruitmentnoticeBoardUpfiles> modifyFileList;
 
 	// 회사가 공고를 등록하는 메서드
@@ -66,11 +66,9 @@ public class RecruitmentNoticeRestController {
 		// 현재 작성한 작성회사의 pk를 넣어준다.
 		recruitmentNoticeDTO.setRefCompany(uid);
 		// String으로 받은 값을 int로 바꾸자..
-		 Timestamp dueDate = recruitmentNoticeDTO.getDueDate();
-	        LocalDateTime onlyDate = dueDate.toLocalDateTime().withHour(0).withMinute(0).withSecond(0);
-	        recruitmentNoticeDTO.setDueDate(Timestamp.valueOf(onlyDate));
-
-		
+		Timestamp dueDate = recruitmentNoticeDTO.getDueDate();
+		LocalDateTime onlyDate = dueDate.toLocalDateTime().withHour(0).withMinute(0).withSecond(0);
+		recruitmentNoticeDTO.setDueDate(Timestamp.valueOf(onlyDate));
 
 		try {
 			if (recService.saveRecruitmentNotice(recruitmentNoticeDTO, advantageList, applicationList, regionCode,
@@ -82,7 +80,7 @@ public class RecruitmentNoticeRestController {
 			result = ResponseEntity.badRequest().body(false);
 			e.printStackTrace();
 		}
-		
+
 		// 리스트 필드 다 비워주기
 		ListAllClear();
 
@@ -97,19 +95,16 @@ public class RecruitmentNoticeRestController {
 		// 성공, 실패 여부를 json으로 응답
 		ResponseEntity<List<AdvantageDTO>> result = null;
 
-		
 		if (advantageDTO != null) {
 			advantageList.add(advantageDTO);
 			result = ResponseEntity.ok(this.advantageList);
 		} else {
 			result = ResponseEntity.badRequest().body(this.advantageList);
 		}
-		
+
 		System.out.println(advantageList);
 		return result;
 	}
-
-	
 
 	// 회사가 공고를 작성할 때 지역을 필드에 임시저장하는 메서드
 	@PostMapping(value = "/region/{regionCode}")
@@ -154,14 +149,14 @@ public class RecruitmentNoticeRestController {
 			@RequestBody ApplicationDTO applicationDTO) {
 		// 성공, 실패 여부를 json으로 응답
 		ResponseEntity<List<ApplicationDTO>> result = null;
-		
+
 		boolean isDuplicate = false;
-		for(ApplicationDTO appl : applicationList) {
-			if(appl.getMethod() == applicationDTO.getMethod()) {
+		for (ApplicationDTO appl : applicationList) {
+			if (appl.getMethod() == applicationDTO.getMethod()) {
 				isDuplicate = true;
 			}
 		}
-		
+
 		// 같은 이름의 method가 들어올 경우 방지
 		if (applicationDTO != null && !isDuplicate) {
 			applicationList.add(applicationDTO);
@@ -214,75 +209,73 @@ public class RecruitmentNoticeRestController {
 
 		return result;
 	}
-	
-	
-	
+
 	// 공고를 작성할 때 면접방식을 삭제하는 메서드
-	
+
 	@DeleteMapping("/application")
-	public ResponseEntity<List<ApplicationDTO>> deleteApplicationWithRecruitmentNotice(@RequestBody ApplicationDTO applicationDTO){
+	public ResponseEntity<List<ApplicationDTO>> deleteApplicationWithRecruitmentNotice(
+			@RequestBody ApplicationDTO applicationDTO) {
 		ResponseEntity<List<ApplicationDTO>> result = null;
-		
-		for(int i = 0; i < applicationList.size(); i++) {
-			if(applicationList.get(i).getMethod() == applicationDTO.getMethod()) {
+
+		for (int i = 0; i < applicationList.size(); i++) {
+			if (applicationList.get(i).getMethod() == applicationDTO.getMethod()) {
 				applicationList.remove(i);
 			}
 		}
 		result = ResponseEntity.ok(applicationList);
-		
+
 		System.out.println(applicationList);
-		
+
+		return result;
+	}
+
+	// 회사가 공고를 작성할 때 우대조건을 리스트에서 삭제 해주는 메서드
+	@DeleteMapping(value = "/advantage/{advantageType}")
+	public ResponseEntity<List<AdvantageDTO>> deleteAdvantage(@PathVariable("advantageType") String advantageType) {
+		ResponseEntity<List<AdvantageDTO>> result = null;
+
+		if (this.advantageList.removeIf(adv -> adv.getAdvantageType().equals(advantageType))) {
+			System.out.println("우대조건 삭제 : " + advantageList);
+
+		}
+		result = ResponseEntity.ok(this.advantageList);
+
 		return result;
 	}
 	
-	
-	// 회사가 공고를 작성할 때 우대조건을 리스트에서 삭제 해주는 메서드
-		@DeleteMapping(value = "/advantage/{advantageType}")
-		public ResponseEntity<List<AdvantageDTO>> deleteAdvantage(@PathVariable("advantageType") String advantageType) {
-			ResponseEntity<List<AdvantageDTO>> result = null;
-
-			
-			if (this.advantageList.removeIf(adv -> adv.getAdvantageType().equals(advantageType))) {
-				System.out.println("우대조건 삭제 : " + advantageList);
-				
-			} 
-			result = ResponseEntity.ok(this.advantageList);
-			
-			return result;
+	// 파일을 저장하는 메서드
+	@PostMapping("/file")
+	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadFile(@RequestParam("file") MultipartFile file,
+			HttpServletRequest request) {
+		try {
+			RecruitmentnoticeBoardUpfiles uploadedFile = fp.saveFileToRealPath(file, request,
+					"/resources/recruitmentFiles");
+			uploadedFile.setStatus(FileStatus.NEW);
+			fileList.add(uploadedFile);
+			System.out.println(fileList);
+			return ResponseEntity.ok(fileList);
+		} catch (IOException e) {
+			logger.error("파일 업로드 실패", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
+	}
 	
+	// 파일을 삭제하는 메서드
+	@DeleteMapping("/file")
+	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> removeFile(
+			@RequestParam("removeFileName") String removeFileName) {
+		fileList.removeIf(f -> {
+			if (f.getOriginalFileName().equals(removeFileName)) {
+				fp.removeFile(f);
+				System.out.println(fileList);
+				return true;
+			}
+			return false;
+		});
+		return ResponseEntity.ok(fileList);
+	}
 	
-	
-	 @PostMapping("/file")
-	    public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadFile(@RequestParam("file") MultipartFile file,
-	                                                                          HttpServletRequest request) {
-	        try {
-	            RecruitmentnoticeBoardUpfiles uploadedFile = fp.saveFileToRealPath(file, request, "/resources/recruitmentFiles");
-	            uploadedFile.setStatus(FileStatus.NEW);
-	            fileList.add(uploadedFile);
-	            System.out.println(fileList);
-	            return ResponseEntity.ok(fileList);
-	        } catch (IOException e) {
-	            logger.error("파일 업로드 실패", e);
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-	        }
-	    }
-
-	    @DeleteMapping("/file")
-	    public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> removeFile(@RequestParam("removeFileName") String removeFileName) {
-	        fileList.removeIf(f -> {
-	            if (f.getOriginalFileName().equals(removeFileName)) {
-	                fp.removeFile(f);
-	                System.out.println(fileList);
-	                return true;
-	            }
-	            return false;
-	        });
-	        return ResponseEntity.ok(fileList);
-	    }
-	
-	
-	
+	// 파일을 받아오는 메서드
 
 	// 내가 작성한 공고 수정하는 메서드
 

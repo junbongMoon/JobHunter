@@ -270,12 +270,15 @@ h3 {
 
 										<div class="share-section">
 											<h4>Share Article</h4>
-											<div class="social-links">
-												<a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-												<a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-												<a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-												<a href="#" class="copy-link" title="Copy Link"><i
-													class="bi bi-link-45deg"></i></a>
+											<div class="social-links mt-2">
+												<div class="d-flex gap-2">
+													<button type="button" class="btn btn-secondary"
+														onclick="location.href='/recruitmentnotice/listAll'">목록으로</button>
+													<button type="button" class="btn btn-primary"
+														onclick="location.href='/recruitmentnotice/modify?uid=${RecruitmentDetailInfo.uid}'">수정</button>
+													<button type="button" class="btn btn-danger"
+														onclick="deleteRecruitment('${RecruitmentDetailInfo.uid}')">삭제</button>
+												</div>
 											</div>
 										</div>
 									</div>
