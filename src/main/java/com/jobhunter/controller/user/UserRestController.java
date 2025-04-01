@@ -1,5 +1,7 @@
 package com.jobhunter.controller.user;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.user.ContactUpdateDTO;
 import com.jobhunter.model.user.PasswordDTO;
+import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.service.user.UserService;
 import com.jobhunter.util.AccountUtil;
@@ -40,6 +43,28 @@ public class UserRestController {
 
 	    return ResponseEntity.status(HttpStatus.OK).body(userVO);
 	}
+	
+	@PostMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
+    public ResponseEntity<?> updateUserInfo(@RequestBody UserInfoDTO userInfo, @PathVariable("uid") Integer uid, HttpSession session) {
+        
+		System.out.println(userInfo);
+		
+		if (uid == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("success", false, "message", "잘못된 계정입니다."));
+        }
+
+        userInfo.setUid(uid);
+        boolean success = false;
+		try {
+			success = service.updateUserInfo(userInfo);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        return ResponseEntity.ok(Map.of("success", success));
+    }
 	
 	@PostMapping(value = "/password", consumes = "application/json")
 	public ResponseEntity<Boolean> checkPassword(@RequestBody PasswordDTO dto) {
