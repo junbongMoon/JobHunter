@@ -54,7 +54,7 @@
 			<header id="header" class="header d-flex align-items-center">
 				<div class="container-fluid container-xl position-relative d-flex align-items-center header-background">
 
-					<a href="index.html" class="logo d-flex align-items-center me-auto">
+					<a href="/" class="logo d-flex align-items-center me-auto">
 						<!-- Uncomment the line below if you also wish to use an image logo -->
 						<!-- <img src="assets/img/logo.webp" alt=""> -->
 						<h1 class="sitename">JobHunter</h1>
