@@ -11,6 +11,7 @@
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
 .resume-card {
 	border: 1px solid #e4e4e4;
@@ -457,8 +458,17 @@
 				function deleteResume(resumeNo) {
 					if (confirm('정말로 이 이력서를 삭제하시겠습니까?')) {
 						// TODO: 이력서 삭제 API 호출
-						console.log(resumeNo);
-						alert('삭제 기능은 아직 준비중입니다.');
+						$.ajax({
+							url: '/resume/delete/' + resumeNo,
+							type: 'DELETE',
+							success: function (response) {
+								alert('이력서가 성공적으로 삭제되었습니다.');
+								location.reload();
+							},
+							error: function (xhr, status, error) {
+								alert('이력서 삭제 중 오류가 발생했습니다.');
+							}
+						});
 					}
 				}
 			</script>

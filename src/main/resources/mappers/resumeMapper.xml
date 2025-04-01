@@ -131,4 +131,17 @@
         JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
         WHERE jrs.refResumeNo = #{resumeNo}
     </select>
+
+    <!-- 이력서 삭제 -->
+    <delete id="deleteResume" parameterType="int">
+        DELETE FROM resume
+        WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 이력서 파일 조회 -->
+    <select id="selectResumeUpfile" parameterType="int" resultType="com.jobhunter.model.resume.ResumeUpfileDTO">
+        SELECT *
+        FROM resumeupfiles
+        WHERE resumeNo = #{resumeNo}
+    </select>
 </mapper>

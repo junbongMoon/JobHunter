@@ -5,6 +5,7 @@ import java.util.List;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
+import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.ResumeVO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SigunguVO;
@@ -26,5 +27,10 @@ public interface ResumeService {
     List<ResumeVO> getResumeList(int userUid, int page, int pageSize) throws Exception;
     int getTotalResumes(int userUid) throws Exception;
     List<SigunguVO> getResumeSigungu(int resumeNo) throws Exception;
+
     List<SubCategoryVO> getResumeSubCategory(int resumeNo) throws Exception;
+
+    List<ResumeUpfileDTO> selectResumeUpfile(int resumeNo) throws Exception;
+
+    void deleteResume(int resumeNo) throws Exception;
 }

@@ -53,4 +53,8 @@ public interface ResumeDAO {
 	List<SigunguVO> selectResumeSigungu(int resumeNo) throws Exception;
 
 	List<SubCategoryVO> selectResumeSubCategory(int resumeNo) throws Exception;
+
+	List<ResumeUpfileDTO> selectResumeUpfile(int resumeNo) throws Exception;
+
+	void deleteResume(int resumeNo) throws Exception;
 }

@@ -132,4 +132,14 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public List<SubCategoryVO> selectResumeSubCategory(int resumeNo) throws Exception {
 		return ses.selectList(NS + ".selectResumeSubCategory", resumeNo);
 	}
+
+	@Override
+	public List<ResumeUpfileDTO> selectResumeUpfile(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeUpfile", resumeNo);
+	}
+
+	@Override
+	public void deleteResume(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteResume", resumeNo);
+	}
 }

@@ -209,4 +209,13 @@ public class ResumeServiceImpl implements ResumeService {
 		return rdao.selectResumeSubCategory(resumeNo);
 	}
 
+	@Override
+	public List<ResumeUpfileDTO> selectResumeUpfile(int resumeNo) throws Exception {
+		return rdao.selectResumeUpfile(resumeNo);
+	}
+
+	@Override
+	public void deleteResume(int resumeNo) throws Exception {
+		rdao.deleteResume(resumeNo);
+	}
 }
