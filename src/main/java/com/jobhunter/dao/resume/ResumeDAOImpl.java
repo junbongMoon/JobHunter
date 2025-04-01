@@ -32,10 +32,6 @@ public class ResumeDAOImpl implements ResumeDAO {
 
 	private static final String NS = "com.jobhunter.mapper.resumemapper";
 
-	@Override
-	public void insertResumeTemp(ResumeDTO resumeDTO) {
-		ses.insert(NS + ".insertResumeTemp", resumeDTO);
-	}
 
 	@Override
 	public void insertResumeFinal(ResumeDTO resumeDTO) {

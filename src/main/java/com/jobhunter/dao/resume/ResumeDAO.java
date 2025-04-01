@@ -18,7 +18,6 @@ import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 
 public interface ResumeDAO {
-	void insertResumeTemp(ResumeDTO resumeDTO);
 
 	void insertResumeFinal(ResumeDTO resumeDTO);
 

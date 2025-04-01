@@ -21,10 +21,23 @@
 				<form id="resumeForm" method="post" enctype="multipart/form-data">
 
 					<!-- 이력서 제목 -->
-					<div class="mb-4">
-						<label for="title" class="form-label fw-bold">이력서 제목<span
-								class="essentialPoint">*</span></label> <input type="text" class="form-control"
-							id="title" name="title" placeholder="예: 자바 개발자 지원" maxlength="30" />
+					<div class="card mb-4">
+						<div class="card-header">
+							이력서 제목<span class="essentialPoint">*</span>
+						</div>
+						<div class="card-body">
+							<div class="input-group">
+								<span class="input-group-text bg-light">
+									<i class="bi bi-pencil-square"></i>
+								</span>
+								<input type="text" class="form-control form-control-lg" id="title" name="title"
+									placeholder="예: 자바 개발자 지원" maxlength="30">
+							</div>
+							<div class="d-flex justify-content-between mt-2">
+								<small class="text-muted">* 이력서의 제목을 입력해 주세요.</small>
+								<small class="text-muted"><span id="titleLength">0</span> / 30</small>
+							</div>
+						</div>
 					</div>
 
 					<!-- 기본 정보 (users 테이블에서 가져올 예정) -->
@@ -401,26 +414,26 @@
 								</div>
 
 								<!-- 근무기간 -->
-								<div class="col-md-4">
+								<div class="col-md-6">
 									<label class="form-label">근무기간<span class="essentialPoint">*</span></label>
-									<div class="row g-2">
-										<div class="col-md-4">
+									<div class="row g-3">
+										<div class="col-md-5">
 											<input type="date" class="form-control start-date" name="startDate"
 												max="${today}">
 										</div>
 										<div
-											class="col-md-1 text-center d-flex align-items-center justify-content-center">
+											class="col-md-2 text-center d-flex align-items-center justify-content-center textflow">
 											<span>~</span>
 										</div>
-										<div class="col-md-4">
+										<div class="col-md-5">
 											<input type="date" class="form-control end-date" name="endDate"
 												max="${today}">
 										</div>
 									</div>
 									<div class="form-check mt-2">
 										<input type="checkbox" class="form-check-input currently-employed"
-											id="currentlyEmployed"> <label class="form-check-label"
-											for="currentlyEmployed">재직중</label>
+											id="currentlyEmployed">
+										<label class="form-check-label" for="currentlyEmployed">재직중</label>
 									</div>
 								</div>
 
@@ -517,14 +530,8 @@
 						</div>
 					</div>
 
-
-					<!-- 임시 저장 버튼 -->
-					<button type="button" class="btn btn-secondary" id="tempSaveBtn">임시
-						저장</button>
-
 					<!-- 완전 저장 버튼 -->
-					<button type="button" class="btn btn-primary" id="finalSaveBtn">완전
-						저장</button>
+					<button type="button" class="btn btn-primary" id="finalSaveBtn">저장하기</button>
 
 					<button type="button" class="btn btn-secondary" id="testBtn">코드
 						테스트용 버튼</button>
@@ -554,114 +561,307 @@
 		</html>
 
 		<style>
-			/* 파일 첨부 텍스트 폰트 크기 + 폰트 위치 아래로*/
+			/* 전체 컨테이너 스타일 */
+			.container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 2rem;
+			}
+
+			/* 날짜 선택 필드 스타일 */
+			input[type="date"] {
+				width: 100%;
+				min-width: 150px;
+				padding: 0.75rem 1rem;
+				border: 1px solid #e0e0e0;
+				border-radius: 8px;
+				transition: all 0.3s ease;
+			}
+
+			input[type="date"]:focus {
+				border-color: var(--accent-color);
+				box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
+			}
+
+			/* 제목 스타일 */
+			h2 {
+				color: var(--heading-color);
+				font-family: var(--heading-font);
+				font-weight: 600;
+				margin-bottom: 2rem;
+				position: relative;
+				padding-bottom: 1rem;
+			}
+
+			h2:after {
+				content: '';
+				position: absolute;
+				left: 0;
+				bottom: 0;
+				width: 50px;
+				height: 3px;
+				background: var(--accent-color);
+			}
+
+			/* 카드 스타일 */
+			.card {
+				border: none;
+				box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+				margin-bottom: 2rem;
+				transition: all 0.3s ease;
+			}
+
+			.card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+			}
+
+			/* 카드 헤더 스타일 */
+			.card-header {
+				background: var(--heading-color);
+				color: white;
+				font-weight: 600;
+				padding: 0.75rem 1rem;
+				border-radius: 8px 8px 0 0 !important;
+				min-height: 45px;
+				display: inline-block;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.card-body {
+				padding: 1.5rem;
+			}
+
+			/* 폼 요소 스타일 */
+			.form-control,
+			.form-select {
+				border: 1px solid #e0e0e0;
+				border-radius: 8px;
+				padding: 0.75rem 1rem;
+				transition: all 0.3s ease;
+			}
+
+			.form-control:focus,
+			.form-select:focus {
+				border-color: var(--accent-color);
+				box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
+			}
+
+			/* 버튼 스타일 */
+			.btn {
+				padding: 0.5rem 1rem;
+				border-radius: 6px;
+				font-weight: 500;
+				transition: all 0.3s ease;
+				font-size: 0.9rem;
+			}
+
+			.btn-sm {
+				padding: 0.25rem 0.75rem;
+				font-size: 0.85rem;
+			}
+
+			.btn-primary {
+				background: var(--accent-color);
+				border: none;
+			}
+
+			.btn-primary:hover {
+				background: color-mix(in srgb, var(--accent-color), transparent 15%);
+				transform: translateY(-2px);
+			}
+
+			.btn-secondary {
+				background: #6c757d;
+				border: none;
+			}
+
+			.btn-secondary:hover {
+				background: #5a6268;
+				transform: translateY(-2px);
+			}
+
+			/* 필수 입력 항목 스타일 */
+			.essentialPoint {
+				color: #dc3545;
+				font-weight: bold;
+				margin-left: 0;
+				font-size: 0.9rem;
+				display: inline;
+			}
+
+			/* 파일 업로드 영역 스타일 */
+			#fileContainer {
+				border: 2px dashed var(--accent-color);
+				border-radius: 12px;
+				padding: 2rem;
+				text-align: center;
+				transition: all 0.3s ease;
+				background: rgba(71, 178, 228, 0.05);
+			}
+
+			#fileContainer:hover {
+				background: rgba(71, 178, 228, 0.1);
+			}
+
 			.fileText {
 				font-size: 1.1rem;
-				margin-top: 45px;
+				color: #666;
+				margin: 0;
 			}
 
-			/* 첨부파일 드래그 & 드롭 하는 곳 */
-			#fileContainer {
-				border: 2px dashed #ccc;
-				border-radius: 8px;
-				padding: 20px;
-				min-height: 150px;
-			}
-
-			/* 필수 입력 항목 스타일링 */
-			.essentialPoint {
-				color: red;
-			}
-
-			/* 스크롤바 스타일링 - 모든 리스트 컨테이너에 적용 */
-			.region-list-container::-webkit-scrollbar,
-			.sigungu-list-container::-webkit-scrollbar,
-			.major-list-container::-webkit-scrollbar,
-			.sub-list-container::-webkit-scrollbar {
-				width: 8px;
-				/* 스크롤바 너비 */
-			}
-
-			/* 스크롤바 트랙 스타일링 */
-			.region-list-container::-webkit-scrollbar-track,
-			.sigungu-list-container::-webkit-scrollbar-track,
-			.major-list-container::-webkit-scrollbar-track,
-			.sub-list-container::-webkit-scrollbar-track {
-				background: #f1f1f1;
-				/* 트랙 배경색 */
-				border-radius: 4px;
-				/* 모서리 둥글게 */
-			}
-
-			/* 스크롤바 썸 스타일링 */
-			.region-list-container::-webkit-scrollbar-thumb,
-			.sigungu-list-container::-webkit-scrollbar-thumb,
-			.major-list-container::-webkit-scrollbar-thumb,
-			.sub-list-container::-webkit-scrollbar-thumb {
-				background: #888;
-				/* 썸 배경색 */
-				border-radius: 4px;
-				/* 모서리 둥글게 */
-			}
-
-			/* 스크롤바 썸 호버 효과 */
-			.region-list-container::-webkit-scrollbar-thumb:hover,
-			.sigungu-list-container::-webkit-scrollbar-thumb:hover,
-			.major-list-container::-webkit-scrollbar-thumb:hover,
-			.sub-list-container::-webkit-scrollbar-thumb:hover {
-				background: #555;
-				/* 호버 시 배경색 */
-			}
-
-			/* 리스트 아이템 스타일링 */
-			.list-group-item {
-				cursor: pointer;
-				/* 마우스 커서 포인터로 변경 */
-				transition: background-color 0.2s;
-				/* 배경색 변경 애니메이션 */
-			}
-
-			/* 리스트 아이템 호버 효과 */
-			.list-group-item:hover {
-				background-color: #f8f9fa;
-			}
-
-			/* 선택된 시/도, 대분류 아이템 스타일링 */
-			.region-item.selected,
-			.major-item.selected {
-				background-color: #e9ecef;
-				font-weight: bold;
-			}
-
-			/* 선택된 항목(뱃지) 스타일링 */
-			#selectedRegions .badge,
-			#selectedJobTypes .badge {
-				margin-bottom: 0.5rem;
-				/* 뱃지 간격 */
-				display: inline-block;
-				/* 인라인 블록으로 표시 */
-				padding: 0.5rem 0.75rem;
-				/* 뱃지 내부 여백 */
-			}
-
-			#fileContainer {
-				min-height: 150px;
-				transition: all 0.3s ease;
-				position: relative;
-			}
-
-			#fileContainer.border-primary {
-				border-color: #0d6efd !important;
-				background-color: rgba(13, 110, 253, 0.05);
-			}
-
+			/* 파일 미리보기 스타일 */
 			.file-preview {
-				border: 1px solid #dee2e6;
-				transition: all 0.2s ease;
+				background: white;
+				border-radius: 8px;
+				padding: 1rem;
+				margin-bottom: 1rem;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+				transition: all 0.3s ease;
 			}
 
 			.file-preview:hover {
-				background-color: #e9ecef !important;
+				transform: translateX(5px);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+			}
+
+			/* 리스트 컨테이너 스타일 */
+			.region-list-container,
+			.sigungu-list-container,
+			.major-list-container,
+			.sub-list-container {
+				border: 1px solid #e0e0e0;
+				border-radius: 8px;
+				background: white;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+			}
+
+			/* 리스트 아이템 스타일 */
+			.list-group-item {
+				border: none;
+				padding: 0.75rem 1rem;
+				transition: all 0.2s ease;
+			}
+
+			.list-group-item:hover {
+				background: rgba(71, 178, 228, 0.1);
+			}
+
+			.list-group-item.selected {
+				background: var(--accent-color);
+				color: white;
+			}
+
+			/* 뱃지 스타일 */
+			.badge {
+				padding: 0.5rem 1rem;
+				font-weight: 500;
+				margin: 0.25rem;
+				border-radius: 20px;
+				display: inline-flex;
+				align-items: center;
+			}
+
+			/* 모달 스타일 */
+			.modal-content {
+				border: none;
+				border-radius: 12px;
+				box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+			}
+
+			.modal-header {
+				background: var(--heading-color);
+				color: white;
+				border-radius: 12px 12px 0 0;
+				padding: 1.5rem;
+			}
+
+			.modal-body {
+				padding: 2rem;
+			}
+
+			/* 성격 및 강점 버튼 스타일 */
+			.merit-btn {
+				margin: 0.5rem;
+				border-radius: 20px;
+				padding: 0.5rem 1.5rem;
+				transition: all 0.3s ease;
+			}
+
+			.merit-btn:hover {
+				transform: translateY(-2px);
+			}
+
+			/* 스크롤바 스타일 */
+			::-webkit-scrollbar {
+				width: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: #f1f1f1;
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: var(--accent-color);
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: color-mix(in srgb, var(--accent-color), transparent 15%);
+			}
+
+			/* 반응형 스타일 */
+			@media (max-width: 768px) {
+				.container {
+					padding: 1rem;
+				}
+
+				.card-header {
+					padding: 0.75rem 1rem;
+				}
+
+				.card-body {
+					padding: 1rem;
+				}
+
+				.btn {
+					padding: 0.5rem 1rem;
+				}
+
+				#fileContainer {
+					padding: 1rem;
+				}
+			}
+
+			.textflow {
+				margin-left: -10px;
+				margin-right: -10px;
+			}
+
+			/* 이력서 제목 입력 스타일 */
+			#title {
+				font-size: 1.1rem;
+				padding: 0.8rem 1rem;
+				border: 1px solid #e0e0e0;
+				transition: all 0.3s ease;
+			}
+
+			#title:focus {
+				border-color: var(--accent-color);
+				box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
+			}
+
+			.input-group-text {
+				border: 1px solid #e0e0e0;
+				border-right: none;
+				padding: 0.8rem 1rem;
+			}
+
+			.input-group-text i {
+				font-size: 1.2rem;
+				color: var(--accent-color);
 			}
 		</style>
 
@@ -1085,9 +1285,137 @@
 					console.log('저장할 데이터:', formData);
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
-				// Temp 저장 버튼 클릭 이벤트
-				$('#tempSaveBtn').on('click', function () {
-					// 폼 데이터 수집
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 최종 저장 버튼 클릭 이벤트
+				$('#finalSaveBtn').on('click', function () {
+					// 유효성 검사
+					const title = $('#title').val().trim();
+					const titleLength = $('#title').val().length;
+					if (!title) {
+						showValidationModal("이력서 제목을 입력해주세요.", "#title");
+						return;
+					}
+
+					if (titleLength > 30) {
+						showValidationModal("이력서 제목은 30자 이내로 작성해주세요.", "#title");
+						return;
+					}
+
+					const jobFormCount = $('input[name="jobForm"]:checked').length;
+					if (jobFormCount === 0) {
+						showValidationModal("희망 고용형태를 하나 이상 선택해주세요.", "#fullTime");
+						return;
+					}
+
+					const payType = $('input[name="payType"]:checked').val();
+					const payAmount = $('#payAmount').val().trim();
+					if (payType !== '협의 후 결정' && (!payAmount || payAmount <= 0)) {
+						showValidationModal("희망 금액을 입력해주세요", "#payAmount");
+						return;
+					}
+
+					const regionCount = $('#selectedRegions .badge').length;
+					if (regionCount === 0) {
+						showValidationModal("희망 근무지를 선택해 주세요");
+						$("#wishRegion").attr("tabindex", -1).focus();
+						return;
+					}
+
+					const jobTypeCount = $('#selectedJobTypes .badge').length;
+					if (jobTypeCount === 0) {
+						showValidationModal("희망 업직종을 선택해 주세요");
+						$("#wishJobBox").attr("tabindex", -1).focus();
+						return;
+					}
+
+					const meritCount = $('#selectedMerits .badge').length;
+					if (meritCount === 0) {
+						showValidationModal("성격 및 강점을 선택해 주세요");
+						$("#myMerits").attr("tabindex", -1).focus();
+						return;
+					}
+
+					// 학력을 추가하였는가 확인하고 추가하였다면 값을 입력하지 않았을 시 학력사항에 입력사항이 누락되었음을 알리고 입력을 하도록 유도
+					const educationItems = $('.education-item'); // each -> 
+					if (educationItems.length > 0) {
+						let isValid = true;
+
+						educationItems.each(function () {
+							const educationLevel = $(this).find('.education-level').val();
+							const educationStatus = $(this).find('.education-status').val();
+							const customInput = $(this).find('.custom-input').val().trim();
+
+							if (!educationLevel || !educationStatus || !customInput) {
+								isValid = false;
+								return false; // each 중단
+							}
+						});
+
+						if (!isValid) {
+							showValidationModal("학력사항에 입력사항이 누락되었습니다.");
+							$("#myEducationBox").attr("tabindex", -1).focus();
+							return;
+						}
+					}
+
+					// 경력사항 유효성 검사 -> 학력과 유사한 형식
+					const historyItems = $('.history-item');
+					if (historyItems.length > 0) {
+						let isValid = true;
+
+						historyItems.each(function () {
+							const companyName = $(this).find('.company-name').val().trim();
+							const jobDescription = $(this).find('.job-description').val().trim();
+							const startDate = $(this).find('.start-date').val();
+							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
+							const endDate = $(this).find('.end-date').val();
+
+							if (!companyName || !jobDescription || !startDate) {
+								isValid = false;
+								focusElement = $(this).find(':input[value=""]:first');
+								return false; // each 중단
+							}
+
+							// 재직중이 아닌 경우에만 종료일 체크
+							if (!isCurrentlyEmployed && !endDate) {
+								isValid = false;
+								return false;
+							}
+						});
+
+						if (!isValid) {
+							showValidationModal("경력사항에 입력사항이 누락되었습니다.");
+							$("#myHistoryBox").attr("tabindex", -1).focus();
+							return;
+						}
+					}
+
+					// 자격증 유효성 검사
+					const licenseItems = $('.license-item');
+					if (licenseItems.length > 0) {
+						let isValid = true;
+
+						licenseItems.each(function () {
+							const licenseName = $(this).find('.license-name').val().trim();
+							const acquisitionDate = $(this).find('.acquisition-date').val();
+							const institution = $(this).find('.institution').val();
+
+							if (!licenseName || !acquisitionDate || !institution) {
+								isValid = false;
+								return false; // each 중단
+							}
+
+							if (!isValid) {
+								showValidationModal("자격증 정보가 누락되었습니다.");
+								$("#myLicenseBox").attr("tabindex", -1).focus();
+								return;
+							}
+						});
+					}
+
+					console.log("유효성 검사 통과");
+
+					// 폼 데이터 수집 .map() -> .get()으로 배열 변환해서 값 가져오기
 					const formData = {
 						title: $('#title').val(),
 						payType: $('input[name="payType"]:checked').val(),
@@ -1137,83 +1465,6 @@
 						introduce: $('#selfIntroTextarea').val(),
 						files: uploadedFiles,
 						userUid: $('#userUid').val()
-					};
-
-					console.log('저장할 데이터:', formData);
-
-					$.ajax({
-						url: '/resume/submit-temp',
-						type: 'POST',
-						data: JSON.stringify(formData),
-						contentType: 'application/json',
-						success: function (response) {
-							if (response.success) {
-								window.location.href = response.redirectUrl;
-							} else {
-								alert(response.message);
-							}
-						},
-						error: function (xhr, status, error) {
-							console.error('Error details:', {
-								status: status,
-								error: error,
-								response: xhr.responseText
-							});
-							alert('저장 중 오류가 발생했습니다.');
-						}
-					});
-				});
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// 최종 저장 버튼 클릭 이벤트
-				$('#finalSaveBtn').on('click', function () {
-					// 폼 데이터 수집 .map() -> .get()으로 배열 변환해서 값 가져오기
-					const formData = {
-						title: $('#title').val(),
-						payType: $('input[name="payType"]:checked').val(),
-						pay: $('#payAmount').val(),
-						jobForms: $('input[name="jobForm"]:checked').map(function () {
-							return {
-								form: $(this).val()
-							};
-						}).get(),
-						sigunguNos: $('#selectedRegions').find('.badge').map(function () {
-							return $(this).data("sigungu");
-						}).get(),
-						subcategoryNos: $('#selectedJobTypes').find('.badge').map(function () {
-							let subName = $(this).text().trim();
-							return $('input[data-name="' + subName + '"]').val();
-						}).get(),
-						merits: $('#selectedMerits').find('.badge').map(function () {
-							return {
-								meritContent: $(this).data('merit')
-							};
-						}).get(),
-						educations: $('.education-item').map(function () {
-							return {
-								educationLevel: $(this).find('.education-level').val(),
-								educationStatus: $(this).find('.education-status').val(),
-								customInput: $(this).find('.custom-input').val()
-							};
-						}).get(),
-						histories: $('.history-item').map(function () {
-							const $endDate = $(this).find('.end-date');
-							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
-							return {
-								companyName: $(this).find('.company-name').val(),
-								position: $(this).find('.position').val(),
-								jobDescription: $(this).find('.job-description').val(),
-								startDate: $(this).find('.start-date').val(),
-								endDate: isCurrentlyEmployed ? null : $endDate.val()
-							};
-						}).get(),
-						licenses: $('.license-item').map(function () {
-							return {
-								licenseName: $(this).find('.license-name').val(),
-								acquisitionDate: $(this).find('.acquisition-date').val(),
-								institution: $(this).find('.institution').val()
-							};
-						}).get(),
-						introduce: $('#selfIntroTextarea').val()
 					};
 
 					console.log('저장할 데이터:', formData);
@@ -1577,5 +1828,11 @@
 						$fileText.show();
 					}
 				}
+
+				// 제목 입력 글자수 카운트
+				$('#title').on('input', function () {
+					const currentLength = $(this).val().length;
+					$('#titleLength').text(currentLength);
+				});
 			});
 		</script>

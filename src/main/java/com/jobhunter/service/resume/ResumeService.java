@@ -13,7 +13,7 @@ import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 
 public interface ResumeService {
-	void tempSaveResume(ResumeDTO resumeDTO) throws Exception;
+
     void finalSaveResume(ResumeDTO resumeDTO) throws Exception;
     
 
