@@ -767,16 +767,98 @@ if (workDetailType) {
 </script>
 
 <style>
-.form-check-input {
-	width: 18px;
-	height: 18px;
-	margin-top: 0 !important;
-	margin-bottom: 0 !important;
+form {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #37517e;
+  }
+
+  .custom-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
 }
 
-.form-check-label {
-	margin-bottom: 0 !important;
-	line-height: 1.5;
+/* 라벨 간격 조절 (상단 마진 추가) */
+.custom-select-wrapper label {
+  margin-bottom: 0.6rem;
+  margin-top: 1rem;  
+  font-size: 1rem;
+  font-weight: 600;
+  color: #37517e;
+}
+
+/* 박스형 셀렉트 */
+.form-select {
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #cfd8dc;
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  border-radius: 1rem;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23444" height="24" viewBox="0 0 24 24" width="24"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  max-width: 100%;
+  width: 100%;
+}
+
+  .form-control, .form-select {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0.75rem;
+    padding: 0.6rem 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+  }
+
+  .form-select:focus, .form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+	outline: none;
+  }
+
+  .form-section {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  label.form-check-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #37517e;
+  }
+
+  .input-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .addAdvantageBtn, #write {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.5rem 1.2rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  float: right;
+  margin-top: 0.5rem;
+}
+
+.addAdvantageBtn:hover, #write {
+  background-color: #298ce7; /* 진한 하늘색 hover 효과 */
 }
 </style>
 
@@ -827,38 +909,40 @@ if (workDetailType) {
 					</div>
 
 
-					<div class="col-12">
-						<div class="input-group">
-							<label for="majorCategory" class="form-check-label">산업군</label> <select
-								class="MajorCategory form-select" id="MajorCategory">
-
+					<div class="form-section">
+						<div class="custom-select-wrapper">
+							<label for="MajorCategory">산업군</label>
+							<select class="MajorCategory form-select" id="MajorCategory">
+							  
 							</select>
-						</div>
+						  </div>
 
-						<div class="col-12">
-							<div class="input-group">
-								<label for="subCategory" class="form-check-label">직종</label> <select
-									class="SubCategory form-select" id="SubCategory">
+						
+						  <div class="custom-select-wrapper">
+							<label for="subCategory">직종</label>
+							<select class="SubCategory form-select" id="SubCategory">
+							  
+							</select>
+						  </div>
 
-								</select>
-							</div>
-
-							<div class="col-12">
-								<div class="input-group">
-									<label for="region" class="form-check-label">도시</label> <select
-										class="Region form-select" id="regionList">
+							
+								<div class="custom-select-wrapper">
+									<label for="region" class="form-check-label">도시</label> 
+									<select class="Region form-select" id="regionList">
 
 									</select>
 								</div>
 								<input type="hidden" id="region">
-								<div class="col-12">
-									<div class="input-group">
-										<label for="sigungu" class="form-check-label">시군구</label> <select
-											class="Sigungu form-select" id="sigunguList">
+								
+								<div class="custom-select-wrapper">
+									<label for="sigungu" class="form-check-label">시군구</label> 
+									<select	class="Sigungu form-select" id="sigunguList">
 
-										</select>
-									</div>
-									<input type="hidden" id="sigungu">
+									</select>
+								</div>
+							<input type="hidden" id="sigungu">
+					</div>
+									
 
 									<div class="col-12">
 										<label for="workType1" class="form-check-label mb-2"
@@ -927,7 +1011,7 @@ if (workDetailType) {
 										</div>
 									</div>
 
-									<div class="col-md-6">
+									<div class="col-md-12">
 										<div class="input-group">
 											<label for="pay" class="form-check-label mb-2">급여 액수</label>
 											<input type="text" id="pay" maxlength="15"
@@ -946,10 +1030,10 @@ if (workDetailType) {
 									</div>
 
 									<div class="col-md-6">
-										<div class="input-group">
-											<label for="workDetailType" class="form-check-label mb-2">근무시간
-												상세</label> <select class="form-select" id="workDetailType">
-												<option value="">선택 없음</option>
+										<div class="custom-select-wrapper">
+											<label for="workDetailType">근무시간 상세</label> 
+											<select class="form-select" id="workDetailType">
+												<option value="주 5일제">주 5일제</option>
 												<option value="2교대">2교대</option>
 												<option value="3교대">3교대</option>
 												<option value="격일근무">격일 근무</option>
@@ -1070,9 +1154,11 @@ if (workDetailType) {
 											<label for="advantage" class="form-check-label mb-2">우대조건</label>
 											<input type="text" id="advantage"
 												placeholder="우대조건을 입력하고 저장 버튼을 눌러주세요..">
-											<button type="button" class="addAdvantageBtn"
-												onclick="addAdvantage()">저장하기</button>
+											
 										</div>
+										<div class="text-end mb-3">
+											<button type="button" class="addAdvantageBtn" onclick="addAdvantage()">저장하기</button>
+										  </div>
 										<div class="advantageArea"></div>
 									</div>
 
@@ -1102,7 +1188,7 @@ if (workDetailType) {
 									<label for="files">추가로 올릴 자료가 있으면 하단의 박스에 드래그드롭 하세요.</label>
 									<div class="col-12">
 										<div class="input-group fileUploadArea" id="files"
-											style="width: 800px; height: 80px; background-color: #eee; border-radius: 10px;">
+											style="width: 100%; height: 80px; background-color: #eee; border-radius: 10px;">
 
 
 										</div>
