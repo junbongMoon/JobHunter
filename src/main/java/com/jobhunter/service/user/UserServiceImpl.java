@@ -57,13 +57,13 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	private void normalizeUserInfo(UserInfoDTO userInfo) {
-	    // 문자열 필드 중 빈 문자열을 null로 변환
+	    // 문자열 필드 중 빈 문자열을 null로 변환 (js에서 하기는 했지만 한번 더 체크)
 	    userInfo.setAddr(trimToNull(userInfo.getAddr()));
 	    userInfo.setPayType(trimToNull(userInfo.getPayType()));
 	    userInfo.setIntroduce(trimToNull(userInfo.getIntroduce()));
 	    userInfo.setDisability(trimToNull(userInfo.getDisability()));
 
-	    // 정수형도 "0"이나 -1 같은 값이면 null 처리
+	    // 정수형도 0이나 -1 같은 값이면 null 처리
 	    if (userInfo.getAge() != null && userInfo.getAge() <= 0) {
 	        userInfo.setAge(null);
 	    }
