@@ -792,10 +792,9 @@ if (workDetailType) {
 			<!-- 일단 /recruitmentnotice/rest/ 뒤의 값을 1번으로 해둠 나중 되면 el표현식으로 sessionScope.loginmember.uid로 바꾸자.. -->
 			<form method="post" role="form">
 
-				<div class="form-header">
+				<div class="form-header categories-widget widget-item">
 					<h3>채용 공고</h3>
-					<p>Your email address will not be published. Required fields
-						are marked *</p>
+					<p>하단에 정보를 입력해주세요</p>
 				</div>
 
 				<div class="row gy-3">
@@ -811,7 +810,7 @@ if (workDetailType) {
 
 					<div class="col-md-6">
 						<div class="input-group">
-							<label for="email" class="form-check-label">작성자*</label> <input
+							<label for="email" class="form-check-label">작성자</label> <input
 								type="email" id="writer" placeholder="Enter your email address"
 								required="" readonly="true"
 								value="${sessionScope.account.accountId}">
