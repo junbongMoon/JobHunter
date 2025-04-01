@@ -75,7 +75,7 @@
                     <li class="dropdown"><a href="#"><span>채용정보</span> <i
                                 class="bi bi-chevron-down toggle-dropdown"></i></a>
                         <ul>
-                            <li><a href="#">전체 채용정보</a></li>
+                            <li><a href="/recruitmentnotice/listAll">전체 채용정보</a></li>
                             <li><a href="#">지역별 채용정보</a></li>
                             <li><a href="#">직업별 채용정보</a></li>
                         </ul>
