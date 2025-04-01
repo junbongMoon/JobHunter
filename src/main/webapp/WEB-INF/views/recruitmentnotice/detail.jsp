@@ -11,7 +11,8 @@
 		showDetailInfo();
 
 	});
-
+	
+	// 데이터를 출력 하는 함수
 	function showDetailInfo() {
 		const uid = '${RecruitmentDetailInfo.uid}';
 		const application = '${RecruitmentDetailInfo.application}';
@@ -28,12 +29,13 @@
 		const fileList = '${RecruitmentDetailInfo.fileList}';
 		const count = '${RecruitmentDetailInfo.count}';
 
-		// 마감일 넣어주기
-		if (!isNaN(dueDate.getTime())) {
+		// 마감일 출력
+		
+		if (!isNaN(dueDate.getTime())) { // dueDateRaw가 날짜형식이 아니면 Invalid Date객체 생성, .getTime()이 NaN을 반환
 			const formatted = dueDate.toLocaleDateString('ko-KR', {
-				year : 'numeric',
-				month : 'long',
-				day : 'numeric'
+				year : 'numeric', // 숫자
+				month : 'long', // n월
+				day : '2-digit' // 2자리
 			});
 			$('#dueDateSpan').text(formatted);
 		} else {
@@ -83,6 +85,12 @@ h3 {
 .trend-list li:hover {
 	background-color: #f1f8ff;
 	transform: scale(1.01);
+}
+
+#fileList .badge {
+	margin-right: 6px;
+	margin-bottom: 4px;
+	font-size: 0.9rem;
 }
 </style>
 <body>
@@ -201,7 +209,16 @@ h3 {
 											</div>
 										</div>
 										<h3>첨부 파일</h3>
-										<p id="fileList">첨부 파일 뱃지 형식으로 출력</p>
+										<p id="fileList">
+											<c:if test="${not empty RecruitmentDetailInfo.fileList}">
+												<c:forEach var="file"
+													items="${RecruitmentDetailInfo.fileList}">
+													<span class="badge rounded-pill text-bg-secondary"
+														onclick="downloadFile(${RecruitmentDetailInfo.boardUpFileNo})">
+														${file.originalFileName} </span>
+												</c:forEach>
+											</c:if>
+										</p>
 									</div>
 
 									<div class="meta-bottom">
@@ -213,29 +230,32 @@ h3 {
 														items="${RecruitmentDetailInfo.application}">
 														<c:choose>
 															<c:when test="${app.method eq 'ONLINE'}">
-																<li onclick="openContactModal('${app.method}', '${app.detail}')"><img
+																<li
+																	onclick="openContactModal('${app.method}', '${app.detail}')"><img
 																	src="/resources/images_mjb/internet100.png" width="24"
-																	height="24"
-																	
-																	style="cursor: pointer;" /> <span>온라인 접수 안내</span></li>
+																	height="24" style="cursor: pointer;" /> <span>온라인
+																		접수 안내</span></li>
 															</c:when>
 															<c:when test="${app.method eq 'EMAIL'}">
-																<li onclick="openContactModal('${app.method}', '${app.detail}')"><img src="/resources/images_mjb/mail100.png"
-																	width="24" height="24"
-																	
-																	style="cursor: pointer;" /> <span>이메일 접수 안내</span></li>
+																<li
+																	onclick="openContactModal('${app.method}', '${app.detail}')"><img
+																	src="/resources/images_mjb/mail100.png" width="24"
+																	height="24" style="cursor: pointer;" /> <span>이메일
+																		접수 안내</span></li>
 															</c:when>
 															<c:when test="${app.method eq 'PHONE'}">
-																<li onclick="openContactModal('${app.method}', '${app.detail}')"><img src="/resources/images_mjb/phone100.png"
-																	width="24" height="24"
-																	
-																	style="cursor: pointer;" /> <span>전화 접수 안내</span></li>
+																<li
+																	onclick="openContactModal('${app.method}', '${app.detail}')"><img
+																	src="/resources/images_mjb/phone100.png" width="24"
+																	height="24" style="cursor: pointer;" /> <span>전화
+																		접수 안내</span></li>
 															</c:when>
 															<c:when test="${app.method eq 'TEXT'}">
-																<li onclick="openContactModal('${app.method}', '${app.detail}')"><img src="/resources/images_mjb/mobile100.png"
-																	width="24" height="24"
-																	
-																	style="cursor: pointer;" /> <span>문자 접수 안내</span></li>
+																<li
+																	onclick="openContactModal('${app.method}', '${app.detail}')"><img
+																	src="/resources/images_mjb/mobile100.png" width="24"
+																	height="24" style="cursor: pointer;" /> <span>문자
+																		접수 안내</span></li>
 															</c:when>
 														</c:choose>
 													</c:forEach>
