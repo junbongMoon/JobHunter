@@ -454,10 +454,13 @@
           <button type="submit" class="btn-confirm full-width">로그인</button>
 
 					<div class="social-login">
-						<button type="button" class="btn-kakao" onclick="location.href='#'">
+						<button type="button" class="btn-kakao" onclick="kakao()">
 							<img src="#" alt="kakao">
 							카카오 로그인
 						</button>
+						
+						
+    
 			    </div>
 				</c:otherwise>
 			</c:choose>
@@ -465,6 +468,17 @@
 	</div>
 	<!-- 파이어베이스 캡챠 넣을곳 -->
 	<div id="recaptcha-container"></div>
+	
+					    <!-- Fetch -->
+					    <button onclick="sendFetch()">Fetch로 전송</button>
+					
+					    <!-- jQuery -->
+					    <button id="jqueryBtn">jQuery로 전송</button>
+					
+					    <!-- form 태그 -->
+					    <form action="/user/kakao" method="POST" target="_blank">
+					        <button type="submit">Form으로 전송</button>
+					    </form>
 </main>
 
 <!-- 알럿 모달 추가 -->
@@ -770,6 +784,70 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+function kakao () {
+	$.ajax({
+        type: "POST",
+        url: "/user/kakao",
+        data: JSON.stringify({ test: "value" }), // 필요시 전송 데이터
+        contentType: "application/json",
+        success: function(res) {
+        	if (res.data.status === "NEED_LOGIN" || res.data.status === "NEED_VERIFICATION") {
+                window.location.href = res.data.redirect;
+            } else {
+                // 정상 데이터 처리
+                console.log("응답 내용:", res.data);
+            }
+        },
+        error: function(xhr) {
+            console.log("에러 발생:", xhr);
+        }
+    });
+}
+
+
+function sendFetch() {
+    fetch("/user/kakao", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ test: "fetch" })
+    })
+    .then(res => res.json()) // 반드시 json 파싱
+    .then(data => {
+        console.log("Fetch 응답:", data);
+        if (data.status === "NEED_LOGIN" || data.status === "NEED_VERIFICATION") {
+            window.location.href = data.redirect;
+        } else {
+            alert("Fetch: " + data.message);
+        }
+    })
+    .catch(err => {
+        console.error("Fetch 에러:", err);
+    });
+}
+
+$("#jqueryBtn").click(function () {
+    $.ajax({
+        type: "POST",
+        url: "/user/kakao",
+        data: JSON.stringify({ test: "jquery" }),
+        contentType: "application/json",
+        dataType: "json", // 반드시 명시!
+        success: function (res) {
+            console.log("jQuery 응답:", res);
+            if (res.status === "NEED_LOGIN" || res.status === "NEED_VERIFICATION") {
+                window.location.href = res.redirect;
+            } else {
+                alert("jQuery: " + res.message);
+            }
+        },
+        error: function (xhr) {
+            console.error("jQuery 에러:", xhr);
+        }
+    });
+})
 </script>
 
 <jsp:include page="../footer.jsp" />
