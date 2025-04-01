@@ -3,6 +3,53 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+  $(function(){
+    
+    showDetailInfo();
+    
+  });
+
+  function showDetailInfo(){
+    const uid = '${RecruitmentDetailInfo.uid}';
+    const application = '${RecruitmentDetailInfo.application}';
+    const workType = '${RecruitmentDetailInfo.workType}';
+    const region = '${RecruitmentDetailInfo.region}';
+    const sigungu = '${RecruitmentDetailInfo.sigungu}';
+    const majorCategory = '${RecruitmentDetailInfo.majorCategory}';
+    const subCategory = '${RecruitmentDetailInfo.subcategory}';
+    const militaryService = '${RecruitmentDetailInfo.militaryService}';
+    const manager = '${RecruitmentDetailInfo.manager}';
+    const period = '${RecruitmentDetailInfo.period}';
+    const pay = '${RecruitmentDetailInfo.pay}';
+    const payType = '${RecruitmentDetailInfo.payType}';
+    const personalHistory = '${RecruitmentDetailInfo.personalHistory}';
+    const detail = '${RecruitmentDetailInfo.detail}';
+    const dueDateRaw = '${RecruitmentDetailInfo.dueDate}'; 
+    const dueDate = new Date(dueDateRaw);
+    const fileList = '${RecruitmentDetailInfo.fileList}';
+    const count = '${RecruitmentDetailInfo.count}';
+    
+    // 마감일 넣어주기
+    if (!isNaN(dueDate.getTime())) {
+    const formatted = dueDate.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+      $('#dueDateSpan').text(formatted);
+    } else {
+      $('#dueDateSpan').text('유효하지 않은 날짜');
+    }
+
+    $('#detail').html(detail);
+
+    
+  }
+
+</script>
 <body>
 <!-- 헤더 -->
 	<jsp:include page="../header.jsp"></jsp:include>
@@ -22,18 +69,18 @@
 
                 <div class="article-content" data-aos="fade-up" data-aos-delay="100">
                   <div class="content-header">
-                    <h1 class="title">공고 제목</h1>
+                    <h1 class="title">${RecruitmentDetailInfo.title}</h1>
 
                     <div class="author-info">
                       <div class="author-details">
                         <!-- 이미지 있으면 이미지 넣을 것 -->
                         <div class="info">
-                          <h4>작성자(회사명)</h4>
-                          <span class="role">Senior Web Developer</span>
+                          <h4>${RecruitmentDetailInfo.companyName}</h4>
+                          <span class="role">${RecruitmentDetailInfo.subcategory.jobName}</span>
                         </div>
                       </div>
                       <div class="post-meta">
-                        <span class="date"><i class="bi bi-calendar3"></i> Mar 15, 2025(마감기한)</span>
+                        <span class="dueDate"><i class="bi bi-calendar3"></i>마감  <span id="dueDateSpan"></span></span>
                         <span class="divider">•</span>
                         <span class="comments"><i class="bi bi-chat-text"></i> 18 Comments(제출된 이력서 수)</span>
                       </div>
@@ -41,56 +88,84 @@
                   </div>
 
                   <div class="content">
-                    <p class="lead">
+                    <p class="companyIntroduce">
                       회사 기본 소개
                     </p>
-
-                    <p>
-                      지역, 시군구, 산업군, 직업군, 면접 방식, 우대 조건, 경력 사항 뱃지 형식으로 출력
+                    <h3>지역</h3>
+                    <p id="region">
+                      도시, 시군구 뱃지 형식으로 출력
                     </p>
 
-                    <p>
-                      근무형태, 급여형태, 급여액수, 근무 시간
+                    <h3>직업</h3>
+                    <p id="jobType">
+                      산업군, 직업군 뱃지 형식으로 출력
                     </p>
 
-                    <h2>The Rise of Web Components</h2>
-                    <p>
-                      디테일(썸머노트)
+
+                    <h3>근무형태</h3>
+                    <p id="workType">
+                      근무형태, 근무 시간 
+                    </p>
+
+                    
+                    <h3>급여</h3>
+                    <p id="pay">
+                      급여형태, 급여액수
                     </p>
                     
 
+                    <h3>경력</h3>
+                    <p id="personalHistory">
+                      경력 사항 뱃지 형식으로 출력
+                    </p>
+
+                    <h3>우대 조건</h3>
+                    <p id="advantage">
+                      <p id="advantage">
+                        <c:forEach var="item" items="${RecruitmentDetailInfo.advantage}">
+                          <span class="badge bg-primary me-2 mb-2">${item.advantageType}</span>
+                        </c:forEach>
+                      </p>
+                    </p>
+
+                    
+                    
+                    <h2>공고 상세 정보</h2>
                     <div class="highlight-box">
-                      <h3>Key Trends in 2025</h3>
-                      <ul class="trend-list">
-                        <li>
-                          <i class="bi bi-lightning-charge"></i>
-                          <span>여기 클릭하면 모달창(담당자 contact 정보 뜸) 온라인일 시 동적으로 만듬</span>
-                        </li>
-                        <li>
-                          <i class="bi bi-shield-check"></i>
-                          <span>여기 클릭하면 모달창(담당자 contact 정보 뜸) 이메일일 시 동적으로 만듬</span>
-                        </li>
-                        <li>
-                          <i class="bi bi-phone"></i>
-                          <span>여기 클릭하면 모달창(담당자 contact 정보 뜸) 전화일 시 동적으로 만듬</span>
-                        </li>
-                        <li>
-                          <i class="bi bi-phone"></i>
-                          <span>여기 클릭하면 모달창(담당자 contact 정보 뜸) 문자일 시 동적으로 만듬</span>
-                        </li>
-                      </ul>
+                      
+                    <p id = "detail">
+                      
+                    </p>
                     </div>
+
+                    <h3>첨부 파일</h3>
+                    <p id="fileList">
+                      첨부 파일 뱃지 형식으로 출력
+                    </p>
                   </div>
 
                   <div class="meta-bottom">
                     <div class="tags-section">
                       <h4>Related Topics</h4>
                       <div class="tags">
-                        <a href="#" class="tag">토픽 주제 일단대기</a>
-                        <a href="#" class="tag">Performance</a>
-                        <a href="#" class="tag">Best Practices</a>
-                        <a href="#" class="tag">Trends</a>
-                        <a href="#" class="tag">2025</a>
+                        <ul class="trend-list">
+                          <li>
+                            <i class="bi bi-lightning-charge"></i>
+                            <span>여기 클릭하면 모달창(담당자 contact 정보 뜸) 온라인일 시 동적으로 만듬</span>
+                          </li>
+                          <li>
+                            <i class="bi bi-shield-check"></i>
+                            <span>여기 클릭하면 모달창(담당자 contact 정보 뜸) 이메일일 시 동적으로 만듬</span>
+                          </li>
+                          <li>
+                            <i class="bi bi-phone"></i>
+                            <span>여기 클릭하면 모달창(담당자 contact 정보 뜸) 전화일 시 동적으로 만듬</span>
+                          </li>
+                          <li>
+                            <i class="bi bi-phone"></i>
+                            <span>여기 클릭하면 모달창(담당자 contact 정보 뜸) 문자일 시 동적으로 만듬</span>
+                          </li>
+                        </ul>
                       </div>
                     </div>
 

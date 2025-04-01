@@ -2,6 +2,7 @@ package com.jobhunter.service.recruitmentnotice;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -155,6 +156,8 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 					info.setApplication(applications != null ? applications : Collections.emptyList());
 					info.setAdvantage(advantages != null ? advantages : Collections.emptyList());
 					info.setFileList(fileList != null ? fileList : Collections.emptyList());
+				}else {
+					throw new NoSuchElementException();
 				}
 			}
 		}
