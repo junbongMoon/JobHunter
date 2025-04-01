@@ -21,16 +21,38 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession();
         AccountVO account = (AccountVO) session.getAttribute("account");
 
+        // AJAX, Fetch, Axios 등 체크
+        boolean isAsync = isAsyncOrApiRequest(request); 
+        
         // 로그인 안 한 경우
         if (account == null) {
             RedirectUtil.saveRedirectUrl(request, session);
-            response.sendRedirect("/account/login/return");
+            
+            String loginUrl = request.getContextPath() + "/account/login/return";
+            
+            if (isAsync) {
+                response.setContentType("application/json; charset=UTF-8");
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write("{\"status\": \"NEED_LOGIN\", \"redirect\": \"" + loginUrl + "\"}");
+            } else {
+                response.sendRedirect(loginUrl);
+            }
+            
             return false;
         }
 
         // 인증 필요 여부 체크
         if ("Y".equals(account.getRequiresVerification())) {
-        	response.sendRedirect(request.getContextPath() + "/account/login?requireVerification=true");
+        	String redirectUrl = request.getContextPath() + "/account/login?requireVerification=true";
+
+            if (isAsync) {
+                response.setContentType("application/json; charset=UTF-8");
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write("{\"status\": \"NEED_VERIFICATION\", \"redirect\": \"" + redirectUrl + "\"}");
+            } else {
+                response.sendRedirect(redirectUrl);
+            }
+            
             return false;
         }
 
@@ -49,5 +71,13 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
 			throws Exception {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private boolean isAsyncOrApiRequest(HttpServletRequest request) {
+	    String requestedWith = request.getHeader("X-Requested-With");
+	    String accept = request.getHeader("Accept");
+
+	    return "XMLHttpRequest".equalsIgnoreCase(requestedWith)
+	        || (accept != null && accept.contains("application/json"));
 	}
 }
