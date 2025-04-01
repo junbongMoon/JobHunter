@@ -45,7 +45,8 @@
 		$('#detail').html(detail);
 
 	}
-
+	
+	// 모달 띄우기
 	function openContactModal(method, detail) {
 		const message = detail && detail.trim() !== '' ? detail
 				: `${method} 방식으로 접수 가능합니다.`;
@@ -54,6 +55,10 @@
 		const modal = new bootstrap.Modal(document
 				.getElementById('contactModal'));
 		modal.show();
+	}
+	
+	function downloadFile(boardUpFileNo){
+		// 아작스 불러서 파일 저장
 	}
 </script>
 <style>
@@ -214,7 +219,7 @@ h3 {
 												<c:forEach var="file"
 													items="${RecruitmentDetailInfo.fileList}">
 													<span class="badge rounded-pill text-bg-secondary"
-														onclick="downloadFile(${RecruitmentDetailInfo.boardUpFileNo})">
+														onclick="downloadFile(${file.boardUpFileNo})">
 														${file.originalFileName} </span>
 												</c:forEach>
 											</c:if>
