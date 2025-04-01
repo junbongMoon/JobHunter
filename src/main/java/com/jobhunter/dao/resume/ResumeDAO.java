@@ -47,7 +47,8 @@ public interface ResumeDAO {
 	void insertResumeUpfile(ResumeUpfileDTO resumeUpfileDTO) throws Exception;
 
 	// 이력서 목록 조회
-	List<ResumeVO> selectResumeList(int userUid) throws Exception;
+	List<ResumeVO> selectResumeList(int userUid, int page, int pageSize) throws Exception;
+	int selectTotalResumes(int userUid) throws Exception;
 
 	List<SigunguVO> selectResumeSigungu(int resumeNo) throws Exception;
 

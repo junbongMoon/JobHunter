@@ -23,7 +23,8 @@ public interface ResumeService {
     List<SubCategoryDTO> getSubCategoriesByMajor(int majorcategoryNo) throws Exception;
 
     // 이력서 목록 조회
-    List<ResumeVO> getResumeList(int userUid) throws Exception;
+    List<ResumeVO> getResumeList(int userUid, int page, int pageSize) throws Exception;
+    int getTotalResumes(int userUid) throws Exception;
     List<SigunguVO> getResumeSigungu(int resumeNo) throws Exception;
     List<SubCategoryVO> getResumeSubCategory(int resumeNo) throws Exception;
 }

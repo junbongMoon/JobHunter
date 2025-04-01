@@ -180,8 +180,8 @@ public class ResumeServiceImpl implements ResumeService {
 
 	// 이력서 리스트 조회
 	@Override
-	public List<ResumeVO> getResumeList(int userUid) throws Exception {
-		List<ResumeVO> resumeList = rdao.selectResumeList(userUid);
+	public List<ResumeVO> getResumeList(int userUid, int page, int pageSize) throws Exception {
+		List<ResumeVO> resumeList = rdao.selectResumeList(userUid, page, pageSize);
 		
 		// 각 이력서에 대해 시군구와 업직종 정보를 설정
 		for (ResumeVO resume : resumeList) {
@@ -192,6 +192,11 @@ public class ResumeServiceImpl implements ResumeService {
 		}
 		
 		return resumeList;
+	}
+
+	@Override
+	public int getTotalResumes(int userUid) throws Exception {
+		return rdao.selectTotalResumes(userUid);
 	}
 
 	@Override

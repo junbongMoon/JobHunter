@@ -110,9 +110,17 @@ public class ResumeDAOImpl implements ResumeDAO {
 	}
 
 	@Override
-	public List<ResumeVO> selectResumeList(int userUid) throws Exception {
-		System.out.println("###############다오단");
-		return ses.selectList(NS + ".selectResumeList", userUid);
+	public List<ResumeVO> selectResumeList(int userUid, int page, int pageSize) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("userUid", userUid);
+		params.put("offset", (page - 1) * pageSize);
+		params.put("pageSize", pageSize);
+		return ses.selectList(NS + ".selectResumeList", params);
+	}
+
+	@Override
+	public int selectTotalResumes(int userUid) throws Exception {
+		return ses.selectOne(NS + ".selectTotalResumes", userUid);
 	}
 
 	@Override

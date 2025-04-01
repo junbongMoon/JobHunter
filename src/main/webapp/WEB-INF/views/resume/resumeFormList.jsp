@@ -44,7 +44,7 @@
 }
 
 .resume-title {
-	color: var(--heading-color, #37517e);
+	color: var(- -heading-color, #37517e);
 	font-size: 1.5rem;
 	font-weight: 600;
 	margin-bottom: 15px;
@@ -250,6 +250,70 @@
 .nameWithGoodDay {
 	margin-top: 20px;
 }
+
+/* 페이지네이션 스타일 */
+.pagination {
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 5px;
+}
+
+.pagination .page-item {
+	list-style: none;
+	margin: 0 2px;
+}
+
+.pagination .page-link {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 40px;
+	height: 40px;
+	padding: 0 12px;
+	border-radius: 8px;
+	background-color: #fff;
+	color: #37517e;
+	font-weight: 500;
+	text-decoration: none;
+	border: 1px solid #e4e4e4;
+	transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+	background-color: #f8f9fa;
+	color: #47b2e4;
+	border-color: #47b2e4;
+	transform: translateY(-2px);
+}
+
+.pagination .page-item.active .page-link {
+	background-color: #37517e;
+	color: #fff;
+	border-color: #37517e;
+}
+
+.pagination .page-item:first-child .page-link, .pagination .page-item:last-child .page-link
+	{
+	padding: 0 15px;
+	font-size: 1.2rem;
+}
+
+.pagination .page-item.disabled .page-link {
+	background-color: #f8f9fa;
+	color: #adb5bd;
+	border-color: #e4e4e4;
+	cursor: not-allowed;
+	transform: none;
+}
+
+.pagination .page-item.disabled .page-link:hover {
+	background-color: #f8f9fa;
+	color: #adb5bd;
+	border-color: #e4e4e4;
+}
 </style>
 </head>
 
@@ -272,7 +336,7 @@
 			<!-- Section Actions -->
 			<div class="section-actions">
 				<div class="resume-count">
-					<span>내 이력서</span> <span class="count">${resumeList.size()}건</span>
+					<span>내 이력서</span> <span class="count">${totalResumes}건</span>
 				</div>
 				<a href="/resume/form" class="btn-custom btn-create"> <i
 					class="fas fa-plus"></i> 새 이력서 작성
@@ -304,9 +368,11 @@
 														<span class="info-empty">등록된 희망근무지역이 없습니다</span>
 													</c:when>
 													<c:otherwise>
-														<c:forEach items="${resume.sigunguList}" var="sigungu" varStatus="status">
+														<c:forEach items="${resume.sigunguList}" var="sigungu"
+															varStatus="status">
 															<c:if test="${status.index < 4}">
-																<span class="info-value">${sigungu.regionName} ${sigungu.name}</span>
+																<span class="info-value">${sigungu.regionName}
+																	${sigungu.name}</span>
 															</c:if>
 															<c:if test="${status.index == 4}">
 																<span class="more-indicator">...</span>
@@ -324,9 +390,11 @@
 														<span class="info-empty">등록된 희망업직종이 없습니다</span>
 													</c:when>
 													<c:otherwise>
-														<c:forEach items="${resume.subcategoryList}" var="subcategory" varStatus="status">
+														<c:forEach items="${resume.subcategoryList}"
+															var="subcategory" varStatus="status">
 															<c:if test="${status.index < 4}">
-																<span class="info-value">${subcategory.majorCategoryName} ${subcategory.jobName}</span>
+																<span class="info-value">${subcategory.majorCategoryName}
+																	${subcategory.jobName}</span>
 															</c:if>
 															<c:if test="${status.index == 4}">
 																<span class="more-indicator">...</span>
@@ -355,6 +423,35 @@
 			</div>
 		</div>
 	</section>
+
+	<!-- 페이지네이션 -->
+	<c:if test="${totalPages > 1}">
+		<div class="container mt-1 mb-5">
+			<nav aria-label="Page navigation">
+				<ul class="pagination">
+					<c:if test="${currentPage > 1}">
+						<li class="page-item"><a class="page-link"
+							href="/resume/list?page=${currentPage - 1}&pageSize=${pageSize}"
+							aria-label="Previous"> <i class="fas fa-chevron-left"></i>
+						</a></li>
+					</c:if>
+
+					<c:forEach begin="1" end="${totalPages}" var="i">
+						<li class="page-item ${currentPage == i ? 'active' : ''}"><a
+							class="page-link"
+							href="/resume/list?page=${i}&pageSize=${pageSize}">${i}</a></li>
+					</c:forEach>
+
+					<c:if test="${currentPage < totalPages}">
+						<li class="page-item"><a class="page-link"
+							href="/resume/list?page=${currentPage + 1}&pageSize=${pageSize}"
+							aria-label="Next"> <i class="fas fa-chevron-right"></i>
+						</a></li>
+					</c:if>
+				</ul>
+			</nav>
+		</div>
+	</c:if>
 
 	<script>
 				function deleteResume(resumeNo) {

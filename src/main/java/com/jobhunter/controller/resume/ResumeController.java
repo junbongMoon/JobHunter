@@ -48,7 +48,7 @@ public class ResumeController {
 	// 이력서 작성 폼 연결
 	@GetMapping("/form")
 	public String resumeForm(Model model) {
-		
+
 		try {
 			// 지역 목록 조회
 			List<RegionDTO> regionList = resumeService.getAllRegions();
@@ -60,13 +60,13 @@ public class ResumeController {
 			model.addAttribute("error", "데이터를 불러오는 중 오류가 발생했습니다.");
 			return "error";
 		}
-		
+
 		// 고용형태 ENUM 목록 추가
 		model.addAttribute("jobFormList", JobForm.values());
-		
+
 		// 학력 레벨 ENUM 목록 추가
 		model.addAttribute("educationLevelList", EducationLevel.values());
-		
+
 		// 학력 상태 ENUM 목록 추가
 		model.addAttribute("educationStatusList", EducationStatus.values());
 
@@ -79,18 +79,25 @@ public class ResumeController {
 
 	// 이력서 목록 페이지
 	@GetMapping("/list")
-	public String resumeFormList(HttpSession session, Model model) {
+	public String resumeFormList(HttpSession session, Model model, @RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int pageSize) {
 		try {
 			AccountVO account = (AccountVO) session.getAttribute("account");
 			if (account == null || account.getUid() == 0) {
 				return "redirect:/account/login";
 			}
-			
+
 			int userUid = account.getUid();
-			List<ResumeVO> resumeList = resumeService.getResumeList(userUid);
-			
+			List<ResumeVO> resumeList = resumeService.getResumeList(userUid, page, pageSize);
+			int totalResumes = resumeService.getTotalResumes(userUid);
+			int totalPages = (int) Math.ceil((double) totalResumes / pageSize);
+
 			model.addAttribute("resumeList", resumeList);
 			model.addAttribute("account", account);
+			model.addAttribute("currentPage", page);
+			model.addAttribute("totalPages", totalPages);
+			model.addAttribute("pageSize", pageSize);
+			model.addAttribute("totalResumes", totalResumes);
 			return "resume/resumeFormList";
 		} catch (Exception e) {
 			model.addAttribute("error", "이력서 목록을 불러오는 중 오류가 발생했습니다.");
@@ -163,14 +170,15 @@ public class ResumeController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
-	
+
 	// status추가해야함!!!!!! 그걸로 파일삭제 수정처리 할 예정
 	@PostMapping(value = "/uploadFile", produces = "application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		Map<String, Object> result = new HashMap<>();
 		try {
-			ResumeUpfileDTO savedFile = fileProcessForResume.saveFileToRealPath(file, request, "/resources/resumeUpfiles");
+			ResumeUpfileDTO savedFile = fileProcessForResume.saveFileToRealPath(file, request,
+					"/resources/resumeUpfiles");
 			if (savedFile == null) {
 				result.put("success", false);
 				result.put("message", "파일 저장 실패");
