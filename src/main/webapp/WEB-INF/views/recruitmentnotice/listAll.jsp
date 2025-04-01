@@ -29,7 +29,7 @@
 								<div class="meta-top">
 									<ul>
 										<li class="d-flex align-items-center"><i
-											class="bi bi-person writer"></i> <a href="#">${rec.companyName != null ? rec.companyName : rec.refCompany}</a>
+											class="bi bi-person writer"></i> <a href="#">${rec.companyName}</a>
 										</li>
 										<li class="d-flex align-items-center"><i
 											class="bi bi-clock"></i> <a href="#"><time>
