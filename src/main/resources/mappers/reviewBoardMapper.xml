@@ -28,31 +28,50 @@
 	</select>
 
 	<select id="gonggoAll"
-		resultType="com.jobhunter.model.reviewboard.recruitmentnoticContentDTO">
+		resultType="com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO">
 		SELECT
-		rn.uid AS gonggoNo,
-		r.title,
+		rn.uid AS recruitmentnoticeNo,
+		rn.title AS
+		recruitmentTitle,
 		c.companyName,
 		rn.workType,
-		rn.payType
-		FROM
-		users u
-		INNER JOIN resume r on u.uid = userUid
-		JOIN recruitmentnotice rn ON rn.refCompany = r.resumeNo
-		JOIN company c ON rn.refCompany = c.uid
-		WHERE r.userUid = userUid;
+		rn.personalHistory,
+		rn.payType,
+		rn.period
+		FROM users u
+		LEFT JOIN resume r ON u.uid =
+		r.userUid
+		JOIN recruitmentnotice rn ON rn.uid = r.resumeNo
+		JOIN company
+		c ON rn.refCompany = c.uid
+		WHERE u.uid = #{userUid}
 
 	</select>
 
-	<insert id="insertReview" useGeneratedKeys="true"
-		keyProperty="boardNo">
-		INSERT INTO reviewBoard (
-		writer,companyName,reviewResult,reviewType,
-		reviewLevel,content,category,jobType
+	<insert id="insertReview"
+		parameterType="com.jobhunter.model.reviewboard.WriteBoardDTO">
+		insert into reviewBoard 
+		(writer,
+		companyName,
+		reviewType,
+		reviewLevel,
+		reviewResult,
+		content,
+		postDate,
+		likes,
+		views
 		)
 		VALUES (
-		#{writer},#{companyName},#{reviewResult},#{reviewType},
-		#{reviewLevel},#{content},#{category},#{jobType})
+		#{writer},
+		#{companyName},
+		#{reviewType},
+		#{reviewLevel},
+		#{reviewResult},
+		#{content},
+		NOW(),
+		0,
+		0
+		)
 	</insert>
 
 

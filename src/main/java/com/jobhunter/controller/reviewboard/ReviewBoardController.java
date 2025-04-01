@@ -1,6 +1,10 @@
 package com.jobhunter.controller.reviewboard;
 
 import java.util.List;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
-import com.jobhunter.model.reviewboard.recruitmentnoticContentDTO;
+import com.jobhunter.model.reviewboard.WriteBoardDTO;
+import com.jobhunter.model.user.UserAllVO;
 import com.jobhunter.service.reviewboard.ReviewBoardService;
+import com.jobhunter.util.GetClientIPAddr;
 
 import lombok.RequiredArgsConstructor;
 
@@ -48,38 +56,52 @@ public class ReviewBoardController {
 		return resultPage;
 
 	};
-
+		// 공고글 게시물을 조회 
 	@GetMapping("/write")
-	public String reviewBoardWrite(Model model) {
-		List<recruitmentnoticContentDTO> goggoList;
-		try {
-			goggoList = service.selectgoggo();
-			model.addAttribute("gonggoList", goggoList);
-			System.out.println(goggoList);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public String reviewBoardWrite(HttpSession session, Model model, HttpServletRequest req) {
 
-		return "reviewBoard/write";
+	    AccountVO account = (AccountVO) session.getAttribute("account");
+	    if (account == null) {
+	        return "redirect:/account/login";
+	    }
+
+	    int userUid = account.getUid(); // ✅ AccountVO에서 꺼냄
+
+	    try {
+	        List<RecruitmentnoticContentDTO> gonggoList = service.selectgoggo(userUid, GetClientIPAddr.getClientIp(req));
+	        model.addAttribute("gonggoList", gonggoList);
+	        model.addAttribute("userUid", userUid);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return "redirect:/account/login";
+	    }
+
+	    return "reviewBoard/write";
 	}
-
+		// 게시물 작성 저장 
 	@PostMapping("/write")
-	public String saveReviewBoard(@ModelAttribute ReviewBoardDTO newReview) {
-		logger.info("리뷰 게시글 저장 시도: " + newReview.toString());
+	public String saveReviewBoard(@ModelAttribute WriteBoardDTO writeBoardDTO, HttpSession session) {
+	    AccountVO account = (AccountVO) session.getAttribute("account");
+	    if (account == null) {
+	        return "redirect:/account/login";
+	    }
 
-		String returnPage = "redirect:./allBoard"; // 기본 리디렉션 경로
+	    writeBoardDTO.setWriter(account.getUid()); // ✅ 여기서도 수정 필요
 
-		try {
-			if (service.saveReview(newReview)) {
-				returnPage += "?status=success";
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			returnPage += "?status=fail";
-		}
+	    logger.info("리뷰 게시글 저장 시도: " + writeBoardDTO.toString());
 
-		return returnPage;
+	    String returnPage = "redirect:./allBoard";
+
+	    try {
+	        if (service.saveReview(writeBoardDTO)) {
+	            returnPage += "?status=success";
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        returnPage += "?status=fail";
+	    }
+
+	    return returnPage;
 	}
 
 	@GetMapping("/detail")

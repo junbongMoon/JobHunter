@@ -7,9 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.jobhunter.dao.reviewboard.ReviewBoardDAO;
+import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
-import com.jobhunter.model.reviewboard.recruitmentnoticContentDTO;
+import com.jobhunter.model.reviewboard.WriteBoardDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,11 +27,24 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 		return Rdao.selectListBoard();
 	}
+	@Override
+	public List<RecruitmentnoticContentDTO> selectgoggo(int userUid, String ip) throws Exception {
+		if (userUid > 0) {
+		    List<RecruitmentnoticContentDTO> list = Rdao.selectWriteGonggo(userUid);
+
+		    for (RecruitmentnoticContentDTO dto : list) {
+		        System.out.println("ip: " + dto);
+		    }
+		} else {
+		    System.out.println("유효하지 않은 사용자 ID입니다.");
+		}
+		return Rdao.selectWriteGonggo(userUid);
+	}
 
 	@Override
-	public boolean saveReview(ReviewBoardDTO reviewBoardDTO) throws Exception {
+	public boolean saveReview(WriteBoardDTO writeBoardDTO) throws Exception {
 		boolean result = false;
-		int boardInsert = Rdao.insertBoard(reviewBoardDTO);
+		int boardInsert = Rdao.insertBoard(writeBoardDTO);
 
 		System.out.println("insertBoard() 결과: " + boardInsert);
 
@@ -51,10 +65,5 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 		return Rdao.selectReviewInfo(boardNo);
 	}
 
-	@Override
-	public List<recruitmentnoticContentDTO> selectgoggo() throws Exception {
-		
-		return Rdao.selectWriteGonggo();
-	}
 }
 

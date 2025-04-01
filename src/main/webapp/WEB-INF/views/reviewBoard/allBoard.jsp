@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>리뷰 게시판</title>
+<title>면접 후 게시판</title>
 <style>
 /* 전체 배경 및 기본 글꼴 설정 */
 
@@ -73,7 +73,7 @@ th, td {
 
 /* 테이블 헤더 배경 및 글자색 */
 th {
-  background-color: #007BFF;    /* 파란 배경 */
+  background-color: 3d4d6a;  /* 파란 배경 */
   color: white;                 /* 흰색 글자 */
 }
 
@@ -86,9 +86,6 @@ th {
 
 	<h2>면접 후기 목록</h2>
 
-	<!-- 글쓰기 버튼 -->
-	<button onclick="location.href='/reviewBoard/write'" class="btn-write">글
-		작성</button>
 
 
 	<table class="table-container">
@@ -110,6 +107,11 @@ th {
 			</tr>
 		</c:forEach>
 	</table>
-
+	
+	
+	
+		<!-- 글쓰기 버튼 -->
+	<button onclick="location.href='/reviewBoard/write'" class="btn-write">글
+		작성</button>
 </body>
 </html>

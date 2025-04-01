@@ -1,127 +1,90 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>게시글 작성</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 30px;
-            background-color: #f7f7f7;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-
-        button {
-            padding: 10px 20px;
-            margin-right: 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .btn-primary { background-color: #007bff; color: white; }
-        .btn-warning { background-color: #ffc107; color: black; }
-    </style>
+    <title>면접 후기 작성</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
+    <h2 class="mb-4">면접 후기 작성</h2>
 
-<jsp:include page="../header.jsp" />
+<div class="container mt-5">
+    <c:if test="${not empty sessionScope.account}">
+        <form action="${pageContext.request.contextPath}/reviewBoard/write" method="post">
+            <!-- 공고 선택 -->
+            <div class="mb-3">
+                <label class="form-label">공고 선택<span class="text-danger">*</span></label>
+                <select class="form-select" name="companyName" required>
+                    <option value="" selected disabled>지원한 공고를 선택하세요</option>
+                    <c:forEach var="gonggo" items="${gonggoList}">
+                        <option value="${gonggo.companyName}">
+                            [${gonggo.companyName}] ${gonggo.recruitmentTitle} | ${gonggo.workType} | ${gonggo.payType}
+                        </option>
+                    </c:forEach>
+                </select>
+            </div>
 
-<div class="container">
-    <h1>게시글 작성</h1>
+            <!-- 면접 유형 -->
+              <div class="mb-3">
+                <label class="form-label">면접 유형<span class="text-danger">*</span></label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="reviewType" value="FACE_TO_FACE" required> 대면
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="reviewType" value="VIDEO"> 비대면
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="reviewType" value="PHONE"> 전화면접
+                </div>
+            </div>
 
-    <form action="/reviewBoard/write" method="post">
-        <div class="form-group">
-            <label for="writer">작성자 ID</label>
-            <input type="text" class="form-control" id="writer" name="writer" required>
+            <!-- 면접 난이도 -->
+            <div class="mb-3">
+                <label class="form-label">면접 난이도<span class="text-danger">*</span></label>
+                <select class="form-select" name="reviewLevel" required>
+                    <option value="" selected disabled>난이도를 선택하세요</option>
+                    <option value="1">⭐️</option>
+                    <option value="2">⭐️⭐️</option>
+                    <option value="3">⭐️⭐️⭐️</option>
+                    <option value="4">⭐️⭐️⭐️⭐️</option>
+                    <option value="5">⭐️⭐️⭐️⭐️⭐️</option>
+                </select>
+            </div>
+
+            <!-- 면접 결과 -->
+            <div class="mb-3">
+                <label class="form-label">면접 결과<span class="text-danger">*</span></label>
+                <select class="form-select" name="reviewResult" required>
+                    <option value="" selected disabled>결과를 선택하세요</option>
+                    <option value="합격">합격</option>
+                    <option value="불합격">불합격</option>
+                    <option value="진행중">진행중</option>
+                </select>
+            </div>
+
+            <!-- 리뷰 내용 -->
+            <div class="mb-3">
+                <label class="form-label">리뷰 내용<span class="text-danger">*</span></label>
+                <textarea class="form-control" name="content" rows="6" placeholder="면접 질문, 분위기 등을 자유롭게 작성해주세요." required></textarea>
+            </div>
+
+            <!-- writer 정보 숨김 전달 -->
+            <input type="hidden" name="writer" value="${sessionScope.account.uid}" />
+
+            <button type="submit" class="btn btn-primary">후기 등록</button>
+            <a href="${pageContext.request.contextPath}/reviewBoard/allBoard" class="btn btn-secondary">취소</a>
+        </form>
+    </c:if>
+
+    <c:if test="${empty sessionScope.account}">
+        <div class="alert alert-warning" role="alert">
+            로그인 후 이용 가능한 기능입니다. <a href="${pageContext.request.contextPath}/account/login" class="alert-link">로그인하러 가기</a>
         </div>
-
-        <div class="form-group">
-            <label for="companyName">회사명</label>
-            <input type="text" id="companyName" name="companyName" required>
-        </div>
-
-        <div class="form-group">
-            <label for="reviewResult">면접 결과</label>
-            <select id="reviewResult" name="reviewResult" required>
-                <option value="PASSED">합격</option>
-                <option value="FAILED">불합격</option>
-                <option value="PENDING">보류</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="reviewType">면접 유형</label>
-            <select id="reviewType" name="reviewType" required>
-                <option value="FACE_TO_FACE">대면</option>
-                <option value="VIDEO">화상통화</option>
-                <option value="PHONE">통화</option>
-                <option value="OTHER">기타</option> 
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="reviewLevel">난이도 (1~5)</label>
-            <input type="number" id="reviewLevel" name="reviewLevel" min="1" max="5" required>
-        </div>
-
-        <div class="form-group">
-            <label for="content">내용</label>
-            <textarea id="content" name="content" rows="5" required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="jobType">직무 고용형태</label>
-            <select id="jobType" name="jobType" required>
-                <option value="FULL_TIME">정규직</option>
-                <option value="CONTRACT">계약직</option>
-                <option value="INTERN">인턴</option>
-                <option value="FREELANCER">프리랜서</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="category">카테고리</label>
-            <input type="text" id="category" name="category" required>
-        </div>
-
-
-        <button type="submit" class="btn-primary">저장</button>
-        <button type="button" class="btn-warning" onclick="location.href='/reviewBoard/allBoard'">취소</button>
-    </form>
+    </c:if>
 </div>
-
 </body>
 </html>

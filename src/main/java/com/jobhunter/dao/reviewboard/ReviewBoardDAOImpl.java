@@ -8,9 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
-import com.jobhunter.model.reviewboard.recruitmentnoticContentDTO;
+import com.jobhunter.model.reviewboard.WriteBoardDTO;
 
 
 @Repository
@@ -34,16 +35,16 @@ import com.jobhunter.model.reviewboard.recruitmentnoticContentDTO;
 	}
 	
 	@Override
-	public List<recruitmentnoticContentDTO> selectWriteGonggo()throws Exception{
-		
-		return ses.selectList(NS+".gonggoAll");
+	public List<RecruitmentnoticContentDTO> selectWriteGonggo(int userUid)throws Exception{
+		 
+		return ses.selectList(NS+".gonggoAll",userUid);
 	}
 
 
 	@Override
-	public int insertBoard(ReviewBoardDTO reviewBoardDTO) throws Exception {
+	public int insertBoard(WriteBoardDTO writeBoardDTO) throws Exception {
 		
-		return ses.insert(NS + ".insertReview",reviewBoardDTO);
+		return ses.insert(NS + ".insertReview",writeBoardDTO);
 	}
 
 

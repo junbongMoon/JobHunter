@@ -4,18 +4,21 @@ import java.util.List;
 
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
-import com.jobhunter.model.reviewboard.recruitmentnoticContentDTO;
+import com.jobhunter.model.reviewboard.WriteBoardDTO;
+import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 
 
 public interface ReviewBoardDAO {
 
 	List<ReviewBoardDTO> selectListBoard() throws Exception;
 
-	List<recruitmentnoticContentDTO> selectWriteGonggo()throws Exception;
+	List<RecruitmentnoticContentDTO> selectWriteGonggo(int userUid)throws Exception;
 
-	int insertBoard(ReviewBoardDTO reviewBoardDTO) throws Exception;
+	int insertBoard(WriteBoardDTO writeBoardDTO) throws Exception;
 
 	ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception;
+
+	
 
 	
 
