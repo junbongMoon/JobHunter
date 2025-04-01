@@ -223,5 +223,42 @@
 		from recruitmentnoticeboardupfiles
 		where refrecruitmentnoticeNo = #{uid}
 	</select>
+	
+	<select id="getBoardDetailInfoByUid" resultMap="RecruitmentDetailMap">
+		SELECT
+		r.*, c.companyName,
 
+		rg.regionNo,
+		rg.name AS regionName, rg.code,
+		sg.sigunguNo, sg.name AS sigunguName, sg.regionNo,
+
+		mj.majorcategoryNo AS majorNo, mj.jobName AS majorJobName,
+		sj.subcategoryNo AS subNo, sj.jobName AS subJobName, sj.refMajorcategoryNo
+
+		FROM
+		recruitmentnotice r
+		LEFT JOIN where_recruit_region rr ON r.uid =
+		rr.refRecNo
+		LEFT JOIN region rg ON rr.refRegion = rg.regionNo
+
+		LEFT JOIN
+		where_recruit_sigungu rs ON r.uid = rs.refRecNo
+		LEFT JOIN sigungu sg ON
+		rs.refSigungu = sg.sigunguNo
+
+		LEFT JOIN jobtype_recruit_major rm ON
+		r.uid = rm.refRecNo
+		LEFT JOIN majorcategory mj ON rm.refMajorNo =
+		mj.majorcategoryNo
+
+		LEFT JOIN jobtype_recruit_sub rsb ON r.uid =
+		rsb.refRecNo
+		LEFT JOIN subcategory sj ON rsb.refSubNo =
+		sj.subcategoryNo
+		
+		LEFT JOIN company c ON c.uid = r.refCompany
+		
+		where r.uid = #{uid} 
+	</select>
+	
 </mapper>

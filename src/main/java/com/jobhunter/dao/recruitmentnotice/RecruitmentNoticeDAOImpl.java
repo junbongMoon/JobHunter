@@ -33,11 +33,11 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	}
 
 	
-	// 사용자(회사) uid로 공고를 조회하는 메서드
+	// 공고번호 uid로 공고를 조회하는 메서드
 	@Override
-	public List<RecruitmentNotice> selectRecruitmentByUid(int uid) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public RecruitmentDetailInfo selectRecruitmentByUid(int uid) throws Exception {
+		
+		return ses.selectOne(NS + ".getBoardDetailInfoByUid", uid);
 	}
 
 	// 우대조건을 입력하는 메서드

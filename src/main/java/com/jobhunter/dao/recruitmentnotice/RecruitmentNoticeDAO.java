@@ -17,8 +17,8 @@ public interface RecruitmentNoticeDAO {
 	// 공고를 입력하는 메서드
 	int insertRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO) throws Exception;
 	
-	// 내가 쓴 공고를 select하는 메서드(이것도 pageResponseDTO로 변경해야 할듯...)
-	List<RecruitmentNotice> selectRecruitmentByUid(int uid) throws Exception;
+	// 내가 쓴 공고를 select하는 메서드
+	RecruitmentDetailInfo selectRecruitmentByUid(int uid) throws Exception;
 	
 	// 우대조건을 insert하는  메서드
 	int insertAdvantageWithRecruitmentNotice(AdvantageDTO advantageDTO) throws Exception;

@@ -252,24 +252,6 @@ public class RecruitmentNoticeRestController {
 		}
 	
 	
-	// 내가 작성한(템플릿 제외) 공고 불러오는 메서드
-	// 아직 미완
-	@GetMapping(value = "/company/{uid}")
-	public ResponseEntity<List<RecruitmentNotice>> getRecruiment(@PathVariable("uid") int uid) {
-		ResponseEntity<List<RecruitmentNotice>> result = null;
-		List<RecruitmentNotice> recList = null;
-		try {
-			recList = recService.getRecruitmentByUid(uid);
-			result = ResponseEntity.ok(recList);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			result = ResponseEntity.badRequest().body(recList);
-		}
-
-		return result;
-
-	}
 	
 	 @PostMapping("/file")
 	    public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadFile(@RequestParam("file") MultipartFile file,

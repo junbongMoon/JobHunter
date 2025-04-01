@@ -104,11 +104,24 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		return result;
 	}
 
-	// 내가 쓴 공고 모두를 조회하는 메서드
+	// uid(pk)로 공고를 조회하는 메서드
 	@Override
-	public List<RecruitmentNotice> getRecruitmentByUid(int uid) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public RecruitmentDetailInfo getRecruitmentByUid(int uid) throws Exception {
+		
+		RecruitmentDetailInfo detailInfo = recdao.selectRecruitmentByUid(uid);
+		
+		if(detailInfo != null) {
+			List<Application> applications = recdao.getApplications(uid);
+			List<Advantage> advantages = recdao.getAdvantages(uid);
+			List<RecruitmentnoticeBoardUpfiles> fileList = recdao.getFileList(uid);
+			
+			detailInfo.setApplication(applications != null ? applications : Collections.emptyList());
+			detailInfo.setAdvantage(advantages != null ? advantages : Collections.emptyList());
+			detailInfo.setFileList(fileList != null ? fileList : Collections.emptyList());
+		}
+		System.out.println(detailInfo);
+		
+		return detailInfo;
 	}
 
 	// 공고 전체를 조회하는 메서드

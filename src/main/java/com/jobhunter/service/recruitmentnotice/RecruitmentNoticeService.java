@@ -15,8 +15,8 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 public interface RecruitmentNoticeService {
 	// 공고를 입력하는 메서드
 	boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO, List<AdvantageDTO> advantageList, List<ApplicationDTO> applicationList, String regionCode, String sigunguCode, List<RecruitmentnoticeBoardUpfiles> fileList, String majorCategortCode, String subCategoryCode) throws Exception;
-	// 내가 작성한 공고를 조회하는 메서드
-	List<RecruitmentNotice> getRecruitmentByUid(int uid) throws Exception;
+	// uid로 공고를 조회하는 메서드
+	RecruitmentDetailInfo getRecruitmentByUid(int uid) throws Exception;
 		 
 	// 공고 전체를 조회하는 메서드(템플릿 제외)
 	PageResponseDTO<RecruitmentDetailInfo> getEntireRecruitment(PageRequestDTO pageRequestDTO) throws Exception;

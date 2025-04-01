@@ -51,9 +51,21 @@ public class RecruitmentNoticeController {
 	}
 	
 	// 상세 보기 페이지를 출력
-	@GetMapping("/detail")
-	public void showDetailRecruitment(@PathVariable("uid") int uid) {
+	@GetMapping("/detail/{uid}")
+	public String showDetailRecruitment(@PathVariable("uid") int uid, Model model) {
 		System.out.println(uid);
+		
+		try {
+			 RecruitmentDetailInfo detailInfo = recruitmentService.getRecruitmentByUid(uid);
+			 model.addAttribute("RecruitmentDetailInfo", detailInfo);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		return "recruitmentnotice/detail";
 	}
 	
 	
