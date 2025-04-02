@@ -187,4 +187,54 @@
         FROM license
         WHERE resumeNo = #{resumeNo}
     </select>
+
+    <!-- 이력서 기본 정보 수정 -->
+    <update id="updateResume" parameterType="com.jobhunter.model.resume.ResumeDTO">
+        UPDATE resume 
+        SET title = #{title},
+            payType = #{payType},
+            pay = #{pay},
+            introduce = #{introduce}
+        WHERE resumeNo = #{resumeNo}
+    </update>
+
+    <!-- 고용형태 삭제 -->
+    <delete id="deleteJobForms" parameterType="int">
+        DELETE FROM jobform WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 성격 및 장점 삭제 -->
+    <delete id="deleteMerits" parameterType="int">
+        DELETE FROM merit WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 지역 정보 삭제 -->
+    <delete id="deleteResumeSigungu" parameterType="int">
+        DELETE FROM where_resume_sigungu WHERE refResumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 업직종 정보 삭제 -->
+    <delete id="deleteResumeSubCategory" parameterType="int">
+        DELETE FROM jobtype_resume_sub WHERE refResumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 학력 정보 삭제 -->
+    <delete id="deleteEducations" parameterType="int">
+        DELETE FROM education WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 경력 정보 삭제 -->
+    <delete id="deleteHistories" parameterType="int">
+        DELETE FROM personalhistory WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 자격증 정보 삭제 -->
+    <delete id="deleteLicenses" parameterType="int">
+        DELETE FROM license WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 파일 정보 삭제 -->
+    <delete id="deleteResumeUpfiles" parameterType="int">
+        DELETE FROM resumeupfiles WHERE resumeNo = #{resumeNo}
+    </delete>
 </mapper>

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.resume.EducationLevel;
@@ -191,6 +192,70 @@ public class ResumeController {
 			result.put("message", "파일 삭제 중 오류 발생: " + e.getMessage());
 		}
 		return result;
+	}
+
+	// 이력서 수정 페이지
+	@GetMapping("/edit/{resumeNo}")
+	public String editResumeForm(@PathVariable int resumeNo, Model model) {
+		try {
+			// 기존 이력서 정보 조회
+			ResumeDetailDTO resumeDetail = resumeService.getResumeDetailWithAll(resumeNo);
+			model.addAttribute("resumeDetail", resumeDetail);
+			
+			// 지역 목록 조회
+			List<RegionDTO> regionList = resumeService.getAllRegions();
+			model.addAttribute("regionList", regionList);
+			
+			// 업직종 대분류 목록 조회
+			List<MajorCategoryDTO> majorList = resumeService.getAllMajorCategories();
+			model.addAttribute("majorList", majorList);
+			
+			// 선택된 시군구 목록 조회
+			List<SigunguVO> selectedSigungu = resumeService.getResumeSigungu(resumeNo);
+			model.addAttribute("selectedSigungu", selectedSigungu);
+			
+			// 선택된 업직종 목록 조회
+			List<SubCategoryVO> selectedSubCategory = resumeService.getResumeSubCategory(resumeNo);
+			model.addAttribute("selectedSubCategory", selectedSubCategory);
+
+			// 고용형태 ENUM 목록 추가
+			model.addAttribute("jobFormList", JobForm.values());
+
+			// 학력 레벨 ENUM 목록 추가
+			model.addAttribute("educationLevelList", EducationLevel.values());
+
+			// 학력 상태 ENUM 목록 추가
+			model.addAttribute("educationStatusList", EducationStatus.values());
+
+			// 현재 날짜를 YYYY-MM-DD 형식으로 추가
+			String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			model.addAttribute("today", today);
+
+			return "resume/resumeForm";
+		} catch (Exception e) {
+			model.addAttribute("error", "이력서 정보를 불러오는 중 오류가 발생했습니다.");
+			return "error";
+		}
+	}
+
+	// 이력서 수정 처리
+	@PostMapping("/update/{resumeNo}")
+	@ResponseBody
+	public ResponseEntity<?> updateResume(@PathVariable int resumeNo, @RequestBody ResumeDTO resumeDTO) {
+		try {
+			resumeDTO.setResumeNo(resumeNo);
+			resumeService.updateResume(resumeDTO);
+			Map<String, Object> response = new HashMap<>();
+			response.put("success", true);
+			response.put("message", "이력서가 성공적으로 수정되었습니다.");
+			response.put("redirectUrl", "/resume/list");
+			return ResponseEntity.ok().body(response);
+		} catch (Exception e) {
+			Map<String, Object> response = new HashMap<>();
+			response.put("success", false);
+			response.put("message", "이력서 수정 실패: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
 	}
 
 }

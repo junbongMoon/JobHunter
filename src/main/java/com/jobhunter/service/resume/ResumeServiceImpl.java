@@ -98,6 +98,85 @@ public class ResumeServiceImpl implements ResumeService {
 		}
 	}
 
+	@Override
+	@Transactional
+	public void updateResume(ResumeDTO resumeDTO) throws Exception {
+		// 기존 데이터 삭제
+		rdao.deleteJobForms(resumeDTO.getResumeNo());
+		rdao.deleteMerits(resumeDTO.getResumeNo());
+		rdao.deleteResumeSigungu(resumeDTO.getResumeNo());
+		rdao.deleteResumeSubCategory(resumeDTO.getResumeNo());
+		rdao.deleteEducations(resumeDTO.getResumeNo());
+		rdao.deleteHistories(resumeDTO.getResumeNo());
+		rdao.deleteLicenses(resumeDTO.getResumeNo());
+		
+		// 기본 정보 업데이트
+		rdao.updateResume(resumeDTO);
+		
+		// 고용형태 저장
+		if (resumeDTO.getJobForms() != null && !resumeDTO.getJobForms().isEmpty()) {
+			for (JobFormDTO jobForm : resumeDTO.getJobForms()) {
+				jobForm.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertJobForm(jobForm);
+			}
+		}
+
+		// 성격 및 장점 저장
+		if (resumeDTO.getMerits() != null && !resumeDTO.getMerits().isEmpty()) {
+			for (MeritDTO merit : resumeDTO.getMerits()) {
+				merit.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertMerit(merit);
+			}
+		}
+
+		// 지역 저장
+		if (resumeDTO.getSigunguNos() != null && !resumeDTO.getSigunguNos().isEmpty()) {
+			for (Integer sigunguNo : resumeDTO.getSigunguNos()) {
+				rdao.insertSigungu(resumeDTO.getResumeNo(), sigunguNo);
+			}
+		}
+
+		// 업직종 저장
+		if (resumeDTO.getSubcategoryNos() != null && !resumeDTO.getSubcategoryNos().isEmpty()) {
+			for (Integer subcategoryNo : resumeDTO.getSubcategoryNos()) {
+				rdao.insertSubCategory(resumeDTO.getResumeNo(), subcategoryNo);
+			}
+		}
+
+		// 학력 저장
+		if (resumeDTO.getEducations() != null && !resumeDTO.getEducations().isEmpty()) {
+			for (EducationDTO education : resumeDTO.getEducations()) {
+				education.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertEducation(education);
+			}
+		}
+
+		// 경력 저장
+		if (resumeDTO.getHistories() != null && !resumeDTO.getHistories().isEmpty()) {
+			for (PersonalHistoryDTO history : resumeDTO.getHistories()) {
+				history.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertHistory(history);
+			}
+		}
+
+		// 자격증 저장
+		if (resumeDTO.getLicenses() != null && !resumeDTO.getLicenses().isEmpty()) {
+			for (LicenseDTO license : resumeDTO.getLicenses()) {
+				license.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertLicense(license);
+			}
+		}
+
+		// 파일 처리
+		if (resumeDTO.getFiles() != null && !resumeDTO.getFiles().isEmpty()) {
+			rdao.deleteResumeUpfiles(resumeDTO.getResumeNo());
+			for (ResumeUpfileDTO upfile : resumeDTO.getFiles()) {
+				upfile.setResumeNo(resumeDTO.getResumeNo());
+				rdao.insertResumeUpfile(upfile);
+			}
+		}
+	}
+
 	// 카테고리 가져오기
 	@Override
 	public List<RegionDTO> getAllRegions() throws Exception {

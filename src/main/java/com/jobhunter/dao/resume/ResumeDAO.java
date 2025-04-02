@@ -75,4 +75,23 @@ public interface ResumeDAO {
 
 	List<LicenseDTO> selectResumeLicenses(int resumeNo) throws Exception;
 
+	// 이력서 수정
+	void updateResume(ResumeDTO resumeDTO) throws Exception;
+	
+	void deleteJobForms(int resumeNo) throws Exception;
+	
+	void deleteMerits(int resumeNo) throws Exception;
+	
+	void deleteResumeSigungu(int resumeNo) throws Exception;
+	
+	void deleteResumeSubCategory(int resumeNo) throws Exception;
+	
+	void deleteEducations(int resumeNo) throws Exception;
+	
+	void deleteHistories(int resumeNo) throws Exception;
+	
+	void deleteLicenses(int resumeNo) throws Exception;
+	
+	void deleteResumeUpfiles(int resumeNo) throws Exception;
+
 }

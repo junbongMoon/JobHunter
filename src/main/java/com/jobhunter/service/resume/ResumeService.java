@@ -41,4 +41,7 @@ public interface ResumeService {
 	// 이력서 상세 정보 조회
 	ResumeDetailDTO getResumeDetailWithAll(int resumeNo) throws Exception;
 
+	// 이력서 수정
+	void updateResume(ResumeDTO resumeDTO) throws Exception;
+
 }

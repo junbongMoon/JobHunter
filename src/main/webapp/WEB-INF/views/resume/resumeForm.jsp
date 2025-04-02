@@ -1687,8 +1687,8 @@
 
 				// 드래그 앤 드롭 이벤트
 				$('#fileContainer').on('dragenter dragover', function (e) {
-					e.preventDefault();
-					e.stopPropagation();
+					e.preventDefault(); // 브라우저가 기본적으로 파일을 열거나 다운로드하려는 동작을 막음
+					e.stopPropagation(); // 이벤트가 부모 요소로 전달되지 않도록 함
 					$(this).addClass('border-primary');
 				});
 
@@ -1852,7 +1852,6 @@
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// -todoList-
-				// 학력에 졸업 일자 추가
 				// 로컬스토리지에 임시저장 기능 추가
 
 			});
