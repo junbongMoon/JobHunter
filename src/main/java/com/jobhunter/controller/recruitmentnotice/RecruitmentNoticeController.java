@@ -62,8 +62,8 @@ public class RecruitmentNoticeController {
 
 	// 회사가 공고를 등록하는 메서드
 	@PostMapping("/save")
-	public String saveRecruitment(RecruitmentNoticeDTO dto) {
-
+	public String saveRecruitment(@ModelAttribute RecruitmentNoticeDTO dto) {
+		boolean result = false;
 		List<ApplicationDTO> appList = new ArrayList<>();
 		List<AdvantageDTO> advList = new ArrayList<>();
 
@@ -71,19 +71,21 @@ public class RecruitmentNoticeController {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		// 추가 파싱 및 변환
-		if (dto.getDueDateForString() != null) {
-			LocalDate date = LocalDate.parse(dto.getDueDateForString());
-			dto.setDueDate(Timestamp.valueOf(date.atStartOfDay()));
-		}
+		if (dto.getDueDateForString() != null && !dto.getDueDateForString().isEmpty()) {
+	        LocalDate date = LocalDate.parse(dto.getDueDateForString());
+	        dto.setDueDate(Timestamp.valueOf(date.atStartOfDay()));
+	    }
 
 		// 저장 로직 호출
 		try {
 			recruitmentService.saveRecruitmentNotice(dto, advantageList, applicationList, fileList);
+			result = true;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		System.out.println(result);
 
 		ListAllClear();
 

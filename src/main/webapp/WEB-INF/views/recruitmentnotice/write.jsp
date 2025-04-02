@@ -665,6 +665,9 @@ if (workDetailType) {
   
   if(result){
 	// period 히든에 넣어주자
+	mjrno = $("#majorcategoryNo").val();
+
+	console.log(mjrno);
 	$("#period").val(period);
 
 	return result;
@@ -1076,7 +1079,7 @@ label {
 									<div class="col-md-6 dueDate">
 										<div class="input-group">
 											<label for="date" class="form-check-label mb-2">마감 기한</label>
-											<input type="date" id="date" name="dueDate">
+											<input type="date" id="date" name="dueDateForString">
 										</div>
 									</div>
 
@@ -1112,7 +1115,7 @@ label {
 									<div class="col-12 text-center">
 
 										<button type="submit" id="write"
-											onclick="isValidRecruitmentForm()">작성</button>
+											onclick="return isValidRecruitmentForm()">작성</button>
 									</div>
 								</div>
 			</form>

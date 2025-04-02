@@ -52,6 +52,9 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 			recNo = recdao.selectRecentRecruitment(CompanyUid);
 		}
+		
+		System.out.println(recNo);
+		System.out.println(recruitmentNoticeDTO);
 		// 우대 조건을 입력하는 메서드 호출
 		if (!advantageList.isEmpty()) {
 			// advantageList에서 하나씩 꺼내서 insert
