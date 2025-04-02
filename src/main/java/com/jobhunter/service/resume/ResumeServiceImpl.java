@@ -14,6 +14,7 @@ import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
+import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.ResumeVO;
 import com.jobhunter.model.resume.SigunguDTO;
@@ -41,7 +42,7 @@ public class ResumeServiceImpl implements ResumeService {
 				rdao.insertJobForm(jobForm);
 			}
 		}
-		
+
 		// 성격 및 장점 저장
 		if (resumeDTO.getMerits() != null && !resumeDTO.getMerits().isEmpty()) {
 			for (MeritDTO merit : resumeDTO.getMerits()) {
@@ -122,7 +123,7 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	public List<ResumeVO> getResumeList(int userUid, int page, int pageSize) throws Exception {
 		List<ResumeVO> resumeList = rdao.selectResumeList(userUid, page, pageSize);
-		
+
 		// 각 이력서에 대해 시군구와 업직종 정보를 설정
 		for (ResumeVO resume : resumeList) {
 			List<SigunguVO> sigunguList = rdao.selectResumeSigungu(resume.getResumeNo());
@@ -130,7 +131,7 @@ public class ResumeServiceImpl implements ResumeService {
 			resume.setSigunguList(sigunguList);
 			resume.setSubcategoryList(subCategoryList);
 		}
-		
+
 		return resumeList;
 	}
 
@@ -157,5 +158,19 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	public void deleteResume(int resumeNo) throws Exception {
 		rdao.deleteResume(resumeNo);
+	}
+
+	// 이력서 수정을 위한 해당 이력서 정보 조회
+	@Override
+	public ResumeDetailDTO getResumeDetailWithAll(int resumeNo) throws Exception {
+		ResumeDetailDTO resumeDetail = new ResumeDetailDTO();
+		resumeDetail.setResume(rdao.selectResumeDetail(resumeNo));
+		resumeDetail.setJobForms(rdao.selectResumeJobForms(resumeNo));
+		resumeDetail.setMerits(rdao.selectResumeMerits(resumeNo));
+		resumeDetail.setEducations(rdao.selectResumeEducations(resumeNo));
+		resumeDetail.setHistories(rdao.selectResumeHistories(resumeNo));
+		resumeDetail.setLicenses(rdao.selectResumeLicenses(resumeNo));
+		resumeDetail.setFiles(rdao.selectResumeUpfile(resumeNo));
+		return resumeDetail;
 	}
 }
