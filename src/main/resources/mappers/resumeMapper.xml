@@ -63,8 +63,8 @@
 
     <!-- 학력 저장 -->
     <insert id="insertEducation" parameterType="com.jobhunter.model.resume.EducationDTO">
-        INSERT INTO education (educationLevel, educationStatus, customInput, resumeNo)
-        VALUES (#{educationLevel}, #{educationStatus}, #{customInput}, #{resumeNo});
+        INSERT INTO education (educationLevel, educationStatus, graduationDate, customInput, resumeNo)
+        VALUES (#{educationLevel}, #{educationStatus}, #{graduationDate}, #{customInput}, #{resumeNo});
     </insert>
 
     <!-- 경력 저장 -->

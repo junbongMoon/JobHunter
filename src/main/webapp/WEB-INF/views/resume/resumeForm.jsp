@@ -363,6 +363,17 @@
 									</select>
 								</div>
 
+								<!-- 졸업 날짜 -->
+								<div class="col-md-4">
+									<label class="form-label">졸업일자<span class="essentialPoint">*</span></label>
+									<div class="row g-2">
+										<div class="col-md-4">
+											<input type="date" class="form-control graduation-date"
+												name="graduationDate">
+										</div>
+									</div>
+								</div>
+
 								<!-- 학교명 입력 -->
 								<div class="col-md-4">
 									<label class="form-label">학교명<span class="essentialPoint">*</span></label>
@@ -1158,9 +1169,10 @@
 						educationItems.each(function () {
 							const educationLevel = $(this).find('.education-level').val();
 							const educationStatus = $(this).find('.education-status').val();
+							const graduationDate = $(this).find('.graduation-date').val();
 							const customInput = $(this).find('.custom-input').val().trim();
 
-							if (!educationLevel || !educationStatus || !customInput) {
+							if (!educationLevel || !educationStatus || !graduationDate || !customInput) {
 								isValid = false;
 								return false; // each 중단
 							}
@@ -1256,6 +1268,7 @@
 							return {
 								educationLevel: $(this).find('.education-level').val(),
 								educationStatus: $(this).find('.education-status').val(),
+								graduationDate: $(this).find('.graduation-date').val(),
 								customInput: $(this).find('.custom-input').val()
 							};
 						}).get(),
@@ -1343,9 +1356,10 @@
 						educationItems.each(function () {
 							const educationLevel = $(this).find('.education-level').val();
 							const educationStatus = $(this).find('.education-status').val();
+							const graduationDate = $(this).find('.graduation-date').val();
 							const customInput = $(this).find('.custom-input').val().trim();
 
-							if (!educationLevel || !educationStatus || !customInput) {
+							if (!educationLevel || !educationStatus || !graduationDate || !customInput) {
 								isValid = false;
 								return false; // each 중단
 							}
@@ -1441,6 +1455,7 @@
 							return {
 								educationLevel: $(this).find('.education-level').val(),
 								educationStatus: $(this).find('.education-status').val(),
+								graduationDate: $(this).find('.graduation-date').val(),
 								customInput: $(this).find('.custom-input').val()
 							};
 						}).get(),
@@ -1838,6 +1853,6 @@
 				// -todoList-
 				// 학력에 졸업 일자 추가
 				// 로컬스토리지에 임시저장 기능 추가
-				
+
 			});
 		</script>

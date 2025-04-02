@@ -133,7 +133,7 @@ public class ResumeController {
 		}
 	}
 
-	// 최종 저장
+	// 저장
 	@PostMapping("/submit-final")
 	@ResponseBody
 	public ResponseEntity<?> submitFinal(@RequestBody ResumeDTO resumeDTO) {
