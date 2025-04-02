@@ -14,7 +14,12 @@
 <script>
 	let errorMessage = "";
 	let focusElement = null;
-	let upfiles = [];
+	
+	let fileList = [];
+	let ApplicationList = [];
+	let AdvantageList = [];
+
+	
 	
 
 	$(function() {
@@ -563,7 +568,7 @@ function markUploadSuccess(fileName) {
 	function addAdvantage() {
 		
 		let advVal = $("#advantage").val();
-    let advantageValue = $("#advantage").val();
+        let advantageValue = $("#advantage").val();
 
     if (!advantageValue) {
         alert("우대조건을 입력하세요");
@@ -571,16 +576,6 @@ function markUploadSuccess(fileName) {
         return;
     }
 
-    $.ajax({
-        url: "/recruitmentnotice/rest/advantage",
-        type: "POST",
-        data: JSON.stringify({ advantageType: advantageValue }),
-        contentType: "application/json",
-        success: function (response) {
-            console.log("우대조건 저장 성공", response);
-            $("#advantage").val("");
-
-            // DOM에 추가할 HTML 구성
             let output = `
                 <div class="d-flex align-items-center mb-2 advantage-item">
                     <input type="hidden" value="\${advantageValue}">
@@ -589,13 +584,7 @@ function markUploadSuccess(fileName) {
                 </div>
             `;
             $(".advantageArea").append(output);
-        },
-        error: function (err) {
-            console.error("우대조건 저장 실패", err);
-        }
-    });
-
-
+        
 
 }
 
@@ -872,7 +861,7 @@ label {
 
 		<div class="container" data-aos="fade-up" data-aos-delay="100">
 			<!-- 일단 /recruitmentnotice/rest/ 뒤의 값을 1번으로 해둠 나중 되면 el표현식으로 sessionScope.loginmember.uid로 바꾸자.. -->
-			<form method="post" role="form">
+			<form method="post" role="form" action="/recruitmentnotice/save">
 
 				<div class="form-header categories-widget widget-item">
 					<h3>채용 공고</h3>
@@ -916,7 +905,7 @@ label {
 							  
 							</select>
 						  </div>
-
+						  
 						
 						  <div class="custom-select-wrapper">
 							<label for="subCategory">직종</label>
@@ -1014,7 +1003,7 @@ label {
 									<div class="col-md-12">
 										<div class="input-group">
 											<label for="pay" class="form-check-label mb-2">급여 액수</label>
-											<input type="text" id="pay" maxlength="15"
+											<input type="text" id="pay" maxlength="15" name="pay"
 												placeholder="숫자만 입력할 수 있습니다." oninput="formatPay(this)">
 										</div>
 									</div>
@@ -1028,6 +1017,7 @@ label {
 											<!-- 해야할 것 : 격일, 격주, 2교대 등 근무 시간에 대한 상세 내용 -->
 										</div>
 									</div>
+									<input type="hidden" id="period" name="period">
 
 									<div class="col-md-6">
 										<div class="custom-select-wrapper">
@@ -1226,25 +1216,6 @@ label {
 					</div>
 				</div>
 			</div>
-
-			<!-- 작성 완료 모달 -->
-			<div class="modal fade" id="successModal" tabindex="-1"
-				aria-labelledby="successModalLabel" aria-hidden="true">
-				<div class="modal-dialog modal-dialog-centered">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="successModalLabel">작성 완료</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal"
-								aria-label="닫기"></button>
-						</div>
-						<div class="modal-body">채용 공고가 성공적으로 작성되었습니다.</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-primary" id="goToListBtn">확인</button>
-						</div>
-					</div>
-				</div>
-			</div>
-
 
 		</div>
 
