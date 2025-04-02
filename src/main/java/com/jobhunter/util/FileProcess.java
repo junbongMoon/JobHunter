@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jobhunter.model.etc.BoardUpFilesVODTO;
+import com.jobhunter.model.util.BoardUpFilesVODTO;
 
 /**
  * @author Administrator

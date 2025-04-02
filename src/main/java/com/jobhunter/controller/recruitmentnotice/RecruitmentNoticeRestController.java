@@ -23,12 +23,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jobhunter.model.etc.FileStatus;
 import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
 import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
+import com.jobhunter.model.util.FileStatus;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 import com.jobhunter.util.RecruitmentFileProcess;
 

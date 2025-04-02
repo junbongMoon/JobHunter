@@ -1,4 +1,4 @@
-package com.jobhunter.model.etc;
+package com.jobhunter.model.util;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
