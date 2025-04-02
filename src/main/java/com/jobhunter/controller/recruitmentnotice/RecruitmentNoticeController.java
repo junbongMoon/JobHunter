@@ -79,7 +79,7 @@ public class RecruitmentNoticeController {
 
 		// 저장 로직 호출
 		try {
-			recruitmentService.saveRecruitmentNotice(dto);
+			recruitmentService.saveRecruitmentNotice(dto, advantageList, applicationList, fileList);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

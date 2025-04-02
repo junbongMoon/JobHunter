@@ -141,7 +141,7 @@ $(document).on("click", "#goToListBtn", function () {
 					console.log("선택한 지역:", selectedRegion);
 
 					if (selectedRegion !== "-1") {
-						saveRegion(selectedRegion);
+						$("#regionNo").val(selectedRegion);
 						getSigungu(selectedRegion);
 					} else {
 						$(".Sigungu").empty().append(
@@ -154,7 +154,7 @@ $(document).on("click", "#goToListBtn", function () {
 			console.log("선택한 시군구:", selectedSigungu);
 
 			if (selectedSigungu !== "-1") {
-				saveSigungu(selectedSigungu);
+				$("#sigunguNo").val(selectedSigungu);
 			}
 		});
 		
@@ -164,10 +164,10 @@ $(document).on("click", "#goToListBtn", function () {
 				".MajorCategory",
 				function() {
 					let selectedMajorNo = $(this).val();
-					console.log("선택한 지역:", selectedMajorNo);
+					console.log("선택한 산업군:", selectedMajorNo);
 
 					if (selectedMajorNo !== "-1") {
-						saveMajorCategory(selectedMajorNo); 
+						$("#majorcategoryNo").val(selectedMajorNo); 
 						getSubCategory(selectedMajorNo);
 					} else {
 						$(".MajorCategory").empty().append(
@@ -181,7 +181,7 @@ $(document).on("click", "#goToListBtn", function () {
 			console.log("선택한 직업:", selectedSubCategory);
 
 			if (selectedSubCategory !== "-1") {
-				saveSubCategory(selectedSubCategory);
+				$("#subcategoryNo").val(selectedSubCategory);
 			}
 		});
 		
@@ -275,7 +275,7 @@ function uploadFileAndShowPreview(file) {
     formData.append("file", file);
 
     $.ajax({
-        url: "/recruitmentnotice/rest/file",
+        url: "/recruitmentnotice/file",
         type: "POST",
         data: formData,
         contentType: false,
@@ -316,7 +316,7 @@ function showThumbnail(file) {
 // 파일 삭제 함수
 function removeFile(fileName) {
     $.ajax({
-        url: "/recruitmentnotice/rest/file",
+        url: "/recruitmentnotice/file",
         type: "DELETE",
         data: { removeFileName: fileName },
         success: function(response) {
@@ -352,7 +352,7 @@ function markUploadSuccess(fileName) {
 	// 면접타입 저장 함수
 	function saveApplication(method, detail) {
     $.ajax({
-      url: "/recruitmentnotice/rest/application",
+      url: "/recruitmentnotice/application",
       type: "POST",
       contentType: "application/json",
       data: JSON.stringify({
@@ -372,7 +372,7 @@ function markUploadSuccess(fileName) {
 		 // 면접 타입 삭제 함수
 		 function deleteApplication(method) {
     $.ajax({
-      url: "/recruitmentnotice/rest/application",
+      url: "/recruitmentnotice/application",
       type: "DELETE",
       contentType: "application/json",
       data: JSON.stringify({ method: method }),
@@ -481,74 +481,13 @@ function markUploadSuccess(fileName) {
 			});
 	}
 
-	// 지역 컨트롤러 필드에
-	function saveRegion(regionCode) {
-		$.ajax({
-			url : "/recruitmentnotice/rest/region/" + regionCode,
-			type : "POST",
-			dataType : "json",
-			success : function(response) {
-				console.log("지역 저장 성공:", response);
-			},
-			error : function(err) {
-				console.error("지역 저장 실패", err);
-			}
-		});
-	}
 
-	// 시군구 컨트롤러 필드에
-	function saveSigungu(sigunguCode) {
-		$.ajax({
-			url : "/recruitmentnotice/rest/sigungu/" + sigunguCode,
-			type : "POST",
-			dataType : "json",
-			success : function(response) {
-				console.log("시군구 저장 성공:", response);
-			},
-			error : function(err) {
-				console.error("시군구 저장 실패", err);
-			}
-		});
-	}
-
-	// 산업군 컨트롤러 필드에
-
-	function saveMajorCategory(majorCategoryNo){
-		$.ajax({
-			url : "/recruitmentnotice/rest/major/" + majorCategoryNo,
-			type : "POST",
-			dataType : "json",
-			success : function(response) {
-				console.log("산업군 저장 성공:", response);
-			},
-			error : function(err) {
-				console.error("산업군 저장 실패", err);
-			}
-		});
-	}
-
-	// 직업 컨트롤러 필드에 
-	function saveSubCategory(subCategoryNo){
-		$.ajax({
-			url : "/recruitmentnotice/rest/sub/" + subCategoryNo,
-			type : "POST",
-			dataType : "json",
-			success : function(response) {
-				console.log("직업 저장 성공:", response);
-			},
-			error : function(err) {
-				console.error("직업 저장 실패", err);
-			}
-		});
-	}
-
-	
 
 	function removeAdvantage(deleteBtn) {
     let advantageType = $(deleteBtn).siblings("input[type='hidden']").val();
 
     $.ajax({
-        url: "/recruitmentnotice/rest/advantage/" + advantageType,
+        url: "/recruitmentnotice/advantage/" + advantageType,
         type: "DELETE",
         success: function (response) {
             console.log("삭제 성공", response);
@@ -572,7 +511,7 @@ function markUploadSuccess(fileName) {
     }
 
     $.ajax({
-        url: "/recruitmentnotice/rest/advantage",
+        url: "/recruitmentnotice/advantage",
         type: "POST",
         data: JSON.stringify({ advantageType: advantageValue }),
         contentType: "application/json",
@@ -725,8 +664,11 @@ if (workDetailType) {
   // 면접 방식 유효성 검사도 포함
   
   if(result){
+	// period 히든에 넣어주자
+	$("#period").val(period);
+
 	return result;
-}
+	}
 return result;
 }
 
@@ -840,14 +782,14 @@ label {
 	<section id="blog-comment-form" class="blog-comment-form section">
 
 		<div class="container" data-aos="fade-up" data-aos-delay="100">
-			<!-- 일단 /recruitmentnotice/rest/ 뒤의 값을 1번으로 해둠 나중 되면 el표현식으로 sessionScope.loginmember.uid로 바꾸자.. -->
+			
 			<form method="post" role="form" action="/recruitmentnotice/save">
 
 				<div class="form-header categories-widget widget-item">
 					<h3>채용 공고</h3>
 					<p>하단에 정보를 입력해주세요</p>
 				</div>
-
+				<input type="hidden" id="refCompany" name="refCompany" value="1"><!-- 내일 근우씨한테 물어봐서 회사 uid 값 넣기 -->
 				<div class="row gy-3">
 					<div class="col-md-6">
 						<div class="input-group">
@@ -885,7 +827,7 @@ label {
 							  
 							</select>
 						  </div>
-
+						  <input type="hidden" id="majorcategoryNo" name="majorcategoryNo">
 						
 						  <div class="custom-select-wrapper">
 							<label for="subCategory">직종</label>
@@ -893,7 +835,7 @@ label {
 							  
 							</select>
 						  </div>
-
+						  <input type="hidden" id="subcategoryNo" name="subcategoryNo">
 							
 								<div class="custom-select-wrapper">
 									<label for="region" class="form-check-label">도시</label> 
@@ -901,7 +843,7 @@ label {
 
 									</select>
 								</div>
-								<input type="hidden" id="region">
+								<input type="hidden" id="regionNo" name="regionNo" >
 								
 								<div class="custom-select-wrapper">
 									<label for="sigungu" class="form-check-label">시군구</label> 
@@ -909,7 +851,7 @@ label {
 
 									</select>
 								</div>
-							<input type="hidden" id="sigungu">
+							<input type="hidden" id="sigunguNo" name="sigunguNo">
 					</div>
 									
 
@@ -1012,7 +954,7 @@ label {
 											</select>
 										</div>
 									</div>
-
+									<input type="hidden" id="period" name="period">
 
 									<div class="col-12">
 										<label for="military1" class="form-check-label mb-2"
@@ -1134,7 +1076,7 @@ label {
 									<div class="col-md-6 dueDate">
 										<div class="input-group">
 											<label for="date" class="form-check-label mb-2">마감 기한</label>
-											<input type="date" id="date">
+											<input type="date" id="date" name="dueDate">
 										</div>
 									</div>
 
@@ -1149,7 +1091,7 @@ label {
 									<div class="col-md-6">
 										<div class="input-group">
 											<label for="manager" class="form-check-label">담당자</label> <input
-												type="text" id="manager" placeholder="담당자를 입력해주세요">
+												type="text" id="manager" name="manager" placeholder="담당자를 입력해주세요">
 
 										</div>
 									</div>

@@ -37,11 +37,11 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-	public boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO) throws Exception {
+	public boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO, List<AdvantageDTO> advantageList,
+			List<ApplicationDTO> applicationList, List<RecruitmentnoticeBoardUpfiles> fileList) throws Exception {
 		boolean result = false;
 		int CompanyUid = recruitmentNoticeDTO.getRefCompany();
 		int recNo = 0;
-		
 
 //		if(recdao.insertRecruitmentNotice(recruitmentNoticeDTO) > 0) {
 //			result = true;
@@ -49,45 +49,43 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 		// 공고를 제출하는 메서드
 		if (recdao.insertRecruitmentNotice(recruitmentNoticeDTO) > 0) {
-			
+
 			recNo = recdao.selectRecentRecruitment(CompanyUid);
 		}
 		// 우대 조건을 입력하는 메서드 호출
-		if (!recruitmentNoticeDTO.getAdvantageList().isEmpty()) {
+		if (!advantageList.isEmpty()) {
 			// advantageList에서 하나씩 꺼내서 insert
-			for (AdvantageDTO advDTO : recruitmentNoticeDTO.getAdvantageList()) {
+			for (AdvantageDTO advDTO : advantageList) {
 				advDTO.setRecruitmentNoticeUid(recNo);
 				// 여기서 insert
 				recdao.insertAdvantageWithRecruitmentNotice(advDTO);
 			}
 		}
-		if (!recruitmentNoticeDTO.getApplicationList().isEmpty()) {
-			for (ApplicationDTO aplDTO : recruitmentNoticeDTO.getApplicationList()) {
+		if (!applicationList.isEmpty()) {
+			for (ApplicationDTO aplDTO : applicationList) {
 				aplDTO.setRecruitmentNoticeUid(recNo);
 				// 여기서 insert
 				recdao.insertApplicationWithRecruitmentNotice(aplDTO);
 			}
 		}
 
-			jobdao.insertMajorCategoryWithRecruitmentnotice(recNo, recruitmentNoticeDTO.getMajorcategory().getMajorcategoryNo());
+		jobdao.insertMajorCategoryWithRecruitmentnotice(recNo,
+				recruitmentNoticeDTO.getMajorcategoryNo());
 
-			jobdao.insertSubCategoryWithRecruitmentnotice(recNo, recruitmentNoticeDTO.getSubcategory().getSubcategoryNo());
+		jobdao.insertSubCategoryWithRecruitmentnotice(recNo, recruitmentNoticeDTO.getSubcategoryNo());
 
-			regiondao.insertRegionWithRecruitmentNotice(recNo, recruitmentNoticeDTO.getRegion().getRegionNo());
-				
-			// 여기서 insert
-			regiondao.insertSigunguWithRecruitmentNotice(recNo, recruitmentNoticeDTO.getSigungu().getSigunguNo());
-		
-		if (recruitmentNoticeDTO.getFileList().size() > 0) {
-			for (RecruitmentnoticeBoardUpfiles file : recruitmentNoticeDTO.getFileList()) {
+		regiondao.insertRegionWithRecruitmentNotice(recNo, recruitmentNoticeDTO.getRegionNo());
+
+		// 여기서 insert
+		regiondao.insertSigunguWithRecruitmentNotice(recNo, recruitmentNoticeDTO.getSigunguNo());
+
+		if (fileList.size() > 0) {
+			for (RecruitmentnoticeBoardUpfiles file : fileList) {
 				// 여기서 insert
 				file.setRefrecruitmentnoticeNo(recNo);
 				recdao.insertRecruitmentFile(file);
 			}
 		}
-		
-			
-		
 
 		return result;
 	}
