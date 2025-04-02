@@ -13,4 +13,6 @@ public interface AccountService {
 	void setRequiresVerificationFalse(String type, String value, AccountType userType) throws Exception;
 
 	AccountVO refreshAccount(int uid, AccountType type) throws Exception;
+
+	AccountVO findAccountByAutoLogin(String sessionId, AccountType type) throws Exception;
 }

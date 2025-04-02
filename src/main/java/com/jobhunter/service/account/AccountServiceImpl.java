@@ -96,7 +96,7 @@ public class AccountServiceImpl implements AccountService {
 		
 		if (!requiresVerification) { // 로그인 성공
 			// 마지막 로그인일자 갱신
-			dao.setLoginTime(loginDto);
+			dao.setLoginTime(account.getUid());
 			
 			if (loginDto.getAutoLogin() != null) { // 자동로그인
 				dao.setAutoLogin(loginDto);
@@ -114,6 +114,18 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public AccountVO refreshAccount(int uid, AccountType type) throws Exception {
 		return getDAO(type).getAccountByUid(uid);
+	}
+
+	@Override
+	public AccountVO findAccountByAutoLogin(String sessionId, AccountType type) throws Exception {
+		AccountLoginDAO dao = getDAO(type);
+		AccountVO account = dao.getAccountByAutoLogin(sessionId);
+		boolean requiresVerification = "Y".equals(account.getRequiresVerification());
+		if (requiresVerification) {
+			dao.setLoginTime(account.getUid());
+		}
+		
+		return account;
 	}
 
 }

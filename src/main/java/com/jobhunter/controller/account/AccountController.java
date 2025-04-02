@@ -31,14 +31,23 @@ public class AccountController {
 
 	// 인터셉터 하나로 헤더 로그인 눌러도 로그인 끝나고 기존페이지 돌아오게 만드려고 넣음
 	@GetMapping("/login/return")
-	public String redirectToLogin(HttpServletRequest request, HttpSession session,
-			@RequestParam(required = false) String redirect) {
+	public String redirectToLogin(HttpServletRequest request, HttpSession session) {
 
-		if (redirect != null && session.getAttribute("redirectUrl") == null) {
-			session.setAttribute("redirectUrl", redirect);
-		} else {
-			RedirectUtil.saveRedirectUrl(request, session);
+		String redirectUrl = (String) session.getAttribute("redirectUrl");
+		if (redirectUrl != null) {
+			String referer = request.getHeader("Referer");
+			
+			session.setAttribute("redirectUrl", referer);
 		}
+		
+		AccountVO beforeAccount = (AccountVO) session.getAttribute("account");
+		if(!beforeAccount.getRequiresVerification().equalsIgnoreCase("Y")) {
+			// 자동로그인 성공했고 인증 필요 없음
+			String redirect = (String) session.getAttribute("redirectUrl");
+			session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
+			return "redirect:" + (redirect != null ? redirect : "/");
+		}
+		
 
 		// 로그인버튼 눌러서 들어왔을때 초기상태 유지+로그인으로 인증 건너뛰기 막는용 로그인데이터도 클린
 		// 어차피 정상적으로 로그인버튼 누르는건 로그인 안된유저뿐이니까
@@ -55,22 +64,21 @@ public class AccountController {
 	public String showLoginForm(HttpServletRequest request, HttpSession session,
 			@RequestParam(value = "redirect", required = false) String redirect) {
 
-		String referer = request.getHeader("Referer");
-
-		if (redirect != null && session.getAttribute("redirectUrl") == null) {
-			session.setAttribute("redirectUrl", redirect);
-		} else if (referer != null && !referer.matches(".*/account/(login|signup|verify|email-auth).*")
-				&& session.getAttribute("redirectUrl") == null) {
-			session.setAttribute("redirectUrl", referer);
-		}
-
 		// 인증 성공하면 세션 정리
-		if (session.getAttribute("account") != null) {
-			AccountVO user = (AccountVO) session.getAttribute("account");
-			if (!"Y".equals(user.getRequiresVerification())) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+		if (account != null) {
+			if ("Y".equals(account.getRequiresVerification())) {
+				session.setAttribute("authTargetMobile", account.getMobile());
+				session.setAttribute("authTargetEmail", account.getEmail());
+				session.setAttribute("requiresVerification", true);
+			} else { // 자동로그인 또는 로그인 성공하고 인증도 필요없을때
 				session.removeAttribute("requiresVerification");
 				session.removeAttribute("authTargetMobile");
 				session.removeAttribute("authTargetEmail");
+				
+				String redirectUrl = (String) session.getAttribute("redirectUrl");
+				session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
+				return "redirect:" + (redirectUrl != null ? redirectUrl : "/");
 			}
 		}
 
@@ -81,12 +89,12 @@ public class AccountController {
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginDTO loginDto, HttpSession session, HttpServletResponse response) {
 
-		System.out.println(loginDto);
-
+		// 자동로그인용 세팅
 		String sessionId = session.getId();
 		if (loginDto.getAutoLogin() != null && loginDto.getAutoLogin().equals("on")) {
 			loginDto.setAutoLogin(sessionId);
 		}
+		
 		// auth로그인인터셉터에서 쿼리스트링에 requireVerification=true 식으로 인증필요여부 들고옴
 		// auth로그인인터셉터에서 이전페이지나 가려던 페이지(get방식만) uri+쿼리 세션에 넣어둠
 		Map<String, Object> result = null;
@@ -107,10 +115,7 @@ public class AccountController {
 				session.setAttribute("account", account);
 
 				if (Boolean.TRUE.equals(auth)) { // 로그인은 했는데 인증이 필요
-					session.setAttribute("authTargetMobile", account.getMobile());
-					session.setAttribute("authTargetEmail", account.getEmail());
-					session.setAttribute("requiresVerification", true);
-					// 인증할 번호 세션에 묶고 인증필요하다고 저장해둔 다음 다시 로그인페이지 로딩
+					// 다시 로그인페이지 로딩 (로딩하면서 자동 인증 체크)
 					return "account/login";
 				}
 
@@ -139,7 +144,7 @@ public class AccountController {
 		session.removeAttribute("authTargetEmail");
 		session.removeAttribute("authTargetMobile");
 		session.removeAttribute("account");
-		return "redirect:/account/login?error=true&accountType=" + loginDto.getAccountType();
+		return "redirect:/account/login?error=true&accountType=" + loginDto.getAccountType() + "&autoLogin=" + loginDto.getAutoLogin();
 	}
 
 	@GetMapping("/logout")

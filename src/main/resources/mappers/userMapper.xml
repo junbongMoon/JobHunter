@@ -42,8 +42,7 @@
 	<update id="setLastLoginDate">
 		UPDATE users
 		SET lastLoginDate = NOW()
-		where userId = #{id} and
-		password = sha1(md5(#{password}))
+		where uid = #{uid}
 	</update>
 
 	<update id="setAutoLogin">
@@ -82,6 +81,13 @@
 		accountId, userName as accountName
 		from users
 		where uid = #{uid}
+	</select>
+	
+	<select id="getAccountByUid" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where autoLogin = #{sessionId}
 	</select>
 
 	<!-- 여기까진 로그인용 -->

@@ -37,8 +37,7 @@
     <update id="setLastLoginDate">
 	    UPDATE company
 	    SET lastLoginDate = NOW()
-	    where userId = #{id} and
-		password = sha1(md5(#{password}))
+	    where uid = #{uid}
 	</update>
     
     <update id="setAutoLogin">
@@ -102,5 +101,12 @@
 	<update id="updateMobile" parameterType="map">
 		UPDATE company SET mobile = #{mobile} WHERE uid = #{uid}
 	</update>
+	
+	<select id="getAccountByAutoLogin" resultMap="accountMap">
+        select *, companyId as accountId, companyName as accountName,
+               NULL as socialId, NULL as isSocial
+        from company
+        where autoLogin = #{sessionId}
+    </select>
     
 </mapper>
