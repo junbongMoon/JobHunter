@@ -38,18 +38,21 @@
 		rn.personalHistory,
 		rn.payType,
 		rn.period
-		FROM users u
+		FROM
+		users u
 		LEFT JOIN resume r ON u.uid =
 		r.userUid
-		JOIN recruitmentnotice rn ON rn.uid = r.resumeNo
+		JOIN recruitmentnotice rn
+		ON rn.uid = r.resumeNo
 		JOIN company c ON rn.refCompany = c.uid
-		WHERE u.uid = #{r.userUid}
+		WHERE
+		u.uid = #{r.userUid}
 
 	</select>
 
 	<insert id="insertReview"
 		parameterType="com.jobhunter.model.reviewboard.WriteBoardDTO">
-		insert into reviewBoard 
+		insert into reviewBoard
 		(gonggoUid,
 		writer,
 		companyName,
@@ -89,17 +92,11 @@
 		r.content,
 		r.likes
 		from reviewBoard r
-		left join users u on
-		r.writer = u.uid
-		left join
-		resume res on u.uid = res.userUid
-		left join
-		recruitmentnotice rec on
-		rec.uid = res.resumeNo
-		inner join company com
-		on rec.refCompany =
-		com.uid
-		where r.boardNo=#{r.boardNo}
+		left join users u on r.writer = u.uid
+		left join resume res on u.uid = res.userUid
+		left join recruitmentnotice rec on rec.uid = res.resumeNo
+		inner join company com on rec.refCompany = com.uid
+		where r.boardNo = #{boardNo}
 	</select>
 
 	<resultMap id="ReviewDetailViewDTOMap"
