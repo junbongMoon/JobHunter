@@ -43,50 +43,9 @@ public class RecruitmentNoticeRestController {
 	private static final Logger logger = LoggerFactory.getLogger(RecruitmentNoticeRestController.class);
 	private final RecruitmentFileProcess fp;
 
-	// 양식을 저장 할 List, 코드들
-	private final List<AdvantageDTO> advantageList = new ArrayList<>();
-	private final List<ApplicationDTO> applicationList = new ArrayList<>();
-	private String regionCode;
-	private String sigunguCode;
-	private String majorCategoryCode;
-	private String subCategoryCode;
-	// 게시글 작성시 업로드한 파일객체들을 임시로 저장
-	private List<RecruitmentnoticeBoardUpfiles> fileList = new ArrayList<RecruitmentnoticeBoardUpfiles>();
-	// 게시글 수정시 업로한 파일 객체들을 임식로 저장
-	private List<RecruitmentnoticeBoardUpfiles> modifyFileList;
+	
 
-	// 회사가 공고를 등록하는 메서드
-	@PostMapping(value = "/{uid}", produces = "application/json; charset=utf-8")
-	public ResponseEntity<Boolean> saveRecruiment(@PathVariable("uid") int uid,
-			@RequestBody RecruitmentNoticeDTO recruitmentNoticeDTO) {
-		// 성공, 실패 여부를 json으로 응답
-		ResponseEntity<Boolean> result = null;
-
-		logger.info("입력 할 때 들고옴.." + recruitmentNoticeDTO);
-		// 현재 작성한 작성회사의 pk를 넣어준다.
-		recruitmentNoticeDTO.setRefCompany(uid);
-		// String으로 받은 값을 int로 바꾸자..
-		Timestamp dueDate = recruitmentNoticeDTO.getDueDate();
-		LocalDateTime onlyDate = dueDate.toLocalDateTime().withHour(0).withMinute(0).withSecond(0);
-		recruitmentNoticeDTO.setDueDate(Timestamp.valueOf(onlyDate));
-
-		try {
-			if (recService.saveRecruitmentNotice(recruitmentNoticeDTO, advantageList, applicationList, regionCode,
-					sigunguCode, fileList, majorCategoryCode, subCategoryCode)) {
-				// service 단도 바꿔주자
-				result = ResponseEntity.ok(true);
-			}
-		} catch (Exception e) {
-			result = ResponseEntity.badRequest().body(false);
-			e.printStackTrace();
-		}
-
-		// 리스트 필드 다 비워주기
-		ListAllClear();
-
-		return result;
-
-	}
+	
 
 	// 회사가 공고를 작성할 때 우대조건을 리스트에 누적 해주는 메서드
 	@PostMapping(value = "/advantage")
