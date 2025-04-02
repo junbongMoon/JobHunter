@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.jobhunter.customexception.NeedLoginException;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.util.RedirectUtil;
 
@@ -34,6 +35,7 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
                 response.setContentType("application/json; charset=UTF-8");
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write("{\"status\": \"NEED_LOGIN\", \"redirect\": \"" + loginUrl + "\"}");
+                NeedLoginException.writeToResponse(response, request.getContextPath());
             } else {
                 response.sendRedirect(loginUrl);
             }
