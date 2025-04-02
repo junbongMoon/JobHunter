@@ -13,7 +13,8 @@
 		u.userId AS writer,
 		c.companyName,
 		r.likes,
-		r.views
+		r.views,
+		r.postDate
 		FROM
 		reviewBoard r
 		JOIN
@@ -29,10 +30,9 @@
 
 	<select id="gonggoAll"
 		resultType="com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO">
-		SELECT
-		rn.uid AS recruitmentnoticeNo,
-		rn.title AS
-		recruitmentTitle,
+		select
+		r.title AS resumeTitle,
+		rn.title AS recruitmentTitle,
 		c.companyName,
 		rn.workType,
 		rn.personalHistory,
@@ -42,16 +42,16 @@
 		LEFT JOIN resume r ON u.uid =
 		r.userUid
 		JOIN recruitmentnotice rn ON rn.uid = r.resumeNo
-		JOIN company
-		c ON rn.refCompany = c.uid
-		WHERE u.uid = #{userUid}
+		JOIN company c ON rn.refCompany = c.uid
+		WHERE u.uid = #{r.userUid}
 
 	</select>
 
 	<insert id="insertReview"
 		parameterType="com.jobhunter.model.reviewboard.WriteBoardDTO">
 		insert into reviewBoard 
-		(writer,
+		(gonggoUid,
+		writer,
 		companyName,
 		reviewType,
 		reviewLevel,
@@ -62,6 +62,7 @@
 		views
 		)
 		VALUES (
+		#{gonggoUid},
 		#{writer},
 		#{companyName},
 		#{reviewType},
