@@ -51,6 +51,8 @@ public class RecruitmentNoticeController {
 	private static final Logger logger = LoggerFactory.getLogger(RecruitmentNoticeController.class);
 
 	// 양식을 저장 할 List, 코드들
+	private final List<AdvantageDTO> advantageList = new ArrayList<>();
+	private final List<ApplicationDTO> applicationList = new ArrayList<>();
 
 	// 게시글 작성시 업로드한 파일객체들을 임시로 저장
 	private List<RecruitmentnoticeBoardUpfiles> fileList = new ArrayList<RecruitmentnoticeBoardUpfiles>();
@@ -60,65 +62,32 @@ public class RecruitmentNoticeController {
 
 	// 회사가 공고를 등록하는 메서드
 	@PostMapping("/save")
-	public String saveRecruitment(@RequestParam(required = false) String applicationListJson,
-            @RequestParam(required = false) String advantageListJson,
-            RecruitmentNoticeDTO dto) {
-		
+	public String saveRecruitment(RecruitmentNoticeDTO dto) {
+
 		List<ApplicationDTO> appList = new ArrayList<>();
 		List<AdvantageDTO> advList = new ArrayList<>();
-		
-	    System.out.println("DTO 확인: " + dto);
-	    
-	    ObjectMapper objectMapper = new ObjectMapper();
 
-	    // 추가 파싱 및 변환
-	    if (dto.getDueDateForString() != null) {
-	        LocalDate date = LocalDate.parse(dto.getDueDateForString());
-	        dto.setDueDate(Timestamp.valueOf(date.atStartOfDay()));
-	    }
-	    
-	 // 면접 방식 파싱
-	    if (applicationListJson != null && !applicationListJson.isEmpty()) {
-	        
-			try {
-				appList = objectMapper.readValue(
-				    applicationListJson,
-				    new TypeReference<List<ApplicationDTO>>() {}
-				);
-			} catch (JsonMappingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        dto.setApplicationList(appList);
-	    }
+		System.out.println("DTO 확인: " + dto);
 
-	    // 우대조건 파싱
-	    if (advantageListJson != null && !advantageListJson.isEmpty()) {
-	        
-			try {
-				advList = objectMapper.readValue(
-				    advantageListJson,
-				    new TypeReference<List<AdvantageDTO>>() {}
-				);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        dto.setAdvantageList(advList);
-	    }
+		ObjectMapper objectMapper = new ObjectMapper();
 
-	    // 저장 로직 호출
-	    try {
+		// 추가 파싱 및 변환
+		if (dto.getDueDateForString() != null) {
+			LocalDate date = LocalDate.parse(dto.getDueDateForString());
+			dto.setDueDate(Timestamp.valueOf(date.atStartOfDay()));
+		}
+
+		// 저장 로직 호출
+		try {
 			recruitmentService.saveRecruitmentNotice(dto);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    
-	    return "redirect:/recruitmentnotice/listAll"; // 혹은 성공 페이지
+
+		ListAllClear();
+
+		return "redirect:/recruitmentnotice/listAll"; // 혹은 성공 페이지
 	}
 
 	// 전체 공고 리스트를 출력하는 메서드
@@ -141,7 +110,52 @@ public class RecruitmentNoticeController {
 		return "recruitmentnotice/listAll";
 	}
 
-	
+	// 회사가 공고를 작성할 때 면접방식을 리스트에 누적 해주는 메서드
+	// 같은 면접방식이 중복 저장되는 문제가 생겼다... 해결해보자
+	@PostMapping(value = "/application")
+	public ResponseEntity<List<ApplicationDTO>> saveApplicationWithRecruitmentNotice(
+			@RequestBody ApplicationDTO applicationDTO) {
+		// 성공, 실패 여부를 json으로 응답
+		ResponseEntity<List<ApplicationDTO>> result = null;
+
+		boolean isDuplicate = false;
+		for (ApplicationDTO appl : applicationList) {
+			if (appl.getMethod() == applicationDTO.getMethod()) {
+				isDuplicate = true;
+			}
+		}
+
+		// 같은 이름의 method가 들어올 경우 방지
+		if (applicationDTO != null && !isDuplicate) {
+			applicationList.add(applicationDTO);
+			result = ResponseEntity.ok(this.applicationList);
+		} else {
+			result = ResponseEntity.badRequest().body(this.applicationList);
+		}
+
+		System.out.println(applicationList);
+
+		return result;
+	}
+
+	// 공고를 작성할 때 면접방식을 삭제하는 메서드
+
+	@DeleteMapping("/application")
+	public ResponseEntity<List<ApplicationDTO>> deleteApplicationWithRecruitmentNotice(
+			@RequestBody ApplicationDTO applicationDTO) {
+		ResponseEntity<List<ApplicationDTO>> result = null;
+
+		for (int i = 0; i < applicationList.size(); i++) {
+			if (applicationList.get(i).getMethod() == applicationDTO.getMethod()) {
+				applicationList.remove(i);
+			}
+		}
+		result = ResponseEntity.ok(applicationList);
+
+		System.out.println(applicationList);
+
+		return result;
+	}
 
 	// 파일을 저장하는 메서드
 	@PostMapping("/file")
@@ -158,6 +172,53 @@ public class RecruitmentNoticeController {
 			logger.error("파일 업로드 실패", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
+	}
+
+	// 파일을 삭제하는 메서드
+	@DeleteMapping("/file")
+	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> removeFile(
+			@RequestParam("removeFileName") String removeFileName) {
+		fileList.removeIf(f -> {
+			if (f.getOriginalFileName().equals(removeFileName)) {
+				fp.removeFile(f);
+				System.out.println(fileList);
+				return true;
+			}
+			return false;
+		});
+		return ResponseEntity.ok(fileList);
+	}
+
+	// 회사가 공고를 작성할 때 우대조건을 리스트에 누적 해주는 메서드
+	@PostMapping(value = "/advantage")
+	public ResponseEntity<List<AdvantageDTO>> saveAdvantageWithRecruitmentNotice(
+			@RequestBody AdvantageDTO advantageDTO) {
+		// 성공, 실패 여부를 json으로 응답
+		ResponseEntity<List<AdvantageDTO>> result = null;
+
+		if (advantageDTO != null) {
+			advantageList.add(advantageDTO);
+			result = ResponseEntity.ok(this.advantageList);
+		} else {
+			result = ResponseEntity.badRequest().body(this.advantageList);
+		}
+
+		System.out.println(advantageList);
+		return result;
+	}
+
+	// 회사가 공고를 작성할 때 우대조건을 리스트에서 삭제 해주는 메서드
+	@DeleteMapping(value = "/advantage/{advantageType}")
+	public ResponseEntity<List<AdvantageDTO>> deleteAdvantage(@PathVariable("advantageType") String advantageType) {
+		ResponseEntity<List<AdvantageDTO>> result = null;
+
+		if (this.advantageList.removeIf(adv -> adv.getAdvantageType().equals(advantageType))) {
+			System.out.println("우대조건 삭제 : " + advantageList);
+
+		}
+		result = ResponseEntity.ok(this.advantageList);
+
+		return result;
 	}
 
 	// 지역별 공고 리스트를 출력하는 메서드
@@ -191,5 +252,12 @@ public class RecruitmentNoticeController {
 
 	// 공고를 삭제하는 페이지를 출력하는 메서드
 
-	
+	// 리스트, 필드를 전부 비워주는 메서드 (다 하고 맨 밑으로 내리자)
+	private void ListAllClear() {
+		this.advantageList.clear();
+		this.applicationList.clear();
+		this.fileList.clear();
+
+	}
+
 }

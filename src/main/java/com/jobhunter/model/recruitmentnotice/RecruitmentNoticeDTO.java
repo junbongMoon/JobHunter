@@ -53,19 +53,14 @@ public class RecruitmentNoticeDTO {
 	private String status;
 	// 작성한 회사의 pk를 참조하는 값
 	private int refCompany;
-	// 우대 조건 List
-	private List<AdvantageDTO> advantageList;
-	// 면접 방법 List
-	private List<ApplicationDTO> applicationList;
 	// 도시
-	private Region region;
+	private int regionNo;
 	// 시군구
-	private Sigungu sigungu;
+	private int sigunguNo;
 	// 산업군
-	private Majorcategory majorcategory;
+	private int majorcategoryNo;
 	// 직업
-	private Subcategory subcategory;
-	// 파일 리스트
-	private List<RecruitmentnoticeBoardUpfiles> fileList;
+	private int subcategoryNo;
+
 	
 }
