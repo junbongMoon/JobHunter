@@ -14,12 +14,7 @@
 <script>
 	let errorMessage = "";
 	let focusElement = null;
-	
-	let fileList = [];
-	let ApplicationList = [];
-	let AdvantageList = [];
-
-	
+	let upfiles = [];
 	
 
 	$(function() {
@@ -568,7 +563,7 @@ function markUploadSuccess(fileName) {
 	function addAdvantage() {
 		
 		let advVal = $("#advantage").val();
-        let advantageValue = $("#advantage").val();
+    let advantageValue = $("#advantage").val();
 
     if (!advantageValue) {
         alert("우대조건을 입력하세요");
@@ -576,6 +571,16 @@ function markUploadSuccess(fileName) {
         return;
     }
 
+    $.ajax({
+        url: "/recruitmentnotice/rest/advantage",
+        type: "POST",
+        data: JSON.stringify({ advantageType: advantageValue }),
+        contentType: "application/json",
+        success: function (response) {
+            console.log("우대조건 저장 성공", response);
+            $("#advantage").val("");
+
+            // DOM에 추가할 HTML 구성
             let output = `
                 <div class="d-flex align-items-center mb-2 advantage-item">
                     <input type="hidden" value="\${advantageValue}">
@@ -584,41 +589,16 @@ function markUploadSuccess(fileName) {
                 </div>
             `;
             $(".advantageArea").append(output);
-        
+        },
+        error: function (err) {
+            console.error("우대조건 저장 실패", err);
+        }
+    });
+
+
 
 }
 
-function submitRecruitmentNotice(title, workType, payType, pay, period, militaryService, dueDate, detail, personalHistory, manager, refCompany) {
-	$.ajax({
-      url: "/recruitmentnotice/rest/" + refCompany, // 일단 대충 1 나중에 input hidden에 sessionScope.loginmember.uid 
-      type: "POST",
-      contentType: "application/json",
-      data: JSON.stringify({
-        "title" : title,
-		"workType" : workType,
-		"payType" : payType,
-		"pay" : pay,
-		"period" : period,
-		"personalHistory" : personalHistory,
-		"militaryService" : militaryService,
-		"detail" : detail,
-		"manager" : manager,
-		"dueDate" : dueDate,
-		
-		
-      }),
-      success: function (data) {
-        console.log(data)
-
-		$("#successModal").modal("show");
-      },
-      error: function () {
-        alert(`${method} 방식 저장 실패`);
-      }
-
- 
- });
-}
 
 function formatPay(input) {
     // 숫자만 추출
@@ -745,9 +725,9 @@ if (workDetailType) {
   // 면접 방식 유효성 검사도 포함
   
   if(result){
-	submitRecruitmentNotice(title, workType, payType, pay, period, militaryService, dueDate, detail, personalHistory, manager, refCompany);
+	return result;
 }
-
+return result;
 }
 
 
@@ -905,7 +885,7 @@ label {
 							  
 							</select>
 						  </div>
-						  
+
 						
 						  <div class="custom-select-wrapper">
 							<label for="subCategory">직종</label>
@@ -1003,7 +983,7 @@ label {
 									<div class="col-md-12">
 										<div class="input-group">
 											<label for="pay" class="form-check-label mb-2">급여 액수</label>
-											<input type="text" id="pay" maxlength="15" name="pay"
+											<input type="text" id="pay" maxlength="15"
 												placeholder="숫자만 입력할 수 있습니다." oninput="formatPay(this)">
 										</div>
 									</div>
@@ -1017,7 +997,6 @@ label {
 											<!-- 해야할 것 : 격일, 격주, 2교대 등 근무 시간에 대한 상세 내용 -->
 										</div>
 									</div>
-									<input type="hidden" id="period" name="period">
 
 									<div class="col-md-6">
 										<div class="custom-select-wrapper">
@@ -1190,7 +1169,7 @@ label {
 
 									<div class="col-12 text-center">
 
-										<button type="button" id="write"
+										<button type="submit" id="write"
 											onclick="isValidRecruitmentForm()">작성</button>
 									</div>
 								</div>
@@ -1216,6 +1195,9 @@ label {
 					</div>
 				</div>
 			</div>
+
+			
+
 
 		</div>
 
