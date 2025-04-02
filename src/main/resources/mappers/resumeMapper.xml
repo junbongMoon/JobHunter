@@ -138,4 +138,53 @@
         FROM resumeupfiles
         WHERE resumeNo = #{resumeNo}
     </select>
+    
+    <!-- 이력서 상세 정보 조회 -->
+    <select id="selectResumeDetail" parameterType="int" resultType="com.jobhunter.model.resume.ResumeDTO">
+        SELECT 
+            r.resumeNo,
+            r.title,
+            r.payType,
+            r.pay,
+            r.introduce,
+            r.userUid,
+            r.saveType
+        FROM resume r
+        WHERE r.resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 고용형태 조회 -->
+    <select id="selectResumeJobForms" parameterType="int" resultType="com.jobhunter.model.resume.JobFormDTO">
+        SELECT form
+        FROM jobform
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 성격 및 장점 조회 -->
+    <select id="selectResumeMerits" parameterType="int" resultType="com.jobhunter.model.resume.MeritDTO">
+        SELECT meritContent
+        FROM merit
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 학력 조회 -->
+    <select id="selectResumeEducations" parameterType="int" resultType="com.jobhunter.model.resume.EducationDTO">
+        SELECT educationLevel, educationStatus, graduationDate, customInput
+        FROM education
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 경력 조회 -->
+    <select id="selectResumeHistories" parameterType="int" resultType="com.jobhunter.model.resume.PersonalHistoryDTO">
+        SELECT companyName, position, jobDescription, startDate, endDate
+        FROM personalhistory
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 자격증 조회 -->
+    <select id="selectResumeLicenses" parameterType="int" resultType="com.jobhunter.model.resume.LicenseDTO">
+        SELECT licenseName, acquisitionDate, institution
+        FROM license
+        WHERE resumeNo = #{resumeNo}
+    </select>
 </mapper>

@@ -128,7 +128,8 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public List<SubCategoryVO> selectResumeSubCategory(int resumeNo) throws Exception {
 		return ses.selectList(NS + ".selectResumeSubCategory", resumeNo);
 	}
-
+	
+	// 이력서 삭제
 	@Override
 	public List<ResumeUpfileDTO> selectResumeUpfile(int resumeNo) throws Exception {
 		return ses.selectList(NS + ".selectResumeUpfile", resumeNo);
@@ -137,5 +138,36 @@ public class ResumeDAOImpl implements ResumeDAO {
 	@Override
 	public void deleteResume(int resumeNo) throws Exception {
 		ses.delete(NS + ".deleteResume", resumeNo);
+	}
+	
+	// 이력서 상세 조회
+	@Override
+	public ResumeDTO selectResumeDetail(int resumeNo) throws Exception {
+		return ses.selectOne(NS + ".selectResumeDetail", resumeNo);
+	}
+
+	@Override
+	public List<JobFormDTO> selectResumeJobForms(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeJobForms", resumeNo);
+	}
+
+	@Override
+	public List<MeritDTO> selectResumeMerits(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeMerits", resumeNo);
+	}
+
+	@Override
+	public List<EducationDTO> selectResumeEducations(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeEducations", resumeNo);
+	}
+
+	@Override
+	public List<PersonalHistoryDTO> selectResumeHistories(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeHistories", resumeNo);
+	}
+
+	@Override
+	public List<LicenseDTO> selectResumeLicenses(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeLicenses", resumeNo);
 	}
 }
