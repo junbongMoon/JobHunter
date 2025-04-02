@@ -15,7 +15,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class RecruitmentnoticContentDTO {
-	 private int recruitmentnoticeNo;   // 공고 ID
+	 private String resumeTitle;   // 이력서 제목 
 	    private String recruitmentTitle;   // 공고 제목
 	    private String companyName;        // 회사 이름
 	    private String workType;           // 근무 형태
