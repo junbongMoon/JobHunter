@@ -2,6 +2,7 @@ package com.jobhunter.controller.recruitmentnotice;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +26,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
@@ -53,33 +59,66 @@ public class RecruitmentNoticeController {
 	private final RecruitmentFileProcess fp;
 
 	// 회사가 공고를 등록하는 메서드
-	@PostMapping(value = "/save", produces = "application/json; charset=utf-8")
-	public ResponseEntity<Boolean> saveRecruiment(@PathVariable("uid") int uid,
-			@RequestBody RecruitmentNoticeDTO recruitmentNoticeDTO) {
-		// 성공, 실패 여부를 json으로 응답
-		ResponseEntity<Boolean> result = null;
+	@PostMapping("/save")
+	public String saveRecruitment(@RequestParam(required = false) String applicationListJson,
+            @RequestParam(required = false) String advantageListJson,
+            RecruitmentNoticeDTO dto) {
+		
+		List<ApplicationDTO> appList = new ArrayList<>();
+		List<AdvantageDTO> advList = new ArrayList<>();
+		
+	    System.out.println("DTO 확인: " + dto);
+	    
+	    ObjectMapper objectMapper = new ObjectMapper();
 
-		logger.info("입력 할 때 들고옴.." + recruitmentNoticeDTO);
-		// 현재 작성한 작성회사의 pk를 넣어준다.
-		recruitmentNoticeDTO.setRefCompany(uid);
-		// String으로 받은 값을 int로 바꾸자..
-		Timestamp dueDate = recruitmentNoticeDTO.getDueDate();
-		LocalDateTime onlyDate = dueDate.toLocalDateTime().withHour(0).withMinute(0).withSecond(0);
-		recruitmentNoticeDTO.setDueDate(Timestamp.valueOf(onlyDate));
-
-		try {
-			if (recruitmentService.saveRecruitmentNotice(recruitmentNoticeDTO)) {
-				// service 단도 바꿔주자
-				result = ResponseEntity.ok(true);
+	    // 추가 파싱 및 변환
+	    if (dto.getDueDateForString() != null) {
+	        LocalDate date = LocalDate.parse(dto.getDueDateForString());
+	        dto.setDueDate(Timestamp.valueOf(date.atStartOfDay()));
+	    }
+	    
+	 // 면접 방식 파싱
+	    if (applicationListJson != null && !applicationListJson.isEmpty()) {
+	        
+			try {
+				appList = objectMapper.readValue(
+				    applicationListJson,
+				    new TypeReference<List<ApplicationDTO>>() {}
+				);
+			} catch (JsonMappingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+	        dto.setApplicationList(appList);
+	    }
+
+	    // 우대조건 파싱
+	    if (advantageListJson != null && !advantageListJson.isEmpty()) {
+	        
+			try {
+				advList = objectMapper.readValue(
+				    advantageListJson,
+				    new TypeReference<List<AdvantageDTO>>() {}
+				);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        dto.setAdvantageList(advList);
+	    }
+
+	    // 저장 로직 호출
+	    try {
+			recruitmentService.saveRecruitmentNotice(dto);
 		} catch (Exception e) {
-			result = ResponseEntity.badRequest().body(false);
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-
-		return result;
-
+	    
+	    return "redirect:/recruitmentnotice/listAll"; // 혹은 성공 페이지
 	}
 
 	// 전체 공고 리스트를 출력하는 메서드
