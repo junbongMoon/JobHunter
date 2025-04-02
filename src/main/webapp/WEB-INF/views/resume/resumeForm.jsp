@@ -1748,7 +1748,8 @@
 									originalFileName: result.originalFileName,
 									newFileName: result.newFileName,
 									ext: result.ext,
-									size: result.size
+									size: result.size,
+									base64Image: result.base64Image
 								});
 								showFilePreview(result);
 								updateFileText();
