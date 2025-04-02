@@ -15,16 +15,15 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ReviewDetailViewDTO {
-	
-	  private String title;         // 이력서 제목
-	    private String userId;        // 유저 ID
-	    private String payType;       // 급여 형태
-	    private String detail;        // 공고 상세
-	    private String companyName;   // 회사명
-
-	    private String reviewResult;  // 후기 결과
-	    private String reviewType;    // 후기 유형
-	    private String reviewLevel;   // 후기 난이도
-	    private String content;       // 후기 내용
-	    private int likes;            // 좋아요 수
+		
+	 private String title; 
+	    private String userId; 
+	    private String payType;
+	    private String detail; 
+	    private String companyName; 
+	    private String reviewResult;
+	    private String reviewType;
+	    private int reviewLevel;
+	    private String content;
+	    private int likes;
 }
