@@ -16,9 +16,9 @@ import lombok.ToString;
 @ToString
 public class WriteBoardDTO {
 	
-	
-	private int writer;  
-    private String companyName;
+	private int gonggoUid;
+	private int writer;
+	private String companyName;
     private String reviewType;
     private int reviewLevel;
     private String reviewResult;
