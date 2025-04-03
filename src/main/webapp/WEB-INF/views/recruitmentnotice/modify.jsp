@@ -293,6 +293,10 @@ function instalRecruitment() {
 	const detail = '${RecruitmentDetailInfo.detail}';
 	const manager = '${RecruitmentDetailInfo.manager}';
 	const dueDate = '<fmt:formatDate value="${RecruitmentDetailInfo.dueDate}" pattern="yyyy-MM-dd"/>'; // JSTL 형식 유지
+	const regionNo = '${RecruitmentDetailInfo.region.regionNo}';
+	const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';
+	const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}'
+	const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}'
 
 	// 입력 값 세팅
 	$('#title').val(title);
@@ -304,6 +308,10 @@ function instalRecruitment() {
 	$('#summernote').summernote('code', detail);
 	$('#manager').val(manager);
 	$('#date').val(dueDate);
+	$('#regionNo').val(regionNo);
+	$('#sigunguNo').val(sigunguNo);
+	$('#majorcategoryNo').val(majorcategoryNo);
+	$('#subcategoryNo').val(subcategoryNo);
 
 	// 근무 시간 분해 (예: "08:00~17:00 (주 5일제)")
 	const timeRegex = /^(\d{2}:\d{2})~(\d{2}:\d{2})(?: \((.+)\))?$/;
