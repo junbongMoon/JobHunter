@@ -108,8 +108,10 @@
     <!-- 이력서별 시군구 정보 조회 -->
     <select id="selectResumeSigungu" parameterType="int" resultType="com.jobhunter.model.resume.SigunguVO">
         SELECT 
+            sg.sigunguNo,
             sg.name,
-            r.name as regionName
+            r.name as regionName,
+            r.regionNo
         FROM where_resume_sigungu wrs
         JOIN sigungu sg ON wrs.refSigunguNo = sg.sigunguNo
         JOIN region r ON sg.regionNo = r.regionNo

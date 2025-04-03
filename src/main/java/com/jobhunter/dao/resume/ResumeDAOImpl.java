@@ -170,4 +170,49 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public List<LicenseDTO> selectResumeLicenses(int resumeNo) throws Exception {
 		return ses.selectList(NS + ".selectResumeLicenses", resumeNo);
 	}
+
+	@Override
+	public void updateResume(ResumeDTO resumeDTO) throws Exception {
+		ses.update(NS + ".updateResume", resumeDTO);
+	}
+
+	@Override
+	public void deleteJobForms(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteJobForms", resumeNo);
+	}
+
+	@Override
+	public void deleteMerits(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteMerits", resumeNo);
+	}
+
+	@Override
+	public void deleteResumeSigungu(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteResumeSigungu", resumeNo);
+	}
+
+	@Override
+	public void deleteResumeSubCategory(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteResumeSubCategory", resumeNo);
+	}
+
+	@Override
+	public void deleteEducations(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteEducations", resumeNo);
+	}
+
+	@Override
+	public void deleteHistories(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteHistories", resumeNo);
+	}
+
+	@Override
+	public void deleteLicenses(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteLicenses", resumeNo);
+	}
+
+	@Override
+	public void deleteResumeUpfiles(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteResumeUpfiles", resumeNo);
+	}
 }
