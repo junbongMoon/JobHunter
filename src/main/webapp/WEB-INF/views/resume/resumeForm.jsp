@@ -1155,20 +1155,22 @@ h2:after {
 											// 삭제 버튼 생성 및 삭제 기능
 											let $removeBtn = $("<button>")
 												.addClass("btn-close ms-2")
-												.attr("type", "button")  // type="button" 추가
+												.attr("type", "button")
 												.on("click", function (e) {
 													e.preventDefault();
 													e.stopPropagation();
 													
 													const $badge = $(this).parent();
-													const subNo = $badge.data("sub");
-													const majorNo = $badge.data("major");
+													const jobName = $badge.text().trim();
 													
 													$badge.remove();
 													
-													// 해당 대분류의 체크박스 중에서 subNo와 일치하는 것을 찾아 해제
-													$(`.major-item[data-major="${majorNo}"]`).trigger('click');
-													$(`input[data-sub="${subNo}"]`).prop("checked", false);
+													// 해당 텍스트와 일치하는 체크박스 찾아서 해제
+													$('.sub-item input[type="checkbox"]').each(function() {
+														if ($(this).data('name') === jobName) {
+															$(this).prop('checked', false);
+														}
+													});
 												});
 
 											$badge.append($removeBtn);
@@ -2059,17 +2061,19 @@ h2:after {
 					});
 
 					// 삭제 버튼 이벤트 처리
-					$('#selectedJobTypes').on('click', '.btn-close', function () {
+					$('#selectedJobTypes').on('click', '.btn-close', function (e) {
+						e.preventDefault();
+						e.stopPropagation();
+						
 						const $badge = $(this).parent();
 						const subNo = $badge.data('sub');
 						const jobName = $badge.text().trim(); // 배지의 텍스트 가져오기
+						
 						$badge.remove();
-						$(`#sub_${subNo}`).prop('checked', false);
 						
 						// 해당 텍스트와 일치하는 체크박스 찾아서 해제
 						$('.sub-item input[type="checkbox"]').each(function() {
-							const checkboxText = $(this).data('name');
-							if (checkboxText === jobName) {
+							if ($(this).data('name') === jobName) {
 								$(this).prop('checked', false);
 							}
 						});
