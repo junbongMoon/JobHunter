@@ -1,7 +1,6 @@
 package com.jobhunter.controller.reviewboard;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -65,7 +64,7 @@ public class ReviewBoardController {
 	        return "redirect:/account/login";
 	    }
 
-	    int userUid = account.getUid(); // ✅ AccountVO에서 꺼냄
+	    int userUid = account.getUid(); 
 
 	    try {
 	        List<RecruitmentnoticContentDTO> gonggoList = service.selectgoggo(userUid, GetClientIPAddr.getClientIp(req));
@@ -86,11 +85,12 @@ public class ReviewBoardController {
 	        return "redirect:/account/login";
 	    }
 
-	    writeBoardDTO.setWriter(account.getUid()); // ✅ 여기서도 수정 필요
+	    writeBoardDTO.setWriter(account.getUid());
 
-	    logger.info("리뷰 게시글 저장 시도: " + writeBoardDTO.toString());
-
+	    //logger.info("리뷰 게시글 저장 시도: " + writeBoardDTO.toString());
 	    String returnPage = "redirect:./allBoard";
+	    //logger.info("writeBoardDTO.toString());
+	    //logger.info("reviewResult 넘어온 값 = {}", writeBoardDTO.getReviewResult());
 
 	    try {
 	        if (service.saveReview(writeBoardDTO)) {
@@ -117,4 +117,5 @@ public class ReviewBoardController {
 		return "reviewBoard/detail";
 
 	}
+	
 }

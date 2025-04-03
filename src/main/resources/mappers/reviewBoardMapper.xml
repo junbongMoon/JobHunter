@@ -71,60 +71,55 @@
 		#{reviewType},
 		#{reviewLevel},
 		#{reviewResult},
-		#{content},
-		NOW(),
-		0,
-		0
+		#{content}
 		)
 	</insert>
 
 
 	<select id="detailAll" resultMap="ReviewDetailViewDTOMap">
-		select
+		SELECT
 		res.title,
 		u.userId,
+		rec.workType,
 		res.payType,
+		rec.personalHistory,
+		rec.period,
 		rec.detail,
 		com.companyName,
 		r.reviewResult,
 		r.reviewType,
 		r.reviewLevel,
 		r.content,
-		r.likes
-		from reviewBoard r
-		left join users u on r.writer = u.uid
-		left join resume res on u.uid = res.userUid
-		left join recruitmentnotice rec on rec.uid = res.resumeNo
-		inner join company com on rec.refCompany = com.uid
-		where r.boardNo = #{boardNo}
+		r.likes,
+		r.views
+		FROM reviewBoard r
+		INNER JOIN users u ON r.writer =
+		u.uid
+		INNER JOIN recruitmentnotice rec ON r.gonggoUid = rec.uid
+		INNER
+		JOIN resume res ON rec.uid =res.resumeNo
+		INNER JOIN company com ON
+		rec.refCompany = com.uid
+		WHERE r.boardNo = #{r.boardNo}
 	</select>
 
 	<resultMap id="ReviewDetailViewDTOMap"
 		type="com.jobhunter.model.reviewboard.ReviewDetailViewDTO">
-
-		<!-- resume -->
-		<result column="title" property="title" javaType="String" />
-		<result column="payType" property="payType" javaType="String" />
-
-		<!-- users -->
-		<result column="userId" property="userId" javaType="String" />
-
-		<!-- recruitmentNotice -->
-		<result column="detail" property="detail" javaType="String" />
-
-		<!-- company -->
-		<result column="companyName" property="companyName"
-			javaType="String" />
-
-		<!-- reviewBoard -->
-		<result column="reviewResult" property="reviewResult"
-			javaType="String" />
-		<result column="reviewType" property="reviewType"
-			javaType="String" />
-		<result column="reviewLevel" property="reviewLevel"
-			javaType="String" />
-		<result column="content" property="content" javaType="String" />
-		<result column="likes" property="likes" javaType="int" />
+		<result column="boardNo" property="boardNo" /> <!-- 게시글 번호 -->
+		<result column="title" property="title" /> <!-- 공고 제 -->
+		<result column="userId" property="userId" /> <!--유저 아이디 -->
+		<result column="workType" property="workType" /> <!-- 근무 형태 -->
+		<result column="payType" property="payType" /><!-- 급여 형태 -->
+		<result column="personalHistory" property="personalHistory" /> <!--경력사항 -->
+		<result column="period" property="period" /><!--근무기간 -->
+		<result column="detail" property="detail" /><!-- 공고 상세 설명 -->
+		<result column="companyName" property="companyName" /> <!--회사명 -->
+		<result column="reviewResult" property="reviewResult" /><!-- 면접 결과 -->
+		<result column="reviewType" property="reviewType" /> <!-- 면접 유형 -->
+		<result column="reviewLevel" property="reviewLevel" /><!--면접 난이도 -->
+		<result column="content" property="content" /> <!--후기 본문 -->
+		<result column="likes" property="likes" /> <!-- 좋아요 -->
+		<result column="views" property="views" /><!-- 조회수 -->
 	</resultMap>
 
 </mapper>
