@@ -32,7 +32,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.recruitmentnotice.Advantage;
 import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
+import com.jobhunter.model.recruitmentnotice.Application;
 import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
@@ -233,24 +235,55 @@ public class RecruitmentNoticeController {
 
 	}
 
-	// 상세 보기 페이지를 출력
-	@GetMapping("/detail/{uid}")
-	public String showDetailRecruitment(@PathVariable("uid") int uid, Model model) {
+	// 공고 상세 페이지, 수정 페이지를 출력
+	@GetMapping(value = {"/detail", "/modify"})
+	public String showRecruitment(@RequestParam("uid") int uid, Model model, HttpServletRequest req) {
 		System.out.println(uid);
-
+		
+		String returnPage ="";
+		
 		try {
 			RecruitmentDetailInfo detailInfo = recruitmentService.getRecruitmentByUid(uid);
+			
+			if(detailInfo.getAdvantage().size() > 0) {
+				for(Advantage advantage : detailInfo.getAdvantage()) {
+					AdvantageDTO advdto = AdvantageDTO.builder()
+							.advantageType(advantage.getAdvantageType()).build();
+							this.advantageList.add(advdto);
+				}
+			}
+
+			if(detailInfo.getFileList().size() > 0) {
+				this.fileList = detailInfo.getFileList();
+			}
+			
+			for(Application application : detailInfo.getApplication()) {
+				ApplicationDTO appdto = ApplicationDTO.builder()
+						.method(application.getMethod())
+						.detail(application.getDetail())
+						.build();
+			}
+			
+			
 			model.addAttribute("RecruitmentDetailInfo", detailInfo);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			returnPage = "redirect:./listAll?status=fail";
 
 		}
+		
+		
+		if(req.getRequestURI().contains("detail")){
+			returnPage = "recruitmentnotice/detail";
+		}else if(req.getRequestURI().contains("modify")) {
+			returnPage = "recruitmentnotice/modify";
+		}
 
-		return "recruitmentnotice/detail";
+		return returnPage;
 	}
+	
 
-	// 공고를 수정하는 페이지를 출력하는 메서드
 
 	// 공고를 삭제하는 메서드
 	@DeleteMapping("/remove/{uid}")
