@@ -140,7 +140,7 @@ public class ResumeController {
 	// 저장
 	@PostMapping("/submit-final")
 	@ResponseBody
-	public ResponseEntity<?> submitFinal(@RequestBody ResumeDTO resumeDTO) {
+	public ResponseEntity<Map<String, Object>> submitFinal(@RequestBody ResumeDTO resumeDTO) {
 		try {
 			resumeService.finalSaveResume(resumeDTO);
 			Map<String, Object> response = new HashMap<>();
@@ -156,7 +156,7 @@ public class ResumeController {
 		}
 	}
 
-	// status추가해야함!!!!!! 그걸로 파일삭제 수정처리 할 예정
+	// 이력서 첨부파일 업로드
 	@PostMapping(value = "/uploadFile", produces = "application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
@@ -197,7 +197,7 @@ public class ResumeController {
 		return result;
 	}
 
-	// 이력서 수정 페이지
+	// 이력서 수정 페이지 -> /form과 합침 작업 예정
 	@GetMapping("/edit/{resumeNo}")
 	public String editResumeForm(@PathVariable int resumeNo, Model model) {
 		try {
