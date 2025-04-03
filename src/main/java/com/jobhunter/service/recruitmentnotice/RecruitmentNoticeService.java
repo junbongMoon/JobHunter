@@ -20,12 +20,12 @@ public interface RecruitmentNoticeService {
 		 
 	// 공고 전체를 조회하는 메서드(템플릿 제외)
 	PageResponseDTO<RecruitmentDetailInfo> getEntireRecruitment(PageRequestDTO pageRequestDTO) throws Exception;
-	// 파일을 실제 db에 저장하는 메서드
 	
 	// 공고를 수정하는 메서드 
 	
+	
 	// 공고를 삭제하는 메서드
-	 
+	boolean removeRecruitmentByUid(int uid);
 	
 	
 }

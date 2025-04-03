@@ -252,7 +252,19 @@ public class RecruitmentNoticeController {
 
 	// 공고를 수정하는 페이지를 출력하는 메서드
 
-	// 공고를 삭제하는 페이지를 출력하는 메서드
+	// 공고를 삭제하는 메서드
+	@DeleteMapping("/remove/{uid}")
+	public ResponseEntity<Boolean> removeRecruitment(@PathVariable("uid") int uid) {
+		ResponseEntity<Boolean> result = null;
+		
+		if(recruitmentService.removeRecruitmentByUid(uid)) {			
+			result =ResponseEntity.ok().body(true);
+		}else {
+			result =ResponseEntity.badRequest().body(false);
+		}
+	    
+	    return result; 
+	}
 
 	// 리스트, 필드를 전부 비워주는 메서드 (다 하고 맨 밑으로 내리자)
 	private void ListAllClear() {

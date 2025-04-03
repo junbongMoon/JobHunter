@@ -155,7 +155,8 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 		return pageResponseDTO;
 	}
-
+	
+	// 페이징하여 공고를 출력하는 메서드
 	private PageResponseDTO<RecruitmentDetailInfo> pagingProcess(PageRequestDTO pageRequestDTO) throws Exception {
 		PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO = new PageResponseDTO<RecruitmentDetailInfo>(
 				pageRequestDTO.getPageNo(), pageRequestDTO.getRowCntPerPage());
@@ -182,6 +183,18 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 		return pageResponseDTO;
 
+	}
+	
+	// uid를 매개변수로 공고를 삭제하는 메서드
+	@Override
+	public boolean removeRecruitmentByUid(int uid) {
+		boolean result = false;
+		
+		if(recdao.deleteRecruitmentByUid(uid) > 0) {
+			result = true;
+		}
+		
+		return result;
 	}
 
 }

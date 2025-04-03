@@ -261,4 +261,10 @@
 		where r.uid = #{uid} 
 	</select>
 	
+	<delete id="removeRecruitmentByUid">
+		delete from recruitmentnotice
+		where uid = #{uid}
+	</delete>
+	
+	
 </mapper>

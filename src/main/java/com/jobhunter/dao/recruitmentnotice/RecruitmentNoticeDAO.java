@@ -52,4 +52,7 @@ public interface RecruitmentNoticeDAO {
 	
 	// 공고의 uid를 매개변수로 RecruitmentnoticeBoardUpfiles를 조회하는 메서드
 	List<RecruitmentnoticeBoardUpfiles> getFileList(int uid);
+	
+	// 공고를 삭제하는 메서드
+	int deleteRecruitmentByUid(int uid);
 }

@@ -118,6 +118,13 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		return ses.selectList(NS + ".getFileWithRecruitment", uid);
 	}
 
+	// 공고를 삭제하는 메서드
+	@Override
+	public int deleteRecruitmentByUid(int uid) {
+		
+		return ses.delete(NS + ".removeRecruitmentByUid", uid);
+	}
+
 
 	
 
