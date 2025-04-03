@@ -53,13 +53,53 @@
 
 		$('#contactModalBody').text(message);
 		const modal = new bootstrap.Modal(document
-				.getElementById('contactModal'));
+		.getElementById('contactModal'));
 		modal.show();
 	}
 	
 	function downloadFile(boardUpFileNo){
 		// 아작스 불러서 파일 저장
 	}
+
+	function deleteRecruitment(uid) {
+    $('#contactModalLabel').text("공고 삭제 확인");
+    $('#contactModalBody').html("정말로 이 공고를 삭제하시겠습니까?<br><br><strong>삭제하면 되돌릴 수 없습니다.</strong>");
+
+    const footer = $('#contactModal .modal-footer');
+    footer.find('#deleteConfirmBtn').remove(); // 중복 제거
+
+    const deleteBtn = $('<button>')
+        .attr('type', 'button')
+        .attr('id', 'deleteConfirmBtn')
+        .addClass('btn btn-danger')
+        .text('삭제하기')
+        .on('click', function () {
+            $.ajax({
+                url: '/recruitmentnotice/remove/' + uid,
+                type: 'DELETE',
+                success: function () {
+                    // 모달 닫기
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('contactModal'));
+                    modal.hide();
+
+                    // 삭제 완료 후 페이지 이동
+                    setTimeout(() => {
+                        window.location.href = '/recruitmentnotice/listAll';
+                    }, 500);
+                },
+                error: function (xhr, status, error) {
+                    console.error('삭제 실패:', error);
+                    alert('삭제에 실패했습니다.');
+                }
+            });
+        });
+
+    footer.prepend(deleteBtn);
+
+    const modal = new bootstrap.Modal(document.getElementById('contactModal'));
+    modal.show();
+}
+
 </script>
 <style>
 .badge {
