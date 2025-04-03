@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
@@ -15,9 +16,14 @@
 	let errorMessage = "";
 	let focusElement = null;
 	let upfiles = [];
+	let uid = '${RecruitmentDetailInfo.uid}';
 	
 
 	$(function() {
+
+		
+
+		
 
 		const today = new Date();
 		today.setHours(0,0,0,0); // 오늘 자정으로 설정
@@ -26,9 +32,9 @@
 
     // yyyy-MM-dd 포맷으로 변환
     function formatDate(date) {
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const dd = String(date.getDate()).padStart(2, '0');
+        const yyyy = date.getFullYear(); // ex : 2025
+        const mm = String(date.getMonth() + 1).padStart(2, '0'); // ex : 04
+        const dd = String(date.getDate()).padStart(2, '0'); // ex : 03
         return `${yyyy}-${mm}-${dd}`;
     }
 
@@ -55,7 +61,7 @@
 
 		getRegion();
 		getMajorCategory();
-
+		
 		$('.method-detail, .save-method-btn').hide();
 
 		$(".fileUploadArea").on("dragover", function (e) {
@@ -128,6 +134,8 @@ $(document).on("click", "#goToListBtn", function () {
   } else {
     $(".parttime-only").remove();
   }
+
+  
 });
 
 		
@@ -267,7 +275,49 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 		}
 	});
 	
+	instalRecruitment();
+
 	});
+
+	
+// 수정 페이지에 들어왔을 때 공고의 정보를 입력해주는 함수
+// 수정 페이지에 들어왔을 때 공고의 정보를 입력해주는 함수
+function instalRecruitment() {
+	const title = '${RecruitmentDetailInfo.title}';
+	const workType = '${RecruitmentDetailInfo.workType}';
+	const payType = '${RecruitmentDetailInfo.payType}';
+	const pay = '${RecruitmentDetailInfo.pay}';
+	const period = '${RecruitmentDetailInfo.period}';
+	const personalHistory = '${RecruitmentDetailInfo.personalHistory}';
+	const militaryService = '${RecruitmentDetailInfo.militaryService}';
+	const detail = '${RecruitmentDetailInfo.detail}';
+	const manager = '${RecruitmentDetailInfo.manager}';
+	const dueDate = '<fmt:formatDate value="${RecruitmentDetailInfo.dueDate}" pattern="yyyy-MM-dd"/>'; // JSTL 형식 유지
+
+	// 입력 값 세팅
+	$('#title').val(title);
+	$(`input[name="workType"][value="\${workType}"]`).prop("checked", true).trigger("change");
+	$(`input[name="payType"][value="\${payType}"]`).prop("checked", true);
+	$('#pay').val(pay.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")); // 쉼표 추가
+	$(`input[name="personalHistory"][value="\${personalHistory}"]`).prop("checked", true);
+	$(`input[name="militaryService"][value="\${militaryService}"]`).prop("checked", true);
+	$('#summernote').summernote('code', detail);
+	$('#manager').val(manager);
+	$('#date').val(dueDate);
+
+	// 근무 시간 분해 (예: "08:00~17:00 (주 5일제)")
+	const timeRegex = /^(\d{2}:\d{2})~(\d{2}:\d{2})(?: \((.+)\))?$/;
+	const match = period.match(timeRegex);
+
+	if (match) {
+		const [, startTime, endTime, detailType] = match;
+		$('#startTime').val(startTime);
+		$('#endTime').val(endTime);
+		if (detailType) {
+			$('#workDetailType').val(detailType);
+		}
+	}
+}
 
 // 파일 업로드 + 썸네일 표시
 function uploadFileAndShowPreview(file) {
