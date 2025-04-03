@@ -31,7 +31,7 @@
 									<i class="bi bi-pencil-square"></i>
 								</span>
 								<input type="text" class="form-control form-control-lg" id="title" name="title"
-									placeholder="예: 자바 개발자 지원" maxlength="30">
+									placeholder="예: 자바 개발자 지원" maxlength="30" value="${resumeDetail.resume.title}">
 							</div>
 							<div class="d-flex justify-content-between mt-2">
 								<small class="text-muted">* 이력서의 제목을 입력해 주세요.</small>
@@ -76,9 +76,16 @@
 									<div class="d-flex flex-wrap">
 										<c:forEach var="jobForm" items="${jobFormList}">
 											<div class="form-check form-check-inline">
+												<c:set var="isChecked" value="false" />
+												<c:forEach var="selectedJobForm" items="${resumeDetail.jobForms}">
+													<c:if test="${selectedJobForm.form == jobForm}">
+														<c:set var="isChecked" value="true" />
+													</c:if>
+												</c:forEach>
 												<input class="form-check-input" type="checkbox" name="jobForm"
-													value="${jobForm.name()}" id="${jobForm.name()}"> <label
-													class="form-check-label"
+													value="${jobForm.name()}" id="${jobForm.name()}" ${isChecked
+													? 'checked' : '' }>
+												<label class="form-check-label"
 													for="${jobForm.name()}">${jobForm.displayName}</label>
 											</div>
 										</c:forEach>
@@ -87,480 +94,497 @@
 							</div>
 						</div>
 					</div>
+			</div>
 
-					<!-- 희망 급여 -->
-					<div class="card mb-4">
-						<div class="card-header">
-							희망 급여<span class="essentialPoint">*</span>
-						</div>
-						<div class="card-body">
-							<div class="row g-3 align-items-center">
-								<div class="col-md-8">
-									<div class="d-flex align-items-center">
-										<label class="form-label me-3">급여 방식</label>
-										<div class="form-check form-check-inline">
-											<input class="form-check-input" type="radio" name="payType" value="시급"
-												id="hourly"> <label class="form-check-label" for="hourly">시급</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input class="form-check-input" type="radio" name="payType" value="일급"
-												id="daily"> <label class="form-check-label" for="daily">일급</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input class="form-check-input" type="radio" name="payType" value="월급"
-												id="monthly"> <label class="form-check-label" for="monthly">월급</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input class="form-check-input" type="radio" name="payType" value="연봉"
-												id="yearly"> <label class="form-check-label" for="yearly">연봉</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input class="form-check-input" type="radio" name="payType" value="협의 후 결정"
-												id="negotiable" checked> <label class="form-check-label"
-												for="negotiable">협의 후 결정</label>
-										</div>
-									</div>
+			<!-- 희망 급여 -->
+			<div class="card mb-4">
+				<div class="card-header">
+					희망 급여<span class="essentialPoint">*</span>
+				</div>
+				<div class="card-body">
+					<div class="row g-3 align-items-center">
+						<div class="col-md-8">
+							<div class="d-flex align-items-center">
+								<label class="form-label me-3">급여 방식</label>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="payType" value="시급" id="hourly"
+										${resumeDetail.resume.payType=='시급' ? 'checked' : '' }>
+									<label class="form-check-label" for="hourly">시급</label>
 								</div>
-								<div class="col-md-4 d-flex align-items-center">
-									<input type="text" class="form-control text-end" id="payAmount" name="pay"
-										placeholder="금액 입력(숫자만 입력 가능해요)" maxlength="11" disabled> <span
-										class="ms-2">원</span>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="payType" value="일급" id="daily"
+										${resumeDetail.resume.payType=='일급' ? 'checked' : '' }>
+									<label class="form-check-label" for="daily">일급</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="payType" value="월급" id="monthly"
+										${resumeDetail.resume.payType=='월급' ? 'checked' : '' }>
+									<label class="form-check-label" for="monthly">월급</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="payType" value="연봉" id="yearly"
+										${resumeDetail.resume.payType=='연봉' ? 'checked' : '' }>
+									<label class="form-check-label" for="yearly">연봉</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="radio" name="payType" value="협의 후 결정"
+										id="negotiable" ${resumeDetail.resume.payType=='협의 후 결정' ? 'checked' : '' }>
+									<label class="form-check-label" for="negotiable">협의 후 결정</label>
 								</div>
 							</div>
-							<small class="text-muted">* 시급, 일급, 월급, 연봉의 경우 금액을 입력해 주세요.</small>
+						</div>
+						<div class="col-md-4 d-flex align-items-center">
+							<input type="text" class="form-control text-end" id="payAmount" name="pay"
+								placeholder="금액 입력(숫자만 입력 가능해요)" maxlength="11" value="${resumeDetail.resume.pay}"
+								${resumeDetail.resume.payType=='협의 후 결정' ? 'disabled' : '' }>
+							<span class="ms-2">원</span>
 						</div>
 					</div>
+					<small class="text-muted">* 시급, 일급, 월급, 연봉의 경우 금액을 입력해 주세요.</small>
+				</div>
+			</div>
 
-					<!-- 근무 지역 선택 -->
-					<div class="card mb-4">
-						<div class="card-header wishRegionBox" id="wishRegion">
-							희망 근무 지역<span class="essentialPoint">*</span>
-						</div>
-						<div class="card-body">
-							<div class="row">
-								<!-- 시/도 목록 -->
-								<div class="col-md-4">
-									<div class="region-list-container"
-										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-										<ul class="list-group" id="regionList">
-											<c:forEach var="region" items="${regionList}">
-												<li class="list-group-item region-item"
-													data-region="${region.regionNo}">${region.name}▶</li>
-											</c:forEach>
-										</ul>
-									</div>
-								</div>
-
-								<!-- 시/군/구 목록 -->
-								<div class="col-md-4">
-									<div class="sigungu-list-container"
-										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-										<ul class="list-group" id="sigunguList">
-											<li class="list-group-item text-muted">시/도를 선택하세요</li>
-										</ul>
-									</div>
-								</div>
-
-								<!-- 선택한 지역 표시 영역 -->
-								<div class="col-md-4">
-									<label class="form-label">선택한 지역</label>
-									<div id="selectedRegions" class="mt-2"></div>
-								</div>
+			<!-- 근무 지역 선택 -->
+			<div class="card mb-4">
+				<div class="card-header wishRegionBox" id="wishRegion">
+					희망 근무 지역<span class="essentialPoint">*</span>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<!-- 시/도 목록 -->
+						<div class="col-md-4">
+							<div class="region-list-container"
+								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+								<ul class="list-group" id="regionList">
+									<c:forEach var="region" items="${regionList}">
+										<li class="list-group-item region-item" data-region="${region.regionNo}">
+											${region.name}▶</li>
+									</c:forEach>
+								</ul>
 							</div>
 						</div>
-					</div>
 
-					<!-- 희망 업직종 -->
-					<div class="card mb-4">
-						<div class="card-header" id="wishJobBox">
-							희망 업직종<span class="essentialPoint">*</span>
-						</div>
-						<div class="card-body">
-							<div class="row">
-								<!-- 대분류 목록 -->
-								<div class="col-md-4">
-									<div class="major-list-container"
-										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-										<ul class="list-group" id="majorCategoryList">
-											<c:forEach var="major" items="${majorList}">
-												<li class="list-group-item major-item"
-													data-major="${major.majorcategoryNo}">${major.jobName}▶</li>
-											</c:forEach>
-										</ul>
-									</div>
-								</div>
-
-								<!-- 소분류 목록 -->
-								<div class="col-md-4">
-									<div class="sub-list-container"
-										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-										<ul class="list-group" id="subCategoryList">
-											<li class="list-group-item text-muted">대분류를 선택하세요</li>
-										</ul>
-									</div>
-								</div>
-
-								<!-- 선택한 업직종 표시 영역 -->
-								<div class="col-md-4">
-									<label class="form-label">선택한 업직종</label>
-									<div id="selectedJobTypes" class="mt-2"></div>
-								</div>
+						<!-- 시/군/구 목록 -->
+						<div class="col-md-4">
+							<div class="sigungu-list-container"
+								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+								<ul class="list-group" id="sigunguList">
+									<li class="list-group-item text-muted">시/도를 선택하세요</li>
+								</ul>
 							</div>
 						</div>
-					</div>
 
-					<!-- 성격 및 강점 -->
-					<div class="card mb-4">
-						<div class="card-header d-flex justify-content-between align-items-center">
-							<span id=myMerits>성격 및 강점<span class="essentialPoint">*</span></span>
-							<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-								data-bs-target="#meritModal">추가하기
-							</button>
-						</div>
-						<div class="card-body">
-							<div id="selectedMerits" class="mt-2"></div>
-							<small class="text-muted">* 나의 성격 및 강점을 선택해 주세요(최대 5개)</small>
-						</div>
-					</div>
-
-					<!-- 성격 및 강점 선택 모달 -->
-					<div class="modal fade" id="meritModal" tabindex="-1" aria-labelledby="meritModalLabel"
-						aria-hidden="true" data-bs-backdrop="static">
-						<div class="modal-dialog modal-lg">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="meritModalLabel">성격 및 강점 선택</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal"
-										aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<div class="row g-2" role="group" aria-label="성격 및 강점 선택">
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="성실함"
-												type="button">성실함</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="책임감"
-												type="button">책임감</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="리더십"
-												type="button">리더십</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="창의성"
-												type="button">창의성</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="의사소통"
-												type="button">의사소통</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="문제해결"
-												type="button">문제해결</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="팀워크"
-												type="button">팀워크</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="적극성"
-												type="button">적극성</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="인내심"
-												type="button">인내심</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="정확성"
-												type="button">정확성</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="분석력"
-												type="button">분석력</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="계획성"
-												type="button">계획성</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="협동심"
-												type="button">협동심</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="주도성"
-												type="button">주도성</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="유연성"
-												type="button">유연성</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="꼼꼼함"
-												type="button">꼼꼼함</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="도전정신"
-												type="button">도전정신</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="긍정성"
-												type="button">긍정성</button>
-										</div>
-										<div class="col-md-3">
-											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="배려심"
-												type="button">배려심</button>
-										</div>
-									</div>
-								</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- 학력사항 -->
-					<div class="card mb-4">
-						<div class="card-header d-flex justify-content-between align-items-center" id="myEducationBox">
-							<span>학력사항</span>
-							<button type="button" class="btn btn-primary btn-sm" id="addEducationBtn">추가하기</button>
-						</div>
-						<div class="card-body">
-							<div id="educationContainer">
-								<!-- 학력 항목 -->
-							</div>
-							<small class="text-muted">* 원하는 학력만 선택하여 작성이 가능해요.</small>
-						</div>
-					</div>
-
-					<!-- 학력사항 템플릿 (추가 버튼 눌러야 나옴) -->
-					<template id="educationTemplate">
-						<div class="education-item border rounded p-3 mb-3 position-relative">
-							<!-- 삭제 버튼 (X) -->
-							<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-education"
-								aria-label="삭제"></button>
-							<div class="row g-3">
-								<!-- 학력 레벨 선택 -->
-								<div class="col-md-4">
-									<label class="form-label">학력 구분<span class="essentialPoint">*</span></label> <select
-										class="form-select education-level" name="educationLevel">
-										<option value="">선택하세요</option>
-										<c:forEach var="level" items="${educationLevelList}">
-											<option value="${level.name()}">${level.displayName}</option>
-										</c:forEach>
-									</select>
-								</div>
-
-								<!-- 학력 상태 선택 -->
-								<div class="col-md-4">
-									<label class="form-label">학력 상태<span class="essentialPoint">*</span></label> <select
-										class="form-select education-status" name="educationStatus">
-										<option value="">선택하세요</option>
-										<c:forEach var="status" items="${educationStatusList}">
-											<option value="${status.name()}">${status.displayName}</option>
-										</c:forEach>
-									</select>
-								</div>
-
-								<!-- 졸업 날짜 -->
-								<div class="col-md-4">
-									<label class="form-label">졸업일자<span class="essentialPoint">*</span></label>
-									<div class="row g-2">
-										<div class="col-md-4">
-											<input type="date" class="form-control graduation-date"
-												name="graduationDate">
-										</div>
-									</div>
-								</div>
-
-								<!-- 학교명 입력 -->
-								<div class="col-md-4">
-									<label class="form-label">학교명<span class="essentialPoint">*</span></label>
-									<input type="text" class="form-control custom-input" name="customInput"
-										placeholder="학교명을 입력하세요" maxlength="190">
-								</div>
-							</div>
-						</div>
-					</template>
-
-					<!-- 경력사항 -->
-					<div class="card mb-4">
-						<div class="card-header d-flex justify-content-between align-items-center" id="myHistoryBox">
-							<span>경력사항</span>
-							<button type="button" class="btn btn-primary btn-sm" id="addHistoryBtn">추가하기</button>
-						</div>
-						<div class="card-body">
-							<div id="historyContainer">
-								<!-- 경력 항목 -->
-							</div>
-							<div>
-								<small class="text-muted">* 경력사항이 있는 경우에만 작성해 주세요.</small>
-							</div>
-							<div>
-								<small class="text-muted">* 경력사항은 이력서 저장 시 최신순으로 정렬됩니다.</small>
-							</div>
-						</div>
-					</div>
-
-					<!-- 경력사항 템플릿 (추가 버튼 눌러야 나옴) -->
-					<template id="historyTemplate">
-						<div class="history-item border rounded p-3 mb-3 position-relative">
-							<!-- 삭제 버튼 (X) -->
-							<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-history"
-								aria-label="삭제"></button>
-							<div class="row g-3">
-								<!-- 회사명 입력 -->
-								<div class="col-md-6">
-									<label class="form-label">회사명<span class="essentialPoint">*</span></label>
-									<input type="text" class="form-control company-name" name="companyName"
-										placeholder="회사명을 입력하세요" maxlength="20">
-								</div>
-
-								<!-- 직위 입력 -->
-								<div class="col-md-6">
-									<label class="form-label">직위<span class="essentialPoint">*</span></label>
-									<input type="text" class="form-control position" name="position"
-										placeholder="직위를 입력하세요" maxlength="45">
-								</div>
-
-								<!-- 근무기간 -->
-								<div class="col-md-6">
-									<label class="form-label">근무기간<span class="essentialPoint">*</span></label>
-									<div class="row g-3">
-										<div class="col-md-5">
-											<input type="date" class="form-control start-date" name="startDate"
-												max="${today}">
-										</div>
-										<div
-											class="col-md-2 text-center d-flex align-items-center justify-content-center textflow">
-											<span>~</span>
-										</div>
-										<div class="col-md-5">
-											<input type="date" class="form-control end-date" name="endDate"
-												max="${today}">
-										</div>
-									</div>
-									<div class="form-check mt-2">
-										<input type="checkbox" class="form-check-input currently-employed"
-											id="currentlyEmployed">
-										<label class="form-check-label" for="currentlyEmployed">재직중</label>
-									</div>
-								</div>
-
-								<!-- 담당업무 입력 -->
-								<div class="col-md-12">
-									<label class="form-label">담당업무<span class="essentialPoint">*</span></label> <input
-										type="text" class="form-control job-description" id="jobDescription"
-										name="jobDescription" placeholder="담당업무를 입력하세요(최대 100자)" maxlength="100">
-									<div class="text-end">
-										<span id="jobDescriptionCount" class="text-muted">0 / 100</span>
-									</div>
-								</div>
-							</div>
-						</div>
-					</template>
-
-					<!-- 보유 자격증 -->
-					<div class="card mb-4">
-						<div class="card-header d-flex justify-content-between align-items-center" id="myLicenseBox">
-							<span>자격증</span>
-							<button type="button" class="btn btn-primary btn-sm" id="addLicenseBtn">추가하기</button>
-						</div>
-						<div class="card-body">
-							<div id="licenseContainer">
-								<!-- 자격증 항목 -->
-							</div>
-							<small class="text-muted">* 자격증은 최대 10개까지 저장 가능합니다.</small>
-						</div>
-					</div>
-
-					<!-- 자격증 템플릿 (추가 버튼 눌러야 나옴) -->
-					<template id="licenseTemplate">
-						<div class="license-item border rounded p-3 mb-3 position-relative">
-							<!-- 삭제 버튼 (X) -->
-							<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-license"
-								aria-label="삭제"></button>
-							<div class="row g-3">
-								<!-- 자격증명 입력 -->
-								<div class="col-md-6">
-									<label class="form-label">자격증명<span class="essentialPoint">*</span></label> <input
-										type="text" class="form-control license-name" name="licenseName"
-										placeholder="자격증명을 입력하세요" maxlength="30">
-								</div>
-								<!-- 발급기관 입력 -->
-								<div class="col-md-6">
-									<label class="form-label">발급기관<span class="essentialPoint">*</span></label> <input
-										type="text" class="form-control institution" name="institution"
-										placeholder="발급기관을 입력하세요" maxlength="45">
-								</div>
-								<!-- 취득날짜 -->
-								<div class="col-md-4">
-									<label class="form-label">취득날짜<span class="essentialPoint">*</span></label>
-									<div class="row g-2">
-										<div class="col-md-4">
-											<input type="date" class="form-control acquisition-date"
-												name="acquisitionDate">
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</template>
-
-
-					<!-- 자기소개란 -->
-					<div class="card mb-4">
-						<div class="card-header d-flex justify-content-between align-items-center">
-							<span>자기소개</span>
-						</div>
-						<div class="card-body">
-							<textarea class="form-control" id="selfIntroTextarea" rows="8"
-								placeholder="자기소개를 입력하세요(최대 1000자)" maxlength="1000"></textarea>
-							<div class="text-end">
-								<span id="charCount" class="text-muted">0 / 1000</span>
-							</div>
-						</div>
-					</div>
-
-
-					<!-- 파일 첨부 -->
-					<div class="card mb-4">
-						<div class="card-header d-flex justify-content-between align-items-center">
-							<span>첨부파일</span> <label for="fileInput" class="btn btn-primary btn-sm mb-0">파일 선택</label>
-							<input type="file" id="fileInput" style="display: none;" multiple>
-						</div>
-						<div class="card-body">
-							<div id="fileContainer" class="border rounded p-3">
-								<div class="text-center text-muted fileText">
-									여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br> (최대 10MB)
-								</div>
-								<div id="previewContainer" class="mt-3"></div>
-							</div>
-							<small class="text-muted">* 자격증명서, 졸업증명서 등 첨부 가능합니다.</small>
-						</div>
-					</div>
-
-					<!-- 완전 저장 버튼 -->
-					<button type="button" class="btn btn-primary" id="finalSaveBtn">저장하기</button>
-
-					<button type="button" class="btn btn-secondary" id="testBtn">코드
-						테스트용 버튼</button>
-				</form>
-
-				<!-- 재사용 공용 경고 모달창 -->
-				<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel"
-					aria-hidden="true">
-					<div class="modal-dialog modal-dialog-centered">
-						<div class="modal-content text-center">
-							<div class="modal-body">
-								<p id="validationMessage" class="mb-3">알림 메시지</p>
-								<button type="button" class="btn btn-primary" id="validationCheckBtn"
-									data-bs-dismiss="modal">확인</button>
+						<!-- 선택한 지역 표시 영역 -->
+						<div class="col-md-4">
+							<label class="form-label">선택한 지역</label>
+							<div id="selectedRegions" class="mt-2">
+								<c:forEach var="selectedRegion" items="${selectedSigungu}">
+									<span class="badge bg-primary me-2" data-region="${selectedRegion.regionNo}"
+										data-sigungu="${selectedRegion.sigunguNo}">
+										${selectedRegion.regionName} ${selectedRegion.name}
+										<button class="btn-close ms-2" aria-label="삭제"></button>
+									</span>
+								</c:forEach>
 							</div>
 						</div>
 					</div>
 				</div>
+			</div>
+
+			<!-- 희망 업직종 -->
+			<div class="card mb-4">
+				<div class="card-header" id="wishJobBox">
+					희망 업직종<span class="essentialPoint">*</span>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<!-- 대분류 목록 -->
+						<div class="col-md-4">
+							<div class="major-list-container"
+								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+								<ul class="list-group" id="majorCategoryList">
+									<c:forEach var="major" items="${majorList}">
+										<li class="list-group-item major-item" data-major="${major.majorcategoryNo}">
+											${major.jobName}▶</li>
+									</c:forEach>
+								</ul>
+							</div>
+						</div>
+
+						<!-- 소분류 목록 -->
+						<div class="col-md-4">
+							<div class="sub-list-container"
+								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+								<ul class="list-group" id="subCategoryList">
+									<li class="list-group-item text-muted">대분류를 선택하세요</li>
+								</ul>
+							</div>
+						</div>
+
+						<!-- 선택한 업직종 표시 영역 -->
+						<div class="col-md-4">
+							<label class="form-label">선택한 업직종</label>
+							<div id="selectedJobTypes" class="mt-2">
+								<c:forEach var="selectedJob" items="${selectedSubcategory}">
+									<span class="badge bg-primary me-2" data-major="${selectedJob.majorcategoryNo}"
+										data-sub="${selectedJob.subcategoryNo}">
+										${selectedJob.jobName}
+										<button class="btn-close ms-2" aria-label="삭제"></button>
+									</span>
+								</c:forEach>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 성격 및 강점 -->
+			<div class="card mb-4">
+				<div class="card-header d-flex justify-content-between align-items-center">
+					<span id=myMerits>성격 및 강점<span class="essentialPoint">*</span></span>
+					<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+						data-bs-target="#meritModal">추가하기
+					</button>
+				</div>
+				<div class="card-body">
+					<div id="selectedMerits" class="mt-2"></div>
+					<small class="text-muted">* 나의 성격 및 강점을 선택해 주세요(최대 5개)</small>
+				</div>
+			</div>
+
+			<!-- 성격 및 강점 선택 모달 -->
+			<div class="modal fade" id="meritModal" tabindex="-1" aria-labelledby="meritModalLabel" aria-hidden="true"
+				data-bs-backdrop="static">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="meritModalLabel">성격 및 강점 선택</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div class="row g-2" role="group" aria-label="성격 및 강점 선택">
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="성실함"
+										type="button">성실함</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="책임감"
+										type="button">책임감</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="리더십"
+										type="button">리더십</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="창의성"
+										type="button">창의성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="의사소통"
+										type="button">의사소통</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="문제해결"
+										type="button">문제해결</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="팀워크"
+										type="button">팀워크</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="적극성"
+										type="button">적극성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="인내심"
+										type="button">인내심</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="정확성"
+										type="button">정확성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="분석력"
+										type="button">분석력</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="계획성"
+										type="button">계획성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="협동심"
+										type="button">협동심</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="주도성"
+										type="button">주도성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="유연성"
+										type="button">유연성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="꼼꼼함"
+										type="button">꼼꼼함</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="도전정신"
+										type="button">도전정신</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="긍정성"
+										type="button">긍정성</button>
+								</div>
+								<div class="col-md-3">
+									<button class="btn btn-outline-primary w-100 merit-btn" data-merit="배려심"
+										type="button">배려심</button>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 학력사항 -->
+			<div class="card mb-4">
+				<div class="card-header d-flex justify-content-between align-items-center" id="myEducationBox">
+					<span>학력사항</span>
+					<button type="button" class="btn btn-primary btn-sm" id="addEducationBtn">추가하기</button>
+				</div>
+				<div class="card-body">
+					<div id="educationContainer">
+						<!-- 학력 항목 -->
+					</div>
+					<small class="text-muted">* 원하는 학력만 선택하여 작성이 가능해요.</small>
+				</div>
+			</div>
+
+			<!-- 학력사항 템플릿 (추가 버튼 눌러야 나옴) -->
+			<template id="educationTemplate">
+				<div class="education-item border rounded p-3 mb-3 position-relative">
+					<!-- 삭제 버튼 (X) -->
+					<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-education"
+						aria-label="삭제"></button>
+					<div class="row g-3">
+						<!-- 학력 레벨 선택 -->
+						<div class="col-md-4">
+							<label class="form-label">학력 구분<span class="essentialPoint">*</span></label> <select
+								class="form-select education-level" name="educationLevel">
+								<option value="">선택하세요</option>
+								<c:forEach var="level" items="${educationLevelList}">
+									<option value="${level.name()}">${level.displayName}</option>
+								</c:forEach>
+							</select>
+						</div>
+
+						<!-- 학력 상태 선택 -->
+						<div class="col-md-4">
+							<label class="form-label">학력 상태<span class="essentialPoint">*</span></label> <select
+								class="form-select education-status" name="educationStatus">
+								<option value="">선택하세요</option>
+								<c:forEach var="status" items="${educationStatusList}">
+									<option value="${status.name()}">${status.displayName}</option>
+								</c:forEach>
+							</select>
+						</div>
+
+						<!-- 졸업 날짜 -->
+						<div class="col-md-4">
+							<label class="form-label">졸업일자<span class="essentialPoint">*</span></label>
+							<div class="row g-2">
+								<div class="col-md-4">
+									<input type="date" class="form-control graduation-date" name="graduationDate">
+								</div>
+							</div>
+						</div>
+
+						<!-- 학교명 입력 -->
+						<div class="col-md-4">
+							<label class="form-label">학교명<span class="essentialPoint">*</span></label>
+							<input type="text" class="form-control custom-input" name="customInput"
+								placeholder="학교명을 입력하세요" maxlength="190">
+						</div>
+					</div>
+				</div>
+			</template>
+
+			<!-- 경력사항 -->
+			<div class="card mb-4">
+				<div class="card-header d-flex justify-content-between align-items-center" id="myHistoryBox">
+					<span>경력사항</span>
+					<button type="button" class="btn btn-primary btn-sm" id="addHistoryBtn">추가하기</button>
+				</div>
+				<div class="card-body">
+					<div id="historyContainer">
+						<!-- 경력 항목 -->
+					</div>
+					<div>
+						<small class="text-muted">* 경력사항이 있는 경우에만 작성해 주세요.</small>
+					</div>
+					<div>
+						<small class="text-muted">* 경력사항은 이력서 저장 시 최신순으로 정렬됩니다.</small>
+					</div>
+				</div>
+			</div>
+
+			<!-- 경력사항 템플릿 (추가 버튼 눌러야 나옴) -->
+			<template id="historyTemplate">
+				<div class="history-item border rounded p-3 mb-3 position-relative">
+					<!-- 삭제 버튼 (X) -->
+					<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-history"
+						aria-label="삭제"></button>
+					<div class="row g-3">
+						<!-- 회사명 입력 -->
+						<div class="col-md-6">
+							<label class="form-label">회사명<span class="essentialPoint">*</span></label>
+							<input type="text" class="form-control company-name" name="companyName"
+								placeholder="회사명을 입력하세요" maxlength="20">
+						</div>
+
+						<!-- 직위 입력 -->
+						<div class="col-md-6">
+							<label class="form-label">직위<span class="essentialPoint">*</span></label>
+							<input type="text" class="form-control position" name="position" placeholder="직위를 입력하세요"
+								maxlength="45">
+						</div>
+
+						<!-- 근무기간 -->
+						<div class="col-md-6">
+							<label class="form-label">근무기간<span class="essentialPoint">*</span></label>
+							<div class="row g-3">
+								<div class="col-md-5">
+									<input type="date" class="form-control start-date" name="startDate" max="${today}">
+								</div>
+								<div
+									class="col-md-2 text-center d-flex align-items-center justify-content-center textflow">
+									<span>~</span>
+								</div>
+								<div class="col-md-5">
+									<input type="date" class="form-control end-date" name="endDate" max="${today}">
+								</div>
+							</div>
+							<div class="form-check mt-2">
+								<input type="checkbox" class="form-check-input currently-employed"
+									id="currentlyEmployed">
+								<label class="form-check-label" for="currentlyEmployed">재직중</label>
+							</div>
+						</div>
+
+						<!-- 담당업무 입력 -->
+						<div class="col-md-12">
+							<label class="form-label">담당업무<span class="essentialPoint">*</span></label> <input
+								type="text" class="form-control job-description" id="jobDescription"
+								name="jobDescription" placeholder="담당업무를 입력하세요(최대 100자)" maxlength="100">
+							<div class="text-end">
+								<span id="jobDescriptionCount" class="text-muted">0 / 100</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</template>
+
+			<!-- 보유 자격증 -->
+			<div class="card mb-4">
+				<div class="card-header d-flex justify-content-between align-items-center" id="myLicenseBox">
+					<span>자격증</span>
+					<button type="button" class="btn btn-primary btn-sm" id="addLicenseBtn">추가하기</button>
+				</div>
+				<div class="card-body">
+					<div id="licenseContainer">
+						<!-- 자격증 항목 -->
+					</div>
+					<small class="text-muted">* 자격증은 최대 10개까지 저장 가능합니다.</small>
+				</div>
+			</div>
+
+			<!-- 자격증 템플릿 (추가 버튼 눌러야 나옴) -->
+			<template id="licenseTemplate">
+				<div class="license-item border rounded p-3 mb-3 position-relative">
+					<!-- 삭제 버튼 (X) -->
+					<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-license"
+						aria-label="삭제"></button>
+					<div class="row g-3">
+						<!-- 자격증명 입력 -->
+						<div class="col-md-6">
+							<label class="form-label">자격증명<span class="essentialPoint">*</span></label> <input
+								type="text" class="form-control license-name" name="licenseName"
+								placeholder="자격증명을 입력하세요" maxlength="30">
+						</div>
+						<!-- 발급기관 입력 -->
+						<div class="col-md-6">
+							<label class="form-label">발급기관<span class="essentialPoint">*</span></label> <input
+								type="text" class="form-control institution" name="institution"
+								placeholder="발급기관을 입력하세요" maxlength="45">
+						</div>
+						<!-- 취득날짜 -->
+						<div class="col-md-4">
+							<label class="form-label">취득날짜<span class="essentialPoint">*</span></label>
+							<div class="row g-2">
+								<div class="col-md-4">
+									<input type="date" class="form-control acquisition-date" name="acquisitionDate">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</template>
+
+
+			<!-- 자기소개란 -->
+			<div class="card mb-4">
+				<div class="card-header d-flex justify-content-between align-items-center">
+					<span>자기소개</span>
+				</div>
+				<div class="card-body">
+					<textarea class="form-control" id="selfIntroTextarea" rows="8" placeholder="자기소개를 입력하세요(최대 1000자)"
+						maxlength="1000"></textarea>
+					<div class="text-end">
+						<span id="charCount" class="text-muted">0 / 1000</span>
+					</div>
+				</div>
+			</div>
+
+
+			<!-- 파일 첨부 -->
+			<div class="card mb-4">
+				<div class="card-header d-flex justify-content-between align-items-center">
+					<span>첨부파일</span> <label for="fileInput" class="btn btn-primary btn-sm mb-0">파일 선택</label>
+					<input type="file" id="fileInput" style="display: none;" multiple>
+				</div>
+				<div class="card-body">
+					<div id="fileContainer" class="border rounded p-3">
+						<div class="text-center text-muted fileText">
+							여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br> (최대 10MB)
+						</div>
+						<div id="previewContainer" class="mt-3"></div>
+					</div>
+					<small class="text-muted">* 자격증명서, 졸업증명서 등 첨부 가능합니다.</small>
+				</div>
+			</div>
+
+			<!-- 완전 저장 버튼 -->
+			<button type="button" class="btn btn-primary" id="finalSaveBtn">저장하기</button>
+
+			<button type="button" class="btn btn-secondary" id="testBtn">코드
+				테스트용 버튼</button>
+			</form>
+
+			<!-- 재사용 공용 경고 모달창 -->
+			<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content text-center">
+						<div class="modal-body">
+							<p id="validationMessage" class="mb-3">알림 메시지</p>
+							<button type="button" class="btn btn-primary" id="validationCheckBtn"
+								data-bs-dismiss="modal">확인</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
 
 			</div>
@@ -1853,6 +1877,103 @@
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// -todoList-
 				// 로컬스토리지에 임시저장 기능 추가
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 페이지 로드 시 선택된 지역에 대한 체크박스 처리
+				function initializeSelectedRegions() {
+					const $badges = $('#selectedRegions .badge');
 
+					// 이미 선택된 지역이 없으면 초기화 중단
+					if ($badges.length === 0) return;
+
+					// 선택된 지역들의 데이터 수집
+					const selectedRegions = new Map();
+					$badges.each(function () {
+						const regionNo = $(this).data('region');
+						const sigunguNo = $(this).data('sigungu');
+						if (!selectedRegions.has(regionNo)) {
+							selectedRegions.set(regionNo, []);
+						}
+						selectedRegions.get(regionNo).push(sigunguNo);
+					});
+
+					// 각 시/도에 대해 한 번만 클릭 이벤트 발생
+					selectedRegions.forEach(function (sigunguNos, regionNo) {
+						const $regionItem = $(`.region-item[data-region="${regionNo}"]`);
+						$regionItem.trigger('click');
+
+						// Ajax 완료 후 해당 시군구들 체크
+						$.ajax({
+							url: "/resume/getSigungu",
+							type: "GET",
+							data: { regionNo: regionNo },
+							success: function () {
+								for (let i = 0; i < sigunguNos.length; i++) {
+									$(`#sigungu_${sigunguNos[i]}`).prop('checked', true);
+								}
+							}
+						});
+					});
+
+					// 삭제 버튼 이벤트 처리
+					$('#selectedRegions').on('click', '.btn-close', function () {
+						const $badge = $(this).parent();
+						const sigunguNo = $badge.data('sigungu');
+						$badge.remove();
+						$(`#sigungu_${sigunguNo}`).prop('checked', false);
+					});
+				}
+
+				// 페이지 로드 시 지역 선택 초기화 실행
+				initializeSelectedRegions();
+
+				// 페이지 로드 시 선택된 업직종에 대한 체크박스 처리
+				function initializeSelectedJobTypes() {
+					const $badges = $('#selectedJobTypes .badge');
+
+					// 이미 선택된 업직종이 없으면 초기화 중단
+					if ($badges.length === 0) return;
+
+					// 선택된 업직종들의 데이터 수집
+					const selectedJobTypes = new Map();
+					$badges.each(function () {
+						const majorNo = $(this).data('major');
+						const subNo = $(this).data('sub');
+						const jobName = $(this).text().trim();
+						if (!selectedJobTypes.has(majorNo)) {
+							selectedJobTypes.set(majorNo, []);
+						}
+						selectedJobTypes.get(majorNo).push({
+							subNo: subNo,
+							jobName: jobName
+						});
+					});
+
+					// 각 대분류에 대해 한 번만 클릭 이벤트 발생
+					selectedJobTypes.forEach(function (jobs, majorNo) {
+						const $majorItem = $(`.major-item[data-major="${majorNo}"]`);
+						$majorItem.trigger('click');
+
+						// Ajax 완료 후 해당 소분류들 체크
+						$.ajax({
+							url: "/resume/getSubCategory",
+							type: "GET",
+							data: { majorNo: majorNo },
+							success: function () {
+								for (let i = 0; i < jobs.length; i++) {
+									const job = jobs[i];
+									$(`#sub_${job.subNo}`).prop('checked', true);
+								}
+							}
+						});
+					});
+
+					// 삭제 버튼 이벤트 처리
+					$('#selectedJobTypes').on('click', '.btn-close', function () {
+						const $badge = $(this).parent();
+						const subNo = $badge.data('sub');
+						$badge.remove();
+						$(`#sub_${subNo}`).prop('checked', false);
+					});
+				}
 			});
 		</script>
