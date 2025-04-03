@@ -66,7 +66,7 @@
 									</p>
 
 									<div class="read-more">
-										<a href="/recruitmentnotice/detail/${rec.uid}">바로 가기</a>
+										<a href="/recruitmentnotice/detail/?uid=${rec.uid}">바로 가기</a>
 									</div>
 								</div>
 							</article>
