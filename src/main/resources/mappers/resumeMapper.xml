@@ -123,9 +123,11 @@
         SELECT 
             sc.subcategoryNo,
             sc.jobName,
-            sc.refMajorcategoryNo as majorcategoryNo
+            sc.refMajorcategoryNo as majorCategoryNo,
+            mc.jobName as majorCategoryName
         FROM jobtype_resume_sub jrs
         JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
+        JOIN majorcategory mc ON sc.refMajorcategoryNo = mc.majorcategoryNo
         WHERE jrs.refResumeNo = #{resumeNo}
     </select>
 
