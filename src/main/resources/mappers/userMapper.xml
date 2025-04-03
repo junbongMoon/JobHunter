@@ -83,7 +83,7 @@
 		where uid = #{uid}
 	</select>
 	
-	<select id="getAccountByUid" resultMap="accountMap">
+	<select id="getAccountByAutoLogin" resultMap="accountMap">
 		select *, userId as
 		accountId, userName as accountName
 		from users

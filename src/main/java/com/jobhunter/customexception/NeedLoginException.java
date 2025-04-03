@@ -1,9 +1,10 @@
 package com.jobhunter.customexception;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -12,7 +13,7 @@ public class NeedLoginException extends RuntimeException {
     private static final ObjectMapper mapper = new ObjectMapper(); // Json으로 만들어주는거 (jackson라이브러리에 있는거)
     private static final int STATUS_CODE = 449; // 에러코드 고정
     private static final String STATUS_TEXT = "NEED_LOGIN"; // 에러메시지 제목 고정
-    private static final String REDIRECT_PATH = "/account/login/return"; // 로그인에러니까 로그인페이지 주소 메시지로 보내기
+    private static final String REDIRECT_PATH = "/account/login"; // 로그인에러니까 로그인페이지 주소 메시지로 보내기
 
     public NeedLoginException() {
         super("로그인이 필요합니다.");

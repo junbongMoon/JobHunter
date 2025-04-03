@@ -35,8 +35,8 @@
         </div>
       
         <div class="edit-buttons">
-        <button id="openContactModalBtn" class="btn-edit"><i class="bi bi-pencil-square"></i> 연락처 수정</button>
-        <button id="openPasswordModalBtn" class="btn-edit"><i class="bi bi-key"></i> 비밀번호 변경</button>
+        <button class="btn-edit" onclick="openContactModal()"><i class="bi bi-pencil-square"></i> 연락처 수정</button>
+        <button class="btn-edit" onclick="openPasswordModal()"><i class="bi bi-key"></i> 비밀번호 변경</button>
         </div>
       </section>
 
@@ -219,6 +219,28 @@
 </main>
 
 <script>
+  $(()=>{
+      getInfo();
+    })
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
+    authDomain: "jobhunter-672dd.firebaseapp.com",
+    projectId: "jobhunter-672dd",
+    storageBucket: "jobhunter-672dd.appspot.com",
+    messagingSenderId: "686284302067",
+    appId: "1:686284302067:web:30c6bc60e91aeea963b986",
+    measurementId: "G-RHVS9BGBQ7"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  let confirmationResult = null;
+  // JS에서 enum타입처럼 쓰는거 
+  const METHOD = {
+   EMAIL: "email",
+   PHONE: "phone"
+  };
+  
 
   document.getElementById('payType').addEventListener('change', function() {
     if (this.value === '연봉') {
@@ -266,10 +288,24 @@ function confirmModify() {
   const selectedAddress = $('#selectedAddress').val().trim();
   const addressDetail = $('#addressDetail').val().trim();
   let fullAddress = '';
-  if (selectedAddress === '' || addressDetail === '') {
+  if (!selectedAddress && !addressDetail) {
     fullAddress = null;
+  } else if (!selectedAddress) {
+    alertUtils.show("도로명주소를 선택해 주세요!", {
+      onConfirm: () => {
+        document.getElementById('addressSearch').focus();
+      }
+    })
+    return;
+  } else if (!addressDetail) {
+    alertUtils.show("상세주소를 입력해 주세요!", {
+      onConfirm: () => {
+        document.getElementById('addressDetail').focus();
+      }
+    })
+    return;
   } else {
-    fullAddress = selectedAddress + '[[ ]]' + addressDetail;
+    fullAddress = selectedAddress + ' 상세주소 : ' + addressDetail;
   }
   const parseOrNull = (value) => {
     const num = parseInt(value, 10);
@@ -345,7 +381,50 @@ function confirmModify() {
   });
 }
 
-
+  // 국제번호로 변환 (Firebase 용)
+  function formatPhoneNumberForFirebase(koreanNumber) {
+    const cleaned = koreanNumber.replace(/-/g, '');
+    return cleaned.startsWith('0') ? '+82' + cleaned.substring(1) : cleaned;
+  }
+  // 국제번호를 한국 형식으로 되돌림 (서버 전송용)
+  function formatToKoreanPhoneNumber(internationalNumber) {
+    return internationalNumber.startsWith("+82")
+       ? internationalNumber.replace("+82", "0").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
+       : internationalNumber;
+  }
+  // 날짜형식 변환용
+  function formatDate(dateString) {
+    if (!dateString) return '미입력';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+  // 날짜시간형식 변환용
+  function formatDateTime(dateString) {
+    if (!dateString) return '미입력';
+    const date = new Date(dateString);
+    return date.toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+  //캡챠기능 파이어베이스 기본 제공
+  function firebaseCaptcha() {
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            size: 'invisible',
+            callback: () => {}
+          });
+      }
+  }
+  
+  
   function openModal() {
       document.getElementById('basicModal').style.display = 'flex';
       document.getElementById('basicModalOverlay').style.display = 'block';
@@ -456,7 +535,7 @@ function confirmModify() {
     let addressText = '등록된 주소 없음';
     let addressDetailText = '';
     if (userInfo.addr) {
-      const addressSplit = userInfo.addr.split('[[ ]]');
+      const addressSplit = userInfo.addr.split(' 상세주소 : ');
       addressText = addressSplit[0];
       if (addressSplit[1]) {
         addressDetailText = addressSplit[1];
@@ -474,124 +553,44 @@ function confirmModify() {
       '<div>장애여부</div><div>' + disabilityText + '</div>' +
       '<div class="introduce-section"><div class="introduce-title">자기소개</div><div class="introduce-content">' + introduceSection + '</div></div>' +
       '<div class="edit-buttons">' +
-      '<button id="chanegeDetailInfoBtn" class="btn-edit"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>' +
+      '<button class="btn-edit" onclick="chanegeDetailInfoBtn()"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>' +
+      '<button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>' +
       '</div>';
   }
 
-  const firebaseConfig = {
-      apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
-      authDomain: "jobhunter-672dd.firebaseapp.com",
-      projectId: "jobhunter-672dd",
-      storageBucket: "jobhunter-672dd.appspot.com",
-      messagingSenderId: "686284302067",
-      appId: "1:686284302067:web:30c6bc60e91aeea963b986",
-      measurementId: "G-RHVS9BGBQ7"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  let confirmationResult = null;
-  // JS에서 enum타입처럼 쓰는거 
-  const METHOD = {
-   EMAIL: "email",
-   PHONE: "phone"
-  };
-  // 국제번호로 변환 (Firebase 용)
-  function formatPhoneNumberForFirebase(koreanNumber) {
-    const cleaned = koreanNumber.replace(/-/g, '');
-    return cleaned.startsWith('0') ? '+82' + cleaned.substring(1) : cleaned;
+  function deleteAccount() {
+    alertUtils.show("정말로 삭제하시겠습니까?", {
+      confirmText : '확인',
+      cancelText : '취소',
+      onConfirm : checkedDeleteAccount,
+      onCancel : alertUtils.hide
+    })
   }
-  // 국제번호를 한국 형식으로 되돌림 (서버 전송용)
-  function formatToKoreanPhoneNumber(internationalNumber) {
-    return internationalNumber.startsWith("+82")
-       ? internationalNumber.replace("+82", "0").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
-       : internationalNumber;
-  }
-  // 날짜형식 변환용
-  function formatDate(dateString) {
-    if (!dateString) return '미입력';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-  // 날짜시간형식 변환용
-  function formatDateTime(dateString) {
-    if (!dateString) return '미입력';
-    const date = new Date(dateString);
-    return date.toLocaleString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+
+  function checkedDeleteAccount() {
+    $.ajax({
+      url: `/user/delete/${sessionScope.account.uid}`,
+      method: "DELETE",
+      contentType: "application/json",
+      success: () => {alertUtils.show("삭제 대기중...", {onConfirm : getInfo})},
+      error: (xhr) => {alertUtils.show("연결 실패! 새로고침 후 다시 시도해주세요")}
     });
   }
 
-  //캡챠기능 파이어베이스 기본 제공
-  function firebaseCaptcha() {
-      if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            size: 'invisible',
-            callback: () => {}
-          });
-      }
+  function chanegeDetailInfoBtn () {
+    // 상세정보 출력란 수정가능하게 바꾸는 함수
+    const section = document.getElementById('modifySection');
+
+    // 먼저 display를 block으로 설정
+    section.style.display = "block";
+
+    // 잠깐 기다렸다가 클래스를 추가해야 트랜지션이 작동함
+    setTimeout(() => {
+      section.classList.add("show");
+    }, 10);
+
+    section.scrollIntoView({ behavior: 'smooth' });
   }
-  
-  $(()=>{
-    getInfo()
-  
-    $(document).on('click', '#passwordBtn', ()=>{
-      checkPassword()
-    });
-    
-    $(document).on('click', '#startMobileVerifiBtn', ()=>{
-      startVerifiPhonePwd()
-    });
-    $(document).on('click', '#startEmailVerifiBtn', ()=>{
-      startVerifiEmailPwd()
-    });
-    $(document).on('click', '#endVerifiPwdToPhoneBtn', ()=>{
-      endVerifiPwdMobile()
-    });
-    $(document).on('click', '#endVerifiPwdToEmailBtn', ()=>{
-      endVerifiPwdEmail()
-    });
-    $(document).on('click', '#changeMobileStartVerifiBtn', ()=>{
-      startVerifiPhonePne()
-    });
-    $(document).on('click', '#changeEmailStartVerifiBtn', ()=>{
-      startVerifiEmailPne()
-    });
-    $(document).on('click', '#changeMobileEndVerifiBtn', ()=>{
-      endVerifiPneMobile()
-    });
-    $(document).on('click', '#changeEmailEndVerifiBtn', ()=>{
-      endVerifiPneEmail()
-    });
-    $(document).on('click', '#chanegeDetailInfoBtn', ()=>{
-      // 상세정보 출력란 수정가능하게 바꾸는 함수
-      const section = document.getElementById('modifySection');
-
-      // 먼저 display를 block으로 설정
-      section.style.display = "block";
-
-      // 잠깐 기다렸다가 클래스를 추가해야 트랜지션이 작동함
-      setTimeout(() => {
-        section.classList.add("show");
-      }, 10);
-    });
-    $(document).on('click', '#openContactModalBtn', ()=>{
-      // 연락처 수정 버튼
-      openContactModal();
-    });
-    $(document).on('click', '#openPasswordModalBtn', ()=>{
-      // 비밀번호 수정 버튼
-      openPasswordModal();
-    });
-  })
-
   
   function openPasswordModal() {
     const modal = document.getElementById('basicModal');
@@ -604,7 +603,7 @@ function confirmModify() {
       <div class="form-group">
           <div style="display: flex; align-items: center; gap: 10px;">
           <input type="password" id="nowPassword" placeholder="현재 비밀번호를 입력하세요" style="flex: 1;">
-          <button id="passwordBtn" class="btn-confirm">확인</button>
+          <button class="btn-confirm" onclick="checkPassword()">확인</button>
           </div>
       </div>
     `;
@@ -642,7 +641,7 @@ function confirmModify() {
       // 초기화용 주소 저장
       document.getElementById('addressBackup').value = address;
 
-      const addressSplit = address.split('[[ ]]');
+      const addressSplit = address.split(' 상세주소 : ');
       document.getElementById('selectedAddress').value = addressSplit[0] || '';
       document.getElementById('selectedAddress').style.display = 'block'; // 표시
       document.getElementById('addressDetail').value = addressSplit[1] || '';
@@ -769,7 +768,7 @@ function confirmModify() {
   async function endVerifiPwdEmail() {
     const emailCode = document.getElementById('pwdToEmailCode').value
     $.ajax({
-      url: `/account/auth/email/${emailCode}`,
+      url: `/account/auth/email/\${emailCode}`,
       method: "POST",
       contentType: "application/json",
       data: JSON.stringify({ email: "${sessionScope.account.email}" }),
@@ -812,7 +811,7 @@ function confirmModify() {
             <div class="contact-info" style="margin-bottom: 15px;">${sessionScope.account.email}</div>
             <div class="verification-group">
                 <input type="text" id="pwdToEmailCode" placeholder="인증번호 입력">
-                <button id="endVerifiPwdToEmailBtn" class="btn-confirm">인증완료</button>
+                <button class="btn-confirm" onclick="endVerifiPwdEmail()">인증완료</button>
             </div>
         </div>
       `;
@@ -826,7 +825,7 @@ function confirmModify() {
             <div class="contact-info" style="margin-bottom: 15px;">${sessionScope.account.mobile}</div>
             <div class="verification-group">
                 <input type="text" id="pwdToPhoneCode" placeholder="인증번호 입력">
-                <button id="endVerifiPwdToPhoneBtn" class="btn-confirm">인증완료</button>
+                <button class="btn-confirm" onclick="endVerifiPwdMobile()">인증완료</button>
             </div>
         </div>
       `;
@@ -901,7 +900,7 @@ function confirmModify() {
 
       bodyText += mobile === ""
             ? `<button class="btn-cancel" disabled><i class="bi bi-telephone"></i> 전화번호 인증 불가</button>`
-            : `<button id="startMobileVerifiBtn" class="btn-edit"><i class="bi bi-telephone"></i> 전화번호 인증</button>`;
+            : `<button class="btn-edit" onclick="startVerifiPhonePwd()"><i class="bi bi-telephone"></i> 전화번호 인증</button>`;
 
       bodyText += `<i class="bi bi-telephone"></i> 전화번호 인증`+
                   `</button>`+
@@ -912,7 +911,7 @@ function confirmModify() {
 
       bodyText += email === "" 
             ? `<button class="btn-cancel" disabled><i class="bi bi-envelope"></i> 이메일 인증 불가</button>`
-            : `<button id="startEmailVerifiBtn" class="btn-edit"><i class="bi bi-envelope"></i> 이메일 인증</button>`;
+            : `<button class="btn-edit" onclick="startVerifiEmailPwd()"><i class="bi bi-envelope"></i> 이메일 인증</button>`;
 
 
       bodyText += `<div class="contact-info">\${emailText}</div>`+
@@ -990,7 +989,7 @@ function confirmModify() {
               <div class="verification-option">
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                   \${getPhoneInputHTML()}
-                  <button id="changeMobileStartVerifiBtn" class="btn-confirm">확인</button>
+                  <button class="btn-confirm" onclick="startVerifiPhonePne()">확인</button>
                 </div>
               </div>
             </div>
@@ -999,7 +998,7 @@ function confirmModify() {
               <div class="verification-option">
                 <div style="display: flex; align-items: center; gap: 10px;">
                   <input type="text" id="pneToPhoneCode" placeholder="인증번호를 입력해 주세요" style="flex: 1;">
-                  <button id="changeMobileEndVerifiBtn" class="btn-confirm">인증완료</button>
+                  <button class="btn-confirm" onclick="endVerifiPneMobile()">인증완료</button>
                 </div>
               </div>
             </div>
@@ -1008,7 +1007,7 @@ function confirmModify() {
               <div class="verification-option">
                 <div style="display: flex; align-items: center; gap: 10px;">
                   <input type="text" id="changeEmail" placeholder="변경할 이메일을 입력해 주세요" style="flex: 1;">
-                  <button id="changeEmailStartVerifiBtn" class="btn-confirm">확인</button>
+                  <button class="btn-confirm" onclick="startVerifiEmailPne()">확인</button>
                 </div>
               </div>
             </div>
@@ -1017,7 +1016,7 @@ function confirmModify() {
               <div class="verification-option">
                 <div style="display: flex; align-items: center; gap: 10px;">
                   <input type="text" id="pneToEmailCode" placeholder="인증번호를 입력해 주세요" style="flex: 1;">
-                  <button id="changeEmailEndVerifiBtn" class="btn-confirm">인증완료</button>
+                  <button class="btn-confirm" onclick="endVerifiPneEmail()">인증완료</button>
                 </div>
               </div>
             </div>
@@ -1218,7 +1217,7 @@ function confirmModify() {
     deleteAddress();
     beforeAddress = document.getElementById('addressBackup').value;
     if (beforeAddress && beforeAddress !== '') {
-      beforeAddress = beforeAddress.split('[[ ]]');
+      beforeAddress = beforeAddress.split(' 상세주소 : ');
       document.getElementById('selectedAddress').value = beforeAddress[0];
       document.getElementById('selectedAddress').style.display = 'block';
       if (beforeAddress[1]) {
@@ -1231,10 +1230,13 @@ function confirmModify() {
   function setSearchAddressOption(jsonStr) {
     const addressSelect = document.getElementById('addressSelect');
     const addressSearch = document.getElementById('selectedAddress');
-    
     // 첫 검색시에만 기본 옵션 추가
     if (addrCurrentPage === 1) {
+      if (jsonStr.results.juso.length <= 0) {
+        addressSelect.innerHTML = '<li class="address-dropdown-item" data-value="">검색 결과가 없습니다</li>';
+      } else {
         addressSelect.innerHTML = '<li class="address-dropdown-item" data-value="">주소를 선택하세요</li>';
+      }
     }
     
     // 드롭다운 표시
@@ -1287,24 +1289,16 @@ function confirmModify() {
     }
   }
 
-  const dropdown = document.getElementById("addressSelect");
-
-  dropdown.addEventListener("scroll", () => {
+  document.getElementById("addressSelect").addEventListener("scroll", () => {
     const top = dropdown.scrollTop;
     const height = dropdown.clientHeight;
     const full = dropdown.scrollHeight;
-
-    if (top === 0) {
-      console.log("맨 위 도착");
-      // 맨 위 이벤트
-    }
 
     if (top + height >= full) {
       console.log("맨 아래 도착");
       searchAddress();
     }
   });
-
 
   let addrCurrentPage = 0;
   // 주소검색API용 함수들
@@ -1387,14 +1381,6 @@ function confirmModify() {
 		}
 	}
 	return true ;
-}
-
-function searchAddresssss() {
-	var evt_code = (window.netscape) ? ev.which : event.keyCode;
-	if (evt_code == 13) {    
-		event.keyCode = 0;  
-		getAddrLoc(); 
-	} 
 }
 
 document.getElementById('pay').addEventListener('input', function(e) {

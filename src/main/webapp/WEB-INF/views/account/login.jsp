@@ -357,6 +357,11 @@
       justify-content: center;
     }
   }
+  
+  .login-failed-massege {
+  	 font-size: 14px;
+  	 color: var(--bs-red);
+  }
 </style>
 
 <main class="main">
@@ -379,11 +384,10 @@
 
 					<!-- 이메일 인증 컨텐츠 -->
 					<div id="emailContent" class="verification-content">
-            <input type="hidden" id="authEmail" value="${sessionScope.authTargetEmail}" />
 
 						<div id="emailVerificationContent">
 							<div class="target-info">
-								인증 이메일 주소: <strong>${sessionScope.authTargetEmail}</strong>
+								인증 이메일 주소: <strong>${sessionScope.account.email}</strong>
 							</div>
 							<div id="emailSendSection" class="verification-step">
 								<button type="button" id="emailSendBtn" class="btn-confirm full-width">인증 메일 발송</button>
@@ -398,11 +402,10 @@
 
 					<!-- 전화번호 인증 컨텐츠 -->
 					<div id="phoneContent" class="verification-content" style="display: none;">
-            <input type="hidden" id="authMobile" value="${sessionScope.authTargetMobile}" />
 
 						<div id="phoneVerificationContent">
 							<div class="target-info">
-								인증 전화번호: <strong>${sessionScope.authTargetMobile}</strong>
+								인증 전화번호: <strong>${sessionScope.account.mobile}</strong>
 							</div>
 							<div id="phoneSendSection" class="verification-step">
 								<button type="button" id="phoneSendBtn" class="btn-confirm full-width">인증번호 발송</button>
@@ -436,6 +439,11 @@
 					<div class="form-group">
 						<input type="text" name="id" placeholder="아이디" required />
 						<input type="password" name="password" placeholder="비밀번호" required />
+						<c:if test="${sessionScope.remainingSeconds != null && sessionScope.remainingSeconds >= 0}">
+							<p class="login-failed-massege">
+								5회 이상 로그인에 실패하셨습니다. ${sessionScope.remainingSeconds}초 후에 다시 시도해 주세요
+							</p>
+						</c:if>
 					</div>
 
 					<div class="login-options">
@@ -458,27 +466,13 @@
 							<img src="#" alt="kakao">
 							카카오 로그인
 						</button>
-						
-						
-    
-			    </div>
+			    	</div>
 				</c:otherwise>
 			</c:choose>
 	</form>
 	</div>
 	<!-- 파이어베이스 캡챠 넣을곳 -->
 	<div id="recaptcha-container"></div>
-	
-					    <!-- Fetch -->
-					    <button onclick="sendFetch()">Fetch로 전송</button>
-					
-					    <!-- jQuery -->
-					    <button id="jqueryBtn">jQuery로 전송</button>
-					
-					    <!-- form 태그 -->
-					    <form action="/user/kakao" method="POST" target="_blank">
-					        <button type="submit">Form으로 전송</button>
-					    </form>
 </main>
 
 <!-- 알럿 모달 추가 -->
@@ -570,13 +564,15 @@ const alertUtils = {
 };
 
 // 이메일 인증 코드 전송
-async function sendEmailVerification(email) {
+async function sendEmailVerification() {
     
+    const email = "${sessionScope.account.email}";
+
     $.ajax({
         url: "/account/auth/email",
         method: "POST",
-  		contentType: "application/json",
-    data: JSON.stringify({ email }),
+  		  contentType: "application/json",
+        data: JSON.stringify({ email }),
         success: (res) => {
           alertUtils.show("메일 전송 성공: " + res);
         document.getElementById('emailVerifySection').style.display = 'block';
@@ -595,10 +591,12 @@ function firebaseCaptcha() {
         });
     }
 }
-
 // 전화번호 인증 코드 전송
-async function sendPhoneVerification(phoneNumber) {
-    // firebase에서 해줌
+async function sendPhoneVerification() {
+
+  const phoneNumber = formatPhoneNumberForFirebase("${sessionScope.account.mobile}");
+
+    // 캡챠_firebase에서 제공해줌
     firebaseCaptcha() 
 
     try {
@@ -613,18 +611,6 @@ async function sendPhoneVerification(phoneNumber) {
     }
 }
 
-// 인증 코드 확인(성공하면 onVerificationSuccess 호출)
-async function verifyCode(method) {
-
-  if (method === METHOD.PHONE) {
-    const code = document.getElementById("phoneCode").value;
-    verifyPhoneCode(code)
-  } else {
-    const code = document.getElementById("emailCode").value;
-    verifyEmailCode(code)
-  }
-}
-
 async function verifyPhoneCode(code) {
     try {
       await confirmationResult.confirm(code);
@@ -636,7 +622,7 @@ async function verifyPhoneCode(code) {
 }
 
 async function verifyEmailCode(code) {
-    const email = document.getElementById("authEmail").value;
+    const email = "${sessionScope.account.email}";
     $.ajax({
       url: `/account/auth/email/${code}`,
       method: "POST",
@@ -649,66 +635,64 @@ async function verifyEmailCode(code) {
     });
 }
 
-// 인증 성공 후 처리 함수만 수정
 function onVerificationSuccess(method) {
-    const accountType = document.getElementById("accountType")?.value;
+    const accountType = "${sessionScope.account.accountType}";
     if (!accountType) {
-        console.error("계정 유형을 찾을 수 없습니다.");
+    	alertUtils.show("세션이 만료되었습니다. 새로고침 후 다시 시도해 주세요.")
         return;
     }
 
-let value;
-if (method === METHOD.PHONE) {
-        const intlPhone = document.getElementById("authMobile")?.value;
+    let value;
+    if (method === METHOD.PHONE) {
+        const intlPhone = "${sessionScope.account.mobile}";
         if (!intlPhone) {
-            console.error("전화번호를 찾을 수 없습니다.");
+          alertUtils.show("세션이 만료되었습니다. 새로고침 후 다시 시도해 주세요.")
             return;
         }
- value = formatToKoreanPhoneNumber(intlPhone);
-} else {
-        const email = document.getElementById("authEmail")?.value;
-        if (!email) {
-            console.error("이메일을 찾을 수 없습니다.");
-            return;
-        }
-        value = email;
-}
+      value = formatToKoreanPhoneNumber(intlPhone);
+    } else {
+            const email = "${sessionScope.account.email}";
+            if (!email) {
+              alertUtils.show("세션이 만료되었습니다. 새로고침 후 다시 시도해 주세요.")
+                return;
+            }
+            value = email;
+    }
 
-const dto = {
- type: method === METHOD.PHONE ? "mobile" : "email",
- value,
- accountType
-};
+    const dto = {
+    type: method === METHOD.PHONE ? "mobile" : "email",
+    value,
+    accountType
+    };
 
-$.ajax({
- url: "/account/auth",
- method: "POST",
- contentType: "application/json",
- data: JSON.stringify(dto),
- success: (redirectUrl) => {
-            alertUtils.show("인증이 완료되었습니다.", {
-                onConfirm: () => {
-   window.location.href = redirectUrl || "/";
-                }
-            });
- },
- error: (xhr) => {
-            alertUtils.show("인증 처리 중 오류가 발생했습니다.");
-   console.error(xhr.responseText);
- }
-});
+    $.ajax({
+    url: "/account/auth",
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify(dto),
+    success: (redirectUrl) => {
+                console.log(redirectUrl);
+                alertUtils.show("인증이 완료되었습니다.", {
+                    onConfirm: () => {
+                window.location.href = redirectUrl || "/";
+                    }
+                });
+    },
+    error: (xhr) => {
+                alertUtils.show("인증 처리 중 오류가 발생했습니다.");
+      console.error(xhr.responseText);
+    }
+    });
 }
 
 //DOM 로딩 후 버튼 이벤트 연결
 window.onload=()=>{
   document.getElementById("emailSendBtn")?.addEventListener("click", () => {
-    sendEmailVerification(document.getElementById("authEmail").value);
+    sendEmailVerification();
   });
 
   document.getElementById("phoneSendBtn")?.addEventListener("click", () => {
-    const rawPhone = document.getElementById("authMobile").value;
-    const phoneNumber = formatPhoneNumberForFirebase(rawPhone);
-    sendPhoneVerification(phoneNumber);
+    sendPhoneVerification()
   });
 
   document.getElementById("emailVerifyBtn")?.addEventListener("click", () => {
@@ -765,6 +749,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const urlParams = new URLSearchParams(window.location.search);
   const error = urlParams.get('error');
   const prevAccountType = urlParams.get('accountType');
+  const autoLogin = urlParams.get('autoLogin');
 
   // 로그인 실패 메시지 표시
   if (error === 'true') {
@@ -783,71 +768,79 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+  
+  // 이전 자동로그인 선택 상태 복원
+  if (autoLogin == "on") {
+	  const tabs = document.querySelectorAll('#autoLogin');
+    if (tabs) {
+      tabs.checked = true; // 체크 상태로 만들기
+    }
+  }
 });
 
-function kakao () {
-	$.ajax({
-        type: "POST",
-        url: "/user/kakao",
-        data: JSON.stringify({ test: "value" }), // 필요시 전송 데이터
-        contentType: "application/json",
-        success: function(res) {
-        	if (res.data.status === "NEED_LOGIN" || res.data.status === "NEED_VERIFICATION") {
-                window.location.href = res.data.redirect;
-            } else {
-                // 정상 데이터 처리
-                console.log("응답 내용:", res.data);
-            }
-        },
-        error: function(xhr) {
-            console.log("에러 발생:", xhr);
-        }
-    });
-}
+// function kakao () {
+// 	$.ajax({
+//         type: "POST",
+//         url: "/user/kakao",
+//         data: JSON.stringify({ test: "value" }), // 필요시 전송 데이터
+//         contentType: "application/json",
+//         success: function(res) {
+//         	if (res.data.status === "NEED_LOGIN" || res.data.status === "NEED_VERIFICATION") {
+//                 window.location.href = res.data.redirect;
+//             } else {
+//                 // 정상 데이터 처리
+//                 console.log("응답 내용:", res.data);
+//             }
+//         },
+//         error: function(xhr) {
+//             console.log("에러 발생:", xhr);
+//         }
+//     });
+// }
 
 
-function sendFetch() {
-    fetch("/user/kakao", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ test: "fetch" })
-    })
-    .then(res => res.json()) // 반드시 json 파싱
-    .then(data => {
-        console.log("Fetch 응답:", data);
-        if (data.status === "NEED_LOGIN" || data.status === "NEED_VERIFICATION") {
-            window.location.href = data.redirect;
-        } else {
-            alert("Fetch: " + data.message);
-        }
-    })
-    .catch(err => {
-        console.error("Fetch 에러:", err);
-    });
-}
+// function sendFetch() {
+//     fetch("/user/kakao", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify({ test: "fetch" })
+//     })
+//     .then(res => res.json()) // 반드시 json 파싱
+//     .then(data => {
+//         console.log("Fetch 응답:", data);
+//         if (data.status === "NEED_LOGIN" || data.status === "NEED_VERIFICATION") {
+//             window.location.href = data.redirect;
+//         } else {
+//             alert("Fetch: " + data.message);
+//         }
+//     })
+//     .catch(err => {
+//         console.error("Fetch 에러:", err);
+//     });
+// }
 
-$("#jqueryBtn").click(function () {
-    $.ajax({
-        type: "POST",
-        url: "/user/kakao",
-        data: JSON.stringify({ test: "jquery" }),
-        contentType: "application/json",
-        dataType: "json", // 반드시 명시!
-        success: function (res) {
-            console.log("jQuery 응답:", res);
-            if (res.status === "NEED_LOGIN" || res.status === "NEED_VERIFICATION") {
-                window.location.href = res.redirect;
-            } else {
-                alert("jQuery: " + res.message);
-            }
-        },
-        error: function (xhr) {
-            console.error("jQuery 에러:", xhr);
-        }
-    });
-})
+// $("#jqueryBtn").click(function () {
+//     $.ajax({
+//         type: "POST",
+//         url: "/user/kakao",
+//         data: JSON.stringify({ test: "jquery" }),
+//         contentType: "application/json",
+//         dataType: "json", // 반드시 명시!
+//         success: function (res) {
+//             console.log("jQuery 응답:", res);
+//             if (res.status === "NEED_LOGIN" || res.status === "NEED_VERIFICATION") {
+//                 window.location.href = res.redirect;
+//             } else {
+//                 alert("jQuery: " + res.message);
+//             }
+//         },
+//         error: function (xhr) {
+//             console.error("jQuery 에러:", xhr);
+//         }
+//     });
+// })
 </script>
 
 <jsp:include page="../footer.jsp" />

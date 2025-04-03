@@ -13,7 +13,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.service.account.AccountService;
-import com.jobhunter.util.RedirectUtil;
 
 @Component
 public class AutoLoginInterceptor implements HandlerInterceptor {
@@ -31,6 +30,8 @@ public class AutoLoginInterceptor implements HandlerInterceptor {
             return true; // 이미 로그인 되어 있음
         }
 
+        System.out.println("자동로그인 인터셉터");
+        
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -43,7 +44,6 @@ public class AutoLoginInterceptor implements HandlerInterceptor {
 
                         AccountVO account = accountService.findAccountByAutoLogin(sessionId, type);
                         if (account != null) {
-                            // 새 세션 생성 또는 기존 세션 사용
                         	session.setAttribute("account", account);
                             return true;
                         }
@@ -55,7 +55,7 @@ public class AutoLoginInterceptor implements HandlerInterceptor {
             }
         }
 
-        return true; // 자동 로그인 쿠키 없음 → 그냥 넘김
+        return true; // 자동 로그인 쿠키 없음
         
     }
 
@@ -71,13 +71,5 @@ public class AutoLoginInterceptor implements HandlerInterceptor {
 			throws Exception {
 		// TODO Auto-generated method stub
 		
-	}
-	
-	private boolean isAsyncOrApiRequest(HttpServletRequest request) {
-	    String requestedWith = request.getHeader("X-Requested-With");
-	    String accept = request.getHeader("Accept");
-
-	    return "XMLHttpRequest".equalsIgnoreCase(requestedWith)
-	        || (accept != null && accept.contains("application/json"));
 	}
 }

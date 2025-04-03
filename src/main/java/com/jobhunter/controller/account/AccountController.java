@@ -18,7 +18,6 @@ import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
 import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.service.account.AccountService;
-import com.jobhunter.util.RedirectUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,26 +27,19 @@ import lombok.RequiredArgsConstructor;
 public class AccountController {
 
 	private final AccountService accountService;
+	
 
-	// 인터셉터 하나로 헤더 로그인 눌러도 로그인 끝나고 기존페이지 돌아오게 만드려고 넣음
+	// 인터셉터 없이 로그인버튼 눌러서 들어오는곳
 	@GetMapping("/login/return")
 	public String redirectToLogin(HttpServletRequest request, HttpSession session) {
 
 		String redirectUrl = (String) session.getAttribute("redirectUrl");
-		if (redirectUrl != null) {
+		if (redirectUrl == null) {
 			String referer = request.getHeader("Referer");
-			
-			session.setAttribute("redirectUrl", referer);
+			if (referer == null) {
+				session.setAttribute("redirectUrl", referer);
+			}
 		}
-		
-		AccountVO beforeAccount = (AccountVO) session.getAttribute("account");
-		if(!beforeAccount.getRequiresVerification().equalsIgnoreCase("Y")) {
-			// 자동로그인 성공했고 인증 필요 없음
-			String redirect = (String) session.getAttribute("redirectUrl");
-			session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
-			return "redirect:" + (redirect != null ? redirect : "/");
-		}
-		
 
 		// 로그인버튼 눌러서 들어왔을때 초기상태 유지+로그인으로 인증 건너뛰기 막는용 로그인데이터도 클린
 		// 어차피 정상적으로 로그인버튼 누르는건 로그인 안된유저뿐이니까
@@ -64,17 +56,14 @@ public class AccountController {
 	public String showLoginForm(HttpServletRequest request, HttpSession session,
 			@RequestParam(value = "redirect", required = false) String redirect) {
 
+		System.out.println(session.getAttribute("redirectUrl"));
 		// 인증 성공하면 세션 정리
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		if (account != null) {
 			if ("Y".equals(account.getRequiresVerification())) {
-				session.setAttribute("authTargetMobile", account.getMobile());
-				session.setAttribute("authTargetEmail", account.getEmail());
 				session.setAttribute("requiresVerification", true);
 			} else { // 자동로그인 또는 로그인 성공하고 인증도 필요없을때
 				session.removeAttribute("requiresVerification");
-				session.removeAttribute("authTargetMobile");
-				session.removeAttribute("authTargetEmail");
 				
 				String redirectUrl = (String) session.getAttribute("redirectUrl");
 				session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
@@ -100,9 +89,17 @@ public class AccountController {
 		Map<String, Object> result = null;
 		try {
 			result = accountService.loginAccount(loginDto);
-
-			// 맵에서 auth에 인증필요여부, success에 로그인 성공여부, user에 실제 유저 담아옴
-			Boolean auth = (Boolean) result.get("auth");
+			
+			if (result.get("remainingSeconds") != null) {
+			    int remainingSeconds = (int) result.get("remainingSeconds");
+			    if (remainingSeconds >= 0) {
+			        session.setAttribute("remainingSeconds", remainingSeconds);
+			        return "account/login";
+			    }
+			}
+			session.removeAttribute("remainingSeconds");
+			
+			// success에 로그인 성공여부, user에 실제 유저 담아옴
 			Boolean success = (Boolean) result.get("success");
 
 			// 이거 일반이나 기업중 하나 나올거같은데?
@@ -114,8 +111,9 @@ public class AccountController {
 
 				session.setAttribute("account", account);
 
-				if (Boolean.TRUE.equals(auth)) { // 로그인은 했는데 인증이 필요
+				if (account.getRequiresVerification().equals("Y")) { // 로그인은 했는데 인증이 필요
 					// 다시 로그인페이지 로딩 (로딩하면서 자동 인증 체크)
+					session.setAttribute("requiresVerification", true);
 					return "account/login";
 				}
 
@@ -141,16 +139,27 @@ public class AccountController {
 		}
 		// 로그인 실패시 세션 청소하고 다시 로그인페이지 로딩(인증 필요한지 체크용)
 		session.removeAttribute("requiresVerification");
-		session.removeAttribute("authTargetEmail");
-		session.removeAttribute("authTargetMobile");
 		session.removeAttribute("account");
 		return "redirect:/account/login?error=true&accountType=" + loginDto.getAccountType() + "&autoLogin=" + loginDto.getAutoLogin();
 	}
 
 	@GetMapping("/logout")
-	public String logout(HttpSession session) {
+	public String logout(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
 		session.invalidate();
-
+		
+		// 자동 로그인 쿠키 제거
+	    Cookie[] cookies = request.getCookies();
+	    if (cookies != null) {
+	        for (Cookie cookie : cookies) {
+	            if ("userAutoLogin".equals(cookie.getName()) || "companyAutoLogin".equals(cookie.getName())) {
+	                cookie.setValue("");
+	                cookie.setMaxAge(0);
+	                cookie.setPath("/");
+	                response.addCookie(cookie);
+	            }
+	        }
+	    }
+	    
 		return "redirect:/";
 	}
 

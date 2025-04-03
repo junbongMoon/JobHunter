@@ -1,5 +1,6 @@
 package com.jobhunter.service.account;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jobhunter.dao.account.AccountLoginDAO;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
+import com.jobhunter.model.account.LoginFailedDTO;
 import com.jobhunter.model.customenum.AccountType;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
+	private Map<String, LoginFailedDTO> failedUserMap = new HashMap<>();
+	private Map<String, LoginFailedDTO> failedCompanyMap = new HashMap<>();
+	
 	// 인터페이스 통합으로 하려니까 빈객체 주입에 문제생겨서 이걸로 강제주입
 	@Autowired
 	@Qualifier("userLoginDAO")
@@ -30,6 +35,19 @@ public class AccountServiceImpl implements AccountService {
 	@Qualifier("companyLoginDAO")
 	private AccountLoginDAO companyDAO;
 
+	// Map 선택 (return했으니까 break 굳이 안넣음)
+		private Map<String, LoginFailedDTO> getMap(AccountType type) {
+
+			switch (type) {
+			case USER:
+				return failedUserMap;
+			case COMPANY:
+				return failedCompanyMap;
+			default:
+				return null;
+			}
+		}
+	
 	// DAO 선택 (return했으니까 break 굳이 안넣음)
 	private AccountLoginDAO getDAO(AccountType type) {
 
@@ -63,25 +81,57 @@ public class AccountServiceImpl implements AccountService {
 		AccountType accountType = loginDto.getAccountType();
 		AccountLoginDAO dao = getDAO(accountType);
 
+		Map<String, LoginFailedDTO> failedMap = getMap(accountType);
+		LoginFailedDTO loginFailedDTO = failedMap.getOrDefault(loginDto.getId(), LoginFailedDTO.builder().loginFailCnt(0).build());
+		
+		System.out.println(failedMap);
+		
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+		if(loginFailedDTO.getLoginFailCnt() >= 5) {
+			if (loginFailedDTO.getBlockTime() != null && now.before(loginFailedDTO.getBlockTime())) {
+				long remainingMillis = loginFailedDTO.getBlockTime().getTime() - now.getTime();
+				int remainingSeconds = (int) (remainingMillis / 1000); // 초 단위로 변환
+
+			    System.out.println(remainingSeconds + "남은시간");
+			    
+			    result.put("remainingSeconds", remainingSeconds); // 남은 시간(초) 추가
+			    return result;
+			} else {
+				failedMap.remove(loginDto.getId());
+				loginFailedDTO = LoginFailedDTO.builder().loginFailCnt(0).build();
+			}
+		}
+		
 		// 로그인 시도
 		AccountVO account = dao.loginAccount(loginDto);
 
 		if (account == null) {
 			// 없는 유저거나 비밀번호 틀림
+			
+			// 컬렉션 실패횟수 증가
+			loginFailedDTO.setLoginFailCnt(loginFailedDTO.getLoginFailCnt() + 1);
+			if (loginFailedDTO.getLoginFailCnt() >= 5) {
+			    // 로그인 차단 시간 설정 (30초 후)
+			    long blockDurationMillis = 30 * 1000; // 30초
+			    Timestamp blockUntil = new Timestamp(System.currentTimeMillis() + blockDurationMillis);
+			    loginFailedDTO.setBlockTime(blockUntil);
+			    result.put("remainingSeconds", 30); // 남은 시간(초) 추가
+			};
+			failedMap.put(loginDto.getId(),loginFailedDTO);
+			
 			// 실패 횟수 증가 전에 유저 존재 여부 확인
 			if (dao.existsAccountId(loginDto.getId())) {
 				int failCount = dao.getFailCount(loginDto.getId());
 
-				// 실패횟수 증가(인증필요 체크 else로 넣으면 카운트 4일때 증가 안하거나 6되야 인증필요되니까 따로
-				if (failCount < 5) {
+				// 실패횟수 증가(인증필요 체크 else로 넣으면 카운트 29일때 증가 안하거나 31되야 인증필요되니까 따로
+				if (failCount < 30) {
 
 					dao.increaseFailCount(loginDto.getId());
 				}
 
-				// 실패횟수 5되면 인증필요 체크하기
-				if (failCount + 1 >= 5) {
+				// 실패횟수 30되면 인증필요 체크하기
+				if (failCount + 1 >= 30) {
 					dao.setRequiresVerification(loginDto.getId());
-					result.put("auth", true);
 				}
 			}
 			result.put("success", false);
@@ -97,6 +147,7 @@ public class AccountServiceImpl implements AccountService {
 		if (!requiresVerification) { // 로그인 성공
 			// 마지막 로그인일자 갱신
 			dao.setLoginTime(account.getUid());
+			failedMap.remove(loginDto.getId());
 			
 			if (loginDto.getAutoLogin() != null) { // 자동로그인
 				dao.setAutoLogin(loginDto);

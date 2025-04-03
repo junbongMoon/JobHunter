@@ -25,34 +25,14 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
         // AJAX, Fetch, Axios 등 체크
         boolean isAsync = isAsyncOrApiRequest(request); 
         
-        // 로그인 안 한 경우
-        if (account == null) {
+        // 로그인 안 했거나 인증이 필요할 때
+        if (account == null || "Y".equals(account.getRequiresVerification())) {
             RedirectUtil.saveRedirectUrl(request, session);
             
-            String loginUrl = request.getContextPath() + "/account/login/return";
-            
-            if (isAsync) {
-                response.setContentType("application/json; charset=UTF-8");
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write("{\"status\": \"NEED_LOGIN\", \"redirect\": \"" + loginUrl + "\"}");
+            if (isAsync) { // 비동기면 에러코드 보내서 뷰단에서 알아서 로그인페이지로 보내도록 유도
                 NeedLoginException.writeToResponse(response, request.getContextPath());
             } else {
-                response.sendRedirect(loginUrl);
-            }
-            
-            return false;
-        }
-
-        // 인증 필요 여부 체크
-        if ("Y".equals(account.getRequiresVerification())) {
-        	String redirectUrl = request.getContextPath() + "/account/login?requireVerification=true";
-
-            if (isAsync) {
-                response.setContentType("application/json; charset=UTF-8");
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write("{\"status\": \"NEED_VERIFICATION\", \"redirect\": \"" + redirectUrl + "\"}");
-            } else {
-                response.sendRedirect(redirectUrl);
+                response.sendRedirect(request.getContextPath() + "/account/login");
             }
             
             return false;
