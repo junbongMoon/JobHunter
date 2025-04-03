@@ -121,6 +121,7 @@
     <!-- 이력서별 업직종 정보 조회 -->
     <select id="selectResumeSubCategory" parameterType="int" resultType="com.jobhunter.model.resume.SubCategoryVO">
         SELECT 
+            sc.subcategoryNo,
             sc.jobName,
             sc.refMajorcategoryNo as majorcategoryNo
         FROM jobtype_resume_sub jrs
