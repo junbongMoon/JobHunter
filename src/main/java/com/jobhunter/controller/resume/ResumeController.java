@@ -244,7 +244,7 @@ public class ResumeController {
 	// 이력서 수정 처리
 	@PostMapping("/update/{resumeNo}")
 	@ResponseBody
-	public ResponseEntity<?> updateResume(@PathVariable int resumeNo, @RequestBody ResumeDTO resumeDTO) {
+	public ResponseEntity<Map<String, Object>> updateResume(@PathVariable int resumeNo, @RequestBody ResumeDTO resumeDTO) {
 		try {
 			resumeDTO.setResumeNo(resumeNo);
 			resumeService.updateResume(resumeDTO);
