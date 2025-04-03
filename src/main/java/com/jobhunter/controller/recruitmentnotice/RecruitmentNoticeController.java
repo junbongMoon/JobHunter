@@ -3,7 +3,6 @@ package com.jobhunter.controller.recruitmentnotice;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,9 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
@@ -57,21 +52,20 @@ public class RecruitmentNoticeController {
 	private final List<ApplicationDTO> applicationList = new ArrayList<>();
 
 	// 게시글 작성시 업로드한 파일객체들을 임시로 저장
-	private List<RecruitmentnoticeBoardUpfiles> fileList = new ArrayList<RecruitmentnoticeBoardUpfiles>();
+	private List<RecruitmentnoticeBoardUpfiles> fileList = new ArrayList<>();
 	// 게시글 수정시 업로한 파일 객체들을 임시로 저장
-	private List<RecruitmentnoticeBoardUpfiles> modifyFileList;
+	private List<RecruitmentnoticeBoardUpfiles> modifyFileList = new ArrayList<>();
 	private final RecruitmentFileProcess fp;
 
 	// 회사가 공고를 등록하는 메서드
 	@PostMapping("/save")
 	public String saveRecruitment(@ModelAttribute RecruitmentNoticeDTO dto) {
 		boolean result = false;
-		List<ApplicationDTO> appList = new ArrayList<>();
-		List<AdvantageDTO> advList = new ArrayList<>();
+		
 
 		System.out.println("DTO 확인: " + dto);
 
-		ObjectMapper objectMapper = new ObjectMapper();
+		
 
 		if (dto.getDueDateForString() != null && !dto.getDueDateForString().isEmpty()) {
 	        LocalDate date = LocalDate.parse(dto.getDueDateForString());
@@ -266,6 +260,7 @@ public class RecruitmentNoticeController {
 			
 			
 			model.addAttribute("RecruitmentDetailInfo", detailInfo);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -278,6 +273,10 @@ public class RecruitmentNoticeController {
 			returnPage = "recruitmentnotice/detail";
 		}else if(req.getRequestURI().contains("modify")) {
 			returnPage = "recruitmentnotice/modify";
+		}
+		
+		if (returnPage.equals("")) {
+		    returnPage = "redirect:/recruitmentnotice/listAll?status=fail";
 		}
 
 		return returnPage;

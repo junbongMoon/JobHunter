@@ -215,6 +215,7 @@ $(document).on("click", ".save-method-btn", function () {
   // 상세 정보는 입력하지 않아도 된다.
 
   saveApplication(method, detail);
+  
  
 
 });
@@ -276,6 +277,8 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 	});
 	
 	instalRecruitment();
+
+	instalSelectOptions();
 
 	});
 
@@ -733,6 +736,28 @@ if (workDetailType) {
 return result;
 }
 
+function instalSelectOptions(){
+
+	// 셀렉트 리스트 들
+	let majorCategoryList = $('#MajorCategory');
+	let subCategoryList = $('#SubCategory');
+	let regionList = $('#regionList');
+	let sigunguList = $('#sigunguList');
+
+	// 셀렉트 리스트에 넣을 변수
+	const regionNo = '${RecruitmentDetailInfo.region.regionNo}';
+	const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';
+	const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}'
+	const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}'
+
+	majorCategoryList.each((i, e)=> 
+	if(e.val() = majorcategoryNo){
+		
+	}
+)
+
+
+}
 
 
 
