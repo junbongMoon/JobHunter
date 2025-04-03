@@ -1,83 +1,78 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>면접 후 게시판</title>
 <style>
-/* 전체 배경 및 기본 글꼴 설정 */
 
-body {
-  font-family: 'Segoe UI', sans-serif; /* 기본 글꼴 */
-  background-color: #f4f4f4;            /* 페이지 배경색 */
-  margin: 0;
-  padding: 0;
-}
 
-/* 페이지 제목 스타일 */
 h2 {
-  text-align: center;      /* 가운데 정렬 */
-  margin-top: 40px;        /* 위쪽 여백 */
-  color: #333;             /* 글자색 (어두운 회색) */
+  text-align: center;
+  margin-top: 40px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #2c3e50;
 }
 
-/* 글쓰기 버튼 스타일 */
-.btn-write {
-  display: block;               /* 블록 요소로 설정 */
-  width: 120px;                 /* 버튼 너비 */
-  margin: 20px auto;            /* 위아래 여백 + 가운데 정렬 */
-  padding: 10px 20px;           /* 내부 여백 */
-  background-color: #007BFF;    /* 배경 파란색 */
-  color: white;                 /* 글자색 흰색 */
-  text-align: center;           /* 텍스트 가운데 정렬 */
-  text-decoration: none;        /* 밑줄 제거 */
-  border: none;                 /* 테두리 제거 */
-  border-radius: 6px;           /* 버튼 모서리 둥글게 */
-  font-weight: bold;            /* 글자 굵게 */
-  cursor: pointer;              /* 마우스 올리면 손모양 커서 */
-}
-
-/* 글쓰기 버튼 마우스 오버 시 색상 변경 */
-.btn-write:hover {
-  background-color: #0056b3;    /* 더 진한 파란색 */
-}
-
-/* 테이블을 감싸는 부모 영역 */
 .table-container {
-  width: 100%;                  /* 가로폭 100% */
-  max-width: 1000px;            /* 최대 너비 제한 */
-  margin: auto;                 /* 가운데 정렬 */
-  /* overflow-x: auto; ← 이 부분 제거하면 가로 스크롤 없음 */
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  font-size: 15px;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
-/* 테이블 기본 스타일 */
-table {
-  width: 100%;                  /* 테이블 전체 너비 */
-  table-layout: fixed;          /* 열 너비 고정 (비율에 따라 정렬됨) */
-  border-collapse: collapse;    /* 셀 테두리 겹치기 */
-  background-color: white;      /* 배경 흰색 */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+.table-container th, .table-container td {
+  padding: 12px 16px;
+  text-align: center;
+  border-bottom: 1px solid #dee2e6;
 }
 
-/* 테이블 헤더 및 데이터 셀 스타일 */
-th, td {
- padding: 12px 8px;               /* 셀 안 여백 */
-  border-bottom: 1px solid #ddd;
-  text-align: center;              /* 가로 가운데 정렬 */
-  vertical-align: middle;          /* 세로 가운데 정렬 */
-  word-wrap: break-word;        /* 긴 텍스트 줄바꿈 허용 */
+.table-container th {
+  background-color: #2c3e50;
+  color: white;
+  font-weight: bold;
 }
 
-/* 테이블 헤더 배경 및 글자색 */
-th {
-  background-color: 3d4d6a;  /* 파란 배경 */
-  color: white;                 /* 흰색 글자 */
+.table-container td a {
+  color: #0d6efd;
+  text-decoration: none;
 }
 
+.table-container td a:hover {
+  text-decoration: underline;
+}
 
+.table-container tr:hover {
+  background-color: #f8f9fa;
+}
+
+.postDate {
+  white-space: nowrap;
+}
+
+.btn-write {
+  display: block;
+  margin: 30px auto;
+  padding: 10px 30px;
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-write:hover {
+  background-color: #0b5ed7;
+}
 </style>
 </head>
 <body>
@@ -95,15 +90,17 @@ th {
 			<th>회사</th>
 			<th>좋아요</th>
 			<th>조회수</th>
+			<th>등록날짜<th>
 		</tr>
 		<c:forEach var="board" items="${board}">
 			<tr>
 				<td>${board.boardNo}</td>
 				<td>${board.writer}</td>
-				<td><a href="/reviewBoard/detail?boardNo=${reviewBoard.boardNo}">
+				<td><a href="/reviewBoard/detail?boardNo=${board.boardNo}">
 				${board.companyName}</a></td>
 				<td>${board.likes}</td>
 				<td>${board.views}</td>
+				<td class="postDate()">${board.postDate}</td>
 			</tr>
 		</c:forEach>
 	</table>
@@ -113,5 +110,29 @@ th {
 		<!-- 글쓰기 버튼 -->
 	<button onclick="location.href='/reviewBoard/write'" class="btn-write">글
 		작성</button>
+		
+		<script >
+		function postDate() {
+			  const now = new Date();  // 현재 시간
+			  const postTime = new Date(createdAt);  // 글 작성 시간
+			  const milli = now - postTime;  // 밀리초 차이
+			  const sec = Math.floor(milli / 1000);  // 초로 변환
+
+			  if (sec < 60) return sec;
+
+			  const min = Math.floor(sec / 60);  // 분
+			  if (min < 60) return min;
+
+			  const hr = Math.floor(min / 60);  // 시간
+			  if (hr < 24) return hr;
+
+			  const day = Math.floor(hr / 24);  // 일
+			  if (day < 7) return day;
+
+			  // 오래된 글은 날짜 출력
+			  return postTime.toLocaleString();
+			}
+		
+		</script>
 </body>
 </html>
