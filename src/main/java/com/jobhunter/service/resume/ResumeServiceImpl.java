@@ -34,7 +34,7 @@ public class ResumeServiceImpl implements ResumeService {
 	@Transactional
 	public void finalSaveResume(ResumeDTO resumeDTO) throws Exception {
 		rdao.insertResumeFinal(resumeDTO); // resumeNo 세팅
-
+		// 아래 저장하는 코드 재사용 가능하게 묶기(?)
 		// 고용형태 저장
 		if (resumeDTO.getJobForms() != null && !resumeDTO.getJobForms().isEmpty()) {
 			for (JobFormDTO jobForm : resumeDTO.getJobForms()) {
