@@ -137,7 +137,8 @@
 								<div class="form-check form-check-inline">
 									<input class="form-check-input" type="radio" name="payType"
 										value="협의 후 결정" id="negotiable"
-										${resumeDetail.resume.payType=='협의 후 결정' ? 'checked' : '' }>
+										${resumeDetail.resume.payType=='협의 후 결정' ? 'checked'
+												: '' }>
 									<label class="form-check-label" for="negotiable">협의 후
 										결정</label>
 								</div>
@@ -147,7 +148,8 @@
 							<input type="text" class="form-control text-end" id="payAmount"
 								name="pay" placeholder="금액 입력(숫자만 입력 가능해요)" maxlength="11"
 								value="${resumeDetail.resume.pay}"
-								${resumeDetail.resume.payType=='협의 후 결정' ? 'disabled' : '' }>
+								${resumeDetail.resume.payType=='협의 후 결정'
+										? 'disabled' : '' }>
 							<span class="ms-2">원</span>
 						</div>
 					</div>
@@ -237,7 +239,13 @@
 						<div class="col-md-4">
 							<label class="form-label">선택한 업직종</label>
 							<div id="selectedJobTypes" class="mt-2">
-								<c:forEach var="selectedJob" items="${selectedSubcategory}">
+								<!-- 디버깅 -->
+								<!-- <c:if test="${empty selectedSubCategory}">
+									<script>
+										console.log('selectedSubCategory가 없음;');
+									</script>
+								</c:if> -->
+								<c:forEach var="selectedJob" items="${selectedSubCategory}">
 									<span class="badge bg-primary me-2"
 										data-major="${selectedJob.majorCategoryNo}"
 										data-sub="${selectedJob.subcategoryNo}">
@@ -660,14 +668,14 @@ input[type="date"] {
 }
 
 input[type="date"]:focus {
-	border-color: var(- -accent-color);
+	border-color: var(--accent-color);
 	box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
 }
 
 /* 제목 스타일 */
 h2 {
-	color: var(- -heading-color);
-	font-family: var(- -heading-font);
+	color: var(--heading-color);
+	font-family: var(--heading-font);
 	font-weight: 600;
 	margin-bottom: 2rem;
 	position: relative;
@@ -681,7 +689,7 @@ h2:after {
 	bottom: 0;
 	width: 50px;
 	height: 3px;
-	background: var(- -accent-color);
+	background: var(--accent-color);
 }
 
 /* 카드 스타일 */
@@ -699,7 +707,7 @@ h2:after {
 
 /* 카드 헤더 스타일 */
 .card-header {
-	background: var(- -heading-color);
+	background: var(--heading-color);
 	color: white;
 	font-weight: 600;
 	padding: 0.75rem 1rem;
@@ -723,7 +731,7 @@ h2:after {
 }
 
 .form-control:focus, .form-select:focus {
-	border-color: var(- -accent-color);
+	border-color: var(--accent-color);
 	box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
 }
 
@@ -742,12 +750,12 @@ h2:after {
 }
 
 .btn-primary {
-	background: var(- -accent-color);
+	background: var(--accent-color);
 	border: none;
 }
 
 .btn-primary:hover {
-	background: color-mix(in srgb, var(- -accent-color), transparent 15%);
+	background: color-mix(in srgb, var(--accent-color), transparent 15%);
 	transform: translateY(-2px);
 }
 
@@ -772,7 +780,7 @@ h2:after {
 
 /* 파일 업로드 영역 스타일 */
 #fileContainer {
-	border: 2px dashed var(- -accent-color);
+	border: 2px dashed var(--accent-color);
 	border-radius: 12px;
 	padding: 2rem;
 	text-align: center;
@@ -826,7 +834,7 @@ h2:after {
 }
 
 .list-group-item.selected {
-	background: var(- -accent-color);
+	background: var(--accent-color);
 	color: white;
 }
 
@@ -848,7 +856,7 @@ h2:after {
 }
 
 .modal-header {
-	background: var(- -heading-color);
+	background: var(--heading-color);
 	color: white;
 	border-radius: 12px 12px 0 0;
 	padding: 1.5rem;
@@ -881,16 +889,16 @@ h2:after {
 }
 
 ::-webkit-scrollbar-thumb {
-	background: var(- -accent-color);
+	background: var(--accent-color);
 	border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background: color-mix(in srgb, var(- -accent-color), transparent 15%);
+	background: color-mix(in srgb, var(--accent-color), transparent 15%);
 }
 
 /* 반응형 스타일 */
-@media ( max-width : 768px) {
+@media (max-width: 768px) {
 	.container {
 		padding: 1rem;
 	}
@@ -922,7 +930,7 @@ h2:after {
 }
 
 #title:focus {
-	border-color: var(- -accent-color);
+	border-color: var(--accent-color);
 	box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
 }
 
@@ -934,7 +942,14 @@ h2:after {
 
 .input-group-text i {
 	font-size: 1.2rem;
-	color: var(- -accent-color);
+	color: var(--accent-color);
+}
+
+/* CSS 변수 정의 */
+:root {
+	--accent-color: #47B2E4;
+	--heading-color: #37517E;
+	--heading-font: 'Poppins', sans-serif;
 }
 </style>
 
@@ -978,7 +993,8 @@ h2:after {
 										value: sigungu.sigunguNo,
 										id: "sigungu_" + sigungu.sigunguNo,
 										"data-name": sigungu.name,
-										"data-region": regionNo // 시/도 번호 저장
+										"data-region": regionNo,
+										"data-sigungu": sigungu.sigunguNo // 시/군/구 번호 추가
 									});
 
 								// 라벨 생성
@@ -995,7 +1011,7 @@ h2:after {
 								// 체크박스 상태 변경 이벤트
 								$checkbox.on("change", function () {
 									let selectedRegions = $("#selectedRegions");
-									let sigunguNo = $(this).val();
+									let sigunguNo = $(this).data("sigungu");
 									let sigunguName = $(this).data("name");
 									let currentRegion = $(this).data("region");
 									let regionName = $(".region-item.selected").text().replace("▶", "").trim();
@@ -1013,9 +1029,24 @@ h2:after {
 											// 삭제 버튼 생성 및 삭제 기능
 											let $removeBtn = $("<button>")
 												.addClass("btn-close ms-2")
-												.on("click", function () {
+												.attr("type", "button")  // type="button" 추가
+												.on("click", function (e) {
+													e.preventDefault();
+													e.stopPropagation();
+													
+													const $badge = $(this).parent();
+													const sigunguNo = $badge.data("sigungu");
+													const regionName = $badge.text().trim().split(' ')[1];
+													
 													$badge.remove();
-													$("#sigungu_" + sigunguNo).prop("checked", false);
+													$(`input[data-sigungu="${sigunguNo}"]`).prop("checked", false);
+													
+													// 해당 텍스트와 일치하는 체크박스 찾아서 해제
+													$('.sigungu-item input[type="checkbox"]').each(function() {
+														if ($(this).data('name') === regionName) {
+															$(this).prop('checked', false);
+														}
+													});
 												});
 
 											$badge.append($removeBtn);
@@ -1089,7 +1120,8 @@ h2:after {
 										value: sub.subcategoryNo,
 										id: "sub_" + sub.subcategoryNo,
 										"data-name": sub.jobName,
-										"data-major": majorNo // 대분류 번호 저장
+										"data-major": majorNo,
+										"data-sub": sub.subcategoryNo // 소분류 번호 추가
 									});
 
 								// 라벨 생성
@@ -1106,7 +1138,7 @@ h2:after {
 								// 체크박스 상태 변경
 								$checkbox.on("change", function () {
 									let selectedJobTypes = $("#selectedJobTypes");
-									let subNo = $(this).val();
+									let subNo = $(this).data("sub");
 									let subName = $(this).data("name");
 									let currentMajor = $(this).data("major");
 
@@ -1117,14 +1149,26 @@ h2:after {
 											let $badge = $("<span>")
 												.addClass("badge bg-primary me-2")
 												.text(subName)
-												.attr("data-major", majorNo); // 대분류 정보 저장
+												.attr("data-major", majorNo)
+												.attr("data-sub", subNo);
 
 											// 삭제 버튼 생성 및 삭제 기능
 											let $removeBtn = $("<button>")
 												.addClass("btn-close ms-2")
-												.on("click", function () {
+												.attr("type", "button")  // type="button" 추가
+												.on("click", function (e) {
+													e.preventDefault();
+													e.stopPropagation();
+													
+													const $badge = $(this).parent();
+													const subNo = $badge.data("sub");
+													const majorNo = $badge.data("major");
+													
 													$badge.remove();
-													$("#sub_" + subNo).prop("checked", false);
+													
+													// 해당 대분류의 체크박스 중에서 subNo와 일치하는 것을 찾아 해제
+													$(`.major-item[data-major="${majorNo}"]`).trigger('click');
+													$(`input[data-sub="${subNo}"]`).prop("checked", false);
 												});
 
 											$badge.append($removeBtn);
@@ -1132,7 +1176,7 @@ h2:after {
 										} else {
 											// 체크박스가 해제되면 선택된 업직종 목록에서 제거
 											selectedJobTypes.find(".badge").each(function () {
-												if ($(this).text().trim() === subName && $(this).data("major") === majorNo) {
+												if ($(this).data("sub") === subNo) {
 													$(this).remove();
 												}
 											});
@@ -1145,7 +1189,7 @@ h2:after {
 
 								// 이미 선택된 소분류인 경우 체크박스 체크
 								$("#selectedJobTypes").find(".badge").each(function () {
-									if ($(this).text().trim() === sub.jobName && $(this).data("major") === majorNo) {
+									if ($(this).data("sub") === sub.subcategoryNo) {
 										$checkbox.prop("checked", true);
 										return false; // each 중단
 									}
@@ -1318,8 +1362,7 @@ h2:after {
 							return $(this).data("sigungu");
 						}).get(),
 						subcategoryNos: $('#selectedJobTypes').find('.badge').map(function () {
-							let subName = $(this).text().trim();
-							return $('input[data-name="' + subName + '"]').val();
+							return $(this).data("sub");
 						}).get(),
 						merits: $('#selectedMerits').find('.badge').map(function () {
 							return {
@@ -1505,8 +1548,7 @@ h2:after {
 							return $(this).data("sigungu");
 						}).get(),
 						subcategoryNos: $('#selectedJobTypes').find('.badge').map(function () {
-							let subName = $(this).text().trim();
-							return $('input[data-name="' + subName + '"]').val();
+							return $(this).data("sub");
 						}).get(),
 						merits: $('#selectedMerits').find('.badge').map(function () {
 							return {
@@ -1916,11 +1958,14 @@ h2:after {
 				// -todoList-
 				// 로컬스토리지에 임시저장 기능 추가
 				//---------------------------------------------------------------------------------------------------------------------------------
+				// 페이지 로드 시 지역 선택 실행
+				initializeSelectedRegions();
+				
 				// 페이지 로드 시 선택된 지역에 대한 체크박스 처리
 				function initializeSelectedRegions() {
 					const $badges = $('#selectedRegions .badge');
 
-					// 이미 선택된 지역이 없으면 초기화 중단
+					// 이미 선택된 지역이 없으면 중단
 					if ($badges.length === 0) return;
 
 					// 선택된 지역들의 데이터 수집
@@ -1953,22 +1998,34 @@ h2:after {
 					});
 
 					// 삭제 버튼 이벤트 처리
-					$('#selectedRegions').on('click', '.btn-close', function () {
+					$('#selectedRegions').on('click', '.btn-close', function (e) {
+						e.preventDefault();
+						e.stopPropagation();
+						
 						const $badge = $(this).parent();
 						const sigunguNo = $badge.data('sigungu');
+						const regionName = $badge.text().trim().split(' ')[1]; // 띄어쓰기로 분리 (시/군/구 이름)
+						
 						$badge.remove();
 						$(`#sigungu_${sigunguNo}`).prop('checked', false);
+						
+						// 해당 텍스트와 일치하는 체크박스 찾아서 해제
+						$('.sigungu-item input[type="checkbox"]').each(function() {
+							if ($(this).data('name') === regionName) {
+								$(this).prop('checked', false);
+							}
+						});
 					});
 				}
-
-				// 페이지 로드 시 지역 선택 초기화 실행
-				initializeSelectedRegions();
 				//---------------------------------------------------------------------------------------------------------------------------------
+				// 페이지 로드 시 업직종 선택 실행
+				initializeSelectedJobTypes();
+
 				// 페이지 로드 시 선택된 업직종에 대한 체크박스 처리
 				function initializeSelectedJobTypes() {
 					const $badges = $('#selectedJobTypes .badge');
 
-					// 이미 선택된 업직종이 없으면 초기화 중단
+					// 이미 선택된 업직종이 중단
 					if ($badges.length === 0) return;
 
 					// 선택된 업직종들의 데이터 수집
@@ -1976,18 +2033,14 @@ h2:after {
 					$badges.each(function () {
 						const majorNo = $(this).data('major');
 						const subNo = $(this).data('sub');
-						const jobName = $(this).text().trim();
 						if (!selectedJobTypes.has(majorNo)) {
 							selectedJobTypes.set(majorNo, []);
 						}
-						selectedJobTypes.get(majorNo).push({
-							subNo: subNo,
-							jobName: jobName
-						});
+						selectedJobTypes.get(majorNo).push(subNo);
 					});
 
 					// 각 대분류에 대해 한 번만 클릭 이벤트 발생
-					selectedJobTypes.forEach(function (jobs, majorNo) {
+					selectedJobTypes.forEach(function (subNos, majorNo) {
 						const $majorItem = $(`.major-item[data-major="${majorNo}"]`);
 						$majorItem.trigger('click');
 
@@ -1996,10 +2049,10 @@ h2:after {
 							url: "/resume/getSubCategory",
 							type: "GET",
 							data: { majorNo: majorNo },
+
 							success: function () {
-								for (let i = 0; i < jobs.length; i++) {
-									const job = jobs[i];
-									$(`#sub_${job.subNo}`).prop('checked', true);
+								for (let i = 0; i < subNos.length; i++) {
+									$(`#sub_${subNos[i]}`).prop('checked', true);
 								}
 							}
 						});
@@ -2009,10 +2062,20 @@ h2:after {
 					$('#selectedJobTypes').on('click', '.btn-close', function () {
 						const $badge = $(this).parent();
 						const subNo = $badge.data('sub');
+						const jobName = $badge.text().trim(); // 배지의 텍스트 가져오기
 						$badge.remove();
 						$(`#sub_${subNo}`).prop('checked', false);
+						
+						// 해당 텍스트와 일치하는 체크박스 찾아서 해제
+						$('.sub-item input[type="checkbox"]').each(function() {
+							const checkboxText = $(this).data('name');
+							if (checkboxText === jobName) {
+								$(this).prop('checked', false);
+							}
+						});
 					});
 				}
-				initializeSelectedJobTypes();
+
+				
 			});
 		</script>
