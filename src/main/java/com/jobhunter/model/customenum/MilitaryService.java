@@ -5,7 +5,8 @@ package com.jobhunter.model.customenum;
  */
 public enum MilitaryService {
     NOT_SERVED, // 미필
-    SERVED,     // 군필
-    EXEMPTED    // 면제
+    SERVED, // 군필
+    EXEMPTED, // 면제
+    COMPLETED, // 임시_추후 회의통해 DB 통일 후 삭제 필요
+    NOT_COMPLETED // 임시_추후 회의통해 DB 통일 후 삭제 필요
 }
-
