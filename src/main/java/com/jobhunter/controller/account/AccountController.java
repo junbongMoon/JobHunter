@@ -34,11 +34,13 @@ public class AccountController {
 	public String redirectToLogin(HttpServletRequest request, HttpSession session) {
 
 		String redirectUrl = (String) session.getAttribute("redirectUrl");
+		System.out.println("redirectUrl : " + redirectUrl);
 		if (redirectUrl == null) {
 			String referer = request.getHeader("Referer");
 			if (referer == null) {
 				session.setAttribute("redirectUrl", referer);
 			}
+			System.out.println("referer : " + referer);
 		}
 
 		// 로그인버튼 눌러서 들어왔을때 초기상태 유지+로그인으로 인증 건너뛰기 막는용 로그인데이터도 클린
@@ -56,7 +58,7 @@ public class AccountController {
 	public String showLoginForm(HttpServletRequest request, HttpSession session,
 			@RequestParam(value = "redirect", required = false) String redirect) {
 
-		System.out.println(session.getAttribute("redirectUrl"));
+		System.out.println("가야할 곳" + session.getAttribute("redirectUrl"));
 		// 인증 성공하면 세션 정리
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		if (account != null) {
@@ -80,15 +82,13 @@ public class AccountController {
 
 		// 자동로그인용 세팅
 		String sessionId = session.getId();
-		if (loginDto.getAutoLogin() != null && loginDto.getAutoLogin().equals("on")) {
-			loginDto.setAutoLogin(sessionId);
-		}
+		
 		
 		// auth로그인인터셉터에서 쿼리스트링에 requireVerification=true 식으로 인증필요여부 들고옴
 		// auth로그인인터셉터에서 이전페이지나 가려던 페이지(get방식만) uri+쿼리 세션에 넣어둠
 		Map<String, Object> result = null;
 		try {
-			result = accountService.loginAccount(loginDto);
+			result = accountService.loginAccount(loginDto, sessionId);
 			
 			if (result.get("remainingSeconds") != null) {
 			    int remainingSeconds = (int) result.get("remainingSeconds");
@@ -137,10 +137,17 @@ public class AccountController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		String queryStr = "?error=true&accountType=" + loginDto.getAccountType();
+		
+		if (loginDto.isRemember()) {
+			queryStr += "&autoLogin=true";
+		}
+		
 		// 로그인 실패시 세션 청소하고 다시 로그인페이지 로딩(인증 필요한지 체크용)
 		session.removeAttribute("requiresVerification");
 		session.removeAttribute("account");
-		return "redirect:/account/login?error=true&accountType=" + loginDto.getAccountType() + "&autoLogin=" + loginDto.getAutoLogin();
+		return "redirect:/account/login" + queryStr;
 	}
 
 	@GetMapping("/logout")

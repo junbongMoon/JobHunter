@@ -8,7 +8,7 @@ import com.jobhunter.model.customenum.AccountType;
 
 public interface AccountService {
 	
-	Map<String, Object> loginAccount(LoginDTO loginDto) throws Exception;
+	Map<String, Object> loginAccount(LoginDTO loginDto, String sessionId) throws Exception;
 	
 	void setRequiresVerificationFalse(String type, String value, AccountType userType) throws Exception;
 
