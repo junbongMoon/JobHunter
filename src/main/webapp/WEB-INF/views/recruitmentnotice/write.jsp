@@ -121,7 +121,7 @@ $(document).on("click", "#goToListBtn", function () {
     </div>
   `;
 
-  if (selectedWorkType === "PARTTIME") {
+  if (selectedWorkType === "PART_TIME") {
     if ($("#phoneOption").length === 0 && $("#textOption").length === 0) {
       $("#application-methods").append(phoneAndTextHtml);
     }
@@ -864,28 +864,33 @@ label {
 										<div class="d-flex flex-wrap gap-3">
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType1" value="FULLTIME"> <label
+													name="workType" id="workType1" value="FULL_TIME"> <label
 													class="form-check-label mb-2" for="workType1">정규직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType2" value="NONREGULAR">
-												<label class="form-check-label mb-2" for="workType2">비정규직</label>
+													name="workType" id="workType2" value="CONTRACT">
+												<label class="form-check-label mb-2" for="workType2">계약직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType3" value="APPOINT"> <label
+													name="workType" id="workType3" value="COMMISSION"> <label
 													class="form-check-label mb-2" for="workType3">위촉직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType4" value="PARTTIME"> <label
+													name="workType" id="workType4" value="PART_TIME"> <label
 													class="form-check-label mb-2" for="workType4">아르바이트</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType5" value="FREELANCER">
+													name="workType" id="workType5" value="FREELANCE">
 												<label class="form-check-label mb-2" for="workType5">프리랜서</label>
+											</div>
+											<div class="form-check">
+												<input class="form-check-input workType" type="radio"
+													name="workType" id="workType6" value="DISPATCH">
+												<label class="form-check-label mb-2" for="workType5">파견직</label>
 											</div>
 										</div>
 									</div>

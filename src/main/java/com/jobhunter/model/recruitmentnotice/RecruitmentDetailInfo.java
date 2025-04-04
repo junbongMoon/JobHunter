@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.jobhunter.model.category.MajorCategory;
 import com.jobhunter.model.category.SubCategory;
+import com.jobhunter.model.customenum.JobForm;
 import com.jobhunter.model.customenum.MilitaryService;
 import com.jobhunter.model.region.Region;
 import com.jobhunter.model.region.Sigungu;
@@ -25,7 +26,7 @@ public class RecruitmentDetailInfo {
 	// 아직
 	private int uid;
 	private String title;
-	private String workType;
+	private JobForm workType;
 	private String payType;
 	private int pay;
 	private String period;

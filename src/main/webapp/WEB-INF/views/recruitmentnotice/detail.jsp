@@ -200,15 +200,17 @@ h3 {
 											<p class="mb-1 fw-semibold" id="workType">
 												<c:choose>
 													<c:when
-														test="${RecruitmentDetailInfo.workType eq 'FULLTIME'}">정규직</c:when>
+														test="${RecruitmentDetailInfo.workType eq 'FULL_TIME'}">정규직</c:when>
 													<c:when
-														test="${RecruitmentDetailInfo.workType eq 'NONREGULAR'}">비정규직</c:when>
+														test="${RecruitmentDetailInfo.workType eq 'CONTRACT'}">계약직</c:when>
 													<c:when
-														test="${RecruitmentDetailInfo.workType eq 'APPOINT'}">위촉직</c:when>
+														test="${RecruitmentDetailInfo.workType eq 'COMMISSION'}">위촉직</c:when>
 													<c:when
-														test="${RecruitmentDetailInfo.workType eq 'PARTTIME'}">아르바이트</c:when>
+														test="${RecruitmentDetailInfo.workType eq 'PART_TIME'}">아르바이트</c:when>
 													<c:when
-														test="${RecruitmentDetailInfo.workType eq 'FREELANCER'}">프리랜서</c:when>
+														test="${RecruitmentDetailInfo.workType eq 'FREELANCE'}">프리랜서</c:when>
+														<c:when
+														test="${RecruitmentDetailInfo.workType eq 'DISPATCH'}">파견직</c:when>
 													<c:otherwise>기타</c:otherwise>
 												</c:choose>
 											</p>

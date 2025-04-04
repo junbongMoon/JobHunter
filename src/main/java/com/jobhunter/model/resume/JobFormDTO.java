@@ -1,5 +1,7 @@
 package com.jobhunter.model.resume;
 
+import com.jobhunter.model.customenum.JobForm;
+
 import lombok.Data;
 
 @Data
