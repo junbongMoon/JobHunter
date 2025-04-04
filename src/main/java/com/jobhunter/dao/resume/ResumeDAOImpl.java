@@ -15,8 +15,12 @@ import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
+import com.jobhunter.model.resume.ResumeUpfileDTO;
+import com.jobhunter.model.resume.ResumeVO;
 import com.jobhunter.model.resume.SigunguDTO;
+import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
+import com.jobhunter.model.resume.SubCategoryVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,10 +32,6 @@ public class ResumeDAOImpl implements ResumeDAO {
 
 	private static final String NS = "com.jobhunter.mapper.resumemapper";
 
-	@Override
-	public void insertResumeTemp(ResumeDTO resumeDTO) {
-		ses.insert(NS + ".insertResumeTemp", resumeDTO);
-	}
 
 	@Override
 	public void insertResumeFinal(ResumeDTO resumeDTO) {
@@ -100,10 +100,119 @@ public class ResumeDAOImpl implements ResumeDAO {
 		ses.insert(NS + ".insertLicense", licenseDTO);
 	}
 	
-	
-	
-	
-	
+	@Override
+	public void insertResumeUpfile(ResumeUpfileDTO resumeUpfileDTO) throws Exception {
+		ses.insert(NS + ".insertResumeUpfile", resumeUpfileDTO);
+	}
 
+	@Override
+	public List<ResumeVO> selectResumeList(int userUid, int page, int pageSize) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("userUid", userUid);
+		params.put("offset", (page - 1) * pageSize);
+		params.put("pageSize", pageSize);
+		return ses.selectList(NS + ".selectResumeList", params);
+	}
 
+	@Override
+	public int selectTotalResumes(int userUid) throws Exception {
+		return ses.selectOne(NS + ".selectTotalResumes", userUid);
+	}
+
+	@Override
+	public List<SigunguVO> selectResumeSigungu(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeSigungu", resumeNo);
+	}
+
+	@Override
+	public List<SubCategoryVO> selectResumeSubCategory(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeSubCategory", resumeNo);
+	}
+	
+	// 이력서 삭제
+	@Override
+	public List<ResumeUpfileDTO> selectResumeUpfile(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeUpfile", resumeNo);
+	}
+
+	@Override
+	public void deleteResume(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteResume", resumeNo);
+	}
+	
+	// 이력서 상세 조회
+	@Override
+	public ResumeDTO selectResumeDetail(int resumeNo) throws Exception {
+		return ses.selectOne(NS + ".selectResumeDetail", resumeNo);
+	}
+
+	@Override
+	public List<JobFormDTO> selectResumeJobForms(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeJobForms", resumeNo);
+	}
+
+	@Override
+	public List<MeritDTO> selectResumeMerits(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeMerits", resumeNo);
+	}
+
+	@Override
+	public List<EducationDTO> selectResumeEducations(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeEducations", resumeNo);
+	}
+
+	@Override
+	public List<PersonalHistoryDTO> selectResumeHistories(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeHistories", resumeNo);
+	}
+
+	@Override
+	public List<LicenseDTO> selectResumeLicenses(int resumeNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeLicenses", resumeNo);
+	}
+
+	@Override
+	public void updateResume(ResumeDTO resumeDTO) throws Exception {
+		ses.update(NS + ".updateResume", resumeDTO);
+	}
+
+	@Override
+	public void deleteJobForms(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteJobForms", resumeNo);
+	}
+
+	@Override
+	public void deleteMerits(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteMerits", resumeNo);
+	}
+
+	@Override
+	public void deleteResumeSigungu(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteResumeSigungu", resumeNo);
+	}
+
+	@Override
+	public void deleteResumeSubCategory(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteResumeSubCategory", resumeNo);
+	}
+
+	@Override
+	public void deleteEducations(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteEducations", resumeNo);
+	}
+
+	@Override
+	public void deleteHistories(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteHistories", resumeNo);
+	}
+
+	@Override
+	public void deleteLicenses(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteLicenses", resumeNo);
+	}
+
+	@Override
+	public void deleteResumeUpfiles(int resumeNo) throws Exception {
+		ses.delete(NS + ".deleteResumeUpfiles", resumeNo);
+	}
 }

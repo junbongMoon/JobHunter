@@ -23,7 +23,7 @@ public class ResumeDTO {
 	private int pay;
 	private String introduce;
 	private String saveType;
-	private int userUid = 1;
+	private int userUid;
 	
 	// 고용 형태 리스트
     private List<JobFormDTO> jobForms;
@@ -50,4 +50,15 @@ public class ResumeDTO {
     // 업직종 선택 리스트
     private List<Integer> majorcategoryNos;  // 대분류 번호
     private List<Integer> subcategoryNos;    // 소분류 번호
+
+    private List<SigunguDTO> sigunguList;
+    private List<SubCategoryDTO> subcategoryList;
+
+    public void setSigunguList(List<SigunguDTO> sigunguList) {
+        this.sigunguList = sigunguList;
+    }
+
+    public void setSubcategoryList(List<SubCategoryDTO> subcategoryList) {
+        this.subcategoryList = subcategoryList;
+    }
 }

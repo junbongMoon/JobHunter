@@ -4,12 +4,6 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.resumemapper">
 
-    <!-- 이력서 TEMP 저장 -->
-    <insert id="insertResumeTemp" parameterType="com.jobhunter.model.resume.ResumeDTO" useGeneratedKeys="true" keyProperty="resumeNo">
-        INSERT INTO resume (title, payType, pay, introduce, userUid, saveType)
-        VALUES (#{title}, #{payType}, #{pay}, #{introduce}, #{userUid}, 'TEMP');
-    </insert>
-
     <!-- 이력서 FINAL 저장 -->
     <insert id="insertResumeFinal" parameterType="com.jobhunter.model.resume.ResumeDTO" useGeneratedKeys="true" keyProperty="resumeNo">
         INSERT INTO resume (title, payType, pay, introduce, userUid, saveType)
@@ -69,20 +63,183 @@
 
     <!-- 학력 저장 -->
     <insert id="insertEducation" parameterType="com.jobhunter.model.resume.EducationDTO">
-        INSERT INTO education (educationLevel, educationStatus, customInput, resumeNo)
-        VALUES (#{educationLevel}, #{educationStatus}, #{customInput}, #{resumeNo});
+        INSERT INTO education (educationLevel, educationStatus, graduationDate, customInput, resumeNo)
+        VALUES (#{educationLevel}, #{educationStatus}, #{graduationDate}, #{customInput}, #{resumeNo});
     </insert>
 
     <!-- 경력 저장 -->
     <insert id="insertHistory" parameterType="com.jobhunter.model.resume.PersonalHistoryDTO">
-        INSERT INTO personalhistory (companyName, jobDescription, startDate, endDate, resumeNo)
-        VALUES (#{companyName}, #{jobDescription}, #{startDate}, #{endDate}, #{resumeNo});
+        INSERT INTO personalhistory (companyName, position, jobDescription, startDate, endDate, resumeNo)
+        VALUES (#{companyName}, #{position}, #{jobDescription}, #{startDate}, #{endDate}, #{resumeNo});
     </insert>
 
     <!-- 자격증 저장 -->
     <insert id="insertLicense" parameterType="com.jobhunter.model.resume.LicenseDTO">
-        INSERT INTO license (licenseName, acquisitionDate, resumeNo)
-        VALUES (#{licenseName}, #{acquisitionDate}, #{resumeNo});
+        INSERT INTO license (licenseName, acquisitionDate, institution, resumeNo)
+        VALUES (#{licenseName}, #{acquisitionDate}, #{institution}, #{resumeNo});
     </insert>
 
+    <!-- 파일 저장 -->
+    <insert id="insertResumeUpfile" parameterType="com.jobhunter.model.resume.ResumeUpfileDTO">
+        INSERT INTO resumeupfiles (originalFileName, newFileName, ext, size, base64Image, resumeNo)
+        VALUES (#{originalFileName}, #{newFileName}, #{ext}, #{size}, #{base64Image}, #{resumeNo});
+    </insert>
+
+    <!-- 이력서 기본 정보 조회 -->
+    <select id="selectResumeList" parameterType="map" resultType="com.jobhunter.model.resume.ResumeVO">
+        SELECT 
+            resumeNo,
+            title,
+            userUid,
+            saveType
+        FROM resume
+        WHERE userUid = #{userUid}
+        ORDER BY resumeNo DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 전체 이력서 수 조회 -->
+    <select id="selectTotalResumes" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM resume
+        WHERE userUid = #{userUid}
+    </select>
+
+    <!-- 이력서별 시군구 정보 조회 -->
+    <select id="selectResumeSigungu" parameterType="int" resultType="com.jobhunter.model.resume.SigunguVO">
+        SELECT 
+            sg.sigunguNo,
+            sg.name,
+            r.name as regionName,
+            r.regionNo
+        FROM where_resume_sigungu wrs
+        JOIN sigungu sg ON wrs.refSigunguNo = sg.sigunguNo
+        JOIN region r ON sg.regionNo = r.regionNo
+        WHERE wrs.refResumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서별 업직종 정보 조회 -->
+    <select id="selectResumeSubCategory" parameterType="int" resultType="com.jobhunter.model.resume.SubCategoryVO">
+        SELECT 
+            sc.subcategoryNo,
+            sc.jobName,
+            sc.refMajorcategoryNo as majorCategoryNo,
+            mc.jobName as majorCategoryName
+        FROM jobtype_resume_sub jrs
+        JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
+        JOIN majorcategory mc ON sc.refMajorcategoryNo = mc.majorcategoryNo
+        WHERE jrs.refResumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 삭제 -->
+    <delete id="deleteResume" parameterType="int">
+        DELETE FROM resume
+        WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 이력서 파일 조회 -->
+    <select id="selectResumeUpfile" parameterType="int" resultType="com.jobhunter.model.resume.ResumeUpfileDTO">
+        SELECT *
+        FROM resumeupfiles
+        WHERE resumeNo = #{resumeNo}
+    </select>
+    
+    <!-- 이력서 상세 정보 조회 -->
+    <select id="selectResumeDetail" parameterType="int" resultType="com.jobhunter.model.resume.ResumeDTO">
+        SELECT 
+            r.resumeNo,
+            r.title,
+            r.payType,
+            r.pay,
+            r.introduce,
+            r.userUid,
+            r.saveType
+        FROM resume r
+        WHERE r.resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 고용형태 조회 -->
+    <select id="selectResumeJobForms" parameterType="int" resultType="com.jobhunter.model.resume.JobFormDTO">
+        SELECT form
+        FROM jobform
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 성격 및 장점 조회 -->
+    <select id="selectResumeMerits" parameterType="int" resultType="com.jobhunter.model.resume.MeritDTO">
+        SELECT meritContent
+        FROM merit
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 학력 조회 -->
+    <select id="selectResumeEducations" parameterType="int" resultType="com.jobhunter.model.resume.EducationDTO">
+        SELECT educationLevel, educationStatus, graduationDate, customInput
+        FROM education
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 경력 조회 -->
+    <select id="selectResumeHistories" parameterType="int" resultType="com.jobhunter.model.resume.PersonalHistoryDTO">
+        SELECT companyName, position, jobDescription, startDate, endDate
+        FROM personalhistory
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 자격증 조회 -->
+    <select id="selectResumeLicenses" parameterType="int" resultType="com.jobhunter.model.resume.LicenseDTO">
+        SELECT licenseName, acquisitionDate, institution
+        FROM license
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 기본 정보 수정 -->
+    <update id="updateResume" parameterType="com.jobhunter.model.resume.ResumeDTO">
+        UPDATE resume 
+        SET title = #{title},
+            payType = #{payType},
+            pay = #{pay},
+            introduce = #{introduce}
+        WHERE resumeNo = #{resumeNo}
+    </update>
+
+    <!-- 고용형태 삭제 -->
+    <delete id="deleteJobForms" parameterType="int">
+        DELETE FROM jobform WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 성격 및 장점 삭제 -->
+    <delete id="deleteMerits" parameterType="int">
+        DELETE FROM merit WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 지역 정보 삭제 -->
+    <delete id="deleteResumeSigungu" parameterType="int">
+        DELETE FROM where_resume_sigungu WHERE refResumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 업직종 정보 삭제 -->
+    <delete id="deleteResumeSubCategory" parameterType="int">
+        DELETE FROM jobtype_resume_sub WHERE refResumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 학력 정보 삭제 -->
+    <delete id="deleteEducations" parameterType="int">
+        DELETE FROM education WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 경력 정보 삭제 -->
+    <delete id="deleteHistories" parameterType="int">
+        DELETE FROM personalhistory WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 자격증 정보 삭제 -->
+    <delete id="deleteLicenses" parameterType="int">
+        DELETE FROM license WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 파일 정보 삭제 -->
+    <delete id="deleteResumeUpfiles" parameterType="int">
+        DELETE FROM resumeupfiles WHERE resumeNo = #{resumeNo}
+    </delete>
 </mapper>
