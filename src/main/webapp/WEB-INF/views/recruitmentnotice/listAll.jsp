@@ -7,7 +7,10 @@
 	color: #47b2e4;;
 	
 }
-
+.recruitmentList{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
 </style>
 <body>
 	<!-- 헤더 -->
@@ -38,7 +41,7 @@
 									</ul>
 								</div>
 
-								<div class="content">
+								<div class="content recruitmentList">
 									<p class="rectext">
 										<strong>지역:</strong>
 										<span class="badge bg-primary me-2"><c:out value="${rec.region.name}" default="-" /></span>
