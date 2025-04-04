@@ -17,11 +17,13 @@ public class RedirectUtil {
             String uri = request.getRequestURI();
             String query = request.getQueryString();
             String fullUrl = uri + (query != null ? "?" + query : "");
+            
             if (!isLoginPage(uri)) {
                 session.setAttribute(attributeName, fullUrl);
             }
         } else {
             String referer = request.getHeader("Referer");
+            
             if (referer != null && !isLoginPage(referer)) {
                 session.setAttribute(attributeName, referer);
             }

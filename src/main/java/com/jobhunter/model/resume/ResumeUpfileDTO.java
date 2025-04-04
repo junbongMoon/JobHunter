@@ -23,5 +23,5 @@ public class ResumeUpfileDTO {
     private String ext;
     private int size;
     private String base64Image;
-    private int refResumeNo;
+    private int resumeNo;
 }

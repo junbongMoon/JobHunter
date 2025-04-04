@@ -18,5 +18,6 @@ public class LicenseDTO {
 	private int licenseNo;
     private String licenseName;
     private String acquisitionDate;
+    private String institution;
     private int resumeNo;
 }

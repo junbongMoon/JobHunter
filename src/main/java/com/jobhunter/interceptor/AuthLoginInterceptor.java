@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.jobhunter.customexception.NeedLoginException;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.util.RedirectUtil;
 
@@ -21,16 +22,19 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession();
         AccountVO account = (AccountVO) session.getAttribute("account");
 
-        // 로그인 안 한 경우
-        if (account == null) {
+        // AJAX, Fetch, Axios 등 체크
+        boolean isAsync = isAsyncOrApiRequest(request); 
+        
+        // 로그인 안 했거나 인증이 필요할 때
+        if (account == null || "Y".equals(account.getRequiresVerification())) {
             RedirectUtil.saveRedirectUrl(request, session);
-            response.sendRedirect("/account/login/return");
-            return false;
-        }
-
-        // 인증 필요 여부 체크
-        if ("Y".equals(account.getRequiresVerification())) {
-        	response.sendRedirect(request.getContextPath() + "/account/login?requireVerification=true");
+            
+            if (isAsync) { // 비동기면 에러코드 보내서 뷰단에서 알아서 로그인페이지로 보내도록 유도
+                NeedLoginException.writeToResponse(response, request.getContextPath());
+            } else {
+                response.sendRedirect(request.getContextPath() + "/account/login");
+            }
+            
             return false;
         }
 
@@ -49,5 +53,13 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
 			throws Exception {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private boolean isAsyncOrApiRequest(HttpServletRequest request) {
+	    String requestedWith = request.getHeader("X-Requested-With");
+	    String accept = request.getHeader("Accept");
+
+	    return "XMLHttpRequest".equalsIgnoreCase(requestedWith)
+	        || (accept != null && accept.contains("application/json"));
 	}
 }

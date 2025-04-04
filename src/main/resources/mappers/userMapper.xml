@@ -39,6 +39,18 @@
 		password = sha1(md5(#{password}))
 	</select>
 
+	<update id="setLastLoginDate">
+		UPDATE users
+		SET lastLoginDate = NOW()
+		where uid = #{uid}
+	</update>
+
+	<update id="setAutoLogin">
+		UPDATE users SET autoLogin = #{autoLogin}
+		where userId = #{id} and
+		password = sha1(md5(#{password}))
+	</update>
+
 	<select id="existsAccountId" parameterType="String"
 		resultType="boolean">
 		SELECT EXISTS (SELECT 1 FROM users WHERE userId = #{id})
@@ -63,12 +75,19 @@
 		UPDATE users SET
 		loginCnt = 0 WHERE userId = #{id}
 	</update>
-	
+
 	<select id="getAccountByUid" resultMap="accountMap">
 		select *, userId as
 		accountId, userName as accountName
 		from users
 		where uid = #{uid}
+	</select>
+	
+	<select id="getAccountByAutoLogin" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where autoLogin = #{sessionId}
 	</select>
 
 	<!-- 여기까진 로그인용 -->
@@ -93,11 +112,28 @@
 	</update>
 
 	<update id="updateEmail" parameterType="map">
-		UPDATE users SET email = #{email} WHERE uid = #{uid}
+		UPDATE users SET email =
+		#{email} WHERE uid = #{uid}
 	</update>
 
 	<update id="updateMobile" parameterType="map">
-		UPDATE users SET mobile = #{mobile} WHERE uid = #{uid}
+		UPDATE users SET mobile
+		= #{mobile} WHERE uid = #{uid}
 	</update>
-	
+
+	<update id="updateUserInfo"
+		parameterType="com.jobhunter.model.user.UserInfoDTO">
+		UPDATE users
+		SET
+		addr = #{addr},
+		gender = #{gender},
+		age = #{age},
+		payType = #{payType},
+		pay = #{pay},
+		introduce = #{introduce},
+		militaryService = #{militaryService},
+		nationality = #{nationality},
+		disability = #{disability}
+		WHERE uid = #{uid}
+	</update>
 </mapper>

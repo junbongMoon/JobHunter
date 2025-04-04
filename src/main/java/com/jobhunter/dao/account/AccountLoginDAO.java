@@ -25,4 +25,10 @@ public interface AccountLoginDAO {
 
 	AccountVO getAccountByUid(int uid) throws Exception;
 
+	void setAutoLogin(LoginDTO loginDto) throws Exception;
+
+	void setLoginTime(int uid) throws Exception;
+
+	AccountVO getAccountByAutoLogin(String sessionId) throws Exception;
+
 }

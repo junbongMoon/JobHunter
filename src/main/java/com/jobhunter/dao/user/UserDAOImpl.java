@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.model.user.UserVO;
 
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,11 @@ public class UserDAOImpl implements UserDAO {
 	public void updateMobile(Map<String, String> paramMap) throws Exception {
 	    
 	    ses.update(NS + ".updateMobile", paramMap);
+	}
+
+	@Override
+	public int updateUserInfo(UserInfoDTO userInfo) throws Exception {
+		return ses.update(NS + ".updateUserInfo", userInfo);
 	}
 	
 	

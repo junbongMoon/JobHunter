@@ -33,6 +33,18 @@
         from company
         where companyId = #{id} and password = sha1(md5(#{password}))
     </select>
+    
+    <update id="setLastLoginDate">
+	    UPDATE company
+	    SET lastLoginDate = NOW()
+	    where uid = #{uid}
+	</update>
+    
+    <update id="setAutoLogin">
+		UPDATE company SET autoLogin = #{autoLogin} 
+		where userId = #{id} and
+		password = sha1(md5(#{password}))
+	</update>
 
     <select id="existsAccountId" parameterType="String" resultType="boolean">
         SELECT EXISTS (SELECT 1 FROM company WHERE companyId = #{id})
@@ -89,5 +101,12 @@
 	<update id="updateMobile" parameterType="map">
 		UPDATE company SET mobile = #{mobile} WHERE uid = #{uid}
 	</update>
+	
+	<select id="getAccountByAutoLogin" resultMap="accountMap">
+        select *, companyId as accountId, companyName as accountName,
+               NULL as socialId, NULL as isSocial
+        from company
+        where autoLogin = #{sessionId}
+    </select>
     
 </mapper>

@@ -228,8 +228,6 @@
          <version>3.5.2</version>
       </dependency>
 
-
-
       <!-- Test -->
       <dependency>
          <groupId>junit</groupId>
@@ -276,4 +274,5 @@
          </plugin>
       </plugins>
    </build>
+
 </project>
