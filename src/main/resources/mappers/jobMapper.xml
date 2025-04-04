@@ -19,6 +19,33 @@
         INSERT IGNORE INTO subcategory (refMajorcategoryNo, jobName)
         VALUES (#{refMajorcategoryNo}, #{jobName})
     </insert>
+	
+	
+	<!-- 공고에 대분류 저장 -->
+		<insert id="insertMajorJobTypeWithRecruitmentnotice">
+		insert into jobtype_recruit_major
+		(refRecNo, refMajorNo)
+		values
+		(#{refRecNo}, #{refMajorNo})
+	</insert>
+	<!-- 공고에 소분류 저장 -->
+		<insert id="insertSubJobTypeWithRecruitmentnotice">
+		insert into jobtype_recruit_sub
+		(refRecNo, refSubNo)
+		values
+		(#{refRecNo}, #{refSubNo})
+	</insert>
 
+	<!-- 공고에 있는 대분류 갖고오는 -->
+		<select id="findMajorCategoryWithRecruitmentnotice" resultType="com.jobhunter.model.jobtype.Majorcategory">
+			select * from jobtype_recruit_major
+			where refRecNo = #{refRecNo}
+		</select>
+	
+	<!-- 공고에 있는 소분류 갖고오는 -->
+		<select id="findSubCategoryWithRecruitmentnotice" resultType="com.jobhunter.model.jobtype.Subcategory">
+			select * from jobtype_recruit_sub
+			where refRecNo = #{refRecNo}
+		</select>	
 </mapper>
 

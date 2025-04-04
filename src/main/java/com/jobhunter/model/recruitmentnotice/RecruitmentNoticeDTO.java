@@ -1,8 +1,14 @@
 package com.jobhunter.model.recruitmentnotice;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.jobhunter.model.customenum.MilitaryService;
+import com.jobhunter.model.jobtype.Majorcategory;
+import com.jobhunter.model.jobtype.Subcategory;
+import com.jobhunter.model.region.Region;
+import com.jobhunter.model.region.Sigungu;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,4 +53,14 @@ public class RecruitmentNoticeDTO {
 	private String status;
 	// 작성한 회사의 pk를 참조하는 값
 	private int refCompany;
+	// 도시
+	private int regionNo;
+	// 시군구
+	private int sigunguNo;
+	// 산업군
+	private int majorcategoryNo;
+	// 직업
+	private int subcategoryNo;
+
+	
 }

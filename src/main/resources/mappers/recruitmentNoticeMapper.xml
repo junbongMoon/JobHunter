@@ -20,9 +20,11 @@
 
 	<insert id="insertApplicationWithRecruitmentnotice">
 		insert into application
-		(method, recruitmentNoticeUid)
+		(method,
+		detail,recruitmentNoticeUid)
 		values
-		(#{method}, #{recruitmentNoticeUid})
+		(#{method},#{detail},
+		#{recruitmentNoticeUid})
 	</insert>
 
 	<insert id="insertAdvantageWithRecruitmentnotice">
@@ -33,17 +35,236 @@
 		(#{advantageType},
 		#{recruitmentNoticeUid})
 	</insert>
-	
+
 	<insert id="insertFileWithRecruitmentnotice">
-	insert into recruitmentnoticeboardupfiles
-	(originalFileName, newFileName, thumbFileName, fileType, ext, size, base64Image, status, refrecruitmentnoticeNo)
-	values
-	(#{originalFileName},#{newFileName}, #{thumbFileName}, #{fileType}, #{ext}, #{size}, #{base64Image}, #{status}, #{refrecruitmentnoticeNo})
-	
+		insert into recruitmentnoticeboardupfiles
+		(originalFileName, newFileName, thumbFileName, fileType, ext, size,
+		base64Image, status,
+		refrecruitmentnoticeNo)
+		values
+		(#{originalFileName},#{newFileName}, #{thumbFileName}, #{fileType},
+		#{ext}, #{size}, #{base64Image},
+		#{status}, #{refrecruitmentnoticeNo})
+
 	</insert>
 
-	<select id="selectMostRecentRecruitmentnoticeByrefCompany">
-		select * from recruitmentnotice where refCompany = #{companyUid} order by uid
+	<!-- application 조회 -->
+	<select id="getApplications"
+		resultType="com.jobhunter.model.recruitmentnotice.Application">
+		SELECT
+		applicationNo,
+		method,
+		detail,
+		recruitmentNoticeUid
+		FROM
+		application
+		WHERE
+		recruitmentNoticeUid = #{recruitmentNoticeUid}
+	</select>
+
+	<!-- advantage 조회 -->
+	<select id="getAdvantages"
+		resultType="com.jobhunter.model.recruitmentnotice.Advantage">
+		SELECT
+		advantageNo,
+		advantageType,
+		recruitmentNoticeUid
+		FROM
+		advantage
+		WHERE
+		recruitmentNoticeUid = #{recruitmentNoticeUid}
+	</select>
+
+	<select id="selectMostRecentRecruitmentnoticeByrefCompany"
+		resultType="int">
+		select r.uid from recruitmentnotice r where refCompany =
+		#{companyUid} order by uid
 		desc limit 1;
 	</select>
+
+	<select id="selectRecruitmentWithPaging"
+		resultMap="RecruitmentDetailMap">
+		SELECT
+		r.*, c.companyName,
+
+		rg.regionNo,
+		rg.name AS regionName, rg.code,
+		sg.sigunguNo, sg.name AS sigunguName, sg.regionNo,
+
+		mj.majorcategoryNo AS majorNo, mj.jobName AS majorJobName,
+		sj.subcategoryNo AS subNo, sj.jobName AS subJobName, sj.refMajorcategoryNo
+
+		FROM
+		recruitmentnotice r
+		LEFT JOIN where_recruit_region rr ON r.uid =
+		rr.refRecNo
+		LEFT JOIN region rg ON rr.refRegion = rg.regionNo
+
+		LEFT JOIN
+		where_recruit_sigungu rs ON r.uid = rs.refRecNo
+		LEFT JOIN sigungu sg ON
+		rs.refSigungu = sg.sigunguNo
+
+		LEFT JOIN jobtype_recruit_major rm ON
+		r.uid = rm.refRecNo
+		LEFT JOIN majorcategory mj ON rm.refMajorNo =
+		mj.majorcategoryNo
+
+		LEFT JOIN jobtype_recruit_sub rsb ON r.uid =
+		rsb.refRecNo
+		LEFT JOIN subcategory sj ON rsb.refSubNo =
+		sj.subcategoryNo
+		
+		LEFT JOIN company c ON c.uid = r.refCompany
+
+		<where>
+			r.status = 'Y'
+
+			<if
+				test="searchType != null and searchWord != null and searchWord != ''">
+				<choose>
+					<when test="searchType == 'title'">
+						AND r.title LIKE CONCAT('%', #{searchWord}, '%')
+					</when>
+					<when test="searchType == 'region'">
+						AND rg.name LIKE CONCAT('%', #{searchWord}, '%')
+					</when>
+					<when test="searchType == 'sigungu'">
+						AND sg.name LIKE CONCAT('%', #{searchWord}, '%')
+					</when>
+					<when test="searchType == 'majorcategory'">
+						AND mj.jobName LIKE CONCAT('%', #{searchWord}, '%')
+					</when>
+					<when test="searchType == 'subcategory'">
+						AND sj.jobName LIKE CONCAT('%', #{searchWord}, '%')
+					</when>
+				</choose>
+			</if>
+		</where>
+		ORDER BY r.uid DESC
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
+	</select>
+
+	<resultMap id="RecruitmentDetailMap"
+		type="com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo">
+
+		<!-- RecruitmentDetailInfo -->
+
+		<id property="uid" column="uid" />
+		<result property="title" column="title" />
+		<result property="workType" column="workType" />
+		<result property="payType" column="payType" />
+		<result property="pay" column="pay" />
+		<result property="period" column="period" />
+		<result property="personalHistory" column="personalHistory" />
+		<result property="militaryService" column="militaryService"
+			javaType="com.jobhunter.model.customenum.MilitaryService" />
+		<result property="detail" column="detail" />
+		<result property="manager" column="manager" />
+		<result property="miniTitle" column="miniTitle" />
+		<result property="dueDate" column="dueDate" />
+		<result property="status" column="status" />
+		<result property="count" column="count" />
+		<result property="refCompany" column="refCompany" />
+		<result property="companyName" column="companyName" />
+
+		<!-- Region (도시) -->
+		<association property="region"
+			javaType="com.jobhunter.model.region.Region">
+			<id property="regionNo" column="regionNo" />
+			<result property="name" column="regionName" />
+		</association>
+
+		<!-- Sigungu (시군구) -->
+		<association property="sigungu"
+			javaType="com.jobhunter.model.region.Sigungu">
+			<id property="sigunguNo" column="sigunguNo" />
+			<result property="name" column="sigunguName" />
+		</association>
+
+		<!-- MajorCategory (산업군) -->
+		<association property="majorCategory"
+			javaType="com.jobhunter.model.category.MajorCategory">
+			<id property="majorcategoryNo" column="majorNo" />
+			<result property="jobName" column="majorJobName" />
+		</association>
+
+		<!-- SubCategory (직종) -->
+		<association property="subcategory"
+			javaType="com.jobhunter.model.category.SubCategory">
+			<id property="subcategoryNo" column="subNo" />
+			<result property="jobName" column="subJobName" />
+		</association>
+
+	</resultMap>
+	
+	<select id="getTotalCountRow" resultType="int">
+      select count(*) from
+      recruitmentnotice
+   </select>
+   
+   <select id="getSearchResultCountRow" resultType="int">
+      select count(*) from recruitmentnotice
+      <choose>
+         <when test="searchType == 'title'">
+            where title like #{searchWord}
+         </when>
+         <when test="searchType == 'detail'">
+            where detail like #{searchWord}
+         </when>
+         <when test="searchType == 'manager'">
+            where manager like #{searchWord}
+         </when>
+      </choose>
+   </select>
+
+	<select id="getFileWithRecruitment" resultType="com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles">
+		select *
+		from recruitmentnoticeboardupfiles
+		where refrecruitmentnoticeNo = #{uid}
+	</select>
+	
+	<select id="getBoardDetailInfoByUid" resultMap="RecruitmentDetailMap">
+		SELECT
+		r.*, c.companyName,
+
+		rg.regionNo,
+		rg.name AS regionName, rg.code,
+		sg.sigunguNo, sg.name AS sigunguName, sg.regionNo,
+
+		mj.majorcategoryNo AS majorNo, mj.jobName AS majorJobName,
+		sj.subcategoryNo AS subNo, sj.jobName AS subJobName, sj.refMajorcategoryNo
+
+		FROM
+		recruitmentnotice r
+		LEFT JOIN where_recruit_region rr ON r.uid =
+		rr.refRecNo
+		LEFT JOIN region rg ON rr.refRegion = rg.regionNo
+
+		LEFT JOIN
+		where_recruit_sigungu rs ON r.uid = rs.refRecNo
+		LEFT JOIN sigungu sg ON
+		rs.refSigungu = sg.sigunguNo
+
+		LEFT JOIN jobtype_recruit_major rm ON
+		r.uid = rm.refRecNo
+		LEFT JOIN majorcategory mj ON rm.refMajorNo =
+		mj.majorcategoryNo
+
+		LEFT JOIN jobtype_recruit_sub rsb ON r.uid =
+		rsb.refRecNo
+		LEFT JOIN subcategory sj ON rsb.refSubNo =
+		sj.subcategoryNo
+		
+		LEFT JOIN company c ON c.uid = r.refCompany
+		
+		where r.uid = #{uid} 
+	</select>
+	
+	<delete id="removeRecruitmentByUid">
+		delete from recruitmentnotice
+		where uid = #{uid}
+	</delete>
+	
+	
 </mapper>

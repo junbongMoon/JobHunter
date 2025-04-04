@@ -2,6 +2,8 @@ package com.jobhunter.model.recruitmentnotice;
 
 import java.sql.Timestamp;
 
+import com.jobhunter.model.customenum.MilitaryService;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +23,7 @@ public class RecruitmentNotice {
 	private int pay;
 	private String period;
 	private String personalHistory;
+	private MilitaryService militaryService;
 	private String detail;
 	private String manager;
 	private String miniTitle;

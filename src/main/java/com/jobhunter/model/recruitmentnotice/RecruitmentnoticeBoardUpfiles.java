@@ -1,6 +1,6 @@
 package com.jobhunter.model.recruitmentnotice;
 
-import com.jobhunter.model.etc.FileStatus;
+import com.jobhunter.model.util.FileStatus;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
