@@ -1,4 +1,114 @@
-/*
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<jsp:include page="../header.jsp" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<main class="main">
+  <div class="container">
+    <h2>권한 체커 테스트 페이지</h2>
+
+    <div style="margin-top: 20px;">
+      <button onclick="checkOwner()">본인 여부 확인</button>
+      <button onclick="checkRole()">계정 타입 확인</button>
+      <button onclick="checkBlocked()">정지 여부 확인</button>
+      <button onclick="checkDeleted()">삭제 여부 확인</button>
+      <button onclick="testLoginInterceptor()">로그인 ajax테스트</button>
+      <a href="/account/testGetLogin" class="btn">로그인 get테스트</a>
+      <a href="/account/testGetOwner?uid=1&accountType=USER" class="btn">본인 get테스트</a>
+      <a href="/account/testGetRole" class="btn">역할 get테스트</a>
+      <!-- 기본 (정지 우선) -->
+      <a href="/account/testGetBlocked" class="btn">정지/삭제 get테스트</a>
+
+      <!-- 정지만 따로 테스트 -->
+      <a href="/account/testGetBlocked?checkStatType=BLOCK" class="btn">정지만 체크</a>
+
+      <!-- 삭제만 따로 테스트 -->
+      <a href="/account/testGetBlocked?checkStatType=DELETE" class="btn">삭제만 체크</a>
+    </div>
+
+    <div style="margin-top: 30px;">
+      <h4>결과</h4>
+      <pre id="result" style="background-color: #f5f5f5; padding: 10px;"></pre>
+    </div>
+  </div>
+</main>
+
+<script>
+
+  function setResult(data) {
+    $("#result").text(JSON.stringify(data, null, 2));
+  }
+
+  async function checkOwner() {
+    const uid = 1
+    const type = ACCOUNTTYPE.USER
+
+    if (await isOwner(uid, type)) {
+    // 여기 써놓은 uid랑 본인(로그인된 계정) uid, type 동일하면 이거 작동
+    setResult("본인아님")
+    } 
+
+    else {
+      setResult("본인맞음")
+    }
+  }
+
+  async function checkRole() {
+	  if (await hasRole(ACCOUNTTYPE.USER) || await hasRole(ACCOUNTTYPE.ADMIN)) {
+		    // 써놓은 권한이랑 본인 권한 맞으면 여기 작동
+		    // admin도 같이 작동시키고싶다 하면 or연산자같은걸로 붙이면 됩니다
+        setResult("역할 안맞음")
+		  }
+
+      else {
+      setResult("역할맞음")
+    }
+  }
+
+  async function checkBlocked() {
+	  if (await isBlocked()) {
+		  setResult("정지중")
+	  }
+
+    else {
+      setResult("정지안당함")
+    }
+  }
+
+  async function checkDeleted() {
+	  if (await isDeleted()) {
+		  setResult("삭제대기중")
+	  }
+
+    else {
+      setResult("삭제아님")
+    }
+  }
+
+  function testLoginInterceptor() {
+    $.ajax({
+      url: `/account/testLoginAjax`,
+      method: "GET",
+      success: setResult,
+      error: (xhr) => {
+        if (xhr.status === 449) {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            if (response.status === 'NEED_LOGIN' && response.redirect) {
+              alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.");
+              location.href = response.redirect;
+              return;
+            }
+          } catch (e) {
+            console.error("응답 파싱 실패", e);
+          }
+        }
+        setResult({ status: xhr.status, message: xhr.responseText });
+      }
+    });
+  }
+  
+  /*
   ===============================================================================================
               @@@설명서@@@
   1. 함수 주석보고 필요한거 복사해서 필요한 페이지 javascript에 넣어주세요
@@ -100,3 +210,6 @@ async function isDeleted() {
     return false;
   }
 }
+</script>
+
+<jsp:include page="../footer.jsp" />

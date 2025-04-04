@@ -166,4 +166,5 @@ config.properties
 # database.properties
 database.properties
 mail.properties
+address.properties
 # End of https://www.gitignore.io/api/git,java,maven,windows,eclipse

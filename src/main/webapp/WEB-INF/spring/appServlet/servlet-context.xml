@@ -59,17 +59,28 @@
 	<beans:bean id="OwnerInterceptor"
 		class="com.jobhunter.interceptor.OwnerInterceptor">
 	</beans:bean>
+	
+	<!-- 자동로그인 인터셉터 -->
+	<beans:bean id="autoLoginInterceptor"
+		class="com.jobhunter.interceptor.AutoLoginInterceptor">
+	</beans:bean>
 
 	<interceptors>
 
 		<interceptor>
 			<mapping path="/user/mypage" />
+			<mapping path="/user/kakao" />
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
 
 		<interceptor>
 			<mapping path="/user/mypage" />
 			<beans:ref bean="OwnerInterceptor" />
+		</interceptor>
+		
+		<interceptor>
+			<mapping path="/account/login" />
+			<beans:ref bean="autoLoginInterceptor" />
 		</interceptor>
 
 	</interceptors>
