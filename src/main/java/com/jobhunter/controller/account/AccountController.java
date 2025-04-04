@@ -174,5 +174,29 @@ public class AccountController {
 		System.out.println("미구현");
 		return "redirect:/";
 	}
+	
+	@GetMapping("/test")
+	public void testPage() {
+	}
+	
+	@GetMapping("/testLoginAjax")
+	public void testLoginPage() {
+	}
+	
+	@GetMapping("/testGetLogin")
+	public void testGetLoginPage() {
+	}
+	
+	@GetMapping("/testGetOwner")
+	public void testGetOwnerPage() {
+	}
+	
+	@GetMapping("/testGetRole")
+	public void testGetRolePage() {
+	}
+	
+	@GetMapping("/testGetBlocked")
+	public void testGetBlockedPage() {
+	}
 
 }
