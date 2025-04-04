@@ -448,8 +448,8 @@
 
 					<div class="login-options">
 						<div class="auto-login">
-							<input type="checkbox" id="autoLogin" name="autoLogin">
-							<label for="autoLogin">자동 로그인</label>
+							<input type="checkbox" id="remember" name="remember">
+							<label for="checkbox">자동 로그인</label>
 						</div>
             
 						<div class="find-account">
@@ -770,9 +770,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // 이전 자동로그인 선택 상태 복원
-  if (autoLogin == "on") {
-	  const tabs = document.querySelectorAll('#autoLogin');
+  if (autoLogin == "true") {
+	  const tabs = document.getElementById('remember');
     if (tabs) {
+    	console.log("자동로그인?")
       tabs.checked = true; // 체크 상태로 만들기
     }
   }
