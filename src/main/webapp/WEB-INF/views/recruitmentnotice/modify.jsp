@@ -750,11 +750,7 @@ function instalSelectOptions(){
 	const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}'
 	const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}'
 
-	majorCategoryList.each((i, e)=> 
-	if(e.val() = majorcategoryNo){
-		
-	}
-)
+	
 
 
 }
