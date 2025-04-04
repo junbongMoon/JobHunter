@@ -268,7 +268,14 @@
 						data-bs-toggle="modal" data-bs-target="#meritModal">추가하기</button>
 				</div>
 				<div class="card-body">
-					<div id="selectedMerits" class="mt-2"></div>
+					<div id="selectedMerits" class="mt-2">
+						<c:forEach var="merit" items="${resumeDetail.merits}">
+							<span class="badge bg-primary me-2 mb-2" data-merit="${merit.meritContent}">
+								${merit.meritContent}
+								<button class="btn-close ms-2" aria-label="삭제"></button>
+							</span>
+						</c:forEach>
+					</div>
 					<small class="text-muted">* 나의 성격 및 강점을 선택해 주세요(최대 5개)</small>
 				</div>
 			</div>
@@ -1651,7 +1658,7 @@ h2:after {
 						// 현재 선택된 항목 수 확인
 						const currentCount = selectedMerits.find('.badge').length;
 						if (currentCount >= 5) {
-
+							showValidationModal("성격 및 강점은 최대 5개까지 선택 가능합니다.");
 							return;
 						}
 
@@ -1665,7 +1672,10 @@ h2:after {
 						const $removeBtn = $('<button>')
 							.addClass('btn-close ms-2')
 							.attr('aria-label', merit + ' 삭제')
-							.on('click', function () {
+							.on('click', function (e) {
+								e.preventDefault();
+								e.stopPropagation();
+								
 								$badge.remove();
 								// 삭제 시 버튼 스타일 초기화
 								$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-primary').addClass('btn-outline-primary');
@@ -1678,13 +1688,63 @@ h2:after {
 						$(this).removeClass('btn-outline-primary').addClass('btn-primary');
 					}
 				});
+
+				// 페이지 로드 시 기존 선택된 성격 및 강점에 대한 버튼 스타일 설정
+				$('#selectedMerits .badge').each(function() {
+					const merit = $(this).data('merit');
+					$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-outline-primary').addClass('btn-primary');
+				});
+
+				// 기존 성격 및 강점 배지의 삭제 버튼 이벤트
+				$('#selectedMerits').on('click', '.btn-close', function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+					
+					const $badge = $(this).parent();
+					const merit = $badge.data('merit');
+					
+					$badge.remove();
+					// 삭제 시 버튼 스타일 초기화
+					$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-primary').addClass('btn-outline-primary');
+				});
 				//---------------------------------------------------------------------------------------------------------------------------------
-				// 성격 및 강점 선택 모달이 열릴 때 포커스 관리
+				// 성격 및 강점 선택 모달이 열리기 전에 버튼 스타일 설정
+				$('#meritModal').on('show.bs.modal', function () {
+					// 모든 버튼 초기화
+					$('.merit-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+					
+					// 현재 선택된 배지들의 텍스트 수집
+					const selectedMerits = [];
+					$('#selectedMerits .badge').each(function() {
+						selectedMerits.push($(this).text().trim().replace('삭제', '').trim());
+					});
+					
+					// 각 버튼을 순회하면서 선택된 배지의 텍스트와 비교
+					$('.merit-btn').each(function() {
+						const buttonText = $(this).text().trim();
+						if (selectedMerits.includes(buttonText)) {
+							$(this).removeClass('btn-outline-primary').addClass('btn-primary');
+						}
+					});
+				});
+
+				// 성격 및 강점 선택 모달이 열린 후 포커스 관리
 				$('#meritModal').on('shown.bs.modal', function () {
 					// 모달이 열릴 때 첫 번째 버튼에 포커스
 					$(this).find('.merit-btn').first().focus();
 				});
 
+				// 모달이 닫힐 때 버튼 스타일 초기화
+				$('#meritModal').on('hidden.bs.modal', function () {
+					// 모든 버튼 초기화
+					$('.merit-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+					
+					// 선택된 항목들의 버튼 스타일 변경
+					$('#selectedMerits .badge').each(function() {
+						const merit = $(this).data('merit');
+						$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-outline-primary').addClass('btn-primary');
+					});
+				});
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 학력 추가 버튼 클릭 이벤트
 				$('#addEducationBtn').on('click', function () {
