@@ -23,6 +23,9 @@ public class ReviewBoardDTO {
 	    private String companyName;
 	    private int likes;
 	    private int views;
+	    private Timestamp postDate;
+	    
+	  
 }
 
 	
