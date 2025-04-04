@@ -18,7 +18,13 @@
 	<main class="main">
 		<!-- Blog Posts Section -->
 		<section id="blog-posts" class="blog-posts section">
-
+			<div>
+			<c:choose>
+					<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
+						<div class="read-more"><a href="/recruitmentnotice/write">공고 작성</a></div>
+					</c:when>
+				</c:choose>
+				</div>
 			<div class="container" data-aos="fade-up" data-aos-delay="100">
 				<div class="row gy-4">
 
@@ -69,6 +75,7 @@
 									</p>
 
 									<div class="read-more">
+										
 										<a href="/recruitmentnotice/detail/?uid=${rec.uid}">바로 가기</a>
 									</div>
 								</div>
@@ -113,7 +120,11 @@
 					</c:if>
 
 				</ul>
+
+
+
 			</div>
+
 		</section>
 
 
