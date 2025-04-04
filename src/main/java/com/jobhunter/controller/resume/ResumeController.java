@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.customenum.JobForm;
 import com.jobhunter.model.resume.EducationLevel;
 import com.jobhunter.model.resume.EducationStatus;
-import com.jobhunter.model.resume.JobForm;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
@@ -87,10 +87,7 @@ public class ResumeController {
 			@RequestParam(defaultValue = "10") int pageSize) {
 		try {
 			AccountVO account = (AccountVO) session.getAttribute("account");
-			if (account == null || account.getUid() == 0) {
-				return "redirect:/account/login";
-			}
-
+			
 			int userUid = account.getUid();
 			List<ResumeVO> resumeList = resumeService.getResumeList(userUid, page, pageSize);
 			int totalResumes = resumeService.getTotalResumes(userUid);
