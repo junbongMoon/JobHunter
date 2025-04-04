@@ -69,7 +69,6 @@
 
 		<interceptor>
 			<mapping path="/user/mypage" />
-			<mapping path="/user/kakao" />
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
 
