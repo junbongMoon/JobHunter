@@ -14,8 +14,9 @@
       <button onclick="checkDeleted()">삭제 여부 확인</button>
       <button onclick="testLoginInterceptor()">로그인 ajax테스트</button>
       <a href="/account/testGetLogin" class="btn">로그인 get테스트</a>
+
       <a href="/account/testGetOwner?uid=1&accountType=USER" class="btn">본인 get테스트</a>
-      <a href="/account/testGetRole" class="btn">역할 get테스트</a>
+
       <!-- 기본 (정지 우선) -->
       <a href="/account/testGetBlocked" class="btn">정지/삭제 get테스트</a>
 
@@ -45,11 +46,9 @@
 
     if (await isOwner(uid, type)) {
     // 여기 써놓은 uid랑 본인(로그인된 계정) uid, type 동일하면 이거 작동
-    setResult("본인아님")
-    } 
-
-    else {
-      setResult("본인맞음")
+    setResult("본인맞음")
+    } else {
+      setResult("본인아님")
     }
   }
 
@@ -57,31 +56,27 @@
 	  if (await hasRole(ACCOUNTTYPE.USER) || await hasRole(ACCOUNTTYPE.ADMIN)) {
 		    // 써놓은 권한이랑 본인 권한 맞으면 여기 작동
 		    // admin도 같이 작동시키고싶다 하면 or연산자같은걸로 붙이면 됩니다
+        setResult("역할맞음")
+		  } else {
         setResult("역할 안맞음")
-		  }
-
-      else {
-      setResult("역할맞음")
     }
   }
 
   async function checkBlocked() {
 	  if (await isBlocked()) {
-		  setResult("정지중")
-	  }
-
-    else {
+      // 현재 로그인한 계정이 멀쩡한 상태면 여기 작동
       setResult("정지안당함")
+    } else {
+      setResult("정지중")
     }
   }
 
   async function checkDeleted() {
 	  if (await isDeleted()) {
-		  setResult("삭제대기중")
-	  }
-
-    else {
+      // 현재 로그인한 계정이 멀쩡한 상태면 여기 작동
       setResult("삭제아님")
+    } else {
+      setResult("삭제대기중")
     }
   }
 
@@ -90,22 +85,16 @@
       url: `/account/testLoginAjax`,
       method: "GET",
       success: setResult,
-      error: (xhr) => {
-        if (xhr.status === 449) {
-          try {
-            const response = JSON.parse(xhr.responseText);
-            if (response.status === 'NEED_LOGIN' && response.redirect) {
-              alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.");
-              location.href = response.redirect;
-              return;
-            }
-          } catch (e) {
-            console.error("응답 파싱 실패", e);
-          }
+      error: (error) => {
+        if (error.status === 449) {
+          location.href = "/account/login/return";
         }
-        setResult({ status: xhr.status, message: xhr.responseText });
       }
     });
+  }
+
+  function loginFailed(error) {
+    
   }
   
   /*
@@ -170,7 +159,7 @@ async function isLoggedIn() {
 // uid, type넘기면 세션에 로그인된 계정이 해당 uid, accountType이 맞는지 체크(맞다면 true반환)
 async function isOwner(uid, type) {
   try {
-    const res = await fetch(`/account/owner/${type}/${uid}`);
+    const res = await fetch(`/account/owner/\${type}/\${uid}`);
     return await res.json(); // true or false
   } catch (e) {
     console.error('본인 여부 확인 실패', e);
@@ -181,7 +170,7 @@ async function isOwner(uid, type) {
 // type 넘기면 세션에 로그인된 계정이 해당 accountType이 맞는지 체크(맞다면 true반환)
 async function hasRole(type) {
   try {
-    const res = await fetch(`/account/role/${type}`);
+    const res = await fetch(`/account/role/\${type}`);
     return await res.json(); // true or false
   } catch (e) {
     console.error('권한 확인 실패', e);

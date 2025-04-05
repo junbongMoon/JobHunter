@@ -18,6 +18,8 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
 	@Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
+		
+		System.out.println("로그인체커");
 
         HttpSession session = request.getSession();
         AccountVO account = (AccountVO) session.getAttribute("account");

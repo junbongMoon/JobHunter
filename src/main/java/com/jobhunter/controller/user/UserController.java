@@ -21,11 +21,10 @@ public class UserController {
 		
 	}
 	
-	@PostMapping("kakao")
+	@PostMapping("/kakao")
 	@ResponseBody
 	public Map<String, Object> forKakao() {
 	    Map<String, Object> result = new HashMap<>();
-	    result.put("message", "카카오에서 요청을 잘 받았습니다!");
 	    result.put("status", "success");
 	    return result;
 	}

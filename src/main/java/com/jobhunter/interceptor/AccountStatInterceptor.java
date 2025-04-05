@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.service.account.AccountService;
 import com.jobhunter.util.AccountUtil;
+import com.jobhunter.util.RedirectUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,12 +41,16 @@ public class AccountStatInterceptor implements HandlerInterceptor {
 
         // 일단 계정 상태 서버에있는걸로 갱신좀 해서 그사이 정지먹진않았나 체크해주고
         AccountVO account = accUtils.refreshAccount((AccountVO) session.getAttribute("account"));
+        
+        // 로그인 안 했거나 인증이 필요할 때
+        if (account == null || "Y".equals(account.getRequiresVerification())) {
+            RedirectUtil.saveRedirectUrl(request, session);
+            
+            response.sendRedirect(request.getContextPath() + "/account/login");
+            return false;
+        }
 
         String checkStatType = request.getParameter("checkStatType");
-
-        // 유연성 추가용 쿼리스트링(계정정지/계정삭제 단일체크) 확인
-        boolean checkBlock = checkStatType == null || "BLOCK".equalsIgnoreCase(checkStatType);
-        boolean checkDelete = checkStatType == null || "DELETE".equalsIgnoreCase(checkStatType);
 
         // 상태 확인
         boolean isBlocked = account.getBlockDeadline() != null &&

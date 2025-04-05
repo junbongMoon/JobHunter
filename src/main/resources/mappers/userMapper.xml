@@ -126,6 +126,7 @@
 		UPDATE users
 		SET
 		addr = #{addr},
+		detailAddr = #{detailAddr},
 		gender = #{gender},
 		age = #{age},
 		payType = #{payType},

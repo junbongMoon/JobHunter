@@ -33,13 +33,14 @@ public class UserRestController {
 	
 	@GetMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<UserVO> myinfo(@PathVariable("uid") String uid) {
-	    System.out.println(uid);
 	    UserVO userVO = null;
 	    try {
 	        userVO = service.showMypage(uid);
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
+	    
+	    System.out.println("/info_userVO : " + userVO);
 
 	    return ResponseEntity.status(HttpStatus.OK).body(userVO);
 	}
@@ -47,7 +48,7 @@ public class UserRestController {
 	@PostMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
     public ResponseEntity<?> updateUserInfo(@RequestBody UserInfoDTO userInfo, @PathVariable("uid") Integer uid, HttpSession session) {
         
-		System.out.println(userInfo);
+		System.out.println("/info_userInfo : " + userInfo);
 		
 		if (uid == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

@@ -34,22 +34,18 @@ public class AccountController {
 	public String redirectToLogin(HttpServletRequest request, HttpSession session) {
 
 		String redirectUrl = (String) session.getAttribute("redirectUrl");
-		System.out.println("redirectUrl : " + redirectUrl);
 		if (redirectUrl == null) {
 			String referer = request.getHeader("Referer");
-			if (referer == null) {
+			if (referer != null) {
 				session.setAttribute("redirectUrl", referer);
 			}
-			System.out.println("referer : " + referer);
 		}
-
 		// 로그인버튼 눌러서 들어왔을때 초기상태 유지+로그인으로 인증 건너뛰기 막는용 로그인데이터도 클린
 		// 어차피 정상적으로 로그인버튼 누르는건 로그인 안된유저뿐이니까
 		session.removeAttribute("requiresVerification");
 		session.removeAttribute("authTargetEmail");
 		session.removeAttribute("authTargetMobile");
 		session.removeAttribute("account");
-
 		return "redirect:/account/login";
 	}
 
@@ -58,7 +54,7 @@ public class AccountController {
 	public String showLoginForm(HttpServletRequest request, HttpSession session,
 			@RequestParam(value = "redirect", required = false) String redirect) {
 
-		System.out.println("가야할 곳" + session.getAttribute("redirectUrl"));
+		System.out.println("로그인 끝나고 가야할 곳 : " + session.getAttribute("redirectUrl"));
 		// 인증 성공하면 세션 정리
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		if (account != null) {

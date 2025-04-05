@@ -80,6 +80,7 @@
                     <button class="btn-cancel" id="deleteAddressBtn" onclick="deleteAddress()">주소 삭제</button>
                   </div>
                   <input type="hidden" id="addressBackup">
+                  <input type="hidden" id="detailAddressBackup">
               </div>
               
               <div>성별</div>
@@ -219,6 +220,9 @@
 </main>
 
 <script>
+let sessionMobile = "${sessionScope.account.mobile}";
+let sessionEmail = "${sessionScope.account.email}";
+
   $(()=>{
       getInfo();
     })
@@ -285,28 +289,7 @@ function resetUserModifyForm() {
 }
 
 function confirmModify() {
-  const selectedAddress = $('#selectedAddress').val().trim();
-  const addressDetail = $('#addressDetail').val().trim();
-  let fullAddress = '';
-  if (!selectedAddress && !addressDetail) {
-    fullAddress = null;
-  } else if (!selectedAddress) {
-    alertUtils.show("도로명주소를 선택해 주세요!", {
-      onConfirm: () => {
-        document.getElementById('addressSearch').focus();
-      }
-    })
-    return;
-  } else if (!addressDetail) {
-    alertUtils.show("상세주소를 입력해 주세요!", {
-      onConfirm: () => {
-        document.getElementById('addressDetail').focus();
-      }
-    })
-    return;
-  } else {
-    fullAddress = selectedAddress + ' 상세주소 : ' + addressDetail;
-  }
+  
   const parseOrNull = (value) => {
     const num = parseInt(value, 10);
     return isNaN(num) ? null : num;
@@ -318,6 +301,11 @@ function confirmModify() {
   let nationality = $('#nationality').val();
   let payType = $('#payType').val();
   let disability = $('#disability').val();
+  let addr = $('#selectedAddress').val().trim();
+  let detailAddr = $('#addressDetail').val().trim();
+  let age = $('#age').val();
+  let pay = $('#pay').val();
+  let introduce = $('#introduce').val();
 
   if (gender === '-1' || gender === null) {
     gender = null;
@@ -334,23 +322,27 @@ function confirmModify() {
   if (disability === '-1' || disability === null) {
     disability = null;
   }
-  let age = $('#age').val();
   if (age === '' || age === null || age < 0) {
     age = null;
   }
-  let pay = $('#pay').val();
   if (pay === '' || pay === null || pay < 0) {
     pay = null;
   } else {
     pay = removeComma(pay);
   }
-  let introduce = $('#introduce').val();
   if (introduce === '' || introduce === null) {
     introduce = null;
   }
+  if (addr === '' || addr === null) {
+	  addr = null;
+	    }
+  if (detailAddr === '' || detailAddr === null) {
+	  detailAddr = null;
+	  }
 
   const data = {
-    addr: fullAddress || null,
+    addr: addr || null,
+    detailAddr: detailAddr || null,
     gender: gender || null,
     age: age || null,
     militaryService: military || null,
@@ -533,13 +525,12 @@ function confirmModify() {
     }
 
     let addressText = '등록된 주소 없음';
-    let addressDetailText = '';
     if (userInfo.addr) {
-      const addressSplit = userInfo.addr.split(' 상세주소 : ');
-      addressText = addressSplit[0];
-      if (addressSplit[1]) {
-        addressDetailText = addressSplit[1];
-      }
+      addressText = userInfo.addr;
+    }
+    let addressDetailText = '등록된 주소 없음';
+    if (userInfo.detailAddr) {
+      addressDetailText = userInfo.detailAddr;
     }
 
     userDetailInfo.innerHTML =
@@ -623,6 +614,8 @@ function confirmModify() {
         method: "GET",
         success: (result) => {
           // 기본 정보와 상세 정보 업데이트
+          sessionMobile = result.mobile;
+    		  sessionEmail = result.email;
           resetUserModifyForm();
           updateBasicInfo(result);
           updateUserDetailInfo(result);
@@ -633,18 +626,17 @@ function confirmModify() {
   }
 
   function updateUserModifyInfo(result) {
-    console.log(result);
 
-    // 주소 분리
     const address = result.addr;
-    if (address) {
+    if (result.addr) {
       // 초기화용 주소 저장
-      document.getElementById('addressBackup').value = address;
-
-      const addressSplit = address.split(' 상세주소 : ');
-      document.getElementById('selectedAddress').value = addressSplit[0] || '';
+      document.getElementById('addressBackup').value = result.addr;
+      document.getElementById('selectedAddress').value = result.addr || '';
       document.getElementById('selectedAddress').style.display = 'block'; // 표시
-      document.getElementById('addressDetail').value = addressSplit[1] || '';
+    }
+    if (result.detailAddr) {
+      document.getElementById('detailAddressBackup').value = result.detailAddr;
+      document.getElementById('addressDetail').value = result.detailAddr || '';
     }
 
     // 성별
@@ -722,7 +714,7 @@ function confirmModify() {
   }
 
   async function startVerifiPhonePwd() {
-    const rawPhone = "${sessionScope.account.mobile}";
+    const rawPhone = sessionMobile;
     if (!rawPhone) {
       alertUtils.show('새 전화번호를 입력해주세요.');
       return;
@@ -750,7 +742,7 @@ function confirmModify() {
     }
   }
   async function startVerifiEmailPwd() {
-    const email = "${sessionScope.account.email}"
+    const email = sessionEmail;
     if (!email) {
       alertUtils.show('새 이메일을 입력해주세요.');
       return;
@@ -771,7 +763,7 @@ function confirmModify() {
       url: `/account/auth/email/\${emailCode}`,
       method: "POST",
       contentType: "application/json",
-      data: JSON.stringify({ email: "${sessionScope.account.email}" }),
+      data: JSON.stringify({ email: sessionEmail }),
       async: false,
       success: () => {showNewPasswordForm()},
       error: (xhr) => {alertUtils.show("이메일 인증 실패: " + xhr.responseText)}
@@ -808,7 +800,7 @@ function confirmModify() {
       modalBody.innerHTML = `
         <div class="form-group">
             <label>이메일 인증</label>
-            <div class="contact-info" style="margin-bottom: 15px;">${sessionScope.account.email}</div>
+            <div class="contact-info" style="margin-bottom: 15px;">email</div>
             <div class="verification-group">
                 <input type="text" id="pwdToEmailCode" placeholder="인증번호 입력">
                 <button class="btn-confirm" onclick="endVerifiPwdEmail()">인증완료</button>
@@ -822,7 +814,7 @@ function confirmModify() {
       modalBody.innerHTML = `
         <div class="form-group">
             <label>전화번호 인증</label>
-            <div class="contact-info" style="margin-bottom: 15px;">${sessionScope.account.mobile}</div>
+            <div class="contact-info" style="margin-bottom: 15px;">mobile</div>
             <div class="verification-group">
                 <input type="text" id="pwdToPhoneCode" placeholder="인증번호 입력">
                 <button class="btn-confirm" onclick="endVerifiPwdMobile()">인증완료</button>
@@ -878,8 +870,8 @@ function confirmModify() {
   function showVerificationOptions() {
     const modalBody = document.querySelector('.modal-body');
     const modalButtons = document.querySelector('.modal-buttons');
-    const mobile = "${sessionScope.account.mobile}";
-    const email = "${sessionScope.account.email}";
+    const mobile = sessionMobile;
+    const email = sessionEmail;
 
     let mobileText = "연결된 연락처가 없습니다.";
     if (mobile) {
@@ -959,16 +951,17 @@ function confirmModify() {
       </div>
     `;
   }
-
+  
   // 연락처 수정 모달 수정
   function openContactModal() {
     const modal = document.getElementById('basicModal');
     const modalTitle = modal.querySelector('.modal-title');
     const modalBody = modal.querySelector('.modal-body');
     const modalButtons = modal.querySelector('.modal-buttons');
+    const mobile = sessionMobile;
+    const email = sessionEmail;
 
-    const mobile = "${sessionScope.account.mobile}";
-    const email = "${sessionScope.account.email}";
+    
 
     let mobileText = "연결된 연락처가 없습니다.";
     if (mobile) {
@@ -1207,6 +1200,7 @@ function confirmModify() {
 
   function deleteAddress() {
     document.getElementById('addressBackup').value = '';
+    document.getElementById('detailAddressBackup').value = '';
     document.getElementById('selectedAddress').value = '';
     document.getElementById('addressDetail').value = '';
     document.getElementById('addressSelect').innerHTML = '';
@@ -1216,14 +1210,14 @@ function confirmModify() {
   function resetAddress() {
     deleteAddress();
     beforeAddress = document.getElementById('addressBackup').value;
+    beforeDetailAddress = document.getElementById('detailAddressBackup').value;
     if (beforeAddress && beforeAddress !== '') {
-      beforeAddress = beforeAddress.split(' 상세주소 : ');
-      document.getElementById('selectedAddress').value = beforeAddress[0];
+      document.getElementById('selectedAddress').value = beforeAddress;
       document.getElementById('selectedAddress').style.display = 'block';
-      if (beforeAddress[1]) {
-        document.getElementById('addressDetail').value = beforeAddress[1];
         document.getElementById('addressDetail').style.display = 'block';
-      }
+    }
+    if (beforeDetailAddress) {
+        document.getElementById('addressDetail').value = beforeDetailAddress;
     }
   }
 
