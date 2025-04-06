@@ -17,11 +17,13 @@
 	let focusElement = null;
 	let upfiles = [];
 	let uid = '${RecruitmentDetailInfo.uid}';
+	let companyUid = '${sessionScope.account.uid}';
+
 	
 
 	$(function() {
 
-
+		console.log("작성한 회사 uid : " + companyUid);
 		const today = new Date();
 		today.setHours(0,0,0,0); // 오늘 자정으로 설정
     const nextMonth = new Date();
@@ -968,7 +970,7 @@ label {
 
 		<div class="container" data-aos="fade-up" data-aos-delay="100">
 			
-			<form method="post" role="form" action="/recruitmentnotice/save">
+			<form method="post" role="form" action="/recruitmentnotice/modify?uid=${RecruitmentDetailInfo.uid}">
 
 				<div class="form-header categories-widget widget-item">
 					<h3>채용 공고</h3>
