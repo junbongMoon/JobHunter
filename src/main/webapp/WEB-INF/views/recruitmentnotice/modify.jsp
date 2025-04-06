@@ -637,7 +637,7 @@ function markUploadSuccess(fileName) {
 				sigunguSelect.empty();
 				sigunguSelect.append('<option value="-1">시군구 선택</option>');
 						$.each(data, function(index, sigungu) 
-						{sigunguSelect.append(`<option value="\${sigungu.sigunguNo} ">\${sigungu.name} </option>`);});
+						{sigunguSelect.append(`<option value="\${sigungu.sigunguNo}">\${sigungu.name}</option>`);});
 					},
 			error : function(err) {
 				console.error("시군구 데이터 불러오기 실패", err);
