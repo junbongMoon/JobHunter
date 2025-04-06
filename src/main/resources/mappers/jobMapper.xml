@@ -52,6 +52,14 @@
 	</select>
 
 	<!-- 공고에 있는 대분류 수정하는 -->
+	<update id="updateSubCategoryWithRecruitmentnotice"
+		parameterType="map">
+		UPDATE jobtype_recruit_sub
+		SET refSubNo = #{subcategoryNo}
+		WHERE refRecNo = #{uid}
+	</update>
+	
+	<!-- 공고에 있는 대분류 수정하는 -->
 	<update id="updateMajorCategoryWithRecruitmentnotice"
 		parameterType="map">
 		UPDATE jobtype_recruit_major
