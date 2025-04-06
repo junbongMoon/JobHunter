@@ -236,9 +236,15 @@ public class RecruitmentNoticeController {
 		
 		String returnPage ="";
 		
+		
+		
 		try {
 			RecruitmentDetailInfo detailInfo = recruitmentService.getRecruitmentByUid(uid);
 			
+			// 기존 리스트 초기화
+			ListAllClear();
+			
+			// 우대 조건
 			if(detailInfo.getAdvantage().size() > 0) {
 				for(Advantage advantage : detailInfo.getAdvantage()) {
 					AdvantageDTO advdto = AdvantageDTO.builder()
@@ -246,16 +252,20 @@ public class RecruitmentNoticeController {
 							this.advantageList.add(advdto);
 				}
 			}
-
+			
+			// 파일 리스트
 			if(detailInfo.getFileList().size() > 0) {
 				this.fileList = detailInfo.getFileList();
 			}
 			
+			// 면접 방식
 			for(Application application : detailInfo.getApplication()) {
 				ApplicationDTO appdto = ApplicationDTO.builder()
 						.method(application.getMethod())
 						.detail(application.getDetail())
 						.build();
+				
+				this.applicationList.add(appdto);
 			}
 			
 			
