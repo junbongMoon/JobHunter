@@ -21,9 +21,6 @@
 
 	$(function() {
 
-		
-
-		
 
 		const today = new Date();
 		today.setHours(0,0,0,0); // 오늘 자정으로 설정
@@ -62,7 +59,104 @@
 		getRegion();
 		getMajorCategory();
 		
-		$('.method-detail, .save-method-btn').hide();
+		// 기존 공고값 세팅
+		setTimeout(() => {
+      const title = '${RecruitmentDetailInfo.title}';
+      const workType = '${RecruitmentDetailInfo.workType}';
+      const payType = '${RecruitmentDetailInfo.payType}';
+      const pay = '${RecruitmentDetailInfo.pay}';
+      const period = '${RecruitmentDetailInfo.period}';
+      const personalHistory = '${RecruitmentDetailInfo.personalHistory}';
+      const militaryService = '${RecruitmentDetailInfo.militaryService}';
+      const detail = `<c:out value='${RecruitmentDetailInfo.detail}' escapeXml='false'/>`;
+      const manager = '${RecruitmentDetailInfo.manager}';
+      const dueDate = '<fmt:formatDate value="${RecruitmentDetailInfo.dueDate}" pattern="yyyy-MM-dd"/>';
+      const regionNo = '${RecruitmentDetailInfo.region.regionNo}';
+      const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';
+      const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}';
+      const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}';
+
+      // 제목, 담당자, 날짜 등 텍스트 필드 세팅
+      $('#title').val(title);
+      $('#pay').val(Number(pay).toLocaleString());
+      $('#manager').val(manager);
+      $('#date').val(dueDate);
+
+      // summernote 내용 세팅
+      $('#summernote').summernote('code', detail);
+
+      // 라디오 세팅
+      $(`input[name="workType"][value="${workType}"]`).prop("checked", true).trigger("change");
+      $(`input[name="payType"][value="${payType}"]`).prop("checked", true);
+      $(`input[name="personalHistory"][value="${personalHistory}"]`).prop("checked", true);
+      $(`input[name="militaryService"][value="${militaryService}"]`).prop("checked", true);
+
+      // 셀렉트 필드 세팅 (선택 후 로딩 기다림)
+      setTimeout(() => {
+        $(".Region").val(regionNo).trigger("change");
+        setTimeout(() => { $(".Sigungu").val(sigunguNo); }, 300);
+      }, 300);
+
+      setTimeout(() => {
+        $(".MajorCategory").val(majorcategoryNo).trigger("change");
+        setTimeout(() => { $(".SubCategory").val(subcategoryNo); }, 300);
+      }, 300);
+
+      // 근무 시간 분해
+      const timeRegex = /^(\d{2}:\d{2})~(\d{2}:\d{2})(?: \((.+)\))?$/;
+      const match = period.match(timeRegex);
+      if (match) {
+        const [, startTime, endTime, detailType] = match;
+        $('#startTime').val(startTime);
+        $('#endTime').val(endTime);
+        if (detailType) $('#workDetailType').val(detailType);
+      }
+    }, 300);
+
+    // 이벤트 위임으로 동적 삭제 처리
+    $(document).on("click", ".advantage-item .btn-outline-danger", function () {
+      const $item = $(this).closest(".advantage-item");
+      const advantageType = $item.find("input[type='hidden']").val();
+      if (!advantageType) return;
+
+      $.ajax({
+        url: "/recruitmentnotice/advantage/" + advantageType,
+        type: "DELETE",
+        success: function () {
+          console.log("삭제 성공: ", advantageType);
+          $item.remove();
+        },
+        error: function () {
+          console.error("삭제 실패: ", advantageType);
+        }
+      });
+    });
+
+    // 우대조건 추가 처리
+    $(".addAdvantageBtn").on("click", function () {
+      const val = $("#advantage").val().trim();
+      if (!val) return alert("우대조건을 입력해주세요");
+
+      $.ajax({
+        url: "/recruitmentnotice/advantage",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ advantageType: val }),
+        success: function () {
+          const html = `
+            <div class="d-flex align-items-center mb-2 advantage-item">
+              <input type="hidden" value="${val}">
+              <span class="me-2">${val}</span>
+              <button type="button" class="btn btn-sm btn-outline-danger">X</button>
+            </div>
+          `;
+          $(".advantageArea").append(html);
+          $("#advantage").val("");
+        },
+        error: function () { alert("우대조건 저장 실패"); }
+      });
+    });
+		
 
 		$(".fileUploadArea").on("dragover", function (e) {
     e.preventDefault();
@@ -127,7 +221,7 @@ $(document).on("click", "#goToListBtn", function () {
     </div>
   `;
 
-  if (selectedWorkType === "PARTTIME") {
+  if (selectedWorkType === "PART_TIME") {
     if ($("#phoneOption").length === 0 && $("#textOption").length === 0) {
       $("#application-methods").append(phoneAndTextHtml);
     }
@@ -276,9 +370,7 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 		}
 	});
 	
-	instalRecruitment();
 
-	instalSelectOptions();
 
 	});
 
@@ -943,28 +1035,33 @@ label {
 										<div class="d-flex flex-wrap gap-3">
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType1" value="FULLTIME"> <label
+													name="workType" id="workType1" value="FULL_TIME"> <label
 													class="form-check-label mb-2" for="workType1">정규직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType2" value="NONREGULAR">
-												<label class="form-check-label mb-2" for="workType2">비정규직</label>
+													name="workType" id="workType2" value="CONTRACT">
+												<label class="form-check-label mb-2" for="workType2">계약직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType3" value="APPOINT"> <label
+													name="workType" id="workType3" value="COMMISSION"> <label
 													class="form-check-label mb-2" for="workType3">위촉직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType4" value="PARTTIME"> <label
+													name="workType" id="workType4" value="PART_TIME"> <label
 													class="form-check-label mb-2" for="workType4">아르바이트</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType5" value="FREELANCER">
+													name="workType" id="workType5" value="FREELANCE">
 												<label class="form-check-label mb-2" for="workType5">프리랜서</label>
+											</div>
+											<div class="form-check">
+												<input class="form-check-input workType" type="radio"
+													name="workType" id="workType6" value="DISPATCH">
+												<label class="form-check-label mb-2" for="workType5">파견직</label>
 											</div>
 										</div>
 									</div>
