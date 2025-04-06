@@ -1409,7 +1409,14 @@ h2:after {
 						userUid: $('#userUid').val()
 					};
 
+					// 이력서 번호가 있는 경우 추가
+					const resumeNo = '${resumeDetail.resume.resumeNo}';
+					if (resumeNo) {
+						formData.resumeNo = resumeNo;
+					}
+
 					console.log('저장할 데이터:', formData);
+
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
 				//---------------------------------------------------------------------------------------------------------------------------------
@@ -1500,8 +1507,7 @@ h2:after {
 
 							if (!companyName || !jobDescription || !startDate) {
 								isValid = false;
-								focusElement = $(this).find(':input[value=""]:first');
-								return false; // each 중단
+								return false;
 							}
 
 							// 재직중이 아닌 경우에만 종료일 체크
@@ -1526,19 +1532,19 @@ h2:after {
 						licenseItems.each(function () {
 							const licenseName = $(this).find('.license-name').val().trim();
 							const acquisitionDate = $(this).find('.acquisition-date').val();
-							const institution = $(this).find('.institution').val();
+							const institution = $(this).find('.institution').val().trim();
 
 							if (!licenseName || !acquisitionDate || !institution) {
 								isValid = false;
 								return false; // each 중단
 							}
-
-							if (!isValid) {
-								showValidationModal("자격증 정보가 누락되었습니다.");
-								$("#myLicenseBox").attr("tabindex", -1).focus();
-								return;
-							}
 						});
+
+						if (!isValid) {
+							showValidationModal("자격증 정보가 누락되었습니다.");
+							$("#myLicenseBox").attr("tabindex", -1).focus();
+							return;
+						}
 					}
 
 					console.log("유효성 검사 통과");
@@ -1595,10 +1601,18 @@ h2:after {
 						userUid: $('#userUid').val()
 					};
 
+					// 이력서 번호가 있는 경우 추가
+					const resumeNo = '${resumeDetail.resume.resumeNo}';
+					if (resumeNo) {
+						formData.resumeNo = resumeNo;
+					}
+
 					console.log('저장할 데이터:', formData);
 
+					// 저장 또는 수정 요청
+					const url = resumeNo ? `/resume/update/${resumeNo}` : '/resume/submit-final';
 					$.ajax({
-						url: '/resume/submit-final',
+						url: url,
 						type: 'POST',
 						data: JSON.stringify(formData),
 						contentType: 'application/json',
@@ -1606,7 +1620,7 @@ h2:after {
 							if (response.success) {
 								window.location.href = response.redirectUrl;
 							} else {
-								alert(response.message);
+								showValidationModal(response.message || "저장 중 오류가 발생했습니다.");
 							}
 						},
 						error: function (xhr, status, error) {
@@ -1615,7 +1629,7 @@ h2:after {
 								error: error,
 								response: xhr.responseText
 							});
-							alert('저장 중 오류가 발생했습니다.');
+							showValidationModal("저장 중 오류가 발생했습니다.");
 						}
 					});
 				});
@@ -1757,6 +1771,35 @@ h2:after {
 				$(document).on('click', '.remove-education', function () {
 					$(this).closest('.education-item').remove();
 				});
+//---------------------------------------------------------------------------------------------------------------------------------
+				// 페이지 로드 시 기존 학력사항 표시
+				function initializeEducation() {
+					const educationTemplate = document.querySelector('#educationTemplate');
+					
+					<c:forEach var="education" items="${resumeDetail.educations}" varStatus="status">
+						const educationClone${status.index} = educationTemplate.content.cloneNode(true);
+						
+						// 기존 값 설정
+						$(educationClone${status.index}).find('.education-level').val('${education.educationLevel}');
+						$(educationClone${status.index}).find('.education-status').val('${education.educationStatus}');
+						
+						// 날짜 형식 변환 (yyyy-MM-dd)
+						<c:if test="${not empty education.graduationDate}">
+							const graduationDate${status.index} = new Date('${education.graduationDate}');
+							const formattedDate${status.index} = graduationDate${status.index}.getFullYear() + '-' + 
+								String(graduationDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' + 
+								String(graduationDate${status.index}.getDate()).padStart(2, '0');
+							$(educationClone${status.index}).find('.graduation-date').val(formattedDate${status.index});
+						</c:if>
+						
+						$(educationClone${status.index}).find('.custom-input').val('${education.customInput}');
+						
+						$('#educationContainer').append(educationClone${status.index});
+					</c:forEach>
+				}
+
+				// 페이지 로드 시 학력사항 초기화
+				initializeEducation();
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 경력 추가 버튼 클릭 이벤트
 				let count = 0; // id 중복 방지 만들기 위한 count
@@ -1796,6 +1839,53 @@ h2:after {
 						$endDate.prop('disabled', false);
 					}
 				});
+//---------------------------------------------------------------------------------------------------------------------------------
+				// 페이지 로드 시 기존 경력사항 표시
+				function initializeHistory() {
+					const historyTemplate = document.querySelector('#historyTemplate');
+					
+					<c:forEach var="history" items="${resumeDetail.histories}" varStatus="status">
+						const historyClone${status.index} = historyTemplate.content.cloneNode(true);
+						
+						// 기존 값 설정
+						$(historyClone${status.index}).find('.company-name').val('${history.companyName}');
+						$(historyClone${status.index}).find('.position').val('${history.position}');
+						$(historyClone${status.index}).find('.job-description').val('${history.jobDescription}');
+						
+						// 시작일 설정
+						<c:if test="${not empty history.startDate}">
+							const startDate${status.index} = new Date('${history.startDate}');
+							const formattedStartDate${status.index} = startDate${status.index}.getFullYear() + '-' + 
+								String(startDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' + 
+								String(startDate${status.index}.getDate()).padStart(2, '0');
+							$(historyClone${status.index}).find('.start-date').val(formattedStartDate${status.index});
+						</c:if>
+						
+						// 종료일 설정 (재직중이 아닌 경우에만)
+						<c:if test="${not empty history.endDate}">
+							const endDate${status.index} = new Date('${history.endDate}');
+							const formattedEndDate${status.index} = endDate${status.index}.getFullYear() + '-' + 
+								String(endDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' + 
+								String(endDate${status.index}.getDate()).padStart(2, '0');
+							$(historyClone${status.index}).find('.end-date').val(formattedEndDate${status.index});
+						</c:if>
+						
+						// 재직중 체크박스 상태 설정
+						<c:if test="${empty history.endDate}">
+							$(historyClone${status.index}).find('.currently-employed').prop('checked', true);
+							$(historyClone${status.index}).find('.end-date').prop('disabled', true);
+						</c:if>
+						
+						// 담당업무 글자수 카운트 설정
+						const jobDescriptionLength${status.index} = '${history.jobDescription}'.length;
+						$(historyClone${status.index}).find('#jobDescriptionCount').text(jobDescriptionLength${status.index} + ' / 100');
+						
+						$('#historyContainer').append(historyClone${status.index});
+					</c:forEach>
+				}
+
+				// 페이지 로드 시 경력사항 초기화
+				initializeHistory();
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 자격증 추가 버튼 클릭 이벤트
 				$('#addLicenseBtn').on('click', function () {
@@ -1813,7 +1903,45 @@ h2:after {
 				$(document).on('click', '.remove-license', function () {
 					$(this).closest('.license-item').remove();
 				});
+//---------------------------------------------------------------------------------------------------------------------------------
+				// 페이지 로드 시 기존 자격증 표시
+				function initializeLicense() {
+					const licenseTemplate = document.querySelector('#licenseTemplate');
+					
+					<c:forEach var="license" items="${resumeDetail.licenses}" varStatus="status">
+						const licenseClone${status.index} = licenseTemplate.content.cloneNode(true);
+						
+						// 기존 값 설정
+						$(licenseClone${status.index}).find('.license-name').val('${license.licenseName}');
+						$(licenseClone${status.index}).find('.institution').val('${license.institution}');
+						
+						// 취득일자 설정
+						<c:if test="${not empty license.acquisitionDate}">
+							const acquisitionDate${status.index} = new Date('${license.acquisitionDate}');
+							const formattedAcquisitionDate${status.index} = acquisitionDate${status.index}.getFullYear() + '-' + 
+								String(acquisitionDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' + 
+								String(acquisitionDate${status.index}.getDate()).padStart(2, '0');
+							$(licenseClone${status.index}).find('.acquisition-date').val(formattedAcquisitionDate${status.index});
+						</c:if>
+						
+						$('#licenseContainer').append(licenseClone${status.index});
+					</c:forEach>
+				}
+
+				// 페이지 로드 시 자격증 초기화
+				initializeLicense();
 				//---------------------------------------------------------------------------------------------------------------------------------
+				// 페이지 로드 시 기존 자기소개 표시
+				function initializeSelfIntro() {
+					<c:if test="${not empty resumeDetail.resume.introduce}">
+						$('#selfIntroTextarea').val('${resumeDetail.resume.introduce}');
+						$('#charCount').text('${resumeDetail.resume.introduce}'.length + ' / 1000');
+					</c:if>
+				}
+
+				// 페이지 로드 시 자기소개 초기화
+				initializeSelfIntro();
+//---------------------------------------------------------------------------------------------------------------------------------
 				// 자기소개 입력란 몇글자 썻는지 알 수 있게 하기
 				$('#selfIntroTextarea').on('input', function () {
 					const currentLength = $(this).val().length;
@@ -1845,6 +1973,32 @@ h2:after {
 				let uploadedFiles = [];
 				const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 				const MAX_FILES = 30;
+
+				// 페이지 로드 시 기존 첨부파일 표시
+				function initializeFiles() {
+					<c:if test="${not empty resumeDetail.files}">
+						<c:forEach var="file" items="${resumeDetail.files}">
+							uploadedFiles.push({
+								originalFileName: '${file.originalFileName}',
+								newFileName: '${file.newFileName}',
+								ext: '${file.ext}',
+								size: ${file.size},
+								base64Image: '${file.base64Image}'
+							});
+							showFilePreview({
+								originalFileName: '${file.originalFileName}',
+								newFileName: '${file.newFileName}',
+								ext: '${file.ext}',
+								size: ${file.size},
+								base64Image: '${file.base64Image}'
+							});
+						</c:forEach>
+						updateFileText();
+					</c:if>
+				}
+
+				// 페이지 로드 시 첨부파일 초기화
+				initializeFiles();
 
 				// 파일 입력 이벤트
 				$('#fileInput').on('change', function (e) {
