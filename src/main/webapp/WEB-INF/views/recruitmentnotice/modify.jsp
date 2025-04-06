@@ -76,6 +76,8 @@
       const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}';
       const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}';
 
+	  console.log("선택한 시군구, 직업군 : " + sigunguNo, subcategoryNo);
+
       // 제목, 담당자, 날짜 등 텍스트 필드 세팅
       $('#title').val(title);
       $('#pay').val(Number(pay).toLocaleString());
@@ -93,16 +95,23 @@
 
       // 셀렉트 필드 세팅 (선택 후 로딩 기다림)
       setTimeout(() => {
-        $(".Region").val(regionNo).trigger("change");
-		setTimeout(() => {
-		  $(".Sigungu").val(sigunguNo).trigger("change");
-	 	  $("#sigunguNo").val(sigunguNo);  // ← 명시적으로 설정
-		}, 500);
+  $(".Region").val(regionNo).trigger("change");
+  setTimeout(() => {
+    getSigungu(regionNo);
+    setTimeout(() => {
+      $(".Sigungu").val(sigunguNo).trigger("change");
+    }, 400);
+  }, 200);
 
       setTimeout(() => {
         $(".MajorCategory").val(majorcategoryNo).trigger("change");
-        setTimeout(() => { $(".SubCategory").val(subcategoryNo); }, 300);
-      }, 300);
+        setTimeout(() => {
+    getSubCategory(majorcategoryNo);
+    setTimeout(() => {
+      $(".SubCategory").val(subcategoryNo).trigger("change");
+    }, 400);
+ 	 }, 200);
+	}, 300);
 
       // 근무 시간 분해
       const timeRegex = /^(\d{2}:\d{2})~(\d{2}:\d{2})(?: \((.+)\))?$/;
