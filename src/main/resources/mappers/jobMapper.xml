@@ -4,32 +4,33 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.mapper.JobMapper">
 
-    <insert id="insertJobCategory">
-        INSERT IGNORE INTO majorcategory (jobName)
-        VALUES (#{jobName})
-    </insert>
-    
-     <!-- 대분류의 번호 조회 -->
-    <select id="findMajorCategoryNoByName" resultType="int">
-        SELECT MajorcategoryNo FROM majorcategory WHERE jobName = #{jobName}
-    </select>
+	<insert id="insertJobCategory">
+		INSERT IGNORE INTO majorcategory (jobName)
+		VALUES (#{jobName})
+	</insert>
 
-    <!-- 소분류 데이터 저장 -->
-    <insert id="insertSubcategory">
-        INSERT IGNORE INTO subcategory (refMajorcategoryNo, jobName)
-        VALUES (#{refMajorcategoryNo}, #{jobName})
-    </insert>
-	
-	
+	<!-- 대분류의 번호 조회 -->
+	<select id="findMajorCategoryNoByName" resultType="int">
+		SELECT MajorcategoryNo FROM majorcategory WHERE jobName = #{jobName}
+	</select>
+
+	<!-- 소분류 데이터 저장 -->
+	<insert id="insertSubcategory">
+		INSERT IGNORE INTO subcategory (refMajorcategoryNo, jobName)
+		VALUES (#{refMajorcategoryNo}, #{jobName})
+	</insert>
+
+
 	<!-- 공고에 대분류 저장 -->
-		<insert id="insertMajorJobTypeWithRecruitmentnotice">
+	<insert id="insertMajorJobTypeWithRecruitmentnotice">
 		insert into jobtype_recruit_major
-		(refRecNo, refMajorNo)
+		(refRecNo,
+		refMajorNo)
 		values
 		(#{refRecNo}, #{refMajorNo})
 	</insert>
 	<!-- 공고에 소분류 저장 -->
-		<insert id="insertSubJobTypeWithRecruitmentnotice">
+	<insert id="insertSubJobTypeWithRecruitmentnotice">
 		insert into jobtype_recruit_sub
 		(refRecNo, refSubNo)
 		values
@@ -37,15 +38,25 @@
 	</insert>
 
 	<!-- 공고에 있는 대분류 갖고오는 -->
-		<select id="findMajorCategoryWithRecruitmentnotice" resultType="com.jobhunter.model.jobtype.Majorcategory">
-			select * from jobtype_recruit_major
-			where refRecNo = #{refRecNo}
-		</select>
-	
+	<select id="findMajorCategoryWithRecruitmentnotice"
+		resultType="com.jobhunter.model.jobtype.Majorcategory">
+		select * from jobtype_recruit_major
+		where refRecNo = #{refRecNo}
+	</select>
+
 	<!-- 공고에 있는 소분류 갖고오는 -->
-		<select id="findSubCategoryWithRecruitmentnotice" resultType="com.jobhunter.model.jobtype.Subcategory">
-			select * from jobtype_recruit_sub
-			where refRecNo = #{refRecNo}
-		</select>	
+	<select id="findSubCategoryWithRecruitmentnotice"
+		resultType="com.jobhunter.model.jobtype.Subcategory">
+		select * from jobtype_recruit_sub
+		where refRecNo = #{refRecNo}
+	</select>
+
+	<!-- 공고에 있는 대분류 수정하는 -->
+	<update id="updateMajorCategoryWithRecruitmentnotice"
+		parameterType="map">
+		UPDATE jobtype_recruit_major
+		SET refMajorNo = #{majorcategoryNo}
+		WHERE refRecNo = #{uid}
+	</update>
 </mapper>
 
