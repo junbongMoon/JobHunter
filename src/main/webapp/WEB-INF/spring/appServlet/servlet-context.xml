@@ -70,6 +70,7 @@
 		<interceptor>
 			<mapping path="/user/mypage" />
 			<mapping path="/user/kakao" />
+			<mapping path="/review/write"/>
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
 
@@ -82,7 +83,12 @@
 			<mapping path="/account/login" />
 			<beans:ref bean="autoLoginInterceptor" />
 		</interceptor>
-
+		
+		<interceptor>
+			<mapping path="/reviewBoard/write" />
+			<beans:ref bean="autoLoginInterceptor" />
+		</interceptor>
+		
 	</interceptors>
 
 
