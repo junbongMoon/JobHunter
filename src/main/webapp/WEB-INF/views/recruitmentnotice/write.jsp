@@ -578,6 +578,8 @@ function isValidRecruitmentForm() {
   	const personalHistory = $("input[name='personalHistory']:checked").val();
  	const manager = $("#manager").val();
   	const refCompany = $("#refCompany").val();
+
+	  $("#pay").val(pay);
 	  let period = startTime + "~" + endTime;
 if (workDetailType) {
   period += " (" + workDetailType + ")";
@@ -933,7 +935,7 @@ label {
 									<div class="col-md-12">
 										<div class="input-group">
 											<label for="pay" class="form-check-label mb-2">급여 액수</label>
-											<input type="text" id="pay" maxlength="15"
+											<input type="text" id="pay" maxlength="15" name="pay"
 												placeholder="숫자만 입력할 수 있습니다." oninput="formatPay(this)">
 										</div>
 									</div>

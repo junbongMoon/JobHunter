@@ -451,6 +451,10 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 
 	// 저장 버튼 클릭 시 JSON 데이터 세팅
 $("#write").on("click", function () {
+
+  const rawPay = getRawPay();
+  $("#pay").val(rawPay);  // 실제 서버 제출 전에 값을 "123456" 같은 숫자형으로 변경
+
   const apps = [];
 
   $(".application-checkbox:checked").each(function () {
@@ -1209,7 +1213,7 @@ label {
 									<div class="col-md-12">
 										<div class="input-group">
 											<label for="pay" class="form-check-label mb-2">급여 액수</label>
-											<input type="text" id="pay" maxlength="15"
+											<input type="text" id="pay" maxlength="15" name="pay"
 												placeholder="숫자만 입력할 수 있습니다." oninput="formatPay(this)">
 										</div>
 									</div>
