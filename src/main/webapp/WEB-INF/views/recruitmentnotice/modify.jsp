@@ -94,8 +94,10 @@
       // 셀렉트 필드 세팅 (선택 후 로딩 기다림)
       setTimeout(() => {
         $(".Region").val(regionNo).trigger("change");
-        setTimeout(() => { $(".Sigungu").val(sigunguNo); }, 300);
-      }, 300);
+		setTimeout(() => {
+		  $(".Sigungu").val(sigunguNo).trigger("change");
+	 	  $("#sigunguNo").val(sigunguNo);  // ← 명시적으로 설정
+		}, 500);
 
       setTimeout(() => {
         $(".MajorCategory").val(majorcategoryNo).trigger("change");
@@ -370,12 +372,11 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 		}
 	});
 	
-
+	instalRecruitment();
 
 	});
 
-	
-// 수정 페이지에 들어왔을 때 공고의 정보를 입력해주는 함수
+
 // 수정 페이지에 들어왔을 때 공고의 정보를 입력해주는 함수
 function instalRecruitment() {
 	const title = '${RecruitmentDetailInfo.title}';
@@ -421,6 +422,7 @@ function instalRecruitment() {
 		}
 	}
 }
+	});
 
 // 파일 업로드 + 썸네일 표시
 function uploadFileAndShowPreview(file) {
@@ -1249,8 +1251,16 @@ label {
 										<div class="text-end mb-3">
 											<button type="button" class="addAdvantageBtn" onclick="addAdvantage()">저장하기</button>
 										  </div>
-										<div class="advantageArea"></div>
-									</div>
+										<div class="advantageArea">
+											<c:forEach var="adv" items="${RecruitmentDetailInfo.advantage}">
+    										<div class="d-flex align-items-center mb-2 advantage-item">
+      										<input type="hidden" value="${adv.advantageType}">
+      										<span class="me-2">${adv.advantageType}</span>
+      										<button type="button" class="btn btn-sm btn-outline-danger">X</button>
+    										</div>
+  											</c:forEach>
+											</div>
+										</div>
 
 									<div class="col-md-6 dueDate">
 										<div class="input-group">
@@ -1284,7 +1294,18 @@ label {
 										</div>
 									</div>
 									<div class="col-12 text-center">
-										<table class="preview mt-3"></table>
+										<table class="preview mt-3">
+											<c:forEach var="file" items="${RecruitmentDetailInfo.fileList}">
+   												<tr id="thumb_${file.originalFileName}">
+      												<td><img src="/resources/recruitmentFiles/${file.newFileName}" width="60" /></td>
+      												<td>${file.originalFileName}</td>
+      												<td>
+        											<button type="button" class="btn btn-sm btn-danger"
+          											onclick="removeFile('${file.originalFileName}')">X</button>
+      												</td>
+    											</tr>
+  											</c:forEach>
+										</table>
 									</div>
 
 
