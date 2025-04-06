@@ -3,13 +3,37 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <style>
-.rectext strong{
+.rectext strong {
 	color: #47b2e4;;
+}
+
+.recruitmentList {
+	margin-top: 20px;
 	
 }
-.recruitmentList{
-	margin-top: 20px;
-	margin-bottom: 20px;
+
+.write-btn-container {
+  width: 90%;
+  margin-bottom: 50px;
+}
+
+.write-btn {
+  background-color: #47b2e4;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.write-btn:hover {
+  background-color: #1f9fd2;
+}
+
+.recruitment {
+  margin-bottom: 30px;
+
 }
 </style>
 <body>
@@ -19,17 +43,19 @@
 		<!-- Blog Posts Section -->
 		<section id="blog-posts" class="blog-posts section">
 			<div>
-			<c:choose>
+				<c:choose>
 					<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
-						<div class="read-more"><a href="/recruitmentnotice/write">공고 작성</a></div>
+						<div class="write-btn-container text-end">
+							<a href="/recruitmentnotice/write" class="write-btn">공고 작성</a>
+						</div>
 					</c:when>
 				</c:choose>
-				</div>
+			</div>
 			<div class="container" data-aos="fade-up" data-aos-delay="100">
-				<div class="row gy-4">
+				<div class="row gy-4 gx-4">
 
 					<c:forEach var="rec" items="${boardList}">
-						<div class="col-lg-6">
+						<div class="col-lg-6 recruitment">
 							<article>
 								<h2 class="title">
 									<a href="/recruitmentnotice/detail?uid=${rec.uid}">${rec.title}</a>
@@ -49,25 +75,23 @@
 
 								<div class="content recruitmentList">
 									<p class="rectext">
-										<strong>지역:</strong>
-										<span class="badge bg-primary me-2"><c:out value="${rec.region.name}" default="-" /></span>
-										<strong>시군구:</strong>
-										<span class="badge bg-info me-2"><c:out value="${rec.sigungu.name}" default="-" /></span>
-										<br /> 
-										<strong>산업군:</strong>
-										<span class="badge bg-success me-2"><c:out value="${rec.majorCategory.jobName}" default="-" /></span>
-										<strong>직업:</strong>
-										<span class="badge bg-warning text-dark me-2"><c:out value="${rec.subcategory.jobName}" default="-" /></span>
-										<br /> 
-										<strong>우대조건:</strong>
-										<c:forEach var="adv" items="${rec.advantage}" varStatus="status">
+										<strong>지역:</strong> <span class="badge bg-primary me-2"><c:out
+												value="${rec.region.name}" default="-" /></span> <strong>시군구:</strong>
+										<span class="badge bg-info me-2"><c:out
+												value="${rec.sigungu.name}" default="-" /></span> <br /> <strong>산업군:</strong>
+										<span class="badge bg-success me-2"><c:out
+												value="${rec.majorCategory.jobName}" default="-" /></span> <strong>직업:</strong>
+										<span class="badge bg-warning text-dark me-2"><c:out
+												value="${rec.subcategory.jobName}" default="-" /></span> <br /> <strong>우대조건:</strong>
+										<c:forEach var="adv" items="${rec.advantage}"
+											varStatus="status">
 											<c:if test="${status.index < 2}">
 												<span class="badge bg-danger me-2">${adv.advantageType}</span>
 											</c:if>
 										</c:forEach>
-										<br /> 
-										<strong>면접방식:</strong>
-										<c:forEach var="app" items="${rec.application}" varStatus="status">
+										<br /> <strong>면접방식:</strong>
+										<c:forEach var="app" items="${rec.application}"
+											varStatus="status">
 											<c:if test="${status.index < 2}">
 												<span class="badge bg-secondary me-2">${app.method}</span>
 											</c:if>
@@ -75,7 +99,7 @@
 									</p>
 
 									<div class="read-more">
-										
+
 										<a href="/recruitmentnotice/detail/?uid=${rec.uid}">바로 가기</a>
 									</div>
 								</div>
