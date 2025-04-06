@@ -66,6 +66,30 @@ public class RegionDAOImpl implements RegionDAO {
 		
 		return ses.insert(NS + ".insertSigunguByRecruitmentNotice", tempMap);
 	}
+	
+	// 공고에 있는 지역 수정하는 메서드
+	@Override
+	public void updateRegionWithRecruitmentNotice(int uid, int regionNo) throws Exception {
+		
+		Map<String, Integer> param = new HashMap<>();
+		param.put("uid", uid);
+		param.put("regionNo", regionNo);
+		
+		ses.update(NS + ".updateRegionByRecruitmentNotice", param);
+			
+	}
+	
+	// 공고에 있는 시군구 수정하는 메서드
+	@Override
+	public void updateSigunguWithRecruitmentNotice(int uid, int sigunguNo) {
+		
+		Map<String, Integer> param = new HashMap<>();
+		param.put("uid", uid);
+		param.put("sigunguNo", sigunguNo);
+		
+		ses.update(NS + ".updateSigunguByRecruitmentNotice", param);
+		
+	}
 
 	
 

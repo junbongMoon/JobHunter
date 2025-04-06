@@ -34,4 +34,16 @@
 		(#{refRecNo}, #{refSigungu})
 	</insert>
 	
+	<update id="updateRegionByRecruitmentNotice">
+		UPDATE where_recruit_region
+		SET refRegion = #{regionNo}
+		WHERE refRecNo = #{uid}
+	</update>
+	
+	<update id="updateSigunguByRecruitmentNotice">
+		UPDATE where_recruit_sigungu
+		SET refSigungu = #{sigunguNo}
+		WHERE refRecNo = #{uid}
+	</update>
+	
 </mapper>
