@@ -30,23 +30,25 @@
 
 	<select id="gonggoAll"
 		resultType="com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO">
-		select
-		r.title AS resumeTitle,
+		SELECT
+		rn.uid AS recruitmentnoticeNo,
+		res.title AS
+		resumeTitle,
 		rn.title AS recruitmentTitle,
 		c.companyName,
 		rn.workType,
 		rn.personalHistory,
 		rn.payType,
 		rn.period
-		FROM
-		users u
-		LEFT JOIN resume r ON u.uid =
-		r.userUid
-		JOIN recruitmentnotice rn
-		ON rn.uid = r.resumeNo
-		JOIN company c ON rn.refCompany = c.uid
-		WHERE
-		u.uid = #{r.userUid}
+		FROM registration reg
+		JOIN
+		recruitmentnotice rn ON reg.recruitmentNoticePk = rn.uid
+		JOIN resume
+		res ON reg.resumePk = res.resumeNo
+		JOIN company c ON rn.refCompany =
+		c.uid
+		WHERE res.userUid = #{res.userUid}
+		AND reg.status = 'CHECKED'
 
 	</select>
 
@@ -71,7 +73,10 @@
 		#{reviewType},
 		#{reviewLevel},
 		#{reviewResult},
-		#{content}
+		#{content},
+		NOW(),
+		0,
+		0
 		)
 	</insert>
 
@@ -114,7 +119,8 @@
 		<result column="period" property="period" /><!--근무기간 -->
 		<result column="detail" property="detail" /><!-- 공고 상세 설명 -->
 		<result column="companyName" property="companyName" /> <!--회사명 -->
-		<result column="reviewResult" property="reviewResult" /><!-- 면접 결과 -->
+		<result column="reviewResult" property="reviewResult" /><!-- 면접 
+			결과 -->
 		<result column="reviewType" property="reviewType" /> <!-- 면접 유형 -->
 		<result column="reviewLevel" property="reviewLevel" /><!--면접 난이도 -->
 		<result column="content" property="content" /> <!--후기 본문 -->

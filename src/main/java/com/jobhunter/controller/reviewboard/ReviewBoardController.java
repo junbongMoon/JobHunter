@@ -55,53 +55,57 @@ public class ReviewBoardController {
 		return resultPage;
 
 	};
-		// 공고글 게시물을 조회 
+
+	// 공고글 게시물을 조회
 	@GetMapping("/write")
 	public String reviewBoardWrite(HttpSession session, Model model, HttpServletRequest req) {
 
-	    AccountVO account = (AccountVO) session.getAttribute("account");
-	    if (account == null) {
-	        return "redirect:/account/login";
-	    }
+		AccountVO account = (AccountVO) session.getAttribute("account");
+		if (account == null || account.getUid() == 0) {
+			return "redirect:/account/login";
+		}
 
-	    int userUid = account.getUid(); 
+		int userUid = account.getUid();
+		System.out.println(userUid);
 
-	    try {
-	        List<RecruitmentnoticContentDTO> gonggoList = service.selectgoggo(userUid, GetClientIPAddr.getClientIp(req));
-	        model.addAttribute("gonggoList", gonggoList);
-	        model.addAttribute("userUid", userUid);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return "redirect:/account/login";
-	    }
+		try {
+			List<RecruitmentnoticContentDTO> gonggoList = service.selectgoggo(userUid,
+					GetClientIPAddr.getClientIp(req));
+			model.addAttribute("gonggoList", gonggoList);
+			model.addAttribute("userUid", userUid);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "redirect:/account/login";
+		}
 
-	    return "reviewBoard/write";
+		return "reviewBoard/write";
 	}
-		// 게시물 작성 저장 
+
+	// 게시물 작성 저장
 	@PostMapping("/write")
 	public String saveReviewBoard(@ModelAttribute WriteBoardDTO writeBoardDTO, HttpSession session) {
-	    AccountVO account = (AccountVO) session.getAttribute("account");
-	    if (account == null) {
-	        return "redirect:/account/login";
-	    }
+		AccountVO account = (AccountVO) session.getAttribute("account");
 
-	    writeBoardDTO.setWriter(account.getUid());
+		if (account == null || account.getUid() == 0) {
+			return "redirect:/account/login";
+		}
+		writeBoardDTO.setWriter(account.getUid());
 
-	    //logger.info("리뷰 게시글 저장 시도: " + writeBoardDTO.toString());
-	    String returnPage = "redirect:./allBoard";
-	    //logger.info("writeBoardDTO.toString());
-	    //logger.info("reviewResult 넘어온 값 = {}", writeBoardDTO.getReviewResult());
+		// logger.info("리뷰 게시글 저장 시도: " + writeBoardDTO.toString());
+		String returnPage = "redirect:./allBoard";
+		// logger.info("writeBoardDTO.toString());
+		// logger.info("reviewResult 넘어온 값 = {}", writeBoardDTO.getReviewResult());
 
-	    try {
-	        if (service.saveReview(writeBoardDTO)) {
-	            returnPage += "?status=success";
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        returnPage += "?status=fail";
-	    }
+		try {
+			if (service.saveReview(writeBoardDTO)) {
+				returnPage += "?status=success";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			returnPage += "?status=fail";
+		}
 
-	    return returnPage;
+		return returnPage;
 	}
 
 	@GetMapping("/detail")
@@ -117,5 +121,5 @@ public class ReviewBoardController {
 		return "reviewBoard/detail";
 
 	}
-	
+
 }

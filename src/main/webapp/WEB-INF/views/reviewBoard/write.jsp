@@ -1,16 +1,24 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<jsp:include page="/WEB-INF/views/header.jsp"></jsp:include>
 <title>면접 후기 작성</title>
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <style>
+:root { -
+	-heading-color: #1e2a45; -
+	-nav-dropdown-hover-color: #80cfff; -
+	-background-color: #ffffff;
+}
+
+body {
+	background-color: var(- -background-color);
+	font-size: var(- -bs-body-font-size);
+}
+
 h2 {
 	font-size: 32px;
 	color: var(- -heading-color);
@@ -51,42 +59,41 @@ label.form-label {
 }
 </style>
 <script>
+        function showGonggoDetails() {
+            const select = document.getElementById("gonggoSelect");
+            const selectedValue = select.value;
 
-function showGonggoContent() {
-    const select = document.getElementById("gonggoSelect");
-    const selectedOption = select.selectedOptions[0];
-    const selectedValue = select.value;
-    const companyName = selectedOption.dataset.company;
+            const details = document.querySelectorAll(".gonggo-detail");
+            details.forEach(div => div.style.display = "none");
 
-    document.querySelectorAll(".gonggoContent").forEach(div => div.hidden = true);
-    const target = document.getElementById(`gonggoContents${selectedValue}`);
-    if (target) target.hidden = false;
+            const target = document.getElementById("gonggoDetail-" + selectedValue);
+            if (target) target.style.display = "block";
 
-    document.getElementById("companyNameInput").value = companyName || "";
-}
+            const companyName = select.options[select.selectedIndex].getAttribute("data-company");
+            document.getElementById('companyNameInput').value = companyName;
+        }
 
-function TextInput() {
-    const isChecked = document.getElementById("reviewTypeOther").checked;
-    document.getElementById("otherTypeInput").hidden = !isChecked;
-}
-</script>
-
-
-
+        function toggleOtherTypeInput() {
+            const otherInput = document.getElementById("otherTypeInput");
+            const isOtherChecked = document.getElementById("reviewTypeOther").checked;
+            otherInput.style.display = isOtherChecked ? "block" : "none";
+        }
+    </script>
 </head>
 <body>
 	<div class="container mt-5">
 		<h2 class="mb-4">면접 후기 작성</h2>
 
 		<c:if test="${not empty sessionScope.account}">
-			<form action="/reviewBoard/write" method="post">
+			<form action="${pageContext.request.contextPath}/reviewBoard/write"
+				method="post">
 				<div class="mb-3">
-					<label class="form-label">공고 번호 선택<span class="text-danger">*</span></label>
+					<label class="form-label">이력서 선택<span class="text-danger">*</span></label>
 					<select class="form-select" id="gonggoSelect" name="gonggoUid"
-						required onchange="showGonggoContent()">
-						<option value="" selected disabled>공고를 선택하세요</option>
+						required onchange="showGonggoDetails()">
+						<option value="" selected disabled>이력서를 선택하세요</option>
 						<c:forEach var="gonggo" items="${gonggoList}">
-							<option value="${gonggo.resumeTitle}"
+							<option value="${gonggo.recruitmentnoticeNo}"
 								data-company="${gonggo.companyName}">
 								${gonggo.resumeTitle}</option>
 						</c:forEach>
@@ -94,8 +101,8 @@ function TextInput() {
 				</div>
 
 				<c:forEach var="gonggo" items="${gonggoList}">
-					<div id="gonggoContents${gonggo.resumeTitle}"
-						class="gonggoContent mb-3 p-3 border rounded"
+					<div id="gonggoDetail-${gonggo.recruitmentnoticeNo}"
+						class="gonggo-detail mb-3 p-3 border rounded"
 						style="display: none">
 						<p class="mb-1">
 							<strong>회사명:</strong> ${gonggo.companyName}
@@ -112,9 +119,10 @@ function TextInput() {
 						<p class="mb-1">
 							<strong>급여 형태:</strong> ${gonggo.payType}
 						</p>
-						<p class="mb-0">
+						<p class="mb-1">
 							<strong>근무 기간:</strong> ${gonggo.period}
 						</p>
+						
 					</div>
 				</c:forEach>
 
@@ -124,23 +132,23 @@ function TextInput() {
 					<label class="form-label">면접 유형<span class="text-danger">*</span></label><br>
 					<div class="form-check form-check-inline">
 						<input class="form-check-input" type="radio" name="reviewType"
-							value="FACE_TO_FACE" required onclick="textInput()"> <label
-							class="form-check-label">대면</label>
+							value="FACE_TO_FACE" required onclick="toggleOtherTypeInput()">
+						<label class="form-check-label">대면</label>
 					</div>
 					<div class="form-check form-check-inline">
 						<input class="form-check-input" type="radio" name="reviewType"
-							value="VIDEO" onclick="textInput()"> <label
+							value="VIDEO" onclick="toggleOtherTypeInput()"> <label
 							class="form-check-label">비대면</label>
 					</div>
 					<div class="form-check form-check-inline">
 						<input class="form-check-input" type="radio" name="reviewType"
-							value="PHONE" onclick="textInput()"> <label
+							value="PHONE" onclick="toggleOtherTypeInput()"> <label
 							class="form-check-label">전화면접</label>
 					</div>
 					<div class="form-check form-check-inline">
 						<input class="form-check-input" type="radio" id="reviewTypeOther"
-							name="reviewType" value="OTHER" onclick="textInput()"> <label
-							class="form-check-label">기타</label>
+							name="reviewType" value="OTHER" onclick="toggleOtherTypeInput()">
+						<label class="form-check-label">기타</label>
 					</div>
 				</div>
 
@@ -183,7 +191,7 @@ function TextInput() {
 
 				<div class="d-flex gap-2">
 					<button type="submit" class="btn btn-primary">후기 등록</button>
-					<a href="/reviewBoard/allBoard"
+					<a href="${pageContext.request.contextPath}/reviewBoard/allBoard"
 						class="btn btn-secondary">취소</a>
 				</div>
 			</form>
@@ -191,8 +199,9 @@ function TextInput() {
 
 		<c:if test="${empty sessionScope.account}">
 			<div class="alert alert-warning mt-4" role="alert">
-				로그인 후 이용 가능한 기능입니다. <a href="/account/login" class="alert-link">로그인하러
-					가기</a>
+				로그인 후 이용 가능한 기능입니다. <a
+					href="${pageContext.request.contextPath}/account/login"
+					class="alert-link">로그인하러 가기</a>
 			</div>
 		</c:if>
 	</div>
