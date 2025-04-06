@@ -1549,6 +1549,53 @@ h2:after {
 
 					console.log("유효성 검사 통과");
 
+					// 삭제된 파일이 있으면 서버에 삭제 요청
+					if (deletedFiles.length > 0) {
+						// 각 파일에 대해 개별적으로 삭제 요청
+						let deletePromises = deletedFiles.map(function(fileName) {
+							// 비동기 작업을 처리하기 위한 Promise 객체 생성
+							return new Promise(function(resolve, reject) {
+								$.ajax({
+									url: "/resume/deleteFile",
+									type: "POST",
+									data: JSON.stringify({
+										originalFileName: fileName,
+										newFileName: fileName,
+										ext: fileName.split('.').pop(),
+										size: 0
+									}),
+									contentType: "application/json",
+									success: function(result) {
+										if (result.success) {
+											resolve();
+										} else {
+											reject(result.message || "파일 삭제에 실패했습니다.");
+										}
+									},
+									error: function() {
+										reject("파일 삭제 중 오류가 발생했습니다.");
+									}
+								});
+							});
+						});
+						
+						// 모든 삭제 요청이 완료된 후 폼 데이터 수집 및 저장 진행
+						Promise.all(deletePromises)
+							.then(function() {
+								console.log("모든 파일 삭제 성공");
+								submitFormData();
+							})
+							.catch(function(error) {
+								showValidationModal(error);
+							});
+					} else {
+						// 삭제된 파일이 없으면 바로 폼 데이터 수집 및 저장 진행
+						submitFormData();
+					}
+				});
+				
+				// 폼 데이터 수집 및 저장 함수
+				function submitFormData() {
 					// 폼 데이터 수집 .map() -> .get()으로 배열 변환해서 값 가져오기
 					const formData = {
 						title: $('#title').val(),
@@ -1632,7 +1679,7 @@ h2:after {
 							showValidationModal("저장 중 오류가 발생했습니다.");
 						}
 					});
-				});
+				}
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 유효성 검사 모달
 				function showValidationModal(message, focusSelector) {
@@ -1973,6 +2020,8 @@ h2:after {
 				let uploadedFiles = [];
 				const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 				const MAX_FILES = 30;
+				// 삭제된 파일 목록 초기화
+				let deletedFiles = [];
 
 				// 페이지 로드 시 기존 첨부파일 표시
 				function initializeFiles() {
@@ -2119,31 +2168,17 @@ h2:after {
 					$previewContainer.append($preview);
 				}
 
-				// 파일 삭제 함수
+				// 파일 삭제 함수 - 임시 삭제 방식으로 수정
 				function deleteFile(fileName, $preview) {
-					$.ajax({
-						url: "/resume/deleteFile",
-						type: "POST",
-						data: JSON.stringify({
-							originalFileName: fileName,
-							newFileName: fileName,
-							ext: fileName.split('.').pop(),
-							size: 0
-						}),
-						contentType: "application/json",
-						success: function (result) {
-							if (result.success) {
-								uploadedFiles = uploadedFiles.filter(f => f.newFileName !== fileName);
-								$preview.remove();
-								updateFileText();
-							} else {
-								showValidationModal(result.message || "파일 삭제에 실패했습니다.");
-							}
-						},
-						error: function () {
-							showValidationModal("파일 삭제 중 오류가 발생했습니다.");
-						}
-					});
+					// 실제로 서버에서 파일을 삭제하지 않고, 클라이언트에서만 삭제 표시
+					uploadedFiles = uploadedFiles.filter(f => f.newFileName !== fileName);
+					$preview.remove();
+					updateFileText();
+					
+					// 삭제된 파일 목록에 추가 (나중에 저장 시 서버에 전송)
+					if (!deletedFiles.includes(fileName)) {
+						deletedFiles.push(fileName);
+					}
 				}
 
 				// 파일 크기 포맷팅
