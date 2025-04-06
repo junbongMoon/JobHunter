@@ -25,7 +25,12 @@ public interface RecruitmentNoticeService {
 	
 	
 	// 공고를 삭제하는 메서드
-	boolean removeRecruitmentByUid(int uid);
+	boolean removeRecruitmentByUid(int uid) throws Exception;
+	
+	// 공고를 수정하는 메서드
+	void modifyRecruitmentNotice(RecruitmentNoticeDTO dto, List<AdvantageDTO> advantageList,
+			List<ApplicationDTO> applicationList, List<RecruitmentnoticeBoardUpfiles> fileList,
+			RecruitmentDetailInfo existing, int uid) throws Exception;
 	
 	
 }

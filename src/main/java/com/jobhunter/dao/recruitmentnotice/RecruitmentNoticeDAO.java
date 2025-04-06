@@ -2,6 +2,7 @@ package com.jobhunter.dao.recruitmentnotice;
 
 import java.util.List;
 
+import com.jobhunter.model.customenum.Method;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.Advantage;
@@ -54,5 +55,17 @@ public interface RecruitmentNoticeDAO {
 	List<RecruitmentnoticeBoardUpfiles> getFileList(int uid);
 	
 	// 공고를 삭제하는 메서드
-	int deleteRecruitmentByUid(int uid);
+	int deleteRecruitmentByUid(int uid) throws Exception;
+	
+	// 공고를 수정하는 메서드
+	void updateRecruitmentNotice(RecruitmentNoticeDTO dto) throws Exception;
+	
+	// 면접 방식을 삭제하는 메서드
+	void deleteApplication(int uid, Method method) throws Exception;
+	
+	// 파일을 삭제하는 메서드
+	void deleteRecruitmentFile(int uid) throws Exception;
+	
+	// 우대조건을 삭제하는 메서드
+	void deleteAdvantage(int uid, String advantageType) throws Exception;
 }

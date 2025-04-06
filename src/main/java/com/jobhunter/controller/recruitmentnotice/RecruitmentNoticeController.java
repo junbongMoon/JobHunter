@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
@@ -296,6 +298,47 @@ public class RecruitmentNoticeController {
 		return returnPage;
 	}
 	
+	
+	// 공고를 수정하는 메서드 
+	@PostMapping("/modify")
+	public String modifyRecruitment(
+	        @ModelAttribute RecruitmentNoticeDTO dto,
+	        @RequestParam("applicationJson") String applicationJson,
+	        @RequestParam("advantageJson") String advantageJson, @RequestParam("uid") int uid) {
+		dto.setUid(uid);
+	    boolean result = false;
+
+	    System.out.println("수정할 DTO: " + dto);
+
+	    try {
+	        ObjectMapper objectMapper = new ObjectMapper();
+
+	        List<ApplicationDTO> applications = objectMapper.readValue(applicationJson, new TypeReference<List<ApplicationDTO>>() {});
+	        List<AdvantageDTO> advantages = objectMapper.readValue(advantageJson, new TypeReference<List<AdvantageDTO>>() {});
+
+	        if (dto.getDueDateForString() != null && !dto.getDueDateForString().isEmpty()) {
+	            LocalDate date = LocalDate.parse(dto.getDueDateForString());
+	            dto.setDueDate(Timestamp.valueOf(date.atStartOfDay()));
+	        }
+
+	        // 기존 데이터 불러오기
+	        RecruitmentDetailInfo existing = recruitmentService.getRecruitmentByUid(uid);
+
+	        // 서비스로 수정 로직 위임
+	        recruitmentService.modifyRecruitmentNotice(dto, advantages, applications, fileList, existing, uid);
+
+	        result = true;
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    ListAllClear(); // 리스트 초기화
+
+	    return result
+	            ? "redirect:/recruitmentnotice/listAll"
+	            : "redirect:/recruitmentnotice/modify?uid=" + uid + "&status=fail";
+	}
 
 
 	// 공고를 삭제하는 메서드
@@ -303,10 +346,15 @@ public class RecruitmentNoticeController {
 	public ResponseEntity<Boolean> removeRecruitment(@PathVariable("uid") int uid) {
 		ResponseEntity<Boolean> result = null;
 		
-		if(recruitmentService.removeRecruitmentByUid(uid)) {			
-			result =ResponseEntity.ok().body(true);
-		}else {
-			result =ResponseEntity.badRequest().body(false);
+		try {
+			if(recruitmentService.removeRecruitmentByUid(uid)) {			
+				result = ResponseEntity.ok().body(true);
+			}else {
+				result = ResponseEntity.badRequest().body(false);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	    
 	    return result; 

@@ -1,10 +1,13 @@
 package com.jobhunter.dao.recruitmentnotice;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.jobhunter.model.customenum.Method;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.Advantage;
@@ -123,6 +126,46 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	public int deleteRecruitmentByUid(int uid) {
 		
 		return ses.delete(NS + ".removeRecruitmentByUid", uid);
+	}
+
+	// 공고를 수정하는 메서드
+	@Override
+	public void updateRecruitmentNotice(RecruitmentNoticeDTO dto) throws Exception {
+		ses.update(NS +".modifyRecruitmentByUid", dto);
+		
+	}
+
+	// 접수 방식을 삭제하는 메서드
+	@Override
+	public void deleteApplication(int uid, Method method) throws Exception {
+		Map<String, Object> param = new HashMap<>();
+		param.put("uid", uid);
+		param.put("method", method);
+
+		
+		
+		ses.delete(NS + ".removeApplicationByRecruitmentUid", param);
+		
+	}
+
+	// 파일을 삭제하는 메서드
+	@Override
+	public void deleteRecruitmentFile(int uid) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	// 우대조건을 삭제하는 메서드
+	@Override
+	public void deleteAdvantage(int uid, String advantageType) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("uid", uid);
+		param.put("advantageType", advantageType);
+
+		
+		
+		ses.delete(NS + ".removeAdvantageByRecruitmentUid", param);
+		
 	}
 
 

@@ -52,7 +52,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 			recNo = recdao.selectRecentRecruitment(CompanyUid);
 		}
-		
+
 		System.out.println(recNo);
 		System.out.println(recruitmentNoticeDTO);
 		// 우대 조건을 입력하는 메서드 호출
@@ -72,8 +72,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 			}
 		}
 
-		jobdao.insertMajorCategoryWithRecruitmentnotice(recNo,
-				recruitmentNoticeDTO.getMajorcategoryNo());
+		jobdao.insertMajorCategoryWithRecruitmentnotice(recNo, recruitmentNoticeDTO.getMajorcategoryNo());
 
 		jobdao.insertSubCategoryWithRecruitmentnotice(recNo, recruitmentNoticeDTO.getSubcategoryNo());
 
@@ -155,7 +154,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 		return pageResponseDTO;
 	}
-	
+
 	// 페이징하여 공고를 출력하는 메서드
 	private PageResponseDTO<RecruitmentDetailInfo> pagingProcess(PageRequestDTO pageRequestDTO) throws Exception {
 		PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO = new PageResponseDTO<RecruitmentDetailInfo>(
@@ -184,17 +183,94 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		return pageResponseDTO;
 
 	}
-	
+
 	// uid를 매개변수로 공고를 삭제하는 메서드
 	@Override
-	public boolean removeRecruitmentByUid(int uid) {
+	public boolean removeRecruitmentByUid(int uid) throws Exception {
 		boolean result = false;
-		
-		if(recdao.deleteRecruitmentByUid(uid) > 0) {
+
+		if (recdao.deleteRecruitmentByUid(uid) > 0) {
 			result = true;
 		}
-		
+
 		return result;
+	}
+
+	// 공고를 수정하는 메서드
+	@Override
+	@Transactional
+	public void modifyRecruitmentNotice(RecruitmentNoticeDTO dto, List<AdvantageDTO> newAdvList,
+			List<ApplicationDTO> newAppList, List<RecruitmentnoticeBoardUpfiles> newFileList,
+			RecruitmentDetailInfo existing, int uid) throws Exception {
+
+		// Step 1: 공고 기본 정보 수정
+		recdao.updateRecruitmentNotice(dto);
+
+		// Step 2: 우대 조건 비교 후 변경
+		List<Advantage> oldAdvList = existing.getAdvantage();
+		for (Advantage old : oldAdvList) {
+			// anyMatch: newAppList 중 하나라도 같은 method가 있으면 true
+			boolean existsInNew = newAdvList.stream()
+					.anyMatch(newAdv -> newAdv.getAdvantageType().equals(old.getAdvantageType()));
+			if (!existsInNew) {
+				recdao.deleteAdvantage(uid, old.getAdvantageType()); // <-- 여기 수정
+			}
+		}
+
+		for (AdvantageDTO newAdv : newAdvList) {
+			boolean existsInOld = oldAdvList.stream()
+					.anyMatch(old -> old.getAdvantageType().equals(newAdv.getAdvantageType()));
+			if (!existsInOld) {
+				newAdv.setRecruitmentNoticeUid(uid);
+				recdao.insertAdvantageWithRecruitmentNotice(newAdv);
+			}
+		}
+
+		// Step 3: 면접방식 비교 후 변경 (method가 같을 때 삭제)
+		List<Application> oldAppList = existing.getApplication();
+		for (Application old : oldAppList) {
+			// anyMatch: newAppList 중 하나라도 같은 method가 있으면 true
+			boolean existsInNew = newAppList.stream().anyMatch(newApp -> newApp.getMethod() == old.getMethod());
+
+			if (!existsInNew) {
+				// method가 사라졌다면 삭제
+				recdao.deleteApplication(uid, old.getMethod());
+			}
+		}
+
+		// 새로운 면접 방식이면 추가
+		for (ApplicationDTO newApp : newAppList) {
+			boolean existsInOld = oldAppList.stream().anyMatch(old -> old.getMethod() == newApp.getMethod());
+
+			if (!existsInOld) {
+				newApp.setRecruitmentNoticeUid(uid);
+				recdao.insertApplicationWithRecruitmentNotice(newApp);
+			}
+		}
+
+		// Step 4: 파일 비교 후 변경
+		List<RecruitmentnoticeBoardUpfiles> oldFileList = existing.getFileList();
+		for (RecruitmentnoticeBoardUpfiles oldFile : oldFileList) {
+			boolean stillExists = newFileList.stream()
+					.anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()));
+			if (!stillExists) {
+				recdao.deleteRecruitmentFile(uid); // DB + 물리 파일도 제거 필요
+			}
+		}
+		for (RecruitmentnoticeBoardUpfiles newFile : newFileList) {
+			boolean existsInOld = oldFileList.stream()
+					.anyMatch(oldFile -> oldFile.getOriginalFileName().equals(newFile.getOriginalFileName()));
+			if (!existsInOld) {
+				newFile.setRefrecruitmentnoticeNo(uid);
+				recdao.insertRecruitmentFile(newFile);
+			}
+		}
+
+		// Step 5: 직업군, 지역 등 외래키 정보 갱신
+		jobdao.updateMajorCategoryWithRecruitmentnotice(uid, dto.getMajorcategoryNo());
+		jobdao.updateSubCategoryWithRecruitmentnotice(uid, dto.getSubcategoryNo());
+		regiondao.updateRegionWithRecruitmentNotice(uid, dto.getRegionNo());
+		regiondao.updateSigunguWithRecruitmentNotice(uid, dto.getSigunguNo());
 	}
 
 }

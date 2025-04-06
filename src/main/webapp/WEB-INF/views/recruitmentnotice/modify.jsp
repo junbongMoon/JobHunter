@@ -19,6 +19,7 @@
 	let uid = '${RecruitmentDetailInfo.uid}';
 	let companyUid = '${sessionScope.account.uid}';
 	let applications;
+	
 
 	
 
@@ -452,6 +453,25 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 	instalRecruitment();
 
 	}, 500);
+
+	// 저장 버튼 클릭 시 JSON 데이터 세팅
+$("#write").on("click", function () {
+  const apps = [];
+
+  $(".application-checkbox:checked").each(function () {
+    const method = $(this).val();
+    const detail = $(`.method-detail[data-method='${method}']`).val();
+    apps.push({ method, detail });
+  });
+
+  const advantages = [];
+  $(".advantage-item input[type='hidden']").each(function () {
+    advantages.push({ advantageType: $(this).val() });
+  });
+
+  $("#applicationJson").val(JSON.stringify(apps));
+  $("#advantageJson").val(JSON.stringify(advantages));
+});
 
 });
 
@@ -1065,6 +1085,7 @@ label {
 					<p>하단에 정보를 입력해주세요</p>
 				</div>
 				<input type="hidden" id="refCompany" name="refCompany" value="1"><!-- 내일 근우씨한테 물어봐서 회사 uid 값 넣기 -->
+				
 				<div class="row gy-3">
 					<div class="col-md-6">
 						<div class="input-group">
@@ -1360,6 +1381,10 @@ label {
   											</c:forEach>
 											</div>
 										</div>
+
+										<!-- 숨겨진 textarea에 json 문자열 저장 -->
+										<textarea name="applicationJson" id="applicationJson" hidden></textarea>
+										<textarea name="advantageJson" id="advantageJson" hidden></textarea>
 
 									<div class="col-md-6 dueDate">
 										<div class="input-group">
