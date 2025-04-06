@@ -63,11 +63,20 @@ public class AccountRestController {
 	// 계정 타입(기업/일반) 확인
 	@GetMapping("/role/{type}")
 	public ResponseEntity<?> hasRole(@PathVariable String type, HttpSession session) {
+		
 	    AccountVO account = accUtils.refreshAccount((AccountVO) session.getAttribute("account"));
-		if (account == null)
+	    
+		if (account == null) {
 			return ResponseEntity.ok(false);
-
+		}
+		
 		AccountType required = AccountType.valueOf(type.toUpperCase());
+		
+		if (required == AccountType.ADMIN) {
+			if(account.getIsAdmin().equals('Y')) {
+				return ResponseEntity.ok(true);
+			}
+		}
 		return ResponseEntity.ok(account.getAccountType() == required);
 	}
 

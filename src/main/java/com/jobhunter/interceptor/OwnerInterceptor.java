@@ -66,7 +66,7 @@ public class OwnerInterceptor implements HandlerInterceptor {
             boolean isOwner = account.getUid() == uid && account.getAccountType() == type;
             // 어드민 허용 페이지고 내가 어드민인지 체크
             boolean isAdminAllowed = "true".equalsIgnoreCase(allowAdminParam)
-                    && account.getAccountType() == AccountType.ADMIN;
+                    && account.getIsAdmin() == 'Y';
 
             if (isOwner || isAdminAllowed) {
                 return true;
