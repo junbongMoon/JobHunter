@@ -266,9 +266,13 @@ public class RecruitmentNoticeController {
 						.build();
 				
 				this.applicationList.add(appdto);
+				
+				
+				
 			}
 			
-			
+			String applicationsJson = new ObjectMapper().writeValueAsString(this.applicationList);
+			model.addAttribute("applicationsJson", applicationsJson);
 			model.addAttribute("RecruitmentDetailInfo", detailInfo);
 			
 		} catch (Exception e) {

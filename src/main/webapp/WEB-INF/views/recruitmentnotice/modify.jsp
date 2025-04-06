@@ -18,6 +18,7 @@
 	let upfiles = [];
 	let uid = '${RecruitmentDetailInfo.uid}';
 	let companyUid = '${sessionScope.account.uid}';
+	let applications;
 
 	
 
@@ -78,6 +79,44 @@
       const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}';
       const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}';
 
+	  // workType이 PART_TIME이면 PHONE, TEXT DOM 추가
+if (workType === "PART_TIME") {
+  const phoneAndTextHtml = `
+    <div class="col-12 mb-2 parttime-only" id="phoneOption">
+      <div class="d-flex align-items-center">
+        <div class="form-check me-3 d-flex align-items-center">
+          <input class="form-check-input application-checkbox" type="checkbox" id="PHONE" value="PHONE">
+          <label class="form-check-label ms-2" for="PHONE">전화</label>
+        </div>
+        <div class="flex-grow-1">
+          <div class="input-group">
+            <input type="text" class="form-control method-detail" placeholder="전화 면접에 대한 추가내용이 있다면 작성하세요..." data-method="PHONE" style="display: none;">
+            <button type="button" class="btn btn-primary save-method-btn" data-method="PHONE" style="display: none;">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 mb-2 parttime-only" id="textOption">
+      <div class="d-flex align-items-center">
+        <div class="form-check me-3 d-flex align-items-center">
+          <input class="form-check-input application-checkbox" type="checkbox" id="TEXT" value="TEXT">
+          <label class="form-check-label ms-2" for="TEXT">문자</label>
+        </div>
+        <div class="flex-grow-1">
+          <div class="input-group">
+            <input type="text" class="form-control method-detail" placeholder="" data-method="TEXT" style="display: none;">
+            <button type="button" class="btn btn-primary save-method-btn" data-method="TEXT" style="display: none;">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  $("#application-methods").append(phoneAndTextHtml);
+
+
+}
+
 	  console.log("선택한 시군구, 직업군 : " + sigunguNo, subcategoryNo);
 
       // 제목, 담당자, 날짜 등 텍스트 필드 세팅
@@ -95,6 +134,23 @@
       $(`input[name="personalHistory"][value="${personalHistory}"]`).prop("checked", true);
       $(`input[name="militaryService"][value="${militaryService}"]`).prop("checked", true);
 
+
+	  
+	  const jsonStr = '<c:out value="${applicationsJson}" escapeXml="false" />';
+	  
+  try {
+    
+    if (jsonStr && jsonStr.trim().length > 0) {
+      applications = JSON.parse(jsonStr);
+	  console.log(jsonStr);
+    }
+  } catch (e) {
+    console.error("applicationsJson 파싱 오류:", e);
+  }
+
+
+console.log("applicationsJson raw:", jsonStr);
+console.log("parsed applications:", applications);
       // 셀렉트 필드 세팅 (선택 후 로딩 기다림)
       setTimeout(() => {
   $(".Region").val(regionNo).trigger("change");
@@ -111,9 +167,17 @@
     getSubCategory(majorcategoryNo);
     setTimeout(() => {
       $(".SubCategory").val(subcategoryNo).trigger("change");
-    }, 400);
+
+	  setTimeout(() => {
+    renderApplicationMethods(applications);
+  }, 500);
+
+
+    }, 1000);
  	 }, 200);
 	}, 300);
+
+
 
       // 근무 시간 분해
       const timeRegex = /^(\d{2}:\d{2})~(\d{2}:\d{2})(?: \((.+)\))?$/;
@@ -125,6 +189,8 @@
         if (detailType) $('#workDetailType').val(detailType);
       }
     }, 300);
+
+	
 
     // 이벤트 위임으로 동적 삭제 처리
     $(document).on("click", ".advantage-item .btn-outline-danger", function () {
@@ -385,7 +451,9 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 	
 	instalRecruitment();
 
-	});
+	}, 500);
+
+});
 
 
 // 수정 페이지에 들어왔을 때 공고의 정보를 입력해주는 함수
@@ -433,7 +501,7 @@ function instalRecruitment() {
 		}
 	}
 }
-	});
+	
 
 // 파일 업로드 + 썸네일 표시
 function uploadFileAndShowPreview(file) {
@@ -494,6 +562,26 @@ function removeFile(fileName) {
             alert("파일 삭제 실패");
         }
     });
+}
+
+// 면접 타입 로드
+function renderApplicationMethods(applications) {
+  applications.forEach(app => {
+    const method = app.method;
+    const detail = app.detail;
+
+    const checkbox = $(`.application-checkbox[value="\${method}"]`);
+    const detailInput = $(`.method-detail[data-method="\${method}"]`);
+    const saveBtn = $(`.save-method-btn[data-method="\${method}"]`);
+
+    if (checkbox.length) {
+      checkbox.prop("checked", true);
+      detailInput.show().val(detail || '');
+      saveBtn.show();
+    } else {
+      console.warn(`체크박스 없음: \${method}`);
+    }
+  });
 }
 
 function markUploadSuccess(fileName) {
