@@ -394,7 +394,7 @@
 														<c:forEach items="${resume.subcategoryList}"
 															var="subcategory" varStatus="status">
 															<c:if test="${status.index < 4}">
-																<span class="info-value">${subcategory.majorCategoryName}
+																<span class="info-value">
 																	${subcategory.jobName}</span>
 															</c:if>
 															<c:if test="${status.index == 4}">
