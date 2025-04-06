@@ -155,12 +155,7 @@ console.log("parsed applications:", applications);
       // 셀렉트 필드 세팅 (선택 후 로딩 기다림)
       setTimeout(() => {
   $(".Region").val(regionNo).trigger("change");
-  setTimeout(() => {
-    getSigungu(regionNo);
-    setTimeout(() => {
-      $(".Sigungu").val(sigunguNo).trigger("change");
-    }, 400);
-  }, 200);
+
 
       setTimeout(() => {
         $(".MajorCategory").val(majorcategoryNo).trigger("change");
@@ -736,24 +731,33 @@ function markUploadSuccess(fileName) {
 	}
 
 	function getSigungu(regionNo) {
-		$.ajax({
-			url : '/region/sigungu/' + regionNo,
-			type : 'get',
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log("시군구 데이터:", data);
-				let sigunguSelect = $(".Sigungu");
-				sigunguSelect.empty();
-				sigunguSelect.append('<option value="-1">시군구 선택</option>');
-						$.each(data, function(index, sigungu) 
-						{sigunguSelect.append(`<option value="\${sigungu.sigunguNo}">\${sigungu.name}</option>`);});
-					},
-			error : function(err) {
-				console.error("시군구 데이터 불러오기 실패", err);
-					}
-			});
-	}
+    const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';  // 여기 확실히 수정!
+    $.ajax({
+        url: '/region/sigungu/' + regionNo,
+        type: 'get',
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            console.log("시군구 데이터:", data);
+			console.log("regionNo 넘기는 값:", regionNo);
+            let sigunguSelect = $(".Sigungu");
+            sigunguSelect.empty().append('<option value="-1">시군구 선택</option>');
+
+            $.each(data, function (index, sigungu) {
+                sigunguSelect.append(`<option value="\${sigungu.sigunguNo}">\${sigungu.name}</option>`);
+            });
+
+            if (sigunguNo && sigunguNo !== '-1') {
+  			sigunguSelect.val(String(sigunguNo)).trigger("change"); //change 이벤트도 트리거!
+  			console.log("자동 선택된 시군구:", sigunguNo);
+  			$("#sigunguNo").val(sigunguNo); // 히든필드에도 반영
+			}
+        },
+        error: function (err) {
+            console.error("시군구 데이터 불러오기 실패", err);
+        }
+    });
+}
 
 
 
@@ -948,27 +952,6 @@ if (workDetailType) {
 	}
 return result;
 }
-
-function instalSelectOptions(){
-
-	// 셀렉트 리스트 들
-	let majorCategoryList = $('#MajorCategory');
-	let subCategoryList = $('#SubCategory');
-	let regionList = $('#regionList');
-	let sigunguList = $('#sigunguList');
-
-	// 셀렉트 리스트에 넣을 변수
-	const regionNo = '${RecruitmentDetailInfo.region.regionNo}';
-	const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';
-	const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}'
-	const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}'
-
-	
-
-
-}
-
-
 
 </script>
 
