@@ -83,13 +83,24 @@ public class ReviewBoardController {
 
 	// 게시물 작성 저장
 	@PostMapping("/write")
-	public String saveReviewBoard(@ModelAttribute WriteBoardDTO writeBoardDTO, HttpSession session) {
+	public String saveReviewBoard(@ModelAttribute WriteBoardDTO writeBoardDTO,
+            @RequestParam(value = "reviewTypeOtherText", required = false) String otherText,
+            HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 
 		if (account == null || account.getUid() == 0) {
 			return "redirect:/account/login";
 		}
 		writeBoardDTO.setWriter(account.getUid());
+		  if ("OTHER".equals(writeBoardDTO.getReviewType())) {
+		        // enum에는 OTHER만 넣고, 입력한 텍스트는 다른 필드에 저장하거나 로그로 남겨
+		        writeBoardDTO.setReviewType("OTHER");
+
+		        // 만약 content에 추가할
+		        if (otherText != null && !otherText.trim().isEmpty()) {
+		            writeBoardDTO.setContent("[기타 면접유형: " + otherText + "]\n" + writeBoardDTO.getContent());
+		        }
+		    }
 
 		// logger.info("리뷰 게시글 저장 시도: " + writeBoardDTO.toString());
 		String returnPage = "redirect:./allBoard";

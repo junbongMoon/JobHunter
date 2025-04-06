@@ -78,15 +78,46 @@ label.form-label {
             const isOtherChecked = document.getElementById("reviewTypeOther").checked;
             otherInput.style.display = isOtherChecked ? "block" : "none";
         }
+        
+        function toggleResultSelect() {
+            const checkbox = document.getElementById("resultConsent");
+            const select = document.getElementById("reviewResultSelect");
+
+            if (checkbox.checked) {
+                select.disabled = false;
+            } else {
+                select.disabled = true;
+                select.value = ""; // 선택값 초기화
+            }
+        }
+
+        function validateReviewForm() {
+            const checkbox = document.getElementById("resultConsent");
+            const select = document.getElementById("reviewResultSelect");
+
+            if (!checkbox.checked) {
+                alert("면접 결과 등록을 위해 동의서에 체크해주세요.");
+                return false;
+            }
+
+            if (select.disabled || !select.value) {
+                alert("면접 결과를 선택해주세요.");
+                return false;
+            }
+
+            return true;
+        }
+        
     </script>
 </head>
 <body>
+	<jsp:include page="../header.jsp" />
 	<div class="container mt-5">
 		<h2 class="mb-4">면접 후기 작성</h2>
 
 		<c:if test="${not empty sessionScope.account}">
 			<form action="${pageContext.request.contextPath}/reviewBoard/write"
-				method="post">
+				method="post" onsubmit="return validateReviewForm();">
 				<div class="mb-3">
 					<label class="form-label">이력서 선택<span class="text-danger">*</span></label>
 					<select class="form-select" id="gonggoSelect" name="gonggoUid"
@@ -122,7 +153,7 @@ label.form-label {
 						<p class="mb-1">
 							<strong>근무 기간:</strong> ${gonggo.period}
 						</p>
-						
+
 					</div>
 				</c:forEach>
 
@@ -170,15 +201,22 @@ label.form-label {
 					</select>
 				</div>
 
-				<div class="mb-3">
-					<label class="form-label">면접 결과<span class="text-danger">*</span></label>
-					<select class="form-select" name="reviewResult" required>
-						<option value="" selected disabled>결과를 선택하세요</option>
-						<option value="PASSED">합격</option>
-						<option value="FAILED">불합격</option>
-						<option value="PENDING">진행중</option>
-					</select>
-				</div>
+			  <div class="mb-3">
+                <label class="form-label">면접 결과<span class="text-danger">*</span></label>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="resultConsent" onchange="toggleResultSelect()">
+                    <label class="form-check-label" for="resultConsent">
+                        면접 결과에 대한 진실된 사실을 작성하였으며, 허위 사실 작성 시 불이익 또는 위증 책임을 질 수 있음에 동의합니다.
+                    </label>
+                </div>
+                <select class="form-select" name="reviewResult" id="reviewResultSelect" disabled required>
+                    <option value="" selected disabled>결과를 선택하세요</option>
+                    <option value="PASSED">합격</option>
+                    <option value="FAILED">불합격</option>
+                    <option value="PENDING">진행중</option>
+                </select>
+            </div>
+
 
 				<div class="mb-3">
 					<label class="form-label">리뷰 내용<span class="text-danger">*</span></label>
