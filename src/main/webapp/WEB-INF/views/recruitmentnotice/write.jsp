@@ -302,7 +302,7 @@ function showThumbnail(file) {
         let html = `
             <tr id="thumb_\${safeId}">
                 <td><img src="\${isImage ? base64 : '/resources/images/noimage.png'}" width="60" /></td>
-                <td\>${file.name}</td>
+                <td>\${file.name}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-danger" onclick="removeFile('\${file.name}')">X</button>
                 </td>
