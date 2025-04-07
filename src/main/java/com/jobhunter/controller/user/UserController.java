@@ -28,5 +28,10 @@ public class UserController {
 	    result.put("status", "success");
 	    return result;
 	}
+	
+	@GetMapping("/register")
+	public void registUser() {
+		
+	}
 
 }
