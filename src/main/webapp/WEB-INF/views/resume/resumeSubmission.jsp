@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 
@@ -12,9 +13,8 @@
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<style>
+<link rel="stylesheet" href="/resources/css/mypage.css">
 
-</style>
 </head>
 
 <body>
@@ -22,11 +22,6 @@
 	<jsp:include page="/WEB-INF/views/header.jsp" />
 
 	
-
-	<script>
-	
-	
-	</script>
 
 	<!-- 풋터 -->
 	<jsp:include page="/WEB-INF/views/footer.jsp" />

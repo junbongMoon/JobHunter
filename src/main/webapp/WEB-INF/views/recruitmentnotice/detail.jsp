@@ -325,7 +325,7 @@ h3 {
 									<!-- 이력서 제출 버튼 -->
 												<div class="container">
 													<button type="button" class="btn btn-success" id="submitResumeBtn"
-														onclick="location.href='/resume/submit'">
+														onclick="location.href='/submission/check?uid=${RecruitmentDetailInfo.uid}'">
 														이력서 제출</button>
 												</div>
 								</div>

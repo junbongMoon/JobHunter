@@ -259,10 +259,5 @@ public class ResumeController {
 		}
 	}
 	
-	// 이력서 제출 페이지
-	@GetMapping("/submit")
-	public String submitResumeForm() {
-		return "resume/resumeSubmission";
-	}
 
 }
