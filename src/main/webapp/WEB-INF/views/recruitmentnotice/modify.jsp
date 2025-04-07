@@ -1397,7 +1397,7 @@ label {
 											
 										</div>
 										<div class="text-end mb-3">
-											<button type="button" class="addAdvantageBtn" onclick="addAdvantage()">저장하기</button>
+											<button type="button" class="addAdvantageBtn">저장하기</button>
 										  </div>
 										<div class="advantageArea">
 											<c:forEach var="adv" items="${RecruitmentDetailInfo.advantage}">
