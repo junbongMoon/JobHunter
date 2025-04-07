@@ -262,13 +262,13 @@ public class RecruitmentNoticeController {
 		
 		String returnPage ="";
 		
-		
+		// 기존 리스트 초기화
+					ListAllClear();
 		
 		try {
 			RecruitmentDetailInfo detailInfo = recruitmentService.getRecruitmentByUid(uid);
 			
-			// 기존 리스트 초기화
-			ListAllClear();
+			
 			
 			// 우대 조건
 			if(detailInfo.getAdvantage().size() > 0) {
@@ -282,6 +282,8 @@ public class RecruitmentNoticeController {
 			// 파일 리스트
 			if(detailInfo.getFileList().size() > 0) {
 				this.fileList = detailInfo.getFileList();
+				this.modifyFileList = detailInfo.getFileList();
+				System.out.println(modifyFileList);
 			}
 			
 			// 면접 방식
@@ -349,7 +351,7 @@ public class RecruitmentNoticeController {
 	        RecruitmentDetailInfo existing = recruitmentService.getRecruitmentByUid(uid);
 
 	        // 서비스로 수정 로직 위임
-	        recruitmentService.modifyRecruitmentNotice(dto, advantages, applications, fileList, existing, uid);
+	        recruitmentService.modifyRecruitmentNotice(dto, advantages, applications, modifyFileList, existing, uid);
 
 	        result = true;
 
@@ -390,15 +392,19 @@ public class RecruitmentNoticeController {
             @RequestParam("fileName") String fileName,
             @RequestParam("status") String status) {
 
+    	System.out.println(fileName);
+    	
         for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
             if (file.getOriginalFileName().equals(fileName)) {
                 if ("delete".equalsIgnoreCase(status)) {
                     file.setStatus(FileStatus.DELETE);
+                    
                 } else if ("cancel".equalsIgnoreCase(status)) {
                     file.setStatus(null);
                 }
             }
         }
+        System.out.println(modifyFileList);
 
         return ResponseEntity.ok().build();
     }
@@ -459,6 +465,7 @@ public class RecruitmentNoticeController {
 		this.advantageList.clear();
 		this.applicationList.clear();
 		this.fileList.clear();
+		this.modifyFileList.clear();
 
 	}
 

@@ -571,6 +571,8 @@ function showModifyFileThumbnail(fileInfo, status = "") {
 
 // 삭제 버튼 클릭시 삭제상태로 변경
 function markFileAsDeleted(fileName) {
+    const safeId = fileName.replace(/[^a-zA-Z0-9]/g, "_"); // 안전한 ID 생성
+
     $.ajax({
         url: "/recruitmentnotice/file/status",
         type: "POST",
@@ -578,11 +580,12 @@ function markFileAsDeleted(fileName) {
             fileName: fileName,
             status: "delete"
         },
-        success: function() {
-            const safeId = fileName.replace(/[^a-zA-Z0-9]/g, "_");
-            $(`#thumb_${safeId}`).addClass("table-danger").css("text-decoration", "line-through");
+        success: function () {
+            const $targetRow = $(`#thumb_${safeId}`);
+            $targetRow.addClass("table-danger").css("text-decoration", "line-through");
+            $targetRow.remove(); // 또는 이 줄 생략해서 선만 긋기
         },
-        error: function() {
+        error: function () {
             alert("파일 삭제 상태 전환 실패");
         }
     });
@@ -984,7 +987,7 @@ if (workDetailType) {
   result = false;
   $("#MyModal").modal("show");
 }
-
+ 
   // 면접 방식 유효성 검사도 포함
   
   if(result){
@@ -993,6 +996,7 @@ if (workDetailType) {
 
 	console.log(mjrno);
 	$("#period").val(period);
+	finalizeFileModifications();
 
 	return result;
 	}
@@ -1449,7 +1453,7 @@ label {
 									<div class="col-12 text-center">
 										<table class="preview mt-3">
 											<c:forEach var="file" items="${RecruitmentDetailInfo.fileList}">
-   												<tr id="thumb_${file.originalFileName}">
+												<tr id="thumb_${safeId}">
       												<td><img src="${file.thumbFileName}" width="60" /></td>
       												<td>${file.originalFileName}</td>
       												<td>
