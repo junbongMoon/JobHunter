@@ -1,966 +1,930 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<!DOCTYPE html>
-<html>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+		<!DOCTYPE html>
+		<html>
 
-<head>
-<meta charset="UTF-8">
-<title>이력서 작성</title>
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
+		<head>
+			<meta charset="UTF-8">
+			<title>이력서 작성</title>
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		</head>
 
-<body>
-	<!-- 헤더 -->
-	<jsp:include page="/WEB-INF/views/header.jsp" />
+		<body>
+			<!-- 헤더 -->
+			<jsp:include page="/WEB-INF/views/header.jsp" />
 
-	<div class="container my-5">
-		<h2 class="mb-4">이력서 작성</h2>
+			<div class="container my-5">
+				<h2 class="mb-4">이력서 작성</h2>
 
-		<form id="resumeForm" method="post" enctype="multipart/form-data">
+				<form id="resumeForm" method="post" enctype="multipart/form-data">
 
-			<!-- 이력서 제목 -->
-			<div class="card mb-4">
-				<div class="card-header">
-					이력서 제목<span class="essentialPoint">*</span>
-				</div>
-				<div class="card-body">
-					<div class="input-group">
-						<span class="input-group-text bg-light"> <i
-							class="bi bi-pencil-square"></i>
-						</span> <input type="text" class="form-control form-control-lg"
-							id="title" name="title" placeholder="예: 자바 개발자 지원" maxlength="30"
-							value="${resumeDetail.resume.title}">
-					</div>
-					<div class="d-flex justify-content-between mt-2">
-						<small class="text-muted">* 이력서의 제목을 입력해 주세요.</small> <small
-							class="text-muted"><span id="titleLength">0</span> / 30</small>
-					</div>
-				</div>
-			</div>
-
-			<!-- 기본 정보 (users 테이블에서 가져올 예정) -->
-			<div class="card mb-4">
-				<div class="card-header">
-					기본 정보<span class="essentialPoint">*</span>
-				</div>
-				<div class="card-body">
-					<div class="row g-3">
-						<div class="col-md-4">
-							<label class="form-label">이름</label> <input type="text"
-								class="form-control" value="${account.accountName}" readonly />
+					<!-- 이력서 제목 -->
+					<div class="card mb-4">
+						<div class="card-header">
+							이력서 제목<span class="essentialPoint">*</span>
 						</div>
-						<div class="col-md-4">
-							<label class="form-label">이메일</label> <input type="email"
-								class="form-control" value="${account.email}" readonly />
+						<div class="card-body">
+							<div class="input-group">
+								<span class="input-group-text bg-light"> <i class="bi bi-pencil-square"></i>
+								</span> <input type="text" class="form-control form-control-lg" id="title" name="title"
+									placeholder="예: 자바 개발자 지원" maxlength="30" value="${resumeDetail.resume.title}">
+							</div>
+							<div class="d-flex justify-content-between mt-2">
+								<small class="text-muted">* 이력서의 제목을 입력해 주세요.</small> <small class="text-muted"><span
+										id="titleLength">0</span> / 30</small>
+							</div>
 						</div>
-						<div class="col-md-4">
-							<label class="form-label">연락처</label> <input type="tel"
-								class="form-control" value="${account.mobile}" readonly />
-						</div>
-						<!-- userUid -->
-						<input type="hidden" id="userUid" name="userUid"
-							value="${account.uid}" />
 					</div>
-				</div>
-			</div>
 
-			<!-- 고용 형태 -->
-			<div class="card mb-4">
-				<div class="card-header jobTypeBox">
-					고용 형태<span class="essentialPoint">*</span>
-				</div>
-				<div class="card-body">
-					<div class="row g-3">
-						<div class="col-md-12">
-							<div class="d-flex flex-wrap">
-								<c:forEach var="jobForm" items="${jobFormList}">
-									<div class="form-check form-check-inline">
-										<c:set var="isChecked" value="false" />
-										<c:forEach var="selectedJobForm"
-											items="${resumeDetail.jobForms}">
-											<c:if test="${selectedJobForm.form == jobForm}">
-												<c:set var="isChecked" value="true" />
-											</c:if>
+					<!-- 기본 정보 (users 테이블에서 가져올 예정) -->
+					<div class="card mb-4">
+						<div class="card-header">
+							기본 정보<span class="essentialPoint">*</span>
+						</div>
+						<div class="card-body">
+							<div class="row g-3">
+								<div class="col-md-4">
+									<label class="form-label">이름</label> <input type="text" class="form-control"
+										value="${account.accountName}" readonly />
+								</div>
+								<div class="col-md-4">
+									<label class="form-label">이메일</label> <input type="email" class="form-control"
+										value="${account.email}" readonly />
+								</div>
+								<div class="col-md-4">
+									<label class="form-label">연락처</label> <input type="tel" class="form-control"
+										value="${account.mobile}" readonly />
+								</div>
+								<!-- userUid -->
+								<input type="hidden" id="userUid" name="userUid" value="${account.uid}" />
+							</div>
+						</div>
+					</div>
+
+					<!-- 고용 형태 -->
+					<div class="card mb-4">
+						<div class="card-header jobTypeBox">
+							고용 형태<span class="essentialPoint">*</span>
+						</div>
+						<div class="card-body">
+							<div class="row g-3">
+								<div class="col-md-12">
+									<div class="d-flex flex-wrap">
+										<c:forEach var="jobForm" items="${jobFormList}">
+											<div class="form-check form-check-inline">
+												<c:set var="isChecked" value="false" />
+												<c:forEach var="selectedJobForm" items="${resumeDetail.jobForms}">
+													<c:if test="${selectedJobForm.form == jobForm}">
+														<c:set var="isChecked" value="true" />
+													</c:if>
+												</c:forEach>
+												<input class="form-check-input" type="checkbox" name="jobForm"
+													value="${jobForm.name()}" id="${jobForm.name()}" ${isChecked
+													? 'checked' : '' }> <label class="form-check-label"
+													for="${jobForm.name()}">${jobForm.displayName}</label>
+											</div>
 										</c:forEach>
-										<input class="form-check-input" type="checkbox" name="jobForm"
-											value="${jobForm.name()}" id="${jobForm.name()}"
-											${isChecked
-													? 'checked' : '' }> <label
-											class="form-check-label" for="${jobForm.name()}">${jobForm.displayName}</label>
 									</div>
-								</c:forEach>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</div>
 
-			<!-- 희망 급여 -->
-			<div class="card mb-4">
-				<div class="card-header">
-					희망 급여<span class="essentialPoint">*</span>
-				</div>
-				<div class="card-body">
-					<div class="row g-3 align-items-center">
-						<div class="col-md-8">
-							<div class="d-flex align-items-center">
-								<label class="form-label me-3">급여 방식</label>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="payType"
-										value="시급" id="hourly"
-										${resumeDetail.resume.payType=='시급' ? 'checked' : '' }>
-									<label class="form-check-label" for="hourly">시급</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="payType"
-										value="일급" id="daily"
-										${resumeDetail.resume.payType=='일급' ? 'checked' : '' }>
-									<label class="form-check-label" for="daily">일급</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="payType"
-										value="월급" id="monthly"
-										${resumeDetail.resume.payType=='월급' ? 'checked' : '' }>
-									<label class="form-check-label" for="monthly">월급</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="payType"
-										value="연봉" id="yearly"
-										${resumeDetail.resume.payType=='연봉' ? 'checked' : '' }>
-									<label class="form-check-label" for="yearly">연봉</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="payType"
-										value="협의 후 결정" id="negotiable"
-										${resumeDetail.resume.payType=='협의 후 결정' ? 'checked'
+					<!-- 희망 급여 -->
+					<div class="card mb-4">
+						<div class="card-header">
+							희망 급여<span class="essentialPoint">*</span>
+						</div>
+						<div class="card-body">
+							<div class="row g-3 align-items-center">
+								<div class="col-md-8">
+									<div class="d-flex align-items-center">
+										<label class="form-label me-3">급여 방식</label>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" name="payType" value="시급"
+												id="hourly" ${resumeDetail.resume.payType=='시급' ? 'checked' : '' }>
+											<label class="form-check-label" for="hourly">시급</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" name="payType" value="일급"
+												id="daily" ${resumeDetail.resume.payType=='일급' ? 'checked' : '' }>
+											<label class="form-check-label" for="daily">일급</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" name="payType" value="월급"
+												id="monthly" ${resumeDetail.resume.payType=='월급' ? 'checked' : '' }>
+											<label class="form-check-label" for="monthly">월급</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" name="payType" value="연봉"
+												id="yearly" ${resumeDetail.resume.payType=='연봉' ? 'checked' : '' }>
+											<label class="form-check-label" for="yearly">연봉</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" name="payType" value="협의 후 결정"
+												id="negotiable" ${resumeDetail.resume.payType=='협의 후 결정' ? 'checked'
 												: '' }>
-									<label class="form-check-label" for="negotiable">협의 후
-										결정</label>
+											<label class="form-check-label" for="negotiable">협의 후
+												결정</label>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-4 d-flex align-items-center">
+									<input type="text" class="form-control text-end" id="payAmount" name="pay"
+										placeholder="금액 입력(숫자만 입력 가능해요)" maxlength="11"
+										value="${resumeDetail.resume.pay}" ${resumeDetail.resume.payType=='협의 후 결정'
+										? 'disabled' : '' }>
+									<span class="ms-2">원</span>
+								</div>
+							</div>
+							<small class="text-muted">* 시급, 일급, 월급, 연봉의 경우 금액을 입력해 주세요.</small>
+						</div>
+					</div>
+
+					<!-- 근무 지역 선택 -->
+					<div class="card mb-4">
+						<div class="card-header wishRegionBox" id="wishRegion">
+							희망 근무 지역<span class="essentialPoint">*</span>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<!-- 시/도 목록 -->
+								<div class="col-md-4">
+									<div class="region-list-container"
+										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+										<ul class="list-group" id="regionList">
+											<c:forEach var="region" items="${regionList}">
+												<li class="list-group-item region-item"
+													data-region="${region.regionNo}">${region.name}▶</li>
+											</c:forEach>
+										</ul>
+									</div>
+								</div>
+
+								<!-- 시/군/구 목록 -->
+								<div class="col-md-4">
+									<div class="sigungu-list-container"
+										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+										<ul class="list-group" id="sigunguList">
+											<li class="list-group-item text-muted">시/도를 선택하세요</li>
+										</ul>
+									</div>
+								</div>
+
+								<!-- 선택한 지역 표시 영역 -->
+								<div class="col-md-4">
+									<label class="form-label">선택한 지역</label>
+									<div id="selectedRegions" class="mt-2">
+										<c:forEach var="selectedRegion" items="${selectedSigungu}">
+											<span class="badge bg-primary me-2" data-region="${selectedRegion.regionNo}"
+												data-sigungu="${selectedRegion.sigunguNo}">
+												${selectedRegion.regionName} ${selectedRegion.name}
+												<button class="btn-close ms-2" aria-label="삭제"></button>
+											</span>
+										</c:forEach>
+									</div>
 								</div>
 							</div>
 						</div>
-						<div class="col-md-4 d-flex align-items-center">
-							<input type="text" class="form-control text-end" id="payAmount"
-								name="pay" placeholder="금액 입력(숫자만 입력 가능해요)" maxlength="11"
-								value="${resumeDetail.resume.pay}"
-								${resumeDetail.resume.payType=='협의 후 결정'
-										? 'disabled' : '' }>
-							<span class="ms-2">원</span>
-						</div>
 					</div>
-					<small class="text-muted">* 시급, 일급, 월급, 연봉의 경우 금액을 입력해 주세요.</small>
-				</div>
-			</div>
 
-			<!-- 근무 지역 선택 -->
-			<div class="card mb-4">
-				<div class="card-header wishRegionBox" id="wishRegion">
-					희망 근무 지역<span class="essentialPoint">*</span>
-				</div>
-				<div class="card-body">
-					<div class="row">
-						<!-- 시/도 목록 -->
-						<div class="col-md-4">
-							<div class="region-list-container"
-								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-								<ul class="list-group" id="regionList">
-									<c:forEach var="region" items="${regionList}">
-										<li class="list-group-item region-item"
-											data-region="${region.regionNo}">${region.name}▶</li>
-									</c:forEach>
-								</ul>
-							</div>
+					<!-- 희망 업직종 -->
+					<div class="card mb-4">
+						<div class="card-header" id="wishJobBox">
+							희망 업직종<span class="essentialPoint">*</span>
 						</div>
+						<div class="card-body">
+							<div class="row">
+								<!-- 대분류 목록 -->
+								<div class="col-md-4">
+									<div class="major-list-container"
+										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+										<ul class="list-group" id="majorCategoryList">
+											<c:forEach var="major" items="${majorList}">
+												<li class="list-group-item major-item"
+													data-major="${major.majorcategoryNo}">${major.jobName}▶</li>
+											</c:forEach>
+										</ul>
+									</div>
+								</div>
 
-						<!-- 시/군/구 목록 -->
-						<div class="col-md-4">
-							<div class="sigungu-list-container"
-								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-								<ul class="list-group" id="sigunguList">
-									<li class="list-group-item text-muted">시/도를 선택하세요</li>
-								</ul>
-							</div>
-						</div>
+								<!-- 소분류 목록 -->
+								<div class="col-md-4">
+									<div class="sub-list-container"
+										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+										<ul class="list-group" id="subCategoryList">
+											<li class="list-group-item text-muted">대분류를 선택하세요</li>
+										</ul>
+									</div>
+								</div>
 
-						<!-- 선택한 지역 표시 영역 -->
-						<div class="col-md-4">
-							<label class="form-label">선택한 지역</label>
-							<div id="selectedRegions" class="mt-2">
-								<c:forEach var="selectedRegion" items="${selectedSigungu}">
-									<span class="badge bg-primary me-2"
-										data-region="${selectedRegion.regionNo}"
-										data-sigungu="${selectedRegion.sigunguNo}">
-										${selectedRegion.regionName} ${selectedRegion.name}
-										<button class="btn-close ms-2" aria-label="삭제"></button>
-									</span>
-								</c:forEach>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- 희망 업직종 -->
-			<div class="card mb-4">
-				<div class="card-header" id="wishJobBox">
-					희망 업직종<span class="essentialPoint">*</span>
-				</div>
-				<div class="card-body">
-					<div class="row">
-						<!-- 대분류 목록 -->
-						<div class="col-md-4">
-							<div class="major-list-container"
-								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-								<ul class="list-group" id="majorCategoryList">
-									<c:forEach var="major" items="${majorList}">
-										<li class="list-group-item major-item"
-											data-major="${major.majorcategoryNo}">${major.jobName}▶</li>
-									</c:forEach>
-								</ul>
-							</div>
-						</div>
-
-						<!-- 소분류 목록 -->
-						<div class="col-md-4">
-							<div class="sub-list-container"
-								style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-								<ul class="list-group" id="subCategoryList">
-									<li class="list-group-item text-muted">대분류를 선택하세요</li>
-								</ul>
-							</div>
-						</div>
-
-						<!-- 선택한 업직종 표시 영역 -->
-						<div class="col-md-4">
-							<label class="form-label">선택한 업직종</label>
-							<div id="selectedJobTypes" class="mt-2">
-								<!-- 디버깅 -->
-								<!-- <c:if test="${empty selectedSubCategory}">
+								<!-- 선택한 업직종 표시 영역 -->
+								<div class="col-md-4">
+									<label class="form-label">선택한 업직종</label>
+									<div id="selectedJobTypes" class="mt-2">
+										<!-- 디버깅 -->
+										<!-- <c:if test="${empty selectedSubCategory}">
 									<script>
 										console.log('selectedSubCategory가 없음;');
 									</script>
 								</c:if> -->
-								<c:forEach var="selectedJob" items="${selectedSubCategory}">
-									<span class="badge bg-primary me-2"
-										data-major="${selectedJob.majorCategoryNo}"
-										data-sub="${selectedJob.subcategoryNo}">
-										${selectedJob.jobName}
+										<c:forEach var="selectedJob" items="${selectedSubCategory}">
+											<span class="badge bg-primary me-2"
+												data-major="${selectedJob.majorCategoryNo}"
+												data-sub="${selectedJob.subcategoryNo}">
+												${selectedJob.jobName}
+												<button class="btn-close ms-2" aria-label="삭제"></button>
+											</span>
+										</c:forEach>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- 성격 및 강점 -->
+					<div class="card mb-4">
+						<div class="card-header d-flex justify-content-between align-items-center">
+							<span id=myMerits>성격 및 강점<span class="essentialPoint">*</span></span>
+							<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+								data-bs-target="#meritModal">추가하기</button>
+						</div>
+						<div class="card-body">
+							<div id="selectedMerits" class="mt-2">
+								<c:forEach var="merit" items="${resumeDetail.merits}">
+									<span class="badge bg-primary me-2 mb-2" data-merit="${merit.meritContent}">
+										${merit.meritContent}
 										<button class="btn-close ms-2" aria-label="삭제"></button>
 									</span>
 								</c:forEach>
 							</div>
+							<small class="text-muted">* 나의 성격 및 강점을 선택해 주세요(최대 5개)</small>
 						</div>
 					</div>
-				</div>
-			</div>
 
-			<!-- 성격 및 강점 -->
-			<div class="card mb-4">
-				<div
-					class="card-header d-flex justify-content-between align-items-center">
-					<span id=myMerits>성격 및 강점<span class="essentialPoint">*</span></span>
-					<button type="button" class="btn btn-primary btn-sm"
-						data-bs-toggle="modal" data-bs-target="#meritModal">추가하기</button>
-				</div>
-				<div class="card-body">
-					<div id="selectedMerits" class="mt-2">
-						<c:forEach var="merit" items="${resumeDetail.merits}">
-							<span class="badge bg-primary me-2 mb-2" data-merit="${merit.meritContent}">
-								${merit.meritContent}
-								<button class="btn-close ms-2" aria-label="삭제"></button>
-							</span>
-						</c:forEach>
-					</div>
-					<small class="text-muted">* 나의 성격 및 강점을 선택해 주세요(최대 5개)</small>
-				</div>
-			</div>
-
-			<!-- 성격 및 강점 선택 모달 -->
-			<div class="modal fade" id="meritModal" tabindex="-1"
-				aria-labelledby="meritModalLabel" aria-hidden="true"
-				data-bs-backdrop="static">
-				<div class="modal-dialog modal-lg">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="meritModalLabel">성격 및 강점 선택</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal"
-								aria-label="Close"></button>
-						</div>
-						<div class="modal-body">
-							<div class="row g-2" role="group" aria-label="성격 및 강점 선택">
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="성실함" type="button">성실함</button>
+					<!-- 성격 및 강점 선택 모달 -->
+					<div class="modal fade" id="meritModal" tabindex="-1" aria-labelledby="meritModalLabel"
+						aria-hidden="true" data-bs-backdrop="static">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="meritModalLabel">성격 및 강점 선택</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal"
+										aria-label="Close"></button>
 								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="책임감" type="button">책임감</button>
+								<div class="modal-body">
+									<div class="row g-2" role="group" aria-label="성격 및 강점 선택">
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="성실함"
+												type="button">성실함</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="책임감"
+												type="button">책임감</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="리더십"
+												type="button">리더십</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="창의성"
+												type="button">창의성</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="의사소통"
+												type="button">의사소통</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="문제해결"
+												type="button">문제해결</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="팀워크"
+												type="button">팀워크</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="적극성"
+												type="button">적극성</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="인내심"
+												type="button">인내심</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="정확성"
+												type="button">정확성</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="분석력"
+												type="button">분석력</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="계획성"
+												type="button">계획성</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="협동심"
+												type="button">협동심</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="주도성"
+												type="button">주도성</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="유연성"
+												type="button">유연성</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="꼼꼼함"
+												type="button">꼼꼼함</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="도전정신"
+												type="button">도전정신</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="긍정성"
+												type="button">긍정성</button>
+										</div>
+										<div class="col-md-3">
+											<button class="btn btn-outline-primary w-100 merit-btn" data-merit="배려심"
+												type="button">배려심</button>
+										</div>
+									</div>
 								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="리더십" type="button">리더십</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="창의성" type="button">창의성</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="의사소통" type="button">의사소통</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="문제해결" type="button">문제해결</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="팀워크" type="button">팀워크</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="적극성" type="button">적극성</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="인내심" type="button">인내심</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="정확성" type="button">정확성</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="분석력" type="button">분석력</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="계획성" type="button">계획성</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="협동심" type="button">협동심</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="주도성" type="button">주도성</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="유연성" type="button">유연성</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="꼼꼼함" type="button">꼼꼼함</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="도전정신" type="button">도전정신</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="긍정성" type="button">긍정성</button>
-								</div>
-								<div class="col-md-3">
-									<button class="btn btn-outline-primary w-100 merit-btn"
-										data-merit="배려심" type="button">배려심</button>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
 								</div>
 							</div>
 						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary"
-								data-bs-dismiss="modal">닫기</button>
-						</div>
 					</div>
-				</div>
-			</div>
 
-			<!-- 학력사항 -->
-			<div class="card mb-4">
-				<div
-					class="card-header d-flex justify-content-between align-items-center"
-					id="myEducationBox">
-					<span>학력사항</span>
-					<button type="button" class="btn btn-primary btn-sm"
-						id="addEducationBtn">추가하기</button>
-				</div>
-				<div class="card-body">
-					<div id="educationContainer">
-						<!-- 학력 항목 -->
-					</div>
-					<small class="text-muted">* 원하는 학력만 선택하여 작성이 가능해요.</small>
-				</div>
-			</div>
-
-			<!-- 학력사항 템플릿 (추가 버튼 눌러야 나옴) -->
-			<template id="educationTemplate">
-				<div
-					class="education-item border rounded p-3 mb-3 position-relative">
-					<!-- 삭제 버튼 (X) -->
-					<button type="button"
-						class="btn-close position-absolute top-0 end-0 m-3 remove-education"
-						aria-label="삭제"></button>
-					<div class="row g-3">
-						<!-- 학력 레벨 선택 -->
-						<div class="col-md-4">
-							<label class="form-label">학력 구분<span
-								class="essentialPoint">*</span></label> <select
-								class="form-select education-level" name="educationLevel">
-								<option value="">선택하세요</option>
-								<c:forEach var="level" items="${educationLevelList}">
-									<option value="${level.name()}">${level.displayName}</option>
-								</c:forEach>
-							</select>
+					<!-- 학력사항 -->
+					<div class="card mb-4">
+						<div class="card-header d-flex justify-content-between align-items-center" id="myEducationBox">
+							<span>학력사항</span>
+							<button type="button" class="btn btn-primary btn-sm" id="addEducationBtn">추가하기</button>
 						</div>
-
-						<!-- 학력 상태 선택 -->
-						<div class="col-md-4">
-							<label class="form-label">학력 상태<span
-								class="essentialPoint">*</span></label> <select
-								class="form-select education-status" name="educationStatus">
-								<option value="">선택하세요</option>
-								<c:forEach var="status" items="${educationStatusList}">
-									<option value="${status.name()}">${status.displayName}</option>
-								</c:forEach>
-							</select>
-						</div>
-
-						<!-- 졸업 날짜 -->
-						<div class="col-md-4">
-							<label class="form-label">졸업일자<span
-								class="essentialPoint">*</span></label>
-							<div class="row g-2">
-								<div class="col-md-4">
-									<input type="date" class="form-control graduation-date"
-										name="graduationDate">
-								</div>
+						<div class="card-body">
+							<div id="educationContainer">
+								<!-- 학력 항목 -->
 							</div>
-						</div>
-
-						<!-- 학교명 입력 -->
-						<div class="col-md-4">
-							<label class="form-label">학교명<span class="essentialPoint">*</span></label>
-							<input type="text" class="form-control custom-input"
-								name="customInput" placeholder="학교명을 입력하세요" maxlength="190">
+							<small class="text-muted">* 원하는 학력만 선택하여 작성이 가능해요.</small>
 						</div>
 					</div>
-				</div>
-			</template>
 
-			<!-- 경력사항 -->
-			<div class="card mb-4">
-				<div
-					class="card-header d-flex justify-content-between align-items-center"
-					id="myHistoryBox">
-					<span>경력사항</span>
-					<button type="button" class="btn btn-primary btn-sm"
-						id="addHistoryBtn">추가하기</button>
-				</div>
-				<div class="card-body">
-					<div id="historyContainer">
-						<!-- 경력 항목 -->
-					</div>
-					<div>
-						<small class="text-muted">* 경력사항이 있는 경우에만 작성해 주세요.</small>
-					</div>
-					<div>
-						<small class="text-muted">* 경력사항은 이력서 저장 시 최신순으로 정렬됩니다.</small>
-					</div>
-				</div>
-			</div>
-
-			<!-- 경력사항 템플릿 (추가 버튼 눌러야 나옴) -->
-			<template id="historyTemplate">
-				<div class="history-item border rounded p-3 mb-3 position-relative">
-					<!-- 삭제 버튼 (X) -->
-					<button type="button"
-						class="btn-close position-absolute top-0 end-0 m-3 remove-history"
-						aria-label="삭제"></button>
-					<div class="row g-3">
-						<!-- 회사명 입력 -->
-						<div class="col-md-6">
-							<label class="form-label">회사명<span class="essentialPoint">*</span></label>
-							<input type="text" class="form-control company-name"
-								name="companyName" placeholder="회사명을 입력하세요" maxlength="20">
-						</div>
-
-						<!-- 직위 입력 -->
-						<div class="col-md-6">
-							<label class="form-label">직위<span class="essentialPoint">*</span></label>
-							<input type="text" class="form-control position" name="position"
-								placeholder="직위를 입력하세요" maxlength="45">
-						</div>
-
-						<!-- 근무기간 -->
-						<div class="col-md-6">
-							<label class="form-label">근무기간<span
-								class="essentialPoint">*</span></label>
+					<!-- 학력사항 템플릿 (추가 버튼 눌러야 나옴) -->
+					<template id="educationTemplate">
+						<div class="education-item border rounded p-3 mb-3 position-relative">
+							<!-- 삭제 버튼 (X) -->
+							<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-education"
+								aria-label="삭제"></button>
 							<div class="row g-3">
-								<div class="col-md-5">
-									<input type="date" class="form-control start-date"
-										name="startDate" max="${today}">
-								</div>
-								<div
-									class="col-md-2 text-center d-flex align-items-center justify-content-center textflow">
-									<span>~</span>
-								</div>
-								<div class="col-md-5">
-									<input type="date" class="form-control end-date" name="endDate"
-										max="${today}">
-								</div>
-							</div>
-							<div class="form-check mt-2">
-								<input type="checkbox"
-									class="form-check-input currently-employed"
-									id="currentlyEmployed"> <label class="form-check-label"
-									for="currentlyEmployed">재직중</label>
-							</div>
-						</div>
-
-						<!-- 담당업무 입력 -->
-						<div class="col-md-12">
-							<label class="form-label">담당업무<span
-								class="essentialPoint">*</span></label> <input type="text"
-								class="form-control job-description" id="jobDescription"
-								name="jobDescription" placeholder="담당업무를 입력하세요(최대 100자)"
-								maxlength="100">
-							<div class="text-end">
-								<span id="jobDescriptionCount" class="text-muted">0 / 100</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</template>
-
-			<!-- 보유 자격증 -->
-			<div class="card mb-4">
-				<div
-					class="card-header d-flex justify-content-between align-items-center"
-					id="myLicenseBox">
-					<span>자격증</span>
-					<button type="button" class="btn btn-primary btn-sm"
-						id="addLicenseBtn">추가하기</button>
-				</div>
-				<div class="card-body">
-					<div id="licenseContainer">
-						<!-- 자격증 항목 -->
-					</div>
-					<small class="text-muted">* 자격증은 최대 10개까지 저장 가능합니다.</small>
-				</div>
-			</div>
-
-			<!-- 자격증 템플릿 (추가 버튼 눌러야 나옴) -->
-			<template id="licenseTemplate">
-				<div class="license-item border rounded p-3 mb-3 position-relative">
-					<!-- 삭제 버튼 (X) -->
-					<button type="button"
-						class="btn-close position-absolute top-0 end-0 m-3 remove-license"
-						aria-label="삭제"></button>
-					<div class="row g-3">
-						<!-- 자격증명 입력 -->
-						<div class="col-md-6">
-							<label class="form-label">자격증명<span
-								class="essentialPoint">*</span></label> <input type="text"
-								class="form-control license-name" name="licenseName"
-								placeholder="자격증명을 입력하세요" maxlength="30">
-						</div>
-						<!-- 발급기관 입력 -->
-						<div class="col-md-6">
-							<label class="form-label">발급기관<span
-								class="essentialPoint">*</span></label> <input type="text"
-								class="form-control institution" name="institution"
-								placeholder="발급기관을 입력하세요" maxlength="45">
-						</div>
-						<!-- 취득날짜 -->
-						<div class="col-md-4">
-							<label class="form-label">취득날짜<span
-								class="essentialPoint">*</span></label>
-							<div class="row g-2">
+								<!-- 학력 레벨 선택 -->
 								<div class="col-md-4">
-									<input type="date" class="form-control acquisition-date"
-										name="acquisitionDate">
+									<label class="form-label">학력 구분<span class="essentialPoint">*</span></label> <select
+										class="form-select education-level" name="educationLevel">
+										<option value="">선택하세요</option>
+										<c:forEach var="level" items="${educationLevelList}">
+											<option value="${level.name()}">${level.displayName}</option>
+										</c:forEach>
+									</select>
+								</div>
+
+								<!-- 학력 상태 선택 -->
+								<div class="col-md-4">
+									<label class="form-label">학력 상태<span class="essentialPoint">*</span></label> <select
+										class="form-select education-status" name="educationStatus">
+										<option value="">선택하세요</option>
+										<c:forEach var="status" items="${educationStatusList}">
+											<option value="${status.name()}">${status.displayName}</option>
+										</c:forEach>
+									</select>
+								</div>
+
+								<!-- 졸업 날짜 -->
+								<div class="col-md-4">
+									<label class="form-label">졸업일자<span class="essentialPoint">*</span></label>
+									<div class="row g-2">
+										<div class="col-md-4">
+											<input type="date" class="form-control graduation-date"
+												name="graduationDate">
+										</div>
+									</div>
+								</div>
+
+								<!-- 학교명 입력 -->
+								<div class="col-md-4">
+									<label class="form-label">학교명<span class="essentialPoint">*</span></label>
+									<input type="text" class="form-control custom-input" name="customInput"
+										placeholder="학교명을 입력하세요" maxlength="190">
+								</div>
+							</div>
+						</div>
+					</template>
+
+					<!-- 경력사항 -->
+					<div class="card mb-4">
+						<div class="card-header d-flex justify-content-between align-items-center" id="myHistoryBox">
+							<span>경력사항</span>
+							<button type="button" class="btn btn-primary btn-sm" id="addHistoryBtn">추가하기</button>
+						</div>
+						<div class="card-body">
+							<div id="historyContainer">
+								<!-- 경력 항목 -->
+							</div>
+							<div>
+								<small class="text-muted">* 경력사항이 있는 경우에만 작성해 주세요.</small>
+							</div>
+							<div>
+								<small class="text-muted">* 경력사항은 이력서 저장 시 최신순으로 정렬됩니다.</small>
+							</div>
+						</div>
+					</div>
+
+					<!-- 경력사항 템플릿 (추가 버튼 눌러야 나옴) -->
+					<template id="historyTemplate">
+						<div class="history-item border rounded p-3 mb-3 position-relative">
+							<!-- 삭제 버튼 (X) -->
+							<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-history"
+								aria-label="삭제"></button>
+							<div class="row g-3">
+								<!-- 회사명 입력 -->
+								<div class="col-md-6">
+									<label class="form-label">회사명<span class="essentialPoint">*</span></label>
+									<input type="text" class="form-control company-name" name="companyName"
+										placeholder="회사명을 입력하세요" maxlength="20">
+								</div>
+
+								<!-- 직위 입력 -->
+								<div class="col-md-6">
+									<label class="form-label">직위<span class="essentialPoint">*</span></label>
+									<input type="text" class="form-control position" name="position"
+										placeholder="직위를 입력하세요" maxlength="45">
+								</div>
+
+								<!-- 근무기간 -->
+								<div class="col-md-6">
+									<label class="form-label">근무기간<span class="essentialPoint">*</span></label>
+									<div class="row g-3">
+										<div class="col-md-5">
+											<input type="date" class="form-control start-date" name="startDate"
+												max="${today}">
+										</div>
+										<div
+											class="col-md-2 text-center d-flex align-items-center justify-content-center textflow">
+											<span>~</span>
+										</div>
+										<div class="col-md-5">
+											<input type="date" class="form-control end-date" name="endDate"
+												max="${today}">
+										</div>
+									</div>
+									<div class="form-check mt-2">
+										<input type="checkbox" class="form-check-input currently-employed"
+											id="currentlyEmployed"> <label class="form-check-label"
+											for="currentlyEmployed">재직중</label>
+									</div>
+								</div>
+
+								<!-- 담당업무 입력 -->
+								<div class="col-md-12">
+									<label class="form-label">담당업무<span class="essentialPoint">*</span></label> <input
+										type="text" class="form-control job-description" id="jobDescription"
+										name="jobDescription" placeholder="담당업무를 입력하세요(최대 100자)" maxlength="100">
+									<div class="text-end">
+										<span id="jobDescriptionCount" class="text-muted">0 / 100</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</template>
+
+					<!-- 보유 자격증 -->
+					<div class="card mb-4">
+						<div class="card-header d-flex justify-content-between align-items-center" id="myLicenseBox">
+							<span>자격증</span>
+							<button type="button" class="btn btn-primary btn-sm" id="addLicenseBtn">추가하기</button>
+						</div>
+						<div class="card-body">
+							<div id="licenseContainer">
+								<!-- 자격증 항목 -->
+							</div>
+							<small class="text-muted">* 자격증은 최대 10개까지 저장 가능합니다.</small>
+						</div>
+					</div>
+
+					<!-- 자격증 템플릿 (추가 버튼 눌러야 나옴) -->
+					<template id="licenseTemplate">
+						<div class="license-item border rounded p-3 mb-3 position-relative">
+							<!-- 삭제 버튼 (X) -->
+							<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-license"
+								aria-label="삭제"></button>
+							<div class="row g-3">
+								<!-- 자격증명 입력 -->
+								<div class="col-md-6">
+									<label class="form-label">자격증명<span class="essentialPoint">*</span></label> <input
+										type="text" class="form-control license-name" name="licenseName"
+										placeholder="자격증명을 입력하세요" maxlength="30">
+								</div>
+								<!-- 발급기관 입력 -->
+								<div class="col-md-6">
+									<label class="form-label">발급기관<span class="essentialPoint">*</span></label> <input
+										type="text" class="form-control institution" name="institution"
+										placeholder="발급기관을 입력하세요" maxlength="45">
+								</div>
+								<!-- 취득날짜 -->
+								<div class="col-md-4">
+									<label class="form-label">취득날짜<span class="essentialPoint">*</span></label>
+									<div class="row g-2">
+										<div class="col-md-4">
+											<input type="date" class="form-control acquisition-date"
+												name="acquisitionDate">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</template>
+
+
+					<!-- 자기소개란 -->
+					<div class="card mb-4">
+						<div class="card-header d-flex justify-content-between align-items-center">
+							<span>자기소개</span>
+						</div>
+						<div class="card-body">
+							<textarea class="form-control" id="selfIntroTextarea" rows="8"
+								placeholder="자기소개를 입력하세요(최대 1000자)" maxlength="1000"></textarea>
+							<div class="text-end">
+								<span id="charCount" class="text-muted">0 / 1000</span>
+							</div>
+						</div>
+					</div>
+
+
+					<!-- 파일 첨부 -->
+					<div class="card mb-4">
+						<div class="card-header d-flex justify-content-between align-items-center">
+							<span>첨부파일</span> <label for="fileInput" class="btn btn-primary btn-sm mb-0">파일 선택</label>
+							<input type="file" id="fileInput" style="display: none;" multiple>
+						</div>
+						<div class="card-body">
+							<div id="fileContainer" class="border rounded p-3">
+								<div class="text-center text-muted fileText">
+									여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br> (최대 10MB)
+								</div>
+								<div id="previewContainer" class="mt-3"></div>
+							</div>
+							<small class="text-muted">* 자격증명서, 졸업증명서 등 첨부 가능합니다.</small>
+						</div>
+					</div>
+
+					<!-- 완전 저장 버튼 -->
+					<button type="button" class="btn btn-primary" id="finalSaveBtn">저장하기</button>
+
+					<button type="button" class="btn btn-secondary" id="testBtn">코드
+						테스트용 버튼</button>
+				</form>
+				<div>
+					<!-- 재사용 공용 경고 모달창 -->
+					<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel"
+						aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered">
+							<div class="modal-content text-center">
+								<div class="modal-body">
+									<p id="validationMessage" class="mb-3">알림 메시지</p>
+									<button type="button" class="btn btn-primary" id="validationCheckBtn"
+										data-bs-dismiss="modal">확인</button>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</template>
 
 
-			<!-- 자기소개란 -->
-			<div class="card mb-4">
-				<div
-					class="card-header d-flex justify-content-between align-items-center">
-					<span>자기소개</span>
 				</div>
-				<div class="card-body">
-					<textarea class="form-control" id="selfIntroTextarea" rows="8"
-						placeholder="자기소개를 입력하세요(최대 1000자)" maxlength="1000"></textarea>
-					<div class="text-end">
-						<span id="charCount" class="text-muted">0 / 1000</span>
-					</div>
-				</div>
+				<!-- 풋터 -->
+				<jsp:include page="/WEB-INF/views/footer.jsp" />
 			</div>
+		</body>
 
+		</html>
 
-			<!-- 파일 첨부 -->
-			<div class="card mb-4">
-				<div
-					class="card-header d-flex justify-content-between align-items-center">
-					<span>첨부파일</span> <label for="fileInput"
-						class="btn btn-primary btn-sm mb-0">파일 선택</label> <input
-						type="file" id="fileInput" style="display: none;" multiple>
-				</div>
-				<div class="card-body">
-					<div id="fileContainer" class="border rounded p-3">
-						<div class="text-center text-muted fileText">
-							여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br> (최대 10MB)
-						</div>
-						<div id="previewContainer" class="mt-3"></div>
-					</div>
-					<small class="text-muted">* 자격증명서, 졸업증명서 등 첨부 가능합니다.</small>
-				</div>
-			</div>
+		<style>
+			/* 전체 컨테이너 스타일 */
+			.container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 2rem;
+			}
 
-			<!-- 완전 저장 버튼 -->
-			<button type="button" class="btn btn-primary" id="finalSaveBtn">저장하기</button>
+			/* 날짜 선택 필드 스타일 */
+			input[type="date"] {
+				width: 100%;
+				min-width: 150px;
+				padding: 0.75rem 1rem;
+				border: 1px solid #e0e0e0;
+				border-radius: 8px;
+				transition: all 0.3s ease;
+			}
 
-			<button type="button" class="btn btn-secondary" id="testBtn">코드
-				테스트용 버튼</button>
-		</form>
-		<div>
-			<!-- 재사용 공용 경고 모달창 -->
-			<div class="modal fade" id="validationModal" tabindex="-1"
-				aria-labelledby="validationModalLabel" aria-hidden="true">
-				<div class="modal-dialog modal-dialog-centered">
-					<div class="modal-content text-center">
-						<div class="modal-body">
-							<p id="validationMessage" class="mb-3">알림 메시지</p>
-							<button type="button" class="btn btn-primary"
-								id="validationCheckBtn" data-bs-dismiss="modal">확인</button>
-						</div>
-					</div>
-				</div>
-			</div>
+			input[type="date"]:focus {
+				border-color: var(--accent-color);
+				box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
+			}
 
+			/* 제목 스타일 */
+			h2 {
+				color: var(--heading-color);
+				font-family: var(--heading-font);
+				font-weight: 600;
+				margin-bottom: 2rem;
+				position: relative;
+				padding-bottom: 1rem;
+			}
 
-		</div>
-		<!-- 풋터 -->
-		<jsp:include page="/WEB-INF/views/footer.jsp" />
-	</div>
-</body>
+			h2:after {
+				content: '';
+				position: absolute;
+				left: 0;
+				bottom: 0;
+				width: 50px;
+				height: 3px;
+				background: var(--accent-color);
+			}
 
-</html>
+			/* 카드 스타일 */
+			.card {
+				border: none;
+				box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+				margin-bottom: 2rem;
+				transition: all 0.3s ease;
+			}
 
-<style>
-/* 전체 컨테이너 스타일 */
-.container {
-	max-width: 1200px;
-	margin: 0 auto;
-	padding: 2rem;
-}
+			.card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+			}
 
-/* 날짜 선택 필드 스타일 */
-input[type="date"] {
-	width: 100%;
-	min-width: 150px;
-	padding: 0.75rem 1rem;
-	border: 1px solid #e0e0e0;
-	border-radius: 8px;
-	transition: all 0.3s ease;
-}
+			/* 카드 헤더 스타일 */
+			.card-header {
+				background: var(--heading-color);
+				color: white;
+				font-weight: 600;
+				padding: 0.75rem 1rem;
+				border-radius: 8px 8px 0 0 !important;
+				min-height: 45px;
+				display: inline-block;
+				align-items: center;
+				justify-content: space-between;
+			}
 
-input[type="date"]:focus {
-	border-color: var(--accent-color);
-	box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
-}
+			.card-body {
+				padding: 1.5rem;
+			}
 
-/* 제목 스타일 */
-h2 {
-	color: var(--heading-color);
-	font-family: var(--heading-font);
-	font-weight: 600;
-	margin-bottom: 2rem;
-	position: relative;
-	padding-bottom: 1rem;
-}
+			/* 폼 요소 스타일 */
+			.form-control,
+			.form-select {
+				border: 1px solid #e0e0e0;
+				border-radius: 8px;
+				padding: 0.75rem 1rem;
+				transition: all 0.3s ease;
+			}
 
-h2:after {
-	content: '';
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	width: 50px;
-	height: 3px;
-	background: var(--accent-color);
-}
+			.form-control:focus,
+			.form-select:focus {
+				border-color: var(--accent-color);
+				box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
+			}
 
-/* 카드 스타일 */
-.card {
-	border: none;
-	box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-	margin-bottom: 2rem;
-	transition: all 0.3s ease;
-}
+			/* 버튼 스타일 */
+			.btn {
+				padding: 0.5rem 1rem;
+				border-radius: 6px;
+				font-weight: 500;
+				transition: all 0.3s ease;
+				font-size: 0.9rem;
+			}
 
-.card:hover {
-	transform: translateY(-5px);
-	box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
-}
+			.btn-sm {
+				padding: 0.25rem 0.75rem;
+				font-size: 0.85rem;
+			}
 
-/* 카드 헤더 스타일 */
-.card-header {
-	background: var(--heading-color);
-	color: white;
-	font-weight: 600;
-	padding: 0.75rem 1rem;
-	border-radius: 8px 8px 0 0 !important;
-	min-height: 45px;
-	display: inline-block;
-	align-items: center;
-	justify-content: space-between;
-}
+			.btn-primary {
+				background: var(--accent-color);
+				border: none;
+			}
 
-.card-body {
-	padding: 1.5rem;
-}
+			.btn-primary:hover {
+				background: color-mix(in srgb, var(--accent-color), transparent 15%);
+				transform: translateY(-2px);
+			}
 
-/* 폼 요소 스타일 */
-.form-control, .form-select {
-	border: 1px solid #e0e0e0;
-	border-radius: 8px;
-	padding: 0.75rem 1rem;
-	transition: all 0.3s ease;
-}
+			.btn-secondary {
+				background: #6c757d;
+				border: none;
+			}
 
-.form-control:focus, .form-select:focus {
-	border-color: var(--accent-color);
-	box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
-}
+			.btn-secondary:hover {
+				background: #5a6268;
+				transform: translateY(-2px);
+			}
 
-/* 버튼 스타일 */
-.btn {
-	padding: 0.5rem 1rem;
-	border-radius: 6px;
-	font-weight: 500;
-	transition: all 0.3s ease;
-	font-size: 0.9rem;
-}
+			/* 필수 입력 항목 스타일 */
+			.essentialPoint {
+				color: #dc3545;
+				font-weight: bold;
+				margin-left: 0;
+				font-size: 0.9rem;
+				display: inline;
+			}
 
-.btn-sm {
-	padding: 0.25rem 0.75rem;
-	font-size: 0.85rem;
-}
+			/* 파일 업로드 영역 스타일 */
+			#fileContainer {
+				border: 2px dashed var(--accent-color);
+				border-radius: 12px;
+				padding: 2rem;
+				text-align: center;
+				transition: all 0.3s ease;
+				background: rgba(71, 178, 228, 0.05);
+			}
 
-.btn-primary {
-	background: var(--accent-color);
-	border: none;
-}
+			#fileContainer:hover {
+				background: rgba(71, 178, 228, 0.1);
+			}
 
-.btn-primary:hover {
-	background: color-mix(in srgb, var(--accent-color), transparent 15%);
-	transform: translateY(-2px);
-}
+			.fileText {
+				font-size: 1.1rem;
+				color: #666;
+				margin: 0;
+			}
 
-.btn-secondary {
-	background: #6c757d;
-	border: none;
-}
+			/* 파일 미리보기 스타일 */
+			.file-preview {
+				background: white;
+				border-radius: 8px;
+				padding: 1rem;
+				margin-bottom: 1rem;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+				transition: all 0.3s ease;
+			}
 
-.btn-secondary:hover {
-	background: #5a6268;
-	transform: translateY(-2px);
-}
+			.file-preview:hover {
+				transform: translateX(5px);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+			}
 
-/* 필수 입력 항목 스타일 */
-.essentialPoint {
-	color: #dc3545;
-	font-weight: bold;
-	margin-left: 0;
-	font-size: 0.9rem;
-	display: inline;
-}
+			/* 리스트 컨테이너 스타일 */
+			.region-list-container,
+			.sigungu-list-container,
+			.major-list-container,
+			.sub-list-container {
+				border: 1px solid #e0e0e0;
+				border-radius: 8px;
+				background: white;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+			}
 
-/* 파일 업로드 영역 스타일 */
-#fileContainer {
-	border: 2px dashed var(--accent-color);
-	border-radius: 12px;
-	padding: 2rem;
-	text-align: center;
-	transition: all 0.3s ease;
-	background: rgba(71, 178, 228, 0.05);
-}
+			/* 리스트 아이템 스타일 */
+			.list-group-item {
+				border: none;
+				padding: 0.75rem 1rem;
+				transition: all 0.2s ease;
+			}
 
-#fileContainer:hover {
-	background: rgba(71, 178, 228, 0.1);
-}
+			.list-group-item:hover {
+				background: rgba(71, 178, 228, 0.1);
+			}
 
-.fileText {
-	font-size: 1.1rem;
-	color: #666;
-	margin: 0;
-}
+			.list-group-item.selected {
+				background: var(--accent-color);
+				color: white;
+			}
 
-/* 파일 미리보기 스타일 */
-.file-preview {
-	background: white;
-	border-radius: 8px;
-	padding: 1rem;
-	margin-bottom: 1rem;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-	transition: all 0.3s ease;
-}
+			/* 뱃지 스타일 */
+			.badge {
+				padding: 0.5rem 1rem;
+				font-weight: 500;
+				margin: 0.25rem;
+				border-radius: 20px;
+				display: inline-flex;
+				align-items: center;
+			}
 
-.file-preview:hover {
-	transform: translateX(5px);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
+			/* 모달 스타일 */
+			.modal-content {
+				border: none;
+				border-radius: 12px;
+				box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+			}
 
-/* 리스트 컨테이너 스타일 */
-.region-list-container, .sigungu-list-container, .major-list-container,
-	.sub-list-container {
-	border: 1px solid #e0e0e0;
-	border-radius: 8px;
-	background: white;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
+			.modal-header {
+				background: var(--heading-color);
+				color: white;
+				border-radius: 12px 12px 0 0;
+				padding: 1.5rem;
+			}
 
-/* 리스트 아이템 스타일 */
-.list-group-item {
-	border: none;
-	padding: 0.75rem 1rem;
-	transition: all 0.2s ease;
-}
+			.modal-body {
+				padding: 2rem;
+			}
 
-.list-group-item:hover {
-	background: rgba(71, 178, 228, 0.1);
-}
+			/* 성격 및 강점 버튼 스타일 */
+			.merit-btn {
+				margin: 0.5rem;
+				border-radius: 20px;
+				padding: 0.5rem 1.5rem;
+				transition: all 0.3s ease;
+			}
 
-.list-group-item.selected {
-	background: var(--accent-color);
-	color: white;
-}
+			.merit-btn:hover {
+				transform: translateY(-2px);
+			}
 
-/* 뱃지 스타일 */
-.badge {
-	padding: 0.5rem 1rem;
-	font-weight: 500;
-	margin: 0.25rem;
-	border-radius: 20px;
-	display: inline-flex;
-	align-items: center;
-}
+			/* 스크롤바 스타일 */
+			::-webkit-scrollbar {
+				width: 8px;
+			}
 
-/* 모달 스타일 */
-.modal-content {
-	border: none;
-	border-radius: 12px;
-	box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-}
+			::-webkit-scrollbar-track {
+				background: #f1f1f1;
+				border-radius: 4px;
+			}
 
-.modal-header {
-	background: var(--heading-color);
-	color: white;
-	border-radius: 12px 12px 0 0;
-	padding: 1.5rem;
-}
+			::-webkit-scrollbar-thumb {
+				background: var(--accent-color);
+				border-radius: 4px;
+			}
 
-.modal-body {
-	padding: 2rem;
-}
+			::-webkit-scrollbar-thumb:hover {
+				background: color-mix(in srgb, var(--accent-color), transparent 15%);
+			}
 
-/* 성격 및 강점 버튼 스타일 */
-.merit-btn {
-	margin: 0.5rem;
-	border-radius: 20px;
-	padding: 0.5rem 1.5rem;
-	transition: all 0.3s ease;
-}
+			/* 반응형 스타일 */
+			@media (max-width: 768px) {
+				.container {
+					padding: 1rem;
+				}
 
-.merit-btn:hover {
-	transform: translateY(-2px);
-}
+				.card-header {
+					padding: 0.75rem 1rem;
+				}
 
-/* 스크롤바 스타일 */
-::-webkit-scrollbar {
-	width: 8px;
-}
+				.card-body {
+					padding: 1rem;
+				}
 
-::-webkit-scrollbar-track {
-	background: #f1f1f1;
-	border-radius: 4px;
-}
+				.btn {
+					padding: 0.5rem 1rem;
+				}
 
-::-webkit-scrollbar-thumb {
-	background: var(--accent-color);
-	border-radius: 4px;
-}
+				#fileContainer {
+					padding: 1rem;
+				}
+			}
 
-::-webkit-scrollbar-thumb:hover {
-	background: color-mix(in srgb, var(--accent-color), transparent 15%);
-}
+			.textflow {
+				margin-left: -10px;
+				margin-right: -10px;
+			}
 
-/* 반응형 스타일 */
-@media (max-width: 768px) {
-	.container {
-		padding: 1rem;
-	}
-	.card-header {
-		padding: 0.75rem 1rem;
-	}
-	.card-body {
-		padding: 1rem;
-	}
-	.btn {
-		padding: 0.5rem 1rem;
-	}
-	#fileContainer {
-		padding: 1rem;
-	}
-}
+			/* 이력서 제목 입력 스타일 */
+			#title {
+				font-size: 1.1rem;
+				padding: 0.8rem 1rem;
+				border: 1px solid #e0e0e0;
+				transition: all 0.3s ease;
+			}
 
-.textflow {
-	margin-left: -10px;
-	margin-right: -10px;
-}
+			#title:focus {
+				border-color: var(--accent-color);
+				box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
+			}
 
-/* 이력서 제목 입력 스타일 */
-#title {
-	font-size: 1.1rem;
-	padding: 0.8rem 1rem;
-	border: 1px solid #e0e0e0;
-	transition: all 0.3s ease;
-}
+			.input-group-text {
+				border: 1px solid #e0e0e0;
+				border-right: none;
+				padding: 0.8rem 1rem;
+			}
 
-#title:focus {
-	border-color: var(--accent-color);
-	box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
-}
+			.input-group-text i {
+				font-size: 1.2rem;
+				color: var(--accent-color);
+			}
 
-.input-group-text {
-	border: 1px solid #e0e0e0;
-	border-right: none;
-	padding: 0.8rem 1rem;
-}
+			/* CSS 변수 정의 */
+			:root {
+				--accent-color: #47B2E4;
+				--heading-color: #37517E;
+				--heading-font: 'Poppins', sans-serif;
+			}
+		</style>
 
-.input-group-text i {
-	font-size: 1.2rem;
-	color: var(--accent-color);
-}
-
-/* CSS 변수 정의 */
-:root {
-	--accent-color: #47B2E4;
-	--heading-color: #37517E;
-	--heading-font: 'Poppins', sans-serif;
-}
-</style>
-
-<script>
+		<script>
 			//---------------------------------------------------------------------------------------------------------------------------------
 			$(document).ready(function () {
 				// 시/도 클릭하면...
@@ -1040,16 +1004,16 @@ h2:after {
 												.on("click", function (e) {
 													e.preventDefault();
 													e.stopPropagation();
-													
+
 													const $badge = $(this).parent();
 													const sigunguNo = $badge.data("sigungu");
 													const regionName = $badge.text().trim().split(' ')[1];
-													
+
 													$badge.remove();
 													$(`input[data-sigungu="${sigunguNo}"]`).prop("checked", false);
-													
+
 													// 해당 텍스트와 일치하는 체크박스 찾아서 해제
-													$('.sigungu-item input[type="checkbox"]').each(function() {
+													$('.sigungu-item input[type="checkbox"]').each(function () {
 														if ($(this).data('name') === regionName) {
 															$(this).prop('checked', false);
 														}
@@ -1166,14 +1130,14 @@ h2:after {
 												.on("click", function (e) {
 													e.preventDefault();
 													e.stopPropagation();
-													
+
 													const $badge = $(this).parent();
 													const jobName = $badge.text().trim();
-													
+
 													$badge.remove();
-													
+
 													// 해당 텍스트와 일치하는 체크박스 찾아서 해제
-													$('.sub-item input[type="checkbox"]').each(function() {
+													$('.sub-item input[type="checkbox"]').each(function () {
 														if ($(this).data('name') === jobName) {
 															$(this).prop('checked', false);
 														}
@@ -1552,9 +1516,9 @@ h2:after {
 					// 삭제된 파일이 있으면 서버에 삭제 요청
 					if (deletedFiles.length > 0) {
 						// 각 파일에 대해 개별적으로 삭제 요청
-						let deletePromises = deletedFiles.map(function(fileName) {
+						let deletePromises = deletedFiles.map(function (fileName) {
 							// 비동기 작업을 처리하기 위한 Promise 객체 생성
-							return new Promise(function(resolve, reject) {
+							return new Promise(function (resolve, reject) {
 								$.ajax({
 									url: "/resume/deleteFile",
 									type: "POST",
@@ -1565,27 +1529,27 @@ h2:after {
 										size: 0
 									}),
 									contentType: "application/json",
-									success: function(result) {
+									success: function (result) {
 										if (result.success) {
 											resolve();
 										} else {
 											reject(result.message || "파일 삭제에 실패했습니다.");
 										}
 									},
-									error: function() {
+									error: function () {
 										reject("파일 삭제 중 오류가 발생했습니다.");
 									}
 								});
 							});
 						});
-						
+
 						// 모든 삭제 요청이 완료된 후 폼 데이터 수집 및 저장 진행
 						Promise.all(deletePromises)
-							.then(function() {
+							.then(function () {
 								console.log("모든 파일 삭제 성공");
 								submitFormData();
 							})
-							.catch(function(error) {
+							.catch(function (error) {
 								showValidationModal(error);
 							});
 					} else {
@@ -1593,9 +1557,34 @@ h2:after {
 						submitFormData();
 					}
 				});
-				
+
 				// 폼 데이터 수집 및 저장 함수
 				function submitFormData() {
+					// 대기 중인 파일들을 서버에 업로드
+					if (pendingFiles.length > 0) {
+						// 각 파일에 대해 업로드 Promise 생성
+						const uploadPromises = pendingFiles.map(fileInfo => uploadFile(fileInfo));
+
+						// 모든 파일 업로드가 완료된 후 폼 데이터 수집 및 저장 진행
+						Promise.all(uploadPromises)
+							.then(() => {
+								console.log("모든 파일 업로드 성공");
+								// 대기 중인 파일 목록 초기화
+								pendingFiles = [];
+								// 폼 데이터 수집 및 저장 진행
+								saveFormData();
+							})
+							.catch(error => {
+								showValidationModal(error);
+							});
+					} else {
+						// 대기 중인 파일이 없으면 바로 폼 데이터 수집 및 저장 진행
+						saveFormData();
+					}
+				}
+
+				// 폼 데이터 수집 및 저장 함수
+				function saveFormData() {
 					// 폼 데이터 수집 .map() -> .get()으로 배열 변환해서 값 가져오기
 					const formData = {
 						title: $('#title').val(),
@@ -1736,7 +1725,7 @@ h2:after {
 							.on('click', function (e) {
 								e.preventDefault();
 								e.stopPropagation();
-								
+
 								$badge.remove();
 								// 삭제 시 버튼 스타일 초기화
 								$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-primary').addClass('btn-outline-primary');
@@ -1751,19 +1740,19 @@ h2:after {
 				});
 
 				// 페이지 로드 시 기존 선택된 성격 및 강점에 대한 버튼 스타일 설정
-				$('#selectedMerits .badge').each(function() {
+				$('#selectedMerits .badge').each(function () {
 					const merit = $(this).data('merit');
 					$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-outline-primary').addClass('btn-primary');
 				});
 
 				// 기존 성격 및 강점 배지의 삭제 버튼 이벤트
-				$('#selectedMerits').on('click', '.btn-close', function(e) {
+				$('#selectedMerits').on('click', '.btn-close', function (e) {
 					e.preventDefault();
 					e.stopPropagation();
-					
+
 					const $badge = $(this).parent();
 					const merit = $badge.data('merit');
-					
+
 					$badge.remove();
 					// 삭제 시 버튼 스타일 초기화
 					$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-primary').addClass('btn-outline-primary');
@@ -1773,15 +1762,15 @@ h2:after {
 				$('#meritModal').on('show.bs.modal', function () {
 					// 모든 버튼 초기화
 					$('.merit-btn').removeClass('btn-primary').addClass('btn-outline-primary');
-					
+
 					// 현재 선택된 배지들의 텍스트 수집
 					const selectedMerits = [];
-					$('#selectedMerits .badge').each(function() {
+					$('#selectedMerits .badge').each(function () {
 						selectedMerits.push($(this).text().trim().replace('삭제', '').trim());
 					});
-					
+
 					// 각 버튼을 순회하면서 선택된 배지의 텍스트와 비교
-					$('.merit-btn').each(function() {
+					$('.merit-btn').each(function () {
 						const buttonText = $(this).text().trim();
 						if (selectedMerits.includes(buttonText)) {
 							$(this).removeClass('btn-outline-primary').addClass('btn-primary');
@@ -1799,9 +1788,9 @@ h2:after {
 				$('#meritModal').on('hidden.bs.modal', function () {
 					// 모든 버튼 초기화
 					$('.merit-btn').removeClass('btn-primary').addClass('btn-outline-primary');
-					
+
 					// 선택된 항목들의 버튼 스타일 변경
-					$('#selectedMerits .badge').each(function() {
+					$('#selectedMerits .badge').each(function () {
 						const merit = $(this).data('merit');
 						$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-outline-primary').addClass('btn-primary');
 					});
@@ -1818,29 +1807,29 @@ h2:after {
 				$(document).on('click', '.remove-education', function () {
 					$(this).closest('.education-item').remove();
 				});
-//---------------------------------------------------------------------------------------------------------------------------------
+				//---------------------------------------------------------------------------------------------------------------------------------
 				// 페이지 로드 시 기존 학력사항 표시
 				function initializeEducation() {
 					const educationTemplate = document.querySelector('#educationTemplate');
-					
+
 					<c:forEach var="education" items="${resumeDetail.educations}" varStatus="status">
 						const educationClone${status.index} = educationTemplate.content.cloneNode(true);
-						
+
 						// 기존 값 설정
 						$(educationClone${status.index}).find('.education-level').val('${education.educationLevel}');
 						$(educationClone${status.index}).find('.education-status').val('${education.educationStatus}');
-						
+
 						// 날짜 형식 변환 (yyyy-MM-dd)
 						<c:if test="${not empty education.graduationDate}">
 							const graduationDate${status.index} = new Date('${education.graduationDate}');
-							const formattedDate${status.index} = graduationDate${status.index}.getFullYear() + '-' + 
-								String(graduationDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' + 
-								String(graduationDate${status.index}.getDate()).padStart(2, '0');
+							const formattedDate${status.index} = graduationDate${status.index}.getFullYear() + '-' +
+							String(graduationDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
+							String(graduationDate${status.index}.getDate()).padStart(2, '0');
 							$(educationClone${status.index}).find('.graduation-date').val(formattedDate${status.index});
 						</c:if>
-						
+
 						$(educationClone${status.index}).find('.custom-input').val('${education.customInput}');
-						
+
 						$('#educationContainer').append(educationClone${status.index});
 					</c:forEach>
 				}
@@ -1886,47 +1875,47 @@ h2:after {
 						$endDate.prop('disabled', false);
 					}
 				});
-//---------------------------------------------------------------------------------------------------------------------------------
+				//---------------------------------------------------------------------------------------------------------------------------------
 				// 페이지 로드 시 기존 경력사항 표시
 				function initializeHistory() {
 					const historyTemplate = document.querySelector('#historyTemplate');
-					
+
 					<c:forEach var="history" items="${resumeDetail.histories}" varStatus="status">
 						const historyClone${status.index} = historyTemplate.content.cloneNode(true);
-						
+
 						// 기존 값 설정
 						$(historyClone${status.index}).find('.company-name').val('${history.companyName}');
 						$(historyClone${status.index}).find('.position').val('${history.position}');
 						$(historyClone${status.index}).find('.job-description').val('${history.jobDescription}');
-						
+
 						// 시작일 설정
 						<c:if test="${not empty history.startDate}">
 							const startDate${status.index} = new Date('${history.startDate}');
-							const formattedStartDate${status.index} = startDate${status.index}.getFullYear() + '-' + 
-								String(startDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' + 
-								String(startDate${status.index}.getDate()).padStart(2, '0');
+							const formattedStartDate${status.index} = startDate${status.index}.getFullYear() + '-' +
+							String(startDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
+							String(startDate${status.index}.getDate()).padStart(2, '0');
 							$(historyClone${status.index}).find('.start-date').val(formattedStartDate${status.index});
 						</c:if>
-						
+
 						// 종료일 설정 (재직중이 아닌 경우에만)
 						<c:if test="${not empty history.endDate}">
 							const endDate${status.index} = new Date('${history.endDate}');
-							const formattedEndDate${status.index} = endDate${status.index}.getFullYear() + '-' + 
-								String(endDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' + 
-								String(endDate${status.index}.getDate()).padStart(2, '0');
+							const formattedEndDate${status.index} = endDate${status.index}.getFullYear() + '-' +
+							String(endDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
+							String(endDate${status.index}.getDate()).padStart(2, '0');
 							$(historyClone${status.index}).find('.end-date').val(formattedEndDate${status.index});
 						</c:if>
-						
+
 						// 재직중 체크박스 상태 설정
 						<c:if test="${empty history.endDate}">
 							$(historyClone${status.index}).find('.currently-employed').prop('checked', true);
 							$(historyClone${status.index}).find('.end-date').prop('disabled', true);
 						</c:if>
-						
+
 						// 담당업무 글자수 카운트 설정
 						const jobDescriptionLength${status.index} = '${history.jobDescription}'.length;
 						$(historyClone${status.index}).find('#jobDescriptionCount').text(jobDescriptionLength${status.index} + ' / 100');
-						
+
 						$('#historyContainer').append(historyClone${status.index});
 					</c:forEach>
 				}
@@ -1950,27 +1939,27 @@ h2:after {
 				$(document).on('click', '.remove-license', function () {
 					$(this).closest('.license-item').remove();
 				});
-//---------------------------------------------------------------------------------------------------------------------------------
+				//---------------------------------------------------------------------------------------------------------------------------------
 				// 페이지 로드 시 기존 자격증 표시
 				function initializeLicense() {
 					const licenseTemplate = document.querySelector('#licenseTemplate');
-					
+
 					<c:forEach var="license" items="${resumeDetail.licenses}" varStatus="status">
 						const licenseClone${status.index} = licenseTemplate.content.cloneNode(true);
-						
+
 						// 기존 값 설정
 						$(licenseClone${status.index}).find('.license-name').val('${license.licenseName}');
 						$(licenseClone${status.index}).find('.institution').val('${license.institution}');
-						
+
 						// 취득일자 설정
 						<c:if test="${not empty license.acquisitionDate}">
 							const acquisitionDate${status.index} = new Date('${license.acquisitionDate}');
-							const formattedAcquisitionDate${status.index} = acquisitionDate${status.index}.getFullYear() + '-' + 
-								String(acquisitionDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' + 
-								String(acquisitionDate${status.index}.getDate()).padStart(2, '0');
+							const formattedAcquisitionDate${status.index} = acquisitionDate${status.index}.getFullYear() + '-' +
+							String(acquisitionDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
+							String(acquisitionDate${status.index}.getDate()).padStart(2, '0');
 							$(licenseClone${status.index}).find('.acquisition-date').val(formattedAcquisitionDate${status.index});
 						</c:if>
-						
+
 						$('#licenseContainer').append(licenseClone${status.index});
 					</c:forEach>
 				}
@@ -1988,7 +1977,7 @@ h2:after {
 
 				// 페이지 로드 시 자기소개 초기화
 				initializeSelfIntro();
-//---------------------------------------------------------------------------------------------------------------------------------
+				//---------------------------------------------------------------------------------------------------------------------------------
 				// 자기소개 입력란 몇글자 썻는지 알 수 있게 하기
 				$('#selfIntroTextarea').on('input', function () {
 					const currentLength = $(this).val().length;
@@ -2019,9 +2008,11 @@ h2:after {
 				// 파일 업로드
 				let uploadedFiles = [];
 				const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-				const MAX_FILES = 30;
+				const MAX_FILES = 10;
 				// 삭제된 파일 목록 초기화
 				let deletedFiles = [];
+				// 임시 저장된 파일 목록 (서버에 아직 업로드되지 않은 파일)
+				let pendingFiles = [];
 
 				// 페이지 로드 시 기존 첨부파일 표시
 				function initializeFiles() {
@@ -2029,17 +2020,17 @@ h2:after {
 						<c:forEach var="file" items="${resumeDetail.files}">
 							uploadedFiles.push({
 								originalFileName: '${file.originalFileName}',
-								newFileName: '${file.newFileName}',
-								ext: '${file.ext}',
-								size: ${file.size},
-								base64Image: '${file.base64Image}'
+							newFileName: '${file.newFileName}',
+							ext: '${file.ext}',
+							size: ${file.size},
+							base64Image: '${file.base64Image}'
 							});
 							showFilePreview({
 								originalFileName: '${file.originalFileName}',
-								newFileName: '${file.newFileName}',
-								ext: '${file.ext}',
-								size: ${file.size},
-								base64Image: '${file.base64Image}'
+							newFileName: '${file.newFileName}',
+							ext: '${file.ext}',
+							size: ${file.size},
+							base64Image: '${file.base64Image}'
 							});
 						</c:forEach>
 						updateFileText();
@@ -2078,8 +2069,8 @@ h2:after {
 
 				// 파일 처리 함수
 				function handleFiles(files) {
-					if (uploadedFiles.length + files.length > MAX_FILES) {
-						showValidationModal("최대 30개의 파일만 업로드할 수 있습니다.");
+					if (uploadedFiles.length + pendingFiles.length + files.length > MAX_FILES) {
+						showValidationModal("최대 10개의 파일만 업로드할 수 있습니다.");
 						return;
 					}
 
@@ -2090,45 +2081,87 @@ h2:after {
 							return;
 						}
 
-						// 중복 체크
-						if (uploadedFiles.some(f => f.name === file.name)) {
+						// 중복 체크 (업로드된 파일과 대기 중인 파일 모두 확인)
+						if (uploadedFiles.some(f => f.originalFileName === file.name) ||
+							pendingFiles.some(f => f.originalFileName === file.name)) {
 							showValidationModal(`${file.name}은(는) 이미 업로드되었습니다.`);
 							return;
 						}
 
-						uploadFile(file);
+						// 파일 정보 생성
+						const fileInfo = {
+							file: file,
+							originalFileName: file.name,
+							newFileName: generateUniqueFileName(file.name),
+							ext: file.name.split('.').pop(),
+							size: file.size,
+							base64Image: null // 나중에 설정
+						};
+
+						// 파일을 base64로 변환
+						convertFileToBase64(file).then(base64 => {
+							fileInfo.base64Image = base64;
+							// 대기 중인 파일 목록에 추가
+							pendingFiles.push(fileInfo);
+							// 미리보기 표시
+							showFilePreview(fileInfo);
+							updateFileText();
+						}).catch(error => {
+							showValidationModal("파일 변환 중 오류가 발생했습니다.");
+						});
 					});
 				}
 
-				// 파일 업로드 함수
-				function uploadFile(file) {
-					const formData = new FormData();
-					formData.append("file", file);
+				// 파일을 base64로 변환하는 함수
+				function convertFileToBase64(file) {
+					return new Promise((resolve, reject) => {
+						const reader = new FileReader();
+						reader.onload = () => resolve(reader.result);
+						reader.onerror = error => reject(error);
+						reader.readAsDataURL(file);
+					});
+				}
 
-					$.ajax({
-						url: "/resume/uploadFile",
-						type: "POST",
-						data: formData,
-						processData: false,
-						contentType: false,
-						success: function (result) {
-							if (result.success) {
-								uploadedFiles.push({
-									originalFileName: result.originalFileName,
-									newFileName: result.newFileName,
-									ext: result.ext,
-									size: result.size,
-									base64Image: result.base64Image
-								});
-								showFilePreview(result);
-								updateFileText();
-							} else {
-								showValidationModal(result.message || "파일 업로드에 실패했습니다.");
+				// 고유한 파일명 생성 함수
+				function generateUniqueFileName(originalFileName) {
+					const timestamp = new Date().getTime();
+					const random = Math.floor(Math.random() * 1000);
+					const ext = originalFileName.split('.').pop();
+					return `${timestamp}_${random}.${ext}`;
+				}
+
+				// 파일 업로드 함수 (Promise 기반)
+				function uploadFile(fileInfo) {
+					return new Promise((resolve, reject) => {
+						const formData = new FormData();
+						formData.append("file", fileInfo.file);
+
+						$.ajax({
+							url: "/resume/uploadFile",
+							type: "POST",
+							data: formData,
+							processData: false,
+							contentType: false,
+							success: function (result) {
+								if (result.success) {
+									// 업로드된 파일 정보 저장
+									const uploadedFile = {
+										originalFileName: result.originalFileName,
+										newFileName: result.newFileName,
+										ext: result.ext,
+										size: result.size,
+										base64Image: result.base64Image
+									};
+									uploadedFiles.push(uploadedFile);
+									resolve(uploadedFile);
+								} else {
+									reject(result.message || "파일 업로드에 실패했습니다.");
+								}
+							},
+							error: function () {
+								reject("파일 업로드 중 오류가 발생했습니다.");
 							}
-						},
-						error: function () {
-							showValidationModal("파일 업로드 중 오류가 발생했습니다.");
-						}
+						});
 					});
 				}
 
@@ -2170,14 +2203,25 @@ h2:after {
 
 				// 파일 삭제 함수 - 임시 삭제 방식으로 수정
 				function deleteFile(fileName, $preview) {
-					// 실제로 서버에서 파일을 삭제하지 않고, 클라이언트에서만 삭제 표시
-					uploadedFiles = uploadedFiles.filter(f => f.newFileName !== fileName);
-					$preview.remove();
-					updateFileText();
-					
-					// 삭제된 파일 목록에 추가 (나중에 저장 시 서버에 전송)
-					if (!deletedFiles.includes(fileName)) {
-						deletedFiles.push(fileName);
+					// 업로드된 파일인지 대기 중인 파일인지 확인
+					const uploadedFile = uploadedFiles.find(f => f.newFileName === fileName);
+					const pendingFile = pendingFiles.find(f => f.newFileName === fileName);
+
+					if (uploadedFile) {
+						// 업로드된 파일인 경우
+						uploadedFiles = uploadedFiles.filter(f => f.newFileName !== fileName);
+						$preview.remove();
+						updateFileText();
+
+						// 삭제된 파일 목록에 추가 (나중에 저장 시 서버에 전송)
+						if (!deletedFiles.includes(fileName)) {
+							deletedFiles.push(fileName);
+						}
+					} else if (pendingFile) {
+						// 대기 중인 파일인 경우
+						pendingFiles = pendingFiles.filter(f => f.newFileName !== fileName);
+						$preview.remove();
+						updateFileText();
 					}
 				}
 
@@ -2193,7 +2237,7 @@ h2:after {
 				// 파일 텍스트 업데이트
 				function updateFileText() {
 					const $fileText = $('.fileText');
-					if (uploadedFiles.length > 0) {
+					if (uploadedFiles.length + pendingFiles.length > 0) {
 						$fileText.hide();
 					} else {
 						$fileText.show();
@@ -2211,7 +2255,7 @@ h2:after {
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 페이지 로드 시 지역 선택 실행
 				initializeSelectedRegions();
-				
+
 				// 페이지 로드 시 선택된 지역에 대한 체크박스 처리
 				function initializeSelectedRegions() {
 					const $badges = $('#selectedRegions .badge');
@@ -2252,16 +2296,16 @@ h2:after {
 					$('#selectedRegions').on('click', '.btn-close', function (e) {
 						e.preventDefault();
 						e.stopPropagation();
-						
+
 						const $badge = $(this).parent();
 						const sigunguNo = $badge.data('sigungu');
 						const regionName = $badge.text().trim().split(' ')[1]; // 띄어쓰기로 분리 (시/군/구 이름)
-						
+
 						$badge.remove();
 						$(`#sigungu_${sigunguNo}`).prop('checked', false);
-						
+
 						// 해당 텍스트와 일치하는 체크박스 찾아서 해제
-						$('.sigungu-item input[type="checkbox"]').each(function() {
+						$('.sigungu-item input[type="checkbox"]').each(function () {
 							if ($(this).data('name') === regionName) {
 								$(this).prop('checked', false);
 							}
@@ -2313,15 +2357,15 @@ h2:after {
 					$('#selectedJobTypes').on('click', '.btn-close', function (e) {
 						e.preventDefault();
 						e.stopPropagation();
-						
+
 						const $badge = $(this).parent();
 						const subNo = $badge.data('sub');
 						const jobName = $badge.text().trim(); // 배지의 텍스트 가져오기
-						
+
 						$badge.remove();
-						
+
 						// 해당 텍스트와 일치하는 체크박스 찾아서 해제
-						$('.sub-item input[type="checkbox"]').each(function() {
+						$('.sub-item input[type="checkbox"]').each(function () {
 							if ($(this).data('name') === jobName) {
 								$(this).prop('checked', false);
 							}
@@ -2329,6 +2373,6 @@ h2:after {
 					});
 				}
 
-				
+
 			});
 		</script>
