@@ -150,26 +150,26 @@ if (workType === "PART_TIME") {
   }
 
 
-console.log("applicationsJson raw:", jsonStr);
-console.log("parsed applications:", applications);
+	console.log("applicationsJson raw:", jsonStr);
+	console.log("parsed applications:", applications);
       // 셀렉트 필드 세팅 (선택 후 로딩 기다림)
-      setTimeout(() => {
+    setTimeout(() => {
   $(".Region").val(regionNo).trigger("change");
 
 
-      setTimeout(() => {
+    setTimeout(() => {
         $(".MajorCategory").val(majorcategoryNo).trigger("change");
-        setTimeout(() => {
+    setTimeout(() => {
     getSubCategory(majorcategoryNo);
     setTimeout(() => {
       $(".SubCategory").val(subcategoryNo).trigger("change");
 
-	  setTimeout(() => {
+	setTimeout(() => {
     renderApplicationMethods(applications);
   }, 500);
 
 
-    }, 1000);
+    }, 200);
  	 }, 200);
 	}, 300);
 
@@ -536,7 +536,8 @@ function uploadModifyFileAndShowPreview(file) {
         processData: false,
         success: function(response) {
             console.log("수정 파일 업로드 성공", response);
-            showModifyFileThumbnail(file, "NEW");
+			const uploadedFileInfo = response[response.length - 1];
+			showModifyFileThumbnail(uploadedFileInfo, "NEW");
         },
         error: function() {
             alert("파일 업로드 실패");
@@ -555,10 +556,10 @@ function showModifyFileThumbnail(fileInfo, status = "") {
     const html = `
         <tr id="thumb_${safeId}" data-status="${status}">
             <td>
-                <img src="${thumbnailUrl}" width="60" height="60" alt="썸네일 이미지"
+                <img src="\${thumbnailUrl}" width="60" height="60" alt="썸네일 이미지"
                      onerror="this.src='/resources/images_mjb/noimage.png'" />
             </td>
-            <td>${fileInfo.originalFileName}</td>
+            <td>\${fileInfo.originalFileName}</td>
             <td>
                 <button type="button" class="btn btn-sm btn-danger" onclick="markFileAsDeleted('${fileInfo.originalFileName}')">X</button>
             </td>
@@ -996,7 +997,7 @@ if (workDetailType) {
 
 	console.log(mjrno);
 	$("#period").val(period);
-	finalizeFileModifications();
+	
 
 	return result;
 	}

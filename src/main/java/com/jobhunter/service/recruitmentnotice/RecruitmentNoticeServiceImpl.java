@@ -23,6 +23,7 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
+import com.jobhunter.model.util.FileStatus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -200,11 +201,12 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	@Override
 	@Transactional
 	public void modifyRecruitmentNotice(RecruitmentNoticeDTO dto, List<AdvantageDTO> newAdvList,
-			List<ApplicationDTO> newAppList, List<RecruitmentnoticeBoardUpfiles> newFileList,
+			List<ApplicationDTO> newAppList, List<RecruitmentnoticeBoardUpfiles> modifyFileList,
 			RecruitmentDetailInfo existing, int uid) throws Exception {
 
 		// Step 1: 공고 기본 정보 수정
 		recdao.updateRecruitmentNotice(dto);
+		System.out.println("수정할 파일 리스트 : " + modifyFileList);
 
 		// Step 2: 우대 조건 비교 후 변경
 		List<Advantage> oldAdvList = existing.getAdvantage();
@@ -231,7 +233,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		for (Application old : oldAppList) {
 			// anyMatch: newAppList 중 하나라도 같은 method가 있으면 true
 			boolean existsInNew = newAppList.stream().anyMatch(newApp -> newApp.getMethod() == old.getMethod());
-
+			
 			if (!existsInNew) {
 				// method가 사라졌다면 삭제
 				recdao.deleteApplication(uid, old.getMethod());
@@ -251,19 +253,20 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		// Step 4: 파일 비교 후 변경
 		List<RecruitmentnoticeBoardUpfiles> oldFileList = existing.getFileList();
 		for (RecruitmentnoticeBoardUpfiles oldFile : oldFileList) {
-			boolean stillExists = newFileList.stream()
+			boolean stillExists = modifyFileList.stream()
 					.anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()));
 			if (!stillExists) {
 				recdao.deleteFileFromDatabase(uid);; // DB + 물리 파일도 제거 필요
 			}
 		}
-		for (RecruitmentnoticeBoardUpfiles newFile : newFileList) {
-			boolean existsInOld = oldFileList.stream()
-					.anyMatch(oldFile -> oldFile.getOriginalFileName().equals(newFile.getOriginalFileName()));
-			if (!existsInOld) {
-				newFile.setRefrecruitmentnoticeNo(uid);
-				recdao.insertRecruitmentFile(newFile);
-			}
+		for (RecruitmentnoticeBoardUpfiles newFile : modifyFileList) {
+		    boolean existsInOld = oldFileList.stream()
+		        .anyMatch(oldFile -> oldFile.getOriginalFileName().equals(newFile.getOriginalFileName()));
+
+		    if (!existsInOld && FileStatus.NEW.equals(newFile.getStatus())) {
+		        newFile.setRefrecruitmentnoticeNo(uid);
+		        recdao.insertRecruitmentFile(newFile);
+		    }
 		}
 
 		// Step 5: 직업군, 지역 등 외래키 정보 갱신
