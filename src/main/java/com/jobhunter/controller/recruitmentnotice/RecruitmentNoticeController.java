@@ -159,34 +159,57 @@ public class RecruitmentNoticeController {
 
 	// 파일을 저장하는 메서드
 	@PostMapping("/file")
-	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadFile(@RequestParam("file") MultipartFile file,
-			HttpServletRequest request) {
-		try {
-			RecruitmentnoticeBoardUpfiles uploadedFile = fp.saveFileToRealPath(file, request,
-					"/resources/recruitmentFiles");
-			uploadedFile.setStatus(FileStatus.NEW);
-			fileList.add(uploadedFile);
-			System.out.println(fileList);
-			return ResponseEntity.ok(fileList);
-		} catch (IOException e) {
-			logger.error("파일 업로드 실패", e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-		}
+	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadFile(
+	        @RequestParam("file") MultipartFile file,
+	        HttpServletRequest request) {
+	    try {
+	        RecruitmentnoticeBoardUpfiles uploadedFile = fp.saveFileToRealPath(
+	                file, request, "/resources/recruitmentFiles");
+
+	        // 유효한 확장자 검사 (보안 강화)
+	        if (!uploadedFile.getOriginalFileName().matches("^[a-zA-Z0-9_.-]+$")) {
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+	        }
+
+	        uploadedFile.setStatus(FileStatus.NEW);
+	        fileList.add(uploadedFile);
+
+	        return ResponseEntity.ok(fileList);
+	    } catch (IOException e) {
+	        logger.error("파일 업로드 실패", e);
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	    }
 	}
 
 	// 파일을 삭제하는 메서드
 	@DeleteMapping("/file")
 	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> removeFile(
-			@RequestParam("removeFileName") String removeFileName) {
-		fileList.removeIf(f -> {
-			if (f.getOriginalFileName().equals(removeFileName)) {
-				fp.removeFile(f);
-				System.out.println(fileList);
-				return true;
-			}
-			return false;
-		});
-		return ResponseEntity.ok(fileList);
+	        @RequestParam("removeFileName") String removeFileName) {
+
+	    // 보안: 파일명 정규식 검사 (파일 경로 침입 방지)
+	    if (!removeFileName.matches("^[a-zA-Z0-9_.-]+$")) {
+	        return ResponseEntity.badRequest().body(fileList);
+	    }
+
+	    fileList.removeIf(file -> {
+	        boolean match = file.getOriginalFileName().equals(removeFileName);
+	        if (match) {
+	            fp.removeFile(file);
+	        }
+	        return match;
+	    });
+
+	    return ResponseEntity.ok(fileList);
+	}
+	
+	// 전체 파일 리스트 초기화 메서드
+	@DeleteMapping("/removeAllFiles")
+	public ResponseEntity<Void> removeAllFiles() {
+	    for (RecruitmentnoticeBoardUpfiles f : fileList) {
+	        fp.removeFile(f);
+	    }
+	    fileList.clear();
+	    return ResponseEntity.ok().build();
 	}
 
 	// 회사가 공고를 작성할 때 우대조건을 리스트에 누적 해주는 메서드
@@ -228,6 +251,7 @@ public class RecruitmentNoticeController {
 	// 공고를 작성하는 페이지를 출력하는 메서드
 	@GetMapping("/write")
 	public void showRecruitmentWithWrite() {
+		ListAllClear();
 
 	}
 
@@ -359,6 +383,76 @@ public class RecruitmentNoticeController {
 	    
 	    return result; 
 	}
+	
+    // 파일 상태 업데이트
+    @PostMapping("/file/status")
+    public ResponseEntity<Void> updateFileStatus(
+            @RequestParam("fileName") String fileName,
+            @RequestParam("status") String status) {
+
+        for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
+            if (file.getOriginalFileName().equals(fileName)) {
+                if ("delete".equalsIgnoreCase(status)) {
+                    file.setStatus(FileStatus.DELETE);
+                } else if ("cancel".equalsIgnoreCase(status)) {
+                    file.setStatus(null);
+                }
+            }
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    // 수정 취소 시 파일 상태 롤백 및 삭제
+    @PostMapping("/file/cancel")
+    public ResponseEntity<Void> cancelFileModifications() {
+        for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
+            if (file.getStatus() == FileStatus.DELETE) {
+                file.setStatus(null);
+            } else if (file.getStatus() == FileStatus.NEW) {
+                fp.removeFile(file);
+            }
+        }
+        modifyFileList.clear();
+        return ResponseEntity.ok().build();
+    }
+
+    // 파일 수정 최종 반영
+    @PostMapping("/file/finalize")
+    public ResponseEntity<Void> finalizeFileModifications() {
+        for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
+            if (file.getStatus() == FileStatus.DELETE) {
+                fp.removeFile(file); // 실제 파일 삭제
+                recruitmentService.deleteFileFromDatabase(file.getBoardUpFileNo()); // DB에서 삭제
+            }
+        }
+        modifyFileList.clear();
+        return ResponseEntity.ok().build();
+    }
+
+    // 수정 시 새로 업로드된 파일 추가
+    @PostMapping("/file/modify")
+    public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadModifyFile(
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request) {
+        try {
+            RecruitmentnoticeBoardUpfiles uploadedFile = fp.saveFileToRealPath(
+                    file, request, "/resources/recruitmentFiles");
+
+            if (!uploadedFile.getOriginalFileName().matches("^[a-zA-Z0-9_.-]+$")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+            uploadedFile.setStatus(FileStatus.NEW);
+            modifyFileList.add(uploadedFile);
+
+            return ResponseEntity.ok(modifyFileList);
+        } catch (IOException e) {
+            logger.error("파일 업로드 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+	
 
 	// 리스트, 필드를 전부 비워주는 메서드 (다 하고 맨 밑으로 내리자)
 	private void ListAllClear() {

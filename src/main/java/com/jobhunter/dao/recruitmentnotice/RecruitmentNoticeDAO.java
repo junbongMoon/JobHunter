@@ -64,7 +64,7 @@ public interface RecruitmentNoticeDAO {
 	void deleteApplication(int uid, Method method) throws Exception;
 	
 	// 파일을 삭제하는 메서드
-	void deleteRecruitmentFile(int uid) throws Exception;
+	void deleteFileFromDatabase(int boardUpFileNo);
 	
 	// 우대조건을 삭제하는 메서드
 	void deleteAdvantage(int uid, String advantageType) throws Exception;

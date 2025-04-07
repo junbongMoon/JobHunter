@@ -254,7 +254,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 			boolean stillExists = newFileList.stream()
 					.anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()));
 			if (!stillExists) {
-				recdao.deleteRecruitmentFile(uid); // DB + 물리 파일도 제거 필요
+				recdao.deleteFileFromDatabase(uid);; // DB + 물리 파일도 제거 필요
 			}
 		}
 		for (RecruitmentnoticeBoardUpfiles newFile : newFileList) {
@@ -271,6 +271,13 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		jobdao.updateSubCategoryWithRecruitmentnotice(uid, dto.getSubcategoryNo());
 		regiondao.updateRegionWithRecruitmentNotice(uid, dto.getRegionNo());
 		regiondao.updateSigunguWithRecruitmentNotice(uid, dto.getSigunguNo());
+	}
+    
+	// 파일을 삭제하는 메서드
+	@Override
+	public void deleteFileFromDatabase(int boardUpFileNo) {
+		 recdao.deleteFileFromDatabase(boardUpFileNo);
+		
 	}
 
 }

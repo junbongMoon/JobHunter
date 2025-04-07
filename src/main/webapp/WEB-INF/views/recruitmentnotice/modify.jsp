@@ -250,7 +250,7 @@ $(".fileUploadArea").on("drop", function (e) {
     let files = e.originalEvent.dataTransfer.files;
     for (let i = 0; i < files.length; i++) {
         let file = files[i];
-        uploadFileAndShowPreview(file);
+        uploadModifyFileAndShowPreview(file);
     }
 });
 
@@ -523,19 +523,19 @@ function instalRecruitment() {
 	
 
 // 파일 업로드 + 썸네일 표시
-function uploadFileAndShowPreview(file) {
+function uploadModifyFileAndShowPreview(file) {
     const formData = new FormData();
     formData.append("file", file);
 
     $.ajax({
-        url: "/recruitmentnotice/file",
+        url: "/recruitmentnotice/file/modify",
         type: "POST",
         data: formData,
         contentType: false,
         processData: false,
         success: function(response) {
-            console.log("업로드 성공", response);
-            showThumbnail(file);
+            console.log("수정 파일 업로드 성공", response);
+            showModifyFileThumbnail(file, "NEW");
         },
         error: function() {
             alert("파일 업로드 실패");
@@ -543,42 +543,74 @@ function uploadFileAndShowPreview(file) {
     });
 }
 
-// 썸네일 출력 함수
-function showThumbnail(file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const isImage = file.type.startsWith("image/");
-        const base64 = e.target.result;
+function showModifyFileThumbnail(fileInfo, status = "") {
+    const safeId = fileInfo.originalFileName.replace(/[^a-zA-Z0-9]/g, "_");
 
-        const safeId = file.name.replace(/[^a-zA-Z0-9]/g, "_");
+    const isImage = fileInfo.fileType && fileInfo.fileType.startsWith("image/");
+    const thumbnailUrl = isImage && fileInfo.thumbFileName
+        ? fileInfo.thumbFileName
+        : "/resources/images_mjb/noimage.png";
 
-        let html = `
-            <tr id="thumb_\${safeId}">
-                <td><img src="\${isImage ? base64 : '/resources/images/noimage.png'}" width="60" /></td>
-                <td\>${file.name}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="removeFile('\${file.name}')">X</button>
-                </td>
-            </tr>
-        `;
-        $(".preview").append(html);
-    };
-    reader.readAsDataURL(file);
+    const html = `
+        <tr id="thumb_${safeId}" data-status="${status}">
+            <td>
+                <img src="${thumbnailUrl}" width="60" height="60" alt="썸네일 이미지"
+                     onerror="this.src='/resources/images_mjb/noimage.png'" />
+            </td>
+            <td>${fileInfo.originalFileName}</td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger" onclick="markFileAsDeleted('${fileInfo.originalFileName}')">X</button>
+            </td>
+        </tr>
+    `;
+
+    $(".preview").append(html);
 }
 
-// 파일 삭제 함수
-function removeFile(fileName) {
+
+// 삭제 버튼 클릭시 삭제상태로 변경
+function markFileAsDeleted(fileName) {
     $.ajax({
-        url: "/recruitmentnotice/file",
-        type: "DELETE",
-        data: { removeFileName: fileName },
-        success: function(response) {
-            console.log("삭제 성공", response);
+        url: "/recruitmentnotice/file/status",
+        type: "POST",
+        data: {
+            fileName: fileName,
+            status: "delete"
+        },
+        success: function() {
             const safeId = fileName.replace(/[^a-zA-Z0-9]/g, "_");
-            $(`#thumb_${safeId}`).remove();
+            $(`#thumb_${safeId}`).addClass("table-danger").css("text-decoration", "line-through");
         },
         error: function() {
-            alert("파일 삭제 실패");
+            alert("파일 삭제 상태 전환 실패");
+        }
+    });
+}
+
+// 파일 수정 취소
+function cancelFileModifications() {
+    $.ajax({
+        url: "/recruitmentnotice/file/cancel",
+        type: "POST",
+        success: function() {
+            $(".preview").empty();  // 모두 비워줌
+            alert("파일 수정 내역이 취소되었습니다.");
+        },
+        error: function() {
+            alert("수정 취소 실패");
+        }
+    });
+}
+// 수정 완료 시 삭제
+function finalizeFileModifications() {
+    $.ajax({
+        url: "/recruitmentnotice/file/finalize",
+        type: "POST",
+        success: function() {
+            console.log("삭제 처리 완료");
+        },
+        error: function() {
+            alert("파일 최종 반영 실패");
         }
     });
 }
@@ -1408,7 +1440,7 @@ label {
 										<table class="preview mt-3">
 											<c:forEach var="file" items="${RecruitmentDetailInfo.fileList}">
    												<tr id="thumb_${file.originalFileName}">
-      												<td><img src="/resources/recruitmentFiles/${file.newFileName}" width="60" /></td>
+      												<td><img src="${file.thumbFileName}" width="60" /></td>
       												<td>${file.originalFileName}</td>
       												<td>
         											<button type="button" class="btn btn-sm btn-danger"

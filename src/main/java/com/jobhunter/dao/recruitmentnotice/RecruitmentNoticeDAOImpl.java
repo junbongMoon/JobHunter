@@ -148,12 +148,7 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		
 	}
 
-	// 파일을 삭제하는 메서드
-	@Override
-	public void deleteRecruitmentFile(int uid) {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 	// 우대조건을 삭제하는 메서드
 	@Override
@@ -165,6 +160,13 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		
 		
 		ses.delete(NS + ".removeAdvantageByRecruitmentUid", param);
+		
+	}
+
+	// 파일을 삭제하는 메서드
+	@Override
+	public void deleteFileFromDatabase(int boardUpFileNo) {
+		ses.delete(NS + ".deleteFileFromDatabase", boardUpFileNo);
 		
 	}
 

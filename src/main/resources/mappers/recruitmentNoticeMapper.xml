@@ -323,5 +323,9 @@
 		AND method = #{method}
 	</delete>
 
+	<delete id="deleteFileFromDatabase">
+		delete from recruitmentnoticeboardupfiles
+		where boardUpFileNo = #{boardUpFileNo}
+	</delete>
 
 </mapper>
