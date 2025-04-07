@@ -137,6 +137,26 @@ h3 {
 	margin-bottom: 4px;
 	font-size: 0.9rem;
 }
+
+.detail-box {
+  width: 100%;
+  min-height: 300px;
+  background: #f4f8fb;
+  padding: 1rem;
+  border-radius: 12px;
+
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05); 
+}
+
+.detail-box img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  object-fit: contain;
+}
 </style>
 <body>
 	<!-- 헤더 -->
@@ -252,7 +272,7 @@ h3 {
 											<h2 class="widget-title">상세 정보</h2>
 											<div class="highlight-box">
 
-												<p id="detail"></p>
+												<div id="detail" class="detail-box"></div>
 											</div>
 										</div>
 										<h3>첨부 파일</h3>
@@ -261,7 +281,7 @@ h3 {
 												<c:forEach var="file"
 													items="${RecruitmentDetailInfo.fileList}">
 													<span class="badge rounded-pill text-bg-secondary"
-														onclick="downloadFile(${file.boardUpFileNo})">
+														onclick="downloadFile(`\${file.boardUpFileNo}`)">
 														${file.originalFileName} </span>
 												</c:forEach>
 											</c:if>
