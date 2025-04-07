@@ -241,7 +241,8 @@ public class ResumeController {
 	// 이력서 수정 처리
 	@PostMapping("/update/{resumeNo}")
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> updateResume(@PathVariable int resumeNo, @RequestBody ResumeDTO resumeDTO) {
+	public ResponseEntity<Map<String, Object>> updateResume(@PathVariable int resumeNo,
+			@RequestBody ResumeDTO resumeDTO) {
 		try {
 			resumeDTO.setResumeNo(resumeNo);
 			resumeService.updateResume(resumeDTO);
@@ -256,6 +257,12 @@ public class ResumeController {
 			response.put("message", "이력서 수정 실패: " + e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
+	}
+	
+	// 이력서 제출 페이지
+	@GetMapping("/submit")
+	public String submitResumeForm() {
+		return "resume/resumeSubmission";
 	}
 
 }
