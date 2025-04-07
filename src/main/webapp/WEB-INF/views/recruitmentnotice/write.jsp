@@ -533,9 +533,9 @@ function addAdvantage() {
 
             const html = `
                 <div class="d-flex align-items-center mb-2 advantage-item">
-                    <input type="hidden" value="${advantageValue}">
-                    <span class="me-2">${advantageValue}</span>
-                    <button type="button" class="btn btn-sm btn-outline-danger">X</button>
+                    <input type="hidden" value="\${advantageValue}">
+                    <span class="me-2">\${advantageValue}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeAdvantage(this)">X</button>
                 </div>
             `;
             $(".advantageArea").append(html);
