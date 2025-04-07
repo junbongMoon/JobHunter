@@ -499,43 +499,52 @@ function markUploadSuccess(fileName) {
     });
 }
 
-	function addAdvantage() {
-		
-		let advVal = $("#advantage").val();
-    let advantageValue = $("#advantage").val();
+function addAdvantage() {
+    const advantageValue = $("#advantage").val().trim();
 
     if (!advantageValue) {
         alert("우대조건을 입력하세요");
-		// 알럿 대신 모달창으로 바꾸자..
         return;
     }
 
     $.ajax({
         url: "/recruitmentnotice/advantage",
         type: "POST",
-        data: JSON.stringify({ advantageType: advantageValue }),
         contentType: "application/json",
+        data: JSON.stringify({ advantageType: advantageValue }),
         success: function (response) {
-            console.log("우대조건 저장 성공", response);
-            $("#advantage").val("");
+            if (!response || !Array.isArray(response)) {
+                console.warn("응답 데이터 없음 또는 배열 아님");
+                return;
+            }
 
-            // DOM에 추가할 HTML 구성
-            let output = `
+            // 중복 여부 확인 (이미 DOM에 존재하는 값인지)
+            let alreadyExists = false;
+            $(".advantageArea input[type='hidden']").each(function () {
+                if ($(this).val() === advantageValue) {
+                    alreadyExists = true;
+                }
+            });
+
+            if (alreadyExists) {
+                alert("이미 추가된 우대조건입니다.");
+                return;
+            }
+
+            const html = `
                 <div class="d-flex align-items-center mb-2 advantage-item">
-                    <input type="hidden" value="\${advantageValue}">
-                    <span class="me-2">\${advantageValue}</span>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeAdvantage(this)">X</button>
+                    <input type="hidden" value="${advantageValue}">
+                    <span class="me-2">${advantageValue}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger">X</button>
                 </div>
             `;
-            $(".advantageArea").append(output);
+            $(".advantageArea").append(html);
+            $("#advantage").val("");
         },
-        error: function (err) {
-            console.error("우대조건 저장 실패", err);
+        error: function () {
+            alert("우대조건 저장 실패");
         }
     });
-
-
-
 }
 
 
