@@ -27,19 +27,16 @@ import lombok.RequiredArgsConstructor;
 public class AccountController {
 
 	private final AccountService accountService;
-	
 
 	// 인터셉터 없이 로그인버튼 눌러서 들어오는곳
 	@GetMapping("/login/return")
 	public String redirectToLogin(HttpServletRequest request, HttpSession session) {
 
-		String redirectUrl = (String) session.getAttribute("redirectUrl");
-		if (redirectUrl == null) {
-			String referer = request.getHeader("Referer");
-			if (referer != null) {
-				session.setAttribute("redirectUrl", referer);
-			}
+		String referer = request.getHeader("Referer");
+		if (referer != null) {
+			session.setAttribute("redirectUrl", referer);
 		}
+
 		// 로그인버튼 눌러서 들어왔을때 초기상태 유지+로그인으로 인증 건너뛰기 막는용 로그인데이터도 클린
 		// 어차피 정상적으로 로그인버튼 누르는건 로그인 안된유저뿐이니까
 		session.removeAttribute("requiresVerification");
@@ -62,7 +59,7 @@ public class AccountController {
 				session.setAttribute("requiresVerification", true);
 			} else { // 자동로그인 또는 로그인 성공하고 인증도 필요없을때
 				session.removeAttribute("requiresVerification");
-				
+
 				String redirectUrl = (String) session.getAttribute("redirectUrl");
 				session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
 				return "redirect:" + (redirectUrl != null ? redirectUrl : "/");
@@ -78,23 +75,22 @@ public class AccountController {
 
 		// 자동로그인용 세팅
 		String sessionId = session.getId();
-		
-		
+
 		// auth로그인인터셉터에서 쿼리스트링에 requireVerification=true 식으로 인증필요여부 들고옴
 		// auth로그인인터셉터에서 이전페이지나 가려던 페이지(get방식만) uri+쿼리 세션에 넣어둠
 		Map<String, Object> result = null;
 		try {
 			result = accountService.loginAccount(loginDto, sessionId);
-			
+
 			if (result.get("remainingSeconds") != null) {
-			    int remainingSeconds = (int) result.get("remainingSeconds");
-			    if (remainingSeconds >= 0) {
-			        session.setAttribute("remainingSeconds", remainingSeconds);
-			        return "account/login";
-			    }
+				int remainingSeconds = (int) result.get("remainingSeconds");
+				if (remainingSeconds >= 0) {
+					session.setAttribute("remainingSeconds", remainingSeconds);
+					return "account/login";
+				}
 			}
 			session.removeAttribute("remainingSeconds");
-			
+
 			// success에 로그인 성공여부, user에 실제 유저 담아옴
 			Boolean success = (Boolean) result.get("success");
 
@@ -117,8 +113,7 @@ public class AccountController {
 
 				if (loginDto.getAutoLogin() != null) {
 
-					String keyName = (loginDto.getAccountType() == AccountType.USER) 
-							? "userAutoLogin"
+					String keyName = (loginDto.getAccountType() == AccountType.USER) ? "userAutoLogin"
 							: "companyAutoLogin";
 					Cookie autoLoginCookie = new Cookie(keyName, sessionId);
 					autoLoginCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
@@ -133,13 +128,13 @@ public class AccountController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		String queryStr = "?error=true&accountType=" + loginDto.getAccountType();
-		
+
 		if (loginDto.isRemember()) {
 			queryStr += "&autoLogin=true";
 		}
-		
+
 		// 로그인 실패시 세션 청소하고 다시 로그인페이지 로딩(인증 필요한지 체크용)
 		session.removeAttribute("requiresVerification");
 		session.removeAttribute("account");
@@ -149,20 +144,20 @@ public class AccountController {
 	@GetMapping("/logout")
 	public String logout(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
 		session.invalidate();
-		
+
 		// 자동 로그인 쿠키 제거
-	    Cookie[] cookies = request.getCookies();
-	    if (cookies != null) {
-	        for (Cookie cookie : cookies) {
-	            if ("userAutoLogin".equals(cookie.getName()) || "companyAutoLogin".equals(cookie.getName())) {
-	                cookie.setValue("");
-	                cookie.setMaxAge(0);
-	                cookie.setPath("/");
-	                response.addCookie(cookie);
-	            }
-	        }
-	    }
-	    
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if ("userAutoLogin".equals(cookie.getName()) || "companyAutoLogin".equals(cookie.getName())) {
+					cookie.setValue("");
+					cookie.setMaxAge(0);
+					cookie.setPath("/");
+					response.addCookie(cookie);
+				}
+			}
+		}
+
 		return "redirect:/";
 	}
 
@@ -177,29 +172,35 @@ public class AccountController {
 		System.out.println("미구현");
 		return "redirect:/";
 	}
-	
+
 	@GetMapping("/test")
-	public void testPage() {
+	public String testPage() {
+		return "account/test";
 	}
-	
+
 	@GetMapping("/testLoginAjax")
-	public void testLoginPage() {
+	public String testLoginPage() {
+		return "account/test";
 	}
-	
+
 	@GetMapping("/testGetLogin")
-	public void testGetLoginPage() {
+	public String testGetLoginPage() {
+		return "account/test";
 	}
-	
+
 	@GetMapping("/testGetOwner")
-	public void testGetOwnerPage() {
+	public String testGetOwnerPage() {
+		return "account/test";
 	}
-	
+
 	@GetMapping("/testGetRole")
-	public void testGetRolePage() {
+	public String testGetRolePage() {
+		return "account/test";
 	}
-	
+
 	@GetMapping("/testGetBlocked")
-	public void testGetBlockedPage() {
+	public String testGetBlockedPage() {
+		return "account/test";
 	}
 
 }
