@@ -149,7 +149,8 @@ public class AccountController {
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
-				if ("userAutoLogin".equals(cookie.getName()) || "companyAutoLogin".equals(cookie.getName())) {
+				if ("userAutoLogin".equals(cookie.getName()) || "companyAutoLogin".equals(cookie.getName())
+						|| "kakaoAutoLogin".equals(cookie.getName())) {
 					cookie.setValue("");
 					cookie.setMaxAge(0);
 					cookie.setPath("/");

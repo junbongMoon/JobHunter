@@ -3,9 +3,22 @@ package com.jobhunter.service.user;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import com.jobhunter.dao.user.UserDAO;
+import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.user.KakaoUserInfo;
 import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.model.user.UserVO;
 
@@ -54,5 +67,79 @@ public class UserServiceImpl implements UserService {
 	public boolean updateUserInfo(UserInfoDTO userInfo) throws Exception {
 		return dao.updateUserInfo(userInfo) > 0;
 	}
+	
+	@Override
+	public String getKakaoToken(String code, String redirectUri) throws Exception {
+		
+		System.out.println("code : " + code);
+		System.out.println("redirectUri : " + redirectUri);
+		
+	    RestTemplate restTemplate = new RestTemplate();
+
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+	    params.add("grant_type", "authorization_code");
+	    params.add("client_id", "5ac47a1ce0498053f71d927bd5271ec9");
+	    params.add("redirect_uri", redirectUri);
+	    params.add("code", code);
+
+	    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+	    ResponseEntity<Map> response = restTemplate.postForEntity("https://kauth.kakao.com/oauth/token", request, Map.class);
+
+	    System.out.println("response : " + response);
+	    
+	    return (String) response.getBody().get("access_token");
+	}
+	
+	@Override
+	public KakaoUserInfo getKakaoInfo(String accessToken) throws Exception {
+	    RestTemplate restTemplate = new RestTemplate();
+
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.set("Authorization", "Bearer " + accessToken);
+
+	    HttpEntity<Void> request = new HttpEntity<>(headers);
+
+	    ResponseEntity<Map> response = restTemplate.exchange(
+	        "https://kapi.kakao.com/v2/user/me",
+	        HttpMethod.GET,
+	        request,
+	        Map.class
+	    );
+
+	    Map<String, Object> body = response.getBody();
+	    Long kakaoId = ((Number) body.get("id")).longValue(); // ← 카카오 고유 ID
+
+	    Map<String, Object> kakaoAccount = (Map<String, Object>) body.get("kakao_account");
+	    String email = (String) kakaoAccount.get("email");
+	    String nickname = (String) ((Map<String, Object>) body.get("properties")).get("nickname");
+
+	    KakaoUserInfo kakaoUserInfo = KakaoUserInfo.builder()
+	    		.email(email)
+	    		.nickname(nickname)
+	    		.kakaoId(kakaoId)
+	    		.build();
+	    
+	    System.out.println(kakaoUserInfo);
+	    return kakaoUserInfo;
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public AccountVO loginOrRegisterKakao(KakaoUserInfo userInfo) throws Exception {
+		AccountVO accountVo = null;
+		Integer uid = dao.findByKakao(userInfo);
+		if (uid == null) {
+			uid = dao.registKakao(userInfo);
+		}
+		if (uid != null) {
+			accountVo = dao.loginByKakaoId(userInfo.getKakaoId());
+		}
+		return accountVo;
+	}
+
 	
 }

@@ -1,490 +1,512 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!-- 헤더 -->
 <jsp:include page="../header.jsp" />
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Firebase UMD 방식 -->
-<script src="https://www.gstatic.com/firebasejs/11.5.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.5.0/firebase-auth-compat.js"></script>
+<script
+	src="https://www.gstatic.com/firebasejs/11.5.0/firebase-app-compat.js"></script>
+<script
+	src="https://www.gstatic.com/firebasejs/11.5.0/firebase-auth-compat.js"></script>
+	<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.5/kakao.min.js" integrity="sha384-dok87au0gKqJdxs7msEdBPNnKSRT+/mhTVzq+qOhcL464zXwvcrpjeWvyj1kCdq6" crossorigin="anonymous"></script>
 
 <style>
-  .main {
-    padding: 60px 20px;
-    background: #f8f9fa;
-    min-height: calc(100vh - 200px);
-  }
+.main {
+	padding: 60px 20px;
+	background: #f8f9fa;
+	min-height: calc(100vh - 200px);
+}
 
-  .login-container {
-    padding: 40px 60px;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    max-width: 600px;
-    margin: 0 auto;
-  }
+.login-container {
+	background: white;
+	border-radius: 20px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+	max-width: 700px;
+	margin: 0 auto;
+}
 
-  .login-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
-  }
+.login-title {
+	font-weight: 600;
+	color: #2c3e50;
+	border-bottom: 1px solid #eee;
+	line-height: 1.5;
+}
 
-  .form-group {
-    margin-bottom: 20px;
-  }
+.form-group {
+	margin-bottom: 20px;
+}
 
-  .form-group input[type="text"],
-  .form-group input[type="password"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    margin-bottom: 15px;
-  }
+.form-group input[type="text"], .form-group input[type="password"] {
+	padding: 12px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	font-size: 14px;
+	margin-bottom: 15px;
+}
 
-  .form-group input:focus {
-    border-color: #47b2e4;
-    outline: none;
-  }
+.full-width{
+	width: 100%;
+}
 
-  .radio-group {
-    display: none;
-  }
+.form-group input:focus {
+	border-color: #47b2e4;
+	outline: none;
+}
 
-  .verification-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-  }
+.radio-group {
+	display: none;
+}
 
-  .verification-group input {
-    flex: 1;
-  }
+.verification-group {
+	display: flex;
+	gap: 10px;
+	margin-top: 10px;
+}
 
-  .btn-confirm {
-    padding: 10px 20px;
-    background: #47b2e4;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s ease;
-  }
+.verification-group input {
+	flex: 1;
+}
 
-  .btn-confirm:hover {
-    background: #3a8fb8;
-  }
+.btn-confirm {
+	flex: 1;
+	height: 47px;
+	padding: 10px 20px;
+	background: #47b2e4;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	transition: all 0.3s ease;
+}
 
-  /* 반응형 디자인 */
-  @media (max-width: 768px) {
-    .login-container {
-      padding: 30px 20px;
-    }
-  }
+.btn-confirm:hover {
+	background: #3a8fb8;
+}
 
-  /* 탭 스타일 */
-  .account-type-tabs {
-    display: flex;
-    margin: -40px -60px 30px;
-    border-bottom: 1px solid #eee;
-  }
+/* 반응형 디자인 */
+@media ( max-width : 768px) {
+	.login-container {
+		padding: 30px 20px;
+	}
+}
 
-  .account-type-tab {
-    flex: 1;
-    padding: 20px 15px;
-    text-align: center;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 500;
-    color: #666;
-    position: relative;
-    transition: all 0.3s ease;
-    background: #f8f9fa;
-  }
+/* 탭 스타일 */
+.account-type-tabs {
+	display: flex;
+	margin: -40px -60px 30px;
+	border-bottom: 1px solid #eee;
+}
 
-  .account-type-tab:first-child {
-    border-top-left-radius: 20px;
-  }
+.account-type-tab {
+	flex: 1;
+	padding: 20px 15px;
+	text-align: center;
+	cursor: pointer;
+	font-size: 16px;
+	font-weight: 500;
+	color: #666;
+	position: relative;
+	transition: all 0.3s ease;
+	background: #f8f9fa;
+}
 
-  .account-type-tab:last-child {
-    border-top-right-radius: 20px;
-  }
+.account-type-tab:first-child {
+	border-top-left-radius: 20px;
+}
 
-  .account-type-tab input[type="radio"] {
-    display: none;
-  }
+.account-type-tab:last-child {
+	border-top-right-radius: 20px;
+}
 
-  .account-type-tab.active {
-    color: #47b2e4;
-    background: white;
-  }
+.account-type-tab input[type="radio"] {
+	display: none;
+}
 
-  .account-type-tab.active:after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: white;
-  }
+.account-type-tab.active {
+	color: #47b2e4;
+	background: white;
+}
 
-  .account-type-tab:hover {
-    color: #47b2e4;
-  }
+.account-type-tab.active:after {
+	content: '';
+	position: absolute;
+	bottom: -1px;
+	left: 0;
+	width: 100%;
+	height: 1px;
+	background: white;
+}
 
-  .verification-section {
-    display: none;
-    padding: 20px 0;
-  }
+.account-type-tab:hover {
+	color: #47b2e4;
+}
 
-  .verification-section.active {
-    display: block;
-  }
+.verification-section {
+	display: none;
+	padding: 20px 0;
+}
 
-  .target-info {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    margin: 20px 0;
-    color: #666;
-  }
+.verification-section.active {
+	display: block;
+}
 
-  .target-info strong {
-    color: #47b2e4;
-    font-weight: 600;
-  }
+.target-info {
+	background: #f8f9fa;
+	padding: 15px;
+	border-radius: 8px;
+	margin: 20px 0;
+	color: #666;
+}
 
-  .verification-step {
-    margin: 20px 0;
-  }
+.target-info strong {
+	color: #47b2e4;
+	font-weight: 600;
+}
 
-  .verification-step input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 10px;
-  }
+.verification-step {
+	margin: 20px 0;
+}
 
-  .btn-confirm.full-width {
-    width: 100%;
-    margin-top: 10px;
-  }
+.verification-step input {
+	width: 100%;
+	padding: 12px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	margin-bottom: 10px;
+}
 
-  .verification-methods {
-    margin-bottom: 30px;
-  }
+.verification-methods {
+	margin-bottom: 30px;
+}
 
-  .method-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-  }
+.method-buttons {
+	display: flex;
+	gap: 10px;
+	margin-top: 20px;
+}
 
-  .btn-method {
-    flex: 1;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #f8f9fa;
-    color: #666;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
+.btn-method {
+	flex: 1;
+	padding: 15px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	background: #f8f9fa;
+	color: #666;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
 
-  .btn-method.active {
-    background: #47b2e4;
-    color: white;
-    border-color: #47b2e4;
-  }
+.btn-method.active {
+	background: #47b2e4;
+	color: white;
+	border-color: #47b2e4;
+}
 
-  .verification-content {
-    margin-top: 20px;
-  }
+.verification-content {
+	margin-top: 20px;
+}
 
-  /* 알럿 모달 스타일 */
-  .alert-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 9998;
-  }
+/* 알럿 모달 스타일 */
+.alert-modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.3);
+	z-index: 9998;
+}
 
-  .alert-modal-box {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
-    z-index: 9999;
-    text-align: center;
-  }
+.alert-modal-box {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 300px;
+	background: white;
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
+	z-index: 9999;
+	text-align: center;
+}
 
-  .alert-modal-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-  }
+.alert-modal-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 15px;
+}
 
-  .alert-modal-message {
-    font-size: 16px;
-    color: #2c3e50;
-    line-height: 1.5;
-  }
+.alert-modal-message {
+	font-size: 16px;
+	color: #2c3e50;
+	line-height: 1.5;
+}
 
-  .alert-modal-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
+.alert-modal-buttons {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+}
 
-  .alert-modal-button {
-    padding: 8px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
+.alert-modal-button {
+	padding: 8px 20px;
+	border: none;
+	border-radius: 6px;
+	font-size: 14px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
 
-  .alert-modal-button.confirm {
-    background: #47b2e4;
-    color: white;
-  }
+.alert-modal-button.confirm {
+	background: #47b2e4;
+	color: white;
+}
 
-  .alert-modal-button.cancel {
-    background: #f8f9fa;
-    color: #666;
-  }
+.alert-modal-button.cancel {
+	background: #f8f9fa;
+	color: #666;
+}
 
-  .alert-modal-button:hover {
-    opacity: 0.9;
-  }
+.alert-modal-button:hover {
+	opacity: 0.9;
+}
 
-  .login-options {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 20px 0;
-    padding: 15px 0;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-  }
+.login-options {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 20px 0;
+	padding: 15px 0;
+	border-top: 1px solid #eee;
+	border-bottom: 1px solid #eee;
+}
 
-  .auto-login {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #666;
-  }
+.find-account {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
 
-  .auto-login input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-  }
+.find-account a {
+	color: #666;
+	text-decoration: none;
+	font-size: 14px;
+}
 
-  .find-account {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+.find-account a:hover {
+	color: #47b2e4;
+}
 
-  .find-account a {
-    color: #666;
-    text-decoration: none;
-    font-size: 14px;
-  }
+.find-account .divider {
+	color: #ddd;
+	font-size: 12px;
+}
 
-  .find-account a:hover {
-    color: #47b2e4;
-  }
+.social-login {
+	margin-top: 20px;
+}
 
-  .find-account .divider {
-    color: #ddd;
-    font-size: 12px;
-  }
+@media ( max-width : 768px) {
+	.login-options {
+		flex-direction: column;
+		gap: 15px;
+		align-items: flex-start;
+	}
+	.find-account {
+		width: 100%;
+		justify-content: center;
+	}
+}
 
-  .social-login {
-    margin-top: 20px;
-  }
+.login-failed-massege {
+	font-size: 14px;
+	color: var(- -bs-red);
+}
 
-  .btn-kakao {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    background: #FEE500;
-    color: #000000;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
+.flex-x-container{
+	display: flex;
+	flex-direction: row;
+}
 
-  .btn-kakao:hover {
-    background: #FDD835;
-  }
+.between-con{
+	justify-content: space-between;
+}
 
-  .btn-kakao img {
-    width: 20px;
-    height: 20px;
-  }
+.sub-title{
+	text-align: center;
+}
 
-  @media (max-width: 768px) {
-    .login-options {
-      flex-direction: column;
-      gap: 15px;
-      align-items: flex-start;
-    }
+.btn-kakao {
+	margin-bottom: 9px;
+}
 
-    .find-account {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-  
-  .login-failed-massege {
-  	 font-size: 14px;
-  	 color: var(--bs-red);
-  }
+.input-left{
+	margin-right: 20px;
+	width: 80%;
+}
+
+.phone-input-group input {
+	width: 30%;
+}
+
+.phone-input-group span {
+	font-size: 27px;
+	font-weight: 600;
+	text-align: center;
+	flex: 1;
+}
+
 </style>
 
 <main class="main">
 	<div class="login-container">
-		<form action="${pageContext.request.contextPath}/account/login" method="post">
-			<c:choose>
-				<c:when test="${sessionScope.requiresVerification}">
-					<!-- 인증 방법 선택 -->
-					<div class="verification-methods">
-						<h2 class="login-title">인증 방법 선택</h2>
-						<div class="method-buttons">
-							<button type="button" class="btn-method active" data-method="email">
-								이메일 인증
-							</button>
-							<button type="button" class="btn-method" data-method="phone">
-								전화번호 인증
-							</button>
-						</div>
+		<!-- <form action="${pageContext.request.contextPath}/user/register" method="post"> -->
+			
+			<div class="account-type-tabs">
+				<label class="account-type-tab active"> <input type="radio"
+					name="accountType" value="USER" checked> 개인 회원
+				</label> <label class="account-type-tab"> <input type="radio"
+					name="accountType" value="COMPANY"> 기업 회원
+				</label>
+			</div>
+
+			<div class="flex-x-container between-con">
+				<h2 class="login-title">개인 회원가입</h2>
+				<div class="btn-kakao" onclick="loginWithKakao()">
+					<img src="/resources/forKakao/kakao_login_medium_narrow.png" alt="kakao">
+				</div>
+			</div>
+			<hr>
+
+			<h4 class="sub-title">로그인정보</h4>
+			<div class="form-group">
+				<div class="flex-x-container between-con">
+					<input class="input-left" type="text" id="id" name="id" placeholder="아이디를 입력해주세요." required />
+					<button class="btn-confirm">중복확인</button>
+				</div>
+				<input class="full-width" type="password" id="password" name="password" placeholder="비밀번호" required />
+				<input class="full-width" type="password" id="checkPassword" placeholder="비밀번호 확인" required />
+			</div>
+			<hr>
+
+			<h4 class="sub-title">회원정보</h4>
+			<div class="form-group">
+				<input class="full-width" type="text" id="userName" name="name" placeholder="성함을 입력해주세요." required />
+				<div class="flex-x-container between-con">
+					<input class="input-left" type="text" id="email" name="email" placeholder="이메일을 입력해주세요." required />
+					<button class="btn-confirm">인증</button>
+				</div>
+				<div class="flex-x-container between-con">
+					<div class="phone-input-group input-left flex-x-container between-con">
+						<input type="text" maxlength="3" placeholder="000" oninput="handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
+						<span>-</span>
+						<input type="text" maxlength="4" placeholder="0000" oninput="if(this.value.length >= 4) handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
+						<span>-</span>
+						<input type="text" maxlength="4" placeholder="0000" oninput="handlePhoneInput(this, null)">
 					</div>
+					<button class="btn-confirm" onclick="startVerifiPhone()">확인</button>
+				</div>
+				<input type="hidden" id="mobile" name="mobile" >
+			</div>
 
-					<!-- 이메일 인증 컨텐츠 -->
-					<div id="emailContent" class="verification-content">
+			<hr>
 
-						<div id="emailVerificationContent">
-							<div class="target-info">
-								인증 이메일 주소: <strong>${sessionScope.account.email}</strong>
-							</div>
-							<div id="emailSendSection" class="verification-step">
-								<button type="button" id="emailSendBtn" class="btn-confirm full-width">인증 메일 발송</button>
-							</div>
-						</div>
+			<button type="submit" class="btn-confirm full-width">로그인</button>
 
-						<div id="emailVerifySection" class="verification-step" style="display: none;">
-							<input type="text" id="emailCode" name="emailCode" placeholder="인증번호 입력" />
-							<button type="button" id="emailVerifyBtn" class="btn-confirm full-width">인증 완료</button>
-						</div>
-					</div>
-
-					<!-- 전화번호 인증 컨텐츠 -->
-					<div id="phoneContent" class="verification-content" style="display: none;">
-
-						<div id="phoneVerificationContent">
-							<div class="target-info">
-								인증 전화번호: <strong>${sessionScope.account.mobile}</strong>
-							</div>
-							<div id="phoneSendSection" class="verification-step">
-								<button type="button" id="phoneSendBtn" class="btn-confirm full-width">인증번호 발송</button>
-							</div>
-						</div>
-
-						<div id="phoneVerifySection" class="verification-step" style="display: none;">
-							<input type="text" id="phoneCode" name="phoneCode" placeholder="인증번호 입력" />
-							<button type="button" id="phoneVerifyBtn" class="btn-confirm full-width">인증 완료</button>
-						</div>
-
-					</div>
-
-					<input type="hidden" id="method" name="method" value="email" />
-					<input type="hidden" id="accountType" value="${sessionScope.account.accountType}" />
-				</c:when>
-				<c:otherwise>
-					<!-- 일반 로그인 시 보여줄 탭 -->
-					<div class="account-type-tabs">
-						<label class="account-type-tab active">
-							<input type="radio" name="accountType" value="USER" checked>
-							개인 회원
-						</label>
-						<label class="account-type-tab">
-							<input type="radio" name="accountType" value="COMPANY">
-							기업 회원
-			        </label>
-		      </div>
-
-					<h2 class="login-title">로그인 정보 입력</h2>
-					<div class="form-group">
-						<input type="text" name="id" placeholder="아이디" required />
-						<input type="password" name="password" placeholder="비밀번호" required />
-						<c:if test="${sessionScope.remainingSeconds != null && sessionScope.remainingSeconds >= 0}">
-							<p class="login-failed-massege">
-								5회 이상 로그인에 실패하셨습니다. ${sessionScope.remainingSeconds}초 후에 다시 시도해 주세요
-							</p>
-						</c:if>
-					</div>
-
-					<div class="login-options">
-						<div class="auto-login">
-							<input type="checkbox" id="remember" name="remember">
-							<label for="checkbox">자동 로그인</label>
-						</div>
-            
-						<div class="find-account">
-							<a href="/account/find/id">아이디 찾기</a>
-							<span class="divider">|</span>
-							<a href="/account/find/password">비밀번호 찾기</a>
-						</div>
-					</div>
-					
-          <button type="submit" class="btn-confirm full-width">로그인</button>
-
-					<div class="social-login">
-						<button type="button" class="btn-kakao" onclick="kakao()">
-							<img src="#" alt="kakao">
-							카카오 로그인
-						</button>
-			    	</div>
-				</c:otherwise>
-			</c:choose>
-	</form>
+			<div class="social-login">
+			</div>
+		<!-- </form> -->
 	</div>
 	<!-- 파이어베이스 캡챠 넣을곳 -->
 	<div id="recaptcha-container"></div>
 </main>
 
 <!-- 알럿 모달 추가 -->
-<div id="alertModalOverlay" class="alert-modal-overlay" style="display: none;"></div>
+<div id="alertModalOverlay" class="alert-modal-overlay"
+	style="display: none;"></div>
 <div id="alertModal" class="alert-modal-box" style="display: none;">
-  <div class="alert-modal-content">
-    <div class="alert-modal-message"></div>
-    <div class="alert-modal-buttons"></div>
-  </div>
+	<div class="alert-modal-content">
+		<div class="alert-modal-message"></div>
+		<div class="alert-modal-buttons"></div>
+	</div>
 </div>
 
 <script>
+// 카톡
+Kakao.init('b50a2700ff109d1ab2de2eca4e07fa23');
+Kakao.isInitialized();
+
+	function loginWithKakao() {
+		// JSP에서 contextPath 동적으로 주입
+		let contextPath = '${pageContext.request.contextPath}';
+		if (contextPath) {
+			contextPath = '/' + contextPath;
+		}
+		const redirectUri = `\${location.protocol}//\${location.host}\${contextPath}/user/kakao`;
+
+		console.log(contextPath);
+		console.log(redirectUri);
+
+		Kakao.Auth.authorize({
+		redirectUri: redirectUri,
+		scope: 'profile_nickname, account_email'
+		});
+	}
+
+	// 아래는 데모를 위한 UI 코드입니다.
+	displayToken()
+	function displayToken() {
+		var token = getCookie('authorize-access-token');
+
+		if(token) {
+		Kakao.Auth.setAccessToken(token);
+		Kakao.Auth.getStatusInfo()
+			.then(function(res) {
+			if (res.status === 'connected') {
+				document.getElementById('token-result').innerText
+				= 'login success, token: ' + Kakao.Auth.getAccessToken();
+			}
+			})
+			.catch(function(err) {
+			Kakao.Auth.setAccessToken(null);
+			});
+		}
+	}
+
+	function getCookie(name) {
+		var parts = document.cookie.split(name + '=');
+		if (parts.length === 2) { return parts[1].split(';')[0]; }
+	}
+// 카톡
+
+
+function startVerifiPhone() {
+	const phoneInputs = document.querySelectorAll('.phone-input-group input');
+    const formattedNumber = formatPhoneNumber(phoneInputs[0], phoneInputs[1], phoneInputs[2]);
+    console.log(formattedNumber);
+}
+
+// 전화번호 입력 처리 함수
+function handlePhoneInput(input, nextInput) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+    if (input.value.length >= 3 && nextInput) {
+      	nextInput.focus();
+    }
+}
+
+// 전화번호 포맷팅 함수
+function formatPhoneNumber(input1, input2, input3) {
+    const num1 = input1.value;
+    const num2 = input2.value;
+    const num3 = input3.value;
+    
+    if (num1.length === 3 && num2.length === 4 && num3.length === 4) {
+      	return `\${num1}-\${num2}-\${num3}`;
+    }
+    return null;
+}
+
 const firebaseConfig = {
     apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
     authDomain: "jobhunter-672dd.firebaseapp.com",

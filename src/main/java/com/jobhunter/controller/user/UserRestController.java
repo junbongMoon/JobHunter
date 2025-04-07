@@ -102,4 +102,6 @@ public class UserRestController {
 	                             .body("연락처 변경 중 오류 발생");
 	    }
 	}
+	
+	
 }

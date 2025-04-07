@@ -6,6 +6,8 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.user.KakaoUserInfo;
 import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.model.user.UserVO;
 
@@ -57,6 +59,22 @@ public class UserDAOImpl implements UserDAO {
 	public int updateUserInfo(UserInfoDTO userInfo) throws Exception {
 		return ses.update(NS + ".updateUserInfo", userInfo);
 	}
-	
+
+	@Override
+	public Integer findByKakao(KakaoUserInfo userInfo) throws Exception {
+		return ses.selectOne(NS + ".findByKakao", userInfo.getKakaoId());
+	}
+
+	@Override
+	public Integer registKakao(KakaoUserInfo userInfo) throws Exception {
+		ses.insert(NS + ".registKakao", userInfo);
+		return userInfo.getUid();
+	}
+
+	@Override
+	public AccountVO loginByKakaoId(Long kakaoId) throws Exception {
+		return ses.selectOne(NS + ".loginByKakaoId", kakaoId);
+	}
+
 	
 }

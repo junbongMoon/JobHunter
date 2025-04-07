@@ -137,4 +137,20 @@
 		disability = #{disability}
 		WHERE uid = #{uid}
 	</update>
+	
+	<select id="findByKakao" resultType="java.lang.Integer">
+		SELECT uid FROM users WHERE socialId = #{kakaoId}
+	</select>
+	
+	<insert id="registKakao" useGeneratedKeys="true" keyProperty="uid">
+		INSERT INTO `users` (`userName`, `socialId`, `email`, `accountType`, `isSocial`) 
+		VALUES (#{nickname}, #{kakaoId}, #{email}, 'USER', 'Y');
+	</insert>
+	
+	<select id="loginByKakaoId" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where socialId = #{kakaoId}
+	</select>
 </mapper>

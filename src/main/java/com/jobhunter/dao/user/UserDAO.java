@@ -2,6 +2,8 @@ package com.jobhunter.dao.user;
 
 import java.util.Map;
 
+import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.user.KakaoUserInfo;
 import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.model.user.UserVO;
 
@@ -18,5 +20,11 @@ public interface UserDAO {
 	void updateMobile(Map<String, String> paramMap) throws Exception;
 
 	int updateUserInfo(UserInfoDTO userInfo) throws Exception;
+
+	Integer findByKakao(KakaoUserInfo userInfo) throws Exception;
+
+	Integer registKakao(KakaoUserInfo userInfo) throws Exception;
+
+	AccountVO loginByKakaoId(Long kakaoId) throws Exception;
 
 }
