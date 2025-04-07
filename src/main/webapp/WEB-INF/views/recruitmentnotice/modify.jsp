@@ -218,11 +218,12 @@ console.log("parsed applications:", applications);
         contentType: "application/json",
         data: JSON.stringify({ advantageType: val }),
         success: function () {
+			console.log(val);
           const html = `
             <div class="d-flex align-items-center mb-2 advantage-item">
               <input type="hidden" value="${val}">
-              <span class="me-2">${val}</span>
-              <button type="button" class="btn btn-sm btn-outline-danger">X</button>
+              <span class="me-2">\${val}</span>
+              <button type="button" class="btn btn-sm btn-outline-danger" onclick="">X</button>
             </div>
           `;
           $(".advantageArea").append(html);
