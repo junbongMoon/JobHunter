@@ -56,10 +56,6 @@
 		.getElementById('contactModal'));
 		modal.show();
 	}
-	
-	function downloadFile(boardUpFileNo){
-		// 아작스 불러서 파일 저장
-	}
 
 	function deleteRecruitment(uid) {
     $('#contactModalLabel').text("공고 삭제 확인");
@@ -156,6 +152,19 @@ h3 {
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   object-fit: contain;
+}
+
+.singleFile {
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.singleFile:hover {
+  background-color: #1a237e; /* 진한 남색 */
+  color: white;
+  transform: translateY(-2px); /* 살짝 위로 튀어나오게 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
 }
 </style>
 <body>
@@ -280,9 +289,9 @@ h3 {
 											<c:if test="${not empty RecruitmentDetailInfo.fileList}">
 												<c:forEach var="file"
 													items="${RecruitmentDetailInfo.fileList}">
-													<span class="badge rounded-pill text-bg-secondary"
-														onclick="downloadFile(`\${file.boardUpFileNo}`)">
-														${file.originalFileName} </span>
+													<span class="badge rounded-pill text-bg-secondary singleFile"
+														><a href="${file.newFileName}" download="${file.newFileName}">
+														${file.originalFileName}</a></span>
 												</c:forEach>
 											</c:if>
 										</p>
