@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class SubmitServiceImpl implements SubmitService {
 	
 	// 이력서 DAO
-	 private SubmitDAO submitDAO;
+	 private final SubmitDAO submitDAO;
 	
 
 	

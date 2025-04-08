@@ -16,9 +16,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SubmitDAOImpl implements SubmitDAO {
 	
-	private SqlSession ses;
+	private final SqlSession ses;
 	
-	private String NS = "com.jobhunter.mapper.submitmapper";
+	private final String NS = "com.jobhunter.mapper.submitmapper";
 	
 
 

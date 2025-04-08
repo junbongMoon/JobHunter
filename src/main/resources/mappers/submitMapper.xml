@@ -27,10 +27,10 @@
         LEFT JOIN license l ON r.resumeNo = l.resumeNo
 
         LEFT JOIN where_resume_sigungu sr ON r.resumeNo = sr.refResumeNo
-        LEFT JOIN sigungu s ON sr.sigunguNo = s.sigunguNo
+        LEFT JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
 
-        LEFT JOIN jobtype_resume_sub jrs ON r.resumeNo = jrs.resumeNo
-        LEFT JOIN subcategory sc ON jrs.subcategoryNo = sc.subcategoryNo
+        LEFT JOIN jobtype_resume_sub jrs ON r.resumeNo = jrs.refResumeNo
+        LEFT JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
 
         WHERE r.resumeNo IN (
             SELECT resumePk FROM registration

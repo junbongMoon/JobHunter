@@ -11,8 +11,47 @@ $(function() {
   console.log("companyUid:", companyUid);
   loadRecruitmentList(1, 10); // 페이지 로딩 시 자동 호출
 
+  $('#recruitmentnoticeList').on('change', function () {
+  const selectedRecruitmentNo = $(this).val();
+
+  if (selectedRecruitmentNo !== '-1') {
+    loadSubmittedResumes(selectedRecruitmentNo); // 기본 1페이지 호출
+  } else {
+    $('#resumeList').empty().append(`<option value="-1">이력서를 선택하세요</option>`);
+  }
+});
   
 });
+
+function loadSubmittedResumes(recruitmentNo, pageNo = 1, rowCntPerPage = 10) {
+  $.ajax({
+    url: `/submit/submitList/` + recruitmentNo,
+    type: 'GET',
+    data: { pageNo, rowCntPerPage },
+    success: function (data) {
+      console.log("제출된 이력서 리스트:", data);
+
+      // 결과 출력 처리 예시
+      $('#resumeList').empty();
+      $('#resumeList').append(`<option value="-1">이력서를 선택하세요</option>`);
+
+      if (data && data.boardList && data.boardList.length > 0) {
+        data.boardList.forEach(function (resume) {
+          const option = `<option value="\${resume.resumeNo}">\${resume.title}</option>`;
+          $('#resumeList').append(option);
+        });
+      } else {
+        $('#resumeList').append(`<option disabled>제출된 이력서가 없습니다</option>`);
+      }
+
+      // (선택) 페이징 처리
+      // renderResumePagination(data);  ← 따로 작성 시 호출 가능
+    },
+    error: function (xhr, status, error) {
+      console.error("이력서 조회 실패:", error);
+    }
+  });
+}
 
 function loadRecruitmentList(pageNo, rowCntPerPage) {
     $.ajax({

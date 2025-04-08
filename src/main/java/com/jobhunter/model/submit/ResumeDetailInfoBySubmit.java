@@ -13,6 +13,18 @@ import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 public class ResumeDetailInfoBySubmit {
 	// pk
 	private int resumeNo;
