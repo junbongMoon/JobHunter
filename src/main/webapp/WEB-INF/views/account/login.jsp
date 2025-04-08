@@ -449,7 +449,8 @@
 
 						<div class="find-account">
 							<a href="/account/find/id">아이디 찾기</a> <span class="divider">|</span>
-							<a href="/account/find/password">비밀번호 찾기</a>
+							<a href="/account/find/password">비밀번호 찾기</a> <span class="divider">|</span>
+							<a href="/user/register">회원가입</a>
 						</div>
 					</div>
 
