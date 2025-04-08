@@ -29,10 +29,9 @@ public class RecruitmentNoticeRestController {
 		@GetMapping("/list/{companyUid}")
 		public ResponseEntity<PageResponseDTO<RecruitmentNotice>> showRecruitmentWirteByUid(@PathVariable("companyUid") int companyUid,
 				PageRequestDTO pageRequestDTO, Model model){
-			ResponseEntity<PageResponseDTO<RecruitmentNotice>> result = null;
-			PageResponseDTO<RecruitmentNotice> pageResponseDTO = null;
+			ResponseEntity<PageResponseDTO<RecruitmentNotice>> result = null;		
 			
-			pageResponseDTO = recService.getRecruitmentByCompanyUid(companyUid, pageRequestDTO);
+			PageResponseDTO<RecruitmentNotice> pageResponseDTO = recService.getRecruitmentByCompanyUid(companyUid, pageRequestDTO);
 			
 			result = ResponseEntity.ok().body(pageResponseDTO);
 			

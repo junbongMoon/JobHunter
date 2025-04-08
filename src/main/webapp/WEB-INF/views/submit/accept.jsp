@@ -18,26 +18,59 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
     $.ajax({
       url: `/recruitmentnotice/rest/list/\${companyUid}`,
       type: "GET",
+      data: { pageNo, rowCntPerPage },
       success: function (data) {
         console.log("받은 공고 리스트:", data);
 
-        
-        $('#recruitmentnoticeList').empty(); // 기존 옵션 제거
-
-        // 첫 번째 기본 옵션 추가
+        $('#recruitmentnoticeList').empty();
         $('#recruitmentnoticeList').append(`<option value="-1">공고를 선택하세요</option>`);
 
-        // 공고 리스트 추가
         data.boardList.forEach(function (notice) {
           const option = `<option value="\${notice.uid}">\${notice.title}</option>`;
           $('#recruitmentnoticeList').append(option);
         });
+
+        // 페이징 영역 업데이트
+        renderPagination(data);
       },
       error: function (xhr, status, error) {
         console.error("공고 리스트 불러오기 실패:", error);
       }
     });
   }
+
+  function renderPagination(data) {
+  let paginationHtml = ''; // 버튼 HTML 문자열 누적
+
+  const startPage = data.startPageNumPerBlock;
+  const endPage = data.endPageNumPerBlock;
+  const currentPage = data.pageNo;
+
+  // 이전 버튼
+  if (startPage > 1) {
+    paginationHtml += `<button class="page-btn" data-page="\${startPage - 1}">«</button>`;
+  }
+
+  // 페이지 번호 버튼
+  for (let i = startPage; i <= endPage; i++) {
+    const boldStyle = i === currentPage ? ' style="font-weight:bold;"' : '';
+    paginationHtml += `<button class="page-btn" data-page="\${i}">\${i}</button>`;
+  }
+
+  // 다음 버튼
+  if (endPage < data.totalPageCnt) {
+    paginationHtml += `<button class="page-btn" data-page="\${endPage + 1}">»</button>`;
+  }
+
+  // HTML 출력
+  $('#pagination').html(paginationHtml);
+
+  // 클릭 이벤트 바인딩
+  $('#pagination .page-btn').on('click', function () {
+    const pageNo = parseInt($(this).data('page'));
+    loadRecruitmentList(pageNo, data.rowCntPerPage);
+  });
+}
 
 </script>
 
@@ -158,6 +191,7 @@ label {
 							  
 							</select>              
 						</div>
+            <div id="pagination" class="pagination-container" style="text-align: center; margin-top: 20px;"></div>
 
             <div class="custom-select-wrapper">
 							<label for="resumeList">공고에 제출 된 이력서</label>

@@ -147,7 +147,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	    return pageResponseDTO;
 	}
 
-	// 페이징하여 공고를 출력하는 메서드
+	// 페이징 하는 메서드
 	private <T> PageResponseDTO<T> pagingProcess(PageRequestDTO pageRequestDTO, int totalRowCount) {
 	    PageResponseDTO<T> pageResponseDTO = new PageResponseDTO<>(
 	        pageRequestDTO.getPageNo(),
@@ -184,7 +184,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 	// 공고를 수정하는 메서드
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public void modifyRecruitmentNotice(RecruitmentNoticeDTO dto, List<AdvantageDTO> newAdvList,
 			List<ApplicationDTO> newAppList, List<RecruitmentnoticeBoardUpfiles> modifyFileList,
 			RecruitmentDetailInfo existing, int uid) throws Exception {
@@ -269,6 +269,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	}
 	
 	// 내가 작성한 공고글 가져오는 메서드(필요한 정보는 title, 공고의 uid)
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public PageResponseDTO<RecruitmentNotice> getRecruitmentByCompanyUid(int companyUid, PageRequestDTO pageRequestDTO) {
 	    
