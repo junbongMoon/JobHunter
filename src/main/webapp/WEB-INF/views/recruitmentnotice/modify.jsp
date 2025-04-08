@@ -221,7 +221,7 @@ if (workType === "PART_TIME") {
 			console.log(val);
           const html = `
             <div class="d-flex align-items-center mb-2 advantage-item">
-              <input type="hidden" value="${val}">
+              <input type="hidden" value="\${val}">
               <span class="me-2">\${val}</span>
               <button type="button" class="btn btn-sm btn-outline-danger" onclick="">X</button>
             </div>
@@ -852,8 +852,8 @@ function addAdvantage() {
 
             const html = `
                 <div class="d-flex align-items-center mb-2 advantage-item">
-                    <input type="hidden" value="${advantageValue}">
-                    <span class="me-2">${advantageValue}</span>
+                    <input type="hidden" value="\${advantageValue}">
+                    <span class="me-2">\${advantageValue}</span>
                     <button type="button" class="btn btn-sm btn-outline-danger">X</button>
                 </div>
             `;
