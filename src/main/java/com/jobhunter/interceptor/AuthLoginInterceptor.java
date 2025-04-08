@@ -32,7 +32,7 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
             RedirectUtil.saveRedirectUrl(request, session);
             
             if (isAsync) { // 비동기면 에러코드 보내서 뷰단에서 알아서 로그인페이지로 보내도록 유도
-                NeedLoginException.writeToResponse(response, request.getContextPath());
+                NeedLoginException.writeToResponse(response);
             } else {
                 response.sendRedirect(request.getContextPath() + "/account/login");
             }

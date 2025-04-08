@@ -19,7 +19,7 @@ public class NeedLoginException extends RuntimeException {
     }
 
     // 알아서 에러코드랑 메시지들 세팅해주는거
-    public static void writeToResponse(HttpServletResponse response, String contextPath) throws IOException {
+    public static void writeToResponse(HttpServletResponse response) throws IOException {
     	// 에러코드 응답할때 필요한 리스폰 셋팅
         response.setContentType("application/json; charset=UTF-8");
         response.setStatus(STATUS_CODE);
