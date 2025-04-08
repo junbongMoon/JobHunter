@@ -15,4 +15,8 @@ public interface AccountService {
 	AccountVO refreshAccount(int uid, AccountType type) throws Exception;
 
 	AccountVO findAccountByAutoLogin(String sessionId, AccountType type) throws Exception;
+
+	Boolean checkDuplicateEmail(String email, AccountType type) throws Exception;
+
+	Boolean checkDuplicateMobile(String mobile, AccountType type) throws Exception;
 }

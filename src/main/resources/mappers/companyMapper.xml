@@ -109,4 +109,18 @@
         where autoLogin = #{sessionId}
     </select>
     
+    <select id="findByEmail" resultMap="accountMap">
+		select *, companyId as
+		accountId, companyName as accountName
+		from company
+		where email = #{email}
+	</select>
+	
+	<select id="findByMobile" resultMap="accountMap">
+		select *, companyId as
+		accountId, companyName as accountName
+		from company
+		where mobile = #{mobile}
+	</select>
+    
 </mapper>

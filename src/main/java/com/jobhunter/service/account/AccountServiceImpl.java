@@ -164,4 +164,24 @@ public class AccountServiceImpl implements AccountService {
 		return account;
 	}
 
+	@Override
+	public Boolean checkDuplicateEmail(String email, AccountType type) throws Exception {
+		AccountLoginDAO dao = getDAO(type);
+		AccountVO account = dao.findAccountByEmail(email);
+		if(account != null) {
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public Boolean checkDuplicateMobile(String mobile, AccountType type) throws Exception {
+		AccountLoginDAO dao = getDAO(type);
+		AccountVO account = dao.findAccountByMobile(mobile);
+		if(account != null) {
+			return true;
+		}
+		return false;
+	}
+
 }

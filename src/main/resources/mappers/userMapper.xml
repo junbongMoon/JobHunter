@@ -166,4 +166,11 @@
 		from users
 		where email = #{email}
 	</select>
+	
+	<select id="findByMobile" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where mobile = #{mobile}
+	</select>
 </mapper>
