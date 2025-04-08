@@ -33,5 +33,7 @@ public interface RecruitmentNoticeService {
 			RecruitmentDetailInfo existing, int uid) throws Exception;
 	// 파일을 삭제하는 메서드
 	void deleteFileFromDatabase(int boardUpFileNo);
+	//
+	PageResponseDTO<RecruitmentNotice> getRecruitmentByCompanyUid(int companyUid, PageRequestDTO pageRequestDTO);
 	
 }

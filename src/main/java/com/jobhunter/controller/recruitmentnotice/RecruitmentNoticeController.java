@@ -34,6 +34,7 @@ import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
 import com.jobhunter.model.recruitmentnotice.Application;
 import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
+import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 import com.jobhunter.model.util.FileStatus;
@@ -89,6 +90,7 @@ public class RecruitmentNoticeController {
 
 		return "redirect:/recruitmentnotice/listAll"; // 혹은 성공 페이지
 	}
+		
 
 	// 전체 공고 리스트를 출력하는 메서드
 	@GetMapping("/listAll")

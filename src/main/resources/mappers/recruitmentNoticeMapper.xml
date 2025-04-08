@@ -319,13 +319,30 @@
 	<!-- 실제로 접수 방식(application)을 삭제하는 쿼리 -->
 	<delete id="removeApplicationByRecruitmentUid">
 		DELETE FROM application
-		WHERE recruitmentNoticeUid = #{uid}
+		WHERE recruitmentNoticeUid =
+		#{uid}
 		AND method = #{method}
 	</delete>
 
 	<delete id="deleteFileFromDatabase">
 		delete from recruitmentnoticeboardupfiles
-		where boardUpFileNo = #{boardUpFileNo}
+		where
+		boardUpFileNo = #{boardUpFileNo}
 	</delete>
+
+	<select id="getTotalCountRowByCompanyUid" resultType="int">
+		SELECT COUNT(*)
+		FROM recruitmentnotice
+		WHERE refCompany = #{companyUid}
+	</select>
+
+	<select id="selectRecruitmentByCompanyUid"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentNotice">
+		SELECT *
+		FROM recruitmentnotice
+		WHERE refCompany = #{companyUid}
+		ORDER BY uid DESC
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
+	</select>
 
 </mapper>

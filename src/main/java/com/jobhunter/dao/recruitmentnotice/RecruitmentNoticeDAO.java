@@ -68,4 +68,11 @@ public interface RecruitmentNoticeDAO {
 	
 	// 우대조건을 삭제하는 메서드
 	void deleteAdvantage(int uid, String advantageType) throws Exception;
+	
+	// 내가 작성한 공고수를 가져오는 메서드
+	int getTotalCountRowByCompanyUid(int companyUid);
+	
+	// 내가 작성한 공고 리스트를 조회하는 메서드
+	List<RecruitmentNotice> selectRecruitmentByCompanyUid(int companyUid,
+			PageResponseDTO<RecruitmentNotice> pageResponseDTO);
 }

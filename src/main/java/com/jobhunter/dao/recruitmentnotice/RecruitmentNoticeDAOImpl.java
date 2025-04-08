@@ -170,6 +170,22 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		
 	}
 
+	// 기업이 작성한 공고의 총 갯수를 가져오는 메서드
+	@Override
+	public int getTotalCountRowByCompanyUid(int companyUid) {
+		return ses.selectOne(NS + ".getTotalCountRowByCompanyUid", companyUid);
+	}
+
+	// 기업이 작성한 공고리스트를 페이징하여 조회하는 메서드
+	@Override
+	public List<RecruitmentNotice> selectRecruitmentByCompanyUid(int companyUid, PageResponseDTO<RecruitmentNotice> pageResponseDTO) {
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("companyUid", companyUid);
+	    param.put("startRowIndex", pageResponseDTO.getStartRowIndex());
+	    param.put("rowCntPerPage", pageResponseDTO.getRowCntPerPage());
+
+	    return ses.selectList(NS + ".selectRecruitmentByCompanyUid", param);
+	}
 
 	
 
