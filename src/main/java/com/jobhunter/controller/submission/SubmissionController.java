@@ -7,7 +7,6 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -32,8 +31,13 @@ public class SubmissionController {
 
 	// 이력서 제출 페이지 (쿼리 파라미터 방식)
 	@GetMapping("/check")
-	public String submitResumeForm(@RequestParam int uid, Model model, HttpSession session) {
-		log.info("이력서 제출 페이지 요청 - 공고 ID: {}", uid);
+	public String submitResumeForm(
+			@RequestParam("uid") int uid, 
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
+			Model model, 
+			HttpSession session) {
+		log.info("이력서 제출 페이지 요청 - 공고 ID: {}, 페이지: {}, 페이지 크기: {}", new Object[]{uid, page, pageSize});
 		
 		// 세션에서 사용자 정보 가져오기
 		AccountVO account = (AccountVO) session.getAttribute("account");
@@ -53,6 +57,29 @@ public class SubmissionController {
 			model.addAttribute("recruitmentNotice", recruitmentNotice);
 			log.info("모델에 공고 정보 추가 완료");
 			
+			// 사용자의 이력서 목록 조회 (페이징 처리)
+			if (account != null) {
+				// 전체 이력서 수 조회
+				int totalResumes = resumeService.getTotalResumes(account.getUid());
+				int totalPages = (int) Math.ceil((double) totalResumes / pageSize);
+				
+				// 페이지 범위 검증
+				if (page < 1) page = 1;
+				if (page > totalPages && totalPages > 0) page = totalPages;
+				
+				// 이력서 목록 조회
+				List<ResumeVO> resumeList = resumeService.getResumeList(account.getUid(), page, pageSize);
+				
+				// 모델에 페이징 정보 추가
+				model.addAttribute("resumeList", resumeList);
+				model.addAttribute("currentPage", page);
+				model.addAttribute("pageSize", pageSize);
+				model.addAttribute("totalPages", totalPages);
+				model.addAttribute("totalResumes", totalResumes);
+				
+				log.info("사용자의 이력서 목록 조회 완료: {} 개, 페이지: {}/{}", new Object[]{resumeList.size(), page, totalPages});
+			}
+			
 		} catch (Exception e) {
 			log.error("공고 정보 조회 중 오류 발생: {}", e.getMessage(), e);
 			model.addAttribute("errorMessage", "공고 정보를 불러오는 중 오류가 발생했습니다.");
@@ -61,11 +88,6 @@ public class SubmissionController {
 		return "resume/resumeSubmission";
 	}
 	
-	// 이전에 구현한 경로 변수 방식의 메서드도 유지 (선택적)
-	@GetMapping("/{uid}")
-	public String submitResumeFormWithPathVariable(@PathVariable int uid, Model model, HttpSession session) {
-		log.info("이력서 제출 페이지 요청 (경로 변수) - 공고 ID: {}", uid);
-		return submitResumeForm(uid, model, session);
-	}
+
 
 }
