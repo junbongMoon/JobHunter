@@ -12,7 +12,6 @@
 <script src="https://www.gstatic.com/firebasejs/11.5.0/firebase-auth-compat.js"></script>
 
 <link href="/resources/css/mypage.css" rel="stylesheet">
-<link href="/resources/assets/css/publicMadal.css" rel="stylesheet">
 
 <main class="main" data-aos="fade-up">
   <h1 class="page-title">마이페이지</h1>
@@ -110,7 +109,7 @@
               <div>
                 <select class="form-control" id="nationality">
                   <option value="-1" style="display: none;">선택하세요</option>
-                  <option value="DOMESTIC">한국인</option>
+                  <option value="DOMESTIC">내국인</option>
                   <option value="FOREIGN">외국인</option>
                 </select>
               </div>
@@ -205,21 +204,13 @@
       </div>
     </div>
   </div>
-  <!-- 모달 창 -->
 
-  <!-- 알럿 모달 -->
-  <div id="publicModalOverlay" class="public-modal-overlay" style="display: none;"></div>
-  <div id="publicModal" class="public-modal-box" style="display: none;">
-    <div class="public-modal-content">
-      <div class="public-modal-message"></div>
-      <div class="public-modal-buttons"></div>
-    </div>
-  </div>
+  
 
   <!-- firebase캡챠 -->
   <div id="recaptcha-container"></div>
 </main>
-<script src="/resources/assets/js/publicModal.js"></script>
+
 <script>
 let sessionMobile = "${sessionScope.account.mobile}";
 let sessionEmail = "${sessionScope.account.email}";
@@ -1364,6 +1355,31 @@ function formatNumber(e) {
     e.target.value = value;
 }
 
+// 카톡 잠깐 백업
+displayToken()
+	function displayToken() {
+		var token = getCookie('authorize-access-token');
+
+		if(token) {
+		Kakao.Auth.setAccessToken(token);
+		Kakao.Auth.getStatusInfo()
+			.then(function(res) {
+			if (res.status === 'connected') {
+				document.getElementById('token-result').innerText
+				= 'login success, token: ' + Kakao.Auth.getAccessToken();
+			}
+			})
+			.catch(function(err) {
+			Kakao.Auth.setAccessToken(null);
+			});
+		}
+	}
+
+	function getCookie(name) {
+		var parts = document.cookie.split(name + '=');
+		if (parts.length === 2) { return parts[1].split(';')[0]; }
+	}
+// 카톡 잠깐 백업
 </script>
 <!-- 풋터 -->
 <jsp:include page="/WEB-INF/views/footer.jsp"></jsp:include>
