@@ -67,6 +67,15 @@
         </div>
 
     </footer>
+    
+    <!-- 알럿 모달 -->
+  <div id="publicModalOverlay" class="public-modal-overlay" style="display: none;"></div>
+  <div id="publicModal" class="public-modal-box" style="display: none;">
+    <div class="public-modal-content">
+      <div class="public-modal-message"></div>
+      <div class="public-modal-buttons"></div>
+    </div>
+  </div>
 
 
 </html>
