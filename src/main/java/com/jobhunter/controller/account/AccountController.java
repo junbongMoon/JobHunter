@@ -174,9 +174,9 @@ public class AccountController {
 		return "redirect:/";
 	}
 
-	@GetMapping("/test")
+	@GetMapping("/doc")
 	public String testPage() {
-		return "account/test";
+		return "account/doc";
 	}
 
 	@GetMapping("/testLoginAjax")
