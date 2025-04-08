@@ -42,7 +42,7 @@
     </select>
 
     <!-- 전체 개수 -->
-    <select id="getTotalCountRowOfResumeByUid" resultType="int">
+    <select id="getTotalCountRowOfRecruitmentByUid" resultType="int">
         SELECT COUNT(*)
         FROM registration
         WHERE recruitmentNoticePk = #{uid}
@@ -104,5 +104,10 @@
             <result property="refMajorcategoryNo" column="refMajorcategoryNo" />
         </collection>
     </resultMap>
+    
+    <select id="getFileListByResumeUid">
+    	select * from resumeupfiles
+    	where resumeNo = #{uid}
+    </select>
 	
 </mapper>

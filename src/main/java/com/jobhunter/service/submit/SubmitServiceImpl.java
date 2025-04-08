@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import com.jobhunter.dao.submit.SubmitDAO;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 
 import lombok.RequiredArgsConstructor;
@@ -36,11 +37,12 @@ public class SubmitServiceImpl implements SubmitService {
 		
 		List<ResumeDetailInfoBySubmit> resumeList = submitDAO.selectResumDetailInfoBySubmitByRecruitmentUid(RecruitmentUid, pageResponseDTO);
 		
-		
-		
-		
-		
-		
+		// 각 이력서에 대해 첨부파일도 개별 조회해서 추가
+	    for (ResumeDetailInfoBySubmit resume : resumeList) {
+	        List<ResumeUpfileDTO> fileList = submitDAO.selectUpfileListByResume(resume.getResumeNo());
+	        resume.setFiles(fileList);
+	    }
+			
 		pageResponseDTO.setBoardList(resumeList);
 		
 		

@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class SubmitDAOImpl implements SubmitDAO {
 	private final String NS = "com.jobhunter.mapper.submitmapper";
 	
 
-
+	// join을 이용해 ResumeDetailInfoBySubmit를 조회하는 메서드
     @Override
     public List<ResumeDetailInfoBySubmit> selectResumDetailInfoBySubmitByRecruitmentUid(int recruitmentUid,
             PageResponseDTO<ResumeDetailInfoBySubmit> pageResponseDTO) throws Exception {
@@ -33,11 +34,22 @@ public class SubmitDAOImpl implements SubmitDAO {
 
         return ses.selectList(NS + ".selectRecruitmentsByRecruitmentUid", params);
     }
-
+    
+    // 공고에 제출 된 resume의 갯수를 조회하는 메서드
 	@Override
 	public int selectTotalCountRowOfResumeByUid(int uid) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return ses.selectOne(NS + ".getTotalCountRowOfRecruitmentByUid", uid);
 	}
+	
+	// 파일을 조회하는 메서드
+	@Override
+	public List<ResumeUpfileDTO> selectUpfileListByResume(int uid) throws Exception {
+		
+		return ses.selectList(NS + ".", uid);
+	}
+	
+	
+	
 
 }
