@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.Status;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,6 +48,17 @@ public class SubmitDAOImpl implements SubmitDAO {
 	public List<ResumeUpfileDTO> selectUpfileListByResume(int uid) throws Exception {
 		
 		return ses.selectList(NS + ".getFileListByResumeUid", uid);
+	}
+
+	@Override
+	public void updateStatusByRegistration(Status status, int resumePk, int recruitmentNoticePk) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("status", status);
+		params.put("resumePk", resumePk);
+		params.put("recruitmentNoticePk", recruitmentNoticePk);
+		
+		ses.update(NS + ".modifyStatus", params);
+		
 	}
 	
 	

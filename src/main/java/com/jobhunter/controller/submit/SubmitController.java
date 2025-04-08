@@ -5,12 +5,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.Status;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 import com.jobhunter.service.resume.ResumeService;
 import com.jobhunter.service.submit.SubmitService;
@@ -22,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SubmitController {
 	
-	// 제출에 대한 Service
+	// 제출에 대한 Service단
 	private final SubmitService submitService;
 
 		
@@ -55,9 +57,15 @@ public class SubmitController {
 		return result;
 	}
 	
+	// 제출이력의 status를 변경해주는 메서드
+	@PutMapping("/status/{status}/{registrationNo}/{recruitmentNoticePk}")
+	public void changeStatusByRegistration(@PathVariable("status") Status status, @PathVariable("resumePk") int resumePk,
+			@PathVariable("recruitmentNoticePk") int recruitmentNoticePk) {
+		submitService.changeStatus(status, resumePk, recruitmentNoticePk);
+	}
 	
 	// 합격 여부
-	@GetMapping("/passed")
+	@PutMapping("/passed")
 	public String PassedByRegistration() {
 		
 		

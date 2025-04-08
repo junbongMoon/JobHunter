@@ -13,6 +13,7 @@ import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.Status;
 
 import lombok.RequiredArgsConstructor;
 
@@ -70,6 +71,12 @@ public class SubmitServiceImpl implements SubmitService {
 	    pageResponseDTO.setEndPageNumPerBlock();
 
 	    return pageResponseDTO;
+	}
+
+	@Override
+	public void changeStatus(Status status, int resumePk, int recruitmentNoticePk) {
+		submitDAO.updateStatusByRegistration(status, resumePk, recruitmentNoticePk);
+		
 	}
 
 }

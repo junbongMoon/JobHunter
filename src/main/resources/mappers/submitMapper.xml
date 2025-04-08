@@ -109,5 +109,11 @@
     	select * from resumeupfiles
     	where resumeNo = #{uid}
     </select>
+    
+    <update id="modifyStatus">
+    	update registration 
+    	set status = #{status}
+    	where recruitmentNoticePk = #{recruitmentNoticePk} and resumePk = #{resumePk}
+    </update>
 	
 </mapper>

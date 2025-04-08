@@ -5,6 +5,7 @@ import java.util.List;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.Status;
 
 public interface SubmitDAO {
 	
@@ -17,4 +18,7 @@ public interface SubmitDAO {
 	
 	// 이력서에 있는 파일을 조회하는 메서드
 	List<ResumeUpfileDTO> selectUpfileListByResume(int uid) throws Exception;
+	
+	// 제출 이력의 상태를 변경 해주는 메서드
+	void updateStatusByRegistration(Status status, int resumePk, int recruitmentNoticePk);
 }
