@@ -11,6 +11,7 @@ $(function() {
   console.log("companyUid:", companyUid);
   loadRecruitmentList(1, 10); // 페이지 로딩 시 자동 호출
 
+  // 공고 리스트의 값이 바뀌었을 때
   $('#recruitmentnoticeList').on('change', function () {
   const selectedRecruitmentNo = $(this).val();
 
@@ -18,6 +19,37 @@ $(function() {
     loadSubmittedResumes(selectedRecruitmentNo); // 기본 1페이지 호출
   } else {
     $('#resumeList').empty().append(`<option value="-1">이력서를 선택하세요</option>`);
+  }
+});
+
+  // 이력서 리스트의 값이 바뀌었을 때
+  $('#resumeList').on('change', function () {
+  const selectedResumeNo = parseInt($(this).val());
+  const selectedRecruitmentNo = $('#recruitmentnoticeList').val();
+
+  if (selectedResumeNo !== -1) {
+    // 저장한 데이터 불러오기
+    const selectedData = window.latestResumeList?.find(item => item.resumeNo === selectedResumeNo);
+
+    if (selectedData) {
+      $('#detailTitle').val(selectedData.title);
+      $('#detailPayType').val(selectedData.payType);
+      $('#detailPay').val(selectedData.pay);
+      $('#detailIntroduce').val(selectedData.introduce);
+      $('#detailSaveType').val(selectedData.saveType);
+
+      const jobForms = selectedData.jobForms?.map(j => j.form).join(', ') || '';
+      $('#detailJobForms').val(jobForms);
+
+      const merits = selectedData.merits?.map(m => m.meritContent).join(', ') || '';
+      $('#detailMerits').val(merits);
+
+      const sigunguList = selectedData.sigunguList?.map(s => s.name).join(', ') || '';
+      $('#detailSigungu').val(sigunguList);
+
+      const subcategoryList = selectedData.subcategoryList?.map(s => s.jobName).join(', ') || '';
+      $('#detailSubcategory').val(subcategoryList);
+    }
   }
 });
   
@@ -43,12 +75,51 @@ function loadSubmittedResumes(recruitmentNo, pageNo = 1, rowCntPerPage = 10) {
       } else {
         $('#resumeList').append(`<option disabled>제출된 이력서가 없습니다</option>`);
       }
-
-      // (선택) 페이징 처리
-      // renderResumePagination(data);  ← 따로 작성 시 호출 가능
+      // 데이터 저장
+      window.latestResumeList = data.boardList;
+      // 페이징 처리
+      renderResumePagination(data);
     },
     error: function (xhr, status, error) {
       console.error("이력서 조회 실패:", error);
+    }
+  });
+}
+
+function renderResumePagination(data) {
+  let paginationHtml = '';
+
+  const startPage = data.startPageNumPerBlock;
+  const endPage = data.endPageNumPerBlock;
+  const currentPage = data.pageNo;
+  const rowCntPerPage = data.rowCntPerPage;
+
+  // 이전 페이지 버튼
+  if (startPage > 1) {
+    paginationHtml += `<button class="resume-page-btn" data-page="\${startPage - 1}">«</button>`;
+  }
+
+  // 페이지 번호 버튼
+  for (let i = startPage; i <= endPage; i++) {
+    const boldStyle = i === currentPage ? ' style="font-weight:bold;"' : '';
+    paginationHtml += `<button class="resume-page-btn" data-page="\${i}">\${i}</button>`;
+  }
+
+  // 다음 페이지 버튼
+  if (endPage < data.totalPageCnt) {
+    paginationHtml += `<button class="resume-page-btn" data-page="\${endPage + 1}">»</button>`;
+  }
+
+  // 출력할 위치: resume 전용 pagination 영역이 필요합니다
+  $('#resumePagination').html(paginationHtml);
+
+  // 클릭 이벤트 바인딩
+  $('.resume-page-btn').on('click', function () {
+    const pageNo = parseInt($(this).data('page'));
+    const selectedRecruitmentNo = $('#recruitmentnoticeList').val();
+
+    if (selectedRecruitmentNo && selectedRecruitmentNo !== '-1') {
+      loadSubmittedResumes(selectedRecruitmentNo, pageNo, rowCntPerPage);
     }
   });
 }
@@ -219,7 +290,7 @@ label {
 
 		<div class="container" data-aos="fade-up" data-aos-delay="100">
 			
-			<form method="post" role="form">
+			<form role="form">
 
 				<div class="form-header categories-widget widget-item">
 					
@@ -241,6 +312,37 @@ label {
 					</div>
 				</div>
 			</form>
+
+      <form id="resumeDetailForm" style="margin-top: 2rem;">
+        <div class="form-section">
+          <label>제목</label>
+          <input type="text" class="form-control" id="detailTitle" readonly>
+      
+          <label>급여형태</label>
+          <input type="text" class="form-control" id="detailPayType" readonly>
+      
+          <label>급여</label>
+          <input type="text" class="form-control" id="detailPay" readonly>
+      
+          <label>자기소개</label>
+          <textarea class="form-control" id="detailIntroduce" rows="4" readonly></textarea>
+      
+          <label>저장타입</label>
+          <input type="text" class="form-control" id="detailSaveType" readonly>
+      
+          <label>고용형태</label>
+          <input type="text" class="form-control" id="detailJobForms" readonly>
+      
+          <label>강점</label>
+          <input type="text" class="form-control" id="detailMerits" readonly>
+      
+          <label>지역(시군구)</label>
+          <input type="text" class="form-control" id="detailSigungu" readonly>
+      
+          <label>직업군</label>
+          <input type="text" class="form-control" id="detailSubcategory" readonly>
+        </div>
+      </form>
 
 			<!-- Modal -->
 			<div class="modal fade" id="MyModal" tabindex="-1"
