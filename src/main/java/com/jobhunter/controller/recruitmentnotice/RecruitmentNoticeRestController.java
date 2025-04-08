@@ -1,7 +1,5 @@
 package com.jobhunter.controller.recruitmentnotice;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +25,8 @@ public class RecruitmentNoticeRestController {
 	private static final Logger logger = LoggerFactory.getLogger(RecruitmentNoticeRestController.class);
 	
 	
-	// 내가 작성한 공고 리스트를 가져오는 메서드
-		@GetMapping("/writeBy/{companyUid}")
+	    // 내가 작성한 공고 리스트를 가져오는 메서드
+		@GetMapping("/list/{companyUid}")
 		public ResponseEntity<PageResponseDTO<RecruitmentNotice>> showRecruitmentWirteByUid(@PathVariable("companyUid") int companyUid,
 				PageRequestDTO pageRequestDTO, Model model){
 			ResponseEntity<PageResponseDTO<RecruitmentNotice>> result = null;
@@ -42,8 +40,7 @@ public class RecruitmentNoticeRestController {
 			
 		}
 	
-
-
-
+	   
+	
 	
 }

@@ -1,12 +1,43 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
+  const companyUid = '${sessionScope.account.uid}';
 
-$(function() {});
+$(function() {
+  console.log("companyUid:", companyUid);
+  loadRecruitmentList(1, 10); // 페이지 로딩 시 자동 호출
+
+  
+});
+
+function loadRecruitmentList(pageNo, rowCntPerPage) {
+    $.ajax({
+      url: `/recruitmentnotice/rest/list/\${companyUid}`,
+      type: "GET",
+      success: function (data) {
+        console.log("받은 공고 리스트:", data);
+
+        
+        $('#recruitmentnoticeList').empty(); // 기존 옵션 제거
+
+        // 첫 번째 기본 옵션 추가
+        $('#recruitmentnoticeList').append(`<option value="-1">공고를 선택하세요</option>`);
+
+        // 공고 리스트 추가
+        data.boardList.forEach(function (notice) {
+          const option = `<option value="\${notice.uid}">\${notice.title}</option>`;
+          $('#recruitmentnoticeList').append(option);
+        });
+      },
+      error: function (xhr, status, error) {
+        console.error("공고 리스트 불러오기 실패:", error);
+      }
+    });
+  }
 
 </script>
 
