@@ -1,10 +1,17 @@
 package com.jobhunter.service.submit;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-import com.jobhunter.dao.recruitmentnotice.RecruitmentNoticeDAO;
-import com.jobhunter.dao.resume.ResumeDAO;
-import com.jobhunter.model.resume.ResumeDetailDTO;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import com.jobhunter.dao.submit.SubmitDAO;
+import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,14 +20,54 @@ import lombok.RequiredArgsConstructor;
 public class SubmitServiceImpl implements SubmitService {
 	
 	// 이력서 DAO
-	private ResumeDAO resumeDAO;
-	// 공고 DAO
-	private RecruitmentNoticeDAO recruitmentNoticeDAO;
+	 private SubmitDAO submitDAO;
 	
+
+	
+	// 일단 여기서 임시로 수행. 나중에 ResumeService로 이동할 메서드 
+	// 공고 uid로 해당 공고에 제출 된 ResumDetailInfoBySubmit들을 조회하는 메서드
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
-	public ResumeDetailDTO getResumeWithAll(int RecruitmentUid) throws Exception {
+	public PageResponseDTO<ResumeDetailInfoBySubmit> getResumeWithAll(int RecruitmentUid, PageRequestDTO pageRequestDTO) throws Exception {
 		
-		return null;
+		int totalCount = submitDAO.selectTotalCountRowOfResumeByUid(RecruitmentUid);
+		
+		PageResponseDTO<ResumeDetailInfoBySubmit> pageResponseDTO = pagingProcess(pageRequestDTO, totalCount);
+		
+		List<ResumeDetailInfoBySubmit> resumeList = submitDAO.selectResumDetailInfoBySubmitByRecruitmentUid(RecruitmentUid, pageResponseDTO);
+		
+		
+		
+		
+		
+		
+		pageResponseDTO.setBoardList(resumeList);
+		
+		
+		return pageResponseDTO;
+	}
+	
+	// 페이징 해주는 메서드
+	private <T> PageResponseDTO<T> pagingProcess(PageRequestDTO pageRequestDTO, int totalRowCount) {
+	    PageResponseDTO<T> pageResponseDTO = new PageResponseDTO<>(
+	        pageRequestDTO.getPageNo(),
+	        pageRequestDTO.getRowCntPerPage()
+	    );
+
+	    pageResponseDTO.setTotalRowCnt(totalRowCount); // 전체 데이터 수
+
+	    if (StringUtils.hasText(pageRequestDTO.getSearchType())) {
+	        pageResponseDTO.setSearchType(pageRequestDTO.getSearchType());
+	        pageResponseDTO.setSearchWord(pageRequestDTO.getSearchWord());
+	    }
+
+	    pageResponseDTO.setTotalPageCnt();       // 전체 페이지 수
+	    pageResponseDTO.setStartRowIndex();      // 출력 시작할 rowIndex번호
+	    pageResponseDTO.setBlockOfCurrentPage(); // 현재 페이지가 몇번째 블럭에 있는가?
+	    pageResponseDTO.setStartPageNumPerBlock();
+	    pageResponseDTO.setEndPageNumPerBlock();
+
+	    return pageResponseDTO;
 	}
 
 }
