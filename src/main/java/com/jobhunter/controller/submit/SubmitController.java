@@ -59,9 +59,15 @@ public class SubmitController {
 	
 	// 제출이력의 status를 변경해주는 메서드
 	@PutMapping("/status/{status}/{registrationNo}/{recruitmentNoticePk}")
-	public void changeStatusByRegistration(@PathVariable("status") Status status, @PathVariable("resumePk") int resumePk,
+	public ResponseEntity<Boolean> changeStatusByRegistration(@PathVariable("status") Status status, @PathVariable("resumePk") int resumePk,
 			@PathVariable("recruitmentNoticePk") int recruitmentNoticePk) {
+		ResponseEntity<Boolean> result = null;
+		
 		submitService.changeStatus(status, resumePk, recruitmentNoticePk);
+		
+		result = ResponseEntity.ok().body(true);
+		
+		return result;
 	}
 	
 	// 합격 여부

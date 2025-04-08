@@ -5,7 +5,7 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
-  const companyUid = '${sessionScope.account.uid}';
+  let companyUid = '${sessionScope.account.uid}';
 
 $(function() {
   console.log("companyUid:", companyUid);
@@ -24,7 +24,7 @@ $(function() {
 
   // 이력서 리스트의 값이 바뀌었을 때
   $('#resumeList').on('change', function () {
-  const selectedResumeNo = parseInt($(this).val());
+  let selectedResumeNo = parseInt($(this).val());
   const selectedRecruitmentNo = $('#recruitmentnoticeList').val();
 
   if (selectedResumeNo !== -1) {
@@ -64,11 +64,31 @@ $(function() {
       } else {
         $('#detailFileList').append('<li style="color: gray;">첨부된 파일이 없습니다.</li>');
       }
+
+      if(selectedData.saveType == 'WAITING'){
+        changeStatusByregistration("CHECKED", selectedResumeNo, Math.parseInt(companyUid));
+      }
     }
   }
 });
   
 });
+
+function changeStatusByregistration(status, resumePk, recruitmentNoticePk) {
+  $.ajax({
+    url: `/submit/status/\${status}/\${resumePk}/\${recruitmentNoticePk}`,
+    type: 'PUT',
+    success: function (response) {
+      console.log("상태 변경 성공:", response);
+      // 성공 후 사용자에게 알림 또는 상태 갱신 로직 등 추가 가능
+    },
+    error: function (xhr, status, error) {
+      console.error("상태 변경 실패:", error);
+      alert("상태 변경 중 오류가 발생했습니다.");
+    }
+  });
+}
+
 
 function loadSubmittedResumes(recruitmentNo, pageNo = 1, rowCntPerPage = 10) {
   $.ajax({
