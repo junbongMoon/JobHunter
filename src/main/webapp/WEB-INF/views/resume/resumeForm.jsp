@@ -1378,6 +1378,10 @@
 					if (resumeNo) {
 						formData.resumeNo = resumeNo;
 					}
+					// URL에서 uid 파라미터 가져오기
+					const urlParams = new URLSearchParams(window.location.search);
+					const uid = urlParams.get('uid');
+					console.log('uid:', uid);
 
 					console.log('저장할 데이터:', formData);
 
@@ -1645,6 +1649,11 @@
 
 					console.log('저장할 데이터:', formData);
 
+					// URL에서 uid 파라미터 가져오기
+					const urlParams = new URLSearchParams(window.location.search);
+					const uid = urlParams.get('uid');
+					console.log('uid:', uid);
+
 					// 저장 또는 수정 요청
 					const url = resumeNo ? `/resume/update/${resumeNo}` : '/resume/submit-final';
 					$.ajax({
@@ -1654,7 +1663,12 @@
 						contentType: 'application/json',
 						success: function (response) {
 							if (response.success) {
-								window.location.href = response.redirectUrl;
+								if (uid) {
+									// uid가 있으면 이력서 제출 페이지로 이동
+									window.location.href = `/submission/check?uid=` + uid;
+								} else {
+									window.location.href = response.redirectUrl;
+								}
 							} else {
 								showValidationModal(response.message || "저장 중 오류가 발생했습니다.");
 							}
