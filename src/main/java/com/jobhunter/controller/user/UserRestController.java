@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobhunter.model.account.AccountVO;
@@ -103,5 +104,16 @@ public class UserRestController {
 	    }
 	}
 	
+	@GetMapping(value = "/check/id", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String userId) {
+		boolean exists = false;
+		try {
+			exists = service.isUserIdExists(userId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok(exists);
+	}
 	
 }
