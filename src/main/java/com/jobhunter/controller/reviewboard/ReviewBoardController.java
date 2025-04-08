@@ -7,20 +7,23 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.reviewboard.Likes;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
 import com.jobhunter.model.reviewboard.WriteBoardDTO;
-import com.jobhunter.model.user.UserAllVO;
 import com.jobhunter.service.reviewboard.ReviewBoardService;
 import com.jobhunter.util.GetClientIPAddr;
 
@@ -48,13 +51,13 @@ public class ReviewBoardController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		model.addAttribute("board", blist);
+		model.addAttribute("blist", blist);
 
 		// TODO Auto-generated catch block
 
 		return resultPage;
 
-	};
+	}
 
 	// 공고글 게시물을 조회
 	@GetMapping("/write")
@@ -84,31 +87,30 @@ public class ReviewBoardController {
 	// 게시물 작성 저장
 	@PostMapping("/write")
 	public String saveReviewBoard(@ModelAttribute WriteBoardDTO writeBoardDTO,
-            @RequestParam(value = "reviewTypeOtherText", required = false) String otherText,
-            HttpSession session) {
+			@RequestParam(value = "reviewTypeOtherText", required = false) String otherText, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 
 		if (account == null || account.getUid() == 0) {
 			return "redirect:/account/login";
 		}
 		writeBoardDTO.setWriter(account.getUid());
-		  if ("OTHER".equals(writeBoardDTO.getReviewType())) {
-		        // enum에는 OTHER만 넣고, 입력한 텍스트는 다른 필드에 저장하거나 로그로 남겨
-		        writeBoardDTO.setReviewType("OTHER");
+		if ("OTHER".equals(writeBoardDTO.getReviewType())) {
+		
+			writeBoardDTO.setReviewType("OTHER");
 
-		        // 만약 content에 추가할
-		        if (otherText != null && !otherText.trim().isEmpty()) {
-		            writeBoardDTO.setContent("[기타 면접유형: " + otherText + "]\n" + writeBoardDTO.getContent());
-		        }
-		    }
+			// 만약 content에 추가할
+			if (otherText != null && !otherText.trim().isEmpty()) {
+				writeBoardDTO.setContent("[기타 면접유형: " + otherText + "]\n" + writeBoardDTO.getContent());
+			}
+		}
 
 		// logger.info("리뷰 게시글 저장 시도: " + writeBoardDTO.toString());
 		String returnPage = "redirect:./allBoard";
-		// logger.info("writeBoardDTO.toString());
-		// logger.info("reviewResult 넘어온 값 = {}", writeBoardDTO.getReviewResult());
-
+	
 		try {
 			if (service.saveReview(writeBoardDTO)) {
+			
+				
 				returnPage += "?status=success";
 			}
 		} catch (Exception e) {
@@ -133,4 +135,27 @@ public class ReviewBoardController {
 
 	}
 
-}
+	@PostMapping("/like")
+	@ResponseBody
+	public ResponseEntity<String> addLike(@RequestBody Likes likes, HttpSession session) {
+	    AccountVO account = (AccountVO) session.getAttribute("account");
+	    
+	    if (account == null || account.getUid() == 0) {
+	        return ResponseEntity.status(401).body("로그인이 필요합니다.");
+	    }
+
+	    likes.setUserId(account.getUid()); 
+
+	    try {
+	        service.addlikes(likes.getUserId(), likes.getBoardNo());
+	        return ResponseEntity.ok("좋아요가 등록되었습니다.");
+	    } catch (IllegalStateException e) {
+	        return ResponseEntity.badRequest().body(e.getMessage());
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(500).body("서버 오류 발생");
+	    }
+	}
+	}
+
+	

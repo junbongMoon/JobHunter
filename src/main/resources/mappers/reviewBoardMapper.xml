@@ -83,6 +83,7 @@
 
 	<select id="detailAll" resultMap="ReviewDetailViewDTOMap">
 		SELECT
+		r.boardNo,
 		res.title,
 		u.userId,
 		rec.workType,
@@ -98,12 +99,15 @@
 		r.likes,
 		r.views
 		FROM reviewBoard r
-		INNER JOIN users u ON r.writer =
+		INNER JOIN users u ON
+		r.writer =
 		u.uid
-		INNER JOIN recruitmentnotice rec ON r.gonggoUid = rec.uid
+		INNER JOIN recruitmentnotice rec ON r.gonggoUid =
+		rec.uid
 		INNER
 		JOIN resume res ON rec.uid =res.resumeNo
-		INNER JOIN company com ON
+		INNER JOIN company
+		com ON
 		rec.refCompany = com.uid
 		WHERE r.boardNo = #{r.boardNo}
 	</select>
@@ -128,4 +132,27 @@
 		<result column="views" property="views" /><!-- 조회수 -->
 	</resultMap>
 
+	<!-- 1. 최근 24시간 내 좋아요 시간 -->
+	<select id="selectLastLikeTime"
+		resultType="java.time.LocalDateTime">
+		SELECT createdAt
+		FROM reviewLikes
+		WHERE userId = #{userId}
+		AND boardNo = #{boardNo}
+		ORDER BY createdAt DESC
+		LIMIT 1
+	</select>
+
+	<!-- 2. 좋아요 등록 -->
+	<insert id="insertLike">
+		INSERT INTO reviewLikes (userId, boardNo)
+		VALUES (#{userId}, #{boardNo})
+	</insert>
+
+	<!-- 3. 좋아요 수 증가 -->
+	<update id="updateBoardLikes">
+		UPDATE reviewBoard
+		SET likes = likes + 1
+		WHERE boardNo = #{boardNo}
+	</update>
 </mapper>

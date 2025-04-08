@@ -1,5 +1,6 @@
 package com.jobhunter.dao.reviewboard;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
@@ -17,6 +18,16 @@ public interface ReviewBoardDAO {
 	int insertBoard(WriteBoardDTO writeBoardDTO) throws Exception;
 
 	ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception;
+
+	
+	LocalDateTime selectLike(int userId, int boardNo) throws Exception;
+
+	int insertLike(int userId, int boardNo) throws Exception;
+
+	int updateBoardLikes(int boardNo) throws Exception;
+
+
+	
 
 	
 

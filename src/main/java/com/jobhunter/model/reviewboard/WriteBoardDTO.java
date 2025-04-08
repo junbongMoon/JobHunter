@@ -16,6 +16,7 @@ import lombok.ToString;
 @ToString
 public class WriteBoardDTO {
 	
+	private int boardNo;
 	private int gonggoUid;
 	private int writer;
 	private String companyName;

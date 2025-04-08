@@ -23,6 +23,10 @@ public interface ReviewBoardService {
 	
 	//상세페이지 조회 
 	ReviewDetailViewDTO getReviewDetail(int boardNo)throws Exception;
+	
+	
+	//좋아요 기능 
+	boolean addlikes(int userId, int boardNo) throws Exception;
 
 
 
