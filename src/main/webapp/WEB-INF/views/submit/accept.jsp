@@ -122,11 +122,18 @@ label {
 					
 					<div class="form-section">
 						<div class="custom-select-wrapper">
-							<label for="recruitmentnotices">내가 작성한 공고</label>
-							<select class="recruitmentnotices form-select" id="MajorCategory">
+							<label for="recruitmentnoticeList">내가 작성한 공고</label>
+							<select class="recruitmentnoticeList form-select" id="recruitmentnoticeList">
+							  
+							</select>              
+						</div>
+
+            <div class="custom-select-wrapper">
+							<label for="resumeList">공고에 제출 된 이력서</label>
+							<select class="resumeList form-select" id="resumeList">
 							  
 							</select>
-						</div>
+						  </div>
 					</div>
 				</div>
 			</form>
