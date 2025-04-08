@@ -2,7 +2,6 @@
   // 알럿 모달 유틸리티
 const publicModals = {
   show: (message, options = {}) => {
-    console.log("모달창띄우기");
     const {
       confirmText = '확인',
       cancelText = null,
@@ -32,14 +31,12 @@ const publicModals = {
     const cancelBtn = modal.querySelector('.public-modal-button.cancel');
 
     confirmBtn.onclick = () => {
-      console.log("확인버튼튼");
       if (onConfirm) onConfirm();
       publicModals.hide();
     };
 
     if (cancelBtn) {
       cancelBtn.onclick = () => {
-        console.log("취소버튼튼");
         if (onCancel) onCancel();
         publicModals.hide();
       };
