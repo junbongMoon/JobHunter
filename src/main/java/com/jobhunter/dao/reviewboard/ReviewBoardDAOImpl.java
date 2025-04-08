@@ -79,7 +79,18 @@ import com.jobhunter.model.reviewboard.WriteBoardDTO;
     	return ses.update(NS + ".updateBoardLikes", boardNo);
     }
 
+    @Override
+    public int deleteLike(int userId, int boardNo) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("boardNo", boardNo);
+        return ses.delete(NS + ".deleteLike", map);
+    }
 
+    @Override
+    public int decreaseBoardLikes(int boardNo) throws Exception {
+        return ses.update(NS + ".decreaseBoardLikes", boardNo);
+    }
 
 
 }

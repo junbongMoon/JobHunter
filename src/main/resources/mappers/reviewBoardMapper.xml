@@ -146,13 +146,29 @@
 	<!-- 2. 좋아요 등록 -->
 	<insert id="insertLike">
 		INSERT INTO reviewLikes (userId, boardNo)
-		VALUES (#{userId}, #{boardNo})
+		VALUES
+		(#{userId}, #{boardNo})
 	</insert>
 
 	<!-- 3. 좋아요 수 증가 -->
 	<update id="updateBoardLikes">
 		UPDATE reviewBoard
 		SET likes = likes + 1
+		WHERE boardNo
+		= #{boardNo}
+	</update>
+
+	<!-- 좋아요 취소 (삭제) -->
+	<delete id="deleteLike">
+		DELETE FROM reviewLikes
+		WHERE userId = #{userId}
+		AND boardNo = #{boardNo}
+	</delete>
+
+	<!-- 좋아요 수 감소 -->
+	<update id="decreaseBoardLikes">
+		UPDATE reviewBoard
+		SET likes = likes - 1
 		WHERE boardNo = #{boardNo}
 	</update>
 </mapper>

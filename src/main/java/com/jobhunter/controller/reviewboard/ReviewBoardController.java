@@ -95,7 +95,7 @@ public class ReviewBoardController {
 		}
 		writeBoardDTO.setWriter(account.getUid());
 		if ("OTHER".equals(writeBoardDTO.getReviewType())) {
-		
+
 			writeBoardDTO.setReviewType("OTHER");
 
 			// 만약 content에 추가할
@@ -106,11 +106,10 @@ public class ReviewBoardController {
 
 		// logger.info("리뷰 게시글 저장 시도: " + writeBoardDTO.toString());
 		String returnPage = "redirect:./allBoard";
-	
+
 		try {
 			if (service.saveReview(writeBoardDTO)) {
-			
-				
+
 				returnPage += "?status=success";
 			}
 		} catch (Exception e) {
@@ -135,27 +134,47 @@ public class ReviewBoardController {
 
 	}
 
-	@PostMapping("/like")
+	@PostMapping(value = "/like", produces = "text/plain;charset=UTF-8")
 	@ResponseBody
 	public ResponseEntity<String> addLike(@RequestBody Likes likes, HttpSession session) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+
+		if (account == null || account.getUid() == 0) {
+			return ResponseEntity.status(401).body("로그인이 필요합니다.");
+		}
+
+		try {
+			service.addlikes(likes.getUserId(), likes.getBoardNo());
+			return ResponseEntity.ok("좋아요가 등록되었습니다.");
+		} catch (IllegalArgumentException e) {
+			// 여기에서 명확하게 메시지 설정
+			return ResponseEntity.badRequest().body("이미 좋아요를 누르셨습니다. 24시간 후 다시 가능합니다.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(500).body("서버 오류 발생");
+		}
+	}
+	
+	@PostMapping(value ="/unlike", produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public ResponseEntity<String> cancelLike(@RequestBody Likes likes, HttpSession session) {
 	    AccountVO account = (AccountVO) session.getAttribute("account");
-	    
+
 	    if (account == null || account.getUid() == 0) {
 	        return ResponseEntity.status(401).body("로그인이 필요합니다.");
 	    }
 
-	    likes.setUserId(account.getUid()); 
-
 	    try {
-	        service.addlikes(likes.getUserId(), likes.getBoardNo());
-	        return ResponseEntity.ok("좋아요가 등록되었습니다.");
-	    } catch (IllegalStateException e) {
-	        return ResponseEntity.badRequest().body(e.getMessage());
+	        boolean success = service.removeLike(likes.getUserId(), likes.getBoardNo());
+	        if (success) {
+	            return ResponseEntity.ok("좋아요가 취소되었습니다.");
+	        } else {
+	            return ResponseEntity.status(400).body("더이상 취소를 할 수 없습니다");
+	        }
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        return ResponseEntity.status(500).body("서버 오류 발생");
 	    }
 	}
-	}
 
-	
+}

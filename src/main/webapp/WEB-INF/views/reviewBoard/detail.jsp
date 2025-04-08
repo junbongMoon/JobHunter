@@ -139,7 +139,7 @@
 		</table>
 
 
-		
+
 		<!-- 좋아요 버튼 영역 -->
 		<div class="d-flex justify-content-between align-items-center mt-4">
 			<div class="text-muted">
@@ -148,39 +148,98 @@
 			</div>
 			<!-- 좋아요 버튼 -->
 			<button id="likeBtn" class="btn btn-danger btn-sm">❤️ 좋아요</button>
+			<button id="unlikeBtn" class="btn btn-secondary btn-sm">💔
+				좋아요 취소</button>
 			<a href="${pageContext.request.contextPath}/reviewBoard/allBoard"
 				class="btn btn-outline-secondary">← 목록으로</a>
 		</div>
 	</div>
 	<!-- 게시글 번호 hidden으로 전달 -->
 
-		<input type="hidden" id="boardNo" value="${detail.boardNo}" /> 
-		<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
-	<script>
-	$('#likeBtn').on('click', function () {
-		  const boardNo = $('#boardNo').val();
-		  const userId = $('#userId').val(); 
+	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
+	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
 
-		  $.ajax({
-		    url: '${pageContext.request.contextPath}/reviewBoard/like',
-		    method: 'POST',
-		    contentType: 'application/json',
-		    data: JSON.stringify({ boardNo: boardNo, userId: userId }),  // 둘 다 전송
-		    success: function (message) {
-		      alert("좋아요가 추가 되었습니다");
-		      location.reload(); // 새로고침으로 좋아요 수 반영
-		    },
-		    error: function (xhr) {
-		      if (xhr.status === 401) {
-		        alert("로그인이 필요합니다.");
-		        window.location.href = '${pageContext.request.contextPath}/account/login';
-		      } else {
-		        alert(xhr.responseText);
-		      }
-		    }
-		  });
-		});
-	</script>
+
+
+	<!-- 좋아요 알림 모달 -->
+	<div class="modal fade" id="likeModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content text-center">
+				<div class="modal-header">
+					<h5 class="modal-title" id="likeModalLabel">알림</h5>
+				</div>
+				<div class="modal-body" id="likeModalMessage">
+					<!-- 메시지가 여기에 들어감 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"
+						data-bs-dismiss="modal">확인</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 모달 코드 -->
+	<script>
+  //좋아요 추가 
+  $(function () {
+    $('#likeBtn').on('click', function () {
+      const boardNo = $('#boardNo').val();
+      const userId = $('#userId').val();
+   
+      $.ajax({
+        url: '${pageContext.request.contextPath}/reviewBoard/like',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ boardNo: boardNo, userId: userId }),
+        success: function (message) {
+          alert(message); 
+          location.reload();
+        },
+        error: function (xhr) {
+        	  console.log("xhr status:", xhr.status);
+        	  console.log("xhr response:", xhr.responseText); 
+          if (xhr.status === 401) {
+            alert("로그인이 필요합니다.");
+            window.location.href = '${pageContext.request.contextPath}/account/login';
+          } else if (xhr.status === 400) {
+            alert(xhr.responseText); 
+          } else {
+            alert("서버 오류가 발생했습니다.");
+          }
+        }
+      });
+    });
+  });
+   //좋아요 취소   
+ 	// 좋아요 취소   
+// 좋아요 취소   
+$(function () {
+  const boardNo = $('#boardNo').val();
+  const userId = $('#userId').val();
+
+  $('#unlikeBtn').on('click', function () {
+    $.ajax({
+      url: '${pageContext.request.contextPath}/reviewBoard/unlike',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ userId: userId, boardNo: boardNo }),
+      success: function (message) {
+        $('#likeModalMessage').text(message);
+        $('#likeModal').modal('show');
+        setTimeout(() => location.reload(), 1000); // 1초 후 새로고침
+      },
+      error: function (xhr) {
+        const msg = xhr.status === 400 ? xhr.responseText : "에러 발생";
+        $('#likeModalMessage').text(msg);
+        $('#likeModal').modal('show');
+      }
+    });
+  });
+});
+
+
+ </script>
+
 
 
 </body>
