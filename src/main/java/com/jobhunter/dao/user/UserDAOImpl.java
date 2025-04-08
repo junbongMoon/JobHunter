@@ -76,5 +76,17 @@ public class UserDAOImpl implements UserDAO {
 		return ses.selectOne(NS + ".loginByKakaoId", kakaoId);
 	}
 
+	@Override
+	public boolean findIsUserById(String userId) {
+		Boolean result = ses.selectOne(NS + ".findIsUserById", userId);
+	    return Boolean.TRUE.equals(result);
+	}
+
+	@Override
+	public AccountVO findByEmail(KakaoUserInfo userInfo) throws Exception {
+		AccountVO result = ses.selectOne(NS + ".findByEmail", userInfo.getEmail());
+		return result;
+	}
+
 	
 }

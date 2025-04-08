@@ -153,4 +153,17 @@
 		from users
 		where socialId = #{kakaoId}
 	</select>
+	
+	<select id="findIsUserById" resultType="boolean" parameterType="string">
+		SELECT EXISTS (
+            SELECT 1 FROM users WHERE userId = #{userId}
+        )
+	</select>
+	
+	<select id="findByEmail" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where email = #{email}
+	</select>
 </mapper>

@@ -27,4 +27,8 @@ public interface UserDAO {
 
 	AccountVO loginByKakaoId(Long kakaoId) throws Exception;
 
+	boolean findIsUserById(String userId) throws Exception;
+
+	AccountVO findByEmail(KakaoUserInfo userInfo) throws Exception;
+
 }

@@ -23,4 +23,6 @@ public interface UserService {
 
 	AccountVO loginOrRegisterKakao(KakaoUserInfo userInfo) throws Exception;
 
+	boolean isUserIdExists(String userId) throws Exception;
+
 }

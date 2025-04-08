@@ -16,6 +16,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.jobhunter.customexception.DuplicateEmailException;
 import com.jobhunter.dao.user.UserDAO;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.user.KakaoUserInfo;
@@ -133,12 +134,23 @@ public class UserServiceImpl implements UserService {
 		AccountVO accountVo = null;
 		Integer uid = dao.findByKakao(userInfo);
 		if (uid == null) {
-			uid = dao.registKakao(userInfo);
+			AccountVO emailAccount = dao.findByEmail(userInfo);
+			if(emailAccount == null) {
+				uid = dao.registKakao(userInfo);
+			} else {
+				throw new DuplicateEmailException();
+			}
 		}
+		
 		if (uid != null) {
 			accountVo = dao.loginByKakaoId(userInfo.getKakaoId());
 		}
 		return accountVo;
+	}
+
+	@Override
+	public boolean isUserIdExists(String userId) throws Exception {
+		return dao.findIsUserById(userId);
 	}
 
 	
