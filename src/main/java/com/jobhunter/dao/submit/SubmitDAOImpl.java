@@ -46,7 +46,7 @@ public class SubmitDAOImpl implements SubmitDAO {
 	@Override
 	public List<ResumeUpfileDTO> selectUpfileListByResume(int uid) throws Exception {
 		
-		return ses.selectList(NS + ".", uid);
+		return ses.selectList(NS + ".getFileListByResumeUid", uid);
 	}
 	
 	

@@ -36,9 +36,11 @@ $(function() {
       $('#detailPayType').val(selectedData.payType);
       $('#detailPay').val(selectedData.pay);
       $('#detailIntroduce').val(selectedData.introduce);
-      $('#detailSaveType').val(selectedData.saveType);
-
-      const jobForms = selectedData.jobForms?.map(j => j.form).join(', ') || '';
+      
+      // 배열을 한글로 바꿔서 ,로 연결된 문자열로 만들기
+      // ?. 는 Optional Chaining 문법입니다.
+      // jobForms가 존재하지 않으면 오류를 내지 않고 undefined 반환!
+      const jobForms = selectedData.jobForms?.map(j => translateJobFormCode(j.form)).join(', ') || '';
       $('#detailJobForms').val(jobForms);
 
       const merits = selectedData.merits?.map(m => m.meritContent).join(', ') || '';
@@ -49,6 +51,19 @@ $(function() {
 
       const subcategoryList = selectedData.subcategoryList?.map(s => s.jobName).join(', ') || '';
       $('#detailSubcategory').val(subcategoryList);
+
+      $('#detailFileList').empty();
+      const files = selectedData.files;
+
+      if (files && files.length > 0) {
+        files.forEach(file => {
+          $('#detailFileList').append(
+            `<li><a href="/resume/files/${file.newFileName}" target="_blank">${file.originFileName}</a></li>`
+          );
+        });
+      } else {
+        $('#detailFileList').append('<li style="color: gray;">첨부된 파일이 없습니다.</li>');
+      }
     }
   }
 });
@@ -149,6 +164,7 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
     });
   }
 
+  // 페이징 하는 함수
   function renderPagination(data) {
   let paginationHtml = ''; // 버튼 HTML 문자열 누적
 
@@ -180,6 +196,18 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
     const pageNo = parseInt($(this).data('page'));
     loadRecruitmentList(pageNo, data.rowCntPerPage);
   });
+}
+
+function translateJobFormCode(code) {
+  const map = {
+    FULL_TIME: '정규직',
+    CONTRACT: '계약직',
+    COMMISSION: '위촉직',
+    PART_TIME: '아르바이트',
+    FREELANCE: '프리랜서',
+    DISPATCH: '파견직'
+  };
+  return map[code] || code; // 혹시 없는 코드면 그대로 출력
 }
 
 </script>
@@ -278,6 +306,54 @@ label {
 .addAdvantageBtn:hover, #write {
   background-color: #298ce7; /* 진한 하늘색 hover 효과 */
 }
+
+#resumeDetailForm .form-section {
+  background-color: var(--surface-color);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+#resumeDetailForm label {
+  margin-top: 1.2rem;
+  font-weight: 600;
+  color: var(--heading-color);
+}
+
+#resumeDetailForm input.form-control,
+#resumeDetailForm textarea.form-control {
+  margin-top: 0.4rem;
+  padding: 0.75rem 1rem;
+  background-color: color-mix(in srgb, var(--surface-color), transparent 10%);
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 85%);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--default-color);
+}
+
+#resumeDetailForm input[readonly],
+#resumeDetailForm textarea[readonly] {
+  background-color: color-mix(in srgb, var(--surface-color), transparent 5%);
+  cursor: default;
+}
+
+#resumeDetailForm #detailFileList {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: color-mix(in srgb, var(--surface-color), transparent 8%);
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 85%);
+  border-radius: 8px;
+}
+
+#resumeDetailForm #detailFileList li {
+  margin-bottom: 0.4rem;
+}
+
+#resumeDetailForm #detailFileList a {
+  color: var(--accent-color);
+  font-weight: 500;
+  text-decoration: underline;
+}
 </style>
 
 <body>
@@ -318,29 +394,31 @@ label {
           <label>제목</label>
           <input type="text" class="form-control" id="detailTitle" readonly>
       
-          <label>급여형태</label>
+          <label>희망 급여형태</label>
           <input type="text" class="form-control" id="detailPayType" readonly>
       
-          <label>급여</label>
+          <label>희망 금액</label>
           <input type="text" class="form-control" id="detailPay" readonly>
       
           <label>자기소개</label>
           <textarea class="form-control" id="detailIntroduce" rows="4" readonly></textarea>
       
-          <label>저장타입</label>
-          <input type="text" class="form-control" id="detailSaveType" readonly>
-      
-          <label>고용형태</label>
+          <label>희망 고용형태</label>
           <input type="text" class="form-control" id="detailJobForms" readonly>
       
           <label>강점</label>
           <input type="text" class="form-control" id="detailMerits" readonly>
       
-          <label>지역(시군구)</label>
+          <label>희망 근무지역</label>
           <input type="text" class="form-control" id="detailSigungu" readonly>
       
-          <label>직업군</label>
+          <label>희망 직업군</label>
           <input type="text" class="form-control" id="detailSubcategory" readonly>
+
+          <label>첨부파일</label>
+          <ul id="detailFileList" class="form-control" style="list-style: none; padding-left: 0;" readonly>
+
+          </ul>
         </div>
       </form>
 
