@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,12 +29,14 @@ public class RecruitmentNoticeRestController {
 	
 	// 내가 작성한 공고 리스트를 가져오는 메서드
 		@GetMapping("/writeBy/{companyUid}")
-		public PageResponseDTO<RecruitmentNotice> showRecruitmentWirteByUid(@PathVariable("companyUid") int companyUid,
+		public ResponseEntity<PageResponseDTO<RecruitmentNotice>> showRecruitmentWirteByUid(@PathVariable("companyUid") int companyUid,
 				PageRequestDTO pageRequestDTO, Model model){
-			PageResponseDTO<RecruitmentNotice> result = null;
+			ResponseEntity<PageResponseDTO<RecruitmentNotice>> result = null;
+			PageResponseDTO<RecruitmentNotice> pageResponseDTO = null;
 			
-			recService.getRecruitmentByCompanyUid(companyUid, pageRequestDTO);
+			pageResponseDTO = recService.getRecruitmentByCompanyUid(companyUid, pageRequestDTO);
 			
+			result = ResponseEntity.ok().body(pageResponseDTO);
 			
 			return result;
 			
