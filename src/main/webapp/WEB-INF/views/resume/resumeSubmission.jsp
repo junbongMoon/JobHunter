@@ -202,7 +202,7 @@
 				padding: 20px;
 				margin-bottom: 30px;
 				box-shadow: 0 5px 15px rgba(55, 81, 126, 0.1);
-				border-left: 5px solid #37517e;
+				border-left: 5px solid #47b2e4;
 			}
 
 			.notice-title {
@@ -282,9 +282,9 @@
 			}
 
 			.resume-item.selected {
-				border: 3px solid #37517e;
+				border: 3px solid #47b2e4;
 				background-color: #f8f9fa;
-				box-shadow: 0 5px 15px rgba(55, 81, 126, 0.15);
+				box-shadow: 0 5px 15px rgba(71, 178, 228, 0.15);
 			}
 
 			.resume-title {
@@ -338,7 +338,7 @@
 				border-radius: 5px;
 				color: white;
 				font-weight: 500;
-				transition: all 0.3s ease;
+				transition: all 0.1s ease;
 			}
 
 			.select-resume:hover {
@@ -347,9 +347,9 @@
 
 			.edit-resume {
 				padding: 8px 20px;
-				border: 1px solid #37517e;
+				border: 1px solid #47b2e4;
 				border-radius: 5px;
-				color: #37517e;
+				color: #47b2e4;
 				font-weight: 500;
 				transition: all 0.3s ease;
 				display: inline-flex;
@@ -358,7 +358,7 @@
 			}
 
 			.edit-resume:hover {
-				background-color: #37517e;
+				background-color: #47b2e4;
 				color: white;
 			}
 
@@ -440,7 +440,7 @@
 			}
 
 			.newResumeBtn {
-				background-color: #37517e;
+				background-color: #47b2e4;
 				color: white;
 				height: 40px;
 				font-weight: 500;
@@ -450,7 +450,7 @@
 			}
 
 			.newResumeBtn:hover {
-				background-color: #2c3e50;
+				background-color: #3592c4;
 			}
 
 			.submit-button-container {
@@ -458,7 +458,7 @@
 			}
 
 			#submitResumeBtn {
-				background-color: #37517e;
+				background-color: #47b2e4;
 				border: none;
 				padding: 12px 30px;
 				font-size: 18px;
@@ -471,7 +471,7 @@
 			}
 
 			#submitResumeBtn:not(:disabled):hover {
-				background-color: #2c3e50;
+				background-color: #3592c4;
 				transform: translateY(-2px);
 			}
 
