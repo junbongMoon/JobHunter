@@ -6,6 +6,7 @@
 
 <script>
   let companyUid = '${sessionScope.account.uid}';
+  let recruitmentNoticePk = '';
 
 $(function() {
   console.log("companyUid:", companyUid);
@@ -26,6 +27,7 @@ $(function() {
   $('#resumeList').on('change', function () {
   let selectedResumeNo = parseInt($(this).val());
   const selectedRecruitmentNo = $('#recruitmentnoticeList').val();
+  recruitmentNoticePk = selectedRecruitmentNo;
 
   if (selectedResumeNo !== -1) {
     // 저장한 데이터 불러오기
@@ -55,6 +57,8 @@ $(function() {
       $('#detailFileList').empty();
       const files = selectedData.files;
 
+      const status = selectedData.registrationVO.status;
+
       if (files && files.length > 0) {
         files.forEach(file => {
           $('#detailFileList').append(
@@ -64,9 +68,9 @@ $(function() {
       } else {
         $('#detailFileList').append('<li style="color: gray;">첨부된 파일이 없습니다.</li>');
       }
-
-      if(selectedData.saveType == 'WAITING'){
-        changeStatusByregistration("CHECKED", selectedResumeNo, Math.parseInt(companyUid));
+      
+      if(status == "WAITING"){
+        changeStatusByregistration("CHECKED", selectedResumeNo, recruitmentNoticePk);
       }
     }
   }

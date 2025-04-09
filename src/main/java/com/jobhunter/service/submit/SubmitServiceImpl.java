@@ -76,6 +76,7 @@ public class SubmitServiceImpl implements SubmitService {
 	// 제출내역의 상태값을 변경해주는 메서드
 	@Override
 	public void changeStatus(Status status, int resumePk, int recruitmentNoticePk) {
+		System.out.println("서비스 단" + status + ", " + resumePk + ", " + recruitmentNoticePk);
 		
 		submitDAO.updateStatusByRegistration(status, resumePk, recruitmentNoticePk);
 		
