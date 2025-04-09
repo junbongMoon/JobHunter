@@ -5,9 +5,15 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+  // 작성자의 pk
   let companyUid = '${sessionScope.account.uid}';
+  // 조회된 공고의 pk
   let recruitmentNoticePk = '-1';
+  // 조회된 이력서의 pk
   let selectedResumeNo = '-1';
+  // 출력한 이력서의 상태
+  let registrationStatusByResume;
+
 
 $(function() {
   console.log("companyUid:", companyUid);
@@ -48,7 +54,7 @@ $(function() {
       
       // 배열을 한글로 바꿔서 ,로 연결된 문자열로 만들기
       // ?. 는 Optional Chaining 문법입니다.
-      // jobForms가 존재하지 않으면 오류를 내지 않고 undefined 반환!
+      // jobForms가 존재하지 않으면(null이나 undefined) 오류를 내지 않고 undefined 반환!
       const jobForms = selectedData.jobForms?.map(j => translateJobFormCode(j.form)).join(', ') || '';
       $('#detailJobForms').val(jobForms);
 
@@ -64,7 +70,7 @@ $(function() {
       $('#detailFileList').empty();
       const files = selectedData.files;
 
-      const status = selectedData.registrationVO.status;
+      registrationStatusByResume = selectedData.registrationVO.status;
 
       if (files && files.length > 0) {
         files.forEach(file => {
@@ -76,7 +82,7 @@ $(function() {
         $('#detailFileList').append('<li style="color: gray;">첨부된 파일이 없습니다.</li>');
       }
       
-      if(status == "WAITING"){
+      if(registrationStatusByResume == "WAITING"){
         changeStatusByregistration("CHECKED", selectedResumeNo, recruitmentNoticePk);
       }
     }
