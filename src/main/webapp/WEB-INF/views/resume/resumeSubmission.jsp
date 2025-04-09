@@ -221,8 +221,7 @@
 				</div>
 			</div>
 
-			<div>
-				<!-- 재사용 공용 경고 모달창 -->
+			<!-- 이력서 제출용 모달창 -->
 				<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel"
 					aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered">
@@ -238,8 +237,20 @@
 					</div>
 				</div>
 
+				<!-- 확인용 모달창 -->
+				<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel"
+					aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content text-center">
+							<div class="modal-body">
+								<p id="modalMessage" class="mb-3">알림 메시지</p>
+								<button type="button" class="btn btn-primary" id="modalCheckBtn"
+									data-bs-dismiss="modal">확인</button>
+							</div>
+						</div>
+					</div>
+				</div>
 
-			</div>
 
 			<!-- 풋터 -->
 			<jsp:include page="/WEB-INF/views/footer.jsp" />
@@ -620,28 +631,58 @@
 						return;
 					}
 
-					const recruitmentId = new URLSearchParams(window.location.search).get('uid');
-					if (!recruitmentId) {
-						alert('공고 정보가 없습니다.');
-						return;
-					}
+					// 선택된 이력서의 제목 가져오기
+					const selectedResumeTitle = $('.resume-item.selected .resume-title').text().trim();
+					const recruitmentTitle = $('.notice-title a').text().trim();
+					
+					console.log("선택된 이력서 제목:", selectedResumeTitle);
+					console.log("공고 제목:", recruitmentTitle);
 
-					// 이력서 제출 처리
-					$.ajax({
-						url: '/submission/submit',
-						type: 'POST',
-						data: {
-							resumeNo: selectedResumeId,
-							recruitmentNo: recruitmentId
-						},
-						success: function(response) {
-							alert('이력서가 성공적으로 제출되었습니다.');
-							// 제출 후 해당 공고 페이지로 이동
-							window.location.href = '/recruitmentnotice/detail?uid=' + recruitmentId;
-						},
-						error: function(xhr, status, error) {
-							alert('이력서 제출 중 오류가 발생했습니다: ' + error);
+					// 모달 메시지 설정
+					$('#validationMessage').html(
+						'<strong style="color: #37517e;">[' + recruitmentTitle + ']</strong> 공고에<br>' +
+						'<strong style="color: #37517e;">[' + selectedResumeTitle + ']</strong> 이력서를<br>' +
+						'제출하시겠습니까?'
+					);
+
+					// 모달 표시 전에 메시지 확인
+					console.log("모달 메시지:", $('#validationMessage').html());
+					
+					// 모달 표시 (방식 변경)
+					$('#validationModal').modal('show');
+
+					// 확인 버튼 클릭 이벤트
+					$('#validationCheckBtn').off('click').on('click', function() {
+						const recruitmentId = new URLSearchParams(window.location.search).get('uid');
+						if (!recruitmentId) {
+							alert('공고 정보가 없습니다.');
+							return;
 						}
+
+						// 이력서 제출
+						$.ajax({
+							url: '/submission/submit',
+							type: 'POST',
+							data: {
+								resumeNo: selectedResumeId,
+								recruitmentNo: recruitmentId
+							},
+							success: function(response) {
+								// alert('이력서가 성공적으로 제출되었습니다.');
+								// 성공 모달 표시
+								$('#modalMessage').html(
+									'<strong style="color: #37517e;">이력서가 성공적으로 제출되었습니다.</strong>'
+								);
+								$('#modal').modal('show');
+								// 제출 후 해당 공고 페이지로 이동
+								$('#modalCheckBtn').off('click').on('click', function() {
+									window.location.href = '/recruitmentnotice/detail?uid=' + recruitmentId;
+								});
+							},
+							error: function(xhr, status, error) {
+								alert('이력서 제출 중 오류가 발생했습니다: ' + error);
+							}
+						});
 					});
 				});
 			});
