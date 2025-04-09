@@ -72,9 +72,11 @@ public class SubmitServiceImpl implements SubmitService {
 
 	    return pageResponseDTO;
 	}
-
+	
+	// 제출내역의 상태값을 변경해주는 메서드
 	@Override
 	public void changeStatus(Status status, int resumePk, int recruitmentNoticePk) {
+		
 		submitDAO.updateStatusByRegistration(status, resumePk, recruitmentNoticePk);
 		
 	}
