@@ -21,6 +21,7 @@ import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
+import com.jobhunter.model.user.UserVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -251,5 +252,11 @@ public class ResumeServiceImpl implements ResumeService {
 		resumeDetail.setLicenses(rdao.selectResumeLicenses(resumeNo));
 		resumeDetail.setFiles(rdao.selectResumeUpfile(resumeNo));
 		return resumeDetail;
+	}
+
+	// 유저정보 조회
+	@Override
+	public UserVO getUserInfo(int userUid) throws Exception {
+		return rdao.selectUserInfo(userUid);
 	}
 }

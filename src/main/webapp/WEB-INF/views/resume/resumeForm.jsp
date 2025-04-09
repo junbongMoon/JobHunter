@@ -50,12 +50,24 @@
 										value="${account.accountName}" readonly />
 								</div>
 								<div class="col-md-4">
+									<label class="form-label">나이</label> <input type="text" class="form-control"
+										value="${user.age}" readonly />
+								</div>
+								<div class="col-md-4">
+									<label class="form-label">성별</label> <input type="text" class="form-control"
+										value="${user.gender == 'MALE' ? '남성' : '여성'}" readonly />
+								</div>
+								<div class="col-md-4">
 									<label class="form-label">이메일</label> <input type="email" class="form-control"
 										value="${account.email}" readonly />
 								</div>
 								<div class="col-md-4">
 									<label class="form-label">연락처</label> <input type="tel" class="form-control"
 										value="${account.mobile}" readonly />
+								</div>
+								<div class="col-md-4">
+									<label class="form-label">거주지</label> <input type="text" class="form-control"
+										value="${user.addr}" readonly />
 								</div>
 								<!-- userUid -->
 								<input type="hidden" id="userUid" name="userUid" value="${account.uid}" />
