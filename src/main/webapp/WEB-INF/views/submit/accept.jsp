@@ -93,33 +93,34 @@ $(function() {
 
 
 function changeStatusByregistration(status, resumePk, recruitmentNoticePk) {
-  if(status == 'FAILURE' && !$('#detailTitle').val()){ // 넘겨받은 status 값이 불합격이고 출력된 값이 없을 때 호출 되면..
-        // 출력된 이력서가 없을 때 모달 표시
-        $('#recruitmentModalLabel').text("알림");
-    $('.modal-body').text("출력된 이력서가 없습니다.");
-    $('#MyModal').modal('show'); // Bootstrap 모달 띄우기
+  if(!$('#detailTitle').val()){ // 출력된 값이 없을 때 호출 되면..
+      // 출력된 이력서가 없을 때 모달 표시
+      $('#recruitmentModalLabel').text("알림");
+      $('.modal-body').text("출력된 이력서가 없습니다.");
+      $('#MyModal').modal('show'); // Bootstrap 모달 띄우기
 
-  }else{ 
+    }else{
 
-   $.ajax({
-    url: `/submit/status/\${status}/\${resumePk}/\${recruitmentNoticePk}`,
-    type: 'PUT',
-    success: function (response) {
+    $.ajax({
+      url: `/submit/status/\${status}/\${resumePk}/\${recruitmentNoticePk}`,
+      type: 'PUT',
+      success: function (response) {
       console.log("상태 변경 성공:", response);
       // 성공 후 사용자에게 알림 또는 상태 갱신 로직 등 추가 가능
       if(status == 'FAILURE'){
         $('#resumeDetailForm input').val('');
         $('#resumeDetailForm textarea').val('');
-      }
-    },
-    error: function (xhr, status, error) {
+        }
+      },
+      error: function (xhr, status, error) {
       console.error("상태 변경 실패:", error);
       alert("상태 변경 중 오류가 발생했습니다.");
-    }
+      }
 
   });
 
-}
+ }
+
 }
 
 
