@@ -408,6 +408,16 @@ label {
   font-weight: 500;
   text-decoration: underline;
 }
+
+.fixed-width-btn {
+  padding: 0;
+  font-size: 1rem;
+  text-align: center;
+  display: flex;
+  align-items: center;     /* 세로 가운데 정렬 */
+  justify-content: center; /* 가로 가운데 정렬 */
+  white-space: nowrap;
+}
 </style>
 
 <body>
@@ -474,9 +484,9 @@ label {
           <ul id="detailFileList" class="form-control" style="list-style: none; padding-left: 0;" readonly>
 
           </ul>
-          <div>
-            <button type ="submit" id="passedBtn">합격</button>
-            <button id ="failedBtn">불합격</button>
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="submit" id="passedBtn" class="btn btn-success btn-sm fixed-width-btn" style="width: 20%;">합격</button>
+            <button type="button" id="failedBtn" class="btn btn-danger btn-sm fixed-width-btn" style="width: 20%;">불합격</button>
           </div>
         </div>
       </form>
