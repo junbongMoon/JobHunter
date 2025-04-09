@@ -40,6 +40,8 @@ public class ResumeDetailInfoBySubmit {
 	private String saveType;
 	// 작성의 user의 PK
 	private int userUid;
+	// 제출 이력
+	private RegistrationVO registrationVO;
 	
 	// 고용 형태 리스트
     private List<JobFormDTO> jobForms;

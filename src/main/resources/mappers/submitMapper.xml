@@ -3,117 +3,144 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.submitmapper">
-	
-	    <!-- 이력서 리스트 조회 -->
-    <select id="selectRecruitmentsByRecruitmentUid" resultMap="ResumeDetailInfoBySubmitMap">
-        SELECT 
-            r.resumeNo, r.title, r.payType, r.pay, r.introduce, r.saveType, r.userUid,
-            
-            jf.jobFormNo, jf.form AS jobForm,
-            m.meritNo, m.meritContent,
-            e.educationNo, e.educationLevel, e.educationStatus, e.graduationDate, e.customInput,
-            h.historyNo, h.companyName, h.position, h.jobDescription, h.startDate, h.endDate,
-            l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
 
-            s.sigunguNo, s.name AS sigunguName, s.regionNo,
-            sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo
+	<!-- 이력서 리스트 조회 -->
+	<select id="selectRecruitmentsByRecruitmentUid"
+		resultMap="ResumeDetailInfoBySubmitMap">
+		SELECT
+		r.resumeNo, r.title, r.payType, r.pay, r.introduce, r.saveType, r.userUid,
 
-        FROM resume r
+		reg.registrationNo, reg.status AS regStatus, reg.recruitmentNoticePk
+		AS regRecruitmentNoticePk,
+		reg.regDate, reg.resumePk AS regResumePk,
 
-        LEFT JOIN jobform jf ON r.resumeNo = jf.resumeNo
-        LEFT JOIN merit m ON r.resumeNo = m.resumeNo
-        LEFT JOIN education e ON r.resumeNo = e.resumeNo
-        LEFT JOIN personalhistory h ON r.resumeNo = h.resumeNo
-        LEFT JOIN license l ON r.resumeNo = l.resumeNo
+		jf.jobFormNo, jf.form AS jobForm,
+		m.meritNo, m.meritContent,
+		e.educationNo, e.educationLevel, e.educationStatus, e.graduationDate, e.customInput,
+		h.historyNo, h.companyName, h.position, h.jobDescription, h.startDate,
+		h.endDate,
+		l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
 
-        LEFT JOIN where_resume_sigungu sr ON r.resumeNo = sr.refResumeNo
-        LEFT JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
+		s.sigunguNo, s.name AS sigunguName, s.regionNo,
+		sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo
 
-        LEFT JOIN jobtype_resume_sub jrs ON r.resumeNo = jrs.refResumeNo
-        LEFT JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
+		FROM resume r
 
-        WHERE r.resumeNo IN (
-            SELECT resumePk FROM registration
-            WHERE recruitmentNoticePk = #{recruitmentUid}
-        )
+		LEFT JOIN registration reg ON r.resumeNo = reg.resumePk
+		LEFT JOIN jobform jf ON r.resumeNo = jf.resumeNo
+		LEFT JOIN merit m ON r.resumeNo = m.resumeNo
+		LEFT JOIN education e ON r.resumeNo = e.resumeNo
+		LEFT JOIN personalhistory h ON r.resumeNo = h.resumeNo
+		LEFT JOIN license l ON r.resumeNo = l.resumeNo
+		LEFT JOIN where_resume_sigungu sr ON r.resumeNo = sr.refResumeNo
+		LEFT JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
+		LEFT JOIN jobtype_resume_sub jrs ON r.resumeNo = jrs.refResumeNo
+		LEFT JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
 
-        ORDER BY r.resumeNo DESC
-        LIMIT #{startRowIndex}, #{rowCntPerPage}
-    </select>
+		WHERE r.resumeNo IN (
+		SELECT resumePk FROM registration
+		WHERE recruitmentNoticePk = #{recruitmentUid}
+		)
 
-    <!-- 전체 개수 -->
-    <select id="getTotalCountRowOfRecruitmentByUid" resultType="int">
-        SELECT COUNT(*)
-        FROM registration
-        WHERE recruitmentNoticePk = #{uid}
-    </select>
+		ORDER BY r.resumeNo DESC
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
+	</select>
 
-    <!-- resultMap -->
-    <resultMap id="ResumeDetailInfoBySubmitMap" type="com.jobhunter.model.submit.ResumeDetailInfoBySubmit">
-        <id property="resumeNo" column="resumeNo" />
-        <result property="title" column="title" />
-        <result property="payType" column="payType" />
-        <result property="pay" column="pay" />
-        <result property="introduce" column="introduce" />
-        <result property="saveType" column="saveType" />
-        <result property="userUid" column="userUid" />
+	<!-- 전체 개수 -->
+	<select id="getTotalCountRowOfRecruitmentByUid" resultType="int">
+		SELECT COUNT(*)
+		FROM registration
+		WHERE recruitmentNoticePk = #{uid}
+	</select>
 
-        <collection property="jobForms" ofType="com.jobhunter.model.resume.JobFormDTO">
-            <id property="jobFormNo" column="jobFormNo" />
-            <result property="form" column="jobForm" />
-        </collection>
+	<!-- resultMap -->
+	<resultMap id="ResumeDetailInfoBySubmitMap"
+		type="com.jobhunter.model.submit.ResumeDetailInfoBySubmit">
+		<id property="resumeNo" column="resumeNo" />
+		<result property="title" column="title" />
+		<result property="payType" column="payType" />
+		<result property="pay" column="pay" />
+		<result property="introduce" column="introduce" />
+		<result property="saveType" column="saveType" />
+		<result property="userUid" column="userUid" />
 
-        <collection property="merits" ofType="com.jobhunter.model.resume.MeritDTO">
-            <id property="meritNo" column="meritNo" />
-            <result property="meritContent" column="meritContent" />
-        </collection>
+		<association property="registrationVO"
+			javaType="com.jobhunter.model.submit.RegistrationVO">
+			<id property="registrationNo" column="registrationNo" />
+			<result property="status" column="regStatus" />
+			<result property="recruitmentNoticePk"
+				column="regRecruitmentNoticePk" />
+			<result property="regDate" column="regDate" />
+			<result property="resumePk" column="regResumePk" />
+		</association>
 
-        <collection property="educations" ofType="com.jobhunter.model.resume.EducationDTO">
-            <id property="educationNo" column="educationNo" />
-            <result property="educationLevel" column="educationLevel" />
-            <result property="educationStatus" column="educationStatus" />
-            <result property="graduationDate" column="graduationDate" />
-            <result property="customInput" column="customInput" />
-        </collection>
+		<collection property="jobForms"
+			ofType="com.jobhunter.model.resume.JobFormDTO">
+			<id property="jobFormNo" column="jobFormNo" />
+			<result property="form" column="jobForm" />
+		</collection>
 
-        <collection property="histories" ofType="com.jobhunter.model.resume.PersonalHistoryDTO">
-            <id property="historyNo" column="historyNo" />
-            <result property="companyName" column="companyName" />
-            <result property="position" column="position" />
-            <result property="jobDescription" column="jobDescription" />
-            <result property="startDate" column="startDate" />
-            <result property="endDate" column="endDate" />
-        </collection>
+		<collection property="merits"
+			ofType="com.jobhunter.model.resume.MeritDTO">
+			<id property="meritNo" column="meritNo" />
+			<result property="meritContent" column="meritContent" />
+		</collection>
 
-        <collection property="licenses" ofType="com.jobhunter.model.resume.LicenseDTO">
-            <id property="licenseNo" column="licenseNo" />
-            <result property="licenseName" column="licenseName" />
-            <result property="acquisitionDate" column="acquisitionDate" />
-            <result property="institution" column="institution" />
-        </collection>
+		<collection property="educations"
+			ofType="com.jobhunter.model.resume.EducationDTO">
+			<id property="educationNo" column="educationNo" />
+			<result property="educationLevel" column="educationLevel" />
+			<result property="educationStatus" column="educationStatus" />
+			<result property="graduationDate" column="graduationDate" />
+			<result property="customInput" column="customInput" />
+		</collection>
 
-        <collection property="sigunguList" ofType="com.jobhunter.model.region.Sigungu">
-            <id property="sigunguNo" column="sigunguNo" />
-            <result property="name" column="sigunguName" />
-            <result property="regionNo" column="regionNo" />
-        </collection>
+		<collection property="histories"
+			ofType="com.jobhunter.model.resume.PersonalHistoryDTO">
+			<id property="historyNo" column="historyNo" />
+			<result property="companyName" column="companyName" />
+			<result property="position" column="position" />
+			<result property="jobDescription" column="jobDescription" />
+			<result property="startDate" column="startDate" />
+			<result property="endDate" column="endDate" />
+		</collection>
 
-        <collection property="subcategoryList" ofType="com.jobhunter.model.category.SubCategory">
-            <id property="subcategoryNo" column="subcategoryNo" />
-            <result property="jobName" column="jobName" />
-            <result property="refMajorcategoryNo" column="refMajorcategoryNo" />
-        </collection>
-    </resultMap>
-    
-    <select id="getFileListByResumeUid" resultType="com.jobhunter.model.resume.ResumeUpfileDTO">
-    	select * from resumeupfiles
-    	where resumeNo = #{uid}
-    </select>
-    
-    <update id="modifyStatus">
-    	update registration 
-    	set status = #{status}
-    	where recruitmentNoticePk = #{recruitmentNoticePk} and resumePk = #{resumePk}
-    </update>
-	
+		<collection property="licenses"
+			ofType="com.jobhunter.model.resume.LicenseDTO">
+			<id property="licenseNo" column="licenseNo" />
+			<result property="licenseName" column="licenseName" />
+			<result property="acquisitionDate" column="acquisitionDate" />
+			<result property="institution" column="institution" />
+		</collection>
+
+		<collection property="sigunguList"
+			ofType="com.jobhunter.model.region.Sigungu">
+			<id property="sigunguNo" column="sigunguNo" />
+			<result property="name" column="sigunguName" />
+			<result property="regionNo" column="regionNo" />
+		</collection>
+
+		<collection property="subcategoryList"
+			ofType="com.jobhunter.model.category.SubCategory">
+			<id property="subcategoryNo" column="subcategoryNo" />
+			<result property="jobName" column="jobName" />
+			<result property="refMajorcategoryNo"
+				column="refMajorcategoryNo" />
+		</collection>
+
+	</resultMap>
+
+	<select id="getFileListByResumeUid"
+		resultType="com.jobhunter.model.resume.ResumeUpfileDTO">
+		select * from resumeupfiles
+		where resumeNo = #{uid}
+	</select>
+
+	<update id="modifyStatus">
+		update registration
+		set status = #{status}
+		where recruitmentNoticePk = #{recruitmentNoticePk} and resumePk =
+		#{resumePk}
+	</update>
+
 </mapper>
