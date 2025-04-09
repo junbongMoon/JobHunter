@@ -214,7 +214,6 @@ public class AccountRestController {
 	// 전화번호 중복 확인
 	@PostMapping("/check/mobile")
 	public ResponseEntity<String> checkDuplicateMobile(@RequestBody Map<String, String> mobileTmp, HttpSession session) {
-		// 문자인증이 6자리라서 맞추려고 메일도 6자리 코드 보내기
 		String mobile = mobileTmp.get("mobile");
 		AccountType accountType = AccountType.valueOf(mobileTmp.getOrDefault("accountType", "USER"));
 

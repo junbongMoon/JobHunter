@@ -8,13 +8,16 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jobhunter.customexception.DuplicateEmailException;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.customenum.AccountType;
-import com.jobhunter.model.user.KakaoUserInfo;
+import com.jobhunter.model.user.KakaoUserInfoDTO;
+import com.jobhunter.model.user.UserRegisterDTO;
 import com.jobhunter.service.user.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +40,7 @@ public class UserController {
 	    String redirectUri = formatKakaoUri(request);
 		
         String accessToken = null;
-        KakaoUserInfo userInfo = null;
+        KakaoUserInfoDTO userInfo = null;
 		try {
 			// 1. 인가 코드로 Access Token 요청
 			accessToken = service.getKakaoToken(code, redirectUri);
@@ -88,4 +91,17 @@ public class UserController {
 		return redirectUri;
 	}
 
+	@PostMapping("/register")
+    public String processRegister(@ModelAttribute UserRegisterDTO dto, HttpServletRequest request) {
+        // 실제 회원가입 처리
+        try {
+			AccountVO registAccount = service.registUser(dto);
+			System.out.println(registAccount);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        return "redirect:/";
+    }
 }

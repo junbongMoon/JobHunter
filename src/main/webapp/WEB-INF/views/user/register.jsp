@@ -378,22 +378,35 @@ mark {
 	background-color: transparent;
 }
 
-
 .spacer {
 	margin: auto;
+}
+
+.info-defalt{
+	color: #666;
+}
+.info-message{
+	color: black;
+}
+.info-ok{
+	color: green;
+}
+.info-next{
+	color: blue;
+}
+.info-warning{
+	color: red;
 }
 </style>
 
 <main class="main">
 	<div class="login-container">
-		<!-- <form action="${pageContext.request.contextPath}/user/register" method="post"> -->
+		<form action="${pageContext.request.contextPath}/user/register" method="post" onsubmit="return confirmAll();">
 
 		
 
 		<div class="flex-x-container between-con">
 			<h2 class="login-title">개인 회원 가입</h2>
-			<button class="btn-otherType">기업으로 가입하기</button>
-			<div class="spacer"></div>
 			<div class="btn-kakao" onclick="loginWithKakao()">
 				<img src="/resources/forKakao/kakao_login_medium_narrow.png"
 					alt="kakao">
@@ -403,23 +416,27 @@ mark {
 
 		<h4 class="sub-title">로그인정보</h4>
 		<div class="form-group">
+			
 			<div class="flex-x-container between-con">
 				<input class="input-left" type="text" id="id" name="id"
 					placeholder="아이디를 입력해주세요." required />
-				<button class="btn-confirm" onclick="checkDuplicateId()">중복 확인</button>
+				<button id="checkDuplicateIdBtn" class="btn-confirm" onclick="checkDuplicateId()" disabled>중복 확인</button>
 			</div>
-			<mark id="idInfoMark">중복된 아이디입니다.</mark>
+			<mark id="idInfoMark">아이디는 영어와 숫자를 조합한 6~20자를 입력해주세요.</mark>
+
 			<input class="full-width" type="password" id="password"
 				name="password" placeholder="비밀번호" required />
-			<mark id="pwdInfoMark">비밀번호는 영문자+숫자로 8자 이상이
-				되어야 합니다.</mark>
+			<mark id="pwdInfoMark"></mark>
+
 			<input class="full-width" type="password" id="checkPassword"
 				placeholder="비밀번호 확인" required />
-			<mark id="pwdcheckInfoMark">비밀번호와 맞지 않습니다.</mark>
+			<mark id="pwdcheckInfoMark">비밀번호는 영어와 숫자, 특수문자를 전부 포함한 8~20자를 입력해주세요.</mark>
+
 		</div>
 		<hr>
 
 		<h4 class="sub-title">회원정보</h4>
+
 		<div class="account-type-tabs">
 			<label class="account-type-tab active"> <input type="radio"
 				name="nationality" value="DOMESTIC" checked> 내국인
@@ -427,16 +444,21 @@ mark {
 				name="nationality" value="FOREIGN"> 외국인
 			</label>
 		</div>
+
 		<div class="form-group">
+
 			<input class="full-width" type="text" id="userName" name="name"
 				placeholder="성함을 입력해주세요." required />
+			<mark id="nameInfoMark" class="info-defalt"> * 해당 내용은 이력서에도 입력될 이름이니 되도록 실명을 추천드립니다.</mark>
+
 			<div class="flex-x-container between-con">
 				<input class="input-left" type="text" id="unCheckedEmail"
-					placeholder="이메일을 입력해주세요." required />
+					placeholder="이메일을 입력해주세요."/>
 
-				<button class="btn-confirm" onclick="sendEmailCode()">인증 발송</button>
+				<button id="sendEmailBtn" class="btn-confirm" onclick="sendEmailCode()">인증 발송</button>
 			</div>
-			<mark id="emailInfoMark">이메일 형식에 맞지 않습니다.</mark>
+			<mark id="emailInfoMark"></mark>
+
 			<div class="flex-x-container between-con">
 				<div
 					class="phone-input-group input-left flex-x-container between-con">
@@ -447,24 +469,29 @@ mark {
 					<span>_</span> <input type="text" maxlength="4" placeholder="0000"
 						oninput="handlePhoneInput(this, null)">
 				</div>
-				<button class="btn-confirm" onclick="sendPhoneCode()">인증
+				<button id="sendPhoneBtn" class="btn-confirm" onclick="sendPhoneCode()">인증
 					발송</button>
 			</div>
-			<mark id="mobileInfoMark">올바르지 않은 전화번호입니다.</mark>
+			<mark id="mobileInfoMark"></mark>
 
 			<input type="hidden" id="authEmail"/>
 			<input type="hidden" id="email" name="email">
 			<input type="hidden" id="authMobile">
 			<input type="hidden" id="mobile" name="mobile">
-			<input type="hidden" id="verify" name="requiresVerification">
+			<mark class="info-defalt"> * 이메일 혹은 전화번호중 최소 하나 이상 인증을 진행해주시기 바랍니다.</mark>
 		</div>
 
 		<hr>
+		<label for="acept">
+		<input type="checkbox" id="acept">
+		개인정보 이용에 동의하십니까?
+		</label>
+		<hr>
 
-		<button type="submit" class="btn-confirm full-width">로그인</button>
+		<button type="submit" class="btn-confirm full-width" onclick="return confirmAll()">회원가입</button>
 
 		<div class="social-login"></div>
-		<!-- </form> -->
+		</form>
 	</div>
 	<!-- 파이어베이스 캡챠 넣을곳 -->
 	<div id="recaptcha-container"></div>
@@ -506,6 +533,11 @@ const METHOD = {
   EMAIL: "email",
   PHONE: "phone"
 };
+const codeInput = {
+	defalt:`<input type="text" id="confirmCode" name="confirmCode"
+		placeholder="인증번호를 입력해주세요." required />`,
+	failed:`<div class="warning">인증번호 6자리를 입력해주세요.</div>`
+}
 //캡챠기능 파이어베이스 기본 제공 (1회용이라 초기화)
 function firebaseCaptcha() {
     if (!window.recaptchaVerifier) {
@@ -517,6 +549,7 @@ function firebaseCaptcha() {
 }
 // 파이어베이스
 function checkDuplicateId() {
+	$('#checkDuplicateIdBtn').prop('disabled', true);
     const userId = $("#id").val();
 
     if (!userId || userId.trim().length === 0) {
@@ -530,13 +563,14 @@ function checkDuplicateId() {
         data: { userId },
         success: function (isDuplicate) {
             if (isDuplicate) {
-                $("#idInfoMark").text("이미 사용 중인 아이디입니다.").css("color", "red");
+                $("#idInfoMark").text("이미 사용 중인 아이디입니다.").removeClass().addClass("info-warning");
             } else {
-                $("#idInfoMark").text("사용 가능한 아이디입니다.").css("color", "green");
+                $("#idInfoMark").text("사용 가능한 아이디입니다.").removeClass().addClass("info-ok");
             }
         },
         error: function () {
-            $("#idInfoMark").text("오류가 발생했습니다.").css("color", "red");
+            $("#idInfoMark").text("오류가 발생했습니다.").removeClass().addClass("info-warning");
+			$('#checkDuplicateIdBtn').prop('disabled', false);
         }
     });
 }
@@ -557,10 +591,7 @@ async function sendPhoneCode() {
 
     try {
     	confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-        window.publicModals.show(`
-			<input type="text" id="confirmCode" name="confirmCode"
-				placeholder="인증번호를 입력해주세요." required />
-		`,
+        window.publicModals.show(codeInput.defalt,
 		{
 			confirmText: '인증완료',
 			cancelText: '취소',
@@ -629,8 +660,12 @@ function formatToKoreanPhoneNumber(internationalNumber) {
     : internationalNumber;
 }
 
+
+
 // 이메일 인증 코드 전송
-async function sendEmailCode() {
+function sendEmailCode() {
+	$("#emailInfoMark").text(`이메일을 전송중입니다.`).removeClass().addClass("info-next");
+	$('#sendEmailBtn').prop('disabled', true);
 	const email = $("#unCheckedEmail").val();
     $.ajax({
         url: "/account/auth/email",
@@ -642,29 +677,40 @@ async function sendEmailCode() {
 			accountType: "USER"
 		}),
         success: (res) => {
-			window.publicModals.show(`
-			<input type="text" id="confirmCode" name="confirmCode"
-				placeholder="인증번호를 입력해주세요." required />
-			`,
+			$("#emailInfoMark").text(`이메일이 전송중되었습니다. 인증을 진행해주세요.`).removeClass().addClass("info-next");
+			window.publicModals.show(codeInput.defalt,
 			{
 				confirmText: '인증완료',
 				cancelText: '취소',
 				onConfirm: verifyEmailCode
     		});
         },
-        error: (xhr) => window.publicModals.show("메일 전송 중 오류 발생: " + xhr.responseText)
+        error: (xhr) => {
+			$("#emailInfoMark").text(`이메일의 전송에 실패했습니다. 잠시후 다시 시도해주세요.`).removeClass().addClass("info-warning");
+			$('#sendEmailBtn').prop('disabled', false);
+			console.log("메일 전송 중 오류 발생: " + xhr.responseText)
+		}
     });
 }
 
 function okMobile() {
 	const mobile = $("#authMobile").val()
 	$("#mobile").val(mobile)
-	$("#verify").val('Y')
-	$("#mobileInfoMark").text(`인증에 성공하였습니다. (현재 전화번호 : \${mobile})`).css("color", "green");
+	$("#mobileInfoMark").text(`인증에 성공하였습니다. (현재 전화번호 : \${mobile})`).removeClass().addClass("info-ok");
 }
 
 async function verifyPhoneCode() {
 	const code = document.getElementById("confirmCode").value;
+
+	if (code.length != 6) {
+		window.publicModals.show(codeInput.defalt + codeInput.failed,
+			{
+				confirmText: '인증완료',
+				cancelText: '취소',
+				onConfirm: verifyPhoneCode
+    		});
+		return true;
+	}
 
     try {
       await confirmationResult.confirm(code);
@@ -675,28 +721,169 @@ async function verifyPhoneCode() {
     }
 }
 
-async function verifyEmailCode() {
+function verifyEmailCode() {
 	const code = $("#confirmCode").val();
     const email = $("#unCheckedEmail").val();
+
+	if (code.length != 6) {
+		window.publicModals.show(codeInput.defalt + codeInput.failed,
+			{
+				confirmText: '인증완료',
+				cancelText: '취소',
+				onConfirm: verifyEmailCode
+    		});
+		return false;
+	}
+
     $.ajax({
-      url: `/account/auth/email/\${code}`,
-      method: "POST",
-  	  contentType: "application/json",
-      data: JSON.stringify({
-      email: email
-  }),
-      success: () => okEmail(),
-      error: (xhr) => window.publicModals.show("이메일 인증 실패: ")
+		url: `/account/auth/email/\${code}`,
+		method: "POST",
+		contentType: "application/json",
+		data: JSON.stringify({
+		email: email
+		}),
+		success: () => okEmail(),
+		error: (xhr) => {
+			$("#emailInfoMark").text(`인증에 실패하였습니다. 잠시 후 다시 시도해주세요.`).removeClass().addClass("info-next");
+			$('#sendEmailBtn').prop('disabled', false);
+			window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
+		}
     });
 }
 
 function okEmail() {
+	$('#sendEmailBtn').prop('disabled', false);
 	const email = $("#unCheckedEmail").val()
 	$("#email").val(email)
-	$("#verify").val('Y')
-	$("#emailInfoMark").text(`인증에 성공하였습니다. (현재 이메일 : \${email})`).css("color", "green");
+	$("#emailInfoMark").text(`인증에 성공하였습니다. (현재 이메일 : \${email})`).removeClass().addClass("info-ok");
+}
+// 인증관련
+// message ok next warning
+// ==유효성검사==
+
+function confirmAll() {
+	if (!$("#idInfoMark").hasClass("info-ok")) {
+		$("#id").focus();
+		return false;
+	}
+
+	if (!pwdIsValid()){
+		$("#password").focus();
+		return false;
+	}
+
+	if (!confirmPassword()){
+		$("#checkPassword").focus();
+		return false;
+	}
+
+	if (!nameIsValid()) {
+		$("#userName").focus();
+		return false;
+	}
+
+	if(!$("#mobile").val() && !$("#email").val()) {
+		window.publicModals.show("이메일 혹은 전화번호 인증을 진행해 주세요.")
+		$("#pwdcheckInfoMark")[0].scrollIntoView({ behavior: 'smooth' });
+	}
+	
+	if (!$("#acept").is(":checked")) {
+		window.publicModals.show("개인정보 이용 동의에 체크해주세요.")
+	}
+
+	console.log("검사완료");
+
+	return true;
 }
 
+// 아이디
+$('#id').on('change keyup', () => {
+	idIsValid();
+})
+function idIsValid() {
+	const idValue = $('#id').val();
+    const idRegex = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/;
+
+    if (idRegex.test(idValue)) {
+        $("#idInfoMark").text(`중복검사를 진행해주세요`).removeClass().addClass("info-next");
+		$('#checkDuplicateIdBtn').prop('disabled', false);
+        return true;
+    } else {
+        $("#idInfoMark").text(`아이디는 영어와 숫자를 조합한 6~20자여야 합니다.`).removeClass().addClass("info-warning");
+		$('#checkDuplicateIdBtn').prop('disabled', true);
+        return false;
+    }
+}
+// 비밀번호
+$('#password').on('change keyup', () => {
+	pwdIsValid();
+})
+function pwdIsValid() {
+	const pwdValue = $('#password').val();
+    const pwdRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[a-zA-Z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,20}$/;
+
+    if (pwdRegex.test(pwdValue)) {
+        $("#pwdInfoMark").text(`사용 가능한 비밀번호입니다.`).removeClass().addClass("info-ok");
+        return true;
+    } else {
+        $("#pwdInfoMark").text(`비밀번호는 영어와 숫자, 특수문자를 전부 포함한 6~20자여야 합니다.`).removeClass().addClass("info-warning");
+        return false;
+    }
+}
+
+$('#checkPassword').on('change keyup', () => {
+    confirmPassword();
+});
+
+function confirmPassword() {
+	const pwdValue = $('#password').val();
+	const checkPwdVal = $('#checkPassword').val();
+	if (pwdValue == checkPwdVal) {
+		$("#pwdcheckInfoMark").text(`비밀번호가 일치합니다.`).removeClass().addClass("info-ok");
+		return true;
+	} else {
+		$("#pwdcheckInfoMark").text(`비밀번호가 일치하지 않습니다.`).removeClass().addClass("info-warning")
+		return false;
+	}
+}
+// 이름
+$('#userName').on('change keyup', () => {
+	nameIsValid();
+})
+
+function nameIsValid() {
+	const nameValue = $('#userName').val();
+
+    if (!nameValue) {
+		$("#nameInfoMark").text(`이름은 필수 입력사항입니다.`).removeClass().addClass("info-warning");
+		return false;
+    } else if (nameValue.length >= 100){
+		$("#nameInfoMark").text(`이름은 100글자까지만 저장이 가능합니다. 성함이 100문자 이상이라면 죄송하오나 일부만 기입해주시기 바랍니다.`).removeClass().addClass("info-warning");
+		return false;
+	}
+	$("#nameInfoMark").text(`* 해당 내용은 이력서에도 입력될 이름이니 되도록 실명을 추천드립니다.`).removeClass().addClass("info-ok");
+	return true;
+}
+// 이메일
+$('#unCheckedEmail').on('change keyup', () => {
+	confirmEmail();
+})
+
+function confirmEmail() {
+	const emailValue = $('#unCheckedEmail').val();
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (emailRegex.test(emailValue)) {
+        $("#emailInfoMark").text(`인증을 진행해주세요`).removeClass().addClass("info-next");
+		$('#sendEmailBtn').prop('disabled', false);
+        return true;
+    } else {
+        $("#emailInfoMark").text(`이메일 형식에 맞지 않습니다.`).removeClass().addClass("info-warning");
+		$('#sendEmailBtn').prop('disabled', true);
+        return false;
+    }
+}
+// ==유효성검사==
 // 탭 전환 효과를 위한 스크립트
 document.addEventListener('DOMContentLoaded', function() {
   // 회원 유형 탭 전환

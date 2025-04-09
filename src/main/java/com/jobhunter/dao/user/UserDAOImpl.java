@@ -7,8 +7,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.account.AccountVO;
-import com.jobhunter.model.user.KakaoUserInfo;
+import com.jobhunter.model.user.KakaoUserInfoDTO;
 import com.jobhunter.model.user.UserInfoDTO;
+import com.jobhunter.model.user.UserRegisterDTO;
 import com.jobhunter.model.user.UserVO;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public Boolean findByUidAndPassword(String uid, String password) throws Exception {
+	public AccountVO findByUidAndPassword(String uid, String password) throws Exception {
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uid", uid);
 		paramMap.put("password", password);
@@ -61,12 +62,12 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public Integer findByKakao(KakaoUserInfo userInfo) throws Exception {
+	public Integer findByKakao(KakaoUserInfoDTO userInfo) throws Exception {
 		return ses.selectOne(NS + ".findByKakao", userInfo.getKakaoId());
 	}
 
 	@Override
-	public Integer registKakao(KakaoUserInfo userInfo) throws Exception {
+	public Integer registKakao(KakaoUserInfoDTO userInfo) throws Exception {
 		ses.insert(NS + ".registKakao", userInfo);
 		return userInfo.getUid();
 	}
@@ -83,9 +84,18 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public AccountVO findByEmail(KakaoUserInfo userInfo) throws Exception {
+	public AccountVO findByEmail(KakaoUserInfoDTO userInfo) throws Exception {
 		AccountVO result = ses.selectOne(NS + ".findByEmail", userInfo.getEmail());
 		return result;
+	}
+	
+	@Override
+	public int registUser(UserRegisterDTO dto) throws Exception {
+		int result = ses.insert(NS + ".registUser", dto);
+		if (result > 0) {
+			return dto.getUid();
+		}
+		return 0;
 	}
 
 	

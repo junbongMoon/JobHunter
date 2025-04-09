@@ -178,7 +178,9 @@ public class AccountServiceImpl implements AccountService {
 	public Boolean checkDuplicateMobile(String mobile, AccountType type) throws Exception {
 		AccountLoginDAO dao = getDAO(type);
 		AccountVO account = dao.findAccountByMobile(mobile);
+		
 		if(account != null) {
+			System.out.println(account);
 			return true;
 		}
 		return false;

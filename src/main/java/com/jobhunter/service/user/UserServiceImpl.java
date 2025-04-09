@@ -3,6 +3,8 @@ package com.jobhunter.service.user;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,10 +19,12 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.jobhunter.customexception.DuplicateEmailException;
+import com.jobhunter.dao.account.AccountLoginDAO;
 import com.jobhunter.dao.user.UserDAO;
 import com.jobhunter.model.account.AccountVO;
-import com.jobhunter.model.user.KakaoUserInfo;
+import com.jobhunter.model.user.KakaoUserInfoDTO;
 import com.jobhunter.model.user.UserInfoDTO;
+import com.jobhunter.model.user.UserRegisterDTO;
 import com.jobhunter.model.user.UserVO;
 
 import lombok.RequiredArgsConstructor;
@@ -38,7 +42,11 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public boolean checkPassword(String uid, String password) throws Exception {
-	    return dao.findByUidAndPassword(uid, password);
+		AccountVO account = dao.findByUidAndPassword(uid, password);
+		if (account == null) {
+			return false;
+		}
+	    return true;
 	}
 	
 	@Override
@@ -96,7 +104,7 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public KakaoUserInfo getKakaoInfo(String accessToken) throws Exception {
+	public KakaoUserInfoDTO getKakaoInfo(String accessToken) throws Exception {
 	    RestTemplate restTemplate = new RestTemplate();
 
 	    HttpHeaders headers = new HttpHeaders();
@@ -118,7 +126,7 @@ public class UserServiceImpl implements UserService {
 	    String email = (String) kakaoAccount.get("email");
 	    String nickname = (String) ((Map<String, Object>) body.get("properties")).get("nickname");
 
-	    KakaoUserInfo kakaoUserInfo = KakaoUserInfo.builder()
+	    KakaoUserInfoDTO kakaoUserInfo = KakaoUserInfoDTO.builder()
 	    		.email(email)
 	    		.nickname(nickname)
 	    		.kakaoId(kakaoId)
@@ -130,7 +138,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-	public AccountVO loginOrRegisterKakao(KakaoUserInfo userInfo) throws Exception {
+	public AccountVO loginOrRegisterKakao(KakaoUserInfoDTO userInfo) throws Exception {
 		AccountVO accountVo = null;
 		Integer uid = dao.findByKakao(userInfo);
 		if (uid == null) {
@@ -151,6 +159,12 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean isUserIdExists(String userId) throws Exception {
 		return dao.findIsUserById(userId);
+	}
+	
+	@Override
+	public AccountVO registUser(UserRegisterDTO dto) throws Exception {
+		Integer uid = dao.registUser(dto);
+		return dao.findByUidAndPassword(uid.toString(), dto.getPassword());
 	}
 
 	

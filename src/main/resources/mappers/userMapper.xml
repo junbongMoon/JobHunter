@@ -98,8 +98,8 @@
 	</select>
 
 	<select id="checkPassword" parameterType="map"
-		resultType="boolean">
-		SELECT COUNT(*) > 0
+		resultMap="accountMap">
+		SELECT *
 		FROM users
 		WHERE uid = #{uid}
 		AND password
@@ -173,4 +173,12 @@
 		from users
 		where mobile = #{mobile}
 	</select>
+	
+	<insert id="registUser" parameterType="com.jobhunter.model.user.UserRegisterDTO"
+        useGeneratedKeys="true" keyProperty="uid">
+	INSERT INTO `users` 
+		(`userName`, `userId`, `password`, `mobile`, `email`, `accountType`, `requiresVerification`, `isSocial`, `nationality`)
+	 VALUES 
+	 (#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N', #{nationality});
+	</insert>
 </mapper>

@@ -1,8 +1,9 @@
 package com.jobhunter.service.user;
 
 import com.jobhunter.model.account.AccountVO;
-import com.jobhunter.model.user.KakaoUserInfo;
+import com.jobhunter.model.user.KakaoUserInfoDTO;
 import com.jobhunter.model.user.UserInfoDTO;
+import com.jobhunter.model.user.UserRegisterDTO;
 import com.jobhunter.model.user.UserVO;
 
 public interface UserService {
@@ -17,12 +18,14 @@ public interface UserService {
 
 	boolean updateUserInfo(UserInfoDTO userInfo) throws Exception;
 
-	KakaoUserInfo getKakaoInfo(String accessToken) throws Exception;
+	KakaoUserInfoDTO getKakaoInfo(String accessToken) throws Exception;
 
 	String getKakaoToken(String code, String redirectUri) throws Exception;
 
-	AccountVO loginOrRegisterKakao(KakaoUserInfo userInfo) throws Exception;
+	AccountVO loginOrRegisterKakao(KakaoUserInfoDTO userInfo) throws Exception;
 
 	boolean isUserIdExists(String userId) throws Exception;
+
+	AccountVO registUser(UserRegisterDTO dto) throws Exception;
 
 }
