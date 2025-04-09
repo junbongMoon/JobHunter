@@ -3,10 +3,11 @@
 	<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   let companyUid = '${sessionScope.account.uid}';
-  let recruitmentNoticePk = '';
+  let recruitmentNoticePk = '-1';
+  let selectedResumeNo = '-1';
 
 $(function() {
   console.log("companyUid:", companyUid);
@@ -23,9 +24,15 @@ $(function() {
   }
 });
 
+  // 삭제 버튼이 클릭 되었을 때
+  $('#failedBtn').on('click', function (e) {
+    e.preventDefault(); // 폼 기본 제출 동작 방지
+    changeStatusByregistration('FAILURE', selectedResumeNo, recruitmentNoticePk);
+  });
+
   // 이력서 리스트의 값이 바뀌었을 때
   $('#resumeList').on('change', function () {
-  let selectedResumeNo = parseInt($(this).val());
+  selectedResumeNo = parseInt($(this).val());
   const selectedRecruitmentNo = $('#recruitmentnoticeList').val();
   recruitmentNoticePk = selectedRecruitmentNo;
 
@@ -80,18 +87,32 @@ $(function() {
 
 
 function changeStatusByregistration(status, resumePk, recruitmentNoticePk) {
-  $.ajax({
+  if(status == 'FAILURE' && !$('#detailTitle').val()){ // 넘겨받은 status 값이 불합격이고 출력된 값이 없을 때 호출 되면..
+        // 출력된 이력서가 없을 때 모달 표시
+        $('#recruitmentModalLabel').text("알림");
+    $('.modal-body').text("출력된 이력서가 없습니다.");
+    $('#MyModal').modal('show'); // Bootstrap 모달 띄우기
+
+  }else{ 
+
+   $.ajax({
     url: `/submit/status/\${status}/\${resumePk}/\${recruitmentNoticePk}`,
     type: 'PUT',
     success: function (response) {
       console.log("상태 변경 성공:", response);
       // 성공 후 사용자에게 알림 또는 상태 갱신 로직 등 추가 가능
+      if(status == 'FAILURE'){
+        $('#resumeDetailForm input').val('');
+      }
     },
     error: function (xhr, status, error) {
       console.error("상태 변경 실패:", error);
       alert("상태 변경 중 오류가 발생했습니다.");
     }
+
   });
+
+}
 }
 
 
@@ -136,18 +157,18 @@ function renderResumePagination(data) {
 
   // 이전 페이지 버튼
   if (startPage > 1) {
-    paginationHtml += `<button class="resume-page-btn" data-page="\${startPage - 1}">«</button>`;
+    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 resume-page-btn" data-page="\${startPage - 1}">«</button>`;
   }
 
   // 페이지 번호 버튼
   for (let i = startPage; i <= endPage; i++) {
     const boldStyle = i === currentPage ? ' style="font-weight:bold;"' : '';
-    paginationHtml += `<button class="resume-page-btn" data-page="\${i}">\${i}</button>`;
+    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 resume-page-btn" data-page="\${i}">\${i}</button>`;
   }
 
   // 다음 페이지 버튼
   if (endPage < data.totalPageCnt) {
-    paginationHtml += `<button class="resume-page-btn" data-page="\${endPage + 1}">»</button>`;
+    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 resume-page-btn" data-page="\${endPage + 1}">»</button>`;
   }
 
   // 출력할 위치: resume 전용 pagination 영역이 필요합니다
@@ -199,18 +220,18 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
 
   // 이전 버튼
   if (startPage > 1) {
-    paginationHtml += `<button class="page-btn" data-page="\${startPage - 1}">«</button>`;
+    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 page-btn" data-page="\${startPage - 1}">«</button>`;
   }
 
   // 페이지 번호 버튼
   for (let i = startPage; i <= endPage; i++) {
     const boldStyle = i === currentPage ? ' style="font-weight:bold;"' : '';
-    paginationHtml += `<button class="page-btn" data-page="\${i}">\${i}</button>`;
+    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 page-btn" data-page="\${i}">\${i}</button>`;
   }
 
   // 다음 버튼
   if (endPage < data.totalPageCnt) {
-    paginationHtml += `<button class="page-btn" data-page="\${endPage + 1}">»</button>`;
+    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 page-btn" data-page="\${endPage + 1}">»</button>`;
   }
 
   // HTML 출력
@@ -402,7 +423,7 @@ label {
 							  
 							</select>              
 						</div>
-            <div id="pagination" class="pagination-container" style="text-align: center; margin-top: 20px;"></div>
+            <div id="pagination" class="pagination-container text-center mt-4" style="text-align: center; margin-top: 20px;"></div>
 
             <div class="custom-select-wrapper">
 							<label for="resumeList">공고에 제출 된 이력서</label>
@@ -410,6 +431,7 @@ label {
 							  
 							</select>
 						  </div>
+              <div id="resumePagination" class="pagination-container text-center mt-4" style="text-align: center; margin-top: 20px;"></div>
 					</div>
 				</div>
 			</form>
@@ -444,6 +466,10 @@ label {
           <ul id="detailFileList" class="form-control" style="list-style: none; padding-left: 0;" readonly>
 
           </ul>
+          <div>
+            <button type ="submit" id="passedBtn">합격</button>
+            <button id ="failedBtn">불합격</button>
+          </div>
         </div>
       </form>
 
