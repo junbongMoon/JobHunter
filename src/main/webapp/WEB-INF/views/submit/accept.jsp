@@ -103,6 +103,7 @@ function changeStatusByregistration(status, resumePk, recruitmentNoticePk) {
       // 성공 후 사용자에게 알림 또는 상태 갱신 로직 등 추가 가능
       if(status == 'FAILURE'){
         $('#resumeDetailForm input').val('');
+        $('#resumeDetailForm textarea').val('');
       }
     },
     error: function (xhr, status, error) {
@@ -367,7 +368,7 @@ label {
 }
 
 #resumeDetailForm input.form-control,
-#resumeDetailForm textarea.form-control {
+#resumeDetailForm reatexta.form-control {
   margin-top: 0.4rem;
   padding: 0.75rem 1rem;
   background-color: color-mix(in srgb, var(--surface-color), transparent 10%);
