@@ -251,4 +251,12 @@
         FROM users
         WHERE uid = #{userUid}
     </select>
+    
+    <!-- 이력서 제출 -->
+    <insert id="insertRegistration" parameterType="map">
+        INSERT INTO registration (status, recruitmentNoticePk, resumePk, regDate)
+        VALUES ('WAITING', #{recruitmentNo}, #{resumeNo}, NOW())
+    </insert>
+    
+
 </mapper>

@@ -221,4 +221,12 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public UserVO selectUserInfo(int userUid) throws Exception {
 		return ses.selectOne(NS + ".selectUserInfo", userUid);
 	}
+	
+	@Override
+	public void insertRegistration(int resumeNo, int recruitmentNo) throws Exception {
+		Map<String, Object> map = new HashMap<>();
+		map.put("resumeNo", resumeNo);
+		map.put("recruitmentNo", recruitmentNo);
+		ses.insert(NS + ".insertRegistration", map);
+	}
 }

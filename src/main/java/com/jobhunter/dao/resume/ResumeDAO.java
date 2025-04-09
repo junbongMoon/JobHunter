@@ -97,4 +97,7 @@ public interface ResumeDAO {
 
 	// 유저정보 조회
 	UserVO selectUserInfo(int userUid) throws Exception;
+	
+	// 이력서 제출
+	void insertRegistration(int resumeNo, int recruitmentNo) throws Exception;
 }

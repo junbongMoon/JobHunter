@@ -47,4 +47,7 @@ public interface ResumeService {
 
 	// 유저정보 조회
 	UserVO getUserInfo(int userUid) throws Exception;
+
+	// 이력서 제출
+	void submitResume(int resumeNo, int recruitmentNo) throws Exception;
 }

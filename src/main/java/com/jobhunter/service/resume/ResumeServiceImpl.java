@@ -259,4 +259,11 @@ public class ResumeServiceImpl implements ResumeService {
 	public UserVO getUserInfo(int userUid) throws Exception {
 		return rdao.selectUserInfo(userUid);
 	}
+
+	@Override
+	@Transactional
+	public void submitResume(int resumeNo, int recruitmentNo) throws Exception {
+		// 이력서 제출
+		rdao.insertRegistration(resumeNo, recruitmentNo);
+	}
 }
