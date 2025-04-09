@@ -394,8 +394,7 @@
 														<c:forEach items="${resume.subcategoryList}"
 															var="subcategory" varStatus="status">
 															<c:if test="${status.index < 4}">
-																<span class="info-value">
-																	${subcategory.jobName}</span>
+																<span class="info-value"> ${subcategory.jobName}</span>
 															</c:if>
 															<c:if test="${status.index == 4}">
 																<span class="more-indicator">...</span>
@@ -405,6 +404,10 @@
 												</c:choose>
 											</div>
 										</div>
+										<small class="text-muted">최종수정일 :
+											${resume.regDate.substring(0,4)}년
+											${resume.regDate.substring(5,7)}월
+											${resume.regDate.substring(8,10)}일</small>
 									</div>
 									<div class="action-buttons">
 										<a href="/resume/edit/${resume.resumeNo}"

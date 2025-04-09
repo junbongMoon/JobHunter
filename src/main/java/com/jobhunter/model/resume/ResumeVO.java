@@ -9,6 +9,7 @@ public class ResumeVO {
     private String title;
     private int uid;
     private String saveType;
+	private String regDate;
     private List<SigunguVO> sigunguList;
     private List<SubCategoryVO> subcategoryList;
 } 
