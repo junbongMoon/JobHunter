@@ -74,6 +74,7 @@ $(function() {
   
 });
 
+
 function changeStatusByregistration(status, resumePk, recruitmentNoticePk) {
   $.ajax({
     url: `/submit/status/\${status}/\${resumePk}/\${recruitmentNoticePk}`,
