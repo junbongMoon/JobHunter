@@ -258,5 +258,13 @@
         VALUES ('WAITING', #{recruitmentNo}, #{resumeNo}, NOW())
     </insert>
     
-
+    <!-- 이력서 중복 제출 확인 -->
+    <select id="checkExistingRegistration" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM registration r
+        JOIN resume res ON r.resumePk = res.resumeNo
+        WHERE r.recruitmentNoticePk = #{recruitmentNo}
+        AND res.userUid = #{userUid}
+    </select>
+    
 </mapper>

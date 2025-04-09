@@ -668,19 +668,34 @@
 								recruitmentNo: recruitmentId
 							},
 							success: function(response) {
-								// alert('이력서가 성공적으로 제출되었습니다.');
-								// 성공 모달 표시
-								$('#modalMessage').html(
-									'<strong style="color: #37517e;">이력서가 성공적으로 제출되었습니다.</strong>'
+								if (response.success) {
+									// 성공 모달 표시
+									$('#modalMessage').html(
+										'<strong style="color: #37517e;">' + response.success + '</strong>'
 								);
 								$('#modal').modal('show');
 								// 제출 후 해당 공고 페이지로 이동
 								$('#modalCheckBtn').off('click').on('click', function() {
-									window.location.href = '/recruitmentnotice/detail?uid=' + recruitmentId;
-								});
+										window.location.href = '/recruitmentnotice/detail?uid=' + recruitmentId;
+									});
+								} else if (response.fail) {
+									// 중복 지원 모달 표시
+									$('#modalMessage').html(
+										'<strong style="color: #37517e;">' + response.fail + '</strong>'
+									);
+									$('#modal').modal('show');
+									// 이후 해당 공고 페이지로 이동
+									$('#modalCheckBtn').off('click').on('click', function() {
+										window.location.href = '/recruitmentnotice/detail?uid=' + recruitmentId;
+									});
+								}
 							},
 							error: function(xhr, status, error) {
-								alert('이력서 제출 중 오류가 발생했습니다: ' + error);
+								// 오류 모달 표시
+								$('#modalMessage').html(
+									'<strong style="color: #37517e;">' + response.error + '</strong>'
+								);
+								$('#modal').modal('show');
 							}
 						});
 					});

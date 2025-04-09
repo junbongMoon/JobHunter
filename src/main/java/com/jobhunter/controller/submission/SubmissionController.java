@@ -24,7 +24,7 @@ import com.jobhunter.service.resume.ResumeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+
 @Controller
 @RequestMapping("/submission")
 @RequiredArgsConstructor
@@ -38,7 +38,6 @@ public class SubmissionController {
 	public String submitResumeForm(@RequestParam("uid") int uid,
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "pageSize", defaultValue = "5") int pageSize, Model model, HttpSession session) {
-		log.info("이력서 제출 페이지 요청 - 공고 ID: {}, 페이지: {}, 페이지 크기: {}", new Object[] { uid, page, pageSize });
 
 		// 세션에서 사용자 정보 가져오기
 		AccountVO account = (AccountVO) session.getAttribute("account");
@@ -46,17 +45,14 @@ public class SubmissionController {
 		// 공고 정보 조회
 		try {
 			RecruitmentDetailInfo recruitmentNotice = recruitmentNoticeService.getRecruitmentByUid(uid);
-			log.info("공고 정보 조회 결과: {}", recruitmentNotice);
 
 			if (recruitmentNotice == null) {
-				log.error("공고 정보가 없습니다. uid: {}", uid);
 				model.addAttribute("errorMessage", "존재하지 않는 공고입니다.");
 				return "resume/resumeSubmission";
 			}
 
 			// 모델에 공고 정보 추가
 			model.addAttribute("recruitmentNotice", recruitmentNotice);
-			log.info("모델에 공고 정보 추가 완료");
 
 			// 사용자의 이력서 목록 조회 (페이징 처리)
 			if (account != null) {
@@ -80,11 +76,9 @@ public class SubmissionController {
 				model.addAttribute("totalPages", totalPages);
 				model.addAttribute("totalResumes", totalResumes);
 
-				log.info("사용자의 이력서 목록 조회 완료: {} 개, 페이지: {}/{}", new Object[] { resumeList.size(), page, totalPages });
 			}
 
 		} catch (Exception e) {
-			log.error("공고 정보 조회 중 오류 발생: {}", e.getMessage(), e);
 			model.addAttribute("errorMessage", "공고 정보를 불러오는 중 오류가 발생했습니다.");
 		}
 
@@ -92,18 +86,27 @@ public class SubmissionController {
 	}
 
 	@PostMapping("/submit")
-	public ResponseEntity<Map<String, String>> submitResume(@RequestParam("resumeNo") int resumeNo, @RequestParam("recruitmentNo") int recruitmentNo) {
-		log.info("이력서 제출 요청 - 이력서 ID: {}, 공고 ID: {}", resumeNo, recruitmentNo);
-		
+	public ResponseEntity<Map<String, String>> submitResume(@RequestParam("resumeNo") int resumeNo, @RequestParam("recruitmentNo") int recruitmentNo, HttpSession session) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+		int userUid = account.getUid();
 		try {
-			resumeService.submitResume(resumeNo, recruitmentNo);
-			Map<String, String> response = new HashMap<>();
-			response.put("message", "이력서가 성공적으로 제출되었습니다.");
-			return ResponseEntity.ok(response);
+			// 이력서 중복 제출 확인
+			boolean isAlreadySubmitted = resumeService.isResumeAlreadySubmitted(userUid, recruitmentNo);
+			if (!isAlreadySubmitted) {
+				// 이력서 제출
+				resumeService.submitResume(resumeNo, recruitmentNo);
+				Map<String, String> response = new HashMap<>();
+				response.put("success", "이력서가 성공적으로 제출되었습니다.");
+				return ResponseEntity.ok(response);
+			} else {
+				// 중복 지원 시 메시지 반환
+				Map<String, String> response = new HashMap<>();
+				response.put("fail", "이력서가 이미 제출되었습니다.");
+				return ResponseEntity.ok(response);
+			}
 		} catch (Exception e) {
-			log.error("이력서 제출 중 오류 발생: {}", e.getMessage(), e);
 			Map<String, String> response = new HashMap<>();
-			response.put("message", "이력서 제출 중 오류가 발생했습니다: " + e.getMessage());
+			response.put("error", "이력서 제출 중 오류가 발생했습니다: " + e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}

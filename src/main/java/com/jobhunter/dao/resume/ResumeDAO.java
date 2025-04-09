@@ -100,4 +100,7 @@ public interface ResumeDAO {
 	
 	// 이력서 제출
 	void insertRegistration(int resumeNo, int recruitmentNo) throws Exception;
+	
+	// 중복 지원 확인
+	int checkExistingRegistration(int userUid, int recruitmentNo) throws Exception;
 }

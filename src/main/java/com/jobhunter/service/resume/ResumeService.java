@@ -50,4 +50,7 @@ public interface ResumeService {
 
 	// 이력서 제출
 	void submitResume(int resumeNo, int recruitmentNo) throws Exception;
+
+	// 중복 지원 확인
+	boolean isResumeAlreadySubmitted(int userUid, int recruitmentNo) throws Exception;
 }

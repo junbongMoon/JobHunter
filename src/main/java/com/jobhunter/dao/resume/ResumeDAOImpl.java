@@ -229,4 +229,12 @@ public class ResumeDAOImpl implements ResumeDAO {
 		map.put("recruitmentNo", recruitmentNo);
 		ses.insert(NS + ".insertRegistration", map);
 	}
+	
+	@Override
+	public int checkExistingRegistration(int userUid, int recruitmentNo) throws Exception {
+		Map<String, Object> map = new HashMap<>();
+		map.put("userUid", userUid);
+		map.put("recruitmentNo", recruitmentNo);
+		return ses.selectOne(NS + ".checkExistingRegistration", map);
+	}
 }

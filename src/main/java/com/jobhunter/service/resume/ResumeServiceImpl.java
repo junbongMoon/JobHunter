@@ -261,9 +261,15 @@ public class ResumeServiceImpl implements ResumeService {
 	}
 
 	@Override
-	@Transactional
 	public void submitResume(int resumeNo, int recruitmentNo) throws Exception {
 		// 이력서 제출
 		rdao.insertRegistration(resumeNo, recruitmentNo);
+	}
+
+	@Override
+	public boolean isResumeAlreadySubmitted(int userUid, int recruitmentNo) throws Exception {
+		int count = rdao.checkExistingRegistration(userUid, recruitmentNo);
+		System.out.println("count: " + count);
+		return count > 0;
 	}
 }
