@@ -57,7 +57,9 @@
 					<select class="form-select" name="searchType">
 					  <option value="">-- 검색 조건 선택 --</option>
 					  <option value="region">지역</option>
-					  <option value="jobtype">직업</option>
+					  <option value="sigungu">시군구</option>
+					  <option value="majorCategory">산업군</option>
+					  <option value="subCategory">직업군</option>
 					  <option value="advantage">우대조건</option>
 					  <option value="jobform">근무형태</option>
 					  <option value="pay">급여</option>
