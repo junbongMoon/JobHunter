@@ -132,7 +132,7 @@
     $(".parttime-only").remove();
   }
 });
-        	// 중복입력 방지 코드
+    // 중복입력 방지 코드
 	$('form').on('submit', function (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -615,11 +615,12 @@ function showThumbnail(file) {
 
 		$("#pay").val(pay);
 		let period = startTime + "~" + endTime;
-	if (workDetailType) {
-	period += " (" + workDetailType + ")";
-	}
 
-	console.log(period);
+		if (workDetailType) {
+		period += " (" + workDetailType + ")";
+		}
+
+		console.log(period);
 
 	
 
@@ -699,15 +700,14 @@ function showThumbnail(file) {
 
   	// 면접 방식 유효성 검사도 포함
   
-	if(result){
+	
 		// period 히든에 넣어주자
 		mjrno = $("#majorcategoryNo").val();
 
 		console.log(mjrno);
 		$("#period").val(period);
 
-		return result;
-		}
+
 	return result;
 	}
 
@@ -728,21 +728,36 @@ function showThumbnail(file) {
 
 	// 자동 저장 함수
 	function saveFormToLocalStorage() {
-	const data = {};
-	autosaveFields.forEach(selector => {
-		const el = $(selector);
-		if (el.length) {
-		if (el.attr("type") === "radio" || el.attr("type") === "checkbox") {
-			data[selector] = el.filter(":checked").val();
-		} else {
-			data[selector] = el.val();
-		}
-		}
-	});
+		const data = {};
 
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-	console.log("📦 저장됨:", data);
-	}
+		// 1. 일반 필드 저장
+		[
+			"#title", "#pay", "#startTime", "#endTime", "#workDetailType",
+			"#date", "#manager", "#advantage", "#summernote",
+			".MajorCategory", ".SubCategory", ".Region", ".Sigungu"
+		].forEach(selector => {
+			const el = $(selector);
+			if (el.length) data[selector] = el.val();
+		});
+
+		// 2. 🔥 radio 값 저장 (name 단위로 체크된 값 저장)
+		[
+			"workType", "payType", "militaryService", "personalHistory"
+		].forEach(name => {
+			const checkedVal = $(`input[name='\${name}']:checked`).val();
+			data[`radio-\${name}`] = checkedVal || "";
+		});
+
+		// 3. 🔥 checkbox 저장 (면접 방식)
+		$(".application-checkbox").each(function () {
+			const id = $(this).attr("id");
+			data[`checkbox-\${id}`] = $(this).is(":checked");
+		});
+
+		// 저장
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+		console.log("📦 저장됨:", data);
+		}
 
 	// 복원 함수
 	function restoreFormFromLocalStorage() {
@@ -769,10 +784,12 @@ function showThumbnail(file) {
 		const majorVal = data[".MajorCategory"];
 		if (majorVal && majorVal !== "-1") {
 			$(".MajorCategory").val(majorVal);
+			$("#majorcategoryNo").val(majorVal);
 			getSubCategory(majorVal); // ajax 호출
 
 			setTimeout(() => {
 			$(".SubCategory").val(data[".SubCategory"]);
+			$("#subcategoryNo").val(data[".SubCategory"]);
 			}, 300); // 직업군 로딩 대기
 		}
 
@@ -780,27 +797,35 @@ function showThumbnail(file) {
 		const regionVal = data[".Region"];
 		if (regionVal && regionVal !== "-1") {
 			$(".Region").val(regionVal);
+			$("#regionNo").val(regionVal);
 			getSigungu(regionVal);
 
 			setTimeout(() => {
 			$(".Sigungu").val(data[".Sigungu"]);
+			$("#sigunguNo").val(data[".Sigungu"]);
 			}, 300);
 		}
 
 		// 5. radio & checkbox 복원
 		setTimeout(() => {
+			// radio 복원
 			[
-			"input[name='workType']",
-			"input[name='payType']",
-			"input[name='militaryService']",
-			"input[name='personalHistory']"
+				"workType", "payType", "militaryService", "personalHistory"
 			].forEach(name => {
-			const val = data[`\${name}:checked`];
-			if (val !== undefined) {
-				$(`\${name}[value="\${val}"]`).prop("checked", true).trigger("change");
-			}
+				const val = data[`radio-\${name}`];
+				if (val) {
+					$(`input[name='\${name}'][value='\${val}']`).prop("checked", true).trigger("change");
+				}
 			});
-		}, 400);
+
+			// checkbox 복원
+			$(".application-checkbox").each(function () {
+				const id = $(this).attr("id");
+				if (data[`checkbox-\${id}`]) {
+					$(this).prop("checked", true).trigger("change");
+				}
+			});
+		}, 600);
 
 		console.log("📥 로컬스토리지 폼 복원 완료");
 	}

@@ -67,7 +67,7 @@ public class RecruitmentNoticeController {
 		
 
 		System.out.println("DTO 확인: " + dto);
-
+		System.out.println("Period 값 확인: " + dto.getPeriod()); // ← 여기도 로그 확인!
 		
 
 		if (dto.getDueDateForString() != null && !dto.getDueDateForString().isEmpty()) {
