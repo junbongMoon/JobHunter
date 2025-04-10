@@ -781,7 +781,12 @@ function showThumbnail(file) {
 			"#date", "#manager", "#advantage", "#summernote"
 		].forEach(selector => {
 			const val = data[selector];
-			if (val !== undefined) $(selector).val(val);
+		if (val !== undefined) {
+			$(selector).val(val);
+			if (selector === "#pay") {
+			formatPay(document.getElementById("pay")); // ✨ 쉼표 적용
+			}
+		}
 		});
 
 		// 2. summernote 따로 처리
