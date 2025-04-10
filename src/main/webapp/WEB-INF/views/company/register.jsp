@@ -401,7 +401,7 @@ mark {
 
 <main class="main">
 	<div class="login-container">
-		<form action="${pageContext.request.contextPath}/user/register" method="post" onsubmit="return confirmAll();">
+		<form action="${pageContext.request.contextPath}/company/register" method="post" onsubmit="return confirmAll();">
 
 		<div class="flex-x-container between-con">
 			<h2 class="login-title">기업 회원 가입</h2>
@@ -664,7 +664,8 @@ function sendEmailCode() {
 			{
 				confirmText: '인증완료',
 				cancelText: '취소',
-				onConfirm: verifyEmailCode
+				onConfirm: verifyEmailCode,
+				onCancel: () => {$('#sendEmailBtn').prop('disabled', false)}
     		});
         },
         error: (xhr) => {
@@ -712,7 +713,8 @@ function verifyEmailCode() {
 			{
 				confirmText: '인증완료',
 				cancelText: '취소',
-				onConfirm: verifyEmailCode
+				onConfirm: verifyEmailCode,
+				onCancel: () => {$('#sendEmailBtn').prop('disabled', false)}
     		});
 		return false;
 	}
@@ -771,16 +773,18 @@ function confirmAll() {
 		return false;
 	}
 
+	console.log($("#mobile").val());
+	console.log($("#email").val());
 	if(!$("#mobile").val() && !$("#email").val()) {
 		window.publicModals.show("이메일 혹은 전화번호 인증을 진행해 주세요.")
 		$("#pwdcheckInfoMark")[0].scrollIntoView({ behavior: 'smooth' });
+		return false;
 	}
 	
 	if (!$("#acept").is(":checked")) {
 		window.publicModals.show("개인정보 이용 동의에 체크해주세요.")
+		return false;
 	}
-
-	console.log("검사완료");
 
 	return true;
 }
