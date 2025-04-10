@@ -59,6 +59,15 @@ label.form-label {
 }
 </style>
 <script>
+	document.addEventListener("DOMContentLoaded", function () {
+	  localStorage.removeItem("reviewTypeOtherText-temp");
+	  for (let key in localStorage) {
+	    if (key.startsWith("reviewTypeOtherText-")) {
+	      localStorage.removeItem(key);
+	    }
+	  }
+	  localStorage.removeItem("reviewTypeOtherText");
+	});
         function showGonggoDetails() {
             const select = document.getElementById("gonggoSelect");
             const selectedValue = select.value;
@@ -107,6 +116,42 @@ label.form-label {
 
             return true;
         }
+        
+        function toggleOtherTypeInput() {
+            const otherInput = document.getElementById("otherTypeInput");
+            const isOtherChecked = document.getElementById("reviewTypeOther").checked;
+            otherInput.style.display = isOtherChecked ? "block" : "none";
+
+            const savedOtherText = localStorage.getItem("reviewTypeOtherText");
+            if (isOtherChecked && savedOtherText) {
+              document.getElementById("reviewTypeOtherText").value = savedOtherText;
+            }
+          }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            localStorage.removeItem("reviewTypeOtherText-temp");
+            
+            const boardNo = sessionStorage.getItem("recentBoardNo");
+            if (boardNo) {
+              localStorage.removeItem(`reviewTypeOtherText-${boardNo}`);
+            }
+          });
+        
+        document.addEventListener("DOMContentLoaded", function () {
+        	  const form = document.querySelector("form");
+        	  if (form) {
+        	    form.addEventListener("submit", function () {
+        	      const selectedType = document.querySelector("input[name='reviewType']:checked");
+        	      if (selectedType && selectedType.value === "OTHER") {
+        	        const otherText = document.querySelector("input[name='reviewTypeOtherText']").value;
+        	        if (otherText) {
+        	          localStorage.setItem("reviewTypeOtherText-temp", otherText);
+        	        }
+        	      }
+        	    });
+        	  }
+        	});
+        
         
     </script>
 </head>
@@ -160,34 +205,42 @@ label.form-label {
 				<input type="hidden" name="companyName" id="companyNameInput" />
 
 				<div class="mb-3">
-					<label class="form-label">면접 유형<span class="text-danger">*</span></label><br>
+					<label class="form-label">면접 유형</label><br>
 					<div class="form-check form-check-inline">
 						<input class="form-check-input" type="radio" name="reviewType"
-							value="FACE_TO_FACE" required onclick="toggleOtherTypeInput()">
+							value="FACE_TO_FACE" required onclick="toggleOtherTypeInput()"
+							${writeBoardDTO.reviewType == 'FACE_TO_FACE' ? 'checked' : ''}>
 						<label class="form-check-label">대면</label>
 					</div>
 					<div class="form-check form-check-inline">
 						<input class="form-check-input" type="radio" name="reviewType"
-							value="VIDEO" onclick="toggleOtherTypeInput()"> <label
-							class="form-check-label">비대면</label>
+							value="VIDEO" onclick="toggleOtherTypeInput()"
+							${writeBoardDTO.reviewType == 'VIDEO' ? 'checked' : ''}>
+						<label class="form-check-label">비대면</label>
 					</div>
 					<div class="form-check form-check-inline">
 						<input class="form-check-input" type="radio" name="reviewType"
-							value="PHONE" onclick="toggleOtherTypeInput()"> <label
-							class="form-check-label">전화면접</label>
+							value="PHONE" onclick="toggleOtherTypeInput()"
+							${writeBoardDTO.reviewType == 'PHONE' ? 'checked' : ''}>
+						<label class="form-check-label">전화면접</label>
 					</div>
 					<div class="form-check form-check-inline">
 						<input class="form-check-input" type="radio" id="reviewTypeOther"
-							name="reviewType" value="OTHER" onclick="toggleOtherTypeInput()">
+							name="reviewType" value="OTHER" onclick="toggleOtherTypeInput()"
+							${writeBoardDTO.reviewType == 'OTHER' ? 'checked' : ''}>
 						<label class="form-check-label">기타</label>
 					</div>
 				</div>
 
-				<div class="mb-3" id="otherTypeInput" style="display: none">
-					<label class="form-label">기타 면접 유형 입력</label> <input type="text"
+				<div class="mb-3" id="otherTypeInput"
+					style="display: ${writeBoardDTO.reviewType == 'OTHER' ? 'block' : 'none'};">
+					<label class="form-label">기타 면접 유형</label> <input type="text"
 						class="form-control" name="reviewTypeOtherText"
-						placeholder="면접 유형을 입력하세요">
+						id="reviewTypeOtherText"
+						value="${writeBoardDTO.reviewTypeOtherText}">
 				</div>
+
+
 
 				<div class="mb-3">
 					<label class="form-label">면접 난이도<span class="text-danger">*</span></label>
@@ -201,21 +254,22 @@ label.form-label {
 					</select>
 				</div>
 
-			  <div class="mb-3">
-                <label class="form-label">면접 결과<span class="text-danger">*</span></label>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" id="resultConsent" onchange="toggleResultSelect()">
-                    <label class="form-check-label" for="resultConsent">
-                        면접 결과에 대한 진실된 사실을 작성하였으며, 허위 사실 작성 시 불이익 또는 위증 책임을 질 수 있음에 동의합니다.
-                    </label>
-                </div>
-                <select class="form-select" name="reviewResult" id="reviewResultSelect" disabled required>
-                    <option value="" selected disabled>결과를 선택하세요</option>
-                    <option value="PASSED">합격</option>
-                    <option value="FAILED">불합격</option>
-                    <option value="PENDING">진행중</option>
-                </select>
-            </div>
+				<div class="mb-3">
+					<label class="form-label">면접 결과<span class="text-danger">*</span></label>
+					<div class="form-check mb-2">
+						<input class="form-check-input" type="checkbox" id="resultConsent"
+							onchange="toggleResultSelect()"> <label
+							class="form-check-label" for="resultConsent"> 면접 결과에 대한
+							진실된 사실을 작성하였으며, 허위 사실 작성 시 불이익 또는 위증 책임을 질 수 있음에 동의합니다. </label>
+					</div>
+					<select class="form-select" name="reviewResult"
+						id="reviewResultSelect" disabled required>
+						<option value="" selected disabled>결과를 선택하세요</option>
+						<option value="PASSED">합격</option>
+						<option value="FAILED">불합격</option>
+						<option value="PENDING">진행중</option>
+					</select>
+				</div>
 
 
 				<div class="mb-3">
