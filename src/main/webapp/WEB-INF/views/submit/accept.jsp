@@ -30,10 +30,16 @@ $(function() {
   }
 });
 
-  // 삭제 버튼이 클릭 되었을 때
+  // 불합격 버튼이 클릭 되었을 때
   $('#failedBtn').on('click', function (e) {
     e.preventDefault(); // 폼 기본 제출 동작 방지
     changeStatusByregistration('FAILURE', selectedResumeNo, recruitmentNoticePk);
+  });
+
+    // 합격 버튼이 클릭 되었을 때
+    $('#passedBtn').on('click', function (e) {
+    e.preventDefault(); // 폼 기본 제출 동작 방지
+    changeStatusByregistration('PASS', selectedResumeNo, recruitmentNoticePk);
   });
 
   // 이력서 리스트의 값이 바뀌었을 때
@@ -107,10 +113,10 @@ function changeStatusByregistration(status, resumePk, recruitmentNoticePk) {
       success: function (response) {
       console.log("상태 변경 성공:", response);
       // 성공 후 사용자에게 알림 또는 상태 갱신 로직 등 추가 가능
-      if(status == 'FAILURE'){
+        $('#resumeList').val('-1');
         $('#resumeDetailForm input').val('');
         $('#resumeDetailForm textarea').val('');
-        }
+        
       },
       error: function (xhr, status, error) {
       console.error("상태 변경 실패:", error);
@@ -170,9 +176,9 @@ function renderResumePagination(data) {
 
   // 페이지 번호 버튼
   for (let i = startPage; i <= endPage; i++) {
-    const boldStyle = i === currentPage ? ' style="font-weight:bold;"' : '';
-    paginationHtml += `<button type="button" class="btn btn-outline-primary btn-sm mx-1 resume-page-btn" data-page="\${i}">\${i}</button>`;
-  }
+  const isActive = i === currentPage ? 'active' : '';
+  paginationHtml += `<button type="button" class="btn btn-outline-primary btn-sm mx-1 resume-page-btn \${isActive}" data-page="\${i}">\${i}</button>`;
+}
 
   // 다음 페이지 버튼
   if (endPage < data.totalPageCnt) {
@@ -233,9 +239,9 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
 
   // 페이지 번호 버튼
   for (let i = startPage; i <= endPage; i++) {
-    const boldStyle = i === currentPage ? ' style="font-weight:bold;"' : '';
-    paginationHtml += `<button type="button" class="btn btn-outline-primary btn-sm mx-1 page-btn" data-page="\${i}">\${i}</button>`;
-  }
+  const isActive = i === currentPage ? 'active' : '';
+  paginationHtml += `<button type="button" class="btn btn-outline-primary btn-sm mx-1 page-btn \${isActive}" data-page="\${i}">\${i}</button>`;
+}
 
   // 다음 버튼
   if (endPage < data.totalPageCnt) {
@@ -485,7 +491,7 @@ label {
 
           </ul>
           <div class="d-flex justify-content-end gap-2 mt-3">
-            <button type="submit" id="passedBtn" class="btn btn-success btn-sm fixed-width-btn" style="width: 20%;">합격</button>
+            <button type="button" id="passedBtn" class="btn btn-success btn-sm fixed-width-btn" style="width: 20%;">합격</button>
             <button type="button" id="failedBtn" class="btn btn-danger btn-sm fixed-width-btn" style="width: 20%;">불합격</button>
           </div>
         </div>
