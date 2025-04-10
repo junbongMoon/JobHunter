@@ -38,7 +38,6 @@ public class AccountServiceImpl implements AccountService {
 	private AccountLoginDAO getDAO(AccountType type) {
 
 		switch (type) {
-		case ADMIN: // 일반유저쪽으로 통합되도록
 		case USER:
 			return userDAO;
 		case COMPANY:

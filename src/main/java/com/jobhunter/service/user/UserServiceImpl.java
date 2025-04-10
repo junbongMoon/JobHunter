@@ -3,8 +3,6 @@ package com.jobhunter.service.user;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -19,13 +17,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.jobhunter.customexception.DuplicateEmailException;
-import com.jobhunter.dao.account.AccountLoginDAO;
 import com.jobhunter.dao.user.UserDAO;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.user.KakaoUserInfoDTO;
 import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.model.user.UserRegisterDTO;
 import com.jobhunter.model.user.UserVO;
+import com.jobhunter.util.PropertiesTask;
 
 import lombok.RequiredArgsConstructor;
 
@@ -88,9 +86,11 @@ public class UserServiceImpl implements UserService {
 	    HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+	    String serviceKey = PropertiesTask.getPropertiesValue("config/kakao.properties", "api.key");
+	    
 	    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 	    params.add("grant_type", "authorization_code");
-	    params.add("client_id", "5ac47a1ce0498053f71d927bd5271ec9");
+	    params.add("client_id", serviceKey);
 	    params.add("redirect_uri", redirectUri);
 	    params.add("code", code);
 
@@ -162,6 +162,7 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public AccountVO registUser(UserRegisterDTO dto) throws Exception {
 		Integer uid = dao.registUser(dto);
 		return dao.findByUidAndPassword(uid.toString(), dto.getPassword());

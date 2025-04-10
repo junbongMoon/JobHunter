@@ -404,11 +404,7 @@ mark {
 		<form action="${pageContext.request.contextPath}/user/register" method="post" onsubmit="return confirmAll();">
 
 		<div class="flex-x-container between-con">
-			<h2 class="login-title">개인 회원 가입</h2>
-			<div class="btn-kakao" onclick="loginWithKakao()">
-				<img src="/resources/forKakao/kakao_login_medium_narrow.png"
-					alt="kakao">
-			</div>
+			<h2 class="login-title">기업 회원 가입</h2>
 		</div>
 		<hr>
 
@@ -416,7 +412,7 @@ mark {
 		<div class="form-group">
 			
 			<div class="flex-x-container between-con">
-				<input class="input-left" type="text" id="id" name="id"
+				<input class="input-left" type="text" id="id" name="companyId"
 					placeholder="아이디를 입력해주세요." required />
 				<button type="button" id="checkDuplicateIdBtn" class="btn-confirm" onclick="checkDuplicateId()" disabled>중복 확인</button>
 			</div>
@@ -433,26 +429,33 @@ mark {
 		</div>
 		<hr>
 
-		<h4 class="sub-title">회원정보</h4>
-
-		<div class="account-type-tabs">
-			<label class="account-type-tab active"> <input type="radio"
-				name="nationality" value="DOMESTIC" checked> 내국인
-			</label> <label class="account-type-tab"> <input type="radio"
-				name="nationality" value="FOREIGN"> 외국인
-			</label>
-		</div>
+		<h4 class="sub-title">사업자정보</h4>
 
 		<div class="form-group">
+			<input class="full-width" type="text" id="companyName" name="companyName"
+				placeholder="회사명을 입력해주세요." required />
 
-			<input class="full-width" type="text" id="userName" name="name"
-				placeholder="성함을 입력해주세요." required />
-			<mark id="nameInfoMark" class="info-defalt"> * 해당 내용은 이력서에도 입력될 이름이니 되도록 실명을 추천드립니다.</mark>
+			<input class="full-width" type="text" id="representative" name="representative"
+				placeholder="대표자성명을 입력해주세요." required />
+			<input class="full-width" type="text" id="openDate"
+				placeholder="개업일자를 입력해주세요." required />
+			<input class="full-width" type="text" id="businessNum" name="businessNum"
+				placeholder="사업자등록번호를 입력해주세요." required />
+			<button type="button" id="businessBtn" class="btn-confirm full-width" onclick="business()">사업자확인</button>
+			<button type="button" id="deleteBusinessBtn" class="btn-confirm full-width" onclick="deleteBusiness()" style="display: none;">재입력</button>
+			<mark id="businessInfoMark" class="info-defalt"> * 포트폴리오 테스트용 : 사업자번호에 000-00-00000을 입력시 검사를 건너뜁니다.</mark>
+
+		</div>
+		<hr>
+
+		<h4 class="sub-title">연락처</h4>
+
+		<div class="form-group">
 
 			<div class="flex-x-container between-con">
 				<input class="input-left" type="text" id="unCheckedEmail"
 					placeholder="이메일을 입력해주세요."/>
-
+					
 				<button type="button" id="sendEmailBtn" class="btn-confirm" onclick="sendEmailCode()">인증 발송</button>
 			</div>
 			<mark id="emailInfoMark"></mark>
@@ -486,33 +489,18 @@ mark {
 		</label>
 		<hr>
 
+		
 		<button type="submit" class="btn-confirm full-width" onclick="return confirmAll()">회원가입</button>
 
 		<div class="social-login"></div>
 		</form>
+		
 	</div>
 	<!-- 파이어베이스 캡챠 넣을곳 -->
 	<div id="recaptcha-container"></div>
 </main>
 
 <script>
-// 카톡
-Kakao.init('b50a2700ff109d1ab2de2eca4e07fa23');
-Kakao.isInitialized();
-function loginWithKakao() {
-		// JSP에서 contextPath 동적으로 주입
-		let contextPath = '${pageContext.request.contextPath}';
-		if (contextPath) {
-			contextPath = '/' + contextPath;
-		}
-		const redirectUri = `\${location.protocol}//\${location.host}\${contextPath}/user/kakao`;
-
-		Kakao.Auth.authorize({
-		redirectUri: redirectUri,
-		scope: 'profile_nickname, account_email'
-		});
-	}
-// 카톡
 // 파이어베이스
 const firebaseConfig = {
     apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
@@ -526,11 +514,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 let confirmationResult = null;
-// JS에서 enum타입처럼 쓰는거
-const METHOD = {
-  EMAIL: "email",
-  PHONE: "phone"
-};
+
 const codeInput = {
 	defalt:`<input type="text" id="confirmCode" name="confirmCode"
 		placeholder="인증번호를 입력해주세요." required />`,
@@ -548,17 +532,17 @@ function firebaseCaptcha() {
 // 파이어베이스
 function checkDuplicateId() {
 	$('#checkDuplicateIdBtn').prop('disabled', true);
-    const userId = $("#id").val();
+    const companyId = $("#id").val();
 
-    if (!userId || userId.trim().length === 0) {
+    if (!companyId || companyId.trim().length === 0) {
         $("#idInfoMark").text("아이디를 입력해주세요.").css("color", "red");
         return;
     }
 
     $.ajax({
-        url: "/user/check/id",
+        url: "/company/check/id",
         method: "GET",
-        data: { userId },
+        data: { companyId },
         success: function (isDuplicate) {
             if (isDuplicate) {
                 $("#idInfoMark").text("이미 사용 중인 아이디입니다.").removeClass().addClass("info-warning");
@@ -610,7 +594,7 @@ async function checkDuplicateMobile(formattedNumber) {
       },
       body: JSON.stringify({
         mobile: formattedNumber,
-        accountType: "USER"
+        accountType: "COMPANY"
       })
     });
 
@@ -672,7 +656,7 @@ function sendEmailCode() {
 		data: JSON.stringify({ 
 			email: email,
 			checkDuplicate: true,
-			accountType: "USER"
+			accountType: "COMPANY"
 		}),
         success: (res) => {
 			$("#emailInfoMark").text(`이메일이 전송중되었습니다. 인증을 진행해주세요.`).removeClass().addClass("info-next");
@@ -766,6 +750,12 @@ function confirmAll() {
 		return false;
 	}
 
+	if (!$("#businessInfoMark").hasClass("info-ok")) {
+		$("#businessNum").focus();
+		window.publicModals.show("사업자등록번호 인증을 진행해주세요.")
+		return false;
+	}
+
 	if (!pwdIsValid()){
 		$("#password").focus();
 		return false;
@@ -777,7 +767,7 @@ function confirmAll() {
 	}
 
 	if (!nameIsValid()) {
-		$("#userName").focus();
+		$("#companyName").focus();
 		return false;
 	}
 
@@ -846,21 +836,21 @@ function confirmPassword() {
 	}
 }
 // 이름
-$('#userName').on('change keyup', () => {
+$('#companyName').on('change keyup', () => {
 	nameIsValid();
 })
 
 function nameIsValid() {
-	const nameValue = $('#userName').val();
+	const nameValue = $('#companyName').val();
 
     if (!nameValue) {
-		$("#nameInfoMark").text(`이름은 필수 입력사항입니다.`).removeClass().addClass("info-warning");
+		$("#companyNameInfoMark").text(`회사명은 필수 입력사항입니다.`).removeClass().addClass("info-warning");
 		return false;
     } else if (nameValue.length >= 100){
-		$("#nameInfoMark").text(`이름은 100글자까지만 저장이 가능합니다. 성함이 100문자 이상이라면 죄송하오나 일부만 기입해주시기 바랍니다.`).removeClass().addClass("info-warning");
+		$("#companyNameInfoMark").text(`이름은 100글자까지만 저장이 가능합니다. 성함이 100문자 이상이라면 죄송하오나 일부만 기입해주시기 바랍니다.`).removeClass().addClass("info-warning");
 		return false;
 	}
-	$("#nameInfoMark").text(`* 해당 내용은 이력서에도 입력될 이름이니 되도록 실명을 추천드립니다.`).removeClass().addClass("info-ok");
+	$("#companyNameInfoMark").text(`* 해당 내용은 이력서에도 입력될 이름이니 되도록 실명을 추천드립니다.`).removeClass().addClass("info-ok");
 	return true;
 }
 // 이메일
@@ -882,20 +872,113 @@ function confirmEmail() {
         return false;
     }
 }
+
+// 기업정보
+document.getElementById('openDate').addEventListener('input', formatDate);
+// 숫자 포맷팅 함수 (사업자번호)
+function formatDate(e) {
+    // 숫자 이외의 문자 제거
+    let value = e.target.value.replace(/[^\d]/g, '');
+    // 길이 제한 (8자리까지만)
+    if (value.length > 8) {
+        value = value.substring(0, 8);
+    }
+    // 포맷: yyyy-mm-nn
+    let formatted = value;
+    if (value.length > 4 && value.length <= 6) {
+        formatted = value.slice(0, 4) + '-' + value.slice(4);
+    } else if (value.length > 6) {
+        formatted = value.slice(0, 4) + '-' + value.slice(4, 6) + '-' + value.slice(6);
+    }
+
+    e.target.value = formatted;
+}
+
+document.getElementById('businessNum').addEventListener('input', formatNumber);
+// 숫자 포맷팅 함수 (사업자번호)
+function formatNumber(e) {
+    // 숫자 이외의 문자 제거
+    let value = e.target.value.replace(/[^\d]/g, '');
+    // 길이 제한 (10자리까지만)
+    if (value.length > 10) {
+        value = value.substring(0, 10);
+    }
+    // 포맷: 123-45-67890
+    let formatted = value;
+    if (value.length > 3 && value.length <= 5) {
+        formatted = value.slice(0, 3) + '-' + value.slice(3);
+    } else if (value.length > 5) {
+        formatted = value.slice(0, 3) + '-' + value.slice(3, 5) + '-' + value.slice(5);
+    }
+
+    e.target.value = formatted;
+}
+// 사업자번호
+function business() {
+	let b_no = $('#businessNum').val();
+	let start_dt = $('#openDate').val();
+	const p_nm = $('#representative').val();
+
+	if(!p_nm) {
+		window.publicModals.show("대표자성명을 입력해주세요.")
+		$('#representative').focus();
+		return;
+	}
+
+	if(b_no) { // 숫자만 남기기
+		b_no = b_no.replace(/[^\d]/g, '');
+	} else {
+		window.publicModals.show("사업자등록번호를 입력해주세요.")
+		$('#businessNum').focus();
+		return;
+	}
+
+	if(start_dt) { // 숫자만 남기기
+		start_dt = start_dt.replace(/[^\d]/g, '');
+	} else {
+		window.publicModals.show("개업일자를 입력해주세요.")
+		$('#openDate').focus();
+		return;
+	}
+
+	if(b_no.length == 10 && start_dt.length == 8 && p_nm != null) {
+		$('#businessBtn').prop('disabled', true);
+		$.ajax({
+			url: "/company/business",
+			method: "POST",
+			contentType: "application/json",
+			data: JSON.stringify({
+				b_no: b_no,
+				start_dt: start_dt,
+				p_nm: p_nm
+			}),
+			success: function (response) {
+				if(response == "01") {
+					okBusiness()
+				} else {
+					$('#businessInfoMark').text(`등록되지 않은 사업자입니다.`).removeClass().addClass("info-warning");
+					window.publicModals.show("등록되지 않은 사업자입니다.")
+				}
+			},
+			error: function (xhr, status, error) {
+				$('#businessBtn').prop('disabled', false);
+				$('#businessInfoMark').text(`연결이 불안정합니다. 입력된 번호를 확인하시고 잠시후 다시 시도해주세요.`).removeClass().addClass("info-warning");
+				console.log(xhr.responseText);
+			}
+		});
+	} else {
+		window.publicModals.show("사업자등록번호 10자리, 개업일자 yyyy-mm-nn의 형식에 맞춰 작성해주세요.")
+		return;
+	}
+}
+
+function okBusiness() {
+	$('#businessBtn').hide()
+	$('#deleteBusinessBtn').show()
+	$('#businessInfoMark').text(`확인되었습니다.`).removeClass().addClass("info-ok");
+}
+
 // ==유효성검사==
-// 탭 전환 효과를 위한 스크립트
-document.addEventListener('DOMContentLoaded', function() {
-  // 회원 유형 탭 전환
-  const tabs = document.querySelectorAll('.account-type-tab');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', function() {
-      // 모든 탭에서 active 클래스 제거
-      tabs.forEach(t => t.classList.remove('active'));
-      // 클릭된 탭에 active 클래스 추가
-      this.classList.add('active');
-    });
-  });
-});
 </script>
 
 <jsp:include page="../footer.jsp" />

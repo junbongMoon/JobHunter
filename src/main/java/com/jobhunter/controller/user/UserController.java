@@ -73,11 +73,6 @@ public class UserController {
 	    return "redirect:" + (referer != null ? referer : "/");
 	}
 	
-	@GetMapping("/register")
-	public void registUser() {
-		
-	}
-	
 	private String formatKakaoUri(HttpServletRequest request) {
 		String contextPath = request.getContextPath();
 	    if (contextPath == null || contextPath.equals("/")) {
@@ -90,15 +85,21 @@ public class UserController {
 	                         contextPath + "/user/kakao";
 		return redirectUri;
 	}
+	
+	@GetMapping("/register")
+	public void registUser() {
+		
+	}
 
 	@PostMapping("/register")
-    public String processRegister(@ModelAttribute UserRegisterDTO dto, HttpServletRequest request) {
+    public String processRegister(@ModelAttribute UserRegisterDTO dto, HttpServletRequest request, HttpSession session) {
         // 실제 회원가입 처리
         try {
 			AccountVO registAccount = service.registUser(dto);
-			System.out.println(registAccount);
+			if (registAccount != null) {
+				session.setAttribute("account", registAccount);
+			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
