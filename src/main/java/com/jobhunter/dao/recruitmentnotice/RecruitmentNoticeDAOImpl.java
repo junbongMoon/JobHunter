@@ -141,9 +141,7 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		Map<String, Object> param = new HashMap<>();
 		param.put("uid", uid);
 		param.put("method", method);
-
-		
-		
+	
 		ses.delete(NS + ".removeApplicationByRecruitmentUid", param);
 		
 	}

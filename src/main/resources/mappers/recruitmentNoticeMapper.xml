@@ -83,58 +83,67 @@
 	</select>
 
 
+	<!-- selectRecruitmentWithPaging -->
 	<select id="selectRecruitmentWithPaging"
 		resultMap="RecruitmentDetailMap">
 		SELECT
 		r.*, c.companyName,
 		rg.regionNo, rg.name AS regionName, rg.code,
 		sg.sigunguNo, sg.name AS sigunguName, sg.regionNo,
-		mj.majorcategoryNo AS majorNo, mj.jobName AS majorJobName,
-		sj.subcategoryNo AS subNo, sj.jobName AS subJobName, sj.refMajorcategoryNo
-		FROM recruitmentnotice r
+		mj.majorcategoryNo
+		AS majorNo, mj.jobName AS majorJobName,
+		sj.subcategoryNo AS subNo,
+		sj.jobName AS subJobName, sj.refMajorcategoryNo
+		FROM recruitmentnotice
+		r
 		LEFT JOIN where_recruit_region rr ON r.uid = rr.refRecNo
-		LEFT JOIN region rg ON rr.refRegion = rg.regionNo
-		LEFT JOIN where_recruit_sigungu rs ON r.uid = rs.refRecNo
-		LEFT JOIN sigungu sg ON rs.refSigungu = sg.sigunguNo
+		LEFT JOIN
+		region rg ON rr.refRegion = rg.regionNo
+		LEFT JOIN where_recruit_sigungu
+		rs ON r.uid = rs.refRecNo
+		LEFT JOIN sigungu sg ON rs.refSigungu =
+		sg.sigunguNo
 		LEFT JOIN jobtype_recruit_major rm ON r.uid = rm.refRecNo
 		LEFT JOIN majorcategory mj ON rm.refMajorNo = mj.majorcategoryNo
-		LEFT JOIN jobtype_recruit_sub rsb ON r.uid = rsb.refRecNo
-		LEFT JOIN subcategory sj ON rsb.refSubNo = sj.subcategoryNo
-		LEFT JOIN company c ON c.uid = r.refCompany
-		LEFT JOIN advantage a ON a.recruitmentNoticeUid = r.uid
+		LEFT
+		JOIN jobtype_recruit_sub rsb ON r.uid = rsb.refRecNo
+		LEFT JOIN
+		subcategory sj ON rsb.refSubNo = sj.subcategoryNo
+		LEFT JOIN company c
+		ON c.uid = r.refCompany
 
 		<where>
 			r.status = 'Y'
 
+			<!-- 검색 조건은 그대로 유지 -->
 			<if test="searchType != null and searchType != ''">
 				<choose>
-
-					<!-- region: rg OR sg -->
 					<when
 						test="searchType == 'region' and searchWord != null and searchWord != ''">
 						AND (
 						rg.name LIKE CONCAT('%', #{searchWord}, '%')
-						OR sg.name LIKE CONCAT('%', #{searchWord}, '%')
+						OR sg.name
+						LIKE CONCAT('%', #{searchWord}, '%')
 						)
 					</when>
-
-					<!-- jobType: mj OR sj -->
 					<when
 						test="searchType == 'jobType' and searchWord != null and searchWord != ''">
 						AND (
 						mj.jobName LIKE CONCAT('%', #{searchWord}, '%')
-						OR sj.jobName LIKE CONCAT('%', #{searchWord}, '%')
+						OR
+						sj.jobName LIKE CONCAT('%', #{searchWord}, '%')
 						)
 					</when>
 
 					<when
 						test="searchType == 'advantage' and searchWord != null and searchWord != ''">
-						AND a.advantageType LIKE CONCAT('%', #{searchWord}, '%')
-					</when>
-
-					<when
-						test="searchType == 'jobform' and searchWord != null and searchWord != ''">
-						AND r.worktype LIKE CONCAT('%', #{searchWord}, '%')
+						AND EXISTS (
+						SELECT 1 FROM advantage a
+						WHERE
+						a.recruitmentNoticeUid = r.uid
+						AND a.advantageType LIKE CONCAT('%',
+						#{searchWord}, '%')
+						)
 					</when>
 
 				</choose>
@@ -143,29 +152,29 @@
 
 		<choose>
 			<when test="searchType == 'highPay'">
-				ORDER BY
-				CASE r.payType
-				WHEN 'HOUR' THEN r.pay * 8 * 22
+				ORDER BY CASE r.payType
+				WHEN 'HOUR' THEN r.pay * 8 *
+				22
 				WHEN 'DATE' THEN r.pay * 22
 				WHEN 'WEEK' THEN r.pay * 4
-				WHEN 'MONTH' THEN r.pay
+				WHEN 'MONTH'
+				THEN r.pay
 				WHEN 'YEAR' THEN r.pay / 12
 				ELSE 0
 				END DESC
 			</when>
-
 			<when test="searchType == 'lowPay'">
-				ORDER BY
-				CASE r.payType
-				WHEN 'HOUR' THEN r.pay * 8 * 22
+				ORDER BY CASE r.payType
+				WHEN 'HOUR' THEN r.pay * 8 *
+				22
 				WHEN 'DATE' THEN r.pay * 22
 				WHEN 'WEEK' THEN r.pay * 4
-				WHEN 'MONTH' THEN r.pay
+				WHEN 'MONTH'
+				THEN r.pay
 				WHEN 'YEAR' THEN r.pay / 12
 				ELSE 0
 				END ASC
 			</when>
-
 			<otherwise>
 				ORDER BY r.uid DESC
 			</otherwise>
@@ -228,6 +237,13 @@
 
 	</resultMap>
 
+	<select id="selectAdvantageByRecruitmentNoticeUid"
+		resultType="com.jobhunter.model.recruitmentnotice.Advantage">
+		SELECT advantageNo, advantageType, recruitmentNoticeUid
+		FROM advantage
+		WHERE recruitmentNoticeUid = #{uid}
+	</select>
+
 	<select id="getTotalCountRow" resultType="int">
 		select count(*) from
 		recruitmentnotice
@@ -237,15 +253,22 @@
 	<select id="getSearchResultCountRow" resultType="int">
 		SELECT COUNT(*)
 		FROM recruitmentnotice r
-		LEFT JOIN where_recruit_region rr ON r.uid = rr.refRecNo
-		LEFT JOIN region rg ON rr.refRegion = rg.regionNo
+		LEFT JOIN where_recruit_region
+		rr ON r.uid = rr.refRecNo
+		LEFT JOIN region rg ON rr.refRegion =
+		rg.regionNo
 		LEFT JOIN where_recruit_sigungu rs ON r.uid = rs.refRecNo
 		LEFT JOIN sigungu sg ON rs.refSigungu = sg.sigunguNo
-		LEFT JOIN jobtype_recruit_major rm ON r.uid = rm.refRecNo
-		LEFT JOIN majorcategory mj ON rm.refMajorNo = mj.majorcategoryNo
-		LEFT JOIN jobtype_recruit_sub rsb ON r.uid = rsb.refRecNo
-		LEFT JOIN subcategory sj ON rsb.refSubNo = sj.subcategoryNo
-		LEFT JOIN advantage a ON a.recruitmentNoticeUid = r.uid
+		LEFT JOIN
+		jobtype_recruit_major rm ON r.uid = rm.refRecNo
+		LEFT JOIN majorcategory
+		mj ON rm.refMajorNo = mj.majorcategoryNo
+		LEFT JOIN jobtype_recruit_sub
+		rsb ON r.uid = rsb.refRecNo
+		LEFT JOIN subcategory sj ON rsb.refSubNo =
+		sj.subcategoryNo
+		LEFT JOIN advantage a ON a.recruitmentNoticeUid =
+		r.uid
 
 		<where>
 			r.status = 'Y'
@@ -262,13 +285,18 @@
 
 					<when test="searchType == 'jobType'">
 						AND (
-						mj.jobName LIKE CONCAT('%', #{searchWord}, '%')
+						mj.jobName LIKE CONCAT('%', #{searchWord},
+						'%')
 						OR sj.jobName LIKE CONCAT('%', #{searchWord}, '%')
 						)
 					</when>
 
 					<when test="searchType == 'advantage'">
+						AND EXISTS (
+						SELECT 1 FROM advantage a
+						WHERE a.recruitmentNoticeUid = r.uid
 						AND a.advantageType LIKE CONCAT('%', #{searchWord}, '%')
+						)
 					</when>
 
 					<when test="searchType == 'jobform'">
