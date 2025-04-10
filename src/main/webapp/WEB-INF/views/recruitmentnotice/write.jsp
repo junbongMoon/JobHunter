@@ -754,6 +754,15 @@ function showThumbnail(file) {
 			data[`checkbox-\${id}`] = $(this).is(":checked");
 		});
 
+		// 면접 방식의 detail 저장
+		$(".application-checkbox").each(function () {
+		const id = $(this).attr("id");
+		const detail = $(`.method-detail[data-method='\${id}']`).val();
+		if (detail) {
+			data[`detail-\${id}`] = detail;
+		}
+		});
+
 		// 저장
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 		console.log("📦 저장됨:", data);
@@ -827,6 +836,14 @@ function showThumbnail(file) {
 					// AJAX로 저장 호출
 					const detail = $(`.method-detail[data-method='\${id}']`).val() || "";
         			saveApplication(id, detail);
+
+					// detail 복원
+					Object.keys(data).forEach(key => {
+					if (key.startsWith("detail-")) {
+						const id = key.replace("detail-", "");
+						$(`.method-detail[data-method='\${id}']`).val(data[key]);
+					}
+					});
 				}
 			});
 		}, 600);
