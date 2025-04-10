@@ -450,24 +450,47 @@
 		<div class="container mt-1 mb-5">
 			<nav aria-label="Page navigation">
 				<ul class="pagination">
+					<!-- 이전 블록으로 이동 -->
+					<c:if test="${currentBlock > 1}">
+						<li class="page-item">
+							<a class="page-link" href="/resume/list?page=${startPage - 1}&pageSize=${pageSize}" aria-label="Previous Block">
+								<i class="fas fa-angle-double-left"></i>
+							</a>
+						</li>
+					</c:if>
+					
+					<!-- 이전 페이지로 이동 -->
 					<c:if test="${currentPage > 1}">
-						<li class="page-item"><a class="page-link"
-							href="/resume/list?page=${currentPage - 1}&pageSize=${pageSize}"
-							aria-label="Previous"> <i class="fas fa-chevron-left"></i>
-						</a></li>
+						<li class="page-item">
+							<a class="page-link" href="/resume/list?page=${currentPage - 1}&pageSize=${pageSize}" aria-label="Previous">
+								<i class="fas fa-chevron-left"></i>
+							</a>
+						</li>
 					</c:if>
 
-					<c:forEach begin="1" end="${totalPages}" var="i">
-						<li class="page-item ${currentPage == i ? 'active' : ''}"><a
-							class="page-link"
-							href="/resume/list?page=${i}&pageSize=${pageSize}">${i}</a></li>
+					<!-- 페이지 번호 -->
+					<c:forEach begin="${startPage}" end="${endPage}" var="i">
+						<li class="page-item ${currentPage == i ? 'active' : ''}">
+							<a class="page-link" href="/resume/list?page=${i}&pageSize=${pageSize}">${i}</a>
+						</li>
 					</c:forEach>
 
+					<!-- 다음 페이지로 이동 -->
 					<c:if test="${currentPage < totalPages}">
-						<li class="page-item"><a class="page-link"
-							href="/resume/list?page=${currentPage + 1}&pageSize=${pageSize}"
-							aria-label="Next"> <i class="fas fa-chevron-right"></i>
-						</a></li>
+						<li class="page-item">
+							<a class="page-link" href="/resume/list?page=${currentPage + 1}&pageSize=${pageSize}" aria-label="Next">
+								<i class="fas fa-chevron-right"></i>
+							</a>
+						</li>
+					</c:if>
+					
+					<!-- 다음 블록으로 이동 -->
+					<c:if test="${currentBlock < totalBlocks}">
+						<li class="page-item">
+							<a class="page-link" href="/resume/list?page=${endPage + 1}&pageSize=${pageSize}" aria-label="Next Block">
+								<i class="fas fa-angle-double-right"></i>
+							</a>
+						</li>
 					</c:if>
 				</ul>
 			</nav>

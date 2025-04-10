@@ -154,14 +154,14 @@
 								</c:when>
 								<c:otherwise>
 									<div class="alert alert-info">
-										<i class="fas fa-info-circle"></i> 등록된 이력서가 없습니다. <a href="/resume/form"
-											class="alert-link">이력서 작성하기</a>
+										<i class="fas fa-info-circle"></i> 등록된 이력서가 없습니다. 새 이력서를 작성해주세요.
 									</div>
 								</c:otherwise>
 							</c:choose>
 						</div>
 					</div>
 
+					<c:if test="${totalPages > 1}">
 					<!-- 개인정보 제3자 제공 동의 -->
 					<div class="privacy-consent card">
 						<div class="card-header d-flex justify-content-between align-items-center">
@@ -186,9 +186,7 @@
 							</div>
 						</div>
 					</div>
-
 					<!-- 페이징 처리 -->
-					<c:if test="${totalPages > 1}">
 						<div class="submit-button-container text-center mb-4">
 							<button type="button" id="submitResumeBtn" class="btn btn-primary btn-lg" disabled>
 								<i class="fas fa-paper-plane"></i> 이력서 제출하기
@@ -197,34 +195,48 @@
 						<div class="pagination-container">
 							<nav aria-label="Page navigation">
 								<ul class="pagination justify-content-center">
-
-									<!-- 이전 페이지 버튼 -->
-									<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-										<a class="page-link"
-											href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage - 1}&pageSize=${pageSize}"
-											aria-label="Previous"> <i class="fas fa-chevron-left"></i>
-										</a>
-									</li>
+									<!-- 이전 블록으로 이동 -->
+									<c:if test="${currentBlock > 1}">
+										<li class="page-item">
+											<a class="page-link" href="/submission/check?uid=${recruitmentNotice.uid}&page=${startPage - 1}&pageSize=${pageSize}" aria-label="Previous Block">
+												<i class="fas fa-angle-double-left"></i>
+											</a>
+										</li>
+									</c:if>
+									
+									<!-- 이전 페이지로 이동 -->
+									<c:if test="${currentPage > 1}">
+										<li class="page-item">
+											<a class="page-link" href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage - 1}&pageSize=${pageSize}" aria-label="Previous">
+												<i class="fas fa-chevron-left"></i>
+											</a>
+										</li>
+									</c:if>
 
 									<!-- 페이지 번호 -->
-									<c:set var="startPage" value="${((currentPage - 1) / 5) * 5 + 1}" />
-									<c:set var="endPage"
-										value="${startPage + 4 > totalPages ? totalPages : startPage + 4}" />
-
 									<c:forEach begin="${startPage}" end="${endPage}" var="i">
 										<li class="page-item ${currentPage == i ? 'active' : ''}">
-											<a class="page-link"
-												href="/submission/check?uid=${recruitmentNotice.uid}&page=${i}&pageSize=${pageSize}">${i}</a>
+											<a class="page-link" href="/submission/check?uid=${recruitmentNotice.uid}&page=${i}&pageSize=${pageSize}">${i}</a>
 										</li>
 									</c:forEach>
 
-									<!-- 다음 페이지 버튼 -->
-									<li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-										<a class="page-link"
-											href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage + 1}&pageSize=${pageSize}"
-											aria-label="Next"> <i class="fas fa-chevron-right"></i>
-										</a>
-									</li>
+									<!-- 다음 페이지로 이동 -->
+									<c:if test="${currentPage < totalPages}">
+										<li class="page-item">
+											<a class="page-link" href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage + 1}&pageSize=${pageSize}" aria-label="Next">
+												<i class="fas fa-chevron-right"></i>
+											</a>
+										</li>
+									</c:if>
+									
+									<!-- 다음 블록으로 이동 -->
+									<c:if test="${currentBlock < totalBlocks}">
+										<li class="page-item">
+											<a class="page-link" href="/submission/check?uid=${recruitmentNotice.uid}&page=${endPage + 1}&pageSize=${pageSize}" aria-label="Next Block">
+												<i class="fas fa-angle-double-right"></i>
+											</a>
+										</li>
+									</c:if>
 								</ul>
 							</nav>
 						</div>

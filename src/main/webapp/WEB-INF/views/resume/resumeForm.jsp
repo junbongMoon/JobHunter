@@ -2134,42 +2134,16 @@
 						const fileInfo = {
 							file: file,
 							originalFileName: file.name,
-							newFileName: generateUniqueFileName(file.name),
 							ext: file.name.split('.').pop(),
-							size: file.size,
-							base64Image: null // 나중에 설정
+							size: file.size
 						};
 
-						// 파일을 base64로 변환
-						convertFileToBase64(file).then(base64 => {
-							fileInfo.base64Image = base64;
-							// 대기 중인 파일 목록에 추가
-							pendingFiles.push(fileInfo);
-							// 미리보기 표시
-							showFilePreview(fileInfo);
-							updateFileText();
-						}).catch(error => {
-							showValidationModal("파일 변환 중 오류가 발생했습니다.");
-						});
+						// 대기 중인 파일 목록에 추가
+						pendingFiles.push(fileInfo);
+						// 미리보기 표시
+						showFilePreview(fileInfo);
+						updateFileText();
 					});
-				}
-
-				// 파일을 base64로 변환하는 함수
-				function convertFileToBase64(file) {
-					return new Promise((resolve, reject) => {
-						const reader = new FileReader();
-						reader.onload = () => resolve(reader.result);
-						reader.onerror = error => reject(error);
-						reader.readAsDataURL(file);
-					});
-				}
-
-				// 고유한 파일명 생성 함수
-				function generateUniqueFileName(originalFileName) {
-					const timestamp = new Date().getTime();
-					const random = Math.floor(Math.random() * 1000);
-					const ext = originalFileName.split('.').pop();
-					return `${timestamp}_${random}.${ext}`;
 				}
 
 				// 파일 업로드 함수 (Promise 기반)
@@ -2213,7 +2187,7 @@
 
 					const $preview = $('<div>')
 						.addClass('file-preview d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded')
-						.attr('data-filename', fileInfo.newFileName);
+						.attr('data-filename', fileInfo.originalFileName);
 
 					// 파일 정보 표시
 					const $fileInfo = $('<div>').addClass('d-flex align-items-center');
@@ -2231,37 +2205,36 @@
 					// 삭제 버튼
 					const $deleteBtn = $('<button>')
 						.addClass('btn btn-sm btn-danger ms-2')
-						.attr('type', 'button')  // type 속성 추가
+						.attr('type', 'button')
 						.html('<i class="bi bi-trash"></i>')
 						.on('click', function (e) {
-							e.preventDefault();  // 기본 동작 방지
-							e.stopPropagation();  // 이벤트 전파 중단
-							deleteFile(fileInfo.newFileName, $preview);
+							e.preventDefault();
+							e.stopPropagation();
+							deleteFile(fileInfo.originalFileName, $preview);
 						});
 
 					$preview.append($fileInfo).append($deleteBtn);
 					$previewContainer.append($preview);
 				}
 
-				// 파일 삭제 함수 - 임시 삭제 방식으로 수정
+				// 파일 삭제 함수
 				function deleteFile(fileName, $preview) {
-					// 업로드된 파일인지 대기 중인 파일인지 확인
-					const uploadedFile = uploadedFiles.find(f => f.newFileName === fileName);
-					const pendingFile = pendingFiles.find(f => f.newFileName === fileName);
+					const uploadedFile = uploadedFiles.find(f => f.originalFileName === fileName);
+					const pendingFile = pendingFiles.find(f => f.originalFileName === fileName);
 
 					if (uploadedFile) {
 						// 업로드된 파일인 경우
-						uploadedFiles = uploadedFiles.filter(f => f.newFileName !== fileName);
+						uploadedFiles = uploadedFiles.filter(f => f.originalFileName !== fileName);
 						$preview.remove();
 						updateFileText();
 
-						// 삭제된 파일 목록에 추가 (나중에 저장 시 서버에 전송)
-						if (!deletedFiles.includes(fileName)) {
-							deletedFiles.push(fileName);
+						// 삭제된 파일 목록에 추가
+						if (!deletedFiles.includes(uploadedFile.newFileName)) {
+							deletedFiles.push(uploadedFile.newFileName);
 						}
 					} else if (pendingFile) {
 						// 대기 중인 파일인 경우
-						pendingFiles = pendingFiles.filter(f => f.newFileName !== fileName);
+						pendingFiles = pendingFiles.filter(f => f.originalFileName !== fileName);
 						$preview.remove();
 						updateFileText();
 					}
