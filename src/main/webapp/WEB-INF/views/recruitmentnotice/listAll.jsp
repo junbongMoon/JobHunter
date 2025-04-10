@@ -5,31 +5,38 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
+	// 페이지 로드시 초기 실행
+	$(function () {
+	const selectedVal = $('#searchType').val();
+	const keywordBox = document.querySelector('#keywordBox');
 
-  // 페이지 로드시 초기 실행
-  $(function () {
+	// 페이지 로딩 시 input 없으면 렌더링
+	if (["region", "jobType", "advantage", "jobform"].includes(selectedVal)) {
+		if (!keywordBox.querySelector('input')) {
+			const input = document.createElement('input');
+			input.type = 'text';
+			input.name = 'searchWord';
+			input.placeholder = '검색어를 입력하세요';
+			input.className = 'form-control';
+			input.value = '${param.searchWord}';
+			keywordBox.appendChild(input);
+		}
+	}
+
 	$(document).on('change', '#searchType', function () {
-    const selectedVal = $('#searchType').val();
-    const keywordBox = document.querySelector('#keywordBox');
+		const selectedVal = $('#searchType').val();
+		keywordBox.innerHTML = '';
 
-    // 조건에 해당할 때 input 생성
-    if (["region", "jobType", "advantage", "jobform"].includes(selectedVal)) {
-      // 이미 input이 없다면 생성
-      if (!keywordBox.querySelector('input')) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'searchWord';
-        input.placeholder = '검색어를 입력하세요';
-        input.className = 'form-control';
-        input.value = '${param.searchWord}'; // JSP EL로 초기값 삽입
-        keywordBox.appendChild(input);
-      }
-    } else {
-      // 그 외에는 제거
-      keywordBox.innerHTML = '';
-    }
-  });
-  });
+		if (["region", "jobType", "advantage", "jobform"].includes(selectedVal)) {
+			const input = document.createElement('input');
+			input.type = 'text';
+			input.name = 'searchWord';
+			input.placeholder = '검색어를 입력하세요';
+			input.className = 'form-control';
+			keywordBox.appendChild(input);
+		}
+	});
+});
 </script>
 
 <style>
@@ -39,31 +46,29 @@
 
 .recruitmentList {
 	margin-top: 20px;
-	
 }
 
 .write-btn-container {
-  width: 95%;
-  margin-bottom: 50px;
+	width: 95%;
+	margin-bottom: 50px;
 }
 
 .write-btn {
-  background-color: #47b2e4;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
+	background-color: #47b2e4;
+	color: white;
+	padding: 10px 20px;
+	border-radius: 8px;
+	text-decoration: none;
+	font-weight: bold;
+	transition: background-color 0.3s ease;
 }
 
 .write-btn:hover {
-  background-color: #1f9fd2;
+	background-color: #1f9fd2;
 }
 
 .recruitment {
-  margin-bottom: 30px;
-
+	margin-bottom: 30px;
 }
 </style>
 <body>
@@ -72,40 +77,56 @@
 	<main class="main">
 		<!-- Blog Posts Section -->
 
-			<div class="container" data-aos="fade-up" data-aos-delay="100">
-				<section id="blog-posts" class="blog-posts section">
-					<div>
-						<c:choose>
-							<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
-								<div class="write-btn-container text-end">
-									<a href="/recruitmentnotice/write" class="write-btn">공고 작성</a>
-								</div>
-							</c:when>
-						</c:choose>
-					</div>
-					<form action="/recruitmentnotice/listAll" method="get" class="mb-4" style="width: 90%; margin: 0 auto;">
-						<div class="row">
-							<div class="col-md-3">
+		<div class="container" data-aos="fade-up" data-aos-delay="100">
+			<section id="blog-posts" class="blog-posts section">
+				<div>
+					<c:choose>
+						<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
+							<div class="write-btn-container text-end">
+								<a href="/recruitmentnotice/write" class="write-btn">공고 작성</a>
+							</div>
+						</c:when>
+					</c:choose>
+				</div>
+				<form action="/recruitmentnotice/listAll" method="get" class="mb-4"
+					style="width: 90%; margin: 0 auto;">
+					<div class="row">
+						<div class="col-md-3">
 							<select class="form-select" name="searchType" id="searchType">
-								<option value="">-- 검색 조건 선택 --</option>
-								<option value="region">지역</option>
-								<option value="jobType">직업군</option>
-								<option value="advantage">우대조건</option>
-								<option value="jobform">근무형태</option>
-								<option value="highPay">높은금액 순</option>
-								<option value="lowPay">낮은금액 순</option>
-							  </select>
-							</div>
-					  
-							  <div class="col-md-6" id="keywordBox">
-								<!-- JavaScript로 input 삽입 -->
-							  </div>
-							
-							  <div class="col-md-3 text-end">
-								<button type="submit" class="btn btn-primary">검색</button>
-							  </div>
-							</div>
-					  </form>
+								<option value="">검색 조건 없음</option>
+								<option value="region"
+									${param.searchType == 'region' ? 'selected' : ''}>지역</option>
+								<option value="jobType"
+									${param.searchType == 'jobType' ? 'selected' : ''}>직업군</option>
+								<option value="advantage"
+									${param.searchType == 'advantage' ? 'selected' : ''}>우대조건</option>
+								<option value="jobform"
+									${param.searchType == 'jobform' ? 'selected' : ''}>근무형태</option>
+								<option value="highPay"
+									${param.searchType == 'highPay' ? 'selected' : ''}>높은금액
+									순</option>
+								<option value="lowPay"
+									${param.searchType == 'lowPay' ? 'selected' : ''}>낮은금액
+									순</option>
+							</select>
+						</div>
+
+						<div class="col-md-6" id="keywordBox">
+							<c:if test="${not empty param.searchWord 
+										&& not empty param.searchType 
+										&& param.searchType != 'highPay' 
+										&& param.searchType != 'lowPay'}">
+								<input type="text" name="searchWord" class="form-control"
+									   placeholder="검색어를 입력하세요"
+									   value="${param.searchWord}" />
+							</c:if>
+						</div>
+
+						<div class="col-md-3 text-end">
+							<button type="submit" class="btn btn-primary">검색</button>
+						</div>
+					</div>
+				</form>
 				<div class="row gy-4 gx-4">
 
 					<c:forEach var="rec" items="${boardList}">
@@ -166,42 +187,41 @@
 
 				</div>
 				<!-- End blog posts list -->
+		</div>
+		<!-- 페이지 블럭 -->
+		<div class="pagination justify-content-center mt-4">
+			<ul class="pagination">
 
-			</div>
-			<!-- 페이지 블럭 -->
-			<div class="pagination justify-content-center mt-4">
-				<ul class="pagination">
+				<!-- ◀ 이전 블럭 -->
+				<c:if test="${pageResponse.startPageNumPerBlock > 1}">
+					<li class="page-item"><a class="page-link"
+						href="?pageNo=${pageResponse.startPageNumPerBlock - 1}&searchType=${pageResponse.searchType}&searchWord=${pageResponse.searchWord}"
+						aria-label="Previous"> <span aria-hidden="true">«</span>
+					</a></li>
+				</c:if>
 
-					<!-- ◀ 이전 블럭 -->
-					<c:if test="${pageResponse.startPageNumPerBlock > 1}">
-						<li class="page-item"><a class="page-link"
-							href="?pageNo=${pageResponse.startPageNumPerBlock - 1}"
-							aria-label="Previous"> <span aria-hidden="true">«</span>
-						</a></li>
-					</c:if>
+				<!-- 페이지 번호 반복 출력 -->
+				<c:forEach begin="${pageResponse.startPageNumPerBlock}"
+					end="${pageResponse.endPageNumPerBlock}" var="i">
+					<li class="page-item ${i == pageResponse.pageNo ? 'active' : ''}">
+						<a class="page-link"
+						href="?pageNo=${i}&searchType=${pageResponse.searchType}&searchWord=${pageResponse.searchWord}">${i}</a>
+					</li>
+				</c:forEach>
 
-					<!-- 페이지 번호 반복 출력 -->
-					<c:forEach begin="${pageResponse.startPageNumPerBlock}"
-						end="${pageResponse.endPageNumPerBlock}" var="i">
-						<li class="page-item ${i == pageResponse.pageNo ? 'active' : ''}">
-							<a class="page-link" href="?pageNo=${i}">${i}</a>
-						</li>
-					</c:forEach>
-
-					<!-- ▶ 다음 블럭 -->
-					<c:if
-						test="${pageResponse.endPageNumPerBlock < pageResponse.totalPageCnt}">
-						<li class="page-item"><a class="page-link"
-							href="?pageNo=${pageResponse.endPageNumPerBlock + 1}"
-							aria-label="Next"> <span aria-hidden="true">»</span>
-						</a></li>
-					</c:if>
-
-				</ul>
-
+				<!-- ▶ 다음 블럭 -->
+				<c:if
+					test="${pageResponse.endPageNumPerBlock < pageResponse.totalPageCnt}">
+					<li class="page-item"><a class="page-link"
+						href="?pageNo=${pageResponse.endPageNumPerBlock + 1}&searchType=${pageResponse.searchType}&searchWord=${pageResponse.searchWord}"
+						aria-label="Next"> <span aria-hidden="true">»</span>
+					</a></li>
+				</c:if>
+			</ul>
 
 
-			</div>
+
+		</div>
 
 		</section>
 

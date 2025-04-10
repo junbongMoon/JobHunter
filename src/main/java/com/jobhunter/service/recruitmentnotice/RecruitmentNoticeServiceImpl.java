@@ -35,7 +35,9 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	private final RecruitmentNoticeDAO recdao;
 	private final RegionDAO regiondao;
 	private final JobDAO jobdao;
-
+	
+	
+	// 공고를 저장하는 메서드
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO, List<AdvantageDTO> advantageList,
@@ -112,23 +114,37 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 		return detailInfo;
 	}
-
-	// 공고 전체를 조회하는 메서드
+	
+	// 공고를 검색어에 따라 페이징해서 조회 해오는 메서드
 	@Override
 	public PageResponseDTO<RecruitmentDetailInfo> getEntireRecruitment(PageRequestDTO pageRequestDTO) throws Exception {
-	    
-	    int totalRowCnt = recdao.selectRecruitmentTotalCount(pageRequestDTO);
 
-	    // 제네릭 pagingProcess 사용
+	    String searchType = pageRequestDTO.getSearchType();
+	    String searchWord = pageRequestDTO.getSearchWord();
+	    
+	    int totalRowCnt;
+
+	    // 정렬만 하고 검색은 하지 않을 경우 (전체 count 조회)
+	    if ("highPay".equals(searchType) || "lowPay".equals(searchType)) {
+	        totalRowCnt = recdao.getTotalCountRow(); // WHERE status = 'Y'만 포함된 쿼리
+	    } else if (StringUtils.hasText(searchType) && StringUtils.hasText(searchWord)) {
+	        totalRowCnt = recdao.getSearchResultRowCount(pageRequestDTO); // 조건 검색
+	    } else {
+	        totalRowCnt = recdao.getTotalCountRow(); // 기본
+	    }
+
+	    // 페이징 계산
 	    PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO = pagingProcess(pageRequestDTO, totalRowCnt);
 
+	    // 실제 공고 목록 조회
 	    List<RecruitmentDetailInfo> boardList = recdao.selectRecruitmentWithKeyword(pageResponseDTO);
-	    
+
 	    if (boardList == null) {
 	        boardList = Collections.emptyList();
 	    } else {
 	        for (RecruitmentDetailInfo info : boardList) {
 	            if (info != null) {
+	            	System.out.println(info);
 	                int uid = info.getUid();
 	                List<Application> applications = recdao.getApplications(uid);
 	                List<Advantage> advantages = recdao.getAdvantages(uid);
@@ -142,6 +158,8 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	            }
 	        }
 	    }
+	    
+	    System.out.println("boardList.size() = " + boardList.size());
 
 	    pageResponseDTO.setBoardList(boardList);
 	    return pageResponseDTO;
@@ -153,6 +171,8 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	        pageRequestDTO.getPageNo(),
 	        pageRequestDTO.getRowCntPerPage()
 	    );
+	    
+	    System.out.println("pageresponsedto : " + pageResponseDTO);
 
 	    pageResponseDTO.setTotalRowCnt(totalRowCount); // 전체 데이터 수
 

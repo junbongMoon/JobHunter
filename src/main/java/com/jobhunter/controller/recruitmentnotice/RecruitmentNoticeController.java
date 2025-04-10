@@ -98,7 +98,7 @@ public class RecruitmentNoticeController {
 		try {
 
 			PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO;
-
+			System.out.println(pageRequestDTO);
 			pageResponseDTO = recruitmentService.getEntireRecruitment(pageRequestDTO);
 
 			model.addAttribute("pageResponse", pageResponseDTO); // view에서 pageResponse 사용 가능
