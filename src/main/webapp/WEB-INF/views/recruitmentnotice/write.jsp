@@ -289,7 +289,7 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 	// 로컬스토리지 자동저장
 	setTimeout(() => {
     restoreFormFromLocalStorage();
-  }, 500);
+  	}, 2000);
 
 	setInterval(saveFormToLocalStorage, AUTO_SAVE_INTERVAL);
 
@@ -746,53 +746,64 @@ function showThumbnail(file) {
 
 	// 복원 함수
 	function restoreFormFromLocalStorage() {
-	const saved = localStorage.getItem(STORAGE_KEY);
-	if (!saved) return;
+		const saved = localStorage.getItem(STORAGE_KEY);
+		if (!saved) return;
 
-	const data = JSON.parse(saved);
+		const data = JSON.parse(saved);
 
-	// 1단계: 기본 필드 값 복원
-	Object.keys(data).forEach(selector => {
-		const val = data[selector];
-		const el = $(selector);
+		// 1. 기본 텍스트 필드 및 셀렉트 먼저 복원
+		[
+			"#title", "#pay", "#startTime", "#endTime", "#workDetailType",
+			"#date", "#manager", "#advantage", "#summernote"
+		].forEach(selector => {
+			const val = data[selector];
+			if (val !== undefined) $(selector).val(val);
+		});
 
-		if (el.length) {
-		const type = el.attr("type");
-		if (type === "radio" || type === "checkbox") {
-			el.prop("checked", false);
-			el.filter(`[value="${val}"]`).prop("checked", true);
-		} else {
-			el.val(val);
+		// 2. summernote 따로 처리
+		if (data["#summernote"]) {
+			$("#summernote").summernote("code", data["#summernote"]);
 		}
+
+		// 3. 산업군 → 직업군 (직업군은 delay 필요)
+		const majorVal = data[".MajorCategory"];
+		if (majorVal && majorVal !== "-1") {
+			$(".MajorCategory").val(majorVal);
+			getSubCategory(majorVal); // ajax 호출
+
+			setTimeout(() => {
+			$(".SubCategory").val(data[".SubCategory"]);
+			}, 300); // 직업군 로딩 대기
 		}
-	});
 
-	// 서머노트 별도 처리
-	if (data["#summernote"]) {
-		$("#summernote").summernote("code", data["#summernote"]);
-	}
+		// 4. 지역 → 시군구 (시군구도 delay 필요)
+		const regionVal = data[".Region"];
+		if (regionVal && regionVal !== "-1") {
+			$(".Region").val(regionVal);
+			getSigungu(regionVal);
 
-	// 2단계: 산업군/직종 → 연쇄 호출
-	const majorVal = $(".MajorCategory").val();
-	if (majorVal && majorVal !== "-1") {
-		getSubCategory(majorVal); // 직종 로딩
+			setTimeout(() => {
+			$(".Sigungu").val(data[".Sigungu"]);
+			}, 300);
+		}
+
+		// 5. radio & checkbox 복원
 		setTimeout(() => {
-		$(".SubCategory").val(data[".SubCategory"]);
-		}, 200); // 데이터 도착 후 적용
-	}
+			[
+			"input[name='workType']",
+			"input[name='payType']",
+			"input[name='militaryService']",
+			"input[name='personalHistory']"
+			].forEach(name => {
+			const val = data[`\${name}:checked`];
+			if (val !== undefined) {
+				$(`\${name}[value="\${val}"]`).prop("checked", true).trigger("change");
+			}
+			});
+		}, 400);
 
-	// 3단계: 지역/시군구 → 연쇄 호출
-	const regionVal = $(".Region").val();
-	if (regionVal && regionVal !== "-1") {
-		getSigungu(regionVal); // 시군구 로딩
-		setTimeout(() => {
-		$(".Sigungu").val(data[".Sigungu"]);
-		}, 200); // 시군구 데이터 로딩 후 적용
+		console.log("📥 로컬스토리지 폼 복원 완료");
 	}
-
-	console.log("📥 폼 복원 완료");
-	}
-
 
 </script>
 
