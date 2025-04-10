@@ -65,9 +65,9 @@ public class ReviewBoardController {
 	@GetMapping("/write")
 	public String reviewBoardWrite(HttpSession session, Model model, HttpServletRequest req) {
 	    AccountVO account = (AccountVO) session.getAttribute("account");
-	    if (account == null) {
-	        return "redirect:/account/login?returnUrl=/reviewBoard/write";
-	    }
+//	    if (account == null) {
+//	        return "redirect:/account/login?returnUrl=/reviewBoard/write";
+//	    }
 
 	    int userUid = account.getUid();
 	    try {
