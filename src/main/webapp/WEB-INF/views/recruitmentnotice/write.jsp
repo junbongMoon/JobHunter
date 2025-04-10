@@ -823,6 +823,10 @@ function showThumbnail(file) {
 				const id = $(this).attr("id");
 				if (data[`checkbox-\${id}`]) {
 					$(this).prop("checked", true).trigger("change");
+
+					// AJAX로 저장 호출
+					const detail = $(`.method-detail[data-method='\${id}']`).val() || "";
+        			saveApplication(id, detail);
 				}
 			});
 		}, 600);
