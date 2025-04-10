@@ -4,7 +4,7 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.reviewboardmapper">
 
-
+	<!-- 게시글 목록 조회 -->
 
 	<select id="allList"
 		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
@@ -27,7 +27,7 @@
 		ORDER BY
 		r.boardNo DESC;
 	</select>
-
+	<!-- 작성페이지 조회 -->
 	<select id="gonggoAll"
 		resultType="com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO">
 		SELECT
@@ -48,12 +48,14 @@
 		JOIN company c ON rn.refCompany =
 		c.uid
 		WHERE res.userUid = #{res.userUid}
-		AND reg.status = 'CHECKED'
+		AND reg.status in('PASS','FAILURE','EXPIRED','CHECKED')
 
 	</select>
-
+	<!-- 작성페이지 인서트 -->
 	<insert id="insertReview"
-		parameterType="com.jobhunter.model.reviewboard.WriteBoardDTO">
+		parameterType="com.jobhunter.model.reviewboard.WriteBoardDTO"
+	useGeneratedKeys="true"
+	keyProperty="boardNo">
 		insert into reviewBoard
 		(gonggoUid,
 		writer,
@@ -80,7 +82,7 @@
 		)
 	</insert>
 
-
+	<!-- 상세페이지 조회 -->
 	<select id="detailAll" resultMap="ReviewDetailViewDTOMap">
 		SELECT
 		r.boardNo,
@@ -109,7 +111,7 @@
 		INNER JOIN company
 		com ON
 		rec.refCompany = com.uid
-		WHERE r.boardNo = #{r.boardNo}
+		WHERE r.boardNo = #{boardNo}
 	</select>
 
 	<resultMap id="ReviewDetailViewDTOMap"
@@ -162,13 +164,36 @@
 	<delete id="deleteLike">
 		DELETE FROM reviewLikes
 		WHERE userId = #{userId}
-		AND boardNo = #{boardNo}
+		AND
+		boardNo = #{boardNo}
 	</delete>
 
 	<!-- 좋아요 수 감소 -->
 	<update id="decreaseBoardLikes">
 		UPDATE reviewBoard
 		SET likes = likes - 1
+		WHERE boardNo
+		= #{boardNo}
+	</update>
+
+	<select id="selectModifyReviewBoard" parameterType="int"
+		resultType="com.jobhunter.model.reviewboard.WriteBoardDTO">
+		SELECT boardNo, gonggoUid, writer, companyName, reviewResult, reviewType,
+		reviewLevel, content
+		FROM reviewBoard
 		WHERE boardNo = #{boardNo}
+	</select>
+
+
+	<update id="updateReviewBoard">
+		UPDATE reviewBoard
+		SET
+		gonggoUid = #{gonggoUid},
+		reviewType= #{reviewType},
+		reviewResult =#{reviewResult},
+		content =#{content},
+		postDate= NOW()
+		WHERE boardNo =
+		#{boardNo}
 	</update>
 </mapper>
