@@ -451,7 +451,7 @@
 								<small class="text-muted">* 경력사항이 있는 경우에만 작성해 주세요.</small>
 							</div>
 							<div>
-								<small class="text-muted">* 경력사항은 이력서 저장 시 최신순으로 정렬됩니다.</small>
+								<small class="text-muted">* 경력사항을 허위로 기재시 법적책임을 질 수 있습니다.</small>
 							</div>
 						</div>
 					</div>
@@ -2119,16 +2119,17 @@
 					Array.from(files).forEach(file => {
 						// 파일 크기 체크
 						if (file.size > MAX_FILE_SIZE) {
-							showValidationModal(`${file.name}의 크기가 10MB를 초과합니다.`);
+							showValidationModal(`파일의 크기가 10MB를 초과합니다.`);
 							return;
 						}
 
-						// 중복 체크 (업로드된 파일과 대기 중인 파일 모두 확인)
+						// 중복 체크 (업로드된 파일과 대기 중인 파일 모두 확인 some() -> 배열에 조건에 맞는 요소가 있는지 확인)
 						if (uploadedFiles.some(f => f.originalFileName === file.name) ||
 							pendingFiles.some(f => f.originalFileName === file.name)) {
-							showValidationModal(`${file.name}은(는) 이미 업로드되었습니다.`);
+							showValidationModal(`이미 업로드된 파일입니다.`);
 							return;
 						}
+						
 
 						// 파일 정보 생성
 						const fileInfo = {
@@ -2219,12 +2220,18 @@
 
 				// 파일 삭제 함수
 				function deleteFile(fileName, $preview) {
-					const uploadedFile = uploadedFiles.find(f => f.originalFileName === fileName);
-					const pendingFile = pendingFiles.find(f => f.originalFileName === fileName);
+					const uploadedFile = uploadedFiles.find(function(f) {
+						return f.originalFileName === fileName;
+					});
+					const pendingFile = pendingFiles.find(function(f) {
+						return f.originalFileName === fileName;
+					});
 
 					if (uploadedFile) {
 						// 업로드된 파일인 경우
-						uploadedFiles = uploadedFiles.filter(f => f.originalFileName !== fileName);
+						uploadedFiles = uploadedFiles.filter(function(f) {
+							return f.originalFileName !== fileName;
+						});
 						$preview.remove();
 						updateFileText();
 
