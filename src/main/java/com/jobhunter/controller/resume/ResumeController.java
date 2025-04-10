@@ -205,6 +205,12 @@ public class ResumeController {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		int userUid = account.getUid();
 		try {
+			// 이력서 상태 확인
+			if (resumeService.isResumeChecked(resumeNo)) {
+				model.addAttribute("error", "기업에서 확인중인 이력서는 수정할 수 없습니다.");
+				return "error";
+			}
+			
 			// 기존 이력서 정보 조회
 			ResumeDetailDTO resumeDetail = resumeService.getResumeDetailWithAll(resumeNo);
 			model.addAttribute("resumeDetail", resumeDetail);
@@ -254,7 +260,7 @@ public class ResumeController {
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> updateResume(@PathVariable int resumeNo,
 			@RequestBody ResumeDTO resumeDTO) {
-		try {
+		try {			
 			resumeDTO.setResumeNo(resumeNo);
 			resumeService.updateResume(resumeDTO);
 			Map<String, Object> response = new HashMap<>();

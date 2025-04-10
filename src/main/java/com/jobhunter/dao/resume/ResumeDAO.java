@@ -103,4 +103,7 @@ public interface ResumeDAO {
 	
 	// 중복 지원 확인
 	int checkExistingRegistration(int userUid, int recruitmentNo) throws Exception;
+	
+	// 이력서 상태 확인
+	int checkResumeStatus(int resumeNo) throws Exception;
 }

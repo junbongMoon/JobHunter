@@ -26,6 +26,12 @@ public class ResumeRestController {
 	@DeleteMapping(value = "/delete/{resumeNo}")
 	public ResponseEntity<String> deleteResume(@PathVariable int resumeNo) {
 		try {
+			// 이력서 상태 확인
+			if (resumeService.isResumeChecked(resumeNo)) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN)
+					.body("기업에서 확인중인 이력서는 삭제할 수 없습니다.");
+			}
+			
 			// 이력서에 파일이 있다면 파일 또한 서버에서 삭제
 			List<ResumeUpfileDTO> upfiles = resumeService.selectResumeUpfile(resumeNo);
 			for (ResumeUpfileDTO upfile : upfiles) {

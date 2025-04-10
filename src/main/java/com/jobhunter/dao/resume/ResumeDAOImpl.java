@@ -237,4 +237,9 @@ public class ResumeDAOImpl implements ResumeDAO {
 		map.put("recruitmentNo", recruitmentNo);
 		return ses.selectOne(NS + ".checkExistingRegistration", map);
 	}
+
+	@Override
+	public int checkResumeStatus(int resumeNo) throws Exception {
+		return ses.selectOne(NS + ".checkResumeStatus", resumeNo);
+	}
 }

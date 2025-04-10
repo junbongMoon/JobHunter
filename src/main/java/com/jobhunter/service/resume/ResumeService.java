@@ -53,4 +53,7 @@ public interface ResumeService {
 
 	// 중복 지원 확인
 	boolean isResumeAlreadySubmitted(int userUid, int recruitmentNo) throws Exception;
+
+	// 이력서 상태 확인
+	boolean isResumeChecked(int resumeNo) throws Exception;
 }

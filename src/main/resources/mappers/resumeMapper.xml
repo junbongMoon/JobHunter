@@ -267,4 +267,12 @@
         AND res.userUid = #{userUid}
     </select>
     
+    <!-- 이력서 상태 확인 -->
+    <select id="checkResumeStatus" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM registration
+        WHERE resumePk = #{resumeNo}
+        AND status = 'CHECKED'
+    </select>
+    
 </mapper>

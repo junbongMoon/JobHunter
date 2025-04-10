@@ -210,6 +210,9 @@ public class ResumeServiceImpl implements ResumeService {
 			List<SubCategoryVO> subCategoryList = rdao.selectResumeSubCategory(resume.getResumeNo());
 			resume.setSigunguList(sigunguList);
 			resume.setSubcategoryList(subCategoryList);
+			
+			// 이력서 상태 확인
+			resume.setChecked(rdao.checkResumeStatus(resume.getResumeNo()) > 0);
 		}
 
 		return resumeList;
@@ -271,5 +274,10 @@ public class ResumeServiceImpl implements ResumeService {
 		int count = rdao.checkExistingRegistration(userUid, recruitmentNo);
 		System.out.println("count: " + count);
 		return count > 0;
+	}
+
+	@Override
+	public boolean isResumeChecked(int resumeNo) throws Exception {
+		return rdao.checkResumeStatus(resumeNo) > 0;
 	}
 }
