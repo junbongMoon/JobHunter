@@ -13,7 +13,7 @@
 }
 
 .write-btn-container {
-  width: 90%;
+  width: 95%;
   margin-bottom: 50px;
 }
 
@@ -51,6 +51,28 @@
 					</c:when>
 				</c:choose>
 			</div>
+			<form action="/recruitmentnotice/listAll" method="get" class="mb-4" style="width: 90%; margin: 0 auto;">
+				<div class="row">
+				  <div class="col-md-3">
+					<select class="form-select" name="searchType">
+					  <option value="">-- 검색 조건 선택 --</option>
+					  <option value="region">지역</option>
+					  <option value="jobtype">직업</option>
+					  <option value="advantage">우대조건</option>
+					  <option value="jobform">근무형태</option>
+					  <option value="pay">급여</option>
+					</select>
+				  </div>
+			  
+				  <div class="col-md-6">
+					<input type="text" class="form-control" name="searchWord" placeholder="검색어를 입력하세요" value="${param.searchWord}">
+				  </div>
+			  
+				  <div class="col-md-3 text-end">
+					<button type="submit" class="btn btn-primary">검색</button>
+				  </div>
+				</div>
+			  </form>
 			<div class="container" data-aos="fade-up" data-aos-delay="100">
 				<div class="row gy-4 gx-4">
 
