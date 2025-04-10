@@ -72,15 +72,7 @@ public class SubmitController {
 		return result;
 	}
 	
-	// 합격 여부
-	@PutMapping("/passed")
-	public String PassedByRegistration() {
-		
-		
-		
-	// 승인 페이지로 다시 되돌아가게 하자.
-		return null;
-	}
+
 	
 	
 	

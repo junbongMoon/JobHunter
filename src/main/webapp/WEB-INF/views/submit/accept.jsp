@@ -165,18 +165,18 @@ function renderResumePagination(data) {
 
   // 이전 페이지 버튼
   if (startPage > 1) {
-    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 resume-page-btn" data-page="\${startPage - 1}">«</button>`;
+    paginationHtml += `<button type="button" class="btn btn-outline-primary btn-sm mx-1 resume-page-btn" data-page="\${startPage - 1}">«</button>`;
   }
 
   // 페이지 번호 버튼
   for (let i = startPage; i <= endPage; i++) {
     const boldStyle = i === currentPage ? ' style="font-weight:bold;"' : '';
-    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 resume-page-btn" data-page="\${i}">\${i}</button>`;
+    paginationHtml += `<button type="button" class="btn btn-outline-primary btn-sm mx-1 resume-page-btn" data-page="\${i}">\${i}</button>`;
   }
 
   // 다음 페이지 버튼
   if (endPage < data.totalPageCnt) {
-    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 resume-page-btn" data-page="\${endPage + 1}">»</button>`;
+    paginationHtml += `<button type="button" class="btn btn-outline-primary btn-sm mx-1 resume-page-btn" data-page="\${endPage + 1}">»</button>`;
   }
 
   // 출력할 위치: resume 전용 pagination 영역이 필요합니다
@@ -228,18 +228,18 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
 
   // 이전 버튼
   if (startPage > 1) {
-    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 page-btn" data-page="\${startPage - 1}">«</button>`;
+    paginationHtml += `<button type="button" class="btn btn-outline-primary btn-sm mx-1 page-btn" data-page="\${startPage - 1}">«</button>`;
   }
 
   // 페이지 번호 버튼
   for (let i = startPage; i <= endPage; i++) {
     const boldStyle = i === currentPage ? ' style="font-weight:bold;"' : '';
-    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 page-btn" data-page="\${i}">\${i}</button>`;
+    paginationHtml += `<button type="button" class="btn btn-outline-primary btn-sm mx-1 page-btn" data-page="\${i}">\${i}</button>`;
   }
 
   // 다음 버튼
   if (endPage < data.totalPageCnt) {
-    paginationHtml += `<button class="btn btn-outline-primary btn-sm mx-1 page-btn" data-page="\${endPage + 1}">»</button>`;
+    paginationHtml += `<button type="button" class="btn btn-outline-primary btn-sm mx-1 page-btn" data-page="\${endPage + 1}">»</button>`;
   }
 
   // HTML 출력
