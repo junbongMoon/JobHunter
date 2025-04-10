@@ -28,4 +28,8 @@ public interface ReviewBoardDAO {
 
 	int decreaseBoardLikes(int boardNo) throws Exception;
 
+	WriteBoardDTO selectrecruitmentList(int boardNo) throws Exception;
+
+	int updateReviewBoard(WriteBoardDTO modify) throws Exception;
+
 }

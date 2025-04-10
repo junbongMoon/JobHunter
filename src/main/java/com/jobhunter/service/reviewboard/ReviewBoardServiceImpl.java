@@ -113,4 +113,22 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 		return false;
 	}
 
+	@Override
+	public WriteBoardDTO getReviewBoardUpdate(int boardNo) throws Exception {
+		
+		return Rdao.selectrecruitmentList(boardNo);
+	}
+
+
+	@Override
+	public boolean updateReviewBoard(WriteBoardDTO modify) throws Exception {
+	    int result = Rdao.updateReviewBoard(modify);
+
+	    if (result > 0) {
+	        return true; // 수정 성공
+	    }
+	    return false ; // 수정 실패
+	}
+
+
 }

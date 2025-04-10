@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,10 +17,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.reviewboard.Likes;
+import com.jobhunter.model.reviewboard.MassageCallDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -64,13 +66,7 @@ public class ReviewBoardController {
 	public String reviewBoardWrite(HttpSession session, Model model, HttpServletRequest req) {
 
 		AccountVO account = (AccountVO) session.getAttribute("account");
-		if (account == null || account.getUid() == 0) {
-			return "redirect:/account/login";
-		}
-
 		int userUid = account.getUid();
-		System.out.println(userUid);
-
 		try {
 			List<RecruitmentnoticContentDTO> gonggoList = service.selectgoggo(userUid,
 					GetClientIPAddr.getClientIp(req));
@@ -78,7 +74,7 @@ public class ReviewBoardController {
 			model.addAttribute("userUid", userUid);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "redirect:/account/login";
+			
 		}
 
 		return "reviewBoard/write";
@@ -86,56 +82,51 @@ public class ReviewBoardController {
 
 	// 게시물 작성 저장
 	@PostMapping("/write")
-	public String saveReviewBoard(@ModelAttribute WriteBoardDTO writeBoardDTO,
-			@RequestParam(value = "reviewTypeOtherText", required = false) String otherText, HttpSession session) {
+	public String saveReviewBoard(@ModelAttribute WriteBoardDTO writeBoardDTO, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
-
-		if (account == null || account.getUid() == 0) {
+		if (account == null) {
 			return "redirect:/account/login";
 		}
+
 		writeBoardDTO.setWriter(account.getUid());
-		if ("OTHER".equals(writeBoardDTO.getReviewType())) {
-
-			writeBoardDTO.setReviewType("OTHER");
-
-			// 만약 content에 추가할
-			if (otherText != null && !otherText.trim().isEmpty()) {
-				writeBoardDTO.setContent("[기타 면접유형: " + otherText + "]\n" + writeBoardDTO.getContent());
-			}
-		}
-
-		// logger.info("리뷰 게시글 저장 시도: " + writeBoardDTO.toString());
-		String returnPage = "redirect:./allBoard";
 
 		try {
 			if (service.saveReview(writeBoardDTO)) {
 
-				returnPage += "?status=success";
+				return "redirect:/reviewBoard/detail?boardNo=" + writeBoardDTO.getBoardNo();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			returnPage += "?status=fail";
 		}
 
-		return returnPage;
+		return "redirect:/reviewBoard/allBoard?status=fail";
 	}
 
 	@GetMapping("/detail")
-	public String showReviewDetail(@RequestParam("boardNo") int boardNo, Model model) {
+	public String showReviewDetail(@RequestParam("boardNo") int boardNo, Model model,
+			@ModelAttribute("reviewTypeOtherText") String otherText) {
+		logger.info("상세조회 요청 boardNo: " + boardNo);
 
 		try {
 			ReviewDetailViewDTO detail = service.getReviewDetail(boardNo);
+			if (detail == null) {
+				logger.warn("조회 결과 없음!");
+			} else {
+				logger.info("조회 성공: " + detail.toString());
+			}
+
 			model.addAttribute("detail", detail);
+			if (otherText != null) {
+				model.addAttribute("reviewTypeOtherText", otherText);
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return "reviewBoard/detail";
-
 	}
 
 	@PostMapping(value = "/like", produces = "text/plain;charset=UTF-8")
-	@ResponseBody
 	public ResponseEntity<String> addLike(@RequestBody Likes likes, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 
@@ -154,27 +145,71 @@ public class ReviewBoardController {
 			return ResponseEntity.status(500).body("서버 오류 발생");
 		}
 	}
-	
-	@PostMapping(value ="/unlike", produces = "text/plain;charset=UTF-8")
-	@ResponseBody
-	public ResponseEntity<String> cancelLike(@RequestBody Likes likes, HttpSession session) {
-	    AccountVO account = (AccountVO) session.getAttribute("account");
 
-	    if (account == null || account.getUid() == 0) {
-	        return ResponseEntity.status(401).body("로그인이 필요합니다.");
-	    }
+	@PostMapping(value = "/unlike", produces = "text/plain;charset=UTF-8")
+	public ResponseEntity<String> cancelLike(@RequestBody Likes likes, HttpSession session) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+
+		if (account == null || account.getUid() == 0) {
+			return ResponseEntity.status(401).body("로그인이 필요합니다.");
+		}
+
+		try {
+			boolean success = service.removeLike(likes.getUserId(), likes.getBoardNo());
+			if (success) {
+				return ResponseEntity.ok("좋아요가 취소되었습니다.");
+			} else {
+				return ResponseEntity.status(400).body("더이상 취소를 할 수 없습니다");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(500).body("서버 오류 발생");
+		}
+	}
+
+	@GetMapping("/modify")
+	public String showModify(@RequestParam("boardNo") int boardNo, Model model, HttpSession session,
+			HttpServletRequest req) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+		if (account == null) {
+			throw new IllegalStateException("세션에 사용자 정보가 없습니다.");
+		}
+		int userUid = account.getUid();
+
+		try {
+
+			List<RecruitmentnoticContentDTO> gonggoList = service.selectgoggo(userUid,
+					GetClientIPAddr.getClientIp(req));
+			model.addAttribute("gonggoList", gonggoList);
+
+			WriteBoardDTO writeBoardDTO = service.getReviewBoardUpdate(boardNo);
+			model.addAttribute("writeBoardDTO", writeBoardDTO);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "reviewBoard/modify";
+	}
+
+	@PostMapping("/modify")
+	public String updateReview(@ModelAttribute WriteBoardDTO modify) {
+	    String returnPage;
 
 	    try {
-	        boolean success = service.removeLike(likes.getUserId(), likes.getBoardNo());
-	        if (success) {
-	            return ResponseEntity.ok("좋아요가 취소되었습니다.");
+	        boolean result = service.updateReviewBoard(modify);
+
+	        if (result) {
+	            returnPage = "redirect:/reviewBoard/detail?boardNo=" + modify.getBoardNo();
 	        } else {
-	            return ResponseEntity.status(400).body("더이상 취소를 할 수 없습니다");
+	            returnPage = "redirect:/reviewBoard/modify?boardNo=" + modify.getBoardNo() + "&status=fail";
 	        }
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	        return ResponseEntity.status(500).body("서버 오류 발생");
+	        returnPage = "redirect:/reviewBoard/modify?boardNo=" + modify.getBoardNo() + "&status=error";
 	    }
+	    return returnPage;
 	}
+
 
 }

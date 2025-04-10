@@ -92,5 +92,17 @@ import com.jobhunter.model.reviewboard.WriteBoardDTO;
         return ses.update(NS + ".decreaseBoardLikes", boardNo);
     }
 
+	@Override
+	public WriteBoardDTO selectrecruitmentList(int boardNo) throws Exception {
+		
+		return ses.selectOne(NS + ".selectModifyReviewBoard",boardNo);
+	}
+
+	@Override
+	public int updateReviewBoard(WriteBoardDTO modify) throws Exception {
+
+		return ses.update(NS + ".updateReviewBoard" ,modify);
+	}
+
 
 }
