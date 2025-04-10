@@ -133,10 +133,21 @@
 													${resume.regDate.substring(8,10)}일</small>
 											</div>
 											<div class="resume-actions">
-												<a href="/resume/edit/${resume.resumeNo}?uid=${recruitmentNotice.uid}"
-													class="btn btn-outline-primary edit-resume"> <i
-														class="fas fa-edit"></i> 수정 및 상세보기
-												</a>
+												<c:choose>
+													<c:when test="${resume.checked}">
+														<button type="button"
+															class="btn btn-outline-secondary edit-resume"
+															onclick="showCheckedResumeModal()">
+															<i class="fas fa-edit"></i> 수정 및 상세보기
+														</button>
+													</c:when>
+													<c:otherwise>
+														<a href="/resume/edit/${resume.resumeNo}?uid=${recruitmentNotice.uid}"
+															class="btn btn-outline-primary edit-resume"> <i
+																class="fas fa-edit"></i> 수정 및 상세보기
+														</a>
+													</c:otherwise>
+												</c:choose>
 											</div>
 										</div>
 									</c:forEach>
@@ -222,34 +233,33 @@
 			</div>
 
 			<!-- 이력서 제출용 모달창 -->
-				<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel"
-					aria-hidden="true">
-					<div class="modal-dialog modal-dialog-centered">
-						<div class="modal-content text-center">
-							<div class="modal-body">
-								<p id="validationMessage" class="mb-3">알림 메시지</p>
-								<button type="button" class="btn btn-primary" id="validationCheckBtn"
-									data-bs-dismiss="modal">확인</button>
-								<button type="button" class="btn btn-secondary" id="validationOutBtn"
-									data-bs-dismiss="modal">취소</button>
-							</div>
+			<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content text-center">
+						<div class="modal-body">
+							<p id="validationMessage" class="mb-3">알림 메시지</p>
+							<button type="button" class="btn btn-primary" id="validationCheckBtn"
+								data-bs-dismiss="modal">확인</button>
+							<button type="button" class="btn btn-secondary" id="validationOutBtn"
+								data-bs-dismiss="modal">취소</button>
 						</div>
 					</div>
 				</div>
+			</div>
 
-				<!-- 확인용 모달창 -->
-				<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel"
-					aria-hidden="true">
-					<div class="modal-dialog modal-dialog-centered">
-						<div class="modal-content text-center">
-							<div class="modal-body">
-								<p id="modalMessage" class="mb-3">알림 메시지</p>
-								<button type="button" class="btn btn-primary" id="modalCheckBtn"
-									data-bs-dismiss="modal">확인</button>
-							</div>
+			<!-- 확인용 모달창 -->
+			<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content text-center">
+						<div class="modal-body">
+							<p id="modalMessage" class="mb-3">알림 메시지</p>
+							<button type="button" class="btn btn-primary" id="modalCheckBtn"
+								data-bs-dismiss="modal">확인</button>
 						</div>
 					</div>
 				</div>
+			</div>
 
 
 			<!-- 풋터 -->
@@ -556,16 +566,16 @@
 
 		<script>
 			// 페이지 로드 시 실행
-			$(document).ready(function() {
+			$(document).ready(function () {
 				// Bootstrap 툴팁 초기화
 				var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-				var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+				var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
 					return new bootstrap.Tooltip(tooltipTriggerEl);
 				});
 
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// Collapse 이벤트 펼치면 사라지게
-				$('#consentDetails').on('show.bs.collapse', function() {
+				$('#consentDetails').on('show.bs.collapse', function () {
 					$('#toggleText').text('');
 					$('#toggleButton i').removeClass('fa-chevron-down');
 				});
@@ -583,8 +593,8 @@
 				if (dueDate) {
 					// 날짜 형식 변환 (YYYY-MM-DD)
 					var date = new Date(dueDate);
-					var formattedDate = date.getFullYear() + '-' + 
-						(String(date.getMonth() + 1).padStart(2, '0')) + '-' + 
+					var formattedDate = date.getFullYear() + '-' +
+						(String(date.getMonth() + 1).padStart(2, '0')) + '-' +
 						(String(date.getDate()).padStart(2, '0'));
 					$('#dueDate').text(formattedDate);
 				}
@@ -593,14 +603,14 @@
 
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 이력서 항목 클릭 이벤트
-				$('.resume-item').click(function() {
+				$('.resume-item').click(function () {
 					// 이전 선택 제거
 					$('.resume-item').removeClass('selected');
 
 					// 현재 항목 선택
 					$(this).addClass('selected');
 					selectedResumeId = $(this).data('resume-id');
-					
+
 					console.log(selectedResumeId);
 
 					// 제출 버튼 활성화 여부 확인
@@ -609,7 +619,7 @@
 
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 개인정보 동의 체크박스 변경 이벤트
-				$('#privacyConsentCheckbox').change(function() {
+				$('#privacyConsentCheckbox').change(function () {
 					// 제출 버튼 활성화 여부 확인
 					toggleSubmitButton();
 				});
@@ -625,7 +635,7 @@
 
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 제출하기 버튼 클릭 이벤트
-				$('#submitResumeBtn').click(function() {
+				$('#submitResumeBtn').click(function () {
 					if (!selectedResumeId) {
 						alert('이력서를 선택해주세요.');
 						return;
@@ -634,7 +644,7 @@
 					// 선택된 이력서의 제목 가져오기
 					const selectedResumeTitle = $('.resume-item.selected .resume-title').text().trim();
 					const recruitmentTitle = $('.notice-title a').text().trim();
-					
+
 					console.log("선택된 이력서 제목:", selectedResumeTitle);
 					console.log("공고 제목:", recruitmentTitle);
 
@@ -642,17 +652,19 @@
 					$('#validationMessage').html(
 						'<strong style="color: #37517e;">[' + recruitmentTitle + ']</strong> 공고에<br>' +
 						'<strong style="color: #37517e;">[' + selectedResumeTitle + ']</strong> 이력서를<br>' +
-						'제출하시겠습니까?'
+						'제출하시겠습니까?<br><br>' +
+						'<small style="color: #37517e;">* 제출 후 기업측에서 해당 이력서 확인 시 <br> 수정 및 삭제가 불가능합니다.</small><br>' +
+						'<small style="color: #37517e;">* 한 공고에는 하나의 이력서만 제출할 수 있습니다.</small>'
 					);
 
 					// 모달 표시 전에 메시지 확인
 					console.log("모달 메시지:", $('#validationMessage').html());
-					
-					// 모달 표시 (방식 변경)
+
+					// 모달 표시
 					$('#validationModal').modal('show');
 
 					// 확인 버튼 클릭 이벤트
-					$('#validationCheckBtn').off('click').on('click', function() {
+					$('#validationCheckBtn').off('click').on('click', function () {
 						const recruitmentId = new URLSearchParams(window.location.search).get('uid');
 						if (!recruitmentId) {
 							alert('공고 정보가 없습니다.');
@@ -667,38 +679,39 @@
 								resumeNo: selectedResumeId,
 								recruitmentNo: recruitmentId
 							},
-							success: function(response) {
+							success: function (response) {
 								if (response.success) {
 									// 성공 모달 표시
-									$('#modalMessage').html(
-										'<strong style="color: #37517e;">' + response.success + '</strong>'
-								);
-								$('#modal').modal('show');
-								// 제출 후 해당 공고 페이지로 이동
-								$('#modalCheckBtn').off('click').on('click', function() {
+									$('#modalMessage').html('<strong style="color: #37517e;">' + response.success + '</strong>');
+									$('#modal').modal('show');
+									// 제출 후 해당 공고 페이지로 이동
+									$('#modalCheckBtn').off('click').on('click', function () {
 										window.location.href = '/recruitmentnotice/detail?uid=' + recruitmentId;
 									});
 								} else if (response.fail) {
 									// 중복 지원 모달 표시
-									$('#modalMessage').html(
-										'<strong style="color: #37517e;">' + response.fail + '</strong>'
-									);
+									$('#modalMessage').html('<strong style="color: #37517e;">' + response.fail + '</strong>');
 									$('#modal').modal('show');
 									// 이후 해당 공고 페이지로 이동
-									$('#modalCheckBtn').off('click').on('click', function() {
+									$('#modalCheckBtn').off('click').on('click', function () {
 										window.location.href = '/recruitmentnotice/detail?uid=' + recruitmentId;
 									});
 								}
 							},
-							error: function(xhr, status, error) {
+							error: function (xhr, status, error) {
 								// 오류 모달 표시
-								$('#modalMessage').html(
-									'<strong style="color: #37517e;">' + response.error + '</strong>'
-								);
+								$('#modalMessage').html('<strong style="color: #37517e;">' + response.error + '</strong>');
 								$('#modal').modal('show');
 							}
 						});
 					});
 				});
 			});
+
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 확인된 이력서 모달 표시 함수
+			function showCheckedResumeModal() {
+				$('#modalMessage').text('기업에서 확인중인 이력서는 수정할 수 없습니다.');
+				$('#modal').modal('show');
+			}
 		</script>

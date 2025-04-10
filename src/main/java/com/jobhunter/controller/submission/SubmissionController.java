@@ -22,7 +22,6 @@ import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 import com.jobhunter.service.resume.ResumeService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 
 @Controller
@@ -101,7 +100,7 @@ public class SubmissionController {
 			} else {
 				// 중복 지원 시 메시지 반환
 				Map<String, String> response = new HashMap<>();
-				response.put("fail", "이력서가 이미 제출되었습니다.");
+				response.put("fail", "해당 공고에는 이력서가 이미 제출되었습니다.");
 				return ResponseEntity.ok(response);
 			}
 		} catch (Exception e) {

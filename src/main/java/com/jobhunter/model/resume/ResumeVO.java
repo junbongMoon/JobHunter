@@ -12,4 +12,5 @@ public class ResumeVO {
 	private String regDate;
     private List<SigunguVO> sigunguList;
     private List<SubCategoryVO> subcategoryList;
+    private boolean checked;  // 이력서가 기업에서 확인되었는지 여부
 } 

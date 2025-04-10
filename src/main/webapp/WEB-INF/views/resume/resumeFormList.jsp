@@ -11,6 +11,9 @@
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Bootstrap JS -->
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
 .resume-card {
@@ -410,14 +413,28 @@
 											${resume.regDate.substring(8,10)}일</small>
 									</div>
 									<div class="action-buttons">
-										<a href="/resume/edit/${resume.resumeNo}"
-											class="btn-custom btn-edit"> <i class="fas fa-edit"></i>
-											수정하기
-										</a>
-										<button onclick="deleteResume(${resume.resumeNo})"
-											class="btn-custom btn-delete">
-											<i class="fas fa-trash"></i> 삭제하기
-										</button>
+										<c:choose>
+											<c:when test="${resume.checked}">
+												<button type="button" class="btn-custom btn-edit"
+													onclick="showCheckedResumeModal('수정')">
+													<i class="fas fa-edit"></i> 수정하기
+												</button>
+												<button type="button" class="btn-custom btn-delete"
+													onclick="showCheckedResumeModal('삭제')">
+													<i class="fas fa-trash"></i> 삭제하기
+												</button>
+											</c:when>
+											<c:otherwise>
+												<a href="/resume/edit/${resume.resumeNo}"
+													class="btn-custom btn-edit"> <i class="fas fa-edit"></i>
+													수정하기
+												</a>
+												<button type="button" class="btn-custom btn-delete"
+													onclick="deleteResume(${resume.resumeNo})">
+													<i class="fas fa-trash"></i> 삭제하기
+												</button>
+											</c:otherwise>
+										</c:choose>
 									</div>
 								</div>
 							</div>
@@ -457,22 +474,74 @@
 		</div>
 	</c:if>
 
+	<!-- 재사용 공용 경고 모달창 -->
+	<div class="modal fade" id="validationModal" tabindex="-1"
+		aria-labelledby="validationModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content text-center">
+				<div class="modal-body">
+					<p id="validationMessage" class="mb-3">알림 메시지</p>
+					<div class="d-flex justify-content-center gap-2">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">취소</button>
+						<button type="button" class="btn btn-primary"
+							id="validationCheckBtn">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 결과 알림 모달창 -->
+	<div class="modal fade" id="resultModal" tabindex="-1"
+		aria-labelledby="resultModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content text-center">
+				<div class="modal-body">
+					<p id="resultMessage" class="mb-3">알림 메시지</p>
+					<button type="button" class="btn btn-primary"
+						data-bs-dismiss="modal">확인</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<script>
+				let currentResumeNo = null;
+
 				function deleteResume(resumeNo) {
-					if (confirm('정말로 이 이력서를 삭제하시겠습니까?')) {
-						// TODO: 이력서 삭제 API 호출
+					currentResumeNo = resumeNo;
+					$('#validationMessage').text('정말로 이 이력서를 삭제하시겠습니까?');
+					$('#validationCheckBtn').text('삭제');
+					$('#validationCheckBtn').off('click').on('click', function () {
 						$.ajax({
-							url: '/resume/delete/' + resumeNo,
+							url: '/resume/delete/' + currentResumeNo,
 							type: 'DELETE',
 							success: function (response) {
-								alert('이력서가 성공적으로 삭제되었습니다.');
-								location.reload();
+								$('#validationModal').modal('hide');
+								$('#resultMessage').text('이력서가 성공적으로 삭제되었습니다.');
+								$('#resultModal').on('hidden.bs.modal', function () {
+									location.reload();
+								});
+								$('#resultModal').modal('show');
 							},
 							error: function (xhr, status, error) {
-								alert('이력서 삭제 중 오류가 발생했습니다.');
+								$('#validationModal').modal('hide');
+								$('#resultMessage').text('이력서 삭제 중 오류가 발생했습니다.');
+								$('#resultModal').modal('show');
 							}
 						});
-					}
+					});
+					$('#validationModal').modal('show');
+				}
+
+				function showCheckedResumeModal(action) {
+					const message = action === '수정'
+						? '기업에서 확인중인 이력서는 수정할 수 없습니다.'
+						: '기업에서 확인중인 이력서는 삭제할 수 없습니다.';
+
+					$('#resultMessage').text(message);
+					$('#resultModal').modal('show');
 				}
 			</script>
 
