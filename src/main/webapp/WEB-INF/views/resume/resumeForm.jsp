@@ -594,8 +594,10 @@
 						</div>
 					</div>
 
-					<!-- 완전 저장 버튼 -->
-					<button type="button" class="btn btn-primary" id="finalSaveBtn">저장하기</button>
+					<!-- 저장 버튼 -->
+					<button type="button" class="btn btn-primary" id="finalSaveBtn"><span class="btn-text">저장하기</span>
+						<span class="spinner-border spinner-border-sm text-light d-none" role="status"
+							aria-hidden="true"></span></button>
 
 					<button type="button" class="btn btn-secondary" id="testBtn">코드
 						테스트용 버튼</button>
@@ -1400,8 +1402,18 @@
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
 				//---------------------------------------------------------------------------------------------------------------------------------
+				let isSubmitting = false; // 중복 제출 방지용
 				// 최종 저장 버튼 클릭 이벤트
 				$('#finalSaveBtn').on('click', function () {
+					if (isSubmitting) return; // 이미 제출 중이면 무시
+
+					isSubmitting = true; // 제출 시작
+					$('#finalSaveBtn').prop('disabled', true); // 버튼 비활성화
+
+					// 버튼 안에 스피너 보여주기
+					$('#finalSaveBtn .btn-text').addClass('d-none');
+					$('#finalSaveBtn .spinner-border').removeClass('d-none');
+
 					// 유효성 검사
 					const title = $('#title').val().trim();
 					const titleLength = $('#title').val().length;
@@ -1653,7 +1665,7 @@
 						userUid: $('#userUid').val()
 					};
 
-					// 이력서 번호가 있는 경우 추가
+					// 이력서 번호가 있는 경우 추가(수정기능)
 					const resumeNo = '${resumeDetail.resume.resumeNo}';
 					if (resumeNo) {
 						formData.resumeNo = resumeNo;
@@ -1661,7 +1673,7 @@
 
 					console.log('저장할 데이터:', formData);
 
-					// URL에서 uid 파라미터 가져오기
+					// URL에서 uid(공고uid) 파라미터 가져오기
 					const urlParams = new URLSearchParams(window.location.search);
 					const uid = urlParams.get('uid');
 					console.log('uid:', uid);
@@ -1691,6 +1703,10 @@
 								error: error,
 								response: xhr.responseText
 							});
+							isSubmitting = false; // 중복 방지 플래그 해제
+							$('#finalSaveBtn').prop('disabled', false); // 버튼 복원
+							$('#finalSaveBtn .btn-text').removeClass('d-none');
+							$('#finalSaveBtn .spinner-border').addClass('d-none');
 							showValidationModal("저장 중 오류가 발생했습니다.");
 						}
 					});
