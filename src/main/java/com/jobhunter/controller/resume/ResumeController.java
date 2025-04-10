@@ -97,6 +97,15 @@ public class ResumeController {
 			List<ResumeVO> resumeList = resumeService.getResumeList(userUid, page, pageSize);
 			int totalResumes = resumeService.getTotalResumes(userUid);
 			int totalPages = (int) Math.ceil((double) totalResumes / pageSize);
+			
+			// 페이징 블록 계산
+			int blockSize = 5;
+			int currentBlock = (page - 1) / blockSize;
+			int startPage = currentBlock * blockSize + 1;
+			int endPage = startPage + blockSize - 1;
+			if (endPage > totalPages) {
+				endPage = totalPages;
+			}
 
 			model.addAttribute("resumeList", resumeList);
 			model.addAttribute("account", account);
@@ -104,6 +113,8 @@ public class ResumeController {
 			model.addAttribute("totalPages", totalPages);
 			model.addAttribute("pageSize", pageSize);
 			model.addAttribute("totalResumes", totalResumes);
+			model.addAttribute("startPage", startPage);
+			model.addAttribute("endPage", endPage);
 			return "resume/resumeFormList";
 		} catch (Exception e) {
 			model.addAttribute("error", "이력서 목록을 불러오는 중 오류가 발생했습니다.");

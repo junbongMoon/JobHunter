@@ -74,6 +74,17 @@ public class SubmissionController {
 				model.addAttribute("pageSize", pageSize);
 				model.addAttribute("totalPages", totalPages);
 				model.addAttribute("totalResumes", totalResumes);
+				
+				// 페이지 블록 계산
+				int blockSize = 5; // 한 블록당 표시할 페이지 수
+				int currentBlock = (int) Math.ceil((double) page / blockSize);
+				int startPage = (currentBlock - 1) * blockSize + 1;
+				int endPage = Math.min(startPage + blockSize - 1, totalPages);
+				
+				model.addAttribute("startPage", startPage);
+				model.addAttribute("endPage", endPage);
+				model.addAttribute("currentBlock", currentBlock);
+				model.addAttribute("totalBlocks", (int) Math.ceil((double) totalPages / blockSize));
 
 			}
 
