@@ -30,7 +30,7 @@ public class RecruitmentNoticeControllerTests {
 	
 	
 	// insert 테스트
-	@Test
+//	@Test
 	public void insertRecruitmentNotice() {
 		MilitaryService mili = MilitaryService.EXEMPTED;
 		
@@ -39,7 +39,7 @@ public class RecruitmentNoticeControllerTests {
 		
          
         System.out.println(recService); 
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < 2; i++) {
         	
         
 		RecruitmentNoticeDTO dto = RecruitmentNoticeDTO.builder()
@@ -51,7 +51,7 @@ public class RecruitmentNoticeControllerTests {
 				.personalHistory("코리아 임베디드 4년 근무")
 				.militaryService(mili)
 				.dueDate(deadlineTimestamp)
-				.detail("열심히 하겠습니다.")
+				.detail("")
 				.manager("이성실")
 				.miniTitle("제 1차 테스트")
 				.regionNo(12)

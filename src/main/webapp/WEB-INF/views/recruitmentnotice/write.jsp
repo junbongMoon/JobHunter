@@ -129,7 +129,26 @@ $(document).on("click", "#goToListBtn", function () {
     $(".parttime-only").remove();
   }
 });
+        	// 중복입력 방지 코드
+	$('form').on('submit', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
 
+    const $form = $(this);
+    const $submitBtn = $form.find('button[type="submit"]');
+
+    // 유효성 검사 먼저 수행
+    if (!isValidRecruitmentForm()) {
+        return false; // 실패 시 중단
+    }
+
+    if ($submitBtn.length) {
+        $submitBtn.prop('disabled', true).text('처리 중...');
+    }
+
+    // 유효성 통과 후 실제 제출
+    this.submit();
+});
 		
 		
 		// class = "Region" 값이 바뀌면.. 
@@ -266,8 +285,8 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 			$(this).focus();
 		}
 	});
-	
-	});
+
+});
 
 // 파일 업로드 + 썸네일 표시
 function uploadFileAndShowPreview(file) {
@@ -314,7 +333,7 @@ function showThumbnail(file) {
 }
 
 // 파일 삭제 함수
-function removeFile(fileName) {
+	function removeFile(fileName) {
     $.ajax({
         url: "/recruitmentnotice/file",
         type: "DELETE",
@@ -328,15 +347,14 @@ function removeFile(fileName) {
             alert("파일 삭제 실패");
         }
     });
-}
+	}
 
-function markUploadSuccess(fileName) {
+	function markUploadSuccess(fileName) {
     const safeId = CSS.escape(fileName);
     document.querySelector(`#\${safeId}`).insertAdjacentHTML(
       "beforeend",
-      "<td><img src='/resources/images/success.png' width='20'></td>"
-    );
-}
+      "<td><img src='/resources/images/success.png' width='20'></td>");
+	}
 
 
 	// 면접타입 유효성 검사
@@ -346,8 +364,8 @@ function markUploadSuccess(fileName) {
     alert("면접방식을 최소 하나 이상 선택해주세요.");
     return false;
   }
-  return true;
-}
+  	return true;
+  }
 
 	// 면접타입 저장 함수
 	function saveApplication(method, detail) {
@@ -359,15 +377,15 @@ function markUploadSuccess(fileName) {
         method: method,
         detail: detail,
         recruitmentNoticeUid: -1
-      }),
-      success: function (data) {
-        console.log(data)
-      },
-      error: function () {
+     	 }),
+      		success: function (data) {
+        	console.log(data)
+     	 },
+        error: function () {
         alert(`${method} 방식 저장 실패`);
-      }
-    });
-  }
+      	}
+    	});
+  	}
 
 		 // 면접 타입 삭제 함수
 		 function deleteApplication(method) {
@@ -592,7 +610,7 @@ function isValidRecruitmentForm() {
 	  let period = startTime + "~" + endTime;
 if (workDetailType) {
   period += " (" + workDetailType + ")";
-}
+  }
 
   console.log(period);
 
@@ -683,7 +701,7 @@ if (workDetailType) {
 
 	return result;
 	}
-return result;
+ return result;
 }
 
 
@@ -692,12 +710,12 @@ return result;
 </script>
 
 <style>
-form {
+ form {
     max-width: 700px;
     margin: 0 auto;
   }
 
-label {
+ label {
     display: block;
     font-weight: 500;
     margin-bottom: 0.5rem;
@@ -708,34 +726,34 @@ label {
   display: flex;
   flex-direction: column;
   margin-bottom: 1.5rem;
-}
+ }
 
 /* 라벨 간격 조절 (상단 마진 추가) */
-.custom-select-wrapper label {
+ .custom-select-wrapper label {
   margin-bottom: 0.6rem;
   margin-top: 1rem;  
   font-size: 1rem;
   font-weight: 600;
   color: #37517e;
-}
+ }
 
 /* 박스형 셀렉트 */
-.form-select {
-  appearance: none;
-  background-color: #fff;
-  border: 1px solid #cfd8dc;
-  padding: 0.9rem 1rem;
-  font-size: 1rem;
-  border-radius: 1rem;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23444" height="24" viewBox="0 0 24 24" width="24"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  max-width: 100%;
-  width: 100%;
-}
+  .form-select {
+   appearance: none;
+   background-color: #fff;
+   border: 1px solid #cfd8dc;
+   padding: 0.9rem 1rem;
+   font-size: 1rem;
+   border-radius: 1rem;
+   background-image: url('data:image/svg+xml;utf8,<svg fill="%23444" height="24" viewBox="0 0 24 24" width="24"><path d="M7 10l5 5 5-5z"/></svg>');
+   background-repeat: no-repeat;
+   background-position: right 1rem center;
+   background-size: 1rem;
+   transition: all 0.3s ease;
+   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+   max-width: 100%;
+   width: 100%;
+  }
 
   .form-control, .form-select {
     width: 100%;
@@ -782,9 +800,9 @@ label {
   margin-top: 0.5rem;
 }
 
-.addAdvantageBtn:hover, #write {
+ .addAdvantageBtn:hover, #write {
   background-color: #298ce7; /* 진한 하늘색 hover 효과 */
-}
+ }
 </style>
 
 <body>
@@ -1130,8 +1148,7 @@ label {
 
 									<div class="col-12 text-center">
 
-										<button type="submit" id="write"
-											onclick="return isValidRecruitmentForm()">작성</button>
+										<button type="submit" id="write">작성</button>
 									</div>
 								</div>
 			</form>
