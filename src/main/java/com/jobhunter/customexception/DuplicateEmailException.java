@@ -8,13 +8,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class NeedLoginException extends RuntimeException {
+public class DuplicateEmailException extends Exception {
 
-    private static final ObjectMapper mapper = new ObjectMapper(); // Json으로 만들어주는거 (jackson라이브러리에 있는거)
-    private static final int STATUS_CODE = 449; // 에러코드 고정
-    private static final String STATUS_TEXT = "NEED_LOGIN"; // 에러메시지 제목 고정
+	private static final ObjectMapper mapper = new ObjectMapper(); // Json으로 만들어주는거 (jackson라이브러리에 있는거)
+    private static final int STATUS_CODE = 459; // 에러코드 고정
+    private static final String STATUS_TEXT = "DUPLE_EMAIL"; // 에러메시지 제목 고정
 
-    public NeedLoginException() {
+    public DuplicateEmailException() {
         super("로그인이 필요합니다.");
     }
 
@@ -30,4 +30,5 @@ public class NeedLoginException extends RuntimeException {
 
         mapper.writeValue(response.getWriter(), body);
     }
+    
 }

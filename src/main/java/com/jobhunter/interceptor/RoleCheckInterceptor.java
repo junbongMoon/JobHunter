@@ -1,5 +1,7 @@
 package com.jobhunter.interceptor;
 
+import java.time.Instant;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -9,14 +11,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.jobhunter.customexception.NeedLoginException;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.customenum.AccountType;
+import com.jobhunter.service.account.AccountService;
 import com.jobhunter.util.AccountUtil;
 import com.jobhunter.util.RedirectUtil;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
-public class OwnerInterceptor implements HandlerInterceptor {
+public class RoleCheckInterceptor implements HandlerInterceptor {
 
     @Autowired
     private AccountUtil accUtils;
@@ -24,7 +28,6 @@ public class OwnerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-    	System.out.println("본인확인인터셉터");
 
         // 오직 GET + Accept: text/html 접근만 걸러냄
         boolean isGet = "GET".equalsIgnoreCase(request.getMethod());
@@ -37,8 +40,7 @@ public class OwnerInterceptor implements HandlerInterceptor {
 
         HttpSession session = request.getSession();
 
-        
-        AccountVO account = (AccountVO) session.getAttribute("account");
+AccountVO account = (AccountVO) session.getAttribute("account");
         
         // 로그인 안 했거나 인증이 필요할 때
         if (account == null || "Y".equals(account.getRequiresVerification())) {
@@ -54,21 +56,18 @@ public class OwnerInterceptor implements HandlerInterceptor {
 
         try {
             // 쿼리 파라미터 추출
-            int uid = Integer.parseInt(request.getParameter("uid"));
             AccountType type = AccountType.valueOf(request.getParameter("accountType").toUpperCase());
 
-            System.out.println(uid + "이랑" + type);
-            
             // 본인 아니라 어드민도 볼수있게할거냐? 체크용
             String allowAdminParam = request.getParameter("allowAdmin");
 
             // 일단 진짜 본인만 체크하는거
-            boolean isOwner = account.getUid() == uid && account.getAccountType() == type;
+            boolean isEqType = account.getAccountType() == type;
             // 어드민 허용 페이지고 내가 어드민인지 체크
             boolean isAdminAllowed = "true".equalsIgnoreCase(allowAdminParam)
                     && account.getIsAdmin() == 'Y';
 
-            if (isOwner || isAdminAllowed) {
+            if (isEqType || isAdminAllowed) {
                 return true;
             }
 

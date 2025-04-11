@@ -98,8 +98,8 @@
 	</select>
 
 	<select id="checkPassword" parameterType="map"
-		resultType="boolean">
-		SELECT COUNT(*) > 0
+		resultMap="accountMap">
+		SELECT *
 		FROM users
 		WHERE uid = #{uid}
 		AND password
@@ -126,6 +126,7 @@
 		UPDATE users
 		SET
 		addr = #{addr},
+		detailAddr = #{detailAddr},
 		gender = #{gender},
 		age = #{age},
 		payType = #{payType},
@@ -136,4 +137,48 @@
 		disability = #{disability}
 		WHERE uid = #{uid}
 	</update>
+	
+	<select id="findByKakao" resultType="java.lang.Integer">
+		SELECT uid FROM users WHERE socialId = #{kakaoId}
+	</select>
+	
+	<insert id="registKakao" useGeneratedKeys="true" keyProperty="uid">
+		INSERT INTO `users` (`userName`, `socialId`, `email`, `accountType`, `isSocial`) 
+		VALUES (#{nickname}, #{kakaoId}, #{email}, 'USER', 'Y');
+	</insert>
+	
+	<select id="loginByKakaoId" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where socialId = #{kakaoId}
+	</select>
+	
+	<select id="findIsUserById" resultType="boolean" parameterType="string">
+		SELECT EXISTS (
+            SELECT 1 FROM users WHERE userId = #{userId}
+        )
+	</select>
+	
+	<select id="findByEmail" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where email = #{email}
+	</select>
+	
+	<select id="findByMobile" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where mobile = #{mobile}
+	</select>
+	
+	<insert id="registUser" parameterType="com.jobhunter.model.user.UserRegisterDTO"
+        useGeneratedKeys="true" keyProperty="uid">
+	INSERT INTO `users` 
+		(`userName`, `userId`, `password`, `mobile`, `email`, `accountType`, `requiresVerification`, `isSocial`, `nationality`)
+	 VALUES 
+	 (#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N', #{nationality});
+	</insert>
 </mapper>

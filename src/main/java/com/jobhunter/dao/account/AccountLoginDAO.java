@@ -31,4 +31,8 @@ public interface AccountLoginDAO {
 
 	AccountVO getAccountByAutoLogin(String sessionId) throws Exception;
 
+	AccountVO findAccountByEmail(String email) throws Exception;
+
+	AccountVO findAccountByMobile(String mobile) throws Exception;
+
 }

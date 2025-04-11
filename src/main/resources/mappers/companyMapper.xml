@@ -81,8 +81,8 @@
 	</select>
 
 	<select id="checkPassword" parameterType="map"
-		resultType="boolean">
-		SELECT COUNT(*) > 0
+		resultMap="accountMap">
+		SELECT *
 		FROM company
 		WHERE uid = #{uid}
 		AND password
@@ -109,4 +109,31 @@
         where autoLogin = #{sessionId}
     </select>
     
+    <select id="findByEmail" resultMap="accountMap">
+		select *, companyId as
+		accountId, companyName as accountName
+		from company
+		where email = #{email}
+	</select>
+	
+	<select id="findByMobile" resultMap="accountMap">
+		select *, companyId as
+		accountId, companyName as accountName
+		from company
+		where mobile = #{mobile}
+	</select>
+	
+	<select id="findIsCompanyById" resultType="boolean" parameterType="string">
+		SELECT EXISTS (
+            SELECT 1 FROM company WHERE companyId = #{companyId}
+        )
+	</select>
+    
+    <insert id="registCompany" parameterType="com.jobhunter.model.company.CompanyRegisterDTO"
+        useGeneratedKeys="true" keyProperty="uid">
+	INSERT INTO `company` 
+		(`companyName`, `companyId`, `password`, `businessNum`, `representative`, `email`, `mobile`)
+	 VALUES 
+	 (#{companyName}, #{companyId}, sha1(md5(#{password})), #{businessNum}, #{representative}, #{email}, #{mobile});
+	</insert>
 </mapper>

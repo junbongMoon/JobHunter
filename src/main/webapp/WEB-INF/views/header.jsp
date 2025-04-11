@@ -10,6 +10,10 @@
 			<meta name="description" content="">
 			<meta name="keywords" content="">
 
+			<!-- 공용 모달 -->
+			<script src="/resources/assets/js/publicModal.js"></script>
+			<link href="/resources/assets/css/publicModal.css" rel="stylesheet">
+
 			<!-- Favicons -->
 			<link href="/resources/assets/img/favicon.png" rel="icon">
 			<link href="/resources/assets/img/apple-touch-icon.png" rel="apple-touch-icon">

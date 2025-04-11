@@ -21,6 +21,7 @@ import lombok.ToString;
 public class UserInfoDTO {
 	private Integer uid; // 사용자 고유 ID
     private String addr; // 주소
+    private String detailAddr; // 상세주소
     private Gender gender; // 성별 (MALE: 남성, FEMALE: 여성)
     private Integer age; // 나이
     private String payType; // 희망 급여 유형

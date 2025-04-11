@@ -85,5 +85,17 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 	public AccountVO getAccountByAutoLogin(String sessionId) throws Exception {
 		return ses.selectOne(NS + ".getAccountByAutoLogin", sessionId);
 	}
+	
+	@Override
+	public AccountVO findAccountByEmail(String email) throws Exception {
+		AccountVO result = ses.selectOne(NS + ".findByEmail", email);
+		return result;
+	}
+	
+	@Override
+	public AccountVO findAccountByMobile(String mobile) throws Exception {
+		AccountVO result = ses.selectOne(NS + ".findByMobile", mobile);
+		return result;
+	}
 
 }

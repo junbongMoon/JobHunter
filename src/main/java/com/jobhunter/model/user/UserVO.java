@@ -28,6 +28,8 @@ public class UserVO {
     private String mobile; // 전화번호
     private String email; // 이메일
     private String addr; // 주소
+    private String detailAddr; // 상세주소
+    private String userImg; // 유저 이미지
     private Gender gender; // 성별 (MALE: 남성, FEMALE: 여성)
     private Integer age; // 나이
     private Timestamp regDate; // 가입 일자
