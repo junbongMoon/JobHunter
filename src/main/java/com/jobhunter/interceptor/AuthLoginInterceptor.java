@@ -18,6 +18,8 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
 	@Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
+		
+		System.out.println("로그인체커");
 
         HttpSession session = request.getSession();
         AccountVO account = (AccountVO) session.getAttribute("account");
@@ -30,7 +32,7 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
             RedirectUtil.saveRedirectUrl(request, session);
             
             if (isAsync) { // 비동기면 에러코드 보내서 뷰단에서 알아서 로그인페이지로 보내도록 유도
-                NeedLoginException.writeToResponse(response, request.getContextPath());
+                NeedLoginException.writeToResponse(response);
             } else {
                 response.sendRedirect(request.getContextPath() + "/account/login");
             }

@@ -80,6 +80,7 @@
                     <button class="btn-cancel" id="deleteAddressBtn" onclick="deleteAddress()">주소 삭제</button>
                   </div>
                   <input type="hidden" id="addressBackup">
+                  <input type="hidden" id="detailAddressBackup">
               </div>
               
               <div>성별</div>
@@ -108,7 +109,7 @@
               <div>
                 <select class="form-control" id="nationality">
                   <option value="-1" style="display: none;">선택하세요</option>
-                  <option value="DOMESTIC">한국인</option>
+                  <option value="DOMESTIC">내국인</option>
                   <option value="FOREIGN">외국인</option>
                 </select>
               </div>
@@ -203,22 +204,17 @@
       </div>
     </div>
   </div>
-  <!-- 모달 창 -->
 
-  <!-- 알럿 모달 -->
-  <div id="alertModalOverlay" class="alert-modal-overlay" style="display: none;"></div>
-  <div id="alertModal" class="alert-modal-box" style="display: none;">
-    <div class="alert-modal-content">
-      <div class="alert-modal-message"></div>
-      <div class="alert-modal-buttons"></div>
-    </div>
-  </div>
+  
 
   <!-- firebase캡챠 -->
   <div id="recaptcha-container"></div>
 </main>
 
 <script>
+let sessionMobile = "${sessionScope.account.mobile}";
+let sessionEmail = "${sessionScope.account.email}";
+
   $(()=>{
       getInfo();
     })
@@ -285,28 +281,7 @@ function resetUserModifyForm() {
 }
 
 function confirmModify() {
-  const selectedAddress = $('#selectedAddress').val().trim();
-  const addressDetail = $('#addressDetail').val().trim();
-  let fullAddress = '';
-  if (!selectedAddress && !addressDetail) {
-    fullAddress = null;
-  } else if (!selectedAddress) {
-    alertUtils.show("도로명주소를 선택해 주세요!", {
-      onConfirm: () => {
-        document.getElementById('addressSearch').focus();
-      }
-    })
-    return;
-  } else if (!addressDetail) {
-    alertUtils.show("상세주소를 입력해 주세요!", {
-      onConfirm: () => {
-        document.getElementById('addressDetail').focus();
-      }
-    })
-    return;
-  } else {
-    fullAddress = selectedAddress + ' 상세주소 : ' + addressDetail;
-  }
+  
   const parseOrNull = (value) => {
     const num = parseInt(value, 10);
     return isNaN(num) ? null : num;
@@ -318,6 +293,11 @@ function confirmModify() {
   let nationality = $('#nationality').val();
   let payType = $('#payType').val();
   let disability = $('#disability').val();
+  let addr = $('#selectedAddress').val().trim();
+  let detailAddr = $('#addressDetail').val().trim();
+  let age = $('#age').val();
+  let pay = $('#pay').val();
+  let introduce = $('#introduce').val();
 
   if (gender === '-1' || gender === null) {
     gender = null;
@@ -334,23 +314,27 @@ function confirmModify() {
   if (disability === '-1' || disability === null) {
     disability = null;
   }
-  let age = $('#age').val();
   if (age === '' || age === null || age < 0) {
     age = null;
   }
-  let pay = $('#pay').val();
   if (pay === '' || pay === null || pay < 0) {
     pay = null;
   } else {
     pay = removeComma(pay);
   }
-  let introduce = $('#introduce').val();
   if (introduce === '' || introduce === null) {
     introduce = null;
   }
+  if (addr === '' || addr === null) {
+	  addr = null;
+	    }
+  if (detailAddr === '' || detailAddr === null) {
+	  detailAddr = null;
+	  }
 
   const data = {
-    addr: fullAddress || null,
+    addr: addr || null,
+    detailAddr: detailAddr || null,
     gender: gender || null,
     age: age || null,
     militaryService: military || null,
@@ -368,15 +352,15 @@ function confirmModify() {
     data: JSON.stringify(data),
     success: function (response) {
       if (response.success) {
-        alertUtils.show('정보가 성공적으로 수정되었습니다.');
+        window.publicModals.show('정보가 성공적으로 수정되었습니다.');
         cancleModify();
       } else {
-        alertUtils.show('정보 수정에 실패했습니다.');
+        window.publicModals.show('정보 수정에 실패했습니다.');
       }
     },
     error: function (xhr, status, error) {
       console.error(error);
-      alertUtils.show('서버 오류가 발생했습니다.');
+      window.publicModals.show('서버 오류가 발생했습니다.');
     }
   });
 }
@@ -533,13 +517,12 @@ function confirmModify() {
     }
 
     let addressText = '등록된 주소 없음';
-    let addressDetailText = '';
     if (userInfo.addr) {
-      const addressSplit = userInfo.addr.split(' 상세주소 : ');
-      addressText = addressSplit[0];
-      if (addressSplit[1]) {
-        addressDetailText = addressSplit[1];
-      }
+      addressText = userInfo.addr;
+    }
+    let addressDetailText = '등록된 주소 없음';
+    if (userInfo.detailAddr) {
+      addressDetailText = userInfo.detailAddr;
     }
 
     userDetailInfo.innerHTML =
@@ -559,11 +542,11 @@ function confirmModify() {
   }
 
   function deleteAccount() {
-    alertUtils.show("정말로 삭제하시겠습니까?", {
+	  window.publicModals.show("정말로 삭제하시겠습니까?", {
       confirmText : '확인',
       cancelText : '취소',
       onConfirm : checkedDeleteAccount,
-      onCancel : alertUtils.hide
+      onCancel : window.publicModals.hide
     })
   }
 
@@ -572,8 +555,8 @@ function confirmModify() {
       url: `/user/delete/${sessionScope.account.uid}`,
       method: "DELETE",
       contentType: "application/json",
-      success: () => {alertUtils.show("삭제 대기중...", {onConfirm : getInfo})},
-      error: (xhr) => {alertUtils.show("연결 실패! 새로고침 후 다시 시도해주세요")}
+      success: () => {window.publicModals.show("삭제 대기중...", {onConfirm : getInfo})},
+      error: (xhr) => {window.publicModals.show("연결 실패! 새로고침 후 다시 시도해주세요")}
     });
   }
 
@@ -623,28 +606,29 @@ function confirmModify() {
         method: "GET",
         success: (result) => {
           // 기본 정보와 상세 정보 업데이트
+          sessionMobile = result.mobile;
+    		  sessionEmail = result.email;
           resetUserModifyForm();
           updateBasicInfo(result);
           updateUserDetailInfo(result);
           updateUserModifyInfo(result);
         },
-        error: (xhr) => alertUtils.show("실패")
+        error: (xhr) => window.publicModals.show("실패")
     });
   }
 
   function updateUserModifyInfo(result) {
-    console.log(result);
 
-    // 주소 분리
     const address = result.addr;
-    if (address) {
+    if (result.addr) {
       // 초기화용 주소 저장
-      document.getElementById('addressBackup').value = address;
-
-      const addressSplit = address.split(' 상세주소 : ');
-      document.getElementById('selectedAddress').value = addressSplit[0] || '';
+      document.getElementById('addressBackup').value = result.addr;
+      document.getElementById('selectedAddress').value = result.addr || '';
       document.getElementById('selectedAddress').style.display = 'block'; // 표시
-      document.getElementById('addressDetail').value = addressSplit[1] || '';
+    }
+    if (result.detailAddr) {
+      document.getElementById('detailAddressBackup').value = result.detailAddr;
+      document.getElementById('addressDetail').value = result.detailAddr || '';
     }
 
     // 성별
@@ -699,7 +683,7 @@ function confirmModify() {
     const nowPassword = document.getElementById('nowPassword').value
 
     if (!nowPassword) {
-      alertUtils.show('현재 비밀번호를 입력해주세요.');
+      window.publicModals.show('현재 비밀번호를 입력해주세요.');
       return;
     }
 
@@ -712,19 +696,19 @@ function confirmModify() {
         if (result === true) {
           showVerificationOptions();
         } else {
-          alertUtils.show("비밀번호가 틀렸습니다.");
+          window.publicModals.show("비밀번호가 틀렸습니다.");
         }
       },
       error: (xhr) => {
-        alertUtils.show("비밀번호 확인 중 오류 발생");
+        window.publicModals.show("비밀번호 확인 중 오류 발생");
       }
     });
   }
 
   async function startVerifiPhonePwd() {
-    const rawPhone = "${sessionScope.account.mobile}";
+    const rawPhone = sessionMobile;
     if (!rawPhone) {
-      alertUtils.show('새 전화번호를 입력해주세요.');
+      window.publicModals.show('새 전화번호를 입력해주세요.');
       return;
     }
     const phoneNumber = formatPhoneNumberForFirebase(rawPhone);
@@ -732,11 +716,11 @@ function confirmModify() {
     firebaseCaptcha()
     try {
       confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-      alertUtils.show("인증 코드가 전송되었습니다.");
+      window.publicModals.show("인증 코드가 전송되었습니다.");
       showEndVerifiPwdMobileModal()
     } catch (error) {
       console.error("전화번호 인증 실패:", error);
-      alertUtils.show("전화번호 인증 중 오류 발생.");
+      window.publicModals.show("전화번호 인증 중 오류 발생.");
     }
   }
   async function endVerifiPwdMobile() {
@@ -750,9 +734,9 @@ function confirmModify() {
     }
   }
   async function startVerifiEmailPwd() {
-    const email = "${sessionScope.account.email}"
+    const email = sessionEmail;
     if (!email) {
-      alertUtils.show('새 이메일을 입력해주세요.');
+      window.publicModals.show('새 이메일을 입력해주세요.');
       return;
     }
     $.ajax({
@@ -762,7 +746,7 @@ function confirmModify() {
       data: JSON.stringify({email}),
       async: false,
       success: (res) => {showEndVerifiPwdEmailModal()},
-      error: (xhr) => {alertUtils.show("메일 전송 중 오류 발생: " + xhr.responseText)}
+      error: (xhr) => {window.publicModals.show("메일 전송 중 오류 발생: " + xhr.responseText)}
     });
   }
   async function endVerifiPwdEmail() {
@@ -771,10 +755,10 @@ function confirmModify() {
       url: `/account/auth/email/\${emailCode}`,
       method: "POST",
       contentType: "application/json",
-      data: JSON.stringify({ email: "${sessionScope.account.email}" }),
+      data: JSON.stringify({ email: sessionEmail }),
       async: false,
       success: () => {showNewPasswordForm()},
-      error: (xhr) => {alertUtils.show("이메일 인증 실패: " + xhr.responseText)}
+      error: (xhr) => {window.publicModals.show("이메일 인증 실패: " + xhr.responseText)}
     });
   }
   
@@ -783,7 +767,7 @@ function confirmModify() {
     const checkPassword = document.getElementById('checkPassword').value;
     
     if (changePassword !== checkPassword) {
-      alertUtils.show("비밀번호가 일치하지 않습니다.");
+      window.publicModals.show("비밀번호가 일치하지 않습니다.");
       return;
     }
 
@@ -797,7 +781,7 @@ function confirmModify() {
         successModal();
       },
       error: (xhr) => {
-        alertUtils.show("비밀번호 변경 중 오류가 발생했습니다.");
+        window.publicModals.show("비밀번호 변경 중 오류가 발생했습니다.");
         console.error(xhr.responseText);
       }
     });
@@ -808,7 +792,7 @@ function confirmModify() {
       modalBody.innerHTML = `
         <div class="form-group">
             <label>이메일 인증</label>
-            <div class="contact-info" style="margin-bottom: 15px;">${sessionScope.account.email}</div>
+            <div class="contact-info" style="margin-bottom: 15px;">email</div>
             <div class="verification-group">
                 <input type="text" id="pwdToEmailCode" placeholder="인증번호 입력">
                 <button class="btn-confirm" onclick="endVerifiPwdEmail()">인증완료</button>
@@ -822,7 +806,7 @@ function confirmModify() {
       modalBody.innerHTML = `
         <div class="form-group">
             <label>전화번호 인증</label>
-            <div class="contact-info" style="margin-bottom: 15px;">${sessionScope.account.mobile}</div>
+            <div class="contact-info" style="margin-bottom: 15px;">mobile</div>
             <div class="verification-group">
                 <input type="text" id="pwdToPhoneCode" placeholder="인증번호 입력">
                 <button class="btn-confirm" onclick="endVerifiPwdMobile()">인증완료</button>
@@ -878,8 +862,8 @@ function confirmModify() {
   function showVerificationOptions() {
     const modalBody = document.querySelector('.modal-body');
     const modalButtons = document.querySelector('.modal-buttons');
-    const mobile = "${sessionScope.account.mobile}";
-    const email = "${sessionScope.account.email}";
+    const mobile = sessionMobile;
+    const email = sessionEmail;
 
     let mobileText = "연결된 연락처가 없습니다.";
     if (mobile) {
@@ -959,16 +943,17 @@ function confirmModify() {
       </div>
     `;
   }
-
+  
   // 연락처 수정 모달 수정
   function openContactModal() {
     const modal = document.getElementById('basicModal');
     const modalTitle = modal.querySelector('.modal-title');
     const modalBody = modal.querySelector('.modal-body');
     const modalButtons = modal.querySelector('.modal-buttons');
+    const mobile = sessionMobile;
+    const email = sessionEmail;
 
-    const mobile = "${sessionScope.account.mobile}";
-    const email = "${sessionScope.account.email}";
+    
 
     let mobileText = "연결된 연락처가 없습니다.";
     if (mobile) {
@@ -1041,7 +1026,7 @@ function confirmModify() {
 
 
     if (!formattedNumber) {
-      alertUtils.show('올바른 전화번호를 입력해주세요.');
+      window.publicModals.show('올바른 전화번호를 입력해주세요.');
       return;
     }
 
@@ -1050,12 +1035,12 @@ function confirmModify() {
     firebaseCaptcha();
     try {
       confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-      alertUtils.show("인증 코드가 전송되었습니다.");
+      window.publicModals.show("인증 코드가 전송되었습니다.");
       document.getElementById('phoneInputGroup').style.display = 'none';
       document.getElementById('phoneVerificationGroup').style.display = 'block';
     } catch (error) {
       console.error("전화번호 인증 실패:", error);
-      alertUtils.show("전화번호 인증 중 오류 발생.");
+      window.publicModals.show("전화번호 인증 중 오류 발생.");
     }
   }
   async function startVerifiEmailPne() {
@@ -1069,11 +1054,11 @@ function confirmModify() {
       data: JSON.stringify({email}),
       async: false,
       success: (res) => {
-        alertUtils.show("메일 전송 성공: " + res)
+        window.publicModals.show("메일 전송 성공: " + res)
         document.getElementById('emailInputGroup').style.display = 'none';
         document.getElementById('emailVerificationGroup').style.display = 'block';
       },
-      error: (xhr) => {alertUtils.show("메일 전송 중 오류 발생: " + xhr.responseText)}
+      error: (xhr) => {window.publicModals.show("메일 전송 중 오류 발생: " + xhr.responseText)}
     });
 
   }
@@ -1103,14 +1088,14 @@ function confirmModify() {
           successModal();
         },
         error: (xhr) => {
-        alertUtils.show("인증 처리 중 오류가 발생했습니다.");
+          window.publicModals.show("인증 처리 중 오류가 발생했습니다.");
         console.error(xhr.responseText);
         }
       });
   
     } catch (error) {
       console.error("코드 인증 실패:", error);
-      alertUtils.show("잘못된 인증 코드입니다.");
+      window.publicModals.show("잘못된 인증 코드입니다.");
     }
   
   }
@@ -1140,64 +1125,17 @@ function confirmModify() {
               successModal();
             },
             error: (xhr) => {
-            alertUtils.show("인증 처리 중 오류가 발생했습니다.");
+              window.publicModals.show("인증 처리 중 오류가 발생했습니다.");
             console.error(xhr.responseText);
             }
           });
         },
-        error: (xhr) =>{alertUtils.show("이메일 인증 실패: " + xhr.responseText)}
+        error: (xhr) =>{window.publicModals.show("이메일 인증 실패: " + xhr.responseText)}
       });
     
 }
 
-  // 알럿 모달 유틸리티
-  const alertUtils = {
-    show: (message, options = {}) => {
-      const {
-        confirmText = '확인',
-        cancelText = null,
-        onConfirm = null,
-        onCancel = null
-      } = options;
-
-      const overlay = document.getElementById('alertModalOverlay');
-      const modal = document.getElementById('alertModal');
-      const messageEl = modal.querySelector('.alert-modal-message');
-      const buttonsEl = modal.querySelector('.alert-modal-buttons');
-
-      messageEl.textContent = message;
-      
-      let buttonsHTML = '';
-      if (cancelText) {
-        buttonsHTML += `<button class="alert-modal-button cancel">\${cancelText}</button>`;
-      }
-      buttonsHTML += `<button class="alert-modal-button confirm">\${confirmText}</button>`;
-      
-      buttonsEl.innerHTML = buttonsHTML;
-
-      overlay.style.display = 'block';
-      modal.style.display = 'block';
-
-      const confirmBtn = modal.querySelector('.alert-modal-button.confirm');
-      const cancelBtn = modal.querySelector('.alert-modal-button.cancel');
-
-      confirmBtn.onclick = () => {
-        if (onConfirm) onConfirm();
-        alertUtils.hide();
-      };
-
-      if (cancelBtn) {
-        cancelBtn.onclick = () => {
-          if (onCancel) onCancel();
-          alertUtils.hide();
-        };
-      }
-    },
-    hide: () => {
-      document.getElementById('alertModalOverlay').style.display = 'none';
-      document.getElementById('alertModal').style.display = 'none';
-    }
-  };
+  
 
   function cancleModify() {
     resetUserModifyForm();
@@ -1207,6 +1145,7 @@ function confirmModify() {
 
   function deleteAddress() {
     document.getElementById('addressBackup').value = '';
+    document.getElementById('detailAddressBackup').value = '';
     document.getElementById('selectedAddress').value = '';
     document.getElementById('addressDetail').value = '';
     document.getElementById('addressSelect').innerHTML = '';
@@ -1216,14 +1155,14 @@ function confirmModify() {
   function resetAddress() {
     deleteAddress();
     beforeAddress = document.getElementById('addressBackup').value;
+    beforeDetailAddress = document.getElementById('detailAddressBackup').value;
     if (beforeAddress && beforeAddress !== '') {
-      beforeAddress = beforeAddress.split(' 상세주소 : ');
-      document.getElementById('selectedAddress').value = beforeAddress[0];
+      document.getElementById('selectedAddress').value = beforeAddress;
       document.getElementById('selectedAddress').style.display = 'block';
-      if (beforeAddress[1]) {
-        document.getElementById('addressDetail').value = beforeAddress[1];
         document.getElementById('addressDetail').style.display = 'block';
-      }
+    }
+    if (beforeDetailAddress) {
+        document.getElementById('addressDetail').value = beforeDetailAddress;
     }
   }
 
@@ -1339,7 +1278,7 @@ function confirmModify() {
             var errCode = jsonStr.results.common.errorCode;
             var errDesc = jsonStr.results.common.errorMessage;
             if(errCode != "0"){
-                alertUtils.show(errCode+"="+errDesc);
+              window.publicModals.show(errCode+"="+errDesc);
             }else{
                 if(jsonStr != null){
                     makeListJson(jsonStr);
@@ -1347,7 +1286,7 @@ function confirmModify() {
             }
         },
         error: function(xhr,status, error){
-            alertUtils.show("에러발생");
+          window.publicModals.show("에러발생");
         }
     });
   }
@@ -1357,7 +1296,7 @@ function confirmModify() {
 		//특수문자 제거
 		var expText = /[%=><]/ ;
 		if(expText.test(obj.value) == true){
-			alertUtils.show("특수문자를 입력 할수 없습니다.") ;
+			window.publicModals.show("특수문자를 입력 할수 없습니다.") ;
 			obj.value = obj.value.split(expText).join(""); 
 			return false;
 		}
@@ -1374,7 +1313,7 @@ function confirmModify() {
 			regex = new RegExp( sqlArray[i] ,"gi") ;
 			
 			if (regex.test(obj.value) ) {
-        alertUtils.show("\"" + sqlArray[i]+"\"와(과) 같은 특정문자로 검색할 수 없습니다.");
+        window.publicModals.show("\"" + sqlArray[i]+"\"와(과) 같은 특정문자로 검색할 수 없습니다.");
 				obj.value =obj.value.replace(regex, "");
 				return false;
 			}
@@ -1416,6 +1355,31 @@ function formatNumber(e) {
     e.target.value = value;
 }
 
+// 카톡 잠깐 백업
+displayToken()
+	function displayToken() {
+		var token = getCookie('authorize-access-token');
+
+		if(token) {
+		Kakao.Auth.setAccessToken(token);
+		Kakao.Auth.getStatusInfo()
+			.then(function(res) {
+			if (res.status === 'connected') {
+				document.getElementById('token-result').innerText
+				= 'login success, token: ' + Kakao.Auth.getAccessToken();
+			}
+			})
+			.catch(function(err) {
+			Kakao.Auth.setAccessToken(null);
+			});
+		}
+	}
+
+	function getCookie(name) {
+		var parts = document.cookie.split(name + '=');
+		if (parts.length === 2) { return parts[1].split(';')[0]; }
+	}
+// 카톡 잠깐 백업
 </script>
 <!-- 풋터 -->
 <jsp:include page="/WEB-INF/views/footer.jsp"></jsp:include>

@@ -9,9 +9,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.jobhunter.customexception.NeedLoginException;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.util.AccountUtil;
+import com.jobhunter.util.RedirectUtil;
 
 @Component
 public class OwnerInterceptor implements HandlerInterceptor {
@@ -22,6 +24,7 @@ public class OwnerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
+    	System.out.println("본인확인인터셉터");
 
         // 오직 GET + Accept: text/html 접근만 걸러냄
         boolean isGet = "GET".equalsIgnoreCase(request.getMethod());
@@ -34,8 +37,18 @@ public class OwnerInterceptor implements HandlerInterceptor {
 
         HttpSession session = request.getSession();
 
+        
+        AccountVO account = (AccountVO) session.getAttribute("account");
+        
+        // 로그인 안 했거나 인증이 필요할 때
+        if (account == null || "Y".equals(account.getRequiresVerification())) {
+            RedirectUtil.saveRedirectUrl(request, session);
+            response.sendRedirect(request.getContextPath() + "/account/login");
+            return false;
+        }
+        
         // 일단 계정 상태 서버에있는걸로 갱신좀 해서 그사이 정지먹진않았나 체크해주고
-        AccountVO account = accUtils.refreshAccount((AccountVO) session.getAttribute("account"));
+        account = accUtils.refreshAccount(account);
 
         String errorParam = "accessFail=notOwner";
 
@@ -44,6 +57,8 @@ public class OwnerInterceptor implements HandlerInterceptor {
             int uid = Integer.parseInt(request.getParameter("uid"));
             AccountType type = AccountType.valueOf(request.getParameter("accountType").toUpperCase());
 
+            System.out.println(uid + "이랑" + type);
+            
             // 본인 아니라 어드민도 볼수있게할거냐? 체크용
             String allowAdminParam = request.getParameter("allowAdmin");
 
@@ -51,7 +66,7 @@ public class OwnerInterceptor implements HandlerInterceptor {
             boolean isOwner = account.getUid() == uid && account.getAccountType() == type;
             // 어드민 허용 페이지고 내가 어드민인지 체크
             boolean isAdminAllowed = "true".equalsIgnoreCase(allowAdminParam)
-                    && account.getAccountType() == AccountType.ADMIN;
+                    && account.getIsAdmin() == 'Y';
 
             if (isOwner || isAdminAllowed) {
                 return true;

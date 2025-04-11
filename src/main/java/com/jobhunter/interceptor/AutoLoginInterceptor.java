@@ -23,14 +23,11 @@ public class AutoLoginInterceptor implements HandlerInterceptor {
 	@Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-
         HttpSession session = request.getSession();
         
         if (session != null && session.getAttribute("account") != null) {
             return true; // 이미 로그인 되어 있음
         }
-
-        System.out.println("자동로그인 인터셉터");
         
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

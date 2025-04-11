@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobhunter.model.account.AccountVO;
@@ -33,13 +34,14 @@ public class UserRestController {
 	
 	@GetMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<UserVO> myinfo(@PathVariable("uid") String uid) {
-	    System.out.println(uid);
 	    UserVO userVO = null;
 	    try {
 	        userVO = service.showMypage(uid);
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
+	    
+	    System.out.println("/info_userVO : " + userVO);
 
 	    return ResponseEntity.status(HttpStatus.OK).body(userVO);
 	}
@@ -47,7 +49,7 @@ public class UserRestController {
 	@PostMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
     public ResponseEntity<?> updateUserInfo(@RequestBody UserInfoDTO userInfo, @PathVariable("uid") Integer uid, HttpSession session) {
         
-		System.out.println(userInfo);
+		System.out.println("/info_userInfo : " + userInfo);
 		
 		if (uid == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -101,4 +103,17 @@ public class UserRestController {
 	                             .body("연락처 변경 중 오류 발생");
 	    }
 	}
+	
+	@GetMapping(value = "/check/id", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String userId) {
+		boolean exists = false;
+		try {
+			exists = service.isUserIdExists(userId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok(exists);
+	}
+	
 }

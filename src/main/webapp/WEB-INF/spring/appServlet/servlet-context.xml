@@ -48,14 +48,21 @@
 
 	<!-- 정지+삭제대기 막는 인터셉터(get요청용_rest방식등은 AccountRestController 참조) [ ?checkStatType=BLOCK 
 		] 혹은 [ ?checkStatType=DELETE ] 붙이면 그것만 검사 가능 둘다쓸거면 그냥 인터셉터 걸기만 하면 됩니다. -->
-	<beans:bean id="accountTypeInterceptor"
+	<beans:bean id="AccountStatInterceptor"
 		class="com.jobhunter.interceptor.AccountStatInterceptor">
 	</beans:bean>
+	
+	<!-- 계정타입(개인/기업) 검사하는 인터셉터(get요청용_rest방식등은 AccountRestController 참조) 
+		_쿼리스트링으로 [ ?accountType=company ] 처럼 accountType 붙여놓고 걸면 동작
+		[ &allowAdmin=true ] 추가로 붙이면 해당역할 아니라도 어드민도 볼수있는 페이지됩니다. -->
+	<beans:bean id="RoleCheckInterceptor"
+		class="com.jobhunter.interceptor.RoleCheckInterceptor">
+	</beans:bean>
 
-	<!-- 본인확인 인터셉터_쿼리스트링으로 [ ?uid=101&accountType=company ] 처럼 uid랑 accountType 
-		붙여놓고 걸면 동작 accountType은 com.jobhunter.model.customenum.AccountType 참고(대소문자 
-		구분 없음) [ &allowAdmin=true ] 추가로 붙이면 본인 아니라도 어드민도 볼수있는 페이지됩니다 (get요청용_rest방식등은 
-		AccountRestController 참조) -->
+	<!-- 본인확인 인터셉터_쿼리스트링으로 [ ?uid=101&accountType=company ] 처럼 uid랑 accountType 붙여놓고 걸면 동작.
+		accountType은 com.jobhunter.model.customenum.AccountType 참고(대소문자 구분 없음) 
+		[ &allowAdmin=true ] 추가로 붙이면 본인 아니라도 어드민도 볼수있는 페이지됩니다 
+		(get요청용_rest방식등은 AccountRestController 참조) -->
 	<beans:bean id="OwnerInterceptor"
 		class="com.jobhunter.interceptor.OwnerInterceptor">
 	</beans:bean>
@@ -69,13 +76,25 @@
 
 		<interceptor>
 			<mapping path="/user/mypage" />
-			<mapping path="/user/kakao" />
 			<mapping path="/reviewBoard/write"/>
+			<mapping path="/account/testLoginAjax" />
+			<mapping path="/account/testGetLogin" />
 			<beans:ref bean="authLoginInterceptor" />
+		</interceptor>
+		
+		<interceptor>
+			<mapping path="/account/testGetBlocked" />
+			<beans:ref bean="AccountStatInterceptor" />
+		</interceptor>
+		
+		<interceptor>
+			<mapping path="/account/testGetRole" />
+			<beans:ref bean="RoleCheckInterceptor" />
 		</interceptor>
 
 		<interceptor>
 			<mapping path="/user/mypage" />
+			<mapping path="/account/testGetOwner" />
 			<beans:ref bean="OwnerInterceptor" />
 		</interceptor>
 		

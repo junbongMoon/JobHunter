@@ -24,6 +24,7 @@ public class ResumeDTO {
 	private String introduce;
 	private String saveType;
 	private int userUid;
+	private String regDate;
 	
 	// 고용 형태 리스트
     private List<JobFormDTO> jobForms;

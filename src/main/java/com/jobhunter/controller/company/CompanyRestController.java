@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jobhunter.model.company.BusinessRequestDTO;
 import com.jobhunter.model.company.CompanyVO;
 import com.jobhunter.model.user.ContactUpdateDTO;
 import com.jobhunter.model.user.PasswordDTO;
-import com.jobhunter.model.user.UserVO;
 import com.jobhunter.service.company.CompanyService;
-import com.jobhunter.service.user.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -71,5 +71,37 @@ public class CompanyRestController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	                             .body("연락처 변경 중 오류 발생");
 	    }
+	}
+	
+	@PostMapping(value = "/business", consumes = "application/json")
+	public ResponseEntity<?> valiedBusiness (@RequestBody BusinessRequestDTO dto) {
+		if(dto.getB_no().equals("0000000000")) {
+			return ResponseEntity.ok("01");
+		}
+		System.out.println("/business : " + dto);
+		try {
+		
+			String valid = service.valiedBusiness(dto);
+
+        return ResponseEntity.ok(valid);
+        
+		} catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                             .body("사업자 진위 확인 중 오류 발생: " + e.getMessage());
+	    }
+	}
+	
+	@GetMapping(value = "/check/id", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String companyId) {
+		
+		System.out.println(companyId);
+		boolean exists = false;
+		try {
+			exists = service.isCompanyIdExists(companyId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok(exists);
 	}
 }
