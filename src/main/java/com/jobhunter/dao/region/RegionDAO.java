@@ -23,5 +23,13 @@ public interface RegionDAO {
 
 	// where_recruit_sigungu에 등록하는 메서드
 	int insertSigunguWithRecruitmentNotice(int refRecNo, int refSigungu) throws Exception;
+	
+	// where_recruit_sigungu에 공고에 등록 된 시군구를 수정하는 메서드
+	void updateRegionWithRecruitmentNotice(int uid, int regionNo) throws Exception;
+	
+	// where_recruit_sigungu에 공고에 등록 된 도시를 수정하는 메서드
+	void updateSigunguWithRecruitmentNotice(int uid, int sigunguNo);
+	
+
 
 }

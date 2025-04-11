@@ -19,30 +19,33 @@
 
 	$(function() {
 
+		getRegion();
+		getMajorCategory();
+
 		const today = new Date();
 		today.setHours(0,0,0,0); // 오늘 자정으로 설정
-    const nextMonth = new Date();
-    nextMonth.setMonth(today.getMonth() + 1);
+    	const nextMonth = new Date();
+    	nextMonth.setMonth(today.getMonth() + 1);
 
-    // yyyy-MM-dd 포맷으로 변환
-    function formatDate(date) {
+    	// yyyy-MM-dd 포맷으로 변환
+    	function formatDate(date) {
         const yyyy = date.getFullYear();
         const mm = String(date.getMonth() + 1).padStart(2, '0');
         const dd = String(date.getDate()).padStart(2, '0');
         return `${yyyy}-${mm}-${dd}`;
-    }
+    	}
 
-    const minDate = formatDate(today);
-    const maxDate = formatDate(nextMonth);
+    	const minDate = formatDate(today);
+    	const maxDate = formatDate(nextMonth);
 
-    // 오늘 날짜를 기본값으로 설정하고 min 속성 적용
-    const dateInput = $("#date");
-    dateInput.attr("min", minDate);
-    dateInput.attr("max", maxDate);
-    dateInput.val(minDate);
+		// 오늘 날짜를 기본값으로 설정하고 min 속성 적용
+		const dateInput = $("#date");
+		dateInput.attr("min", minDate);
+		dateInput.attr("max", maxDate);
+		dateInput.val(minDate);
     
-    // 과거 날짜 선택 방지
-    dateInput.on('change', function() {
+    	// 과거 날짜 선택 방지
+   		dateInput.on('change', function() {
         const selectedDate = new Date(this.value);
         if(selectedDate < today) {
             $(".modal-body").text("오늘 이전 날짜는 선택할 수 없습니다.");
@@ -53,22 +56,22 @@
 		
 		$('#summernote').summernote();
 
-		getRegion();
-		getMajorCategory();
+
 
 		$('.method-detail, .save-method-btn').hide();
 
 		$(".fileUploadArea").on("dragover", function (e) {
     e.preventDefault();
     $(this).css("background-color", "#ccc");
-});
+	
+	});
 
-$(".fileUploadArea").on("dragleave", function (e) {
+	$(".fileUploadArea").on("dragleave", function (e) {
     e.preventDefault();
     $(this).css("background-color", "#eee");
-});
+	});
 
-$(".fileUploadArea").on("drop", function (e) {
+	$(".fileUploadArea").on("drop", function (e) {
     e.preventDefault();
     $(this).css("background-color", "#eee");
 
@@ -77,11 +80,11 @@ $(".fileUploadArea").on("drop", function (e) {
         let file = files[i];
         uploadFileAndShowPreview(file);
     }
-});
+	});
 
-$(document).on("click", "#goToListBtn", function () {
+	$(document).on("click", "#goToListBtn", function () {
   location.href = "./listAll";
-});
+	});
 
 		
 
@@ -121,7 +124,7 @@ $(document).on("click", "#goToListBtn", function () {
     </div>
   `;
 
-  if (selectedWorkType === "PARTTIME") {
+  if (selectedWorkType === "PART_TIME") {
     if ($("#phoneOption").length === 0 && $("#textOption").length === 0) {
       $("#application-methods").append(phoneAndTextHtml);
     }
@@ -129,14 +132,30 @@ $(document).on("click", "#goToListBtn", function () {
     $(".parttime-only").remove();
   }
 });
+    // 중복입력 방지 코드
+	$('form').on('submit', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
 
+    const $form = $(this);
+    const $submitBtn = $form.find('button[type="submit"]');
+
+    // 유효성 검사 먼저 수행
+    if (!isValidRecruitmentForm()) {
+        return false; // 실패 시 중단
+    }
+
+    if ($submitBtn.length) {
+        $submitBtn.prop('disabled', true).text('처리 중...');
+    }
+
+    // 유효성 통과 후 실제 제출
+    this.submit();
+});
 		
 		
 		// class = "Region" 값이 바뀌면.. 
-		$(document).on(
-				"change",
-				".Region",
-				function() {
+		$(document).on("change",".Region", function() {
 					let selectedRegion = $(this).val();
 					console.log("선택한 지역:", selectedRegion);
 
@@ -266,8 +285,15 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 			$(this).focus();
 		}
 	});
-	
-	});
+
+	// 로컬스토리지 자동저장
+	setTimeout(() => {
+    restoreFormFromLocalStorage();
+  	}, 2000);
+
+	setInterval(saveFormToLocalStorage, AUTO_SAVE_INTERVAL);
+
+});
 
 // 파일 업로드 + 썸네일 표시
 function uploadFileAndShowPreview(file) {
@@ -302,7 +328,7 @@ function showThumbnail(file) {
         let html = `
             <tr id="thumb_\${safeId}">
                 <td><img src="\${isImage ? base64 : '/resources/images/noimage.png'}" width="60" /></td>
-                <td\>${file.name}</td>
+                <td>\${file.name}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-danger" onclick="removeFile('\${file.name}')">X</button>
                 </td>
@@ -314,7 +340,7 @@ function showThumbnail(file) {
 }
 
 // 파일 삭제 함수
-function removeFile(fileName) {
+	function removeFile(fileName) {
     $.ajax({
         url: "/recruitmentnotice/file",
         type: "DELETE",
@@ -328,15 +354,14 @@ function removeFile(fileName) {
             alert("파일 삭제 실패");
         }
     });
-}
+	}
 
-function markUploadSuccess(fileName) {
+	function markUploadSuccess(fileName) {
     const safeId = CSS.escape(fileName);
     document.querySelector(`#\${safeId}`).insertAdjacentHTML(
       "beforeend",
-      "<td><img src='/resources/images/success.png' width='20'></td>"
-    );
-}
+      "<td><img src='/resources/images/success.png' width='20'></td>");
+	}
 
 
 	// 면접타입 유효성 검사
@@ -346,8 +371,8 @@ function markUploadSuccess(fileName) {
     alert("면접방식을 최소 하나 이상 선택해주세요.");
     return false;
   }
-  return true;
-}
+  	return true;
+  }
 
 	// 면접타입 저장 함수
 	function saveApplication(method, detail) {
@@ -359,15 +384,15 @@ function markUploadSuccess(fileName) {
         method: method,
         detail: detail,
         recruitmentNoticeUid: -1
-      }),
-      success: function (data) {
-        console.log(data)
-      },
-      error: function () {
+     	 }),
+      		success: function (data) {
+        	console.log(data)
+     	 },
+        error: function () {
         alert(`${method} 방식 저장 실패`);
-      }
-    });
-  }
+      	}
+    	});
+  	}
 
 		 // 면접 타입 삭제 함수
 		 function deleteApplication(method) {
@@ -483,210 +508,363 @@ function markUploadSuccess(fileName) {
 
 
 
-	function removeAdvantage(deleteBtn) {
-    let advantageType = $(deleteBtn).siblings("input[type='hidden']").val();
+		function removeAdvantage(deleteBtn) {
+		let advantageType = $(deleteBtn).siblings("input[type='hidden']").val();
 
-    $.ajax({
-        url: "/recruitmentnotice/advantage/" + advantageType,
-        type: "DELETE",
-        success: function (response) {
-            console.log("삭제 성공", response);
-            $(deleteBtn).closest(".advantage-item").remove();
-        },
-        error: function (err) {
-            console.error("삭제 실패", err);
-        }
-    });
-}
+		$.ajax({
+			url: "/recruitmentnotice/advantage/" + advantageType,
+			type: "DELETE",
+			success: function (response) {
+				console.log("삭제 성공", response);
+				$(deleteBtn).closest(".advantage-item").remove();
+			},
+			error: function (err) {
+				console.error("삭제 실패", err);
+			}
+		});
+	}
 
 	function addAdvantage() {
-		
-		let advVal = $("#advantage").val();
-    let advantageValue = $("#advantage").val();
+		const advantageValue = $("#advantage").val().trim();
 
-    if (!advantageValue) {
-        alert("우대조건을 입력하세요");
-		// 알럿 대신 모달창으로 바꾸자..
-        return;
-    }
+		if (!advantageValue) {
+			alert("우대조건을 입력하세요");
+			return;
+		}
 
-    $.ajax({
-        url: "/recruitmentnotice/advantage",
-        type: "POST",
-        data: JSON.stringify({ advantageType: advantageValue }),
-        contentType: "application/json",
-        success: function (response) {
-            console.log("우대조건 저장 성공", response);
-            $("#advantage").val("");
+		$.ajax({
+			url: "/recruitmentnotice/advantage",
+			type: "POST",
+			contentType: "application/json",
+			data: JSON.stringify({ advantageType: advantageValue }),
+			success: function (response) {
+				if (!response || !Array.isArray(response)) {
+					console.warn("응답 데이터 없음 또는 배열 아님");
+					return;
+				}
 
-            // DOM에 추가할 HTML 구성
-            let output = `
-                <div class="d-flex align-items-center mb-2 advantage-item">
-                    <input type="hidden" value="\${advantageValue}">
-                    <span class="me-2">\${advantageValue}</span>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeAdvantage(this)">X</button>
-                </div>
-            `;
-            $(".advantageArea").append(output);
-        },
-        error: function (err) {
-            console.error("우대조건 저장 실패", err);
-        }
-    });
+				// 중복 여부 확인 (이미 DOM에 존재하는 값인지)
+				let alreadyExists = false;
+				$(".advantageArea input[type='hidden']").each(function () {
+					if ($(this).val() === advantageValue) {
+						alreadyExists = true;
+					}
+				});
 
+				if (alreadyExists) {
+					alert("이미 추가된 우대조건입니다.");
+					return;
+				}
 
-
-}
-
-
-function formatPay(input) {
-    // 숫자만 추출
-    let value = input.value.replace(/[^0-9]/g, '');
-    
-    // 최대 2,000,000,000 제한
-    if (parseInt(value) > 2000000000) {
-      value = "2000000000";
-    }
-
-    // 쉼표 추가
-    input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-
-  // 숫자 데이터 전송을 위해 쉼표 제거 함수 (폼 제출 시 사용)
-  function getRawPay() {
-    return document.getElementById("pay").value.replaceAll(",", "");
-  }
-
-function isValidRecruitmentForm() {
-	let result = true;
-
- 	 const title = $("#title").val();
- 	 const workType = $("input[name='workType']:checked").val();
- 	 const payType = $("input[name='payType']:checked").val();
- 	 const pay = getRawPay();
- 	 const militaryService = $("input[name='militaryService']:checked").val();
-  	const dueDate = $("#date").val();
-  	const detail = $("#summernote").val();
-  	const sigungu = $(".Sigungu").val();
-  	const subCategory = $(".SubCategory").val();
-  	const majorCategory = $(".MajorCategory").val();
-  	const region = $(".Region").val();
-  	const workDetailType = $("#workDetailType").val();
-
-  	const startTime = $("#startTime").val();
-  	const endTime = $("#endTime").val();
-  	const personalHistory = $("input[name='personalHistory']:checked").val();
- 	const manager = $("#manager").val();
-  	const refCompany = $("#refCompany").val();
-	  let period = startTime + "~" + endTime;
-if (workDetailType) {
-  period += " (" + workDetailType + ")";
-}
-
-  console.log(period);
-
-  
-
-  if (!title || title.length > 190) { // 완
-    errorMessage = "공고 제목을 입력해주세요.";
-    focusElement = $("#title");
-	result = false;
-  } else if (!majorCategory || majorCategory === "-1") { // 완
-    errorMessage = "산업군을 선택해주세요.";
-    focusElement = $(".MajorCategory");
-	result = false;
-  } else if (!subCategory || subCategory === "-1") { // 완
-    errorMessage = "직업(세부직종)을 선택해주세요.";
-    focusElement = $(".SubCategory");
-	result = false;
-  } else if (!region || region === "-1") { // 완
-    errorMessage = "도시를 선택해주세요.";
-    focusElement = $(".Region");
-	result = false;
-  } else if (!sigungu || sigungu === "-1") { // 완
-    errorMessage = "시군구를 선택해주세요.";
-    focusElement = $(".Sigungu");
-	result = false;
-  } else if (!$("input[name='workType']:checked").length) {
-    errorMessage = "근무형태를 선택해주세요.";
-    focusElement = $("input[name='workType']").first();
-    result = false;
-  } else if (!$("input[name='payType']:checked").length) {
-    errorMessage = "급여 유형을 선택해주세요.";
-    focusElement = $("input[name='payType']").first();
-    result = false;
-  } else if (!pay || pay <= 0) { // 완
-    errorMessage = "급여 금액을 입력해주세요.";
-    focusElement = $("#email");
-	result = false;
-  } else if (!startTime || !endTime) {  // 완
-    errorMessage = "근무시간을 입력해주세요.";
-    if(!startTime) {	
-		focusElement = $("#startTime");
-	} else {
-		focusElement = $("#endTime");
+				const html = `
+					<div class="d-flex align-items-center mb-2 advantage-item">
+						<input type="hidden" value="\${advantageValue}">
+						<span class="me-2">\${advantageValue}</span>
+						<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeAdvantage(this)">X</button>
+					</div>
+				`;
+				$(".advantageArea").append(html);
+				$("#advantage").val("");
+			},
+			error: function () {
+				alert("우대조건 저장 실패");
+			}
+		});
 	}
-	result = false;
-  } else if (!personalHistory) { // 완
-	errorMessage = "경력사항을 입력해주세요.";
-    focusElement = $("#personalHistory");
-	result = false;
-  } else if (!militaryService) { // 완
-    errorMessage = "병역 사항을 선택해주세요.";
-	result = false;
-  } else if (!dueDate) { // 알아서 된다...
-    errorMessage = "마감 기한을 선택해주세요.";
-    focusElement = $("#date");
-	result = false;
-  } else if (!manager || manager.length > 10) { // 완
-    errorMessage = "담당자를 입력해주세요.";
-    focusElement = $("#manager");
-	result = false;
-  } else if(!isValidApplication()) {
-	errorMessage = "면접방식을 선택해주세요."; 
-    focusElement = $(".SubCategory");
-	result = false;
-  } 
 
-  if (errorMessage) {
-  $(".modal-body").text(errorMessage);
 
-  // 모달이 다 보여진 후에 focus 실행
-  $("#MyModal").on("shown.bs.modal", function () {
-    if (focusElement) {
-      focusElement.focus();
-    }
-  });
-  result = false;
-  $("#MyModal").modal("show");
-}
+	function formatPay(input) {
+		// 숫자만 추출
+		let value = input.value.replace(/[^0-9]/g, '');
+		
+		// 최대 2,000,000,000 제한
+		if (parseInt(value) > 2000000000) {
+		value = "2000000000";
+		}
 
-  // 면접 방식 유효성 검사도 포함
+		// 쉼표 추가
+		input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+
+	// 숫자 데이터 전송을 위해 쉼표 제거 함수 (폼 제출 시 사용)
+	function getRawPay() {
+		return document.getElementById("pay").value.replaceAll(",", "");
+	}
+
+	function isValidRecruitmentForm() {
+		let result = true;
+
+		const title = $("#title").val();
+		const workType = $("input[name='workType']:checked").val();
+		const payType = $("input[name='payType']:checked").val();
+		const pay = getRawPay();
+		const militaryService = $("input[name='militaryService']:checked").val();
+		const dueDate = $("#date").val();
+		const detail = $("#summernote").val();
+		const sigungu = $(".Sigungu").val();
+		const subCategory = $(".SubCategory").val();
+		const majorCategory = $(".MajorCategory").val();
+		const region = $(".Region").val();
+		const workDetailType = $("#workDetailType").val();
+
+		const startTime = $("#startTime").val();
+		const endTime = $("#endTime").val();
+		const personalHistory = $("input[name='personalHistory']:checked").val();
+		const manager = $("#manager").val();
+		const refCompany = $("#refCompany").val();
+
+		$("#pay").val(pay);
+		let period = startTime + "~" + endTime;
+
+		if (workDetailType) {
+		period += " (" + workDetailType + ")";
+		}
+
+		console.log(period);
+
+	
+
+	if (!title || title.length > 190) { // 완
+		errorMessage = "공고 제목을 입력해주세요.";
+		focusElement = $("#title");
+		result = false;
+	} else if (!majorCategory || majorCategory === "-1") { // 완
+		errorMessage = "산업군을 선택해주세요.";
+		focusElement = $(".MajorCategory");
+		result = false;
+	} else if (!subCategory || subCategory === "-1") { // 완
+		errorMessage = "직업(세부직종)을 선택해주세요.";
+		focusElement = $(".SubCategory");
+		result = false;
+	} else if (!region || region === "-1") { // 완
+		errorMessage = "도시를 선택해주세요.";
+		focusElement = $(".Region");
+		result = false;
+	} else if (!sigungu || sigungu === "-1") { // 완
+		errorMessage = "시군구를 선택해주세요.";
+		focusElement = $(".Sigungu");
+		result = false;
+	} else if (!$("input[name='workType']:checked").length) {
+		errorMessage = "근무형태를 선택해주세요.";
+		focusElement = $("input[name='workType']").first();
+		result = false;
+	} else if (!$("input[name='payType']:checked").length) {
+		errorMessage = "급여 유형을 선택해주세요.";
+		focusElement = $("input[name='payType']").first();
+		result = false;
+	} else if (!pay || pay <= 0) { // 완
+		errorMessage = "급여 금액을 입력해주세요.";
+		focusElement = $("#email");
+		result = false;
+	} else if (!startTime || !endTime) {  // 완
+		errorMessage = "근무시간을 입력해주세요.";
+		if(!startTime) {	
+			focusElement = $("#startTime");
+		} else {
+			focusElement = $("#endTime");
+		}
+		result = false;
+	} else if (!personalHistory) { // 완
+		errorMessage = "경력사항을 입력해주세요.";
+		focusElement = $("#personalHistory");
+		result = false;
+	} else if (!militaryService) { // 완
+		errorMessage = "병역 사항을 선택해주세요.";
+		result = false;
+	} else if (!dueDate) { // 알아서 된다...
+		errorMessage = "마감 기한을 선택해주세요.";
+		focusElement = $("#date");
+		result = false;
+	} else if (!manager || manager.length > 10) { // 완
+		errorMessage = "담당자를 입력해주세요.";
+		focusElement = $("#manager");
+		result = false;
+	} else if(!isValidApplication()) {
+		errorMessage = "면접방식을 선택해주세요."; 
+		focusElement = $(".SubCategory");
+		result = false;
+	} 
+
+	if (errorMessage) {
+	$(".modal-body").text(errorMessage);
+
+	// 모달이 다 보여진 후에 focus 실행
+	$("#MyModal").on("shown.bs.modal", function () {
+		if (focusElement) {
+		focusElement.focus();
+		}
+	});
+	result = false;
+	$("#MyModal").modal("show");
+	}
+
+  	// 면접 방식 유효성 검사도 포함
   
-  if(result){
-	// period 히든에 넣어주자
-	mjrno = $("#majorcategoryNo").val();
+	
+		// period 히든에 넣어주자
+		mjrno = $("#majorcategoryNo").val();
 
-	console.log(mjrno);
-	$("#period").val(period);
+		console.log(mjrno);
+		$("#period").val(period);
+
 
 	return result;
 	}
-return result;
-}
 
+	// 자동 저장 주기 (ms 단위)
+	const AUTO_SAVE_INTERVAL = 5000;
 
+	// 저장 키 (unique한 key 사용)
+	const STORAGE_KEY = "recruitment_autosave";
 
+	// 저장 대상 필드 목록
+	const autosaveFields = [
+	"#title", "#pay", "#startTime", "#endTime", "#workDetailType",
+	"#date", "#manager", "#advantage", "#summernote",
+	".MajorCategory", ".SubCategory", ".Region", ".Sigungu",
+	"input[name='workType']:checked", "input[name='payType']:checked",
+	"input[name='militaryService']:checked", "input[name='personalHistory']:checked"
+	];
+
+	// 자동 저장 함수
+	function saveFormToLocalStorage() {
+		const data = {};
+
+		// 1. 일반 필드 저장
+		[
+			"#title", "#pay", "#startTime", "#endTime", "#workDetailType",
+			"#date", "#manager", "#advantage", "#summernote",
+			".MajorCategory", ".SubCategory", ".Region", ".Sigungu"
+		].forEach(selector => {
+			const el = $(selector);
+			if (el.length) data[selector] = el.val();
+		});
+
+		// 2. 🔥 radio 값 저장 (name 단위로 체크된 값 저장)
+		[
+			"workType", "payType", "militaryService", "personalHistory"
+		].forEach(name => {
+			const checkedVal = $(`input[name='\${name}']:checked`).val();
+			data[`radio-\${name}`] = checkedVal || "";
+		});
+
+		// 3. 🔥 checkbox 저장 (면접 방식)
+		$(".application-checkbox").each(function () {
+			const id = $(this).attr("id");
+			data[`checkbox-\${id}`] = $(this).is(":checked");
+		});
+
+		// 면접 방식의 detail 저장
+		$(".application-checkbox").each(function () {
+		const id = $(this).attr("id");
+		const detail = $(`.method-detail[data-method='\${id}']`).val();
+		if (detail) {
+			data[`detail-\${id}`] = detail;
+		}
+		});
+
+		// 저장
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+		console.log("📦 저장됨:", data);
+		}
+
+	// 복원 함수
+	function restoreFormFromLocalStorage() {
+		const saved = localStorage.getItem(STORAGE_KEY);
+		if (!saved) return;
+
+		const data = JSON.parse(saved);
+
+		// 1. 기본 텍스트 필드 및 셀렉트 먼저 복원
+		[
+			"#title", "#pay", "#startTime", "#endTime", "#workDetailType",
+			"#date", "#manager", "#advantage", "#summernote"
+		].forEach(selector => {
+			const val = data[selector];
+		if (val !== undefined) {
+			$(selector).val(val);
+			if (selector === "#pay") {
+			formatPay(document.getElementById("pay")); // ✨ 쉼표 적용
+			}
+		}
+		});
+
+		// 2. summernote 따로 처리
+		if (data["#summernote"]) {
+			$("#summernote").summernote("code", data["#summernote"]);
+		}
+
+		// 3. 산업군 → 직업군 (직업군은 delay 필요)
+		const majorVal = data[".MajorCategory"];
+		if (majorVal && majorVal !== "-1") {
+			$(".MajorCategory").val(majorVal);
+			$("#majorcategoryNo").val(majorVal);
+			getSubCategory(majorVal); // ajax 호출
+
+			setTimeout(() => {
+			$(".SubCategory").val(data[".SubCategory"]);
+			$("#subcategoryNo").val(data[".SubCategory"]);
+			}, 300); // 직업군 로딩 대기
+		}
+
+		// 4. 지역 → 시군구 (시군구도 delay 필요)
+		const regionVal = data[".Region"];
+		if (regionVal && regionVal !== "-1") {
+			$(".Region").val(regionVal);
+			$("#regionNo").val(regionVal);
+			getSigungu(regionVal);
+
+			setTimeout(() => {
+			$(".Sigungu").val(data[".Sigungu"]);
+			$("#sigunguNo").val(data[".Sigungu"]);
+			}, 300);
+		}
+
+		// 5. radio & checkbox 복원
+		setTimeout(() => {
+			// radio 복원
+			[
+				"workType", "payType", "militaryService", "personalHistory"
+			].forEach(name => {
+				const val = data[`radio-\${name}`];
+				if (val) {
+					$(`input[name='\${name}'][value='\${val}']`).prop("checked", true).trigger("change");
+				}
+			});
+
+			// checkbox 복원
+			$(".application-checkbox").each(function () {
+				const id = $(this).attr("id");
+				if (data[`checkbox-\${id}`]) {
+					$(this).prop("checked", true).trigger("change");
+
+					// AJAX로 저장 호출
+					const detail = $(`.method-detail[data-method='\${id}']`).val() || "";
+        			saveApplication(id, detail);
+
+					// detail 복원
+					Object.keys(data).forEach(key => {
+					if (key.startsWith("detail-")) {
+						const id = key.replace("detail-", "");
+						$(`.method-detail[data-method='\${id}']`).val(data[key]);
+					}
+					});
+				}
+			});
+		}, 600);
+
+		console.log("📥 로컬스토리지 폼 복원 완료");
+	}
 
 </script>
 
 <style>
-form {
+ form {
     max-width: 700px;
     margin: 0 auto;
   }
 
-label {
+ label {
     display: block;
     font-weight: 500;
     margin-bottom: 0.5rem;
@@ -697,34 +875,34 @@ label {
   display: flex;
   flex-direction: column;
   margin-bottom: 1.5rem;
-}
+ }
 
 /* 라벨 간격 조절 (상단 마진 추가) */
-.custom-select-wrapper label {
+ .custom-select-wrapper label {
   margin-bottom: 0.6rem;
   margin-top: 1rem;  
   font-size: 1rem;
   font-weight: 600;
   color: #37517e;
-}
+ }
 
 /* 박스형 셀렉트 */
-.form-select {
-  appearance: none;
-  background-color: #fff;
-  border: 1px solid #cfd8dc;
-  padding: 0.9rem 1rem;
-  font-size: 1rem;
-  border-radius: 1rem;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23444" height="24" viewBox="0 0 24 24" width="24"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  max-width: 100%;
-  width: 100%;
-}
+  .form-select {
+   appearance: none;
+   background-color: #fff;
+   border: 1px solid #cfd8dc;
+   padding: 0.9rem 1rem;
+   font-size: 1rem;
+   border-radius: 1rem;
+   background-image: url('data:image/svg+xml;utf8,<svg fill="%23444" height="24" viewBox="0 0 24 24" width="24"><path d="M7 10l5 5 5-5z"/></svg>');
+   background-repeat: no-repeat;
+   background-position: right 1rem center;
+   background-size: 1rem;
+   transition: all 0.3s ease;
+   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+   max-width: 100%;
+   width: 100%;
+  }
 
   .form-control, .form-select {
     width: 100%;
@@ -771,9 +949,9 @@ label {
   margin-top: 0.5rem;
 }
 
-.addAdvantageBtn:hover, #write {
+ .addAdvantageBtn:hover, #write {
   background-color: #298ce7; /* 진한 하늘색 hover 효과 */
-}
+ }
 </style>
 
 <body>
@@ -864,28 +1042,33 @@ label {
 										<div class="d-flex flex-wrap gap-3">
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType1" value="FULLTIME"> <label
+													name="workType" id="workType1" value="FULL_TIME"> <label
 													class="form-check-label mb-2" for="workType1">정규직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType2" value="NONREGULAR">
-												<label class="form-check-label mb-2" for="workType2">비정규직</label>
+													name="workType" id="workType2" value="CONTRACT">
+												<label class="form-check-label mb-2" for="workType2">계약직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType3" value="APPOINT"> <label
+													name="workType" id="workType3" value="COMMISSION"> <label
 													class="form-check-label mb-2" for="workType3">위촉직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType4" value="PARTTIME"> <label
+													name="workType" id="workType4" value="PART_TIME"> <label
 													class="form-check-label mb-2" for="workType4">아르바이트</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType5" value="FREELANCER">
+													name="workType" id="workType5" value="FREELANCE">
 												<label class="form-check-label mb-2" for="workType5">프리랜서</label>
+											</div>
+											<div class="form-check">
+												<input class="form-check-input workType" type="radio"
+													name="workType" id="workType6" value="DISPATCH">
+												<label class="form-check-label mb-2" for="workType5">파견직</label>
 											</div>
 										</div>
 									</div>
@@ -928,7 +1111,7 @@ label {
 									<div class="col-md-12">
 										<div class="input-group">
 											<label for="pay" class="form-check-label mb-2">급여 액수</label>
-											<input type="text" id="pay" maxlength="15"
+											<input type="text" id="pay" maxlength="15" name="pay"
 												placeholder="숫자만 입력할 수 있습니다." oninput="formatPay(this)">
 										</div>
 									</div>
@@ -1114,8 +1297,7 @@ label {
 
 									<div class="col-12 text-center">
 
-										<button type="submit" id="write"
-											onclick="return isValidRecruitmentForm()">작성</button>
+										<button type="submit" id="write">작성</button>
 									</div>
 								</div>
 			</form>

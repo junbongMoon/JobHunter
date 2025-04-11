@@ -1,14 +1,9 @@
 package com.jobhunter.model.recruitmentnotice;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
+import com.jobhunter.model.customenum.JobForm;
 import com.jobhunter.model.customenum.MilitaryService;
-import com.jobhunter.model.jobtype.Majorcategory;
-import com.jobhunter.model.jobtype.Subcategory;
-import com.jobhunter.model.region.Region;
-import com.jobhunter.model.region.Sigungu;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -25,10 +20,12 @@ import lombok.ToString;
 @ToString
 @Builder
 public class RecruitmentNoticeDTO {
+	// uid
+	private int uid;
 	// 공고 제목
 	private String title;
 	// 근무 형태 (정규, 비정규, 프리랜서 등)
-	private String workType;
+	private JobForm workType;
 	// 급여 타입(enum으로 할지 생각 중..)
 	private String payType;
 	// 급여 액수

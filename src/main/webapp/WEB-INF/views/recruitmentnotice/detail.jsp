@@ -56,10 +56,6 @@
 		.getElementById('contactModal'));
 		modal.show();
 	}
-	
-	function downloadFile(boardUpFileNo){
-		// 아작스 불러서 파일 저장
-	}
 
 	function deleteRecruitment(uid) {
     $('#contactModalLabel').text("공고 삭제 확인");
@@ -137,6 +133,39 @@ h3 {
 	margin-bottom: 4px;
 	font-size: 0.9rem;
 }
+
+.detail-box {
+  width: 100%;
+  min-height: 300px;
+  background: #f4f8fb;
+  padding: 1rem;
+  border-radius: 12px;
+
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05); 
+}
+
+.detail-box img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  object-fit: contain;
+}
+
+.singleFile {
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.singleFile:hover {
+  background-color: #1a237e; /* 진한 남색 */
+  color: white;
+  transform: translateY(-2px); /* 살짝 위로 튀어나오게 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
 </style>
 <body>
 	<!-- 헤더 -->
@@ -200,15 +229,17 @@ h3 {
 											<p class="mb-1 fw-semibold" id="workType">
 												<c:choose>
 													<c:when
-														test="${RecruitmentDetailInfo.workType eq 'FULLTIME'}">정규직</c:when>
+														test="${RecruitmentDetailInfo.workType eq 'FULL_TIME'}">정규직</c:when>
 													<c:when
-														test="${RecruitmentDetailInfo.workType eq 'NONREGULAR'}">비정규직</c:when>
+														test="${RecruitmentDetailInfo.workType eq 'CONTRACT'}">계약직</c:when>
 													<c:when
-														test="${RecruitmentDetailInfo.workType eq 'APPOINT'}">위촉직</c:when>
+														test="${RecruitmentDetailInfo.workType eq 'COMMISSION'}">위촉직</c:when>
 													<c:when
-														test="${RecruitmentDetailInfo.workType eq 'PARTTIME'}">아르바이트</c:when>
+														test="${RecruitmentDetailInfo.workType eq 'PART_TIME'}">아르바이트</c:when>
 													<c:when
-														test="${RecruitmentDetailInfo.workType eq 'FREELANCER'}">프리랜서</c:when>
+														test="${RecruitmentDetailInfo.workType eq 'FREELANCE'}">프리랜서</c:when>
+														<c:when
+														test="${RecruitmentDetailInfo.workType eq 'DISPATCH'}">파견직</c:when>
 													<c:otherwise>기타</c:otherwise>
 												</c:choose>
 											</p>
@@ -250,7 +281,7 @@ h3 {
 											<h2 class="widget-title">상세 정보</h2>
 											<div class="highlight-box">
 
-												<p id="detail"></p>
+												<div id="detail" class="detail-box"></div>
 											</div>
 										</div>
 										<h3>첨부 파일</h3>
@@ -258,9 +289,9 @@ h3 {
 											<c:if test="${not empty RecruitmentDetailInfo.fileList}">
 												<c:forEach var="file"
 													items="${RecruitmentDetailInfo.fileList}">
-													<span class="badge rounded-pill text-bg-secondary"
-														onclick="downloadFile(${file.boardUpFileNo})">
-														${file.originalFileName} </span>
+													<span class="badge rounded-pill text-bg-secondary singleFile"
+														><a href="${file.newFileName}" download="${file.newFileName}">
+														${file.originalFileName}</a></span>
 												</c:forEach>
 											</c:if>
 										</p>

@@ -1,10 +1,13 @@
 package com.jobhunter.dao.recruitmentnotice;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.jobhunter.model.customenum.Method;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.Advantage;
@@ -125,6 +128,62 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		return ses.delete(NS + ".removeRecruitmentByUid", uid);
 	}
 
+	// 공고를 수정하는 메서드
+	@Override
+	public void updateRecruitmentNotice(RecruitmentNoticeDTO dto) throws Exception {
+		ses.update(NS +".modifyRecruitmentByUid", dto);
+		
+	}
+
+	// 접수 방식을 삭제하는 메서드
+	@Override
+	public void deleteApplication(int uid, Method method) throws Exception {
+		Map<String, Object> param = new HashMap<>();
+		param.put("uid", uid);
+		param.put("method", method);
+	
+		ses.delete(NS + ".removeApplicationByRecruitmentUid", param);
+		
+	}
+
+
+
+	// 우대조건을 삭제하는 메서드
+	@Override
+	public void deleteAdvantage(int uid, String advantageType) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("uid", uid);
+		param.put("advantageType", advantageType);
+
+		
+		
+		ses.delete(NS + ".removeAdvantageByRecruitmentUid", param);
+		
+	}
+
+	// 파일을 삭제하는 메서드
+	@Override
+	public void deleteFileFromDatabase(int boardUpFileNo) {
+		ses.delete(NS + ".deleteFileFromDatabase", boardUpFileNo);
+		
+	}
+
+	// 기업이 작성한 공고의 총 갯수를 가져오는 메서드
+	@Override
+	public int getTotalCountRowByCompanyUid(int companyUid) {
+		return ses.selectOne(NS + ".getTotalCountRowByCompanyUid", companyUid);
+	}
+
+	// 기업이 작성한 공고리스트를 페이징하여 조회하는 메서드
+	@Override
+	public List<RecruitmentNotice> selectRecruitmentByCompanyUid(int companyUid, PageResponseDTO<RecruitmentNotice> pageResponseDTO) {
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("companyUid", companyUid);
+	    param.put("startRowIndex", pageResponseDTO.getStartRowIndex());
+	    param.put("rowCntPerPage", pageResponseDTO.getRowCntPerPage());
+
+	    return ses.selectList(NS + ".selectRecruitmentByCompanyUid", param);
+	}
 
 	
 

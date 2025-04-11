@@ -2,6 +2,7 @@ package com.jobhunter.model.recruitmentnotice;
 
 import java.sql.Timestamp;
 
+import com.jobhunter.model.customenum.JobForm;
 import com.jobhunter.model.customenum.MilitaryService;
 
 import lombok.AccessLevel;
@@ -18,7 +19,7 @@ import lombok.ToString;
 public class RecruitmentNotice {
 	private int uid;
 	private String title;
-	private String workType;
+	private JobForm workType;
 	private String payType;
 	private int pay;
 	private String period;

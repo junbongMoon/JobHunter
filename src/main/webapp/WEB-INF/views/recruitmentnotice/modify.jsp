@@ -17,14 +17,15 @@
 	let focusElement = null;
 	let upfiles = [];
 	let uid = '${RecruitmentDetailInfo.uid}';
+	let companyUid = '${sessionScope.account.uid}';
+	let applications;
+	
+
 	
 
 	$(function() {
 
-		
-
-		
-
+		console.log("작성한 회사 uid : " + companyUid);
 		const today = new Date();
 		today.setHours(0,0,0,0); // 오늘 자정으로 설정
     const nextMonth = new Date();
@@ -62,7 +63,176 @@
 		getRegion();
 		getMajorCategory();
 		
-		$('.method-detail, .save-method-btn').hide();
+		// 기존 공고값 세팅
+		setTimeout(() => {
+      const title = '${RecruitmentDetailInfo.title}';
+      const workType = '${RecruitmentDetailInfo.workType}';
+      const payType = '${RecruitmentDetailInfo.payType}';
+      const pay = '${RecruitmentDetailInfo.pay}';
+      const period = '${RecruitmentDetailInfo.period}';
+      const personalHistory = '${RecruitmentDetailInfo.personalHistory}';
+      const militaryService = '${RecruitmentDetailInfo.militaryService}';
+      const detail = `<c:out value='${RecruitmentDetailInfo.detail}' escapeXml='false'/>`;
+      const manager = '${RecruitmentDetailInfo.manager}';
+      const dueDate = '<fmt:formatDate value="${RecruitmentDetailInfo.dueDate}" pattern="yyyy-MM-dd"/>';
+      const regionNo = '${RecruitmentDetailInfo.region.regionNo}';
+      const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';
+      const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}';
+      const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}';
+
+	  // workType이 PART_TIME이면 PHONE, TEXT DOM 추가
+if (workType === "PART_TIME") {
+  const phoneAndTextHtml = `
+    <div class="col-12 mb-2 parttime-only" id="phoneOption">
+      <div class="d-flex align-items-center">
+        <div class="form-check me-3 d-flex align-items-center">
+          <input class="form-check-input application-checkbox" type="checkbox" id="PHONE" value="PHONE">
+          <label class="form-check-label ms-2" for="PHONE">전화</label>
+        </div>
+        <div class="flex-grow-1">
+          <div class="input-group">
+            <input type="text" class="form-control method-detail" placeholder="전화 면접에 대한 추가내용이 있다면 작성하세요..." data-method="PHONE" style="display: none;">
+            <button type="button" class="btn btn-primary save-method-btn" data-method="PHONE" style="display: none;">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 mb-2 parttime-only" id="textOption">
+      <div class="d-flex align-items-center">
+        <div class="form-check me-3 d-flex align-items-center">
+          <input class="form-check-input application-checkbox" type="checkbox" id="TEXT" value="TEXT">
+          <label class="form-check-label ms-2" for="TEXT">문자</label>
+        </div>
+        <div class="flex-grow-1">
+          <div class="input-group">
+            <input type="text" class="form-control method-detail" placeholder="" data-method="TEXT" style="display: none;">
+            <button type="button" class="btn btn-primary save-method-btn" data-method="TEXT" style="display: none;">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  $("#application-methods").append(phoneAndTextHtml);
+
+
+}
+
+	  console.log("선택한 시군구, 직업군 : " + sigunguNo, subcategoryNo);
+
+      // 제목, 담당자, 날짜 등 텍스트 필드 세팅
+      $('#title').val(title);
+      $('#pay').val(Number(pay).toLocaleString());
+      $('#manager').val(manager);
+      $('#date').val(dueDate);
+
+      // summernote 내용 세팅
+      $('#summernote').summernote('code', detail);
+
+      // 라디오 세팅
+      $(`input[name="workType"][value="${workType}"]`).prop("checked", true).trigger("change");
+      $(`input[name="payType"][value="${payType}"]`).prop("checked", true);
+      $(`input[name="personalHistory"][value="${personalHistory}"]`).prop("checked", true);
+      $(`input[name="militaryService"][value="${militaryService}"]`).prop("checked", true);
+
+
+	  
+	  const jsonStr = '<c:out value="${applicationsJson}" escapeXml="false" />';
+	  
+  try {
+    
+    if (jsonStr && jsonStr.trim().length > 0) {
+      applications = JSON.parse(jsonStr);
+	  console.log(jsonStr);
+    }
+  } catch (e) {
+    console.error("applicationsJson 파싱 오류:", e);
+  }
+
+
+	console.log("applicationsJson raw:", jsonStr);
+	console.log("parsed applications:", applications);
+      // 셀렉트 필드 세팅 (선택 후 로딩 기다림)
+    setTimeout(() => {
+  $(".Region").val(regionNo).trigger("change");
+
+
+    setTimeout(() => {
+        $(".MajorCategory").val(majorcategoryNo).trigger("change");
+    setTimeout(() => {
+    getSubCategory(majorcategoryNo);
+    setTimeout(() => {
+      $(".SubCategory").val(subcategoryNo).trigger("change");
+
+	setTimeout(() => {
+    renderApplicationMethods(applications);
+  }, 500);
+
+
+    }, 200);
+ 	 }, 200);
+	}, 300);
+
+
+
+      // 근무 시간 분해
+      const timeRegex = /^(\d{2}:\d{2})~(\d{2}:\d{2})(?: \((.+)\))?$/;
+      const match = period.match(timeRegex);
+      if (match) {
+        const [, startTime, endTime, detailType] = match;
+        $('#startTime').val(startTime);
+        $('#endTime').val(endTime);
+        if (detailType) $('#workDetailType').val(detailType);
+      }
+    }, 300);
+
+	
+
+    // 이벤트 위임으로 동적 삭제 처리
+    $(document).on("click", ".advantage-item .btn-outline-danger", function () {
+      const $item = $(this).closest(".advantage-item");
+      const advantageType = $item.find("input[type='hidden']").val();
+      if (!advantageType) return;
+
+      $.ajax({
+        url: "/recruitmentnotice/advantage/" + advantageType,
+        type: "DELETE",
+        success: function () {
+          console.log("삭제 성공: ", advantageType);
+          $item.remove();
+        },
+        error: function () {
+          console.error("삭제 실패: ", advantageType);
+        }
+      });
+    });
+
+    // 우대조건 추가 처리
+    $(".addAdvantageBtn").on("click", function () {
+      const val = $("#advantage").val().trim();
+      if (!val) return alert("우대조건을 입력해주세요");
+
+      $.ajax({
+        url: "/recruitmentnotice/advantage",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ advantageType: val }),
+        success: function () {
+			console.log(val);
+          const html = `
+            <div class="d-flex align-items-center mb-2 advantage-item">
+              <input type="hidden" value="\${val}">
+              <span class="me-2">\${val}</span>
+              <button type="button" class="btn btn-sm btn-outline-danger" onclick="">X</button>
+            </div>
+          `;
+          $(".advantageArea").append(html);
+          $("#advantage").val("");
+        },
+        error: function () { alert("우대조건 저장 실패"); }
+      });
+    });
+		
 
 		$(".fileUploadArea").on("dragover", function (e) {
     e.preventDefault();
@@ -81,7 +251,7 @@ $(".fileUploadArea").on("drop", function (e) {
     let files = e.originalEvent.dataTransfer.files;
     for (let i = 0; i < files.length; i++) {
         let file = files[i];
-        uploadFileAndShowPreview(file);
+        uploadModifyFileAndShowPreview(file);
     }
 });
 
@@ -127,7 +297,7 @@ $(document).on("click", "#goToListBtn", function () {
     </div>
   `;
 
-  if (selectedWorkType === "PARTTIME") {
+  if (selectedWorkType === "PART_TIME") {
     if ($("#phoneOption").length === 0 && $("#textOption").length === 0) {
       $("#application-methods").append(phoneAndTextHtml);
     }
@@ -278,12 +448,34 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 	
 	instalRecruitment();
 
-	instalSelectOptions();
+	}, 500);
 
-	});
+	// 저장 버튼 클릭 시 JSON 데이터 세팅
+$("#write").on("click", function () {
 
-	
-// 수정 페이지에 들어왔을 때 공고의 정보를 입력해주는 함수
+  const rawPay = getRawPay();
+  $("#pay").val(rawPay);  // 실제 서버 제출 전에 값을 "123456" 같은 숫자형으로 변경
+
+  const apps = [];
+
+  $(".application-checkbox:checked").each(function () {
+    const method = $(this).val();
+    const detail = $(`.method-detail[data-method='${method}']`).val();
+    apps.push({ method, detail });
+  });
+
+  const advantages = [];
+  $(".advantage-item input[type='hidden']").each(function () {
+    advantages.push({ advantageType: $(this).val() });
+  });
+
+  $("#applicationJson").val(JSON.stringify(apps));
+  $("#advantageJson").val(JSON.stringify(advantages));
+});
+
+});
+
+
 // 수정 페이지에 들어왔을 때 공고의 정보를 입력해주는 함수
 function instalRecruitment() {
 	const title = '${RecruitmentDetailInfo.title}';
@@ -329,21 +521,23 @@ function instalRecruitment() {
 		}
 	}
 }
+	
 
 // 파일 업로드 + 썸네일 표시
-function uploadFileAndShowPreview(file) {
+function uploadModifyFileAndShowPreview(file) {
     const formData = new FormData();
     formData.append("file", file);
 
     $.ajax({
-        url: "/recruitmentnotice/file",
+        url: "/recruitmentnotice/file/modify",
         type: "POST",
         data: formData,
         contentType: false,
         processData: false,
         success: function(response) {
-            console.log("업로드 성공", response);
-            showThumbnail(file);
+            console.log("수정 파일 업로드 성공", response);
+			const uploadedFileInfo = response[response.length - 1];
+			showModifyFileThumbnail(uploadedFileInfo, "NEW");
         },
         error: function() {
             alert("파일 업로드 실패");
@@ -351,44 +545,99 @@ function uploadFileAndShowPreview(file) {
     });
 }
 
-// 썸네일 출력 함수
-function showThumbnail(file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const isImage = file.type.startsWith("image/");
-        const base64 = e.target.result;
+function showModifyFileThumbnail(fileInfo, status = "") {
+    const safeId = fileInfo.originalFileName.replace(/[^a-zA-Z0-9]/g, "_");
 
-        const safeId = file.name.replace(/[^a-zA-Z0-9]/g, "_");
+    const isImage = fileInfo.fileType && fileInfo.fileType.startsWith("image/");
+    const thumbnailUrl = isImage && fileInfo.thumbFileName
+        ? fileInfo.thumbFileName
+        : "/resources/images_mjb/noimage.png";
 
-        let html = `
-            <tr id="thumb_\${safeId}">
-                <td><img src="\${isImage ? base64 : '/resources/images/noimage.png'}" width="60" /></td>
-                <td\>${file.name}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="removeFile('\${file.name}')">X</button>
-                </td>
-            </tr>
-        `;
-        $(".preview").append(html);
-    };
-    reader.readAsDataURL(file);
+    const html = `
+        <tr id="thumb_${safeId}" data-status="${status}">
+            <td>
+                <img src="\${thumbnailUrl}" width="60" height="60" alt="썸네일 이미지"
+                     onerror="this.src='/resources/images_mjb/noimage.png'" />
+            </td>
+            <td>\${fileInfo.originalFileName}</td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger" onclick="markFileAsDeleted('${fileInfo.originalFileName}')">X</button>
+            </td>
+        </tr>
+    `;
+
+    $(".preview").append(html);
 }
 
-// 파일 삭제 함수
-function removeFile(fileName) {
+
+// 삭제 버튼 클릭시 삭제상태로 변경
+function markFileAsDeleted(fileName) {
+    const safeId = fileName.replace(/[^a-zA-Z0-9]/g, "_"); // 안전한 ID 생성
+
     $.ajax({
-        url: "/recruitmentnotice/file",
-        type: "DELETE",
-        data: { removeFileName: fileName },
-        success: function(response) {
-            console.log("삭제 성공", response);
-            const safeId = fileName.replace(/[^a-zA-Z0-9]/g, "_");
-            $(`#thumb_${safeId}`).remove();
+        url: "/recruitmentnotice/file/status",
+        type: "POST",
+        data: {
+            fileName: fileName,
+            status: "delete"
         },
-        error: function() {
-            alert("파일 삭제 실패");
+        success: function () {
+            const $targetRow = $(`#thumb_${safeId}`);
+            $targetRow.addClass("table-danger").css("text-decoration", "line-through");
+            $targetRow.remove(); // 또는 이 줄 생략해서 선만 긋기
+        },
+        error: function () {
+            alert("파일 삭제 상태 전환 실패");
         }
     });
+}
+
+// 파일 수정 취소
+function cancelFileModifications() {
+    $.ajax({
+        url: "/recruitmentnotice/file/cancel",
+        type: "POST",
+        success: function() {
+            $(".preview").empty();  // 모두 비워줌
+            alert("파일 수정 내역이 취소되었습니다.");
+        },
+        error: function() {
+            alert("수정 취소 실패");
+        }
+    });
+}
+// 수정 완료 시 삭제
+function finalizeFileModifications() {
+    $.ajax({
+        url: "/recruitmentnotice/file/finalize",
+        type: "POST",
+        success: function() {
+            console.log("삭제 처리 완료");
+        },
+        error: function() {
+            alert("파일 최종 반영 실패");
+        }
+    });
+}
+
+// 면접 타입 로드
+function renderApplicationMethods(applications) {
+  applications.forEach(app => {
+    const method = app.method;
+    const detail = app.detail;
+
+    const checkbox = $(`.application-checkbox[value="\${method}"]`);
+    const detailInput = $(`.method-detail[data-method="\${method}"]`);
+    const saveBtn = $(`.save-method-btn[data-method="\${method}"]`);
+
+    if (checkbox.length) {
+      checkbox.prop("checked", true);
+      detailInput.show().val(detail || '');
+      saveBtn.show();
+    } else {
+      console.warn(`체크박스 없음: \${method}`);
+    }
+  });
 }
 
 function markUploadSuccess(fileName) {
@@ -523,24 +772,33 @@ function markUploadSuccess(fileName) {
 	}
 
 	function getSigungu(regionNo) {
-		$.ajax({
-			url : '/region/sigungu/' + regionNo,
-			type : 'get',
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log("시군구 데이터:", data);
-				let sigunguSelect = $(".Sigungu");
-				sigunguSelect.empty();
-				sigunguSelect.append('<option value="-1">시군구 선택</option>');
-						$.each(data, function(index, sigungu) 
-						{sigunguSelect.append(`<option value="\${sigungu.sigunguNo} ">\${sigungu.name} </option>`);});
-					},
-			error : function(err) {
-				console.error("시군구 데이터 불러오기 실패", err);
-					}
-			});
-	}
+    const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';  // 여기 확실히 수정!
+    $.ajax({
+        url: '/region/sigungu/' + regionNo,
+        type: 'get',
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            console.log("시군구 데이터:", data);
+			console.log("regionNo 넘기는 값:", regionNo);
+            let sigunguSelect = $(".Sigungu");
+            sigunguSelect.empty().append('<option value="-1">시군구 선택</option>');
+
+            $.each(data, function (index, sigungu) {
+                sigunguSelect.append(`<option value="\${sigungu.sigunguNo}">\${sigungu.name}</option>`);
+            });
+
+            if (sigunguNo && sigunguNo !== '-1') {
+  			sigunguSelect.val(String(sigunguNo)).trigger("change"); //change 이벤트도 트리거!
+  			console.log("자동 선택된 시군구:", sigunguNo);
+  			$("#sigunguNo").val(sigunguNo); // 히든필드에도 반영
+			}
+        },
+        error: function (err) {
+            console.error("시군구 데이터 불러오기 실패", err);
+        }
+    });
+}
 
 
 
@@ -560,43 +818,52 @@ function markUploadSuccess(fileName) {
     });
 }
 
-	function addAdvantage() {
-		
-		let advVal = $("#advantage").val();
-    let advantageValue = $("#advantage").val();
+function addAdvantage() {
+    const advantageValue = $("#advantage").val().trim();
 
     if (!advantageValue) {
         alert("우대조건을 입력하세요");
-		// 알럿 대신 모달창으로 바꾸자..
         return;
     }
 
     $.ajax({
         url: "/recruitmentnotice/advantage",
         type: "POST",
-        data: JSON.stringify({ advantageType: advantageValue }),
         contentType: "application/json",
+        data: JSON.stringify({ advantageType: advantageValue }),
         success: function (response) {
-            console.log("우대조건 저장 성공", response);
-            $("#advantage").val("");
+            if (!response || !Array.isArray(response)) {
+                console.warn("응답 데이터 없음 또는 배열 아님");
+                return;
+            }
 
-            // DOM에 추가할 HTML 구성
-            let output = `
+            // 중복 여부 확인 (이미 DOM에 존재하는 값인지)
+            let alreadyExists = false;
+            $(".advantageArea input[type='hidden']").each(function () {
+                if ($(this).val() === advantageValue) {
+                    alreadyExists = true;
+                }
+            });
+
+            if (alreadyExists) {
+                alert("이미 추가된 우대조건입니다.");
+                return;
+            }
+
+            const html = `
                 <div class="d-flex align-items-center mb-2 advantage-item">
                     <input type="hidden" value="\${advantageValue}">
                     <span class="me-2">\${advantageValue}</span>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeAdvantage(this)">X</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger">X</button>
                 </div>
             `;
-            $(".advantageArea").append(output);
+            $(".advantageArea").append(html);
+            $("#advantage").val("");
         },
-        error: function (err) {
-            console.error("우대조건 저장 실패", err);
+        error: function () {
+            alert("우대조건 저장 실패");
         }
     });
-
-
-
 }
 
 
@@ -721,7 +988,7 @@ if (workDetailType) {
   result = false;
   $("#MyModal").modal("show");
 }
-
+ 
   // 면접 방식 유효성 검사도 포함
   
   if(result){
@@ -730,32 +997,12 @@ if (workDetailType) {
 
 	console.log(mjrno);
 	$("#period").val(period);
+	
 
 	return result;
 	}
 return result;
 }
-
-function instalSelectOptions(){
-
-	// 셀렉트 리스트 들
-	let majorCategoryList = $('#MajorCategory');
-	let subCategoryList = $('#SubCategory');
-	let regionList = $('#regionList');
-	let sigunguList = $('#sigunguList');
-
-	// 셀렉트 리스트에 넣을 변수
-	const regionNo = '${RecruitmentDetailInfo.region.regionNo}';
-	const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';
-	const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}'
-	const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}'
-
-	
-
-
-}
-
-
 
 </script>
 
@@ -865,13 +1112,14 @@ label {
 
 		<div class="container" data-aos="fade-up" data-aos-delay="100">
 			
-			<form method="post" role="form" action="/recruitmentnotice/save">
+			<form method="post" role="form" action="/recruitmentnotice/modify?uid=${RecruitmentDetailInfo.uid}">
 
 				<div class="form-header categories-widget widget-item">
 					<h3>채용 공고</h3>
 					<p>하단에 정보를 입력해주세요</p>
 				</div>
 				<input type="hidden" id="refCompany" name="refCompany" value="1"><!-- 내일 근우씨한테 물어봐서 회사 uid 값 넣기 -->
+				
 				<div class="row gy-3">
 					<div class="col-md-6">
 						<div class="input-group">
@@ -943,28 +1191,33 @@ label {
 										<div class="d-flex flex-wrap gap-3">
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType1" value="FULLTIME"> <label
+													name="workType" id="workType1" value="FULL_TIME"> <label
 													class="form-check-label mb-2" for="workType1">정규직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType2" value="NONREGULAR">
-												<label class="form-check-label mb-2" for="workType2">비정규직</label>
+													name="workType" id="workType2" value="CONTRACT">
+												<label class="form-check-label mb-2" for="workType2">계약직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType3" value="APPOINT"> <label
+													name="workType" id="workType3" value="COMMISSION"> <label
 													class="form-check-label mb-2" for="workType3">위촉직</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType4" value="PARTTIME"> <label
+													name="workType" id="workType4" value="PART_TIME"> <label
 													class="form-check-label mb-2" for="workType4">아르바이트</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input workType" type="radio"
-													name="workType" id="workType5" value="FREELANCER">
+													name="workType" id="workType5" value="FREELANCE">
 												<label class="form-check-label mb-2" for="workType5">프리랜서</label>
+											</div>
+											<div class="form-check">
+												<input class="form-check-input workType" type="radio"
+													name="workType" id="workType6" value="DISPATCH">
+												<label class="form-check-label mb-2" for="workType5">파견직</label>
 											</div>
 										</div>
 									</div>
@@ -1007,7 +1260,7 @@ label {
 									<div class="col-md-12">
 										<div class="input-group">
 											<label for="pay" class="form-check-label mb-2">급여 액수</label>
-											<input type="text" id="pay" maxlength="15"
+											<input type="text" id="pay" maxlength="15" name="pay"
 												placeholder="숫자만 입력할 수 있습니다." oninput="formatPay(this)">
 										</div>
 									</div>
@@ -1150,10 +1403,22 @@ label {
 											
 										</div>
 										<div class="text-end mb-3">
-											<button type="button" class="addAdvantageBtn" onclick="addAdvantage()">저장하기</button>
+											<button type="button" class="addAdvantageBtn">저장하기</button>
 										  </div>
-										<div class="advantageArea"></div>
-									</div>
+										<div class="advantageArea">
+											<c:forEach var="adv" items="${RecruitmentDetailInfo.advantage}">
+    										<div class="d-flex align-items-center mb-2 advantage-item">
+      										<input type="hidden" value="${adv.advantageType}">
+      										<span class="me-2">${adv.advantageType}</span>
+      										<button type="button" class="btn btn-sm btn-outline-danger">X</button>
+    										</div>
+  											</c:forEach>
+											</div>
+										</div>
+
+										<!-- 숨겨진 textarea에 json 문자열 저장 -->
+										<textarea name="applicationJson" id="applicationJson" hidden></textarea>
+										<textarea name="advantageJson" id="advantageJson" hidden></textarea>
 
 									<div class="col-md-6 dueDate">
 										<div class="input-group">
@@ -1187,7 +1452,18 @@ label {
 										</div>
 									</div>
 									<div class="col-12 text-center">
-										<table class="preview mt-3"></table>
+										<table class="preview mt-3">
+											<c:forEach var="file" items="${RecruitmentDetailInfo.fileList}">
+												<tr id="thumb_${safeId}">
+      												<td><img src="${file.thumbFileName}" width="60" /></td>
+      												<td>${file.originalFileName}</td>
+      												<td>
+        											<button type="button" class="btn btn-sm btn-danger"
+          											onclick="markFileAsDeleted('${file.originalFileName}')">X</button>
+      												</td>
+    											</tr>
+  											</c:forEach>
+										</table>
 									</div>
 
 

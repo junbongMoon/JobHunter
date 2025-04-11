@@ -84,9 +84,14 @@
 											<a href="#">My Page</a>
 										</c:when>
 										<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
+										<li class="dropdown">
 											<a
-												href="/company/companyHome?uid=${sessionScope.account.uid}&accountType=company">My
-												Page</a>
+												href="/company/companyHome?uid=${sessionScope.account.uid}&accountType=company"><span>My
+												Page</span><i class="bi bi-chevron-down toggle-dropdown"></i></a>
+												<ul>
+									<li><a href="/recruitmentnotice/write">공고 쓰기</a></li>
+									<li><a href="/recruitmentnotice/listAll">공고 조회</a></li>
+								</ul>
 										</c:when>
 										<c:otherwise>
 							<li class="dropdown"><a

@@ -23,6 +23,7 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
+import com.jobhunter.model.util.FileStatus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +35,9 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	private final RecruitmentNoticeDAO recdao;
 	private final RegionDAO regiondao;
 	private final JobDAO jobdao;
-
+	
+	
+	// 공고를 저장하는 메서드
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO, List<AdvantageDTO> advantageList,
@@ -52,7 +55,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 			recNo = recdao.selectRecentRecruitment(CompanyUid);
 		}
-		
+
 		System.out.println(recNo);
 		System.out.println(recruitmentNoticeDTO);
 		// 우대 조건을 입력하는 메서드 호출
@@ -72,8 +75,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 			}
 		}
 
-		jobdao.insertMajorCategoryWithRecruitmentnotice(recNo,
-				recruitmentNoticeDTO.getMajorcategoryNo());
+		jobdao.insertMajorCategoryWithRecruitmentnotice(recNo, recruitmentNoticeDTO.getMajorcategoryNo());
 
 		jobdao.insertSubCategoryWithRecruitmentnotice(recNo, recruitmentNoticeDTO.getSubcategoryNo());
 
@@ -112,89 +114,196 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 		return detailInfo;
 	}
-
-	// 공고 전체를 조회하는 메서드
+	
+	// 공고를 검색어에 따라 페이징해서 조회 해오는 메서드
 	@Override
 	public PageResponseDTO<RecruitmentDetailInfo> getEntireRecruitment(PageRequestDTO pageRequestDTO) throws Exception {
 
-		// 전체 공고수 조회
-		int totalRowCnt = recdao.selectRecruitmentTotalCount(pageRequestDTO);
-		// pageResponseDTO 설정
-		PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO = pagingProcess(pageRequestDTO);
+	    String searchType = pageRequestDTO.getSearchType();
+	    String searchWord = pageRequestDTO.getSearchWord();
+	    
+	    int totalRowCnt;
 
-		// 전체 검색어에 따라 공고를 가져오는 메서드
-		List<RecruitmentDetailInfo> boardList = recdao.selectRecruitmentWithKeyword(pageResponseDTO);
-		System.out.println(boardList);
+	    // 정렬만 하고 검색은 하지 않을 경우 (전체 count 조회)
+	    if ("highPay".equals(searchType) || "lowPay".equals(searchType)) {
+	        totalRowCnt = recdao.getTotalCountRow(); // WHERE status = 'Y'만 포함된 쿼리
+	    } else if (StringUtils.hasText(searchType) && StringUtils.hasText(searchWord)) {
+	        totalRowCnt = recdao.getSearchResultRowCount(pageRequestDTO); // 조건 검색
+	    } else {
+	        totalRowCnt = recdao.getTotalCountRow(); // 기본
+	    }
 
-		if (boardList == null) {
-			boardList = Collections.emptyList(); // 빈 리스트로 처리
+	    // 페이징 계산
+	    PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO = pagingProcess(pageRequestDTO, totalRowCnt);
 
-		} else {
-			//
-			for (RecruitmentDetailInfo info : boardList) {
-				if (info != null) {
-					int uid = info.getUid();
+	    // 실제 공고 목록 조회
+	    List<RecruitmentDetailInfo> boardList = recdao.selectRecruitmentWithKeyword(pageResponseDTO);
 
-					List<Application> applications = recdao.getApplications(uid);
-					List<Advantage> advantages = recdao.getAdvantages(uid);
-					List<RecruitmentnoticeBoardUpfiles> fileList = recdao.getFileList(uid);
+	    if (boardList == null) {
+	        boardList = Collections.emptyList();
+	    } else {
+	        for (RecruitmentDetailInfo info : boardList) {
+	            if (info != null) {
+	            	System.out.println(info);
+	                int uid = info.getUid();
+	                List<Application> applications = recdao.getApplications(uid);
+	                List<Advantage> advantages = recdao.getAdvantages(uid);
+	                List<RecruitmentnoticeBoardUpfiles> fileList = recdao.getFileList(uid);
 
-					info.setApplication(applications != null ? applications : Collections.emptyList());
-					info.setAdvantage(advantages != null ? advantages : Collections.emptyList());
-					info.setFileList(fileList != null ? fileList : Collections.emptyList());
-				} else {
-					throw new NoSuchElementException();
-				}
+	                info.setApplication(applications != null ? applications : Collections.emptyList());
+	                info.setAdvantage(advantages != null ? advantages : Collections.emptyList());
+	                info.setFileList(fileList != null ? fileList : Collections.emptyList());
+	            } else {
+	                throw new NoSuchElementException("공고 정보가 존재하지 않습니다.");
+	            }
+	        }
+	    }
+	    
+	    System.out.println("boardList.size() = " + boardList.size());
+
+	    pageResponseDTO.setBoardList(boardList);
+	    return pageResponseDTO;
+	}
+
+	// 페이징 하는 메서드
+	private <T> PageResponseDTO<T> pagingProcess(PageRequestDTO pageRequestDTO, int totalRowCount) {
+	    PageResponseDTO<T> pageResponseDTO = new PageResponseDTO<>(
+	        pageRequestDTO.getPageNo(),
+	        pageRequestDTO.getRowCntPerPage()
+	    );
+	    
+	    System.out.println("pageresponsedto : " + pageResponseDTO);
+
+	    pageResponseDTO.setTotalRowCnt(totalRowCount); // 전체 데이터 수
+
+	    if (StringUtils.hasText(pageRequestDTO.getSearchType())) {
+	        pageResponseDTO.setSearchType(pageRequestDTO.getSearchType());
+	        pageResponseDTO.setSearchWord(pageRequestDTO.getSearchWord());
+	    }
+
+	    pageResponseDTO.setTotalPageCnt();       // 전체 페이지 수
+	    pageResponseDTO.setStartRowIndex();      // 출력 시작할 rowIndex번호
+	    pageResponseDTO.setBlockOfCurrentPage(); // 현재 페이지가 몇번째 블럭에 있는가?
+	    pageResponseDTO.setStartPageNumPerBlock();
+	    pageResponseDTO.setEndPageNumPerBlock();
+
+	    return pageResponseDTO;
+	}
+
+	// uid를 매개변수로 공고를 삭제하는 메서드
+	@Override
+	public boolean removeRecruitmentByUid(int uid) throws Exception {
+		boolean result = false;
+
+		if (recdao.deleteRecruitmentByUid(uid) > 0) {
+			result = true;
+		}
+
+		return result;
+	}
+
+	// 공고를 수정하는 메서드
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public void modifyRecruitmentNotice(RecruitmentNoticeDTO dto, List<AdvantageDTO> newAdvList,
+			List<ApplicationDTO> newAppList, List<RecruitmentnoticeBoardUpfiles> modifyFileList,
+			RecruitmentDetailInfo existing, int uid) throws Exception {
+
+		// Step 1: 공고 기본 정보 수정
+		recdao.updateRecruitmentNotice(dto);
+		System.out.println("수정할 파일 리스트 : " + modifyFileList);
+
+		// Step 2: 우대 조건 비교 후 변경
+		List<Advantage> oldAdvList = existing.getAdvantage();
+		for (Advantage old : oldAdvList) {
+			// anyMatch: newAppList 중 하나라도 같은 method가 있으면 true
+			boolean existsInNew = newAdvList.stream()
+					.anyMatch(newAdv -> newAdv.getAdvantageType().equals(old.getAdvantageType()));
+			if (!existsInNew) {
+				recdao.deleteAdvantage(uid, old.getAdvantageType()); // <-- 여기 수정
 			}
 		}
 
-		// PageResponseDTO에 넣어주기
-		pageResponseDTO.setBoardList(boardList);
-
-		System.out.println(pageResponseDTO);
-
-		return pageResponseDTO;
-	}
-	
-	// 페이징하여 공고를 출력하는 메서드
-	private PageResponseDTO<RecruitmentDetailInfo> pagingProcess(PageRequestDTO pageRequestDTO) throws Exception {
-		PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO = new PageResponseDTO<RecruitmentDetailInfo>(
-				pageRequestDTO.getPageNo(), pageRequestDTO.getRowCntPerPage());
-
-		// 기본 페이징
-		if (StringUtils.hasText(pageRequestDTO.getSearchType())) {
-			// 검색 안함
-			pageResponseDTO.setTotalRowCnt(recdao.getTotalCountRow()); // 전체 데이터 수
-		} else if (!StringUtils.hasText(pageRequestDTO.getSearchType())) {
-			// 검색 함
-			pageResponseDTO.setSearchType(pageRequestDTO.getSearchType());
-			pageResponseDTO.setSearchWord(pageRequestDTO.getSearchWord());
-
-			pageResponseDTO.setTotalRowCnt(recdao.getSearchResultRowCount(pageRequestDTO));
+		for (AdvantageDTO newAdv : newAdvList) {
+			boolean existsInOld = oldAdvList.stream()
+					.anyMatch(old -> old.getAdvantageType().equals(newAdv.getAdvantageType()));
+			if (!existsInOld) {
+				newAdv.setRecruitmentNoticeUid(uid);
+				recdao.insertAdvantageWithRecruitmentNotice(newAdv);
+			}
 		}
 
-		pageResponseDTO.setTotalPageCnt(); // 전체 페이지 수
-		pageResponseDTO.setStartRowIndex(); // 출력 시작할 rowIndex번호
+		// Step 3: 면접방식 비교 후 변경 (method가 같을 때 삭제)
+		List<Application> oldAppList = existing.getApplication();
+		for (Application old : oldAppList) {
+			// anyMatch: newAppList 중 하나라도 같은 method가 있으면 true
+			boolean existsInNew = newAppList.stream().anyMatch(newApp -> newApp.getMethod() == old.getMethod());
+			
+			if (!existsInNew) {
+				// method가 사라졌다면 삭제
+				recdao.deleteApplication(uid, old.getMethod());
+			}
+		}
 
-		// 페이징 블럭을 표시하기 위해
-		pageResponseDTO.setBlockOfCurrentPage(); // 현재 페이지가 몇번째 블럭에 있는가?
-		pageResponseDTO.setStartPageNumPerBlock(); // 블럭에서의 시작페이지 번호
-		pageResponseDTO.setEndPageNumPerBlock(); // 블럭에서의 끝페이지 번호
+		// 새로운 면접 방식이면 추가
+		for (ApplicationDTO newApp : newAppList) {
+			boolean existsInOld = oldAppList.stream().anyMatch(old -> old.getMethod() == newApp.getMethod());
 
-		return pageResponseDTO;
+			if (!existsInOld) {
+				newApp.setRecruitmentNoticeUid(uid);
+				recdao.insertApplicationWithRecruitmentNotice(newApp);
+			}
+		}
 
+		// Step 4: 파일 비교 후 변경
+		List<RecruitmentnoticeBoardUpfiles> oldFileList = existing.getFileList();
+		for (RecruitmentnoticeBoardUpfiles oldFile : oldFileList) {
+			boolean stillExists = modifyFileList.stream()
+					.anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()));
+			if (!stillExists) {
+				recdao.deleteFileFromDatabase(uid);; // DB + 물리 파일도 제거 필요
+			}
+		}
+		for (RecruitmentnoticeBoardUpfiles newFile : modifyFileList) {
+		    boolean existsInOld = oldFileList.stream()
+		        .anyMatch(oldFile -> oldFile.getOriginalFileName().equals(newFile.getOriginalFileName()));
+
+		    if (!existsInOld && FileStatus.NEW.equals(newFile.getStatus())) {
+		        newFile.setRefrecruitmentnoticeNo(uid);
+		        recdao.insertRecruitmentFile(newFile);
+		    }
+		}
+
+		// Step 5: 직업군, 지역 등 외래키 정보 갱신
+		jobdao.updateMajorCategoryWithRecruitmentnotice(uid, dto.getMajorcategoryNo());
+		jobdao.updateSubCategoryWithRecruitmentnotice(uid, dto.getSubcategoryNo());
+		regiondao.updateRegionWithRecruitmentNotice(uid, dto.getRegionNo());
+		regiondao.updateSigunguWithRecruitmentNotice(uid, dto.getSigunguNo());
 	}
-	
-	// uid를 매개변수로 공고를 삭제하는 메서드
+    
+	// 파일을 삭제하는 메서드
 	@Override
-	public boolean removeRecruitmentByUid(int uid) {
-		boolean result = false;
+	public void deleteFileFromDatabase(int boardUpFileNo) {
+		 recdao.deleteFileFromDatabase(boardUpFileNo);
 		
-		if(recdao.deleteRecruitmentByUid(uid) > 0) {
-			result = true;
-		}
-		
-		return result;
+	}
+	
+	// 내가 작성한 공고글 가져오는 메서드(필요한 정보는 title, 공고의 uid)
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	@Override
+	public PageResponseDTO<RecruitmentNotice> getRecruitmentByCompanyUid(int companyUid, PageRequestDTO pageRequestDTO) {
+	    
+	    int totalCount = recdao.getTotalCountRowByCompanyUid(companyUid);
+
+	    PageResponseDTO<RecruitmentNotice> pageResponseDTO = pagingProcess(pageRequestDTO, totalCount);
+
+	    List<RecruitmentNotice> boardList = recdao.selectRecruitmentByCompanyUid(companyUid, pageResponseDTO);
+	    if (boardList == null) {
+	        boardList = Collections.emptyList();
+	    }
+
+	    pageResponseDTO.setBoardList(boardList);
+	    return pageResponseDTO;
 	}
 
 }

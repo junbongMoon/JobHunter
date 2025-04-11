@@ -2,9 +2,16 @@ package com.jobhunter.controller.recruitmentnotice;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,21 +24,22 @@ public class RecruitmentNoticeRestController {
 	private final RecruitmentNoticeService recService;
 	private static final Logger logger = LoggerFactory.getLogger(RecruitmentNoticeRestController.class);
 	
-
 	
-
+	    // 내가 작성한 공고 리스트를 가져오는 메서드
+		@GetMapping("/list/{companyUid}")
+		public ResponseEntity<PageResponseDTO<RecruitmentNotice>> showRecruitmentWirteByUid(@PathVariable("companyUid") int companyUid,
+				PageRequestDTO pageRequestDTO, Model model){
+			ResponseEntity<PageResponseDTO<RecruitmentNotice>> result = null;		
+			
+			PageResponseDTO<RecruitmentNotice> pageResponseDTO = recService.getRecruitmentByCompanyUid(companyUid, pageRequestDTO);
+			
+			result = ResponseEntity.ok().body(pageResponseDTO);
+			
+			return result;
+			
+		}
 	
-
+	   
 	
-	
-	
-	
-	// 파일을 받아오는 메서드
-
-	// 내가 작성한 공고 수정하는 메서드
-
-	// 내가 작성한 공고 삭제하는 메서드
-	// delete가 아니라 dueDate(마감기한 now()로 설정) update. sql스케쥴러 사용해서 반년 이따 지우자...
-
 	
 }

@@ -82,68 +82,107 @@
 		desc limit 1;
 	</select>
 
+
+	<!-- selectRecruitmentWithPaging -->
 	<select id="selectRecruitmentWithPaging"
 		resultMap="RecruitmentDetailMap">
 		SELECT
 		r.*, c.companyName,
-
-		rg.regionNo,
-		rg.name AS regionName, rg.code,
+		rg.regionNo, rg.name AS regionName, rg.code,
 		sg.sigunguNo, sg.name AS sigunguName, sg.regionNo,
-
-		mj.majorcategoryNo AS majorNo, mj.jobName AS majorJobName,
-		sj.subcategoryNo AS subNo, sj.jobName AS subJobName, sj.refMajorcategoryNo
-
-		FROM
-		recruitmentnotice r
-		LEFT JOIN where_recruit_region rr ON r.uid =
-		rr.refRecNo
-		LEFT JOIN region rg ON rr.refRegion = rg.regionNo
-
-		LEFT JOIN
-		where_recruit_sigungu rs ON r.uid = rs.refRecNo
-		LEFT JOIN sigungu sg ON
-		rs.refSigungu = sg.sigunguNo
-
-		LEFT JOIN jobtype_recruit_major rm ON
-		r.uid = rm.refRecNo
-		LEFT JOIN majorcategory mj ON rm.refMajorNo =
 		mj.majorcategoryNo
-
-		LEFT JOIN jobtype_recruit_sub rsb ON r.uid =
-		rsb.refRecNo
-		LEFT JOIN subcategory sj ON rsb.refSubNo =
-		sj.subcategoryNo
-		
-		LEFT JOIN company c ON c.uid = r.refCompany
+		AS majorNo, mj.jobName AS majorJobName,
+		sj.subcategoryNo AS subNo,
+		sj.jobName AS subJobName, sj.refMajorcategoryNo
+		FROM recruitmentnotice
+		r
+		LEFT JOIN where_recruit_region rr ON r.uid = rr.refRecNo
+		LEFT JOIN
+		region rg ON rr.refRegion = rg.regionNo
+		LEFT JOIN where_recruit_sigungu
+		rs ON r.uid = rs.refRecNo
+		LEFT JOIN sigungu sg ON rs.refSigungu =
+		sg.sigunguNo
+		LEFT JOIN jobtype_recruit_major rm ON r.uid = rm.refRecNo
+		LEFT JOIN majorcategory mj ON rm.refMajorNo = mj.majorcategoryNo
+		LEFT
+		JOIN jobtype_recruit_sub rsb ON r.uid = rsb.refRecNo
+		LEFT JOIN
+		subcategory sj ON rsb.refSubNo = sj.subcategoryNo
+		LEFT JOIN company c
+		ON c.uid = r.refCompany
 
 		<where>
 			r.status = 'Y'
 
-			<if
-				test="searchType != null and searchWord != null and searchWord != ''">
+			<!-- 검색 조건은 그대로 유지 -->
+			<if test="searchType != null and searchType != ''">
 				<choose>
-					<when test="searchType == 'title'">
-						AND r.title LIKE CONCAT('%', #{searchWord}, '%')
+					<when
+						test="searchType == 'region' and searchWord != null and searchWord != ''">
+						AND (
+						rg.name LIKE CONCAT('%', #{searchWord}, '%')
+						OR sg.name
+						LIKE CONCAT('%', #{searchWord}, '%')
+						)
 					</when>
-					<when test="searchType == 'region'">
-						AND rg.name LIKE CONCAT('%', #{searchWord}, '%')
+					<when
+						test="searchType == 'jobType' and searchWord != null and searchWord != ''">
+						AND (
+						mj.jobName LIKE CONCAT('%', #{searchWord}, '%')
+						OR
+						sj.jobName LIKE CONCAT('%', #{searchWord}, '%')
+						)
 					</when>
-					<when test="searchType == 'sigungu'">
-						AND sg.name LIKE CONCAT('%', #{searchWord}, '%')
+
+					<when
+						test="searchType == 'advantage' and searchWord != null and searchWord != ''">
+						AND EXISTS (
+						SELECT 1 FROM advantage a
+						WHERE
+						a.recruitmentNoticeUid = r.uid
+						AND a.advantageType LIKE CONCAT('%',
+						#{searchWord}, '%')
+						)
 					</when>
-					<when test="searchType == 'majorcategory'">
-						AND mj.jobName LIKE CONCAT('%', #{searchWord}, '%')
-					</when>
-					<when test="searchType == 'subcategory'">
-						AND sj.jobName LIKE CONCAT('%', #{searchWord}, '%')
-					</when>
+
 				</choose>
 			</if>
 		</where>
-		ORDER BY r.uid DESC
+
+		<choose>
+			<when test="searchType == 'highPay'">
+				ORDER BY CASE r.payType
+				WHEN 'HOUR' THEN r.pay * 8 *
+				22
+				WHEN 'DATE' THEN r.pay * 22
+				WHEN 'WEEK' THEN r.pay * 4
+				WHEN 'MONTH'
+				THEN r.pay
+				WHEN 'YEAR' THEN r.pay / 12
+				ELSE 0
+				END DESC
+			</when>
+			<when test="searchType == 'lowPay'">
+				ORDER BY CASE r.payType
+				WHEN 'HOUR' THEN r.pay * 8 *
+				22
+				WHEN 'DATE' THEN r.pay * 22
+				WHEN 'WEEK' THEN r.pay * 4
+				WHEN 'MONTH'
+				THEN r.pay
+				WHEN 'YEAR' THEN r.pay / 12
+				ELSE 0
+				END ASC
+			</when>
+			<otherwise>
+				ORDER BY r.uid DESC
+			</otherwise>
+		</choose>
+
 		LIMIT #{startRowIndex}, #{rowCntPerPage}
 	</select>
+
 
 	<resultMap id="RecruitmentDetailMap"
 		type="com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo">
@@ -197,74 +236,196 @@
 		</association>
 
 	</resultMap>
-	
-	<select id="getTotalCountRow" resultType="int">
-      select count(*) from
-      recruitmentnotice
-   </select>
-   
-   <select id="getSearchResultCountRow" resultType="int">
-      select count(*) from recruitmentnotice
-      <choose>
-         <when test="searchType == 'title'">
-            where title like #{searchWord}
-         </when>
-         <when test="searchType == 'detail'">
-            where detail like #{searchWord}
-         </when>
-         <when test="searchType == 'manager'">
-            where manager like #{searchWord}
-         </when>
-      </choose>
-   </select>
 
-	<select id="getFileWithRecruitment" resultType="com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles">
+	<select id="selectAdvantageByRecruitmentNoticeUid"
+		resultType="com.jobhunter.model.recruitmentnotice.Advantage">
+		SELECT advantageNo, advantageType, recruitmentNoticeUid
+		FROM advantage
+		WHERE recruitmentNoticeUid = #{uid}
+	</select>
+
+	<select id="getTotalCountRow" resultType="int">
+		select count(*) from
+		recruitmentnotice
+		where status = 'Y'
+	</select>
+
+	<select id="getSearchResultCountRow" resultType="int">
+		SELECT COUNT(*)
+		FROM recruitmentnotice r
+		LEFT JOIN where_recruit_region
+		rr ON r.uid = rr.refRecNo
+		LEFT JOIN region rg ON rr.refRegion =
+		rg.regionNo
+		LEFT JOIN where_recruit_sigungu rs ON r.uid = rs.refRecNo
+		LEFT JOIN sigungu sg ON rs.refSigungu = sg.sigunguNo
+		LEFT JOIN
+		jobtype_recruit_major rm ON r.uid = rm.refRecNo
+		LEFT JOIN majorcategory
+		mj ON rm.refMajorNo = mj.majorcategoryNo
+		LEFT JOIN jobtype_recruit_sub
+		rsb ON r.uid = rsb.refRecNo
+		LEFT JOIN subcategory sj ON rsb.refSubNo =
+		sj.subcategoryNo
+		LEFT JOIN advantage a ON a.recruitmentNoticeUid =
+		r.uid
+
+		<where>
+			r.status = 'Y'
+
+			<if
+				test="searchType != null and searchWord != null and searchWord != ''">
+				<choose>
+					<when test="searchType == 'region'">
+						AND (
+						rg.name LIKE CONCAT('%', #{searchWord}, '%')
+						OR sg.name LIKE CONCAT('%', #{searchWord}, '%')
+						)
+					</when>
+
+					<when test="searchType == 'jobType'">
+						AND (
+						mj.jobName LIKE CONCAT('%', #{searchWord},
+						'%')
+						OR sj.jobName LIKE CONCAT('%', #{searchWord}, '%')
+						)
+					</when>
+
+					<when test="searchType == 'advantage'">
+						AND EXISTS (
+						SELECT 1 FROM advantage a
+						WHERE a.recruitmentNoticeUid = r.uid
+						AND a.advantageType LIKE CONCAT('%', #{searchWord}, '%')
+						)
+					</when>
+
+					<when test="searchType == 'jobform'">
+						AND r.worktype LIKE CONCAT('%', #{searchWord}, '%')
+					</when>
+				</choose>
+			</if>
+		</where>
+	</select>
+
+	<select id="getFileWithRecruitment"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles">
 		select *
 		from recruitmentnoticeboardupfiles
-		where refrecruitmentnoticeNo = #{uid}
+		where
+		refrecruitmentnoticeNo = #{uid}
 	</select>
-	
-	<select id="getBoardDetailInfoByUid" resultMap="RecruitmentDetailMap">
+
+	<select id="getBoardDetailInfoByUid"
+		resultMap="RecruitmentDetailMap">
 		SELECT
 		r.*, c.companyName,
 
 		rg.regionNo,
-		rg.name AS regionName, rg.code,
+		rg.name AS regionName,
+		rg.code,
 		sg.sigunguNo, sg.name AS sigunguName, sg.regionNo,
 
 		mj.majorcategoryNo AS majorNo, mj.jobName AS majorJobName,
-		sj.subcategoryNo AS subNo, sj.jobName AS subJobName, sj.refMajorcategoryNo
+		sj.subcategoryNo AS subNo, sj.jobName AS subJobName,
+		sj.refMajorcategoryNo
 
 		FROM
 		recruitmentnotice r
-		LEFT JOIN where_recruit_region rr ON r.uid =
+		LEFT JOIN
+		where_recruit_region rr ON r.uid =
 		rr.refRecNo
-		LEFT JOIN region rg ON rr.refRegion = rg.regionNo
+		LEFT JOIN region rg ON
+		rr.refRegion = rg.regionNo
 
 		LEFT JOIN
-		where_recruit_sigungu rs ON r.uid = rs.refRecNo
+		where_recruit_sigungu rs ON r.uid =
+		rs.refRecNo
 		LEFT JOIN sigungu sg ON
 		rs.refSigungu = sg.sigunguNo
 
-		LEFT JOIN jobtype_recruit_major rm ON
+		LEFT
+		JOIN jobtype_recruit_major rm ON
 		r.uid = rm.refRecNo
-		LEFT JOIN majorcategory mj ON rm.refMajorNo =
+		LEFT JOIN
+		majorcategory mj ON rm.refMajorNo =
 		mj.majorcategoryNo
 
-		LEFT JOIN jobtype_recruit_sub rsb ON r.uid =
+		LEFT JOIN
+		jobtype_recruit_sub rsb ON r.uid =
 		rsb.refRecNo
-		LEFT JOIN subcategory sj ON rsb.refSubNo =
+		LEFT JOIN subcategory sj
+		ON rsb.refSubNo =
 		sj.subcategoryNo
-		
-		LEFT JOIN company c ON c.uid = r.refCompany
-		
-		where r.uid = #{uid} 
+
+		LEFT JOIN company c ON c.uid =
+		r.refCompany
+
+		where r.uid = #{uid}
 	</select>
-	
+
 	<delete id="removeRecruitmentByUid">
 		delete from recruitmentnotice
 		where uid = #{uid}
 	</delete>
-	
-	
+
+	<update id="modifyRecruitmentByUid">
+		UPDATE recruitmentnotice
+		SET
+		title = #{title},
+		workType
+		= #{workType},
+		payType = #{payType},
+		pay = #{pay},
+		period = #{period},
+		personalHistory = #{personalHistory},
+		militaryService =
+		#{militaryService},
+		detail = #{detail},
+		manager = #{manager},
+		miniTitle =
+		#{miniTitle},
+		dueDate = #{dueDate, jdbcType=TIMESTAMP},
+		refCompany =
+		#{refCompany}
+		WHERE uid = #{uid}
+	</update>
+
+	<delete id="removeAdvantageByRecruitmentUid">
+		DELETE FROM advantage
+		WHERE recruitmentNoticeUid =
+		#{uid}
+		AND advantageType = #{advantageType}
+	</delete>
+
+	<!-- 실제로 접수 방식(application)을 삭제하는 쿼리 -->
+	<delete id="removeApplicationByRecruitmentUid">
+		DELETE FROM application
+		WHERE recruitmentNoticeUid =
+		#{uid}
+		AND method = #{method}
+	</delete>
+
+	<delete id="deleteFileFromDatabase">
+		delete from recruitmentnoticeboardupfiles
+		where
+		boardUpFileNo = #{boardUpFileNo}
+	</delete>
+
+	<select id="getTotalCountRowByCompanyUid" resultType="int">
+		SELECT
+		COUNT(*)
+		FROM recruitmentnotice
+		WHERE refCompany = #{companyUid}
+	</select>
+
+	<select id="selectRecruitmentByCompanyUid"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentNotice">
+		SELECT *
+		FROM recruitmentnotice
+		WHERE refCompany =
+		#{companyUid}
+		ORDER BY uid DESC
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
+	</select>
+
 </mapper>

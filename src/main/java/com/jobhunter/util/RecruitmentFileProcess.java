@@ -56,50 +56,55 @@ public class RecruitmentFileProcess {
 	}
 
 	/** 실제 파일 저장 처리 */
-	public RecruitmentnoticeBoardUpfiles saveFileToRealPath(MultipartFile file, HttpServletRequest request, String saveFileDir)
-			throws IOException {
-		RecruitmentnoticeBoardUpfiles result = null;
+	public RecruitmentnoticeBoardUpfiles saveFileToRealPath(
+	        MultipartFile file,
+	        HttpServletRequest request,
+	        String saveFileDir) throws IOException {
 
-		String originalFileName = file.getOriginalFilename();
-		String fileType = file.getContentType();
-		String ext = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
-		long size = file.getSize();
-		String thumbFileName = null;
-		String base64Image = null;
+	    RecruitmentnoticeBoardUpfiles result = null;
 
-		String newFileName = null;
+	    String originalFileName = file.getOriginalFilename();
+	    String fileType = file.getContentType();
+	    String ext = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+	    long size = file.getSize();
+	    String thumbFileName = null;
+	    String base64Image = null;
 
-		this.realPath = request.getSession().getServletContext().getRealPath(saveFileDir);
-		logger.info("파일 저장 경로 : " + this.realPath);
+	    String newFileName = null;
 
-		String[] ymd = makeCalendarPath();
-		makeDirectory(ymd);
-		this.saveFilePath = realPath + ymd[ymd.length - 1]; // 예: /2025/03/27
+	    this.realPath = request.getSession().getServletContext().getRealPath(saveFileDir);
+	    logger.info("파일 저장 경로 : " + this.realPath);
 
-		if (size > 0) {
-			newFileName = renameUniqueFileName(originalFileName);
-			File saveFile = new File(saveFilePath + File.separator + newFileName);
-			FileUtils.writeByteArrayToFile(saveFile, file.getBytes());
+	    String[] ymd = makeCalendarPath();
+	    makeDirectory(ymd);
+	    this.saveFilePath = realPath + ymd[ymd.length - 1]; // 예: /2025/03/27
 
-			if (ImageMimeType.isImage(ext.toLowerCase())) {
-				thumbFileName = makeThumbnailImage(newFileName);
-				base64Image = makeBase64Encoding(thumbFileName);
-			}
+	    String webPath = "/resources/recruitmentFiles"; // 브라우저 접근용 경로
 
-			result = RecruitmentnoticeBoardUpfiles.builder()
-					.originalFileName(originalFileName)
-					.newFileName(ymd[ymd.length - 1].replace("\\", "/") + "/" + newFileName)
-					.thumbFileName(ymd[ymd.length - 1].replace("\\", "/") + "/" + thumbFileName)
-					.fileType(fileType)
-					.ext(ext)
-					.size(size)
-					.base64Image(base64Image)
-					.build();
+	    if (size > 0) {
+	        newFileName = renameUniqueFileName(originalFileName);
+	        File saveFile = new File(saveFilePath + File.separator + newFileName);
+	        FileUtils.writeByteArrayToFile(saveFile, file.getBytes());
 
-			logger.info("파일 저장 완료: " + result);
-		}
+	        if (ImageMimeType.isImage(ext.toLowerCase())) {
+	            thumbFileName = makeThumbnailImage(newFileName);
+	            base64Image = makeBase64Encoding(thumbFileName);
+	        }
 
-		return result;
+	        result = RecruitmentnoticeBoardUpfiles.builder()
+	                .originalFileName(originalFileName)
+	                .newFileName(webPath + ymd[ymd.length - 1].replace("\\", "/") + "/" + newFileName)
+	                .thumbFileName(webPath + ymd[ymd.length - 1].replace("\\", "/") + "/" + thumbFileName)
+	                .fileType(fileType)
+	                .ext(ext)
+	                .size(size)
+	                .base64Image(base64Image)
+	                .build();
+
+	        logger.info("파일 저장 완료: " + result);
+	    }
+
+	    return result;
 	}
 
 	/** 파일 삭제 */

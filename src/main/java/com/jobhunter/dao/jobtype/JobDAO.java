@@ -10,4 +10,10 @@ public interface JobDAO {
 	int insertMajorCategoryWithRecruitmentnotice(int refRecNo, int majorCategortCode) throws Exception;
 	
 	int insertSubCategoryWithRecruitmentnotice(int refRecNo, int refSubNo) throws Exception;
+	
+	// 공고의 직업군을 수정하는 메서드
+	void updateSubCategoryWithRecruitmentnotice(int uid, int subcategoryNo) throws Exception;
+	
+	// 공고의 산업군을 수정하는 메서드
+	void updateMajorCategoryWithRecruitmentnotice(int uid, int majorcategoryNo);
 }
