@@ -45,30 +45,57 @@
 						</div>
 						<div class="card-body">
 							<div class="row g-3">
-								<div class="col-md-4">
-									<label class="form-label">이름</label> <input type="text" class="form-control"
-										value="${account.accountName}" readonly />
+								<!-- 증명사진 업로드 -->
+								<div class="col-md-2">
+									<div class="d-flex justify-content-center align-items-center border rounded position-relative photoUploadBox"
+										style="height: 200px; background-color: #f8f9fa;">
+										<input type="file" id="photoUpload" style="display: none;" accept="image/*">
+										<label for="photoUpload" class="text-center" style="cursor: pointer;">
+											<i class="bi bi-plus-circle"
+												style="font-size: 2rem; color: #6c757d;"></i><br>
+											증명 사진 등록<span class="essentialPoint">*</span>
+										</label>
+										<img id="photoPreview" src="#" alt="사진 미리보기"
+											style="display: none; max-height: 100%; max-width: 100%;" />
+										<button type="button"
+											class="btn-close position-absolute top-0 end-0 m-2 pCloseBtn"
+											id="removePhoto"
+											style="display: none; background-color: #47B2E4; border-radius: 50%; padding: 8px; border: 1px solid #37517E; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></button>
+									</div>
 								</div>
-								<div class="col-md-4">
-									<label class="form-label">나이</label> <input type="text" class="form-control"
-										value="${user.age}" readonly />
+								<input type="hidden" id="profileBase64" name="profileBase64" />
+								<div class="col-md-9 pContent">
+									<div class="row g-3">
+										<div class="col-md-4">
+											<label class="form-label">이름</label>
+											<input type="text" class="form-control" value="${account.accountName}"
+												readonly />
+										</div>
+										<div class="col-md-4">
+											<label class="form-label">나이</label>
+											<input type="text" class="form-control" value="${user.age}" readonly />
+										</div>
+										<div class="col-md-4">
+											<label class="form-label">성별</label>
+											<input type="text" class="form-control"
+												value="${user.gender == 'MALE' ? '남성' : '여성'}" readonly />
+										</div>
+										<div class="col-md-4">
+											<label class="form-label">이메일</label>
+											<input type="email" class="form-control" value="${account.email}"
+												readonly />
+										</div>
+										<div class="col-md-4">
+											<label class="form-label">연락처</label>
+											<input type="tel" class="form-control" value="${account.mobile}" readonly />
+										</div>
+										<div class="col-md-4">
+											<label class="form-label">거주지</label>
+											<input type="text" class="form-control" value="${user.addr}" readonly />
+										</div>
+									</div>
 								</div>
-								<div class="col-md-4">
-									<label class="form-label">성별</label> <input type="text" class="form-control"
-										value="${user.gender == 'MALE' ? '남성' : '여성'}" readonly />
-								</div>
-								<div class="col-md-4">
-									<label class="form-label">이메일</label> <input type="email" class="form-control"
-										value="${account.email}" readonly />
-								</div>
-								<div class="col-md-4">
-									<label class="form-label">연락처</label> <input type="tel" class="form-control"
-										value="${account.mobile}" readonly />
-								</div>
-								<div class="col-md-4">
-									<label class="form-label">거주지</label> <input type="text" class="form-control"
-										value="${user.addr}" readonly />
-								</div>
+								<small class="text-muted">* 2.5MB 이하의 이미지 파일만 등록 가능합니다.</small>
 								<!-- userUid -->
 								<input type="hidden" id="userUid" name="userUid" value="${account.uid}" />
 							</div>
@@ -590,7 +617,9 @@
 								</div>
 								<div id="previewContainer" class="mt-3"></div>
 							</div>
-							<small class="text-muted">* 자격증명서, 졸업증명서 등 첨부 가능합니다.</small>
+							<small class="text-muted">* 자격증명서, 졸업증명서 등 첨부 가능합니다.</small><br>
+							<small class="text-muted">* 이미지 외 파일은 10MB 까지 업로드 가능합니다.</small><br>
+							<small class="text-muted">* 이미지 파일은 2.5MB 이하로 압축 후 업로드 해주세요.</small>
 						</div>
 					</div>
 
@@ -930,6 +959,11 @@
 				color: var(--accent-color);
 			}
 
+			.pContent {
+				margin-left: 40px;
+				margin-top: 30px;
+			}
+
 			/* CSS 변수 정의 */
 			:root {
 				--accent-color: #47B2E4;
@@ -1220,6 +1254,12 @@
 						return;
 					}
 
+					if (!$('#profileBase64').val()) {
+						showValidationModal("사진을 등록해 주세요.");
+						$(".photoUploadBox").attr("tabindex", -1).focus();
+						return;
+					}
+
 					const jobFormCount = $('input[name="jobForm"]:checked').length;
 					if (jobFormCount === 0) {
 						showValidationModal("희망 고용형태를 하나 이상 선택해주세요.", "#fullTime");
@@ -1384,7 +1424,8 @@
 						}).get(),
 						introduce: $('#selfIntroTextarea').val(),
 						files: uploadedFiles,
-						userUid: $('#userUid').val()
+						userUid: $('#userUid').val(),
+						profileBase64: $('#profileBase64').val()
 					};
 
 					// 이력서 번호가 있는 경우 추가
@@ -1419,11 +1460,20 @@
 					const titleLength = $('#title').val().length;
 					if (!title) {
 						showValidationModal("이력서 제목을 입력해주세요.", "#title");
+						resetSubmitButton();
 						return;
 					}
 
 					if (titleLength > 30) {
 						showValidationModal("이력서 제목은 30자 이내로 작성해주세요.", "#title");
+						resetSubmitButton();
+						return;
+					}
+
+					if (!$('#profileBase64').val()) {
+						showValidationModal("사진을 등록해 주세요.");
+						$(".photoUploadBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
 						return;
 					}
 
@@ -1662,7 +1712,8 @@
 						}).get(),
 						introduce: $('#selfIntroTextarea').val(),
 						files: uploadedFiles,
-						userUid: $('#userUid').val()
+						userUid: $('#userUid').val(),
+						profileBase64: $('#profileBase64').val()
 					};
 
 					// 이력서 번호가 있는 경우 추가(수정기능)
@@ -2117,6 +2168,12 @@
 					}
 
 					Array.from(files).forEach(file => {
+						// 👉 이미지 파일이면 2.5MB 제한
+						if (file.type.startsWith("image/") && file.size > 2.5 * 1024 * 1024) {
+							showValidationModal('이미지의 크기가 2.5MB를 초과합니다.');
+							return;
+						}
+
 						// 파일 크기 체크
 						if (file.size > MAX_FILE_SIZE) {
 							showValidationModal(`파일의 크기가 10MB를 초과합니다.`);
@@ -2129,7 +2186,7 @@
 							showValidationModal(`이미 업로드된 파일입니다.`);
 							return;
 						}
-						
+
 
 						// 파일 정보 생성
 						const fileInfo = {
@@ -2220,16 +2277,16 @@
 
 				// 파일 삭제 함수
 				function deleteFile(fileName, $preview) {
-					const uploadedFile = uploadedFiles.find(function(f) {
+					const uploadedFile = uploadedFiles.find(function (f) {
 						return f.originalFileName === fileName;
 					});
-					const pendingFile = pendingFiles.find(function(f) {
+					const pendingFile = pendingFiles.find(function (f) {
 						return f.originalFileName === fileName;
 					});
 
 					if (uploadedFile) {
 						// 업로드된 파일인 경우
-						uploadedFiles = uploadedFiles.filter(function(f) {
+						uploadedFiles = uploadedFiles.filter(function (f) {
 							return f.originalFileName !== fileName;
 						});
 						$preview.remove();
@@ -2394,7 +2451,54 @@
 						});
 					});
 				}
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 사진 업로드 이벤트
+				$('#photoUpload').on('change', function (event) {
+					const file = event.target.files[0];
+					if (file) {
+						if (!file.type.startsWith('image/')) {
+							showValidationModal('이미지 파일만 등록 가능합니다.');
+							return;
+						}
+						if (file.size > 2.5 * 1024 * 1024) {
+							showValidationModal('이미지의 크기가 2.5MB를 초과합니다.');
+							return;
+						}
+						const reader = new FileReader();
+						reader.onload = function (e) {
+							$('#photoPreview').attr('src', e.target.result).show();
+							$('#profileBase64').val(e.target.result);
+							// 사진 등록 텍스트와 아이콘 숨기기
+							$('label[for="photoUpload"]').hide();
+							// X 버튼 보이기
+							$('#removePhoto').show();
+						}
+						reader.readAsDataURL(file);
+					}
+				});
 
+				// X 버튼 클릭 이벤트
+				$('#removePhoto').on('click', function () {
+					// 미리보기 이미지 숨기기
+					$('#photoPreview').hide();
+					// base64 값 초기화
+					$('#profileBase64').val('');
+					// 사진 등록 텍스트와 아이콘 다시 보이기
+					$('label[for="photoUpload"]').show();
+					// X 버튼 숨기기
+					$(this).hide();
+					// 파일 입력 초기화
+					$('#photoUpload').val('');
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 유효성 검사 실패 시 스피너 중지 및 버튼 복원 함수
+				function resetSubmitButton() {
+					isSubmitting = false; // 중복 방지 플래그 해제
+					$('#finalSaveBtn').prop('disabled', false); // 버튼 복원
+					$('#finalSaveBtn .btn-text').removeClass('d-none');
+					$('#finalSaveBtn .spinner-border').addClass('d-none');
+				}
+				//---------------------------------------------------------------------------------------------------------------------------------
 
 			});
 		</script>

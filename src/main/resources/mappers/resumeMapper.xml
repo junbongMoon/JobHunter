@@ -6,8 +6,8 @@
 
     <!-- 이력서 저장 -->
     <insert id="insertResumeFinal" parameterType="com.jobhunter.model.resume.ResumeDTO" useGeneratedKeys="true" keyProperty="resumeNo">
-        INSERT INTO resume (title, payType, pay, introduce, userUid, saveType, regDate)
-        VALUES (#{title}, #{payType}, #{pay}, #{introduce}, #{userUid}, 'FINAL', NOW());
+        INSERT INTO resume (title, payType, pay, introduce, userUid, profileBase64, saveType, regDate)
+        VALUES (#{title}, #{payType}, #{pay}, #{introduce}, #{userUid}, #{profileBase64}, 'FINAL', NOW());
     </insert>
 
     <!-- 고용 형태 저장 -->
@@ -154,7 +154,8 @@
             r.pay,
             r.introduce,
             r.userUid,
-            r.saveType
+            r.saveType,
+            r.profileBase64
         FROM resume r
         WHERE r.resumeNo = #{resumeNo}
     </select>
@@ -201,7 +202,8 @@
             payType = #{payType},
             pay = #{pay},
             introduce = #{introduce},
-            regDate = NOW()
+            regDate = NOW(),
+            profileBase64 = #{profileBase64}
         WHERE resumeNo = #{resumeNo}
     </update>
 
