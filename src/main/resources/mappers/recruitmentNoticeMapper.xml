@@ -204,6 +204,7 @@
 		<result property="dueDate" column="dueDate" />
 		<result property="status" column="status" />
 		<result property="count" column="count" />
+		<result property="regDate" column="regDate" />
 		<result property="refCompany" column="refCompany" />
 		<result property="companyName" column="companyName" />
 

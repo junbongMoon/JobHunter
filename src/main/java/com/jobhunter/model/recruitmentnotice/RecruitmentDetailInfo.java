@@ -23,7 +23,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class RecruitmentDetailInfo {
-	// 아직
+	
 	private int uid;
 	private String title;
 	private JobForm workType;
@@ -39,6 +39,7 @@ public class RecruitmentDetailInfo {
 	private String status;
 	// 조회수
 	private int count;
+	private Timestamp regDate;
 	// 작성한 회사 uid
 	private int refCompany;
 	// 작성자
