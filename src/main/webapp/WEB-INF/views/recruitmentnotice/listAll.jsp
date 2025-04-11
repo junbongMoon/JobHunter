@@ -5,43 +5,12 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
-	// 페이지 로드시 초기 실행
-	$(function () {
-	const selectedVal = $('#searchType').val();
-	const keywordBox = document.querySelector('#keywordBox');
 
-	// 페이지 로딩 시 input 없으면 렌더링
-	if (["region", "jobType", "advantage", "jobform"].includes(selectedVal)) {
-		if (!keywordBox.querySelector('input')) {
-			const input = document.createElement('input');
-			input.type = 'text';
-			input.name = 'searchWord';
-			input.placeholder = '검색어를 입력하세요';
-			input.className = 'form-control';
-			input.value = '${param.searchWord}';
-			keywordBox.appendChild(input);
-		}
-	}
-
-	$(document).on('change', '#searchType', function () {
-		const selectedVal = $('#searchType').val();
-		keywordBox.innerHTML = '';
-
-		if (["region", "jobType", "advantage", "jobform"].includes(selectedVal)) {
-			const input = document.createElement('input');
-			input.type = 'text';
-			input.name = 'searchWord';
-			input.placeholder = '검색어를 입력하세요';
-			input.className = 'form-control';
-			keywordBox.appendChild(input);
-		}
-	});
-});
 </script>
 
 <style>
 .rectext strong {
-	color: #47b2e4;;
+	color: #3d4d6a;
 }
 
 .recruitmentList {
@@ -102,29 +71,34 @@
 									${param.searchType == 'advantage' ? 'selected' : ''}>우대조건</option>
 								<option value="jobform"
 									${param.searchType == 'jobform' ? 'selected' : ''}>근무형태</option>
-								<option value="highPay"
-									${param.searchType == 'highPay' ? 'selected' : ''}>높은금액
-									순</option>
-								<option value="lowPay"
-									${param.searchType == 'lowPay' ? 'selected' : ''}>낮은금액
-									순</option>
+
 							</select>
 						</div>
 
 						<div class="col-md-6" id="keywordBox">
-							<c:if test="${not empty param.searchWord 
-										&& not empty param.searchType 
-										&& param.searchType != 'highPay' 
-										&& param.searchType != 'lowPay'}">
 								<input type="text" name="searchWord" class="form-control"
 									   placeholder="검색어를 입력하세요"
 									   value="${param.searchWord}" />
-							</c:if>
+							
 						</div>
 
 						<div class="col-md-3 text-end">
-							<button type="submit" class="btn btn-primary">검색</button>
+							<button type="submit" class="btn btn-primary" style="background-color: #47b2e4;">검색</button>
 						</div>
+
+						<div class="col-md-3">
+							<label class="form-label">정렬 기준</label><br>
+							<div class="form-check form-check-inline">
+							  <input class="form-check-input" type="radio" name="sortOption" id="sortHigh" value="highPay"
+								${param.sortOption == 'highPay' ? 'checked' : ''}>
+							  <label class="form-check-label" for="sortHigh">높은 금액 순</label>
+							</div>
+							<div class="form-check form-check-inline">
+							  <input class="form-check-input" type="radio" name="sortOption" id="sortLow" value="lowPay"
+								${param.sortOption == 'lowPay' ? 'checked' : ''}>
+							  <label class="form-check-label" for="sortLow">낮은 금액 순</label>
+							</div>
+						  </div>
 					</div>
 				</form>
 				<div class="row gy-4 gx-4">
@@ -151,20 +125,20 @@
 								<div class="content recruitmentList">
 									<p class="rectext">
 										<strong>지역:</strong> <span class="badge bg-primary me-2"><c:out
-												value="${rec.region.name}" default="-" /></span> <strong>시군구:</strong>
+												value="${rec.region.name}" default="-" /></span> <strong>시군구 </strong>
 										<span class="badge bg-info me-2"><c:out
-												value="${rec.sigungu.name}" default="-" /></span> <br /> <strong>산업군:</strong>
+												value="${rec.sigungu.name}" default="-" /></span> <br /> <strong>산업군 </strong>
 										<span class="badge bg-success me-2"><c:out
-												value="${rec.majorCategory.jobName}" default="-" /></span> <strong>직업:</strong>
+												value="${rec.majorCategory.jobName}" default="-" /></span> <strong>직업 </strong>
 										<span class="badge bg-warning text-dark me-2"><c:out
-												value="${rec.subcategory.jobName}" default="-" /></span> <br /> <strong>우대조건:</strong>
+												value="${rec.subcategory.jobName}" default="-" /></span> <br /> <strong>우대조건 </strong>
 										<c:forEach var="adv" items="${rec.advantage}"
 											varStatus="status">
 											<c:if test="${status.index < 2}">
 												<span class="badge bg-danger me-2">${adv.advantageType}</span>
 											</c:if>
 										</c:forEach>
-										<br /> <strong>면접방식:</strong>
+										<br /> <strong>면접방식 </strong>
 										<c:forEach var="app" items="${rec.application}"
 											varStatus="status">
 											<c:if test="${status.index < 2}">
@@ -175,7 +149,7 @@
 
 									<div class="read-more">
 
-										<a href="/recruitmentnotice/detail/?uid=${rec.uid}">바로 가기</a>
+										<a href="/recruitmentnotice/detail/?uid=${rec.uid}">조회하기</a>
 									</div>
 								</div>
 							</article>
