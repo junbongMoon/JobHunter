@@ -856,6 +856,11 @@ function showThumbnail(file) {
 		console.log("📥 로컬스토리지 폼 복원 완료");
 	}
 
+	function show64(){
+		const value = $('#summernote').val();
+		console.log(value);
+	}
+
 </script>
 
 <style>
@@ -1273,6 +1278,8 @@ function showThumbnail(file) {
 											<textarea id="summernote" name="detail"></textarea>
 										</div>
 									</div>
+
+									<button type="button" onclick="show64()">summernoteValue 확인 버튼</button>
 
 									<div class="col-md-6">
 										<div class="input-group">
