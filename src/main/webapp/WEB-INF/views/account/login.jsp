@@ -9,7 +9,9 @@
 	src="https://www.gstatic.com/firebasejs/11.5.0/firebase-app-compat.js"></script>
 <script
 	src="https://www.gstatic.com/firebasejs/11.5.0/firebase-auth-compat.js"></script>
-  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.5/kakao.min.js" integrity="sha384-dok87au0gKqJdxs7msEdBPNnKSRT+/mhTVzq+qOhcL464zXwvcrpjeWvyj1kCdq6" crossorigin="anonymous"></script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.5/kakao.min.js"
+	integrity="sha384-dok87au0gKqJdxs7msEdBPNnKSRT+/mhTVzq+qOhcL464zXwvcrpjeWvyj1kCdq6"
+	crossorigin="anonymous"></script>
 
 <style>
 .main {
@@ -28,7 +30,7 @@
 }
 
 .login-title {
-	margin-left:10px;
+	margin-left: 10px;
 	font-weight: 600;
 	color: #2c3e50;
 	border-bottom: 1px solid #eee;
@@ -418,8 +420,7 @@
 						<label class="account-type-tab active"> <input
 							type="radio" name="accountType" value="USER" checked> 개인
 							회원
-						</label> 
-						<label class="account-type-tab"> <input type="radio"
+						</label> <label class="account-type-tab"> <input type="radio"
 							name="accountType" value="COMPANY"> 기업 회원
 						</label>
 					</div>
@@ -440,17 +441,23 @@
 								${sessionScope.remainingSeconds}초 후에 다시 시도해 주세요</p>
 						</c:if>
 					</div>
+					<div class="auto-login">
+						<input type="checkbox" id="remember" name="remember"> <label
+							for="checkbox">자동 로그인</label>
+					</div>
 
 					<div class="login-options">
-						<div class="auto-login">
-							<input type="checkbox" id="remember" name="remember"> <label
-								for="checkbox">자동 로그인</label>
-						</div>
 
 						<div class="find-account">
 							<a href="/account/find/id">아이디 찾기</a> <span class="divider">|</span>
-							<a href="/account/find/password">비밀번호 찾기</a> <span class="divider">|</span>
-							<a href="/user/register">회원가입</a>
+							<a href="/account/find/password">비밀번호 찾기</a> <span
+								class="divider">|</span> 
+								<span style="margin-left:50px;"></span>
+								<span>회원가입&nbsp;&nbsp;<a
+								href="/user/register">개인</a><span>&nbsp;|</span> <a
+								href="/company/register">기업</a></span>
+
+
 						</div>
 					</div>
 
