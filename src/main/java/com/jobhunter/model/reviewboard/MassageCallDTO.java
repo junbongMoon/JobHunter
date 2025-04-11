@@ -1,5 +1,7 @@
 package com.jobhunter.model.reviewboard;
 
+import java.sql.Timestamp;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,16 +16,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class WriteBoardDTO {
-	
-	private int boardNo;
-	private int gonggoUid;
-	private int writer;
-	private String companyName;
-    private String reviewType;
-    private int reviewLevel;
-    private String reviewResult;
-    private String content;
-    
-    private String reviewTypeOtherText; 
+public class MassageCallDTO {
+	private String message;
+    private boolean success;
 }

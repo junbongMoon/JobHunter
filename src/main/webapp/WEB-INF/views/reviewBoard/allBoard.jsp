@@ -92,7 +92,7 @@ h2 {
 			<th>조회수</th>
 			<th>등록날짜<th>
 		</tr>
-		<c:forEach var="board" items="${board}">
+		<c:forEach var="board" items="${blist}">
 			<tr>
 				<td>${board.boardNo}</td>
 				<td>${board.writer}</td>

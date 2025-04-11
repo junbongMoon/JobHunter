@@ -1,6 +1,9 @@
 package com.jobhunter.dao.reviewboard;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -53,6 +56,53 @@ import com.jobhunter.model.reviewboard.WriteBoardDTO;
 	public ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception {
         return ses.selectOne(NS + ".detailAll", boardNo);
 }
+
+	@Override
+    public LocalDateTime selectLike(int userId, int boardNo) throws Exception {
+        Map<String, Object> selectMap = new HashMap<>();
+        selectMap.put("userId", userId);
+        selectMap.put("boardNo", boardNo);
+        return ses.selectOne(NS + ".selectLastLikeTime", selectMap);
+    }
+
+    @Override
+    public int insertLike(int userId, int boardNo) {
+        Map<String, Object> insertMap = new HashMap<>();
+        insertMap.put("userId", userId);
+        insertMap.put("boardNo", boardNo);
+        return ses.insert(NS + ".insertLike", insertMap);
+    }
+
+    @Override
+    public int updateBoardLikes(int boardNo) {
+    	logger.debug("likes 증가 시도, boardNo: {}", boardNo); 
+    	return ses.update(NS + ".updateBoardLikes", boardNo);
+    }
+
+    @Override
+    public int deleteLike(int userId, int boardNo) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("boardNo", boardNo);
+        return ses.delete(NS + ".deleteLike", map);
+    }
+
+    @Override
+    public int decreaseBoardLikes(int boardNo) throws Exception {
+        return ses.update(NS + ".decreaseBoardLikes", boardNo);
+    }
+
+	@Override
+	public WriteBoardDTO selectrecruitmentList(int boardNo) throws Exception {
+		
+		return ses.selectOne(NS + ".selectModifyReviewBoard",boardNo);
+	}
+
+	@Override
+	public int updateReviewBoard(WriteBoardDTO modify) throws Exception {
+
+		return ses.update(NS + ".updateReviewBoard" ,modify);
+	}
 
 
 }

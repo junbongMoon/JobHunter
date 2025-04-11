@@ -4,7 +4,7 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.reviewboardmapper">
 
-
+	<!-- 게시글 목록 조회 -->
 
 	<select id="allList"
 		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
@@ -27,31 +27,35 @@
 		ORDER BY
 		r.boardNo DESC;
 	</select>
-
+	<!-- 작성페이지 조회 -->
 	<select id="gonggoAll"
 		resultType="com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO">
-		select
-		r.title AS resumeTitle,
+		SELECT
+		rn.uid AS recruitmentnoticeNo,
+		res.title AS
+		resumeTitle,
 		rn.title AS recruitmentTitle,
 		c.companyName,
 		rn.workType,
 		rn.personalHistory,
 		rn.payType,
 		rn.period
-		FROM
-		users u
-		LEFT JOIN resume r ON u.uid =
-		r.userUid
-		JOIN recruitmentnotice rn
-		ON rn.uid = r.resumeNo
-		JOIN company c ON rn.refCompany = c.uid
-		WHERE
-		u.uid = #{r.userUid}
+		FROM registration reg
+		JOIN
+		recruitmentnotice rn ON reg.recruitmentNoticePk = rn.uid
+		JOIN resume
+		res ON reg.resumePk = res.resumeNo
+		JOIN company c ON rn.refCompany =
+		c.uid
+		WHERE res.userUid = #{res.userUid}
+		AND reg.status in('PASS','FAILURE','EXPIRED','CHECKED')
 
 	</select>
-
+	<!-- 작성페이지 인서트 -->
 	<insert id="insertReview"
-		parameterType="com.jobhunter.model.reviewboard.WriteBoardDTO">
+		parameterType="com.jobhunter.model.reviewboard.WriteBoardDTO"
+	useGeneratedKeys="true"
+	keyProperty="boardNo">
 		insert into reviewBoard
 		(gonggoUid,
 		writer,
@@ -71,13 +75,17 @@
 		#{reviewType},
 		#{reviewLevel},
 		#{reviewResult},
-		#{content}
+		#{content},
+		NOW(),
+		0,
+		0
 		)
 	</insert>
 
-
+	<!-- 상세페이지 조회 -->
 	<select id="detailAll" resultMap="ReviewDetailViewDTOMap">
 		SELECT
+		r.boardNo,
 		res.title,
 		u.userId,
 		rec.workType,
@@ -93,14 +101,17 @@
 		r.likes,
 		r.views
 		FROM reviewBoard r
-		INNER JOIN users u ON r.writer =
+		INNER JOIN users u ON
+		r.writer =
 		u.uid
-		INNER JOIN recruitmentnotice rec ON r.gonggoUid = rec.uid
+		INNER JOIN recruitmentnotice rec ON r.gonggoUid =
+		rec.uid
 		INNER
 		JOIN resume res ON rec.uid =res.resumeNo
-		INNER JOIN company com ON
+		INNER JOIN company
+		com ON
 		rec.refCompany = com.uid
-		WHERE r.boardNo = #{r.boardNo}
+		WHERE r.boardNo = #{boardNo}
 	</select>
 
 	<resultMap id="ReviewDetailViewDTOMap"
@@ -114,7 +125,8 @@
 		<result column="period" property="period" /><!--근무기간 -->
 		<result column="detail" property="detail" /><!-- 공고 상세 설명 -->
 		<result column="companyName" property="companyName" /> <!--회사명 -->
-		<result column="reviewResult" property="reviewResult" /><!-- 면접 결과 -->
+		<result column="reviewResult" property="reviewResult" /><!-- 면접 
+			결과 -->
 		<result column="reviewType" property="reviewType" /> <!-- 면접 유형 -->
 		<result column="reviewLevel" property="reviewLevel" /><!--면접 난이도 -->
 		<result column="content" property="content" /> <!--후기 본문 -->
@@ -122,4 +134,66 @@
 		<result column="views" property="views" /><!-- 조회수 -->
 	</resultMap>
 
+	<!-- 1. 최근 24시간 내 좋아요 시간 -->
+	<select id="selectLastLikeTime"
+		resultType="java.time.LocalDateTime">
+		SELECT createdAt
+		FROM reviewLikes
+		WHERE userId = #{userId}
+		AND boardNo = #{boardNo}
+		ORDER BY createdAt DESC
+		LIMIT 1
+	</select>
+
+	<!-- 2. 좋아요 등록 -->
+	<insert id="insertLike">
+		INSERT INTO reviewLikes (userId, boardNo)
+		VALUES
+		(#{userId}, #{boardNo})
+	</insert>
+
+	<!-- 3. 좋아요 수 증가 -->
+	<update id="updateBoardLikes">
+		UPDATE reviewBoard
+		SET likes = likes + 1
+		WHERE boardNo
+		= #{boardNo}
+	</update>
+
+	<!-- 좋아요 취소 (삭제) -->
+	<delete id="deleteLike">
+		DELETE FROM reviewLikes
+		WHERE userId = #{userId}
+		AND
+		boardNo = #{boardNo}
+	</delete>
+
+	<!-- 좋아요 수 감소 -->
+	<update id="decreaseBoardLikes">
+		UPDATE reviewBoard
+		SET likes = likes - 1
+		WHERE boardNo
+		= #{boardNo}
+	</update>
+
+	<select id="selectModifyReviewBoard" parameterType="int"
+		resultType="com.jobhunter.model.reviewboard.WriteBoardDTO">
+		SELECT boardNo, gonggoUid, writer, companyName, reviewResult, reviewType,
+		reviewLevel, content
+		FROM reviewBoard
+		WHERE boardNo = #{boardNo}
+	</select>
+
+
+	<update id="updateReviewBoard">
+		UPDATE reviewBoard
+		SET
+		gonggoUid = #{gonggoUid},
+		reviewType= #{reviewType},
+		reviewResult =#{reviewResult},
+		content =#{content},
+		postDate= NOW()
+		WHERE boardNo =
+		#{boardNo}
+	</update>
 </mapper>

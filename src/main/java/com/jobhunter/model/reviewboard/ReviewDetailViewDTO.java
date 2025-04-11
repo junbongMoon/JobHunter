@@ -31,4 +31,6 @@ public class ReviewDetailViewDTO {
 	private String content; // 후기 본문
 	private int likes; // 좋아요 수
 	private int views; // 조회수
+	
+	private String reviewTypeOtherText; // 기타 상세 유
 }

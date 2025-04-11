@@ -75,6 +75,8 @@
 	<interceptors>
 
 		<interceptor>
+			<mapping path="/user/mypage" />
+			<mapping path="/reviewBoard/write"/>
 			<mapping path="/account/testLoginAjax" />
 			<mapping path="/account/testGetLogin" />
 			<beans:ref bean="authLoginInterceptor" />
@@ -100,7 +102,12 @@
 			<mapping path="/account/login" />
 			<beans:ref bean="autoLoginInterceptor" />
 		</interceptor>
-
+		
+		<interceptor>
+			<mapping path="/reviewBoard/write" />
+			<beans:ref bean="autoLoginInterceptor" />
+		</interceptor>
+		
 	</interceptors>
 
 

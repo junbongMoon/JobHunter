@@ -15,12 +15,13 @@ import lombok.ToString;
 @Setter
 @ToString
 public class RecruitmentnoticContentDTO {
-	 private String resumeTitle;   // 이력서 제목 
-	    private String recruitmentTitle;   // 공고 제목
-	    private String companyName;        // 회사 이름
-	    private String workType;           // 근무 형태
-	    private String personalHistory;    // 경력 사항
-	    private String payType;            // 급여 형태
-	    private String period;             // 근무 기간
+	private int recruitmentnoticeNo; //공고 넘버 
+	private String resumeTitle; // 이력서 제목
+	private String recruitmentTitle; // 공고 제목
+	private String companyName; // 회사 이름
+	private String workType; // 근무 형태
+	private String personalHistory; // 경력 사항
+	private String payType; // 급여 형태
+	private String period; // 근무 기간
 
 }
