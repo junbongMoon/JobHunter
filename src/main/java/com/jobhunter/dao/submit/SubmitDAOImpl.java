@@ -124,6 +124,24 @@ public class SubmitDAOImpl implements SubmitDAO {
 		return ses.update(NS + ".modifyStatus", params);
 		
 	}
+
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 대기중인 제출 이력의 상태를 만료됨으로 변경 해주는 메서드
+	 * </p>
+	 * 
+	 * @param String yesterDayStr
+	 * @return 상태가 변경된 이력의 row 갯수
+	 *
+	 */
+	@Override
+	public int updateStatusToExpired(String yesterDayStr) {
+		
+		return ses.update(NS + ".updateStatusToExpired", yesterDayStr);
+	}
 	
 	
 	

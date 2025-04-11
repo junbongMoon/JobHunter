@@ -131,10 +131,22 @@ public class SubmitServiceImpl implements SubmitService {
 		return result;
 	}
 	
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 *	
+	 * </p>
+	 * 
+	 * @param yesterDayStr
+	 * @return 만료된 제출 상태의 갯수
+	 * @throws Exception
+	 *
+	 */
 	@Override
 	public int expiredToSubmit(String yesterDayStr) throws Exception {
-		
-		return 0;
+	    // 어제 마감된 공고를 기준으로 WATING 상태를 EXPIRED로 변경
+	    return submitDAO.updateStatusToExpired(yesterDayStr);
 	}
 
 }

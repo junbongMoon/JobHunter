@@ -71,4 +71,18 @@ public interface SubmitDAO {
 	 *
 	 */
 	int updateStatusByRegistration(Status status, int resumePk, int recruitmentNoticePk);
+
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 대기중인 제출 이력의 상태를 만료됨으로 변경 해주는 메서드
+	 * </p>
+	 * 
+	 * @param String yesterDayStr
+	 * @return 상태가 변경된 이력의 row 갯수
+	 *
+	 */
+	int updateStatusToExpired(String yesterDayStr);
 }

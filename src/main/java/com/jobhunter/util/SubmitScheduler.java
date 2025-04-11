@@ -45,7 +45,7 @@ public class SubmitScheduler {
 			result = submitService.expiredToSubmit(yesterdayStr);
 			System.out.println("[SubmitScheduler] EXPIRED 처리된 제출 수: " + result);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		

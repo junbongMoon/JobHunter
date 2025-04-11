@@ -21,8 +21,8 @@ public interface SubmitService {
 	 *	내가 작성한 공고에 제출 된 이력서들을 조회하는 메서드
 	 * </p>
 	 * 
-	 * @param RecruitmentUid
-	 * @param pageRequestDTO
+	 * @param int RecruitmentUid
+	 * @param PageRequestDTO pageRequestDTO
 	 * @return
 	 * @throws Exception
 	 *
@@ -37,9 +37,9 @@ public interface SubmitService {
 	 * 제출 이력의 상태를 변경 해주는 메서드
 	 * </p>
 	 * 
-	 * @param status
-	 * @param resumePk
-	 * @param recruitmentNoticePk
+	 * @param Status status
+	 * @param int resumePk
+	 * @param int recruitmentNoticePk
 	 * @return
 	 *
 	 */
@@ -53,7 +53,7 @@ public interface SubmitService {
 	 *	공고의 마감 기한이 만료 되었을 때 제출 된 이력서의 상태를 만료(EXPIRED) 상태로 변경 하는 메서드
 	 * </p>
 	 * 
-	 * @param yesterDayStr
+	 * @param String yesterDayStr
 	 * @return
 	 * @throws Exception
 	 *
