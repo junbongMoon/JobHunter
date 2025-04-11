@@ -17,17 +17,36 @@ import com.jobhunter.model.submit.Status;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * @author 문준봉
+ *
+ */
 @Service
 @RequiredArgsConstructor
 public class SubmitServiceImpl implements SubmitService {
 	
-	// 이력서 DAO
-	 private final SubmitDAO submitDAO;
+	 
+	 /**
+	 * <p> 
+	 * 이력서 DAO
+	 * </p>
+	 */
+	private final SubmitDAO submitDAO;
 	
-
-	
-	// 일단 여기서 임시로 수행. 나중에 ResumeService로 이동할 메서드 
-	// 공고 uid로 해당 공고에 제출 된 ResumDetailInfoBySubmit들을 조회하는 메서드
+ 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 *	공고 uid로 해당 공고에 제출 된 ResumDetailInfoBySubmit들을 조회하는 메서드
+	 * </p>
+	 * 
+	 * @param int RecruitmentUid
+	 * @param PageRequestDTO pageRequestDTO
+	 * @return 제출된 상태의 이력서 상세정보를 담은 페이징에 대한 정보를 담은 객체
+	 * @throws Exception
+	 *
+	 */
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public PageResponseDTO<ResumeDetailInfoBySubmit> getResumeWithAll(int RecruitmentUid, PageRequestDTO pageRequestDTO) throws Exception {
@@ -50,7 +69,20 @@ public class SubmitServiceImpl implements SubmitService {
 		return pageResponseDTO;
 	}
 	
-	// 페이징 해주는 메서드
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 전체 페이지 수, 출력할 rowIndex, 현재 페이지 블럭, 시작 페이지 블럭, 끝 페이지 블럭을 저장하는 메서드
+	 * </p>
+	 * 
+	 * @param <T>
+	 * @param PageRequestDTO pageRequestDTO
+	 * @param int totalRowCount
+	 * @return 페이징에 대한 정보를 담은 객체
+	 *
+	 */
 	private <T> PageResponseDTO<T> pagingProcess(PageRequestDTO pageRequestDTO, int totalRowCount) {
 	    PageResponseDTO<T> pageResponseDTO = new PageResponseDTO<>(
 	        pageRequestDTO.getPageNo(),
@@ -73,13 +105,36 @@ public class SubmitServiceImpl implements SubmitService {
 	    return pageResponseDTO;
 	}
 	
-	// 제출내역의 상태값을 변경해주는 메서드
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 제출내역의 상태값을 변경해주는 메서드
+	 * </p>
+	 * 
+	 * @param Status status
+	 * @param int resumePk
+	 * @param int recruitmentNoticePk
+	 * @return 변경이 성공 됬으면 true, 실패했으면 false
+	 *
+	 */
 	@Override
-	public void changeStatus(Status status, int resumePk, int recruitmentNoticePk) {
+	public boolean changeStatus(Status status, int resumePk, int recruitmentNoticePk) {
+		boolean result = false;
 		System.out.println("서비스 단" + status + ", " + resumePk + ", " + recruitmentNoticePk);
 		
-		submitDAO.updateStatusByRegistration(status, resumePk, recruitmentNoticePk);
 		
+		if(submitDAO.updateStatusByRegistration(status, resumePk, recruitmentNoticePk) > 0) {
+			result = true;
+		}
+		return result;
+	}
+	
+	@Override
+	public int expiredToSubmit(String yesterDayStr) throws Exception {
+		
+		return 0;
 	}
 
 }

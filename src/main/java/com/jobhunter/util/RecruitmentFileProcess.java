@@ -24,23 +24,68 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 @Component
 public class RecruitmentFileProcess {
 
+	/**
+	 * <p> 
+	 * 실제 파일 경로
+	 * </p>
+	 */
 	private String realPath;
+	
+	/**
+	 * <p> 
+	 * 파일이 저장 될 경로
+	 * </p>
+	 */
 	private String saveFilePath;
+	
+	/**
+	 * <p> 
+	 * os
+	 * </p>
+	 */
 	private String os;
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
+	/**
+	 * <p> 
+	 * 현재 os의 이름을 얻어와 소문자로 바꿔주는 메서드
+	 * </p>
+	 */
 	public RecruitmentFileProcess() {
 		this.os = System.getProperty("os.name").toLowerCase();
 	}
 
-	/** 유저 프로필 삭제 */
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 유저 프로필 삭제
+	 * </p>
+	 * 
+	 * @param userImgName
+	 *
+	 */
 	public void removeMemberImg(String userImgName) {
 		File removeFile = new File(this.realPath + File.separator + userImgName);
 		removeFile.delete();
 	}
 
-	/** 유저 프로필 저장 */
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 유저 프로필 저장하는 메서드
+	 * </p>
+	 * 
+	 * @param userId
+	 * @param userImg
+	 * @param req
+	 * @return
+	 * @throws IOException
+	 *
+	 */
 	public String saveUserProfile(String userId, MultipartFile userImg, HttpServletRequest req) throws IOException {
 		String originalFileName = userImg.getOriginalFilename();
 		String ext = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
@@ -55,7 +100,21 @@ public class RecruitmentFileProcess {
 		return fileName;
 	}
 
-	/** 실제 파일 저장 처리 */
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 웹서버에 파일 저장 처리해주는 메서드
+	 * </p>
+	 * 
+	 * @param file
+	 * @param request
+	 * @param saveFileDir
+	 * @return 공고에 저장할 파일
+	 * @throws IOException
+	 *
+	 */
 	public RecruitmentnoticeBoardUpfiles saveFileToRealPath(
 	        MultipartFile file,
 	        HttpServletRequest request,
@@ -107,7 +166,16 @@ public class RecruitmentFileProcess {
 	    return result;
 	}
 
-	/** 파일 삭제 */
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 웹서버에 저장 된 파일 삭제
+	 * </p>
+	 * 
+	 * @param removeFile
+	 *
+	 */
 	public void removeFile(RecruitmentnoticeBoardUpfiles removeFile) {
 		String newFilePath = this.realPath + (this.os.contains("windows")
 				? removeFile.getNewFileName().replace("/", "\\")
@@ -124,11 +192,34 @@ public class RecruitmentFileProcess {
 		}
 	}
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * UUID로 새로운 파일명을 반환하는 메서드
+	 * </p>
+	 * 
+	 * @param String originalFileName
+	 * @return UUID_원래파일명
+	 *
+	 */
 	private String renameUniqueFileName(String originalFileName) {
 		String uuid = UUID.randomUUID().toString();
 		return uuid + "_" + originalFileName;
 	}
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 이미지 파일을 썸네일 파일로 만들어주는 메서드
+	 * </p>
+	 * 
+	 * @param String newFileName
+	 * @return 썸네일 파일
+	 * @throws IOException
+	 *
+	 */
 	private String makeThumbnailImage(String newFileName) throws IOException {
 	    File originalFile = new File(this.saveFilePath + File.separator + newFileName);
 	    BufferedImage originalImage = ImageIO.read(originalFile);
@@ -149,12 +240,34 @@ public class RecruitmentFileProcess {
 	    return thumbName;
 	}
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 썸네일 파일을 Base64 문자열로 바꿔주는 메서드
+	 * </p>
+	 * 
+	 * @param String thumbFileName
+	 * @return Base64 문자열
+	 * @throws IOException
+	 *
+	 */
 	private String makeBase64Encoding(String thumbFileName) throws IOException {
 		File thumb = new File(this.saveFilePath + File.separator + thumbFileName);
 		byte[] bytes = FileUtils.readFileToByteArray(thumb);
 		return Base64.getEncoder().encodeToString(bytes);
 	}
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 디렉토리를 만들어주는 메서드
+	 * </p>
+	 * 
+	 * @param String[] ymd
+	 *
+	 */
 	private void makeDirectory(String[] ymd) {
 		if (!new File(this.realPath + ymd[ymd.length - 1]).exists()) {
 			for (String path : ymd) {
@@ -164,6 +277,16 @@ public class RecruitmentFileProcess {
 		}
 	}
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 *  오늘 날짜의 String 배열을 만들어주는 메서드
+	 * </p>
+	 * 
+	 * @return String[]형식의 {YYYY, MM, DD}
+	 *
+	 */
 	private String[] makeCalendarPath() {
 		Calendar cal = Calendar.getInstance();
 		String year = File.separator + cal.get(Calendar.YEAR);

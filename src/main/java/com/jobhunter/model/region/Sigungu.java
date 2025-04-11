@@ -11,11 +11,31 @@ import lombok.ToString;
 @Getter
 @ToString
 public class Sigungu {
-	// 시군구 pk 값
+
+	/**
+	 * <p> 
+	 * 시군구 pk 값
+	 * </p>
+	 */
 	private int sigunguNo;
+	
+	/**
+	 * <p> 
+	 * 시군구의 코드 값
+	 * </p>
+	 */
 	private String code;
-	// 시군구 이름
+	/**
+	 * <p> 
+	 * 시군구 이름
+	 * </p>
+	 */
 	private String name;
-	// 이 시군구가 위치한 도시의 pk값
+	
+	/**
+	 * <p> 
+	 * 이 시군구가 위치한 도시의 pk값
+	 * </p>
+	 */
 	private int regionNo;
 }
