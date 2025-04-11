@@ -970,7 +970,7 @@ function showThumbnail(file) {
 					<h3>채용 공고</h3>
 					<p>하단에 정보를 입력해주세요</p>
 				</div>
-				<input type="hidden" id="refCompany" name="refCompany" value="1"><!-- 내일 근우씨한테 물어봐서 회사 uid 값 넣기 -->
+				<input type="hidden" id="refCompany" name="refCompany" value="${sessionScope.account.uid}">
 				<div class="row gy-3">
 					<div class="col-md-6">
 						<div class="input-group">
@@ -991,7 +991,7 @@ function showThumbnail(file) {
 
 						</div>
 					</div>
-					<input type="hidden" id="refCompany" value="1">
+
 					<div class="col-12">
 						<div class="input-group">
 							<label for="website" class="form-check-label">공고 제목</label> <input
