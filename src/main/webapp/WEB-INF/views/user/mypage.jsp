@@ -25,10 +25,11 @@
           <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
         </div>
         <div class="info-grid" id="basicInfo">
-          <div class="empty-state">
-            <i class="bi bi-person-circle"></i>
-            <p>기본 정보를 불러오는 중...</p>
-          </div>
+          <div>이름</div><div><strong id="userName">로딩중...</strong></div>
+          <div>전화번호</div><div id="nowMobile">로딩중...</div>
+          <div>이메일</div><div id="nowEmail">로딩중...</div>
+          <div>가입일</div><div id="regDate">로딩중...</div>
+          <div>최근 로그인</div><div id="lastLoginDate">로딩중...</div>
         </div>
 
         <div class="spacer">
@@ -56,7 +57,7 @@
             <div>장애여부</div><div>로딩중...</div>
             <div class="introduce-section"><div class="introduce-title">자기소개</div><div class="introduce-content">로딩중...</div></div>
             <div class="edit-buttons">
-            <button class="btn-edit" onclick="chanegeDetailInfoBtn()"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
+            <button class="btn-edit" onclick="modyfiInfoTapOpen()"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
             <button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
             </div>
         </div>
@@ -220,35 +221,187 @@
 </main>
 
 <script>
+$(()=>{
+  getInfo();
+})
+// #region 전역 변수 및 초기화
+const uid = "${sessionScope.account.uid}"
 let sessionMobile = "${sessionScope.account.mobile}";
 let sessionEmail = "${sessionScope.account.email}";
-let isSocial = false;
-  $(()=>{
-      getInfo();
-    })
+let isSocial = ("${sessionScope.account.email}" == "Y");
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
-    authDomain: "jobhunter-672dd.firebaseapp.com",
-    projectId: "jobhunter-672dd",
-    storageBucket: "jobhunter-672dd.appspot.com",
-    messagingSenderId: "686284302067",
-    appId: "1:686284302067:web:30c6bc60e91aeea963b986",
-    measurementId: "G-RHVS9BGBQ7"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  let confirmationResult = null;
-  // JS에서 enum타입처럼 쓰는거 
-  const METHOD = {
-   EMAIL: "email",
-   PHONE: "phone"
-  };
-  
+const METHOD = {
+  EMAIL: "email",
+  PHONE: "phone"
+};
+// 파이어베이스
+let confirmationResult = null;
+const firebaseConfig = {
+  apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
+  authDomain: "jobhunter-672dd.firebaseapp.com",
+  projectId: "jobhunter-672dd",
+  storageBucket: "jobhunter-672dd.appspot.com",
+  messagingSenderId: "686284302067",
+  appId: "1:686284302067:web:30c6bc60e91aeea963b986",
+  measurementId: "G-RHVS9BGBQ7"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+function firebaseCaptcha() {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+          size: 'invisible',
+          callback: () => {}
+        });
+    }
+}
+// #endregion
 
+// #region 포메팅 관련 함수
+// 국제번호로 변환 (Firebase 용)
+function formatPhoneNumberForFirebase(koreanNumber) {
+  const cleaned = koreanNumber.replace(/-/g, '');
+  return cleaned.startsWith('0') ? '+82' + cleaned.substring(1) : cleaned;
+}
+// 국제번호를 한국 형식으로 되돌림 (서버 전송용)
+function formatToKoreanPhoneNumber(internationalNumber) {
+  return internationalNumber.startsWith("+82")
+    ? internationalNumber.replace("+82", "0").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
+    : internationalNumber;
+}
+// 날짜형식 변환용
+function formatDate(dateString) {
+  if (!dateString) return '미입력';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+// 날짜시간형식 변환용
+function formatDateTime(dateString) {
+  if (!dateString) return '미입력';
+  const date = new Date(dateString);
+  return date.toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+// #endregion
+
+// #region 정보 서버에있는걸로 갱신
+function getInfo() {
+  $.ajax({
+      url: "/user/info/${sessionScope.account.uid}",
+      method: "GET",
+      success: (result) => {
+        isSocial = result.isSocial == 'Y';
+        sessionMobile = result.mobile;
+  		  sessionEmail = result.email;
+        resetUserModifyForm();
+        updateBasicInfo(result);
+        updateUserDetailInfo(result);
+        updateUserModifyInfo(result);
+      },
+      error: (xhr) => window.publicModals.show("정보 로딩에 실패하였습니다. 잠시후 새로고침해 주세요.")
+  });
+}
+
+// 상세정보 수정 창 갱신
+function updateUserModifyInfo(result) {
+  const address = result.addr;
+
+  if (result.addr) {
+    // 초기화용 주소 저장
+    document.getElementById('addressBackup').value = result.addr;
+    document.getElementById('selectedAddress').value = result.addr || '';
+    document.getElementById('selectedAddress').style.display = 'block'; // 표시
+  }
+  if (result.detailAddr) {
+    document.getElementById('detailAddressBackup').value = result.detailAddr;
+    document.getElementById('addressDetail').value = result.detailAddr || '';
+  }
+
+  // 성별
+  if (result.gender) {
+    document.getElementById('gender').value = result.gender;
+  }
+  // 나이
+  if (result.age !== null && result.age !== undefined) {
+    document.getElementById('age').value = result.age;
+  }
+
+  // 병역사항
+  if (result.militaryService) {
+    document.getElementById('military').value = result.militaryService;
+  }
+
+  // 국적
+  if (result.nationality) {
+    document.getElementById('nationality').value = result.nationality;
+  }
+
+  // 희망급여 방식
+  if (result.payType) {
+    document.getElementById('payType').value = result.payType;
+  }
+
+  if (result.payType == '회사 내규에 따름') {
+    document.getElementById('payTitleDiv').style.display = 'none';
+    document.getElementById('payDiv').style.display = 'none';
+  } else {
+    document.getElementById('payTitleDiv').style.display = 'block';
+    document.getElementById('payDiv').style.display = 'block';
+  }
+
+  // 희망급여
+  if (result.pay !== null && result.pay !== undefined) {
+    let pay = result.pay;
+    if (pay) {
+      pay = pay.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    document.getElementById('pay').value = pay;
+  }
+
+  // 자기소개
+  if (result.introduce) {
+    document.getElementById('introduce').value = result.introduce;
+  }
+
+  // 장애여부
+  if (result.disability) {
+    document.getElementById('disability').value = result.disability;
+  }
+}
+
+// #endregion 정보 서버에있는걸로 갱신
+
+// 상세정보 수정 창 열기
+function modyfiInfoTapOpen () {
+  bindPayTypeChangeEvent()
+
+  const section = document.getElementById('modifySection');
+
+  // 먼저 display를 block으로 설정
+  section.style.display = "block";
+
+  // 잠깐 기다렸다가 클래스를 추가해야 트랜지션이 작동함
+  setTimeout(() => {
+    section.classList.add("show");
+  }, 10);
+
+  section.scrollIntoView({ behavior: 'smooth' });
+}
+
+// 연봉타입 변경에 따른 연봉입력란 동적 변화 이벤트 추가
+function bindPayTypeChangeEvent() {
   document.getElementById('payType').addEventListener('change', function() {
     document.getElementById('pay').placeholder = '연봉을 입력해주세요';
-
+  
     switch (this.value) {
       case '회사 내규에 따름':
         document.getElementById('payDiv').style.display = 'none';
@@ -261,7 +414,9 @@ let isSocial = false;
         document.getElementById('payTitleDiv').style.display = 'block';
     }
   });
+}
 
+// 수정창 내용 초기화
 function resetUserModifyForm() {
   // 주소 초기화
   $('#addressSearch').val('');
@@ -288,6 +443,7 @@ function resetUserModifyForm() {
   $('#payTitleDiv').hide();
 }
 
+// 수정완료
 function confirmModify() {
   const nullIfInvalid = (v) => (v === '-1' || v == null || v === '') ? null : v;
   const parseValidNumber = (v) => {
@@ -340,73 +496,20 @@ function confirmModify() {
   });
 }
 
-  // 국제번호로 변환 (Firebase 용)
-  function formatPhoneNumberForFirebase(koreanNumber) {
-    const cleaned = koreanNumber.replace(/-/g, '');
-    return cleaned.startsWith('0') ? '+82' + cleaned.substring(1) : cleaned;
-  }
-  // 국제번호를 한국 형식으로 되돌림 (서버 전송용)
-  function formatToKoreanPhoneNumber(internationalNumber) {
-    return internationalNumber.startsWith("+82")
-       ? internationalNumber.replace("+82", "0").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
-       : internationalNumber;
-  }
-  // 날짜형식 변환용
-  function formatDate(dateString) {
-    if (!dateString) return '미입력';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-  // 날짜시간형식 변환용
-  function formatDateTime(dateString) {
-    if (!dateString) return '미입력';
-    const date = new Date(dateString);
-    return date.toLocaleString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
-  //캡챠기능 파이어베이스 기본 제공
-  function firebaseCaptcha() {
-      if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            size: 'invisible',
-            callback: () => {}
-          });
-      }
-  }
-  
-  function closeModal() {
-        const modalBody = document.querySelector('.modal-body');
-        const modalButtons = document.querySelector('.modal-buttons');
-        modalBody.innerHTML = '';
-        modalButtons.innerHTML = '';
-      document.getElementById('basicModal').style.display = 'none';
-      document.getElementById('basicModalOverlay').style.display = 'none';
-    }
+function closeModal() {
+  $('.modal-body').html('');
+  $('.modal-buttons').html('');
+  $('#basicModal').hide();
+  $('#basicModalOverlay').hide();
+}
 
-  function updateBasicInfo(userInfo) {
-    const basicInfo = document.getElementById('basicInfo');
-
-    
-    
-
-    
-
-    basicInfo.innerHTML =
-      '<div>이름</div><div><strong>' + userInfo.userName + '</strong></div>' +
-      '<div>전화번호</div><div id="nowMobile">' + (userInfo.mobile || '등록된 전화번호 없음') + '</div>' +
-      '<div>이메일</div><div id="nowEmail">' + (userInfo.email || '등록된 이메일 없음') + '</div>' +
-      '<div>가입일</div><div>' + formatDate(userInfo.regDate) + '</div>' +
-      '<div>최근 로그인</div><div>' + formatDateTime(userInfo.lastLoginDate) + '</div>';
-  }
+function updateBasicInfo(userInfo) {
+  $('#userName').text( userInfo.userName || '미입력')
+  $('#nowMobile').text( userInfo.mobile || '등록된 전화번호 없음')
+  $('#nowEmail').text( userInfo.email || '등록된 이메일 없음')
+  $('#regDate').text( formatDate(userInfo.regDate))
+  $('#lastLoginDate').text( formatDateTime(userInfo.lastLoginDate))
+}
 
   function updateUserDetailInfo(userInfo) {
     const userDetailInfo = document.getElementById('userDetailInfo');
@@ -442,12 +545,8 @@ function confirmModify() {
     if (userInfo.pay) {
       if (userInfo.payType != '회사 내규에 따름') {
         payText = userInfo.payType + ' : ' + pay + '원';
-        document.getElementById('payTitleDiv').style.display = 'block';
-        document.getElementById('payDiv').style.display = 'block';
       } else {
         payText = '회사 내규에 따름';
-        document.getElementById('payTitleDiv').style.display = 'none';
-        document.getElementById('payDiv').style.display = 'none';
       }
     }
 
@@ -456,7 +555,16 @@ function confirmModify() {
       introduceSection = userInfo.introduce;
     }
 
-    let disabilityText = '미입력';
+    let disabilityText;
+
+    if (!userInfo.disability) {
+      disabilityText = '미입력';
+    } else if (userInfo.disability == 'NONE') {
+      disabilityText = '비대상';
+    } else {
+      disabilityText = userInfo.disability;
+    }
+
     switch (userInfo.disability) {
       case 'GRADE1':
         disabilityText = '1급';
@@ -481,18 +589,9 @@ function confirmModify() {
         break;
     }
 
-    let addressText = '등록된 주소 없음';
-    if (userInfo.addr) {
-      addressText = userInfo.addr;
-    }
-    let addressDetailText = '등록된 주소 없음';
-    if (userInfo.detailAddr) {
-      addressDetailText = userInfo.detailAddr;
-    }
-
     const values = [
     userInfo.addr || '등록된 주소 없음',
-    userInfo.detailAddr || '등록된 주소 없음',
+    userInfo.detailAddr || '등록된 상세주소 없음',
     genderText,
     (userInfo.age ? userInfo.age + ' 세' : '미입력'),
     militaryServiceText,
@@ -517,10 +616,8 @@ function confirmModify() {
 
   function deleteAccount() {
 	  window.publicModals.show("정말로 삭제하시겠습니까?", {
-      confirmText : '확인',
       cancelText : '취소',
-      onConfirm : checkedDeleteAccount,
-      onCancel : window.publicModals.hide
+      onConfirm : checkedDeleteAccount
     })
   }
 
@@ -534,132 +631,33 @@ function confirmModify() {
     });
   }
 
-  function chanegeDetailInfoBtn () {
-    // 상세정보 출력란 수정가능하게 바꾸는 함수
-    const section = document.getElementById('modifySection');
 
-    // 먼저 display를 block으로 설정
-    section.style.display = "block";
-
-    // 잠깐 기다렸다가 클래스를 추가해야 트랜지션이 작동함
-    setTimeout(() => {
-      section.classList.add("show");
-    }, 10);
-
-    section.scrollIntoView({ behavior: 'smooth' });
-  }
   
   function openPasswordModal() {
-    const modal = document.getElementById('basicModal');
-    const modalTitle = modal.querySelector('.modal-title');
-    const modalBody = modal.querySelector('.modal-body');
-    const modalButtons = modal.querySelector('.modal-buttons');
-    
-    modalTitle.textContent = '비밀번호 변경';
-    modalBody.innerHTML = `
-      <div class="form-group">
-          <div style="display: flex; align-items: center; gap: 10px;">
-          <input type="password" id="nowPassword" placeholder="현재 비밀번호를 입력하세요" style="flex: 1;">
-          <button class="btn-confirm" onclick="checkPassword()">확인</button>
-          </div>
-      </div>
+
+    const modalText = `
+          <input type="password" id="nowPassword" placeholder="현재 비밀번호를 입력하세요" style="min-width: 300px;">
     `;
-    
-    modalButtons.innerHTML = `
-      <button onclick="closeModal()" class="btn-cancel">취소</button>
-      <button onclick="checkPassword()" class="btn-confirm">확인</button>
-    `;
-    
-    document.getElementById('basicModal').style.display = 'flex';
-    document.getElementById('basicModalOverlay').style.display = 'block';
+
+    window.publicModals.show(modalText, {
+      onConfirm: checkPassword,
+      cancelText: "취소",
+      size_x: "350px",
+    })
   }
   
-  function getInfo() {
-    $.ajax({
-        url: "/user/info/${sessionScope.account.uid}",
-        method: "GET",
-        success: (result) => {
-          if (result.isSocial === 'Y') {
-            isSocial = true;
-          }
-          // 기본 정보와 상세 정보 업데이트
-          sessionMobile = result.mobile;
-    		  sessionEmail = result.email;
-          resetUserModifyForm();
-          updateBasicInfo(result);
-          updateUserDetailInfo(result);
-          updateUserModifyInfo(result);
-        },
-        error: (xhr) => window.publicModals.show("실패")
-    });
-  }
-
-  function updateUserModifyInfo(result) {
-
-    const address = result.addr;
-    if (result.addr) {
-      // 초기화용 주소 저장
-      document.getElementById('addressBackup').value = result.addr;
-      document.getElementById('selectedAddress').value = result.addr || '';
-      document.getElementById('selectedAddress').style.display = 'block'; // 표시
-    }
-    if (result.detailAddr) {
-      document.getElementById('detailAddressBackup').value = result.detailAddr;
-      document.getElementById('addressDetail').value = result.detailAddr || '';
-    }
-
-    // 성별
-    if (result.gender) {
-      document.getElementById('gender').value = result.gender;
-    }
-
-    // 나이
-    if (result.age !== null && result.age !== undefined) {
-      document.getElementById('age').value = result.age;
-    }
-
-    // 병역사항
-    if (result.militaryService) {
-      document.getElementById('military').value = result.militaryService;
-    }
-
-    // 국적
-    if (result.nationality) {
-      document.getElementById('nationality').value = result.nationality;
-    }
-
-    // 희망급여 방식
-    if (result.payType) {
-      document.getElementById('payType').value = result.payType;
-    }
-
-    // 희망급여
-    if (result.pay !== null && result.pay !== undefined) {
-      let pay = result.pay;
-      if (pay) {
-        pay = pay.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      }
-      document.getElementById('pay').value = pay;
-    }
-
-    // 자기소개
-    if (result.introduce) {
-      document.getElementById('introduce').value = result.introduce;
-    }
-
-    // 장애여부
-    if (result.disability) {
-      document.getElementById('disability').value = result.disability;
-    }
-  }
-
+  
   function checkPassword() {
-    const uid = "${sessionScope.account.uid}"
-    const nowPassword = document.getElementById('nowPassword').value
 
+    const failedDTO = {
+        onConfirm: openPasswordModal,
+        cancelText: "취소"
+      }
+
+    const nowPassword = document.getElementById('nowPassword').value
     if (!nowPassword) {
-      window.publicModals.show('현재 비밀번호를 입력해주세요.');
-      return;
+      window.publicModals.show('현재 비밀번호를 입력해주세요.', failedDTO);
+      return false; // 공용모달 안닫음
     }
 
     $.ajax({
@@ -671,11 +669,11 @@ function confirmModify() {
         if (result === true) {
           showVerificationOptions();
         } else {
-          window.publicModals.show("비밀번호가 틀렸습니다.");
+          window.publicModals.show("비밀번호가 틀렸습니다.", failedDTO);
         }
       },
       error: (xhr) => {
-        window.publicModals.show("비밀번호 확인 중 오류 발생");
+        window.publicModals.show("비밀번호 확인 중 오류 발생", failedDTO);
       }
     });
   }
