@@ -60,7 +60,8 @@
 										<button type="button"
 											class="btn-close position-absolute top-0 end-0 m-2 pCloseBtn"
 											id="removePhoto"
-											style="display: none; background-color: #47B2E4; border-radius: 50%; padding: 8px; border: 1px solid #37517E; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></button>
+											style="display: none; background-color: #47B2E4; border-radius: 50%; padding: 8px; border: 1px solid #37517E; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+										</button>
 									</div>
 								</div>
 								<input type="hidden" id="profileBase64" name="profileBase64" />
@@ -2499,6 +2500,12 @@
 					$('#finalSaveBtn .spinner-border').addClass('d-none');
 				}
 				//---------------------------------------------------------------------------------------------------------------------------------
-
+				// 페이지 로드 시 프로필 이미지 초기화
+				<c:if test="${not empty resumeDetail.resume.profileBase64}">
+					$('#photoPreview').attr('src', '${resumeDetail.resume.profileBase64}').show();
+					$('#profileBase64').val('${resumeDetail.resume.profileBase64}');
+					$('label[for="photoUpload"]').hide();
+					$('#removePhoto').show();
+				</c:if>
 			});
 		</script>
