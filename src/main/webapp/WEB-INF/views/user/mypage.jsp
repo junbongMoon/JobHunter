@@ -1176,6 +1176,8 @@ function confirmModify() {
       } else {
         addressSelect.innerHTML = '<li class="address-dropdown-item" data-value="">주소를 선택하세요</li>';
       }
+    } else {
+      document.getElementById('lodingLi')?.remove();
     }
     
     // 드롭다운 표시
@@ -1209,10 +1211,16 @@ function confirmModify() {
 
             document.getElementById('selectedAddress').style.display = 'block';
         });
-        
         addressSelect.appendChild(li);
     });
-    
+
+    // 로딩중 표시
+    const lodingLi = document.createElement('li');
+        lodingLi.id = 'lodingLi'
+        lodingLi.className = 'address-dropdown-item';
+        lodingLi.dataset.value = '';
+        lodingLi.textContent = '다음 내역을 로딩중입니다. 잠시만 기다려 주세요.';
+        addressSelect.appendChild(lodingLi);
     // 검색창 클릭시 드롭다운 표시
     addressSearch.addEventListener('click', () => {
         addressSelect.classList.add('show');
@@ -1228,28 +1236,47 @@ function confirmModify() {
     }
   }
 
-  document.getElementById("addressSelect").addEventListener("scroll", () => {
-    const top = dropdown.scrollTop;
-    const height = dropdown.clientHeight;
-    const full = dropdown.scrollHeight;
+  const addressSelect = document.getElementById("addressSelect");
 
-    if (top + height >= full) {
-      console.log("맨 아래 도착");
-      searchAddress();
-    }
-  });
+function disableAddressScroll() {
+  addressSelect.removeEventListener("scroll", onAddressScroll);
+}
+
+function enableAddressScroll() {
+  addressSelect.addEventListener("scroll", onAddressScroll);
+}
+
+function onAddressScroll() {
+  const top = addressSelect.scrollTop;
+  const height = addressSelect.clientHeight;
+  const full = addressSelect.scrollHeight;
+
+  if (top + height >= full - 1) {
+    console.log("맨 아래 도착");
+    searchAddress();
+  }
+}
 
   let addrCurrentPage = 0;
   // 주소검색API용 함수들
   function makeListJson(jsonStr){
-    setSearchAddressOption(jsonStr);
+    let lastPage = Math.ceil(jsonStr.results.common.totalCount / 10)
+    if (lastPage == jsonStr.results.common.currentPage) {
+      // 마지막 페이지면 이벤트 비활성화
+      document.getElementById('lodingLi')?.remove();
+      disableAddressScroll();
+    } else {
+      setSearchAddressOption(jsonStr);
+    }
   }
 
   function searchAddress() {
+    enableAddressScroll();
     const keyword = document.getElementById('addressSearch');
     
     // 새로운 검색어인 경우 페이지 초기화
     if (keyword.value !== keyword.lastSearchValue) {
+        isAddrNextPage = true;
         addrCurrentPage = 0;
         const addressSelect = document.getElementById('addressSelect');
         addressSelect.innerHTML = ''; // 새로운 검색어면 결과 초기화
@@ -1281,7 +1308,7 @@ function confirmModify() {
               window.publicModals.show(errCode+"="+errDesc);
             }else{
                 if(jsonStr != null){
-                    makeListJson(jsonStr);
+                  makeListJson(jsonStr);
                 }
             }
         },
@@ -1355,31 +1382,6 @@ function formatNumber(e) {
     e.target.value = value;
 }
 
-// 카톡 잠깐 백업
-displayToken()
-	function displayToken() {
-		var token = getCookie('authorize-access-token');
-
-		if(token) {
-		Kakao.Auth.setAccessToken(token);
-		Kakao.Auth.getStatusInfo()
-			.then(function(res) {
-			if (res.status === 'connected') {
-				document.getElementById('token-result').innerText
-				= 'login success, token: ' + Kakao.Auth.getAccessToken();
-			}
-			})
-			.catch(function(err) {
-			Kakao.Auth.setAccessToken(null);
-			});
-		}
-	}
-
-	function getCookie(name) {
-		var parts = document.cookie.split(name + '=');
-		if (parts.length === 2) { return parts[1].split(';')[0]; }
-	}
-// 카톡 잠깐 백업
 </script>
 <!-- 풋터 -->
 <jsp:include page="/WEB-INF/views/footer.jsp"></jsp:include>
