@@ -91,7 +91,7 @@ public class AccountController {
 			}
 			session.removeAttribute("remainingSeconds");
 
-			// success에 로그인 성공여부, user에 실제 유저 담아옴
+			// success에 로그인 성공여부, account에 실제 유저 담아옴
 			Boolean success = (Boolean) result.get("success");
 
 			// 이거 일반이나 기업중 하나 나올거같은데?
