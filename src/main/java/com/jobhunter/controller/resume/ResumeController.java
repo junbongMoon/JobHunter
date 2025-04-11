@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.customenum.JobForm;
 import com.jobhunter.model.resume.EducationLevel;
 import com.jobhunter.model.resume.EducationStatus;
-import com.jobhunter.model.resume.JobForm;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeDTO;
@@ -36,6 +36,7 @@ import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
+import com.jobhunter.model.user.UserVO;
 import com.jobhunter.service.resume.ResumeService;
 import com.jobhunter.util.resume.FileProcessForResume;
 
@@ -51,8 +52,9 @@ public class ResumeController {
 
 	// 이력서 작성 폼 연결
 	@GetMapping("/form")
-	public String resumeForm(Model model) {
-
+	public String resumeForm(Model model, HttpSession session) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+		int userUid = account.getUid();
 		try {
 			// 지역 목록 조회
 			List<RegionDTO> regionList = resumeService.getAllRegions();
@@ -60,6 +62,9 @@ public class ResumeController {
 			// 업직종 대분류 목록 조회
 			List<MajorCategoryDTO> majorList = resumeService.getAllMajorCategories();
 			model.addAttribute("majorList", majorList);
+			// 유저정보를 가져옴
+			UserVO user = resumeService.getUserInfo(userUid);
+			model.addAttribute("user", user);
 		} catch (Exception e) {
 			model.addAttribute("error", "데이터를 불러오는 중 오류가 발생했습니다.");
 			return "error";
@@ -87,14 +92,20 @@ public class ResumeController {
 			@RequestParam(defaultValue = "10") int pageSize) {
 		try {
 			AccountVO account = (AccountVO) session.getAttribute("account");
-			if (account == null || account.getUid() == 0) {
-				return "redirect:/account/login";
-			}
 
 			int userUid = account.getUid();
 			List<ResumeVO> resumeList = resumeService.getResumeList(userUid, page, pageSize);
 			int totalResumes = resumeService.getTotalResumes(userUid);
 			int totalPages = (int) Math.ceil((double) totalResumes / pageSize);
+			
+			// 페이징 블록 계산
+			int blockSize = 5;
+			int currentBlock = (page - 1) / blockSize;
+			int startPage = currentBlock * blockSize + 1;
+			int endPage = startPage + blockSize - 1;
+			if (endPage > totalPages) {
+				endPage = totalPages;
+			}
 
 			model.addAttribute("resumeList", resumeList);
 			model.addAttribute("account", account);
@@ -102,6 +113,8 @@ public class ResumeController {
 			model.addAttribute("totalPages", totalPages);
 			model.addAttribute("pageSize", pageSize);
 			model.addAttribute("totalResumes", totalResumes);
+			model.addAttribute("startPage", startPage);
+			model.addAttribute("endPage", endPage);
 			return "resume/resumeFormList";
 		} catch (Exception e) {
 			model.addAttribute("error", "이력서 목록을 불러오는 중 오류가 발생했습니다.");
@@ -199,24 +212,32 @@ public class ResumeController {
 
 	// 이력서 수정 페이지 -> /form과 합침 작업 예정
 	@GetMapping("/edit/{resumeNo}")
-	public String editResumeForm(@PathVariable int resumeNo, Model model) {
+	public String editResumeForm(@PathVariable int resumeNo, Model model, HttpSession session) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+		int userUid = account.getUid();
 		try {
+			// 이력서 상태 확인
+			if (resumeService.isResumeChecked(resumeNo)) {
+				model.addAttribute("error", "기업에서 확인중인 이력서는 수정할 수 없습니다.");
+				return "error";
+			}
+			
 			// 기존 이력서 정보 조회
 			ResumeDetailDTO resumeDetail = resumeService.getResumeDetailWithAll(resumeNo);
 			model.addAttribute("resumeDetail", resumeDetail);
-			
+
 			// 지역 목록 조회
 			List<RegionDTO> regionList = resumeService.getAllRegions();
 			model.addAttribute("regionList", regionList);
-			
+
 			// 업직종 대분류 목록 조회
 			List<MajorCategoryDTO> majorList = resumeService.getAllMajorCategories();
 			model.addAttribute("majorList", majorList);
-			
+
 			// 선택된 시군구 목록 조회
 			List<SigunguVO> selectedSigungu = resumeService.getResumeSigungu(resumeNo);
 			model.addAttribute("selectedSigungu", selectedSigungu);
-			
+
 			// 선택된 업직종 목록 조회
 			List<SubCategoryVO> selectedSubCategory = resumeService.getResumeSubCategory(resumeNo);
 			model.addAttribute("selectedSubCategory", selectedSubCategory);
@@ -234,6 +255,10 @@ public class ResumeController {
 			String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			model.addAttribute("today", today);
 
+			// 유저정보를 가져옴
+			UserVO user = resumeService.getUserInfo(userUid);
+			model.addAttribute("user", user);
+
 			return "resume/resumeForm";
 		} catch (Exception e) {
 			model.addAttribute("error", "이력서 정보를 불러오는 중 오류가 발생했습니다.");
@@ -244,8 +269,9 @@ public class ResumeController {
 	// 이력서 수정 처리
 	@PostMapping("/update/{resumeNo}")
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> updateResume(@PathVariable int resumeNo, @RequestBody ResumeDTO resumeDTO) {
-		try {
+	public ResponseEntity<Map<String, Object>> updateResume(@PathVariable int resumeNo,
+			@RequestBody ResumeDTO resumeDTO) {
+		try {			
 			resumeDTO.setResumeNo(resumeNo);
 			resumeService.updateResume(resumeDTO);
 			Map<String, Object> response = new HashMap<>();

@@ -4,10 +4,10 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.resumemapper">
 
-    <!-- 이력서 FINAL 저장 -->
+    <!-- 이력서 저장 -->
     <insert id="insertResumeFinal" parameterType="com.jobhunter.model.resume.ResumeDTO" useGeneratedKeys="true" keyProperty="resumeNo">
-        INSERT INTO resume (title, payType, pay, introduce, userUid, saveType)
-        VALUES (#{title}, #{payType}, #{pay}, #{introduce}, #{userUid}, 'FINAL');
+        INSERT INTO resume (title, payType, pay, introduce, userUid, saveType, regDate)
+        VALUES (#{title}, #{payType}, #{pay}, #{introduce}, #{userUid}, 'FINAL', NOW());
     </insert>
 
     <!-- 고용 형태 저장 -->
@@ -91,10 +91,11 @@
             resumeNo,
             title,
             userUid,
-            saveType
+            saveType,
+            regDate
         FROM resume
         WHERE userUid = #{userUid}
-        ORDER BY resumeNo DESC
+        ORDER BY regDate DESC
         LIMIT #{offset}, #{pageSize}
     </select>
 
@@ -199,7 +200,8 @@
         SET title = #{title},
             payType = #{payType},
             pay = #{pay},
-            introduce = #{introduce}
+            introduce = #{introduce},
+            regDate = NOW()
         WHERE resumeNo = #{resumeNo}
     </update>
 
@@ -242,4 +244,35 @@
     <delete id="deleteResumeUpfiles" parameterType="int">
         DELETE FROM resumeupfiles WHERE resumeNo = #{resumeNo}
     </delete>
+
+    <!-- 유저정보 조회 -->
+    <select id="selectUserInfo" parameterType="int" resultType="com.jobhunter.model.user.UserVO">
+        SELECT *
+        FROM users
+        WHERE uid = #{userUid}
+    </select>
+    
+    <!-- 이력서 제출 -->
+    <insert id="insertRegistration" parameterType="map">
+        INSERT INTO registration (status, recruitmentNoticePk, resumePk, regDate)
+        VALUES ('WAITING', #{recruitmentNo}, #{resumeNo}, NOW())
+    </insert>
+    
+    <!-- 이력서 중복 제출 확인 -->
+    <select id="checkExistingRegistration" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM registration r
+        JOIN resume res ON r.resumePk = res.resumeNo
+        WHERE r.recruitmentNoticePk = #{recruitmentNo}
+        AND res.userUid = #{userUid}
+    </select>
+    
+    <!-- 이력서 상태 확인 -->
+    <select id="checkResumeStatus" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM registration
+        WHERE resumePk = #{resumeNo}
+        AND status = 'CHECKED'
+    </select>
+    
 </mapper>

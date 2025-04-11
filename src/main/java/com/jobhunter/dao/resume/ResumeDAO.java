@@ -16,6 +16,7 @@ import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
+import com.jobhunter.model.user.UserVO;
 
 public interface ResumeDAO {
 	// 이력서 저장
@@ -94,4 +95,15 @@ public interface ResumeDAO {
 	
 	void deleteResumeUpfiles(int resumeNo) throws Exception;
 
+	// 유저정보 조회
+	UserVO selectUserInfo(int userUid) throws Exception;
+	
+	// 이력서 제출
+	void insertRegistration(int resumeNo, int recruitmentNo) throws Exception;
+	
+	// 중복 지원 확인
+	int checkExistingRegistration(int userUid, int recruitmentNo) throws Exception;
+	
+	// 이력서 상태 확인
+	int checkResumeStatus(int resumeNo) throws Exception;
 }

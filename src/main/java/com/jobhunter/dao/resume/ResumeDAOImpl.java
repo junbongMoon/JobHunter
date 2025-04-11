@@ -21,6 +21,7 @@ import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
+import com.jobhunter.model.user.UserVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -214,5 +215,31 @@ public class ResumeDAOImpl implements ResumeDAO {
 	@Override
 	public void deleteResumeUpfiles(int resumeNo) throws Exception {
 		ses.delete(NS + ".deleteResumeUpfiles", resumeNo);
+	}
+
+	@Override
+	public UserVO selectUserInfo(int userUid) throws Exception {
+		return ses.selectOne(NS + ".selectUserInfo", userUid);
+	}
+	
+	@Override
+	public void insertRegistration(int resumeNo, int recruitmentNo) throws Exception {
+		Map<String, Object> map = new HashMap<>();
+		map.put("resumeNo", resumeNo);
+		map.put("recruitmentNo", recruitmentNo);
+		ses.insert(NS + ".insertRegistration", map);
+	}
+	
+	@Override
+	public int checkExistingRegistration(int userUid, int recruitmentNo) throws Exception {
+		Map<String, Object> map = new HashMap<>();
+		map.put("userUid", userUid);
+		map.put("recruitmentNo", recruitmentNo);
+		return ses.selectOne(NS + ".checkExistingRegistration", map);
+	}
+
+	@Override
+	public int checkResumeStatus(int resumeNo) throws Exception {
+		return ses.selectOne(NS + ".checkResumeStatus", resumeNo);
 	}
 }

@@ -1,8 +1,20 @@
 package com.jobhunter.model.customenum;
 
-/**
- * 근무 형태 (FULL_TIME: 정규직, CONTRACT: 계약직, DISPATCHED: 파견직, PART_TIME: 파트타임, COMMISSIONED: 위촉직, FREELANCER: 프리랜서)
- */
 public enum JobForm {
-    FULL_TIME, CONTRACT, DISPATCHED, PART_TIME, COMMISSIONED, FREELANCER
-}
+    FULL_TIME("정규직"),
+    CONTRACT("계약직"),
+    DISPATCH("파견직"),
+    PART_TIME("아르바이트"),
+    COMMISSION("위촉직"),
+    FREELANCE("프리랜서");
+
+    private final String displayName;
+
+    JobForm(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+} 

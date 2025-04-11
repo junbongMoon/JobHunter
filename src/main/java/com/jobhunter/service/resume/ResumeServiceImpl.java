@@ -21,6 +21,7 @@ import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
+import com.jobhunter.model.user.UserVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,75 +34,20 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	@Transactional
 	public void finalSaveResume(ResumeDTO resumeDTO) throws Exception {
-		rdao.insertResumeFinal(resumeDTO); // resumeNo 세팅
-		// 아래 저장하는 코드 재사용 가능하게 묶기(?)
-		// 고용형태 저장
-		if (resumeDTO.getJobForms() != null && !resumeDTO.getJobForms().isEmpty()) {
-			for (JobFormDTO jobForm : resumeDTO.getJobForms()) {
-				jobForm.setResumeNo(resumeDTO.getResumeNo());
-				rdao.insertJobForm(jobForm);
-			}
-		}
-
-		// 성격 및 장점 저장
-		if (resumeDTO.getMerits() != null && !resumeDTO.getMerits().isEmpty()) {
-			for (MeritDTO merit : resumeDTO.getMerits()) {
-				merit.setResumeNo(resumeDTO.getResumeNo());
-				rdao.insertMerit(merit);
-			}
-		}
-
-		// 지역 저장
-		if (resumeDTO.getSigunguNos() != null && !resumeDTO.getSigunguNos().isEmpty()) {
-			for (Integer sigunguNo : resumeDTO.getSigunguNos()) {
-				rdao.insertSigungu(resumeDTO.getResumeNo(), sigunguNo);
-			}
-		}
-
-		// 업직종 저장
-		if (resumeDTO.getSubcategoryNos() != null && !resumeDTO.getSubcategoryNos().isEmpty()) {
-			for (Integer subcategoryNo : resumeDTO.getSubcategoryNos()) {
-				rdao.insertSubCategory(resumeDTO.getResumeNo(), subcategoryNo);
-			}
-		}
-
-		// 학력 저장
-		if (resumeDTO.getEducations() != null && !resumeDTO.getEducations().isEmpty()) {
-			for (EducationDTO education : resumeDTO.getEducations()) {
-				education.setResumeNo(resumeDTO.getResumeNo());
-				rdao.insertEducation(education);
-			}
-		}
-
-		// 경력 저장
-		if (resumeDTO.getHistories() != null && !resumeDTO.getHistories().isEmpty()) {
-			for (PersonalHistoryDTO history : resumeDTO.getHistories()) {
-				history.setResumeNo(resumeDTO.getResumeNo());
-				rdao.insertHistory(history);
-			}
-		}
-
-		// 자격증 저장
-		if (resumeDTO.getLicenses() != null && !resumeDTO.getLicenses().isEmpty()) {
-			for (LicenseDTO license : resumeDTO.getLicenses()) {
-				license.setResumeNo(resumeDTO.getResumeNo());
-				rdao.insertLicense(license);
-			}
-		}
-
-		// 파일 저장
-		if (resumeDTO.getFiles() != null && !resumeDTO.getFiles().isEmpty()) {
-			for (ResumeUpfileDTO upfile : resumeDTO.getFiles()) {
-				upfile.setResumeNo(resumeDTO.getResumeNo());
-				rdao.insertResumeUpfile(upfile);
-			}
-		}
+		rdao.insertResumeFinal(resumeDTO);
+		saveJobForms(resumeDTO);
+		saveMerits(resumeDTO);
+		saveRegions(resumeDTO);
+		saveSubCategories(resumeDTO);
+		saveEducations(resumeDTO);
+		saveHistories(resumeDTO);
+		saveLicenses(resumeDTO);
+		saveFiles(resumeDTO);
 	}
 
 	@Override
 	@Transactional
 	public void updateResume(ResumeDTO resumeDTO) throws Exception {
-		// 기존 데이터 삭제
 		rdao.deleteJobForms(resumeDTO.getResumeNo());
 		rdao.deleteMerits(resumeDTO.getResumeNo());
 		rdao.deleteResumeSigungu(resumeDTO.getResumeNo());
@@ -109,67 +55,90 @@ public class ResumeServiceImpl implements ResumeService {
 		rdao.deleteEducations(resumeDTO.getResumeNo());
 		rdao.deleteHistories(resumeDTO.getResumeNo());
 		rdao.deleteLicenses(resumeDTO.getResumeNo());
-		
-		// 기본 정보 업데이트
+		rdao.deleteResumeUpfiles(resumeDTO.getResumeNo());
+
 		rdao.updateResume(resumeDTO);
-		
-		// 고용형태 저장
+		saveJobForms(resumeDTO);
+		saveMerits(resumeDTO);
+		saveRegions(resumeDTO);
+		saveSubCategories(resumeDTO);
+		saveEducations(resumeDTO);
+		saveHistories(resumeDTO);
+		saveLicenses(resumeDTO);
+		saveFiles(resumeDTO);
+	}
+
+	// 고용형태 저장
+	private void saveJobForms(ResumeDTO resumeDTO) throws Exception {
 		if (resumeDTO.getJobForms() != null && !resumeDTO.getJobForms().isEmpty()) {
 			for (JobFormDTO jobForm : resumeDTO.getJobForms()) {
 				jobForm.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertJobForm(jobForm);
 			}
 		}
+	}
 
-		// 성격 및 장점 저장
+	// 성격 및 장점 저장
+	private void saveMerits(ResumeDTO resumeDTO) throws Exception {
 		if (resumeDTO.getMerits() != null && !resumeDTO.getMerits().isEmpty()) {
 			for (MeritDTO merit : resumeDTO.getMerits()) {
 				merit.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertMerit(merit);
 			}
 		}
+	}
 
-		// 지역 저장
+	// 지역 저장
+	private void saveRegions(ResumeDTO resumeDTO) throws Exception {
 		if (resumeDTO.getSigunguNos() != null && !resumeDTO.getSigunguNos().isEmpty()) {
 			for (Integer sigunguNo : resumeDTO.getSigunguNos()) {
 				rdao.insertSigungu(resumeDTO.getResumeNo(), sigunguNo);
 			}
 		}
+	}
 
-		// 업직종 저장
+	// 업직종 저장
+	private void saveSubCategories(ResumeDTO resumeDTO) throws Exception {
 		if (resumeDTO.getSubcategoryNos() != null && !resumeDTO.getSubcategoryNos().isEmpty()) {
 			for (Integer subcategoryNo : resumeDTO.getSubcategoryNos()) {
 				rdao.insertSubCategory(resumeDTO.getResumeNo(), subcategoryNo);
 			}
 		}
+	}
 
-		// 학력 저장
+	// 학력 저장
+	private void saveEducations(ResumeDTO resumeDTO) throws Exception {
 		if (resumeDTO.getEducations() != null && !resumeDTO.getEducations().isEmpty()) {
 			for (EducationDTO education : resumeDTO.getEducations()) {
 				education.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertEducation(education);
 			}
 		}
+	}
 
-		// 경력 저장
+	// 경력 저장
+	private void saveHistories(ResumeDTO resumeDTO) throws Exception {
 		if (resumeDTO.getHistories() != null && !resumeDTO.getHistories().isEmpty()) {
 			for (PersonalHistoryDTO history : resumeDTO.getHistories()) {
 				history.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertHistory(history);
 			}
 		}
+	}
 
-		// 자격증 저장
+	// 자격증 저장
+	private void saveLicenses(ResumeDTO resumeDTO) throws Exception {
 		if (resumeDTO.getLicenses() != null && !resumeDTO.getLicenses().isEmpty()) {
 			for (LicenseDTO license : resumeDTO.getLicenses()) {
 				license.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertLicense(license);
 			}
 		}
+	}
 
-		// 파일 처리
+	// 파일 저장
+	private void saveFiles(ResumeDTO resumeDTO) throws Exception {
 		if (resumeDTO.getFiles() != null && !resumeDTO.getFiles().isEmpty()) {
-			rdao.deleteResumeUpfiles(resumeDTO.getResumeNo());
 			for (ResumeUpfileDTO upfile : resumeDTO.getFiles()) {
 				upfile.setResumeNo(resumeDTO.getResumeNo());
 				rdao.insertResumeUpfile(upfile);
@@ -209,6 +178,9 @@ public class ResumeServiceImpl implements ResumeService {
 			List<SubCategoryVO> subCategoryList = rdao.selectResumeSubCategory(resume.getResumeNo());
 			resume.setSigunguList(sigunguList);
 			resume.setSubcategoryList(subCategoryList);
+
+			// 이력서 상태 확인
+			resume.setChecked(rdao.checkResumeStatus(resume.getResumeNo()) > 0);
 		}
 
 		return resumeList;
@@ -251,5 +223,31 @@ public class ResumeServiceImpl implements ResumeService {
 		resumeDetail.setLicenses(rdao.selectResumeLicenses(resumeNo));
 		resumeDetail.setFiles(rdao.selectResumeUpfile(resumeNo));
 		return resumeDetail;
+	}
+
+	// 유저정보 조회
+	@Override
+	public UserVO getUserInfo(int userUid) throws Exception {
+		return rdao.selectUserInfo(userUid);
+	}
+
+	// 이력서 제출
+	@Override
+	public void submitResume(int resumeNo, int recruitmentNo) throws Exception {
+		rdao.insertRegistration(resumeNo, recruitmentNo);
+	}
+	
+	// 유저가 공고에 이력서 제출하였는가 확인
+	@Override
+	public boolean isResumeAlreadySubmitted(int userUid, int recruitmentNo) throws Exception {
+		int count = rdao.checkExistingRegistration(userUid, recruitmentNo);
+		System.out.println("count: " + count);
+		return count > 0;
+	}
+
+	// 기업에서 확인중인 공고인가
+	@Override
+	public boolean isResumeChecked(int resumeNo) throws Exception {
+		return rdao.checkResumeStatus(resumeNo) > 0;
 	}
 }
