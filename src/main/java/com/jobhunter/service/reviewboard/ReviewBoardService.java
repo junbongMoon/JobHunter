@@ -33,4 +33,6 @@ public interface ReviewBoardService {
 	// 수정 저장
 	boolean updateReviewBoard(WriteBoardDTO modify) throws Exception;
 
+	void deleteBoard(int boardNo) throws Exception;
+
 }

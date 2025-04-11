@@ -196,4 +196,8 @@
 		WHERE boardNo =
 		#{boardNo}
 	</update>
+	
+	<delete id="deleteById" parameterType="int">
+    DELETE FROM reviewBoard WHERE boardNo = #{boardNo}
+</delete>
 </mapper>

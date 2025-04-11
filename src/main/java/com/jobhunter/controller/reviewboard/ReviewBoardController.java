@@ -64,29 +64,29 @@ public class ReviewBoardController {
 	// 공고글 게시물을 조회
 	@GetMapping("/write")
 	public String reviewBoardWrite(HttpSession session, Model model, HttpServletRequest req) {
-	    AccountVO account = (AccountVO) session.getAttribute("account");
+		AccountVO account = (AccountVO) session.getAttribute("account");
 //	    if (account == null) {
 //	        return "redirect:/account/login?returnUrl=/reviewBoard/write";
 //	    }
 
-	    int userUid = account.getUid();
-	    try {
-	        List<RecruitmentnoticContentDTO> gonggoList = service.selectgoggo(userUid, GetClientIPAddr.getClientIp(req));
-	        model.addAttribute("gonggoList", gonggoList);
-	        model.addAttribute("userUid", userUid);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		int userUid = account.getUid();
+		try {
+			List<RecruitmentnoticContentDTO> gonggoList = service.selectgoggo(userUid,
+					GetClientIPAddr.getClientIp(req));
+			model.addAttribute("gonggoList", gonggoList);
+			model.addAttribute("userUid", userUid);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    return "reviewBoard/write";
+		return "reviewBoard/write";
 	}
-
 
 	// 게시물 작성 저장
 	@PostMapping("/write")
 	public String saveReviewBoard(@ModelAttribute WriteBoardDTO writeBoardDTO, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
-	
+
 		writeBoardDTO.setWriter(account.getUid());
 		try {
 			if (service.saveReview(writeBoardDTO)) {
@@ -190,22 +190,32 @@ public class ReviewBoardController {
 
 	@PostMapping("/modify")
 	public String updateReview(@ModelAttribute WriteBoardDTO modify) {
-	    String returnPage;
+		String returnPage;
 
-	    try {
-	        boolean result = service.updateReviewBoard(modify);
+		try {
+			boolean result = service.updateReviewBoard(modify);
 
-	        if (result) {
-	            returnPage = "redirect:/reviewBoard/detail?boardNo=" + modify.getBoardNo();
-	        } else {
-	            returnPage = "redirect:/reviewBoard/modify?boardNo=" + modify.getBoardNo() + "&status=fail";
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        returnPage = "redirect:/reviewBoard/modify?boardNo=" + modify.getBoardNo() + "&status=error";
-	    }
-	    return returnPage;
+			if (result) {
+				returnPage = "redirect:/reviewBoard/detail?boardNo=" + modify.getBoardNo();
+			} else {
+				returnPage = "redirect:/reviewBoard/modify?boardNo=" + modify.getBoardNo() + "&status=fail";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			returnPage = "redirect:/reviewBoard/modify?boardNo=" + modify.getBoardNo() + "&status=error";
+		}
+		return returnPage;
 	}
 
+	@PostMapping("/delete")
+	public String deleteBoard(@RequestParam("boardNo") int boardNo, RedirectAttributes redirectAttributes) {
+		try {
+			service.deleteBoard(boardNo);
+			redirectAttributes.addFlashAttribute("result", new MassageCallDTO("게시글이 성공적으로 삭제되었습니다.", true));
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("result", new MassageCallDTO("삭제 중 오류가 발생했습니다.", false));
+		}
+		return "redirect:/reviewBoard/allBoard";
+	}
 
 }

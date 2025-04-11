@@ -130,5 +130,12 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	    return false ; // 수정 실패
 	}
 
+	@Override
+	public void deleteBoard(int boardNo) throws Exception {
+			
+		Rdao.deletBoardNo(boardNo);
+		
+	}
+
 
 }
