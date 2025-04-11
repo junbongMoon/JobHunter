@@ -42,7 +42,7 @@
     
     <update id="setAutoLogin">
 		UPDATE company SET autoLogin = #{autoLogin} 
-		where userId = #{id} and
+		where companyId = #{id} and
 		password = sha1(md5(#{password}))
 	</update>
 
