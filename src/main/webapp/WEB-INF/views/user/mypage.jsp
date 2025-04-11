@@ -46,10 +46,19 @@
           <h2><i class="bi bi-person-vcard section-icon"></i>상세 정보</h2>
         </div>
         <div class="info-grid" id="userDetailInfo">
-          <div class="empty-state">
-            <i class="bi bi-person-vcard"></i>
-            <p>상세 정보를 불러오는 중...</p>
-          </div>
+            <div>주소</div><div>로딩중...</div>
+            <div>상세주소</div><div>로딩중...</div>
+            <div>성별</div><div>로딩중...</div>
+            <div>나이</div><div>로딩중...</div>
+            <div>병역사항</div><div>로딩중...</div>
+            <div>국적</div><div>로딩중...</div>
+            <div>희망급여</div><div>로딩중...</div>
+            <div>장애여부</div><div>로딩중...</div>
+            <div class="introduce-section"><div class="introduce-title">자기소개</div><div class="introduce-content">로딩중...</div></div>
+            <div class="edit-buttons">
+            <button class="btn-edit" onclick="chanegeDetailInfoBtn()"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
+            <button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
+            </div>
         </div>
       </section>
       
@@ -199,8 +208,7 @@
       <div class="modal-spacer"></div>
 
       <div class="modal-buttons">
-        <button onclick="closeModal()" class="btn-cancel">닫기</button>
-        <button onclick="confirmModalAction()" class="btn-confirm">확인</button>
+        <button onclick="closeModal()" class="btn-confirm">닫기</button>
       </div>
     </div>
   </div>
@@ -214,7 +222,7 @@
 <script>
 let sessionMobile = "${sessionScope.account.mobile}";
 let sessionEmail = "${sessionScope.account.email}";
-
+let isSocial = false;
   $(()=>{
       getInfo();
     })
@@ -239,19 +247,19 @@ let sessionEmail = "${sessionScope.account.email}";
   
 
   document.getElementById('payType').addEventListener('change', function() {
-    if (this.value === '연봉') {
-      document.getElementById('pay').placeholder = '연봉을 입력해주세요';
-      document.getElementById('payDiv').style.display = 'block';
-      document.getElementById('payTitleDiv').style.display = 'block';
-    } else if (this.value === '월급') {
-      document.getElementById('pay').placeholder = '월급을 입력해주세요';
-      document.getElementById('payDiv').style.display = 'block';
-      document.getElementById('payTitleDiv').style.display = 'block';
-    } else if (this.value === '회사 내규에 따름') {
-      document.getElementById('payDiv').style.display = 'none';
-      document.getElementById('payTitleDiv').style.display = 'none';
-    }
+    document.getElementById('pay').placeholder = '연봉을 입력해주세요';
 
+    switch (this.value) {
+      case '회사 내규에 따름':
+        document.getElementById('payDiv').style.display = 'none';
+        document.getElementById('payTitleDiv').style.display = 'none';
+        break;
+      case '월급':
+        document.getElementById('pay').placeholder = '월급을 입력해주세요';
+      default:
+        document.getElementById('payDiv').style.display = 'block';
+        document.getElementById('payTitleDiv').style.display = 'block';
+    }
   });
 
 function resetUserModifyForm() {
@@ -281,68 +289,35 @@ function resetUserModifyForm() {
 }
 
 function confirmModify() {
-  
-  const parseOrNull = (value) => {
-    const num = parseInt(value, 10);
-    return isNaN(num) ? null : num;
+  const nullIfInvalid = (v) => (v === '-1' || v == null || v === '') ? null : v;
+  const parseValidNumber = (v) => {
+    const n = parseInt(removeComma(v), 10);
+    return (isNaN(n) || n < 0) ? null : n;
   };
 
   // 선택된 값이 -1이면 null로 변환
-  let gender = $('#gender').val();
-  let military = $('#military').val();
-  let nationality = $('#nationality').val();
-  let payType = $('#payType').val();
-  let disability = $('#disability').val();
-  let addr = $('#selectedAddress').val().trim();
-  let detailAddr = $('#addressDetail').val().trim();
-  let age = $('#age').val();
-  let pay = $('#pay').val();
-  let introduce = $('#introduce').val();
-
-  if (gender === '-1' || gender === null) {
-    gender = null;
-  }
-  if (military === '-1' || military === null) {
-    military = null;
-  }
-  if (nationality === '-1' || nationality === null) {
-    nationality = null;
-  }
-  if (payType === '-1' || payType === null) {
-    payType = null;
-  }
-  if (disability === '-1' || disability === null) {
-    disability = null;
-  }
-  if (age === '' || age === null || age < 0) {
-    age = null;
-  }
-  if (pay === '' || pay === null || pay < 0) {
-    pay = null;
-  } else {
-    pay = removeComma(pay);
-  }
-  if (introduce === '' || introduce === null) {
-    introduce = null;
-  }
-  if (addr === '' || addr === null) {
-	  addr = null;
-	    }
-  if (detailAddr === '' || detailAddr === null) {
-	  detailAddr = null;
-	  }
+  let gender = nullIfInvalid($('#gender').val());
+  let military = nullIfInvalid($('#military').val());
+  let nationality = nullIfInvalid($('#nationality').val());
+  let payType = nullIfInvalid($('#payType').val());
+  let disability = nullIfInvalid($('#disability').val());
+  let addr = nullIfInvalid($('#selectedAddress').val().trim());
+  let detailAddr = nullIfInvalid($('#addressDetail').val().trim());
+  let introduce = nullIfInvalid($('#introduce').val().trim());
+  let age = parseValidNumber($('#age').val());
+  let pay = parseValidNumber($('#pay').val());
 
   const data = {
-    addr: addr || null,
-    detailAddr: detailAddr || null,
-    gender: gender || null,
-    age: age || null,
-    militaryService: military || null,
-    nationality: nationality || null,
-    payType: payType || null,
-    pay: pay || null,
-    introduce: introduce || null,
-    disability: disability || null
+    addr,
+    detailAddr,
+    gender,
+    age,
+    militaryService: military,
+    nationality,
+    payType,
+    pay,
+    introduce,
+    disability
   };
 
   $.ajax({
@@ -408,12 +383,6 @@ function confirmModify() {
       }
   }
   
-  
-  function openModal() {
-      document.getElementById('basicModal').style.display = 'flex';
-      document.getElementById('basicModalOverlay').style.display = 'block';
-    }
-  
   function closeModal() {
         const modalBody = document.querySelector('.modal-body');
         const modalButtons = document.querySelector('.modal-buttons');
@@ -422,17 +391,12 @@ function confirmModify() {
       document.getElementById('basicModal').style.display = 'none';
       document.getElementById('basicModalOverlay').style.display = 'none';
     }
-  
-  function confirmModalAction() {
-      closeModal();
-    }
+
   function updateBasicInfo(userInfo) {
     const basicInfo = document.getElementById('basicInfo');
 
-    let isSocial = false;
-    if (userInfo.isSocial === 'Y') {
-      isSocial = true;
-    }
+    
+    
 
     
 
@@ -443,6 +407,7 @@ function confirmModify() {
       '<div>가입일</div><div>' + formatDate(userInfo.regDate) + '</div>' +
       '<div>최근 로그인</div><div>' + formatDateTime(userInfo.lastLoginDate) + '</div>';
   }
+
   function updateUserDetailInfo(userInfo) {
     const userDetailInfo = document.getElementById('userDetailInfo');
 
@@ -525,20 +490,29 @@ function confirmModify() {
       addressDetailText = userInfo.detailAddr;
     }
 
-    userDetailInfo.innerHTML =
-      '<div>주소</div><div>' + addressText + '</div>' +
-      '<div>상세주소</div><div>' + addressDetailText + '</div>' +
-      '<div>성별</div><div>' + genderText + '</div>' +
-      '<div>나이</div><div>' + (userInfo.age || '미입력') + ' 세</div>' +
-      '<div>병역사항</div><div>' + militaryServiceText + '</div>' +
-      '<div>국적</div><div>' + nationalityText + '</div>' +
-      '<div>희망급여</div><div>' + payText + '</div>' +
-      '<div>장애여부</div><div>' + disabilityText + '</div>' +
-      '<div class="introduce-section"><div class="introduce-title">자기소개</div><div class="introduce-content">' + introduceSection + '</div></div>' +
-      '<div class="edit-buttons">' +
-      '<button class="btn-edit" onclick="chanegeDetailInfoBtn()"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>' +
-      '<button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>' +
-      '</div>';
+    const values = [
+    userInfo.addr || '등록된 주소 없음',
+    userInfo.detailAddr || '등록된 주소 없음',
+    genderText,
+    (userInfo.age ? userInfo.age + ' 세' : '미입력'),
+    militaryServiceText,
+    nationalityText,
+    payText,
+    disabilityText
+  ];
+
+  const divs = userDetailInfo.querySelectorAll(':scope > div:not(.introduce-section):not(.edit-buttons)');
+
+  // 앞에서부터 짝수 인덱스는 label, 홀수 인덱스가 값
+  for (let i = 0, valIdx = 0; i < divs.length; i++) {
+    if (i % 2 === 1) {
+      divs[i].textContent = values[valIdx++];
+    }
+  }
+
+  // 자기소개
+  const introduceDiv = userDetailInfo.querySelector('.introduce-content');
+  introduceDiv.textContent = userInfo.introduce || '자기소개가 아직 없습니다.';
   }
 
   function deleteAccount() {
@@ -605,6 +579,9 @@ function confirmModify() {
         url: "/user/info/${sessionScope.account.uid}",
         method: "GET",
         success: (result) => {
+          if (result.isSocial === 'Y') {
+            isSocial = true;
+          }
           // 기본 정보와 상세 정보 업데이트
           sessionMobile = result.mobile;
     		  sessionEmail = result.email;
@@ -675,8 +652,6 @@ function confirmModify() {
       document.getElementById('disability').value = result.disability;
     }
   }
-
-
 
   function checkPassword() {
     const uid = "${sessionScope.account.uid}"
@@ -816,12 +791,10 @@ function confirmModify() {
   }
 
   function failedVerifiModal() {
-    const modalBody = document.querySelector('.modal-body');
-    const modalButtons = modal.querySelector('.modal-buttons');
-      modalBody.innerHTML = `
+    document.querySelector('.modal-body').innerHTML = `
         <h2>인증 실패! 다시 진행해주세요</h2>
       `;
-      modalButtons.innerHTML = `
+    modal.querySelector('.modal-buttons').innerHTML = `
       <button onclick="closeModal()" class="btn-cancel">확인</button>
     `;
   }
@@ -1039,10 +1012,10 @@ function confirmModify() {
       document.getElementById('phoneInputGroup').style.display = 'none';
       document.getElementById('phoneVerificationGroup').style.display = 'block';
     } catch (error) {
-      console.error("전화번호 인증 실패:", error);
       window.publicModals.show("전화번호 인증 중 오류 발생.");
     }
   }
+
   async function startVerifiEmailPne() {
   
     const email = document.getElementById('changeEmail').value;
@@ -1062,12 +1035,13 @@ function confirmModify() {
     });
 
   }
+  
   async function endVerifiPneMobile() {
     const mobileCode = document.getElementById('pneToPhoneCode').value
 
     console.log(mobileCode);
     try {
-      await confirmationResult.confirm(mobileCode); // 코드 틀렸으면 여기서  catch로 넘어감감
+      await confirmationResult.confirm(mobileCode); // 코드 틀렸으면 여기서  catch로 넘어감
   
       const uid = "${sessionScope.account.uid}";
       const phoneInputs = document.querySelectorAll('.phone-input-group input');
@@ -1099,9 +1073,14 @@ function confirmModify() {
     }
   
   }
+
   async function endVerifiPneEmail() {
     const email = document.getElementById('changeEmail').value;
     const emailCode = document.getElementById('pneToEmailCode').value
+    if (!emailCode) {
+      window.publicModals.show('인증코드 6자리를 입력해주세요!')
+      return;
+    }
     const uid = "${sessionScope.account.uid}"
     $.ajax({
         url: `/account/auth/email/\${emailCode}`,
@@ -1125,7 +1104,7 @@ function confirmModify() {
               successModal();
             },
             error: (xhr) => {
-              window.publicModals.show("인증 처리 중 오류가 발생했습니다.");
+              window.publicModals.show("연락처 변경 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
             console.error(xhr.responseText);
             }
           });
@@ -1134,8 +1113,6 @@ function confirmModify() {
       });
     
 }
-
-  
 
   function cancleModify() {
     resetUserModifyForm();
