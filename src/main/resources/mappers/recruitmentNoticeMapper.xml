@@ -151,30 +151,30 @@
 		</where>
 
 		<choose>
-			<when test="searchType == 'highPay'">
+			<when test="sortOption == 'highPay'">
 				ORDER BY CASE r.payType
-				WHEN 'HOUR' THEN r.pay * 8 *
-				22
+				WHEN 'HOUR' THEN r.pay * 8 * 22
 				WHEN 'DATE' THEN r.pay * 22
 				WHEN 'WEEK' THEN r.pay * 4
-				WHEN 'MONTH'
-				THEN r.pay
+				WHEN 'MONTH' THEN r.pay
 				WHEN 'YEAR' THEN r.pay / 12
 				ELSE 0
 				END DESC
 			</when>
-			<when test="searchType == 'lowPay'">
+			<when test="sortOption == 'lowPay'">
 				ORDER BY CASE r.payType
-				WHEN 'HOUR' THEN r.pay * 8 *
-				22
+				WHEN 'HOUR' THEN r.pay * 8 * 22
 				WHEN 'DATE' THEN r.pay * 22
 				WHEN 'WEEK' THEN r.pay * 4
-				WHEN 'MONTH'
-				THEN r.pay
+				WHEN 'MONTH' THEN r.pay
 				WHEN 'YEAR' THEN r.pay / 12
 				ELSE 0
 				END ASC
 			</when>
+			<when test="sortOption == 'deadlineSoon'">
+				ORDER BY r.dueDate ASC
+			</when>
+
 			<otherwise>
 				ORDER BY r.uid DESC
 			</otherwise>
@@ -295,8 +295,10 @@
 					<when test="searchType == 'advantage'">
 						AND EXISTS (
 						SELECT 1 FROM advantage a
-						WHERE a.recruitmentNoticeUid = r.uid
-						AND a.advantageType LIKE CONCAT('%', #{searchWord}, '%')
+						WHERE
+						a.recruitmentNoticeUid = r.uid
+						AND a.advantageType LIKE CONCAT('%',
+						#{searchWord}, '%')
 						)
 					</when>
 

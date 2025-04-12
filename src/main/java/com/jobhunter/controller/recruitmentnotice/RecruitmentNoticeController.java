@@ -54,14 +54,29 @@ public class RecruitmentNoticeController {
 	private final RecruitmentNoticeService recruitmentService;
 	private static final Logger logger = LoggerFactory.getLogger(RecruitmentNoticeController.class);
 
-	// 양식을 저장 할 List, 코드들
+	
+	/**
+	 * 우대조건을 저장하는 리스트 필드
+	 */
 	private final List<AdvantageDTO> advantageList = new ArrayList<>();
+	/**
+	 * 면접 방식을 저장하는 리스트 필드
+	 */
 	private final List<ApplicationDTO> applicationList = new ArrayList<>();
 
-	// 게시글 작성시 업로드한 파일객체들을 임시로 저장
+	
+	/**
+	 *  작성 페이지에서 업로드하는 파일들을 저장하는 파일 리스트
+	 */
 	private List<RecruitmentnoticeBoardUpfiles> fileList = new ArrayList<>();
 	// 게시글 수정시 업로한 파일 객체들을 임시로 저장
+	/**
+	 * 수정 페이지에서 수정된 파일을 저장하는 파일 리스트
+	 */
 	private List<RecruitmentnoticeBoardUpfiles> modifyFileList = new ArrayList<>();
+	/**
+	 * 파일 처리 객체
+	 */
 	private final RecruitmentFileProcess fp;
 
 	/**

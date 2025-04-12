@@ -864,99 +864,216 @@ function showThumbnail(file) {
 </script>
 
 <style>
- form {
-    max-width: 700px;
-    margin: 0 auto;
+  :root {
+    --primary-color: #47b2e4;
+    --secondary-color: #3d4d6a;
+    --text-color: #444444;
+    --light-bg: #f3f5fa;
+    --border-color: #e1e1e1;
   }
 
- label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: #37517e;
+  body {
+    background-color: var(--light-bg);
+    color: var(--text-color);
   }
 
-  .custom-select-wrapper {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1.5rem;
- }
-
-/* 라벨 간격 조절 (상단 마진 추가) */
- .custom-select-wrapper label {
-  margin-bottom: 0.6rem;
-  margin-top: 1rem;  
-  font-size: 1rem;
-  font-weight: 600;
-  color: #37517e;
- }
-
-/* 박스형 셀렉트 */
-  .form-select {
-   appearance: none;
-   background-color: #fff;
-   border: 1px solid #cfd8dc;
-   padding: 0.9rem 1rem;
-   font-size: 1rem;
-   border-radius: 1rem;
-   background-image: url('data:image/svg+xml;utf8,<svg fill="%23444" height="24" viewBox="0 0 24 24" width="24"><path d="M7 10l5 5 5-5z"/></svg>');
-   background-repeat: no-repeat;
-   background-position: right 1rem center;
-   background-size: 1rem;
-   transition: all 0.3s ease;
-   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-   max-width: 100%;
-   width: 100%;
+  .form-header {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
   }
 
-  .form-control, .form-select {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 0.75rem;
-    padding: 0.6rem 1rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    background-color: #fff;
-    border: 1px solid #ced4da;
+  .form-header h3 {
+    color: var(--secondary-color);
+    font-weight: 700;
+    margin-bottom: 1rem;
   }
 
-  .form-select:focus, .form-control:focus {
-    border-color: #4e73df;
-    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-	outline: none;
+  .form-header p {
+    color: var(--text-color);
+    margin-bottom: 0;
   }
 
   .form-section {
-    max-width: 600px;
-    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
   }
 
-  label.form-check-label {
-    display: block;
-    margin-bottom: 0.5rem;
+  .custom-select-wrapper label {
+    color: var(--secondary-color);
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+  }
+
+  .form-select, .form-control {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .form-select:focus, .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
+  }
+
+  .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  .form-check-label {
+    color: var(--secondary-color);
     font-weight: 500;
-    color: #37517e;
   }
 
   .input-group {
     margin-bottom: 1.5rem;
   }
 
-  .addAdvantageBtn, #write {
-  background-color: var(--accent-color);
-  color: white;
-  border: none;
-  border-radius: 0.75rem;
-  padding: 0.5rem 1.2rem;
-  font-weight: 500;
-  transition: background-color 0.3s ease;
-  float: right;
-  margin-top: 0.5rem;
-}
+  .input-group label {
+    color: var(--secondary-color);
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+  }
 
- .addAdvantageBtn:hover, #write {
-  background-color: #298ce7; /* 진한 하늘색 hover 효과 */
- }
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #3a9fd1;
+    border-color: #3a9fd1;
+    transform: translateY(-2px);
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+    transform: translateY(-2px);
+  }
+
+  .fileUploadArea {
+    border: 2px dashed var(--border-color);
+    background-color: white;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .fileUploadArea:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(71, 178, 228, 0.05);
+  }
+
+  .fileUploadArea label {
+    color: var(--secondary-color);
+    font-weight: 500;
+  }
+
+  .preview {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .preview img {
+    max-width: 100px;
+    border-radius: 5px;
+  }
+
+  .modal-content {
+    border-radius: 15px;
+    border: none;
+  }
+
+  .modal-header {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 15px 15px 0 0;
+  }
+
+  .modal-title {
+    font-weight: 600;
+  }
+
+  .btn-close {
+    color: white;
+  }
+
+  .advantageArea {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+  }
+
+  .advantage-item {
+    background: var(--light-bg);
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+  }
+
+  .addAdvantageBtn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .addAdvantageBtn:hover {
+    background-color: #3a9fd1;
+    transform: translateY(-2px);
+  }
+
+  #summernote {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+  }
+
+  .note-editor.note-frame {
+    border: none !important;
+  }
+
+  .note-editor.note-frame .note-editing-area .note-editable {
+    background-color: white;
+    color: var(--text-color);
+  }
+
+  .note-editor.note-frame .note-toolbar {
+    background-color: var(--light-bg);
+    border-bottom: 2px solid var(--border-color);
+  }
+
+  .note-editor.note-frame .note-statusbar {
+    background-color: var(--light-bg);
+  }
 </style>
 
 <body>

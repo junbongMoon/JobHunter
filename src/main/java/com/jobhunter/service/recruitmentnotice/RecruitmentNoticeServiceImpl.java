@@ -175,49 +175,40 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 	    String searchType = pageRequestDTO.getSearchType();
 	    String searchWord = pageRequestDTO.getSearchWord();
-	    
+	    String sortOption = pageRequestDTO.getSortOption(); // ⭐ 새로 추가된 정렬 옵션
+
 	    int totalRowCnt;
 
-	    // 정렬만 하고 검색은 하지 않을 경우 (전체 count 조회)
-	    if ("highPay".equals(searchType) || "lowPay".equals(searchType)) {
-	        totalRowCnt = recdao.getTotalCountRow(); // WHERE status = 'Y'만 포함된 쿼리
+	    if ("highPay".equals(sortOption) || "lowPay".equals(sortOption)) {
+	        totalRowCnt = recdao.getTotalCountRow(); // 정렬만 할 경우
 	    } else if (StringUtils.hasText(searchType) && StringUtils.hasText(searchWord)) {
-	        totalRowCnt = recdao.getSearchResultRowCount(pageRequestDTO); // 조건 검색
+	        totalRowCnt = recdao.getSearchResultRowCount(pageRequestDTO); // 검색어 있을 경우
 	    } else {
 	        totalRowCnt = recdao.getTotalCountRow(); // 기본
 	    }
 
-	    // 페이징 계산
 	    PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO = pagingProcess(pageRequestDTO, totalRowCnt);
 
-	    // 실제 공고 목록 조회
+	    // ⚠️ 정렬 기준을 DAO로 전달하기 위해 PageRequestDTO 또는 PageResponseDTO에 sortOption 포함되어야 함
+	    pageResponseDTO.setSortOption(sortOption);
+
 	    List<RecruitmentDetailInfo> boardList = recdao.selectRecruitmentWithKeyword(pageResponseDTO);
 
 	    if (boardList == null) {
 	        boardList = Collections.emptyList();
 	    } else {
 	        for (RecruitmentDetailInfo info : boardList) {
-	            if (info != null) {
-	            	System.out.println(info);
-	                int uid = info.getUid();
-	                List<Application> applications = recdao.getApplications(uid);
-	                List<Advantage> advantages = recdao.getAdvantages(uid);
-	                List<RecruitmentnoticeBoardUpfiles> fileList = recdao.getFileList(uid);
-
-	                info.setApplication(applications != null ? applications : Collections.emptyList());
-	                info.setAdvantage(advantages != null ? advantages : Collections.emptyList());
-	                info.setFileList(fileList != null ? fileList : Collections.emptyList());
-	            } else {
-	                throw new NoSuchElementException("공고 정보가 존재하지 않습니다.");
-	            }
+	            int uid = info.getUid();
+	            info.setApplication(recdao.getApplications(uid));
+	            info.setAdvantage(recdao.getAdvantages(uid));
+	            info.setFileList(recdao.getFileList(uid));
 	        }
 	    }
-	    
-	    System.out.println("boardList.size() = " + boardList.size());
 
 	    pageResponseDTO.setBoardList(boardList);
 	    return pageResponseDTO;
 	}
+
 
 	 
 	/**
