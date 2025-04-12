@@ -70,6 +70,7 @@ public class UserRestController {
 	
 	@PostMapping(value = "/password", consumes = "application/json")
 	public ResponseEntity<Boolean> checkPassword(@RequestBody PasswordDTO dto) {
+		System.out.println(dto +"확인할거");
 	    boolean isMatch = false;
 		try {
 			isMatch = service.checkPassword(dto.getUid(), dto.getPassword());

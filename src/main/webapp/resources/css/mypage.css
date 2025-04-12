@@ -432,20 +432,18 @@
 
   /* 전화번호 입력 스타일 */
   .phone-input-group {
-    display: flex;
     align-items: center;
-    gap: 8px;
-  }
-
-  .phone-input-group input {
-    width: 80px;
-    text-align: center;
-    font-size: 16px;
+    margin-right:2px;
   }
 
   .phone-input-group span {
+  	margin:5px;
     color: #666;
-    font-size: 16px;
+    font-size: 30px;
+  }
+
+  .phone-input-group input{
+    width: 114px; font-size:1.1em;padding:7px 12px
   }
 
   .phone-input-group input:focus {

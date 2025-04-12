@@ -45,9 +45,9 @@ const publicModals = {
     const cancelBtn = modal.querySelector('.public-modal-button.cancel');
 
     confirmBtn.onclick = () => {
+    
       if (onConfirm) {
         const result = onConfirm();
-        console.log(result);
 	    if (result === false) {
 	      return; // false 리턴 시 모달 닫지 않음
 	    }
