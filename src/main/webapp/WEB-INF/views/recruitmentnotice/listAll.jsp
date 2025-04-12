@@ -4,60 +4,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script>
-	
-	// 현재 페이지
-	let currentPage = 1;
-	let isLoading = false;
-	let lastPage = false;
-
-	const target = document.querySelector('#observeTarget');
-
-	const observer = new IntersectionObserver((entries) => {
-	if (entries[0].isIntersecting && !isLoading && !lastPage) {
-		isLoading = true;
-		$('#loadingIndicator').show();
-		loadMore();
-	}
-	}, {
-	threshold: 1.0 // 타겟 요소가 100% 화면에 들어오면 실행
-	});
-
-	observer.observe(target);
-
-	function loadMore() {
-	currentPage++; // 페이지 증가
-
-	$.ajax({
-		url: "/recruitmentnotice/listMore",
-		type: "GET",
-		data: {
-		pageNo: currentPage,
-		searchType: "${param.searchType}",
-		searchWord: "${param.searchWord}",
-		sortOption: "${param.sortOption}"
-		},
-		success: function (data) {
-		if (data.trim() === "") {
-			lastPage = true;
-			$('#loadingIndicator').text("더 이상 불러올 데이터가 없습니다.");
-			observer.unobserve(target); // 타겟 감시 해제
-			return;
-		}
-
-		$('.recruitmentContainer').append(data);
-		},
-		error: function () {
-		console.error("불러오기 실패");
-		},
-		complete: function () {
-		isLoading = false;
-		$('#loadingIndicator').hide();
-		}
-	});
-	}
-
-</script>
 
 <style>
 	.search-bar {
@@ -431,13 +377,73 @@
 				<!-- End blog posts list -->
 		</div>
 
+		<!--  관찰할 대상 요소 (보이지 않게 해도 무방) -->
+		<div id="observeTarget" style="height: 40px;"></div>
+
+		<!-- 로딩 표시 -->
+		<div id="loadingIndicator" style="text-align:center; display:none;">로딩 중...</div>
 
 		</section>
 
 
 	</main>
+	<script>
+	
+		// 현재 페이지
+		let currentPage = 1;
+		let isLoading = false;
+		let lastPage = false;
+	
+		const target = document.querySelector('#observeTarget');
+	
+		const observer = new IntersectionObserver((entries) => {
+		if (entries[0].isIntersecting && !isLoading && !lastPage) {
+			isLoading = true;
+			$('#loadingIndicator').show();
+			loadMore();
+		}
+		}, {
+		threshold: 1.0 // 타겟 요소가 100% 화면에 들어오면 실행
+		});
+	
+		observer.observe(target);
+	
+		function loadMore() {
+		currentPage++; // 페이지 증가
+	
+		$.ajax({
+			url: "/recruitmentnotice/listMore",
+			type: "GET",
+			data: {
+			pageNo: currentPage,
+			searchType: "${param.searchType}",
+			searchWord: "${param.searchWord}",
+			sortOption: "${param.sortOption}"
+			},
+			success: function (data) {
+			if (data.trim() === "") {
+				lastPage = true;
+				$('#loadingIndicator').text("더 이상 불러올 데이터가 없습니다.");
+				observer.unobserve(target); // 타겟 감시 해제
+				return;
+			}
+	
+			$('.recruitmentContainer').append(data);
+			},
+			error: function () {
+			console.error("불러오기 실패");
+			},
+			complete: function () {
+			isLoading = false;
+			$('#loadingIndicator').hide();
+			}
+		});
+		}
+	
+	</script>
+	
 	<!-- 풋터 -->
 	<jsp:include page="../footer.jsp"></jsp:include>
-
+	
 </body>
 </html>
