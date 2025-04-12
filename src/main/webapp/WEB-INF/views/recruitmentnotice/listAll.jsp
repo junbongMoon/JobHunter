@@ -5,6 +5,57 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
+	
+	// 현재 페이지
+	let currentPage = 1;
+	let isLoading = false;
+	let lastPage = false;
+
+	const target = document.querySelector('#observeTarget');
+
+	const observer = new IntersectionObserver((entries) => {
+	if (entries[0].isIntersecting && !isLoading && !lastPage) {
+		isLoading = true;
+		$('#loadingIndicator').show();
+		loadMore();
+	}
+	}, {
+	threshold: 1.0 // 타겟 요소가 100% 화면에 들어오면 실행
+	});
+
+	observer.observe(target);
+
+	function loadMore() {
+	currentPage++; // 페이지 증가
+
+	$.ajax({
+		url: "/recruitmentnotice/listMore",
+		type: "GET",
+		data: {
+		pageNo: currentPage,
+		searchType: "${param.searchType}",
+		searchWord: "${param.searchWord}",
+		sortOption: "${param.sortOption}"
+		},
+		success: function (data) {
+		if (data.trim() === "") {
+			lastPage = true;
+			$('#loadingIndicator').text("더 이상 불러올 데이터가 없습니다.");
+			observer.unobserve(target); // 타겟 감시 해제
+			return;
+		}
+
+		$('.recruitmentContainer').append(data);
+		},
+		error: function () {
+		console.error("불러오기 실패");
+		},
+		complete: function () {
+		isLoading = false;
+		$('#loadingIndicator').hide();
+		}
+	});
+	}
 
 </script>
 
@@ -223,6 +274,40 @@
 		background: linear-gradient(135deg, #3a9fd1, #2e6fa9);
 	}
 
+	.sort-label {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #3d4d6a;
+	}
+
+		.pagination .page-link {
+	color: #3d4d6a !important;
+	background-color: #fff !important;
+	border: 1px solid #dee2e6 !important;
+	border-radius: 0.4rem !important;
+	font-weight: 500 !important;
+	transition: all 0.3s ease;
+	}
+
+	.pagination .page-link:hover {
+	background-color: #e6f3fb !important;
+	color: #3a9fd1 !important;
+	border-color: #3a9fd1 !important;
+	}
+
+	.pagination .page-item.active .page-link {
+	background-color: #3a9fd1 !important;
+	color: white !important;
+	border-color: #3a9fd1 !important;
+	font-weight: bold !important;
+	}
+
+	.pagination .page-item.disabled .page-link {
+	background-color: #f9f9f9 !important;
+	color: #ccc !important;
+	pointer-events: none;
+	}
+
 </style>
 <body>
 	<!-- 헤더 -->
@@ -245,7 +330,8 @@
 					<div class="d-flex flex-wrap align-items-center gap-3 w-100">
 						
 						<div class="sort-options" style="flex-basis: 25%;">
-							<label class="form-label d-block mb-2">정렬 기준</label>
+							<label class="form-label sort-label d-block mb-2">정렬 기준</label>
+
 							<div class="form-check form-check-inline">
 							  <input class="form-check-input large-radio" type="radio" name="sortOption" id="sortHigh" value="highPay"
 								${param.sortOption == 'highPay' ? 'checked' : ''}>
@@ -290,7 +376,7 @@
 
 					</div>
 				</form>
-				<div class="row gy-4 gx-4">
+				<div class="row gy-4 gx-4 recruitmentContainer">
 
 					<c:forEach var="rec" items="${boardList}">
 						<div class="col-lg-6 recruitment">
@@ -344,40 +430,7 @@
 				</div>
 				<!-- End blog posts list -->
 		</div>
-		<!-- 페이지 블럭 -->
-		<div class="pagination justify-content-center mt-4">
-			<ul class="pagination">
 
-				<!-- ◀ 이전 블럭 -->
-				<c:if test="${pageResponse.startPageNumPerBlock > 1}">
-					<li class="page-item"><a class="page-link"
-						href="?pageNo=${pageResponse.startPageNumPerBlock - 1}&searchType=${pageResponse.searchType}&searchWord=${pageResponse.searchWord}"
-						aria-label="Previous"> <span aria-hidden="true">«</span>
-					</a></li>
-				</c:if>
-
-				<!-- 페이지 번호 반복 출력 -->
-				<c:forEach begin="${pageResponse.startPageNumPerBlock}"
-					end="${pageResponse.endPageNumPerBlock}" var="i">
-					<li class="page-item ${i == pageResponse.pageNo ? 'active' : ''}">
-						<a class="page-link"
-						href="?pageNo=${i}&searchType=${pageResponse.searchType}&searchWord=${pageResponse.searchWord}">${i}</a>
-					</li>
-				</c:forEach>
-
-				<!-- ▶ 다음 블럭 -->
-				<c:if
-					test="${pageResponse.endPageNumPerBlock < pageResponse.totalPageCnt}">
-					<li class="page-item"><a class="page-link"
-						href="?pageNo=${pageResponse.endPageNumPerBlock + 1}&searchType=${pageResponse.searchType}&searchWord=${pageResponse.searchWord}"
-						aria-label="Next"> <span aria-hidden="true">»</span>
-					</a></li>
-				</c:if>
-			</ul>
-
-
-
-		</div>
 
 		</section>
 

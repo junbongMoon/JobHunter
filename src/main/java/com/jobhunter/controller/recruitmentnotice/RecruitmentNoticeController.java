@@ -188,6 +188,34 @@ public class RecruitmentNoticeController {
 
 		return result;
 	}
+	
+	@GetMapping("/listMore")
+	public String loadMoreRecruitments(@RequestParam("pageNo") int pageNo,
+	                                   @RequestParam(required = false) String searchType,
+	                                   @RequestParam(required = false) String searchWord,
+	                                   @RequestParam(required = false) String sortOption,
+	                                   Model model) {
+
+		PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+			    .pageNo(pageNo)
+			    .rowCntPerPage(10) // ★ 반드시 명시해야 함!
+			    .searchType(searchType)
+			    .searchWord(searchWord)
+			    .sortOption(sortOption)
+			    .build();
+
+	    PageResponseDTO<RecruitmentDetailInfo> response;
+		try {
+			response = recruitmentService.getEntireRecruitment(pageRequestDTO);
+			model.addAttribute("boardList", response.getBoardList());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    
+
+	    return "recruitmentnotice/recruitmentListFragment";
+	}
 
 
 	/**
