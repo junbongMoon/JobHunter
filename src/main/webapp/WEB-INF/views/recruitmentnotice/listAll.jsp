@@ -9,18 +9,12 @@
 </script>
 
 <style>
-	  :root {
-    --primary-color: #47b2e4;
-    --secondary-color: #3d4d6a;
-    --text-color: #444444;
-    --light-bg: #f3f5fa;
-    --border-color: #e1e1e1;
-  }
+	.search-bar {
+	width: 100%;
+	max-width: 100%;
+	padding: 1rem 0;
+	}
 
-  body {
-    background-color: var(--light-bg);
-    color: var(--text-color);
-  }
 
   .form-header {
     background: white;
@@ -55,52 +49,90 @@
     margin-bottom: 0.8rem;
   }
 
-  .form-select, .form-control {
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    padding: 0.8rem 1rem;
-    transition: all 0.3s ease;
-  }
+	.form-control,
+	.form-select {
+	height: 50px;
+	font-size: 1rem;
+	border-radius: 12px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+	padding: 0.8rem 1.2rem;
+	}
 
-  .form-select:focus, .form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
-  }
-
-  .form-check-input:checked {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-  }
-
-  .form-check-label {
-    color: var(--secondary-color);
-    font-weight: 500;
+	.form-select {
+	appearance: none;
+	background-color: #ffffff;
+	border: 2px solid var(--secondary-color);
+	border-radius: 12px;
+	padding: 1rem 1.5rem;
+	font-size: 1.05rem;
+	color: var(--secondary-color);
 	font-weight: 500;
-  }
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%233d4d6a' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5.5l6 6 6-6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 1.2rem center;
+	background-size: 18px 18px;
+	transition: border-color 0.3s ease;
+	}
 
-  .input-group {
-    margin-bottom: 1.5rem;
-  }
-  .input-group label {
-    color: var(--secondary-color);
-    font-weight: 600;
-    margin-bottom: 0.8rem;
-  }
+	.form-select:focus {
+	border-color: var(--primary-color);
+	outline: none;
+	}
 
-  .btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    padding: 0.6rem 1.2rem;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-  }
+	.form-check-input[type="radio"] {
+	appearance: none;
+	width: 18px;
+	height: 18px;
+	border: 2px solid #3d4d6a;
+	border-radius: 50%;
+	position: relative;
+	margin-top: 0.1rem;
+	margin-right: 0.5rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	}
 
-  .btn-primary:hover {
-    background-color: #3a9fd1;
-    border-color: #3a9fd1;
-    transform: translateY(-2px);
-  }
+	.form-check-input[type="radio"]:checked {
+	background-color: #3d4d6a;
+	box-shadow: 0 0 0 2px white inset;
+	}
+
+	.form-check-label {
+	font-weight: 500;
+	color: #3d4d6a;
+	margin-right: 1.2rem;
+	font-weight: 500;
+	}
+
+	.input-group {
+		margin-bottom: 1.5rem;
+	}
+	.input-group label {
+		color: var(--secondary-color);
+		font-weight: 600;
+		margin-bottom: 0.8rem;
+	}
+
+	.serchBtn {
+	height: 56px;
+	width: 90%;
+	padding: 0.75rem 1.5rem;
+	font-size: 1.05rem;
+	font-weight: 600;
+	color: #ffffff;
+	background: linear-gradient(135deg, #3a9fd1, #2e6fa9);
+	border: none;
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(58, 159, 209, 0.25);
+	transition: all 0.3s ease;
+	}
+
+	.serchBtn:hover {
+	background: linear-gradient(135deg, #345f8c, #264f75);
+	box-shadow: 0 6px 16px rgba(46, 111, 169, 0.35);
+	transform: translateY(-2px);
+	}
 
   .btn-danger {
     background-color: #dc3545;
@@ -117,116 +149,79 @@
     transform: translateY(-2px);
   }
 
-  .fileUploadArea {
-    border: 2px dashed var(--border-color);
-    background-color: white;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
 
-  .fileUploadArea label {
-    color: var(--secondary-color);
-    font-weight: 500;
-  }
+   .modal-content {
+     border-radius: 15px;
+     border: none;
+   }
 
-  .preview {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-  }
+   .modal-header {
+     background-color: var(--primary-color);
+     color: white;
+     border-radius: 15px 15px 0 0;
+   }
 
-  .preview img {
-    max-width: 100px;
-    border-radius: 5px;
-  }
+   .modal-title {
+     font-weight: 600;
+   }
 
-  .modal-content {
-    border-radius: 15px;
-    border: none;
-  }
+   .btn-close {
+     color: white;
+   }
 
-  .modal-header {
-    background-color: var(--primary-color);
-    color: white;
-    border-radius: 15px 15px 0 0;
-  }
+	.form-control {
+	border: 2px solid var(--secondary-color);
+	border-radius: 12px;
+	padding: 1rem 1.5rem;
+	font-size: 1.05rem;
+	color: var(--secondary-color);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	transition: border-color 0.3s ease;
+	}
 
-  .modal-title {
-    font-weight: 600;
-  }
+	.form-control::placeholder {
+	color: #888;
+	font-weight: 400;
+	}
 
-  .btn-close {
-    color: white;
-  }
+	.form-control:focus {
+	border-color: var(--primary-color);
+	box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.15);
+	}
 
-  .advantageArea {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 1rem;
-  }
+	.badge-custom {
+	background-color: #f5f8fc;
+	color: #2c3e50;
+	border: 1px solid #cfd8e3;
+	font-size: 0.85rem;
+	padding: 0.4em 0.9em;
+	border-radius: 1.2rem;
+	display: inline-block;
+	font-weight: 500;
+	margin: 0.2rem 0.3rem 0.2rem 0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	}
 
-  .advantage-item {
-    background: var(--light-bg);
-    padding: 0.8rem;
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-  }
+	.large-radio {
+	width: 20px;
+	height: 20px;
+	margin-right: 0.5rem;
+	border: 2px solid #3d4d6a;
+	border-radius: 50%;
+	appearance: none;
+	position: relative;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	}
 
-  .addAdvantageBtn {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-  }
+	.large-radio:checked {
+	background-color: #3d4d6a;
+	box-shadow: 0 0 0 3px white inset;
+	}
 
-  .addAdvantageBtn:hover {
-    background-color: #3a9fd1;
-    transform: translateY(-2px);
-  }
-
-  #summernote {
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-  }
-
-  .note-editor.note-frame {
-    border: none !important;
-  }
-
-  .note-editor.note-frame .note-editing-area .note-editable {
-    background-color: white;
-    color: var(--text-color);
-  }
-
-  .note-editor.note-frame .note-toolbar {
-    background-color: var(--light-bg);
-    border-bottom: 2px solid var(--border-color);
-  }
-
-  .note-editor.note-frame .note-statusbar {
-    background-color: var(--light-bg);
-  }
-
-  .badge-custom {
-  background-color: #3d4d6a;
-  color: white;
-  font-size: 0.85rem;
-  padding: 0.45em 0.8em;
-  border-radius: 1rem;
-  display: inline-block;
-  font-weight: 500;
-  margin-right: 0.3rem;
-  margin-bottom: 0.3rem;
-}
-
+	.read-more a{
+		background: linear-gradient(135deg, #3a9fd1, #2e6fa9);
+	}
 
 </style>
 <body>
@@ -246,54 +241,53 @@
 						</c:when>
 					</c:choose>
 				</div>
-				<form action="/recruitmentnotice/listAll" method="get" class="mb-4"
-					style="width: 90%; margin: 0 auto;">
-					<div class="row">
-						<div class="col-md-3">
-							<select class="form-select" name="searchType" id="searchType">
-								<option value="">검색 조건 없음</option>
-								<option value="region"
-									${param.searchType == 'region' ? 'selected' : ''}>지역</option>
-								<option value="jobType"
-									${param.searchType == 'jobType' ? 'selected' : ''}>직업군</option>
-								<option value="advantage"
-									${param.searchType == 'advantage' ? 'selected' : ''}>우대조건</option>
-								<option value="jobform"
-									${param.searchType == 'jobform' ? 'selected' : ''}>근무형태</option>
-
-							</select>
-						</div>
-
-						<div class="col-md-6" id="keywordBox">
-								<input type="text" name="searchWord" class="form-control"
-									   placeholder="검색어를 입력하세요"
-									   value="${param.searchWord}" />
-							
-						</div>
-
-						<div class="col-md-3 text-end">
-							<button type="submit" class="btn btn-primary" style="background-color: #47b2e4;">검색</button>
-						</div>
-
-						<div class="col-md-3">
-							<label class="form-label">정렬 기준</label><br>
+				<form action="/recruitmentnotice/listAll" method="get" class="search-bar mb-4">
+					<div class="d-flex flex-wrap align-items-center gap-3 w-100">
+						
+						<div class="sort-options" style="flex-basis: 25%;">
+							<label class="form-label d-block mb-2">정렬 기준</label>
 							<div class="form-check form-check-inline">
-							  <input class="form-check-input" type="radio" name="sortOption" id="sortHigh" value="highPay"
+							  <input class="form-check-input large-radio" type="radio" name="sortOption" id="sortHigh" value="highPay"
 								${param.sortOption == 'highPay' ? 'checked' : ''}>
 							  <label class="form-check-label" for="sortHigh">높은 금액 순</label>
 							</div>
 							<div class="form-check form-check-inline">
-							  <input class="form-check-input" type="radio" name="sortOption" id="sortLow" value="lowPay"
+							  <input class="form-check-input large-radio" type="radio" name="sortOption" id="sortLow" value="lowPay"
 								${param.sortOption == 'lowPay' ? 'checked' : ''}>
 							  <label class="form-check-label" for="sortLow">낮은 금액 순</label>
 							</div>
-
 							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="radio" name="sortOption" id="sortdeudate" value="deadlineSoon"
-								  ${param.sortOption == 'lowPay' ? 'checked' : ''}>
-								<label class="form-check-label" for="sortdeudate">마감기한 임박</label>
-							  </div>
+							  <input class="form-check-input large-radio" type="radio" name="sortOption" id="sortdeudate" value="deadlineSoon"
+								${param.sortOption == 'deadlineSoon' ? 'checked' : ''}>
+							  <label class="form-check-label" for="sortdeudate">마감기한 임박</label>
+							</div>
 						  </div>
+					  
+
+						<!-- 검색 조건 선택 -->
+						<div class="flex-grow-1" style="flex-basis: 25%;">
+							<select class="form-select w-100" name="searchType" id="searchType">
+							<option value="">검색 조건 없음</option>
+							<option value="region" ${param.searchType == 'region' ? 'selected' : ''}>지역</option>
+							<option value="jobType" ${param.searchType == 'jobType' ? 'selected' : ''}>직업군</option>
+							<option value="advantage" ${param.searchType == 'advantage' ? 'selected' : ''}>우대조건</option>
+							<option value="jobform" ${param.searchType == 'jobform' ? 'selected' : ''}>근무형태</option>
+							</select>
+						</div>
+
+						<!-- 키워드 입력 -->
+						<div class="flex-grow-1" style="flex-basis: 55%;">
+							<input type="text" name="searchWord" class="form-control w-100"
+								placeholder="검색어를 입력하세요"
+								value="${param.searchWord}" />
+						</div>
+					
+						<!-- 검색 버튼 -->
+						<div class="flex-grow-1 text-end" style="flex-basis: 20%;">
+							<button type="submit" class="btn serchBtn w-100">검색</button>
+						</div>
+  
+
 					</div>
 				</form>
 				<div class="row gy-4 gx-4">
@@ -312,39 +306,32 @@
 										</li>
 										<li class="d-flex align-items-center"><i
 											class="bi bi-clock"></i> <a href="#"><time>
-													<fmt:formatDate value="${rec.dueDate}" pattern="yyyy-MM-dd" />
+													<fmt:formatDate value="${rec.regDate}" pattern="yyyy-MM-dd" />
 												</time></a></li>
 									</ul>
 								</div>
 
 								<div class="content recruitmentList">
 									<p class="rectext">
-										<strong>지역:</strong> <span class="badge bg-primary me-2"><c:out
-												value="${rec.region.name}" default="-" /></span> <strong>시군구 </strong>
-										<span class="badge bg-info me-2"><c:out
-												value="${rec.sigungu.name}" default="-" /></span> <br /> <strong>산업군 </strong>
-										<span class="badge bg-success me-2"><c:out
-												value="${rec.majorCategory.jobName}" default="-" /></span> <strong>직업 </strong>
-										<span class="badge bg-warning text-dark me-2"><c:out
-												value="${rec.subcategory.jobName}" default="-" /></span> <br /> <strong>우대조건 </strong>
-										<c:forEach var="adv" items="${rec.advantage}"
-											varStatus="status">
-											<c:if test="${status.index < 2}">
-												<span class="badge bg-danger me-2">${adv.advantageType}</span>
-											</c:if>
+										<span class="badge-custom">${rec.region.name}</span>
+										<span class="badge-custom">${rec.sigungu.name}</span>
+										<span class="badge-custom">${rec.majorCategory.jobName}</span>
+										<span class="badge-custom">${rec.subcategory.jobName}</span>
+										<c:forEach var="adv" items="${rec.advantage}" varStatus="status">
+										  <c:if test="${status.index < 2}">
+											<span class="badge-custom">${adv.advantageType}</span>
+										  </c:if>
 										</c:forEach>
-										<br /> <strong>면접방식 </strong>
-										<c:forEach var="app" items="${rec.application}"
-											varStatus="status">
-											<c:if test="${status.index < 2}">
-												<span class="badge bg-secondary me-2">${app.method}</span>
-											</c:if>
+										<c:forEach var="app" items="${rec.application}" varStatus="status">
+										  <c:if test="${status.index < 2}">
+											<span class="badge-custom">${app.method}</span>
+										  </c:if>
 										</c:forEach>
 									</p>
 
 									<div class="read-more">
 
-										<a href="/recruitmentnotice/detail/?uid=${rec.uid}">조회하기</a>
+										<a href="/recruitmentnotice/detail/?uid=${rec.uid}" >조회하기</a>
 									</div>
 								</div>
 							</article>
