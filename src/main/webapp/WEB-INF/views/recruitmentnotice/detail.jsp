@@ -186,6 +186,50 @@ h3 {
   color: #3d4d6a;
   font-size: 1.1em;
 }
+
+.attachment-badge {
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.attachment-badge:hover {
+  background-color: #e9ecef; /* 밝은 회색 */
+  color: #1a237e;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 목록으로 버튼 스타일 */
+button.btn-list {
+  background-color: #3d4d6a !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.5rem 1rem;
+  border-radius: 7px; /* ⬅ 여기를 12px로 조정 */
+  transition: all 0.3s ease;
+}
+
+
+.btn-list:hover {
+  background-color: #2a344a;
+  transform: translateY(-2px);
+}
+
+/* 이력서 제출 버튼 스타일 */
+button.btn-resume {
+  background-color: #47b2e4 !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.5rem 1rem;
+  border-radius: 7px; /* ⬅ 여기도 동일하게 */
+  transition: all 0.3s ease;
+}
+
+.btn-resume:hover {
+  background-color: #349fcc;
+  transform: translateY(-2px);
+}
 </style>
 <body>
 	<!-- 헤더 -->
@@ -239,12 +283,12 @@ h3 {
 
 											<h3 class="widget-title">직업</h3>
 											<p id="jobType">
-												<span class="badge-custom">${RecruitmentDetailInfo.majorCategory.jobName}</span>
-												<span class="badge-custom">${RecruitmentDetailInfo.subcategory.jobName}</span>
+												<span class="badge-custom"><i class="fa-solid fa-helmet-safety"></i>${RecruitmentDetailInfo.majorCategory.jobName}</span>
+												<span class="badge-custom"><i class="fa-solid fa-suitcase"></i>${RecruitmentDetailInfo.subcategory.jobName}</span>
 											  
 											</p>
 
-											<h5 class="widget-title">근무</h5>
+											<h5 class="widget-title">근무 형태</h5>
 											<p class="mb-1 fw-semibold" id="workType">
 												<c:choose>
 													<c:when
@@ -284,11 +328,16 @@ h3 {
 
 											<h3 class="widget-title">조건</h3>
 											<p id="personalHistory">
-												<span class="badge-custom">${RecruitmentDetailInfo.personalHistory}</span>
-												<span class="badge-custom">${RecruitmentDetailInfo.militaryService}</span>
+												<span class="badge-custom"><i class="fa-solid fa-clipboard"></i>${RecruitmentDetailInfo.personalHistory}</span>
+												<span class="badge-custom"><i class="fa-solid fa-person-rifle"></i>  <c:choose>
+													<c:when test="${RecruitmentDetailInfo.militaryService eq 'SERVED'}">군필 이상</c:when>
+													<c:when test="${RecruitmentDetailInfo.militaryService eq 'NOT_SERVED'}">미필 이상</c:when>
+													<c:when test="${RecruitmentDetailInfo.militaryService eq 'EXEMPTED'}">면제 이상</c:when>
+													<c:otherwise>기타</c:otherwise>
+												  </c:choose></span>
 												<c:forEach var="item"
 													items="${RecruitmentDetailInfo.advantage}">
-													<span class="badge-custom">${item.advantageType}</span>
+													<span class="badge-custom"><i class="fa-solid fa-user-plus"></i>${item.advantageType}</span>
 												</c:forEach>
 											</p>
 
@@ -305,14 +354,16 @@ h3 {
 										</div>
 										<h3>첨부 파일</h3>
 										<p id="fileList">
-											<c:if test="${not empty RecruitmentDetailInfo.fileList}">
-												<c:forEach var="file"
-													items="${RecruitmentDetailInfo.fileList}">
-													<span class="badge rounded-pill text-bg-secondary singleFile"
-														><a href="${file.newFileName}" download="${file.newFileName}">
-														${file.originalFileName}</a></span>
-												</c:forEach>
-											</c:if>
+										  <c:if test="${not empty RecruitmentDetailInfo.fileList}">
+											<c:forEach var="file" items="${RecruitmentDetailInfo.fileList}">
+											  <a href="${file.newFileName}" 
+												 download="${file.originalFileName}"
+												 class="badge-custom attachment-badge"
+												 title="Download">
+												 <i class="fa-solid fa-download"></i> ${file.originalFileName}
+											  </a>
+											</c:forEach>
+										  </c:if>
 										</p>
 									</div>
 
@@ -362,15 +413,16 @@ h3 {
 											<h4>Share Article</h4>
 											<div class="social-links mt-2">
 												<div class="d-flex gap-2">
-													<button type="button" class="btn btn-secondary"
-														onclick="location.href='/recruitmentnotice/listAll'">목록으로</button>
+													<button type="button" class="btn-list"
+													onclick="location.href='/recruitmentnotice/listAll'">목록으로</button>
 													<button type="button" class="btn btn-primary"
 														onclick="location.href='/recruitmentnotice/modify?uid=${RecruitmentDetailInfo.uid}'">수정</button>
 													<button type="button" class="btn btn-danger"
 														onclick="deleteRecruitment('${RecruitmentDetailInfo.uid}')">삭제</button>
-														<button type="button" class="btn btn-primary" id="submitResumeBtn"
+														<button type="button" class="btn-resume" id="submitResumeBtn"
 														onclick="location.href='/submission/check?uid=${RecruitmentDetailInfo.uid}'">
-														이력서 제출</button>
+														이력서 제출
+													</button>
 												</div>
 											</div>
 										</div>

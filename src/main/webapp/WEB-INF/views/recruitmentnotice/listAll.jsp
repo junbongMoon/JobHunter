@@ -112,23 +112,23 @@
 	}
 
 	.serchBtn {
-	height: 56px;
-	width: 90%;
+	height: 50px;
 	padding: 0.75rem 1.5rem;
 	font-size: 1.05rem;
 	font-weight: 600;
-	color: #ffffff;
-	background: linear-gradient(135deg, #3a9fd1, #2e6fa9);
-	border: none;
+	color: #2e6fa9;
+	background: #ffffff;
+	border: 2px solid #3a9fd1; /* 테두리 선명하게 */
 	border-radius: 12px;
-	box-shadow: 0 4px 12px rgba(58, 159, 209, 0.25);
-	transition: all 0.3s ease;
+	box-shadow: 0 0 0 1px #3a9fd1 inset; /* 안쪽 그림자 강조 */
+	transition: all 0.2s ease;
 	}
 
 	.serchBtn:hover {
-	background: linear-gradient(135deg, #345f8c, #264f75);
-	box-shadow: 0 6px 16px rgba(46, 111, 169, 0.35);
-	transform: translateY(-2px);
+	background: #e7f3fb;
+	color: #1b4c7f;
+	border-color: #2e6fa9;
+	box-shadow: 0 0 0 2px #2e6fa9 inset;
 	}
 
   .btn-danger {
@@ -254,6 +254,12 @@
 	pointer-events: none;
 	}
 
+	.sort-options .form-check {
+	display: flex;
+	align-items: center;
+	margin-bottom: 0.6rem;
+	}
+
 </style>
 <body>
 	<!-- 헤더 -->
@@ -273,22 +279,25 @@
 					</c:choose>
 				</div>
 				<form action="/recruitmentnotice/listAll" method="get" class="search-bar mb-4">
-					<div class="d-flex flex-wrap align-items-center gap-3 w-100">
+					<div class="d-flex align-items-start gap-3 w-100 flex-wrap">
 						
 						<div class="sort-options" style="flex-basis: 25%;">
 							<label class="form-label sort-label d-block mb-2">정렬 기준</label>
-
-							<div class="form-check form-check-inline">
+							<div class="form-check sort-radio">
+								<input class="form-check-input large-radio" type="radio" name="sortOption" id="Notsort" value="">
+								<label class="form-check-label" for="sortHigh">기본</label>
+							  </div>
+							<div class="form-check sort-radio">
 							  <input class="form-check-input large-radio" type="radio" name="sortOption" id="sortHigh" value="highPay"
 								${param.sortOption == 'highPay' ? 'checked' : ''}>
 							  <label class="form-check-label" for="sortHigh">높은 금액 순</label>
 							</div>
-							<div class="form-check form-check-inline">
+							<div class="form-check sort-radio">
 							  <input class="form-check-input large-radio" type="radio" name="sortOption" id="sortLow" value="lowPay"
 								${param.sortOption == 'lowPay' ? 'checked' : ''}>
 							  <label class="form-check-label" for="sortLow">낮은 금액 순</label>
 							</div>
-							<div class="form-check form-check-inline">
+							<div class="form-checksort-radio">
 							  <input class="form-check-input large-radio" type="radio" name="sortOption" id="sortdeudate" value="deadlineSoon"
 								${param.sortOption == 'deadlineSoon' ? 'checked' : ''}>
 							  <label class="form-check-label" for="sortdeudate">마감기한 임박</label>
@@ -298,14 +307,15 @@
 
 						<!-- 검색 조건 선택 -->
 						<div class="flex-grow-1" style="flex-basis: 25%;">
+							<label class="form-label sort-label d-block mb-2">검색 기준</label> <!-- 추가된 라벨 -->
 							<select class="form-select w-100" name="searchType" id="searchType">
-							<option value="">검색 조건 없음</option>
-							<option value="region" ${param.searchType == 'region' ? 'selected' : ''}>지역</option>
-							<option value="jobType" ${param.searchType == 'jobType' ? 'selected' : ''}>직업군</option>
-							<option value="advantage" ${param.searchType == 'advantage' ? 'selected' : ''}>우대조건</option>
-							<option value="jobform" ${param.searchType == 'jobform' ? 'selected' : ''}>근무형태</option>
+							  <option value="">검색 조건 없음</option>
+							  <option value="region" ${param.searchType == 'region' ? 'selected' : ''}>지역</option>
+							  <option value="jobType" ${param.searchType == 'jobType' ? 'selected' : ''}>직업군</option>
+							  <option value="advantage" ${param.searchType == 'advantage' ? 'selected' : ''}>우대조건</option>
+							  <option value="jobform" ${param.searchType == 'jobform' ? 'selected' : ''}>근무형태</option>
 							</select>
-						</div>
+						  </div>
 
 						<!-- 키워드 입력 -->
 						<div class="flex-grow-1" style="flex-basis: 55%;">
