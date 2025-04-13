@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -101,5 +102,31 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 		ses.delete(NS + ".deleteById", boardNo);
 
 	}
+
+	@Override
+	public int checkViewedWithHours(int userId, int boardNo) throws Exception {
+		Map<String, Object> param = new HashMap<>();
+        param.put("userId", userId);
+        param.put("boardNo", boardNo);
+
+        return ses.selectOne(NS + ".checkViewedWithHours", param);
+    }
+
+	@Override
+	public int saveViewRecord(int userId, int boardNo) throws Exception {
+		Map<String, Object> param = new HashMap<>();
+        param.put("userId", userId);
+        param.put("boardNo", boardNo);
+
+        return ses.insert(NS + ".insertReviewView", param);
+	}
+
+	@Override
+	public int incrementViews(int boardNo) throws Exception {
+		// TODO Auto-generated method stub
+		return ses.update(NS + ".updateCountViews", boardNo);
+	}
+
+
 
 }

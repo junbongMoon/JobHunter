@@ -48,37 +48,22 @@
 		JOIN company c ON rn.refCompany =
 		c.uid
 		WHERE res.userUid = #{res.userUid}
-		AND reg.status in('PASS','FAILURE','EXPIRED','CHECKED')
+		AND reg.status
+		in('PASS','FAILURE','EXPIRED','CHECKED')
 
 	</select>
 	<!-- 작성페이지 인서트 -->
 	<insert id="insertReview"
 		parameterType="com.jobhunter.model.reviewboard.WriteBoardDTO"
-	useGeneratedKeys="true"
-	keyProperty="boardNo">
-		insert into reviewBoard
-		(gonggoUid,
-		writer,
-		companyName,
-		reviewType,
-		reviewLevel,
-		reviewResult,
-		content,
-		postDate,
-		likes,
-		views
-		)
-		VALUES (
-		#{gonggoUid},
-		#{writer},
-		#{companyName},
-		#{reviewType},
-		#{reviewLevel},
+		useGeneratedKeys="true" keyProperty="boardNo">
+		insert into
+		reviewBoard (
+		gonggoUid, writer, companyName, reviewType, reviewLevel, reviewResult,
+		typeOtherText, content, postDate, likes, views
+		) values (
+		#{gonggoUid}, #{writer}, #{companyName}, #{reviewType}, #{reviewLevel},
 		#{reviewResult},
-		#{content},
-		NOW(),
-		0,
-		0
+		#{typeOtherText}, #{content}, NOW(), 0, 0
 		)
 	</insert>
 
@@ -96,18 +81,22 @@
 		com.companyName,
 		r.reviewResult,
 		r.reviewType,
+		r.typeOtherText,
 		r.reviewLevel,
 		r.content,
 		r.likes,
 		r.views
-		FROM reviewBoard r
+		FROM
+		reviewBoard r
 		INNER JOIN users u ON
 		r.writer =
 		u.uid
-		INNER JOIN recruitmentnotice rec ON r.gonggoUid =
+		INNER JOIN
+		recruitmentnotice rec ON r.gonggoUid =
 		rec.uid
 		INNER
-		JOIN resume res ON rec.uid =res.resumeNo
+		JOIN resume res ON
+		rec.uid =res.resumeNo
 		INNER JOIN company
 		com ON
 		rec.refCompany = com.uid
@@ -128,6 +117,7 @@
 		<result column="reviewResult" property="reviewResult" /><!-- 면접 
 			결과 -->
 		<result column="reviewType" property="reviewType" /> <!-- 면접 유형 -->
+		<result column="typeOtherText" property="typeOtherText" /> <!-- 면접 유형 -->
 		<result column="reviewLevel" property="reviewLevel" /><!--면접 난이도 -->
 		<result column="content" property="content" /> <!--후기 본문 -->
 		<result column="likes" property="likes" /> <!-- 좋아요 -->
@@ -178,10 +168,12 @@
 
 	<select id="selectModifyReviewBoard" parameterType="int"
 		resultType="com.jobhunter.model.reviewboard.WriteBoardDTO">
-		SELECT boardNo, gonggoUid, writer, companyName, reviewResult, reviewType,
+		SELECT boardNo, gonggoUid, writer, companyName,
+		reviewResult, reviewType,
 		reviewLevel, content
 		FROM reviewBoard
-		WHERE boardNo = #{boardNo}
+		WHERE
+		boardNo = #{boardNo}
 	</select>
 
 
@@ -191,13 +183,41 @@
 		gonggoUid = #{gonggoUid},
 		reviewType= #{reviewType},
 		reviewResult =#{reviewResult},
-		content =#{content},
+		typeOtherText = #{typeOtherText},
+		content
+		=#{content},
 		postDate= NOW()
 		WHERE boardNo =
 		#{boardNo}
 	</update>
-	
+
 	<delete id="deleteById" parameterType="int">
-    DELETE FROM reviewBoard WHERE boardNo = #{boardNo}
-</delete>
+		DELETE FROM reviewBoard
+		WHERE boardNo = #{boardNo}
+	</delete>
+
+
+	<!-- 1. 24시간 내 조회했는지 확인 -->
+	<select id="checkViewedWithHours" resultType="int">
+		SELECT COUNT(*)
+		FROM reviewViews
+		WHERE userId = #{userId}
+		AND boardNo = #{boardNo}
+		AND viewedAt >= NOW() - INTERVAL 24 HOUR
+	</select>
+
+	<!-- 2. 조회 기록 저장 -->
+	<insert id="insertReviewView">
+		INSERT INTO reviewViews (userId, boardNo)
+		VALUES (#{userId}, #{boardNo})
+	</insert>
+
+	<!-- 3. 게시판 조회수 증가 -->
+	<update id="updateCountViews">
+		UPDATE reviewBoard
+		SET views = views + 1
+		WHERE boardNo = #{boardNo}
+	</update>
+
+
 </mapper>

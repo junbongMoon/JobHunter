@@ -59,15 +59,7 @@ label.form-label {
 }
 </style>
 <script>
-	document.addEventListener("DOMContentLoaded", function () {
-	  localStorage.removeItem("reviewTypeOtherText-temp");
-	  for (let key in localStorage) {
-	    if (key.startsWith("reviewTypeOtherText-")) {
-	      localStorage.removeItem(key);
-	    }
-	  }
-	  localStorage.removeItem("reviewTypeOtherText");
-	});
+
         function showGonggoDetails() {
             const select = document.getElementById("gonggoSelect");
             const selectedValue = select.value;
@@ -82,75 +74,31 @@ label.form-label {
             document.getElementById('companyNameInput').value = companyName;
         }
 
-        function toggleOtherTypeInput() {
-            const otherInput = document.getElementById("otherTypeInput");
-            const isOtherChecked = document.getElementById("reviewTypeOther").checked;
-            otherInput.style.display = isOtherChecked ? "block" : "none";
-        }
-        
         function toggleResultSelect() {
             const checkbox = document.getElementById("resultConsent");
-            const select = document.getElementById("reviewResultSelect");
+            const selectBox = document.getElementById("reviewResultSelect");
 
             if (checkbox.checked) {
-                select.disabled = false;
+                selectBox.disabled = false;
             } else {
-                select.disabled = true;
-                select.value = ""; // 선택값 초기화
+                selectBox.disabled = true;
+                selectBox.value = "";
             }
-        }
-
-        function validateReviewForm() {
-            const checkbox = document.getElementById("resultConsent");
-            const select = document.getElementById("reviewResultSelect");
-
-            if (!checkbox.checked) {
-                alert("면접 결과 등록을 위해 동의서에 체크해주세요.");
-                return false;
-            }
-
-            if (select.disabled || !select.value) {
-                alert("면접 결과를 선택해주세요.");
-                return false;
-            }
-
-            return true;
         }
         
         function toggleOtherTypeInput() {
-            const otherInput = document.getElementById("otherTypeInput");
+            const otherInputDiv = document.getElementById("otherTypeInput");
             const isOtherChecked = document.getElementById("reviewTypeOther").checked;
-            otherInput.style.display = isOtherChecked ? "block" : "none";
+            otherInputDiv.style.display = isOtherChecked ? "block" : "none";
 
-            const savedOtherText = localStorage.getItem("reviewTypeOtherText");
-            if (isOtherChecked && savedOtherText) {
-              document.getElementById("reviewTypeOtherText").value = savedOtherText;
+            if (!isOtherChecked) {
+              document.getElementById("reviewTypeOtherText").value = "";
             }
           }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            localStorage.removeItem("reviewTypeOtherText-temp");
-            
-            const boardNo = sessionStorage.getItem("recentBoardNo");
-            if (boardNo) {
-              localStorage.removeItem(`reviewTypeOtherText-${boardNo}`);
-            }
+          document.addEventListener("DOMContentLoaded", () => {
+            toggleOtherTypeInput(); // 페이지 로딩 시 초기 상태 적용
           });
-        
-        document.addEventListener("DOMContentLoaded", function () {
-        	  const form = document.querySelector("form");
-        	  if (form) {
-        	    form.addEventListener("submit", function () {
-        	      const selectedType = document.querySelector("input[name='reviewType']:checked");
-        	      if (selectedType && selectedType.value === "OTHER") {
-        	        const otherText = document.querySelector("input[name='reviewTypeOtherText']").value;
-        	        if (otherText) {
-        	          localStorage.setItem("reviewTypeOtherText-temp", otherText);
-        	        }
-        	      }
-        	    });
-        	  }
-        	});
         
         
     </script>
@@ -234,11 +182,14 @@ label.form-label {
 
 				<div class="mb-3" id="otherTypeInput"
 					style="display: ${writeBoardDTO.reviewType == 'OTHER' ? 'block' : 'none'};">
-					<label class="form-label">기타 면접 유형</label> <input type="text"
-						class="form-control" name="reviewTypeOtherText"
+					<label class="form-label">기타 면접 유형</label>
+					<input type="text"
+						class="form-control"
+						name="typeOtherText"
 						id="reviewTypeOtherText"
-						value="${writeBoardDTO.reviewTypeOtherText}">
+						value="${writeBoardDTO.typeOtherText}">
 				</div>
+
 
 
 

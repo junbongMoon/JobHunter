@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.reviewboard.ReviewBoardDAO;
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -136,6 +137,21 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 		Rdao.deletBoardNo(boardNo);
 		
 	}
+	
+	@Override
+	public boolean oneViewCount(int userId, int boardNo) throws Exception {
+		int count = Rdao.checkViewedWithHours(userId, boardNo);
+	    return count == 0;  //조회 기록이 없다
+	}
 
+	@Transactional
+	public void insertViewCount(int userId, int boardNo)throws Exception {
+		int count = Rdao.checkViewedWithHours(userId, boardNo);
+	    if (count == 0) {
+	    	Rdao.saveViewRecord(userId, boardNo); 
+	    	Rdao.incrementViews(boardNo);     
+	    }
+
+	}
 
 }

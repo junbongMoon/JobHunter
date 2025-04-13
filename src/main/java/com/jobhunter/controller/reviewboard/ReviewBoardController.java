@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -85,6 +86,7 @@ public class ReviewBoardController {
 	// 게시물 작성 저장
 	@PostMapping("/write")
 	public String saveReviewBoard(@ModelAttribute WriteBoardDTO writeBoardDTO, HttpSession session) {
+		logger.info("기타 텍스트: {}", writeBoardDTO.getTypeOtherText());
 		AccountVO account = (AccountVO) session.getAttribute("account");
 
 		writeBoardDTO.setWriter(account.getUid());
@@ -99,11 +101,20 @@ public class ReviewBoardController {
 	}
 
 	@GetMapping("/detail")
-	public String showReviewDetail(@RequestParam("boardNo") int boardNo, Model model,
-			@ModelAttribute("reviewTypeOtherText") String otherText) {
+	public String showReviewDetail(@RequestParam("boardNo") int boardNo, ModelMap model, HttpSession session) {
 		logger.info("상세조회 요청 boardNo: " + boardNo);
-
 		try {
+			System.out.println("받은 boardNo = " + boardNo);
+			AccountVO account = (AccountVO) session.getAttribute("account");
+
+			if (account != null) {
+				int userId = account.getUid();
+
+				
+				service.insertViewCount(userId, boardNo);
+			}
+
+			// 상세 정보 가져오기
 			ReviewDetailViewDTO detail = service.getReviewDetail(boardNo);
 			if (detail == null) {
 				logger.warn("조회 결과 없음!");
@@ -112,13 +123,12 @@ public class ReviewBoardController {
 			}
 
 			model.addAttribute("detail", detail);
-			if (otherText != null) {
-				model.addAttribute("reviewTypeOtherText", otherText);
-			}
+
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			logger.error("상세페이지 처리 중 오류", e);
 		}
+
 		return "reviewBoard/detail";
 	}
 

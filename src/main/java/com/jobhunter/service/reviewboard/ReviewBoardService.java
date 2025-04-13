@@ -2,6 +2,7 @@ package com.jobhunter.service.reviewboard;
 
 import java.util.List;
 
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -34,5 +35,13 @@ public interface ReviewBoardService {
 	boolean updateReviewBoard(WriteBoardDTO modify) throws Exception;
 
 	void deleteBoard(int boardNo) throws Exception;
+
+	// 조회수 조회
+	boolean oneViewCount(int userId, int boardNo) throws Exception;
+
+	// 조회수 증가
+	void insertViewCount(int userId, int boardNo) throws Exception;
+
+
 
 }

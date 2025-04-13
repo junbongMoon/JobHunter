@@ -6,6 +6,7 @@ import java.util.List;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
 import com.jobhunter.model.reviewboard.WriteBoardDTO;
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 
 public interface ReviewBoardDAO {
@@ -33,5 +34,12 @@ public interface ReviewBoardDAO {
 	int updateReviewBoard(WriteBoardDTO modify) throws Exception;
 
 	void deletBoardNo(int boardNo) throws Exception;
+
+	int checkViewedWithHours(int userId, int boardNo) throws Exception;	
+
+	int saveViewRecord(int userId, int boardNo) throws Exception;
+
+	int incrementViews(int boardNo) throws Exception;
+
 
 }

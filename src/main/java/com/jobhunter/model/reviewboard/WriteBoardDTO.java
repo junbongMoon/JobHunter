@@ -25,5 +25,5 @@ public class WriteBoardDTO {
     private String reviewResult;
     private String content;
     
-    private String reviewTypeOtherText; 
+    private String typeOtherText;  
 }
