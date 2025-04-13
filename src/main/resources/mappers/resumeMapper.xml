@@ -95,15 +95,21 @@
             regDate
         FROM resume
         WHERE userUid = #{userUid}
+        <if test="searchTitle != null and searchTitle != ''">
+            AND title LIKE CONCAT('%', #{searchTitle}, '%')
+        </if>
         ORDER BY regDate DESC
         LIMIT #{offset}, #{pageSize}
     </select>
 
     <!-- 전체 이력서 수 조회 -->
-    <select id="selectTotalResumes" parameterType="int" resultType="int">
+    <select id="selectTotalResumes" parameterType="map" resultType="int">
         SELECT COUNT(*)
         FROM resume
         WHERE userUid = #{userUid}
+        <if test="searchTitle != null and searchTitle != ''">
+            AND title LIKE CONCAT('%', #{searchTitle}, '%')
+        </if>
     </select>
 
     <!-- 이력서별 시군구 정보 조회 -->

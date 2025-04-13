@@ -88,14 +88,16 @@ public class ResumeController {
 
 	// 이력서 목록 페이지
 	@GetMapping("/list")
-	public String resumeFormList(HttpSession session, Model model, @RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "10") int pageSize) {
+	public String resumeFormList(HttpSession session, Model model, 
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(required = false) String searchTitle) {
 		try {
 			AccountVO account = (AccountVO) session.getAttribute("account");
 
 			int userUid = account.getUid();
-			List<ResumeVO> resumeList = resumeService.getResumeList(userUid, page, pageSize);
-			int totalResumes = resumeService.getTotalResumes(userUid);
+			List<ResumeVO> resumeList = resumeService.getResumeList(userUid, page, pageSize, searchTitle);
+			int totalResumes = resumeService.getTotalResumes(userUid, searchTitle);
 			int totalPages = (int) Math.ceil((double) totalResumes / pageSize);
 			
 			// 페이징 블록 계산
@@ -106,6 +108,7 @@ public class ResumeController {
 			if (endPage > totalPages) {
 				endPage = totalPages;
 			}
+			int totalBlocks = (int) Math.ceil((double) totalPages / blockSize);
 
 			model.addAttribute("resumeList", resumeList);
 			model.addAttribute("account", account);
@@ -115,6 +118,10 @@ public class ResumeController {
 			model.addAttribute("totalResumes", totalResumes);
 			model.addAttribute("startPage", startPage);
 			model.addAttribute("endPage", endPage);
+			model.addAttribute("currentBlock", currentBlock + 1);
+			model.addAttribute("totalBlocks", totalBlocks);
+			model.addAttribute("searchTitle", searchTitle);
+			
 			return "resume/resumeFormList";
 		} catch (Exception e) {
 			model.addAttribute("error", "이력서 목록을 불러오는 중 오류가 발생했습니다.");

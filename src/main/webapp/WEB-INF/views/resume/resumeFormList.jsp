@@ -318,6 +318,42 @@
 	color: #adb5bd;
 	border-color: #e4e4e4;
 }
+
+.btn-search {
+	background-color: #f8f9fa;
+	color: #37517e;
+	border: 1px solid #37517e;
+	transition: all 0.3s ease;
+}
+
+.btn-search:hover {
+	background-color: #37517e;
+	color: white;
+	transform: translateY(-2px);
+}
+
+.search-area {
+	transition: all 0.3s ease;
+	overflow: hidden;
+}
+
+.search-area .card {
+	border-color: #e4e4e4;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-area input {
+	border-color: #e4e4e4;
+}
+
+.search-area input:focus {
+	border-color: #47b2e4;
+	box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.25);
+}
+
+.search-area button {
+	min-width: 100px;
+}
 </style>
 </head>
 
@@ -342,9 +378,35 @@
 				<div class="resume-count">
 					<span>내 이력서</span> <span class="count">${totalResumes}건</span>
 				</div>
-				<a href="/resume/form" class="btn-custom btn-create"> <i
-					class="fas fa-plus"></i> 새 이력서 작성
-				</a>
+				<div class="d-flex gap-2">
+					<button id="searchToggleBtn" class="btn-custom btn-search">
+						<i class="fas fa-search"></i> 검색
+					</button>
+					<a href="/resume/form" class="btn-custom btn-create">
+						<i class="fas fa-plus"></i> 새 이력서 작성
+					</a>
+				</div>
+			</div>
+			
+			<!-- 검색 영역 -->
+			<div id="searchArea" class="search-area mb-4" style="display: none;">
+				<div class="card">
+					<div class="card-body">
+						<form id="searchForm" action="/resume/list" method="get" class="d-flex gap-2">
+							<input type="hidden" name="page" value="1">
+							<input type="hidden" name="pageSize" value="${pageSize}">
+							<div class="flex-grow-1">
+								<input type="text" name="searchTitle" class="form-control" placeholder="이력서 제목을 입력하세요" value="${param.searchTitle}">
+							</div>
+							<button type="submit" class="btn btn-primary">
+								<i class="fas fa-search"></i> 검색
+							</button>
+							<button type="button" class="btn btn-secondary" onclick="clearSearch()">
+								<i class="fas fa-times"></i> 초기화
+							</button>
+						</form>
+					</div>
+				</div>
 			</div>
 			<!-- End Section Actions -->
 
@@ -453,7 +515,7 @@
 					<!-- 이전 블록으로 이동 -->
 					<c:if test="${currentBlock > 1}">
 						<li class="page-item">
-							<a class="page-link" href="/resume/list?page=${startPage - 1}&pageSize=${pageSize}" aria-label="Previous Block">
+							<a class="page-link" href="/resume/list?page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}" aria-label="Previous Block">
 								<i class="fas fa-angle-double-left"></i>
 							</a>
 						</li>
@@ -462,7 +524,7 @@
 					<!-- 이전 페이지로 이동 -->
 					<c:if test="${currentPage > 1}">
 						<li class="page-item">
-							<a class="page-link" href="/resume/list?page=${currentPage - 1}&pageSize=${pageSize}" aria-label="Previous">
+							<a class="page-link" href="/resume/list?page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}" aria-label="Previous">
 								<i class="fas fa-chevron-left"></i>
 							</a>
 						</li>
@@ -471,14 +533,14 @@
 					<!-- 페이지 번호 -->
 					<c:forEach begin="${startPage}" end="${endPage}" var="i">
 						<li class="page-item ${currentPage == i ? 'active' : ''}">
-							<a class="page-link" href="/resume/list?page=${i}&pageSize=${pageSize}">${i}</a>
+							<a class="page-link" href="/resume/list?page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
 						</li>
 					</c:forEach>
 
 					<!-- 다음 페이지로 이동 -->
 					<c:if test="${currentPage < totalPages}">
 						<li class="page-item">
-							<a class="page-link" href="/resume/list?page=${currentPage + 1}&pageSize=${pageSize}" aria-label="Next">
+							<a class="page-link" href="/resume/list?page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}" aria-label="Next">
 								<i class="fas fa-chevron-right"></i>
 							</a>
 						</li>
@@ -487,7 +549,7 @@
 					<!-- 다음 블록으로 이동 -->
 					<c:if test="${currentBlock < totalBlocks}">
 						<li class="page-item">
-							<a class="page-link" href="/resume/list?page=${endPage + 1}&pageSize=${pageSize}" aria-label="Next Block">
+							<a class="page-link" href="/resume/list?page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}" aria-label="Next Block">
 								<i class="fas fa-angle-double-right"></i>
 							</a>
 						</li>
@@ -565,6 +627,28 @@
 
 					$('#resultMessage').text(message);
 					$('#resultModal').modal('show');
+				}
+
+				$(document).ready(function() {
+					// 검색 영역 토글
+					$('#searchToggleBtn').click(function() {
+						$('#searchArea').slideToggle(300);
+					});
+					
+					// URL에 검색 파라미터가 있으면 검색 영역 표시
+					if ('${param.searchTitle}') {
+						$('#searchArea').show();
+					}
+				});
+
+				// 검색 초기화
+				function clearSearch() {
+					// 검색어 입력창 초기화
+					$('input[name="searchTitle"]').val('');
+					// 검색 영역 숨기기
+					$('#searchArea').slideUp(300);
+					// 검색 결과 초기화를 위해 폼 제출
+					$('#searchForm').submit();
 				}
 			</script>
 
