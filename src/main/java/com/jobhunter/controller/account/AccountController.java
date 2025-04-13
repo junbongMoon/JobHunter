@@ -33,7 +33,7 @@ public class AccountController {
 	public String redirectToLogin(HttpServletRequest request, HttpSession session) {
 
 		String referer = request.getHeader("Referer");
-		if (referer != null) {
+		if (!referer.contains("/login") && !referer.contains("/register")) {
 			session.setAttribute("redirectUrl", referer);
 		}
 

@@ -43,6 +43,8 @@ public class CompanyController {
 			e.printStackTrace();
 		}
 
-        return "redirect:/";
+        String redirectUrl = (String) session.getAttribute("redirectUrl");
+		session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
+		return "redirect:" + (redirectUrl != null ? redirectUrl : "/");
     }
 }
