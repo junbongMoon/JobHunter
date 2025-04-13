@@ -1270,13 +1270,13 @@ function showThumbnail(file) {
 										<div class="d-flex flex-wrap gap-3" id="militaryService">
 											<div class="form-check">
 												<input class="form-check-input" type="radio"
-													name="militaryService" id="military1" value="NOT_COMPLETED">
+													name="militaryService" id="military1" value="NOT_SERVED">
 												<label class="form-check-label mb-2" for="military1">미필
 													이상</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input" type="radio"
-													name="militaryService" id="military2" value="COMPLETED">
+													name="militaryService" id="military2" value="SERVED">
 												<label class="form-check-label mb-2" for="military2">군필
 													이상</label>
 											</div>

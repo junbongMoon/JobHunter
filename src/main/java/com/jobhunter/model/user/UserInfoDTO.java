@@ -1,7 +1,7 @@
 package com.jobhunter.model.user;
 
 import com.jobhunter.model.customenum.Gender;
-import com.jobhunter.model.customenum.MilitaryService;
+import com.jobhunter.model.customenum.MilitaryServe;
 import com.jobhunter.model.customenum.Nationality;
 
 import lombok.AccessLevel;
@@ -27,7 +27,7 @@ public class UserInfoDTO {
     private String payType; // 희망 급여 유형
     private Integer pay; // 희망 급여 금액
     private String introduce; // 자기소개
-    private MilitaryService militaryService; // 병역 사항 (NOT_COMPLETED: 미필, COMPLETED: 군필, EXEMPTED: 면제)
+    private MilitaryServe militaryService; // 병역 사항 (NOT_COMPLETED: 미필, COMPLETED: 군필, EXEMPTED: 면제)
     private Nationality nationality; // 국적 (KOREAN: 한국인, FOREIGNER: 외국인)
     private String disability; // 장애 여부
 }

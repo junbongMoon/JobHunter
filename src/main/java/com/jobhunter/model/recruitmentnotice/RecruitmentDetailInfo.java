@@ -6,7 +6,7 @@ import java.util.List;
 import com.jobhunter.model.category.MajorCategory;
 import com.jobhunter.model.category.SubCategory;
 import com.jobhunter.model.customenum.JobForm;
-import com.jobhunter.model.customenum.MilitaryService;
+import com.jobhunter.model.customenum.MilitaryServe;
 import com.jobhunter.model.region.Region;
 import com.jobhunter.model.region.Sigungu;
 
@@ -31,7 +31,7 @@ public class RecruitmentDetailInfo {
 	private int pay;
 	private String period;
 	private String personalHistory;
-	private MilitaryService militaryService;
+	private MilitaryServe militaryService;
 	private String detail;
 	private String manager;
 	private String miniTitle;

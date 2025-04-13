@@ -197,7 +197,7 @@
 		<result property="period" column="period" />
 		<result property="personalHistory" column="personalHistory" />
 		<result property="militaryService" column="militaryService"
-			javaType="com.jobhunter.model.customenum.MilitaryService" />
+			javaType="com.jobhunter.model.customenum.MilitaryServe" />
 		<result property="detail" column="detail" />
 		<result property="manager" column="manager" />
 		<result property="miniTitle" column="miniTitle" />

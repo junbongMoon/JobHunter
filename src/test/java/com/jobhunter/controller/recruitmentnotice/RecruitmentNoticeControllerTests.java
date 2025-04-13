@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.jobhunter.model.customenum.JobForm;
 import com.jobhunter.model.customenum.Method;
-import com.jobhunter.model.customenum.MilitaryService;
+import com.jobhunter.model.customenum.MilitaryServe;
 import com.jobhunter.model.recruitmentnotice.AdvantageDTO;
 import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
@@ -32,7 +32,7 @@ public class RecruitmentNoticeControllerTests {
 	// insert 테스트
 //	@Test
 	public void insertRecruitmentNotice() {
-		MilitaryService mili = MilitaryService.EXEMPTED;
+		MilitaryServe mili = MilitaryServe.EXEMPTED;
 		
 		 LocalDateTime deadlineDateTime = LocalDateTime.of(2025, 3, 31, 00, 00, 00); // 마감기한 (날짜 + 시간)
          Timestamp deadlineTimestamp = Timestamp.valueOf(deadlineDateTime); // java.sql.Timestamp 변환

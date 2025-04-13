@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
@@ -166,6 +166,26 @@ h3 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
 }
+
+.badge-custom {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 1rem; /* 크기 조절 가능 */
+  font-weight: 600;
+  color: #3d4d6a;
+  background-color: white;
+  border: 2px solid #3d4d6a;
+  border-radius: 10px;
+  margin: 0.25rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.badge-custom i {
+  margin-right: 0.4rem;
+  color: #3d4d6a;
+  font-size: 1.1em;
+}
 </style>
 <body>
 	<!-- 헤더 -->
@@ -207,24 +227,23 @@ h3 {
 									</div>
 
 									<div class="content">
-										<p class="companyIntroduce">회사 기본 소개</p>
+
 										<div class="categories-widget widget-item card">
 											<h3 class="widget-title">지역</h3>
 											<p id="region">
-												<span class="badge rounded-pill text-bg-primary">${RecruitmentDetailInfo.region.name}</span>
-												<span class="badge rounded-pill text-bg-info">${RecruitmentDetailInfo.sigungu.name}</span>
+												<span class="badge-custom"><i class="fa-solid fa-building"></i>${RecruitmentDetailInfo.region.name}</span>
+												<span class="badge-custom"><i class="fa-regular fa-building"></i>${RecruitmentDetailInfo.sigungu.name}</span>
+											  
+											
 											</p>
-										</div>
 
-										<div class="categories-widget widget-item card">
 											<h3 class="widget-title">직업</h3>
 											<p id="jobType">
-												<span class="badge rounded-pill text-bg-primary">${RecruitmentDetailInfo.majorCategory.jobName}</span>
-												<span class="badge rounded-pill text-bg-info">${RecruitmentDetailInfo.subcategory.jobName}</span>
+												<span class="badge-custom">${RecruitmentDetailInfo.majorCategory.jobName}</span>
+												<span class="badge-custom">${RecruitmentDetailInfo.subcategory.jobName}</span>
+											  
 											</p>
-										</div>
 
-										<div class="card categories-widget widget-item">
 											<h5 class="widget-title">근무</h5>
 											<p class="mb-1 fw-semibold" id="workType">
 												<c:choose>
@@ -244,9 +263,7 @@ h3 {
 												</c:choose>
 											</p>
 											<p class="text-muted" id="period">${RecruitmentDetailInfo.period}</p>
-										</div>
 
-										<div class="card categories-widget widget-item">
 											<h5 class="widget-title">급여</h5>
 											<p class="mb-1 fw-semibold" id="payType">
 												<c:choose>
@@ -258,24 +275,26 @@ h3 {
 													<c:otherwise>기타</c:otherwise>
 												</c:choose>
 											</p>
+
 											<p class="fs-5 fw-bold text-success" id="pay">
 												<fmt:formatNumber value="${RecruitmentDetailInfo.pay}"
 													type="number" groupingUsed="true" />
 												원
 											</p>
-										</div>
 
-
-										<div class="categories-widget widget-item card">
 											<h3 class="widget-title">조건</h3>
 											<p id="personalHistory">
-												<span class="badge rounded-pill text-bg-primary">${RecruitmentDetailInfo.personalHistory}</span>
+												<span class="badge-custom">${RecruitmentDetailInfo.personalHistory}</span>
+												<span class="badge-custom">${RecruitmentDetailInfo.militaryService}</span>
 												<c:forEach var="item"
 													items="${RecruitmentDetailInfo.advantage}">
-													<span class="badge rounded-pill text-bg-info">${item.advantageType}</span>
+													<span class="badge-custom">${item.advantageType}</span>
 												</c:forEach>
 											</p>
+
+											
 										</div>
+
 
 										<div class="categories-widget widget-item card">
 											<h2 class="widget-title">상세 정보</h2>
@@ -349,16 +368,14 @@ h3 {
 														onclick="location.href='/recruitmentnotice/modify?uid=${RecruitmentDetailInfo.uid}'">수정</button>
 													<button type="button" class="btn btn-danger"
 														onclick="deleteRecruitment('${RecruitmentDetailInfo.uid}')">삭제</button>
+														<button type="button" class="btn btn-primary" id="submitResumeBtn"
+														onclick="location.href='/submission/check?uid=${RecruitmentDetailInfo.uid}'">
+														이력서 제출</button>
 												</div>
 											</div>
 										</div>
 									</div>
-									<!-- 이력서 제출 버튼 -->
-												<div class="container">
-													<button type="button" class="btn btn-success" id="submitResumeBtn"
-														onclick="location.href='/submission/check?uid=${RecruitmentDetailInfo.uid}'">
-														이력서 제출</button>
-												</div>
+
 								</div>
 
 
