@@ -21,8 +21,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobhunter.dao.company.CompanyDAO;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.company.BusinessRequestDTO;
+import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
+import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.util.PropertiesTask;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,11 @@ import lombok.RequiredArgsConstructor;
 public class CompanyServiceImpl implements CompanyService {
 
 	private final CompanyDAO dao;
+	
+	@Override
+	public boolean updateCompanyInfo(CompanyInfoDTO companyInfo) throws Exception {
+		return dao.updateCompanyInfo(companyInfo) > 0;
+	}
 	
 	@Override
 	public CompanyVO showCompanyHome(String uid) throws Exception {

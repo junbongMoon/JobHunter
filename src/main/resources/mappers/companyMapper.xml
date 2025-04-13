@@ -136,4 +136,16 @@
 	 VALUES 
 	 (#{companyName}, #{companyId}, sha1(md5(#{password})), #{businessNum}, #{representative}, #{email}, #{mobile});
 	</insert>
+	
+	<update id="updateCompanyInfo"
+		parameterType="com.jobhunter.model.company.CompanyInfoDTO">
+		UPDATE company
+		SET
+		addr = #{addr},
+		detailAddr = #{detailAddr},
+		introduce = #{introduce},
+		homePage = #{homePage},
+		scale = #{scale}
+		WHERE uid = #{uid}
+	</update>
 </mapper>

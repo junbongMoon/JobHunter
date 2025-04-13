@@ -2,6 +2,7 @@ package com.jobhunter.service.company;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.company.BusinessRequestDTO;
+import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
 
@@ -20,5 +21,7 @@ public interface CompanyService {
 	boolean isCompanyIdExists(String companyId) throws Exception;
 
 	AccountVO registUser(CompanyRegisterDTO dto) throws Exception;
+
+	boolean updateCompanyInfo(CompanyInfoDTO companyInfo) throws Exception;
 
 }

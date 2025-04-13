@@ -119,7 +119,7 @@
 							</c:when>
 							<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 								<a class="accountName" style="margin-left: 20px;"
-									href="/company/companyHome?uid=${sessionScope.account.uid}&accountType=company">${sessionScope.account.accountName}</a>
+									href="/company/companyInfo?uid=${sessionScope.account.uid}&accountType=company">${sessionScope.account.accountName}</a>
 							</c:when>
 							<c:otherwise>
 								<a class="accountName" style="margin-left: 20px;"

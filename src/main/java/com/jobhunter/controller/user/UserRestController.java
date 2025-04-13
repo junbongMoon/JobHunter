@@ -1,5 +1,6 @@
 package com.jobhunter.controller.user;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -31,80 +32,78 @@ import lombok.RequiredArgsConstructor;
 public class UserRestController {
 	private final UserService service;
 	private final AccountUtil accUtil;
-	
+
 	@GetMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<UserVO> myinfo(@PathVariable("uid") String uid) {
-	    UserVO userVO = null;
-	    try {
-	        userVO = service.showMypage(uid);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    
-	    System.out.println("/info_userVO : " + userVO);
+		UserVO userVO = null;
 
-	    return ResponseEntity.status(HttpStatus.OK).body(userVO);
-	}
-	
-	@PostMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<?> updateUserInfo(@RequestBody UserInfoDTO userInfo, @PathVariable("uid") Integer uid, HttpSession session) {
-        
-		System.out.println("/info_userInfo : " + userInfo);
-		
-		if (uid == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("success", false, "message", "잘못된 계정입니다."));
-        }
-
-        userInfo.setUid(uid);
-        boolean success = false;
 		try {
-			success = service.updateUserInfo(userInfo);
+			userVO = service.showMypage(uid);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-        return ResponseEntity.ok(Map.of("success", success));
-    }
-	
+		return ResponseEntity.status(HttpStatus.OK).body(userVO);
+	}
+
+	@PostMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<?> updateUserInfo(@RequestBody UserInfoDTO userInfo, @PathVariable("uid") Integer uid,
+			HttpSession session) {
+
+		System.out.println("/info_userInfo : " + userInfo);
+
+		if (uid == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Collections.singletonMap("result", "잘못된 계정입니다."));
+		}
+
+		userInfo.setUid(uid);
+		boolean success = false;
+		try {
+			success = service.updateUserInfo(userInfo);
+			return ResponseEntity.ok(Collections.singletonMap("result", "success"));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return ResponseEntity.ok(Collections.singletonMap("result", "서버 오류 발생"));
+		}
+	}
+
 	@PostMapping(value = "/password", consumes = "application/json")
 	public ResponseEntity<Boolean> checkPassword(@RequestBody PasswordDTO dto) {
-		System.out.println(dto +"확인할거");
-	    boolean isMatch = false;
+		boolean isMatch = false;
 		try {
 			isMatch = service.checkPassword(dto.getUid(), dto.getPassword());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    return ResponseEntity.ok(isMatch);
+		return ResponseEntity.ok(isMatch);
 	}
-	
+
 	@PatchMapping(value = "/password", consumes = "application/json")
 	public ResponseEntity<Void> changePassword(@RequestBody PasswordDTO dto) {
-	    try {
+		try {
 			service.updatePassword(dto.getUid(), dto.getPassword());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
-	    return ResponseEntity.ok().build();
+		return ResponseEntity.ok().build();
 	}
-	
+
 	@PatchMapping(value = "/contact", consumes = "application/json")
 	public ResponseEntity<String> changeContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
-	    try {
-	        String updatedValue = service.updateContact(dto.getUid(), dto.getType(), dto.getValue());
-	        accUtil.refreshAccount((AccountVO) session.getAttribute("account"));
-	        return ResponseEntity.ok(updatedValue);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                             .body("연락처 변경 중 오류 발생");
-	    }
+		try {
+			String updatedValue = service.updateContact(dto.getUid(), dto.getType(), dto.getValue());
+			accUtil.refreshAccount((AccountVO) session.getAttribute("account"));
+			return ResponseEntity.ok(updatedValue);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("연락처 변경 중 오류 발생");
+		}
 	}
-	
+
 	@GetMapping(value = "/check/id", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String userId) {
 		boolean exists = false;
@@ -116,5 +115,5 @@ public class UserRestController {
 		}
 		return ResponseEntity.ok(exists);
 	}
-	
+
 }

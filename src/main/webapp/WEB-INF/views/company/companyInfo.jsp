@@ -1,7 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <!-- 헤더 -->
 <jsp:include page="/WEB-INF/views/header.jsp"></jsp:include>
@@ -14,7 +14,7 @@
 <link href="/resources/css/mypage.css" rel="stylesheet">
 
 <main class="main" data-aos="fade-up">
-  <h1 class="page-title">마이페이지</h1>
+  <h1 class="page-title">회사 정보</h1>
 
   <div id="mypageContainer">
     <div class="sections-grid">
@@ -25,7 +25,8 @@
           <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
         </div>
         <div class="info-grid" id="basicInfo">
-          <div>이름</div><div><strong id="userName">로딩중...</strong></div>
+          <div>회사명</div><div><strong id="companyName">로딩중...</strong></div>
+          <div>대표자</div><div id="representative">로딩중...</div>
           <div>전화번호</div><div id="nowMobile">로딩중...</div>
           <div>이메일</div><div id="nowEmail">로딩중...</div>
           <div>가입일</div><div id="regDate">로딩중...</div>
@@ -46,16 +47,12 @@
         <div class="section-title">
           <h2><i class="bi bi-person-vcard section-icon"></i>상세 정보</h2>
         </div>
-        <div class="info-grid" id="userDetailInfo">
+        <div class="info-grid" id="companyDetailInfo">
             <div>주소</div><div>로딩중...</div>
             <div>상세주소</div><div>로딩중...</div>
-            <div>성별</div><div>로딩중...</div>
-            <div>나이</div><div>로딩중...</div>
-            <div>병역사항</div><div>로딩중...</div>
-            <div>국적</div><div>로딩중...</div>
-            <div>희망급여</div><div>로딩중...</div>
-            <div>장애여부</div><div>로딩중...</div>
-            <div class="introduce-section"><div class="introduce-title">자기소개</div><div class="introduce-content">로딩중...</div></div>
+            <div>회사규모</div><div>로딩중...</div>
+            <div>회사 홈페이지</div><div>로딩중...</div>
+            <div class="introduce-section"><div class="introduce-title">회사소개</div><div class="introduce-content">로딩중...</div></div>
             <div class="edit-buttons">
             <button class="btn-edit" onclick="modyfiInfoTapOpen()"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
             <button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
@@ -72,6 +69,7 @@
           <div class="info-section">
             <h3 class="section-subtitle">기본 정보</h3>
             <div class="info-grid">
+
               <div>주소</div>
               <div>
                 <div class="address-search-group">
@@ -93,67 +91,26 @@
                   <input type="hidden" id="detailAddressBackup">
               </div>
               
-              <div>성별</div>
+              <div>회사규모</div>
               <div>
-                <select class="form-control" id="gender">
+                <select class="form-control" id="scale">
                   <option value="-1" style="display: none;">선택하세요</option>
-                  <option value="MALE">남성</option>
-                  <option value="FEMALE">여성</option>
+                  <option value="중소기업">중소기업</option>
+                  <option value="중견기업">중견기업</option>
+                  <option value="대기업">대기업</option>
                 </select>
               </div>
               
-              <div>나이</div>
-              <div><input type="text" class="form-control" id="age" placeholder="나이를 입력하세요"></div>
+              <div>회사 홈페이지</div>
+              <div><input type="text" class="form-control" id="homePage" placeholder="홈페이지 링크를 입력하세요"></div>
               
-              <div>병역사항</div>
-              <div>
-                <select class="form-control" id="military">
-                  <option value="-1" style="display: none;">선택하세요</option>
-                  <option value="NOT_SERVED">미필</option>
-                  <option value="SERVED">군필</option>
-                  <option value="EXEMPTED">면제</option>
-                </select>
-              </div>
-              
-              <div>국적</div>
-              <div>
-                <select class="form-control" id="nationality">
-                  <option value="-1" style="display: none;">선택하세요</option>
-                  <option value="DOMESTIC">내국인</option>
-                  <option value="FOREIGN">외국인</option>
-                </select>
-              </div>
-
-              <div>장애 여부</div>
-              <div>
-                <select class="form-control" id="disability">
-                  <option value="-1" style="display: none;">선택하세요</option>
-                  <option value="NONE">비대상</option>
-                  <option value="GRADE1">1급</option>
-                  <option value="GRADE2">2급</option>
-                  <option value="GRADE3">3급</option>
-                  <option value="GRADE4">4급</option>
-                  <option value="GRADE5">5급</option>
-                  <option value="GRADE6">6급</option>
-                </select>
-              </div>
-              
-              <div>희망급여 방식</div>
-              <div>
-                <select class="form-control" id="payType">
-                  <option value="-1" style="display: none;">선택하세요</option>
-                  <option value="연봉">연봉</option>
-                  <option value="월급">월급</option>
-                  <option value="회사 내규에 따름">회사 내규에 따름</option>
-                </select>
-              </div>
-              <div id="payTitleDiv" style="display: none;">희망급여</div>
-              <div id="payDiv" style="display: none;"><input type="text" class="form-control" id="pay" placeholder="희망급여를 입력하세요"></div>
             </div>
           </div>
+
           <div class="introduce-section">
-            <textarea id="introduce" placeholder="자기소개를 입력해주세요"></textarea>
+            <textarea id="introduce" placeholder="회사소개를 입력해주세요"></textarea>
           </div>
+          
           <div class="edit-buttons">
             <button onclick="cancleModify()" class="btn-cancel">취소</button>
             <button onclick="confirmModify()" class="btn-confirm">변경 확인</button>
@@ -161,10 +118,10 @@
         </div>
       </section>
 
-      <!-- 이력서 영역 -->
+      <!-- 공고 영역 -->
       <section data-aos="fade-up" data-aos-delay="300">
         <div class="section-title">
-          <h2><i class="bi bi-file-earmark-text section-icon"></i>내 이력서</h2>
+          <h2><i class="bi bi-file-earmark-text section-icon"></i>내 공고</h2>
         </div>
         <div class="empty-state">
           <i class="bi bi-file-earmark-text"></i>
@@ -172,27 +129,17 @@
         </div>
       </section>
 
-      <!-- 리뷰 영역 -->
+      <!-- 아무튼 카드 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
-          <h2><i class="bi bi-star section-icon"></i>내가 작성한 리뷰</h2>
-        </div>
-        <div class="empty-state">
-          <i class="bi bi-star"></i>
-          <p>작성한 리뷰가 없습니다.</p>
-        </div>
-      </section>
-
-      <!-- 관심 공고 -->
-      <section data-aos="fade-up" data-aos-delay="500">
-        <div class="section-title">
-          <h2><i class="bi bi-heart section-icon"></i>관심 공고 목록</h2>
+          <h2><i class="bi bi-heart section-icon"></i>카드 예제</h2>
         </div>
         <div class="empty-state">
           <i class="bi bi-heart"></i>
-          <p>관심 등록된 공고가 없습니다.</p>
+          <p>나중에 필요한거 담을 공간.</p>
         </div>
       </section>
+
     </div>
   </div>
 
@@ -208,7 +155,8 @@ $(()=>{
 const uid = "${sessionScope.account.uid}"
 let sessionMobile = "${sessionScope.account.mobile}";
 let sessionEmail = "${sessionScope.account.email}";
-let isSocial = ("${sessionScope.account.email}" == "Y");
+
+console.log(uid);
 
 const METHOD = {
   EMAIL: "email",
@@ -309,121 +257,44 @@ function formatNumber(e) {
 // #region 정보 서버에있는걸로 갱신
 function getInfo() {
   $.ajax({
-      url: "/user/info/${sessionScope.account.uid}",
+      url: "/company/info/${sessionScope.account.uid}",
       method: "GET",
       success: (result) => {
-        isSocial = result.isSocial == 'Y';
         sessionMobile = result.mobile;
   		  sessionEmail = result.email;
         resetUserModifyForm();
         updateBasicInfo(result);
-        updateUserDetailInfo(result);
-        updateUserModifyInfo(result);
+        updateCompanyDetailInfo(result);
+        updateCompanyModifyInfo(result);
       },
       error: (xhr) => window.publicModals.show("정보 로딩에 실패하였습니다. 잠시후 새로고침해 주세요.")
   });
 }
 
 // 기본정보 로딩
-function updateBasicInfo(userInfo) {
-  $('#userName').text( userInfo.userName || '미입력')
-  $('#nowMobile').text( userInfo.mobile || '등록된 전화번호 없음')
-  $('#nowEmail').text( userInfo.email || '등록된 이메일 없음')
-  $('#regDate').text( formatDate(userInfo.regDate))
-  $('#lastLoginDate').text( formatDateTime(userInfo.lastLoginDate))
+function updateBasicInfo(companyInfo) {
+  $('#companyName').text( companyInfo.companyName || '미입력')
+  $('#representative').text( companyInfo.representative || '대표자명 미등록')
+  $('#nowMobile').text( companyInfo.mobile || '등록된 전화번호 없음')
+  $('#nowEmail').text( companyInfo.email || '등록된 이메일 없음')
+  $('#regDate').text( formatDate(companyInfo.regDate))
+  $('#lastLoginDate').text( formatDateTime(companyInfo.lastLoginDate))
 }
 
 // 상세정보 로딩
-function updateUserDetailInfo(userInfo) {
-    const userDetailInfo = document.getElementById('userDetailInfo');
+function updateCompanyDetailInfo(companyInfo) {
+  console.log(companyInfo);
 
-    let genderText = '여성';
-    if (userInfo.gender === 'MALE') {
-      genderText = '남성';
-    } else if (!userInfo.gender) {
-      genderText = '미입력';
-    }
+  const companyDetailInfo = document.getElementById('companyDetailInfo');
 
-    let militaryServiceText = '미필';
-    if (userInfo.militaryService === 'SERVED') {
-      militaryServiceText = '군필';
-    } else if (userInfo.militaryService === 'EXEMPTED') {
-      militaryServiceText = '면제';
-    } else if (!userInfo.militaryService) {
-      genderText = '미입력';
-    }
-
-    let nationalityText = '외국인';
-    if (userInfo.nationality === 'FOREIGN') {
-      nationalityText = '한국인';
-    } else if (!userInfo.nationality) {
-      genderText = '미입력';
-    }
-
-    let payText = '미입력';
-    let pay = userInfo.pay;
-    if (pay) {
-      pay = pay.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-    if (userInfo.pay) {
-      if (userInfo.payType != '회사 내규에 따름') {
-        payText = userInfo.payType + ' : ' + pay + '원';
-      } else {
-        payText = '회사 내규에 따름';
-      }
-    }
-
-    let introduceSection = '자기소개가 아직 없습니다.';
-    if (userInfo.introduce) {
-      introduceSection = userInfo.introduce;
-    }
-
-    let disabilityText;
-
-    if (!userInfo.disability) {
-      disabilityText = '미입력';
-    } else if (userInfo.disability == 'NONE') {
-      disabilityText = '비대상';
-    } else {
-      disabilityText = userInfo.disability;
-    }
-
-    switch (userInfo.disability) {
-      case 'GRADE1':
-        disabilityText = '1급';
-        break;
-      case 'GRADE2':
-        disabilityText = '2급';
-        break;
-      case 'GRADE3':
-        disabilityText = '3급';
-        break;
-      case 'GRADE4':
-        disabilityText = '4급';
-        break;
-      case 'GRADE5':
-        disabilityText = '5급';
-        break;
-      case 'GRADE6':
-        disabilityText = '6급';
-        break;
-      case 'NONE':
-        disabilityText = '비대상';
-        break;
-    }
-
-    const values = [
-    userInfo.addr || '등록된 주소 없음',
-    userInfo.detailAddr || '등록된 상세주소 없음',
-    genderText,
-    (userInfo.age ? userInfo.age + ' 세' : '미입력'),
-    militaryServiceText,
-    nationalityText,
-    payText,
-    disabilityText
+  const values = [
+    companyInfo.addr || '등록된 주소 없음',
+    companyInfo.detailAddr || '등록된 상세주소 없음',
+    companyInfo.scale || '기업규모 비공개',
+    companyInfo.homePage || '홈페이지 미등록'
   ];
 
-  const divs = userDetailInfo.querySelectorAll(':scope > div:not(.introduce-section):not(.edit-buttons)');
+  const divs = companyDetailInfo.querySelectorAll(':scope > div:not(.introduce-section):not(.edit-buttons)');
 
   // 앞에서부터 짝수 인덱스는 label, 홀수 인덱스가 값
   for (let i = 0, valIdx = 0; i < divs.length; i++) {
@@ -433,9 +304,9 @@ function updateUserDetailInfo(userInfo) {
   }
 
   // 자기소개
-  const introduceDiv = userDetailInfo.querySelector('.introduce-content');
-  introduceDiv.textContent = userInfo.introduce || '자기소개가 아직 없습니다.';
-  }
+  const introduceDiv = companyDetailInfo.querySelector('.introduce-content');
+  introduceDiv.textContent = companyInfo.introduce || '회사소개가 아직 없습니다.';
+}
 
 // 수정창 내용 초기화
 function resetUserModifyForm() {
@@ -445,27 +316,15 @@ function resetUserModifyForm() {
   $('#addressDetail').val('');
   $('#addressSelect').empty().append('<li class="address-dropdown-item" data-value="">주소를 선택하세요</li>');
 
-  // select박스 초기화 (성별, 병역사항, 국적, 급여유형)
-  $('#gender').val('-1');
-  $('#military').val('-1');
-  $('#nationality').val('-1');
-  $('#payType').val('-1');
-  $('#disability').val('-1');
-
-  // 나이, 희망급여 입력창 초기화
-  $('#age').val('');
-  $('#pay').val('');
+  $('#scale').val('-1');
+  $('#homePage').val('');
 
   // 자기소개 초기화
   $('#introduce').val('');
-
-  // 희망급여 입력창 숨김
-  $('#payDiv').hide();
-  $('#payTitleDiv').hide();
 }
 
 // 수정창 갱신
-function updateUserModifyInfo(result) {
+function updateCompanyModifyInfo(result) {
   const address = result.addr;
 
   if (result.addr) {
@@ -479,55 +338,19 @@ function updateUserModifyInfo(result) {
     document.getElementById('addressDetail').value = result.detailAddr || '';
   }
 
-  // 성별
-  if (result.gender) {
-    document.getElementById('gender').value = result.gender;
-  }
-  // 나이
-  if (result.age !== null && result.age !== undefined) {
-    document.getElementById('age').value = result.age;
+  // 기업규모
+  if (result.scale) {
+    document.getElementById('scale').value = result.scale;
   }
 
-  // 병역사항
-  if (result.militaryService) {
-    document.getElementById('military').value = result.militaryService;
-  }
-
-  // 국적
-  if (result.nationality) {
-    document.getElementById('nationality').value = result.nationality;
-  }
-
-  // 희망급여 방식
-  if (result.payType) {
-    document.getElementById('payType').value = result.payType;
-  }
-
-  if (result.payType == '회사 내규에 따름') {
-    document.getElementById('payTitleDiv').style.display = 'none';
-    document.getElementById('payDiv').style.display = 'none';
-  } else {
-    document.getElementById('payTitleDiv').style.display = 'block';
-    document.getElementById('payDiv').style.display = 'block';
-  }
-
-  // 희망급여
-  if (result.pay !== null && result.pay !== undefined) {
-    let pay = result.pay;
-    if (pay) {
-      pay = pay.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-    document.getElementById('pay').value = pay;
+  // 홈페이지
+  if (result.homePage) {
+    document.getElementById('homePage').value = result.homePage;
   }
 
   // 자기소개
   if (result.introduce) {
     document.getElementById('introduce').value = result.introduce;
-  }
-
-  // 장애여부
-  if (result.disability) {
-    document.getElementById('disability').value = result.disability;
   }
 }
 
@@ -536,7 +359,6 @@ function updateUserModifyInfo(result) {
 // #region 상세정보 수정 관련
 // 상세정보 수정 창 열기
 function modyfiInfoTapOpen () {
-  bindPayTypeChangeEvent()
 
   const section = document.getElementById('modifySection');
 
@@ -551,25 +373,6 @@ function modyfiInfoTapOpen () {
   section.scrollIntoView({ behavior: 'smooth' });
 }
 
-// 연봉타입 변경에 따른 연봉입력란 동적 변화 이벤트 추가
-function bindPayTypeChangeEvent() {
-  document.getElementById('payType').addEventListener('change', function() {
-    document.getElementById('pay').placeholder = '연봉을 입력해주세요';
-  
-    switch (this.value) {
-      case '회사 내규에 따름':
-        document.getElementById('payDiv').style.display = 'none';
-        document.getElementById('payTitleDiv').style.display = 'none';
-        break;
-      case '월급':
-        document.getElementById('pay').placeholder = '월급을 입력해주세요';
-      default:
-        document.getElementById('payDiv').style.display = 'block';
-        document.getElementById('payTitleDiv').style.display = 'block';
-    }
-  });
-}
-
 // 수정완료
 function confirmModify() {
   const nullIfInvalid = (v) => (v === '-1' || v == null || v === '') ? null : v;
@@ -579,32 +382,26 @@ function confirmModify() {
   };
 
   // 선택된 값이 -1이면 null로 변환
-  let gender = nullIfInvalid($('#gender').val());
-  let military = nullIfInvalid($('#military').val());
-  let nationality = nullIfInvalid($('#nationality').val());
-  let payType = nullIfInvalid($('#payType').val());
-  let disability = nullIfInvalid($('#disability').val());
+
+  let homePage = nullIfInvalid($('#homePage').val().trim());
+
+  let scale = nullIfInvalid($('#scale').val());
+
   let addr = nullIfInvalid($('#selectedAddress').val().trim());
   let detailAddr = nullIfInvalid($('#addressDetail').val().trim());
   let introduce = nullIfInvalid($('#introduce').val().trim());
-  let age = parseValidNumber($('#age').val());
-  let pay = parseValidNumber($('#pay').val());
 
   const data = {
     addr,
     detailAddr,
-    gender,
-    age,
-    militaryService: military,
-    nationality,
-    payType,
-    pay,
-    introduce,
-    disability
+    homePage,
+    scale,
+    introduce
   };
 
+  console.log("${sessionScope.account.uid}");
   $.ajax({
-    url: '/user/info/${sessionScope.account.uid}',
+    url: '/company/info/${sessionScope.account.uid}',
     type: 'POST',
     contentType: 'application/json',
     data: JSON.stringify(data),
@@ -634,7 +431,7 @@ function confirmModify() {
 
   function checkedDeleteAccount() {
     $.ajax({
-      url: `/user/delete/${sessionScope.account.uid}`,
+      url: `/company/delete/${sessionScope.account.uid}`,
       method: "DELETE",
       contentType: "application/json",
       success: () => {window.publicModals.show("삭제 대기중...", {onConfirm : getInfo})},
@@ -687,7 +484,7 @@ function checkPassword() {
   }
 
   $.ajax({
-    url: "/user/password",
+    url: "/company/password",
     method: "POST",
     contentType: "application/json",
     data: JSON.stringify({ uid, password: nowPassword }),
@@ -840,7 +637,7 @@ function changePassword(modalText) {
   }
 
   $.ajax({
-    url: "/user/password",
+    url: "/company/password",
     method: "patch",
     contentType: "application/json",
     data: JSON.stringify({ uid, password: changePassword }),
@@ -899,7 +696,7 @@ async function checkDuplicateMobile(formattedNumber) {
       },
       body: JSON.stringify({
         mobile: formattedNumber,
-        accountType: "USER"
+        accountType: "COMPANY"
       })
     });
 
@@ -911,6 +708,7 @@ async function checkDuplicateMobile(formattedNumber) {
     }
 
   } catch (e) {
+    console.log(e);
     window.publicModals.show('서버와의 연결이 불안정합니다. 잠시 후 다시 시도해주세요.', {onConfirm:()=>{openContactModal(); return false;}});
     return true; // 실패 시 중복된 걸로 취급
   }
@@ -946,10 +744,14 @@ async function verifiToNewMobile() {
 async function changeMobile(formattedNumber) {
   const code = $('#verifiCode').val()
 
+  console.log(code);
+
   if (!code || code.length != 6) {
     showCodeModal(()=>{changeMobile(formattedNumber)}, true);
     return
   }
+
+  console.log("6자리는 넘어왔는데");
 
   try {
     await confirmationResult.confirm(code); // 코드 틀렸으면 여기서  catch로 넘어감
@@ -961,7 +763,7 @@ async function changeMobile(formattedNumber) {
     };
   
     $.ajax({
-      url: "/user/contact",
+      url: "/company/contact",
       method: "patch",
       contentType: "application/json",
       data: JSON.stringify(dto),
@@ -983,7 +785,7 @@ function verifiToNewEmail() {
   const emailInputs = $('#newEmail').val();
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-  if (emailInputs || !emailRegex.test(emailInputs)) {
+  if (!emailInputs || !emailRegex.test(emailInputs)) {
     window.publicModals.show('올바른 이메일을 입력해주세요.', {onConfirm:()=>{openContactModal(); return false;}});
     return;
   }
@@ -997,7 +799,7 @@ function verifiToNewEmail() {
     data: JSON.stringify({ 
       email: emailInputs,
       checkDuplicate: true,
-      accountType: "USER"
+      accountType: "COMPANY"
 		}),
     async: false,
     success: (res) => {
@@ -1045,7 +847,7 @@ function changeEmailFunc(changeEmail) {
   };
 
   $.ajax({
-    url: "/user/contact",
+    url: "/company/contact",
     method: "patch",
     contentType: "application/json",
     data: JSON.stringify(dto),
@@ -1062,7 +864,6 @@ function changeEmailFunc(changeEmail) {
 // #endregion
 
   function cancleModify() {
-    resetUserModifyForm();
     document.getElementById('modifySection').style.display = 'none';
     getInfo();
   }
@@ -1274,26 +1075,7 @@ function enableAddressScroll() {
 	}
 	return true ;
 }
-// #endregion 
-
-document.getElementById('pay').addEventListener('input', function(e) {
-    // 숫자 이외의 문자 제거
-    let value = e.target.value.replace(/[^\d]/g, '');
-    
-    // 숫자를 3자리마다 콤마로 구분
-    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    
-    // 변환된 값을 다시 입력란에 설정
-    e.target.value = value;
-});
-
-// pay와 age 입력란 모두에 숫자만 입력되도록 이벤트 리스너 추가
-document.getElementById('pay').addEventListener('input', formatNumber);
-document.getElementById('age').addEventListener('input', function(e) {
-    // 숫자 이외의 문자 제거
-    let value = e.target.value.replace(/[^\d]/g, '');
-    e.target.value = value;
-});
+// #endregion
 
 </script>
 <!-- 풋터 -->

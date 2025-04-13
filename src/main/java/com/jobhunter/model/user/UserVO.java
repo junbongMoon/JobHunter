@@ -47,8 +47,4 @@ public class UserVO {
     private MilitaryService militaryService; // 병역 사항 (NOT_COMPLETED: 미필, COMPLETED: 군필, EXEMPTED: 면제)
     private Nationality nationality; // 국적 (KOREAN: 한국인, FOREIGNER: 외국인)
     private String disability; // 장애 여부
-    
-//    private List<ResumeVO> resumes;
-//    private List<ReviewBoardVO> reviewBoards;
-//    private List<ReviewLikeVO> reviewLikes;
 }

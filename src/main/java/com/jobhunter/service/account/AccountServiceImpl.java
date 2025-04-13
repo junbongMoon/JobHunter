@@ -179,7 +179,6 @@ public class AccountServiceImpl implements AccountService {
 		AccountVO account = dao.findAccountByMobile(mobile);
 		
 		if(account != null) {
-			System.out.println(account);
 			return true;
 		}
 		return false;

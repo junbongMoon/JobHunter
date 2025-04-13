@@ -3,6 +3,7 @@ package com.jobhunter.dao.company;
 import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
 
@@ -21,5 +22,7 @@ public interface CompanyDAO {
 	boolean findIsCompanyById(String companyId) throws Exception;
 
 	Integer registCompany(CompanyRegisterDTO dto) throws Exception;
+
+	int updateCompanyInfo(CompanyInfoDTO companyInfo) throws Exception;
 
 }

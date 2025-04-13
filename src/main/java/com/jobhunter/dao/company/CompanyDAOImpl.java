@@ -7,8 +7,10 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
+import com.jobhunter.model.user.UserInfoDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +24,12 @@ public class CompanyDAOImpl implements CompanyDAO {
 	@Override
 	public CompanyVO getCompanyInfo(String uid) throws Exception {
 		return ses.selectOne(NS+".getCompanyInfo", uid);
+	}
+	
+	@Override
+	public int updateCompanyInfo(CompanyInfoDTO companyInfo) throws Exception {
+		System.out.println(companyInfo);
+		return ses.update(NS + ".updateCompanyInfo", companyInfo);
 	}
 
 	@Override

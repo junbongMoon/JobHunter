@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class CompanyController {
 	private final CompanyService service;
 	
-	@GetMapping("/companyHome")
+	@GetMapping("/companyInfo")
 	public void showMypage() {
 		
 	}
