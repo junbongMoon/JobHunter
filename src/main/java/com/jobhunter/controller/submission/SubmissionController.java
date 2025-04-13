@@ -56,7 +56,7 @@ public class SubmissionController {
 			// 사용자의 이력서 목록 조회 (페이징 처리)
 			if (account != null) {
 				// 전체 이력서 수 조회
-				int totalResumes = resumeService.getTotalResumes(account.getUid());
+				int totalResumes = resumeService.getTotalResumes(account.getUid(), null);
 				int totalPages = (int) Math.ceil((double) totalResumes / pageSize);
 
 				// 페이지 범위 검증
@@ -66,7 +66,7 @@ public class SubmissionController {
 					page = totalPages;
 
 				// 이력서 목록 조회
-				List<ResumeVO> resumeList = resumeService.getResumeList(account.getUid(), page, pageSize);
+				List<ResumeVO> resumeList = resumeService.getResumeList(account.getUid(), page, pageSize, null);
 
 				// 모델에 페이징 정보 추가
 				model.addAttribute("resumeList", resumeList);
