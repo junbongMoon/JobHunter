@@ -61,7 +61,8 @@
 		gonggoUid, writer, companyName, reviewType, reviewLevel, reviewResult,
 		typeOtherText, content, postDate, likes, views
 		) values (
-		#{gonggoUid}, #{writer}, #{companyName}, #{reviewType}, #{reviewLevel},
+		#{gonggoUid},
+		#{writer}, #{companyName}, #{reviewType}, #{reviewLevel},
 		#{reviewResult},
 		#{typeOtherText}, #{content}, NOW(), 0, 0
 		)
@@ -183,7 +184,8 @@
 		gonggoUid = #{gonggoUid},
 		reviewType= #{reviewType},
 		reviewResult =#{reviewResult},
-		typeOtherText = #{typeOtherText},
+		typeOtherText
+		= #{typeOtherText},
 		content
 		=#{content},
 		postDate= NOW()
@@ -203,21 +205,37 @@
 		FROM reviewViews
 		WHERE userId = #{userId}
 		AND boardNo = #{boardNo}
-		AND viewedAt >= NOW() - INTERVAL 24 HOUR
+		AND
+		viewedAt >= NOW() - INTERVAL 24 HOUR
 	</select>
 
 	<!-- 2. 조회 기록 저장 -->
 	<insert id="insertReviewView">
 		INSERT INTO reviewViews (userId, boardNo)
-		VALUES (#{userId}, #{boardNo})
+		VALUES
+		(#{userId}, #{boardNo})
 	</insert>
 
 	<!-- 3. 게시판 조회수 증가 -->
 	<update id="updateCountViews">
 		UPDATE reviewBoard
 		SET views = views + 1
-		WHERE boardNo = #{boardNo}
+		WHERE boardNo
+		= #{boardNo}
 	</update>
+
+
+	<!-- reviewBoardMapper.xml -->
+	<select id="countAllBoards" resultType="int">
+		SELECT COUNT(*) FROM reviewBoard
+	</select>
+
+	<select id="selectPagedBoards"
+		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
+		SELECT * FROM reviewBoard
+		ORDER BY boardNo DESC
+		LIMIT #{size} OFFSET #{offset}
+	</select>
 
 
 </mapper>

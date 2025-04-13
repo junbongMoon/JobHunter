@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.reviewboard.RPageRequestDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -127,6 +127,16 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 		return ses.update(NS + ".updateCountViews", boardNo);
 	}
 
+	
+	@Override
+	public int countAllBoards() throws Exception {
+	    return ses.selectOne(NS + ".countAllBoards");
+	}
+
+	@Override
+	public List<ReviewBoardDTO> selectPagedBoards(RPageRequestDTO pageRequestDTO) throws Exception {
+	    return ses.selectList(NS + ".selectPagedBoards", pageRequestDTO);
+	}
 
 
 }

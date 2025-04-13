@@ -3,6 +3,8 @@ package com.jobhunter.service.reviewboard;
 import java.util.List;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.reviewboard.RPageRequestDTO;
+import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -41,6 +43,10 @@ public interface ReviewBoardService {
 
 	// 조회수 증가
 	void insertViewCount(int userId, int boardNo) throws Exception;
+
+	RPageResponseDTO<ReviewBoardDTO> getPagedBoardList(RPageRequestDTO pageRequestDTO) throws Exception;
+
+	
 
 
 

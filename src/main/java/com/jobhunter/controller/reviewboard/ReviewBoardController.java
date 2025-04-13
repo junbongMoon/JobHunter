@@ -7,7 +7,6 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,8 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.reviewboard.Likes;
 import com.jobhunter.model.reviewboard.MassageCallDTO;
+import com.jobhunter.model.reviewboard.RPageRequestDTO;
+import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -41,26 +43,19 @@ public class ReviewBoardController {
 
 	private static Logger logger = LoggerFactory.getLogger(ReviewBoardController.class);
 
+	
 	@GetMapping("/allBoard")
-	public String listBoard(Model model) {
-
-		String resultPage = "reviewBoard/allBoard";
-		// String 타입으 뷰로 반환할 경로 지정
-		List<ReviewBoardDTO> blist = null; // 초기값세팅
-		try {
-			blist = service.selectReBoard();
-			System.out.println(blist);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		model.addAttribute("blist", blist);
-
-		// TODO Auto-generated catch block
-
-		return resultPage;
-
+	public String listBoard(@ModelAttribute RPageRequestDTO pageRequestDTO, Model model) {
+	    try {
+	       RPageResponseDTO<ReviewBoardDTO> response = service.getPagedBoardList(pageRequestDTO);
+	        model.addAttribute("pageResult", response);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return "reviewBoard/allBoard";
 	}
+
+
 
 	// 공고글 게시물을 조회
 	@GetMapping("/write")

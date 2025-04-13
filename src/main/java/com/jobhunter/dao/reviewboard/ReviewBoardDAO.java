@@ -3,11 +3,11 @@ package com.jobhunter.dao.reviewboard;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.jobhunter.model.reviewboard.RPageRequestDTO;
+import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
 import com.jobhunter.model.reviewboard.WriteBoardDTO;
-import com.jobhunter.model.account.AccountVO;
-import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 
 public interface ReviewBoardDAO {
 
@@ -40,6 +40,11 @@ public interface ReviewBoardDAO {
 	int saveViewRecord(int userId, int boardNo) throws Exception;
 
 	int incrementViews(int boardNo) throws Exception;
+
+	int countAllBoards() throws Exception;
+    
+	List<ReviewBoardDTO> selectPagedBoards(RPageRequestDTO pageRequestDTO) throws Exception;
+
 
 
 }

@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.reviewboard.ReviewBoardDAO;
-import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.reviewboard.RPageRequestDTO;
+import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -152,6 +154,14 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	    	Rdao.incrementViews(boardNo);     
 	    }
 
+	}
+
+
+	@Override
+	public RPageResponseDTO<ReviewBoardDTO> getPagedBoardList(RPageRequestDTO pageRequestDTO) throws Exception {
+	    int total = Rdao.countAllBoards();  // 총 게시글 수
+	    List<ReviewBoardDTO> list = Rdao.selectPagedBoards(pageRequestDTO);
+	    return new RPageResponseDTO<>(list, total, pageRequestDTO);
 	}
 
 }
