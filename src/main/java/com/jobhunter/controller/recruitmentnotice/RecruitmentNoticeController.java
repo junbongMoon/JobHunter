@@ -458,9 +458,17 @@ public class RecruitmentNoticeController {
 				
 			}
 			
+		    // 이전/다음 글 추가
+			RecruitmentNotice prevPost = recruitmentService.getPreviousPost(uid);
+			RecruitmentNotice nextPost = recruitmentService.getNextPost(uid);
+
+			
 			String applicationsJson = new ObjectMapper().writeValueAsString(this.applicationList);
 			model.addAttribute("applicationsJson", applicationsJson);
 			model.addAttribute("RecruitmentDetailInfo", detailInfo);
+		    model.addAttribute("prevPost", prevPost);
+		    model.addAttribute("nextPost", nextPost);
+
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -414,5 +414,15 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	}
 
 
+	@Override
+	public RecruitmentNotice getPreviousPost(int uid) throws Exception {
+	    return recdao.selectPreviousPost(uid);
+	}
+
+	@Override
+	public RecruitmentNotice getNextPost(int uid) throws Exception {
+	    return recdao.selectNextPost(uid);
+	}
+
 
 }

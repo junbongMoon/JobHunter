@@ -230,6 +230,72 @@ button.btn-resume {
   background-color: #349fcc;
   transform: translateY(-2px);
 }
+
+.post-navigation-card-style {
+  width: 80%;
+  margin: 0 auto;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.post-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.post-row:last-child {
+  border-bottom: none;
+}
+
+.post-row .label {
+  font-weight: bold;
+  color: #47b2e4;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.post-row .title {
+  flex-grow: 1;
+  text-align: left;
+  padding: 0 1rem;
+  font-weight: 600;
+  color: #3d4d6a;
+}
+
+.post-row .title a {
+  color: #3d4d6a;
+  text-decoration: none;
+}
+
+.post-row .title a:hover {
+  color: #47b2e4;
+  text-decoration: underline;
+}
+
+.post-row .date {
+  font-size: 0.95rem;
+  color: #888;
+  flex-shrink: 0;
+}
+
+.post-row.current {
+  background-color: white !important; 
+  border: 2px solid #47b2e4; 
+  border-radius: 8px;
+  color: #3d4d6a;
+  font-weight: bold;
+}
+
+.share-section .social-links .d-flex {
+  justify-content: flex-end !important;
+}
+
 </style>
 <body>
 	<!-- 헤더 -->
@@ -369,7 +435,7 @@ button.btn-resume {
 
 									<div class="meta-bottom">
 										<div class="tags-section">
-											<h4>Related Topics</h4>
+											<h4>면접 방법</h4>
 											<div class="tags">
 												<ul class="trend-list">
 													<c:forEach var="app"
@@ -409,10 +475,37 @@ button.btn-resume {
 											</div>
 										</div>
 
-										<div class="share-section">
-											<h4>Share Article</h4>
-											<div class="social-links mt-2">
-												<div class="d-flex gap-2">
+										<div class="post-navigation-card-style mt-5">
+											<!-- 이전 글 -->
+											<c:if test="${not empty prevPost}">
+											  <div class="post-row">
+												<div class="label">이전 글</div>
+												<div class="title"><a href="/recruitmentnotice/detail?uid=${prevPost.uid}">${prevPost.title}</a></div>
+												<div class="date"><fmt:formatDate value="${prevPost.regDate}" pattern="yyyy-MM-dd" /></div>
+											  </div>
+											</c:if>
+										  
+											<!-- 현재 글 -->
+											<div class="post-row current">
+											  <div class="label">현재 글</div>
+											  <div class="title">${RecruitmentDetailInfo.title}</div>
+											  <div class="date"><fmt:formatDate value="${RecruitmentDetailInfo.regDate}" pattern="yyyy-MM-dd" /></div>
+											</div>
+										  
+											<!-- 다음 글 -->
+											<c:if test="${not empty nextPost}">
+											  <div class="post-row">
+												<div class="label">다음 글</div>
+												<div class="title"><a href="/recruitmentnotice/detail?uid=${nextPost.uid}">${nextPost.title}</a></div>
+												<div class="date"><fmt:formatDate value="${nextPost.regDate}" pattern="yyyy-MM-dd" /></div>
+											  </div>
+											</c:if>
+										  </div>
+
+										<div class="share-section ">
+											<h4>More</h4>
+											<div class="social-links mt-2 w-100">
+												<div class="d-flex gap-2 justify-content-end w-100">
 													<button type="button" class="btn-list"
 													onclick="location.href='/recruitmentnotice/listAll'">목록으로</button>
 													<button type="button" class="btn btn-primary"
@@ -428,10 +521,14 @@ button.btn-resume {
 										</div>
 									</div>
 
+									
+
+
+
+
 								</div>
 
-
-
+								
 							</article>
 						</div>
 					</section>

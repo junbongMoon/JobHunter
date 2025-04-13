@@ -185,6 +185,20 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	    return ses.selectList(NS + ".selectRecruitmentByCompanyUid", param);
 	}
 
+
+	@Override
+	public RecruitmentNotice selectPreviousPost(int uid) throws Exception {
+		// TODO Auto-generated method stub
+		return ses.selectOne(NS + ".selectPreviousPost", uid);
+	}
+
+
+	@Override
+	public RecruitmentNotice selectNextPost(int uid) throws Exception {
+		// TODO Auto-generated method stub
+		return ses.selectOne(NS + ".selectNextPost", uid);
+	}
+
 	
 
 }

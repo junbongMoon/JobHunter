@@ -75,4 +75,8 @@ public interface RecruitmentNoticeDAO {
 	// 내가 작성한 공고 리스트를 조회하는 메서드
 	List<RecruitmentNotice> selectRecruitmentByCompanyUid(int companyUid,
 			PageResponseDTO<RecruitmentNotice> pageResponseDTO);
+
+	RecruitmentNotice selectPreviousPost(int uid) throws Exception;
+
+	RecruitmentNotice selectNextPost(int uid) throws Exception;
 }

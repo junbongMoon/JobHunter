@@ -153,20 +153,24 @@
 		<choose>
 			<when test="sortOption == 'highPay'">
 				ORDER BY CASE r.payType
-				WHEN 'HOUR' THEN r.pay * 8 * 22
+				WHEN 'HOUR' THEN r.pay * 8 *
+				22
 				WHEN 'DATE' THEN r.pay * 22
 				WHEN 'WEEK' THEN r.pay * 4
-				WHEN 'MONTH' THEN r.pay
+				WHEN 'MONTH'
+				THEN r.pay
 				WHEN 'YEAR' THEN r.pay / 12
 				ELSE 0
 				END DESC
 			</when>
 			<when test="sortOption == 'lowPay'">
 				ORDER BY CASE r.payType
-				WHEN 'HOUR' THEN r.pay * 8 * 22
+				WHEN 'HOUR' THEN r.pay * 8 *
+				22
 				WHEN 'DATE' THEN r.pay * 22
 				WHEN 'WEEK' THEN r.pay * 4
-				WHEN 'MONTH' THEN r.pay
+				WHEN 'MONTH'
+				THEN r.pay
 				WHEN 'YEAR' THEN r.pay / 12
 				ELSE 0
 				END ASC
@@ -429,6 +433,26 @@
 		#{companyUid}
 		ORDER BY uid DESC
 		LIMIT #{startRowIndex}, #{rowCntPerPage}
+	</select>
+
+	<!-- 이전 글 -->
+	<select id="selectPreviousPost"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentNotice">
+		SELECT uid, title, regDate
+		FROM recruitmentnotice
+		WHERE uid &lt; #{uid} AND status = 'Y'
+		ORDER BY uid DESC
+		LIMIT 1
+	</select>
+
+	<!-- 다음 글 -->
+	<select id="selectNextPost"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentNotice">
+		SELECT uid, title, regDate
+		FROM recruitmentnotice
+		WHERE uid &gt; #{uid} AND status = 'Y'
+		ORDER BY uid ASC
+		LIMIT 1
 	</select>
 
 </mapper>

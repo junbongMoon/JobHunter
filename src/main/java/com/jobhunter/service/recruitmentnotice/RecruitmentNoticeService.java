@@ -125,6 +125,12 @@ public interface RecruitmentNoticeService {
 	 *
 	 */
 	PageResponseDTO<RecruitmentNotice> getRecruitmentByCompanyUid(int companyUid, PageRequestDTO pageRequestDTO);
+
+
+	RecruitmentNotice getPreviousPost(int uid) throws Exception;
+
+
+	RecruitmentNotice getNextPost(int uid) throws Exception;
 	
 
 }
