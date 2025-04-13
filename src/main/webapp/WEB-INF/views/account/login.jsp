@@ -356,6 +356,7 @@
 					<!-- 인증 방법 선택 -->
 					<div class="verification-methods">
 						<h2 class="login-title">인증 방법 선택</h2>
+						<div>계정이 잠금상태입니다. 인증을 통해 잠금을 해제해주세요.</div>
 						<div class="method-buttons">
 							<button type="button" class="btn-method active"
 								data-method="email">이메일 인증</button>
@@ -481,7 +482,8 @@
 </div>
 
 <script>
-//카톡
+// #region 전역변수 및 API용
+// #region 카톡
 Kakao.init('b50a2700ff109d1ab2de2eca4e07fa23');
 Kakao.isInitialized();
 
@@ -501,33 +503,8 @@ Kakao.isInitialized();
 		scope: 'profile_nickname, account_email'
 		});
 	}
-
-	// 아래는 데모를 위한 UI 코드입니다.
-	displayToken()
-	function displayToken() {
-		var token = getCookie('authorize-access-token');
-
-		if(token) {
-		Kakao.Auth.setAccessToken(token);
-		Kakao.Auth.getStatusInfo()
-			.then(function(res) {
-			if (res.status === 'connected') {
-				document.getElementById('token-result').innerText
-				= 'login success, token: ' + Kakao.Auth.getAccessToken();
-			}
-			})
-			.catch(function(err) {
-			Kakao.Auth.setAccessToken(null);
-			});
-		}
-	}
-
-	function getCookie(name) {
-		var parts = document.cookie.split(name + '=');
-		if (parts.length === 2) { return parts[1].split(';')[0]; }
-	}
-// 카톡
-
+// #endregion 카톡
+// #region 파이어베이스
 const firebaseConfig = {
     apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
     authDomain: "jobhunter-672dd.firebaseapp.com",
@@ -537,14 +514,31 @@ const firebaseConfig = {
     appId: "1:686284302067:web:30c6bc60e91aeea963b986",
     measurementId: "G-RHVS9BGBQ7"
 };
+
 firebase.initializeApp(firebaseConfig);
+
 const auth = firebase.auth();
 let confirmationResult = null;
+
+//캡챠기능 파이어베이스 기본 제공
+function firebaseCaptcha() {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+          size: 'invisible',
+          callback: () => {}
+        });
+    }
+}
+// #endregion 파이어베이스
+
 // JS에서 enum타입처럼 쓰는거
 const METHOD = {
   EMAIL: "email",
   PHONE: "phone"
 };
+// #endregion 전역변수 및 API용
+
+// #region 포매팅 함수
 // 국제번호로 변환 (Firebase 용)
 function formatPhoneNumberForFirebase(koreanNumber) {
   const cleaned = koreanNumber.replace(/-/g, '');
@@ -556,6 +550,7 @@ function formatToKoreanPhoneNumber(internationalNumber) {
     ? internationalNumber.replace("+82", "0").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
     : internationalNumber;
 }
+// #endregion 포매팅 함수
 
 // 알럿 모달 유틸리티
 const alertUtils = {
@@ -607,50 +602,42 @@ const alertUtils = {
 };
 
 // 이메일 인증 코드 전송
-async function sendEmailVerification() {
+function sendEmailVerification() {
     
     const email = "${sessionScope.account.email}";
 
     $.ajax({
         url: "/account/auth/email",
-        method: "POST",
-  		  contentType: "application/json",
+		method: "POST",
+		contentType: "application/json",
         data: JSON.stringify({ email }),
         success: (res) => {
-          alertUtils.show("메일 전송 성공: " + res);
-        document.getElementById('emailVerifySection').style.display = 'block';
-        document.getElementById('emailVerificationContent').style.display = 'none';
+			window.publicModals.show("메일이 전송되었습니다. 인증번호를 입력해주세요.")
+			document.getElementById('emailVerifySection').style.display = 'block';
+			document.getElementById('emailVerificationContent').style.display = 'none';
         },
-        error: (xhr) => alertUtils.show("메일 전송 중 오류 발생: " + xhr.responseText)
+        error: (xhr) => {
+			window.publicModals.show("메일 전송 중 오류가 발생했습니다. 잠시 후 새로고침 뒤 다시 시도해주세요.")
+		}
     });
 }
 
-//캡챠기능 파이어베이스 기본 제공 (1회용이라 초기화)
-function firebaseCaptcha() {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-          size: 'invisible',
-          callback: () => {}
-        });
-    }
-}
 // 전화번호 인증 코드 전송
 async function sendPhoneVerification() {
 
-  const phoneNumber = formatPhoneNumberForFirebase("${sessionScope.account.mobile}");
+	const phoneNumber = formatPhoneNumberForFirebase("${sessionScope.account.mobile}");
 
     // 캡챠_firebase에서 제공해줌
     firebaseCaptcha() 
 
     try {
-    	confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-        alertUtils.show("인증 코드가 전송되었습니다.");
+		confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
+        window.publicModals.show("메시지가 전송되었습니다. 인증번호를 입력해주세요.")
         document.getElementById('phoneSendSection').style.display = 'none';
         document.getElementById('phoneVerifySection').style.display = 'block';
         document.getElementById('phoneVerificationContent').style.display = 'none';
     } catch (error) {
-        console.error("전화번호 인증 실패:", error);
-        alertUtils.show("전화번호 인증 중 오류 발생.");
+        window.publicModals.show("메시지 전송 중 오류가 발생했습니다. 잠시 후 새로고침 뒤 다시 시도해주세요.")
     }
 }
 
@@ -667,14 +654,14 @@ async function verifyPhoneCode(code) {
 async function verifyEmailCode(code) {
     const email = "${sessionScope.account.email}";
     $.ajax({
-      url: `/account/auth/email/${code}`,
-      method: "POST",
-  	  contentType: "application/json",
-      data: JSON.stringify({
-      email: email
-  }),
-      success: () => onVerificationSuccess(METHOD.EMAIL),
-      error: (xhr) => alertUtils.show("이메일 인증 실패: " + xhr.responseText)
+		url: `/account/auth/email/${code}`,
+		method: "POST",
+		contentType: "application/json",
+		data: JSON.stringify({
+		email: email
+	}),
+		success: () => onVerificationSuccess(METHOD.EMAIL),
+		error: (xhr) => alertUtils.show("이메일 인증 실패: " + xhr.responseText)
     });
 }
 
@@ -755,15 +742,29 @@ window.onload=()=>{
   // 회원 유형 탭 전환
   const tabs = document.querySelectorAll('.account-type-tab');
   tabs.forEach(tab => {
-    tab.addEventListener('click', function () {
-      console.log("클릭?");
-      tabs.forEach(t => t.classList.remove('active'));
-      this.classList.add('active');
+	tab.addEventListener('click', function () {
+		tabs.forEach(t => t.classList.remove('active'));
+		this.classList.add('active');
 
-      // radio 체크 직접 반영
-      const radio = this.querySelector('input[type="radio"]');
-      if (radio) radio.checked = true;
-    });
+		const radio = this.querySelector('input[type="radio"]');
+		if (radio) {
+		radio.click();
+		}
+	});
+  });
+
+  // 회원 유형 전환시 이벤트트
+  $('input[name="accountType"]').on('change', function() {
+    const selectedValue = $('input[name="accountType"]:checked').val();
+	console.log('selectedValue: ', selectedValue);
+
+    if (selectedValue === 'USER') {
+      // 여기에 개인 회원 관련 동작 추가
+	  $('.btn-kakao').show(100)
+    } else if (selectedValue === 'COMPANY') {
+      // 여기에 기업 회원 관련 동작 추가
+	  $('.btn-kakao').hide(100)
+    }
   });
 
   // 인증 방법 전환 (이메일/전화번호)
@@ -783,6 +784,8 @@ window.onload=()=>{
       document.getElementById('phoneContent').style.display = method === 'phone' ? 'block' : 'none';
     });
   });
+
+  
 
   // URL 쿼리 파라미터 처리
   const urlParams = new URLSearchParams(window.location.search);
