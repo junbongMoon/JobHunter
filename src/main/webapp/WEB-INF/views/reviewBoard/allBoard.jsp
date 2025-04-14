@@ -71,6 +71,7 @@ h2 {
 .btn-write:hover {
 	background-color: #0b5ed7;
 }
+
 </style>
 </head>
 <body>
@@ -92,19 +93,18 @@ h2 {
 			<th>등록날짜<th>
 		</tr>
 		<c:forEach var="board" items="${pageResult.boardList}">
-			<tr>
+			<tr onclick="location.href='./detail?boardNo=${board.boardNo}';" style="cursor: pointer;">
+
 				<td>${board.boardNo}</td>
 				<td>${board.writer}</td>
-				<td><a href="/reviewBoard/detail?boardNo=${board.boardNo}">
-						${board.companyName}</a></td>
-						  <td>
-						  <c:choose>
-						    <c:when test="${board.reviewResult eq 'PASSED'}">합격</c:when>
-						    <c:when test="${board.reviewResult eq 'FAILED'}">불합격</c:when>
-						    <c:when test="${board.reviewResult eq 'PENDING'}">진행중</c:when>
-						    <c:otherwise>미선택</c:otherwise>
-						  </c:choose>
-									</td>
+				<td>${board.companyName}</td>
+				<td>
+				<c:choose>
+				 <c:when test="${board.reviewResult eq 'PASSED'}">합격</c:when>
+				 <c:when test="${board.reviewResult eq 'FAILED'}">불합격</c:when>
+				 <c:when test="${board.reviewResult eq 'PENDING'}">진행중</c:when>
+					<c:otherwise>미선택</c:otherwise>
+				</c:choose></td>
 				<td>${board.likes}</td>
 				<td>${board.views}</td>
 				<td class="postDate()">${board.postDate}</td>
@@ -175,7 +175,18 @@ h2 {
 		  // 오래된 글은 직접 포맷해서 반환
 		  return formatDateWithoutMillis(createdAt.split('.')[0]);
 		}
-
+	
+	document.addEventListener("detail", function () {
+		const rows = document.querySelectorAll(".clickDetail");
+		rows.forEach(row => {
+			row.addEventListener("click", function () {
+				const url = this.getAttribute("data-href");
+				if (url) {
+					window.location.href = url;
+				}
+			});
+		});
+	});
 		
 </script>
 </body>
