@@ -282,20 +282,7 @@
 
 		<script>
 			function openNotifications() {
-				const width = 500;
-				const height = 700;
-
-				// 다중 모니터 대응
-				const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : screen.left;
-				const dualScreenTop = window.screenTop !== undefined ? window.screenTop : screen.top;
-
-				const screenWidth = window.innerWidth || document.documentElement.clientWidth || screen.width;
-				const screenHeight = window.innerHeight || document.documentElement.clientHeight || screen.height;
-
-				const left = dualScreenLeft + (screenWidth - width) / 2;
-				const top = dualScreenTop + (screenHeight - height) / 2;
-
-				const popup = window.open('/notifications', 'notifications',
+				const popup = window.open('/notification/list', 'notifications',
 					`width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);
 
 				if (popup) popup.focus();
