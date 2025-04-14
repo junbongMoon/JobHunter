@@ -165,7 +165,7 @@
 				  </td>
 				</tr>
 				<tr>
-					<th>난이도</th>
+					<th>면접 난이도</th>
 					<td><c:forEach begin="1" end="${detail.reviewLevel}">⭐</c:forEach>
 						(${detail.reviewLevel}/5)</td>
 				</tr>

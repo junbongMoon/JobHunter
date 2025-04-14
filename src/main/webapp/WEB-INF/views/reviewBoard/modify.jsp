@@ -122,26 +122,26 @@
         </c:forEach>
 
         <!-- 면접 유형 -->
-<div class="mb-3">
-  <label class="form-label">면접 유형</label><br />
-
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="reviewType" id="reviewType-FACE" value="FACE_TO_FACE"
-           onclick="toggleOtherTypeInput()" ${writeBoardDTO.reviewType == 'FACE_TO_FACE' ? 'checked' : ''}>
-    <label class="form-check-label" for="reviewType-FACE">대면</label>
-  </div>
-
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="reviewType" id="reviewType-VIDEO" value="VIDEO"
-           onclick="toggleOtherTypeInput()" ${writeBoardDTO.reviewType == 'VIDEO' ? 'checked' : ''}>
-    <label class="form-check-label" for="reviewType-VIDEO">비대면</label>
-  </div>
-
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="reviewType" id="reviewType-PHONE" value="PHONE"
-           onclick="toggleOtherTypeInput()" ${writeBoardDTO.reviewType == 'PHONE' ? 'checked' : ''}>
-    <label class="form-check-label" for="reviewType-PHONE">전화면접</label>
-  </div>
+		<div class="mb-3">
+		  <label class="form-label">면접 유형</label><br />
+		
+		  <div class="form-check form-check-inline">
+		    <input class="form-check-input" type="radio" name="reviewType" id="reviewType-FACE" value="FACE_TO_FACE"
+		           onclick="toggleOtherTypeInput()" ${writeBoardDTO.reviewType == 'FACE_TO_FACE' ? 'checked' : ''}>
+		    <label class="form-check-label" for="reviewType-FACE">대면</label>
+		  </div>
+		
+		  <div class="form-check form-check-inline">
+		    <input class="form-check-input" type="radio" name="reviewType" id="reviewType-VIDEO" value="VIDEO"
+		           onclick="toggleOtherTypeInput()" ${writeBoardDTO.reviewType == 'VIDEO' ? 'checked' : ''}>
+		    <label class="form-check-label" for="reviewType-VIDEO">비대면</label>
+		  </div>
+		
+		  <div class="form-check form-check-inline">
+		    <input class="form-check-input" type="radio" name="reviewType" id="reviewType-PHONE" value="PHONE"
+		           onclick="toggleOtherTypeInput()" ${writeBoardDTO.reviewType == 'PHONE' ? 'checked' : ''}>
+		    <label class="form-check-label" for="reviewType-PHONE">전화면접</label>
+		  </div>
 
   <div class="form-check form-check-inline">
     <input class="form-check-input" type="radio" name="reviewType" id="reviewType-OTHER" value="OTHER"
@@ -149,28 +149,30 @@
     <label class="form-check-label" for="reviewType-OTHER">기타</label>
   </div>
 
-  <div class="mt-2" id="otherTypeWrapper"
-       style="display: ${writeBoardDTO.reviewType == 'OTHER' ? 'block' : 'none'};">
-    <input type="text" class="form-control"
-           id="otherTypeText"
-           name="typeOtherText"
-           placeholder="기타 면접 유형을 입력해주세요"
-           value="${writeBoardDTO.typeOtherText}">
-  </div>
-</div>
+		  <div class="mt-2" id="otherTypeWrapper"
+		       style="display: ${writeBoardDTO.reviewType == 'OTHER' ? 'block' : 'none'};">
+		    <input type="text" class="form-control"
+		           id="otherTypeText"
+		           name="typeOtherText"
+		           placeholder="기타 면접 유형을 입력해주세요"
+		           value="${writeBoardDTO.typeOtherText}">
+		  </div>
+		</div>
 
 
         <!-- 면접 난이도 -->
-        <div class="mb-3">
-          <label class="form-label">면접 난이도</label>
-          <select class="form-select" name="reviewLevel" required>
-            <c:forEach var="i" begin="1" end="5">
-              <option value="${i}" ${i == writeBoardDTO.reviewLevel ? 'selected' : ''}>
-                <c:forEach begin="1" end="${i}">⭐️</c:forEach>
-              </option>
-            </c:forEach>
-          </select>
-        </div>
+		  <div class="mb-3">
+		  <label class="form-label">면접 난이도</label><br/>
+		  <c:forEach var="i" begin="1" end="5">
+		    <div class="form-check form-check-inline">
+		      <input class="form-check-input" type="radio" name="reviewLevel" id="level${i}" value="${i}"
+		             <c:if test="${i == writeBoardDTO.reviewLevel}">checked</c:if> required />
+		      <label class="form-check-label" for="level${i}">
+		        <c:forEach begin="1" end="${i}">⭐️</c:forEach>
+		      </label>
+		    </div>
+		  </c:forEach>
+		</div>
 
         <!-- 면접 결과 -->
         <div class="mb-3">

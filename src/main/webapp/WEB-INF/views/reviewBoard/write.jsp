@@ -190,19 +190,16 @@ label.form-label {
 						value="${writeBoardDTO.typeOtherText}">
 				</div>
 
-
-
-
 				<div class="mb-3">
-					<label class="form-label">면접 난이도<span class="text-danger">*</span></label>
-					<select class="form-select" name="reviewLevel" required>
-						<option value="" selected disabled>난이도를 선택하세요</option>
-						<option value="1">⭐️</option>
-						<option value="2">⭐️⭐️</option>
-						<option value="3">⭐️⭐️⭐️</option>
-						<option value="4">⭐️⭐️⭐️⭐️</option>
-						<option value="5">⭐️⭐️⭐️⭐️⭐️</option>
-					</select>
+				  <label class="form-label">면접 난이도<span class="text-danger">*</span></label><br/>
+				  <c:forEach var="i" begin="1" end="5">
+				    <div class="form-check form-check-inline">
+				      <input class="form-check-input" type="radio" name="reviewLevel" id="level${i}" value="${i}" required />
+				      <label class="form-check-label" for="level${i}">
+				        <c:forEach begin="1" end="${i}">⭐️</c:forEach>
+				      </label>
+				    </div>
+				  </c:forEach>
 				</div>
 
 				<div class="mb-3">
