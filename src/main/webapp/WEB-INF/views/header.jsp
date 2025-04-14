@@ -213,7 +213,7 @@
 											<div class="notification-count">0</div>
 										</div>
 									</div>
-									<h6 class="mt-2 fw-bold">${sessionScope.account.accountName}</h6>
+									<h6 class="mt-2 fw-bold">${sessionScope.account.accountName}님</h6>
 
 									<!-- accountType에 따라 처리 -->
 									<c:choose>
