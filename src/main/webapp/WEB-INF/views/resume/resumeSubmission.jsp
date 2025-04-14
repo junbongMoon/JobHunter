@@ -89,6 +89,31 @@
 								</a>
 							</div>
 						</div>
+
+						<!-- 검색 영역 -->
+						<div id="searchArea" class="search-area mb-4" style="display: none;">
+							<div class="card">
+								<div class="card-body">
+									<form id="searchForm" action="/submission/check?uid=${recruitmentNotice.uid}"
+										method="get" class="d-flex gap-2">
+										<input type="hidden" name="page" value="1"> <input type="hidden" name="pageSize"
+											value="${pageSize}">
+										<input type="hidden" name="uid" value="${recruitmentNotice.uid}">
+										<div class="flex-grow-1">
+											<input type="text" name="searchTitle" class="form-control"
+												placeholder="이력서 제목을 입력하세요" value="${param.searchTitle}">
+										</div>
+										<button type="submit" class="btn btn-primary searchBtn">
+											<i class="fas fa-search"></i> 검색
+										</button>
+										<button type="button" class="btn btn-secondary" onclick="clearSearch()">
+											<i class="fas fa-times"></i> 초기화
+										</button>
+									</form>
+								</div>
+							</div>
+						</div>
+
 						<div class="resume-list">
 							<c:choose>
 								<c:when test="${not empty resumeList}">
@@ -204,7 +229,7 @@
 									<c:if test="${currentBlock > 1}">
 										<li class="page-item">
 											<a class="page-link"
-												href="/submission/check?uid=${recruitmentNotice.uid}&page=${startPage - 1}&pageSize=${pageSize}"
+												href="/submission/check?uid=${recruitmentNotice.uid}&page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 												aria-label="Previous Block">
 												<i class="fas fa-angle-double-left"></i>
 											</a>
@@ -215,7 +240,7 @@
 									<c:if test="${currentPage > 1}">
 										<li class="page-item">
 											<a class="page-link"
-												href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage - 1}&pageSize=${pageSize}"
+												href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 												aria-label="Previous">
 												<i class="fas fa-chevron-left"></i>
 											</a>
@@ -226,7 +251,7 @@
 									<c:forEach begin="${startPage}" end="${endPage}" var="i">
 										<li class="page-item ${currentPage == i ? 'active' : ''}">
 											<a class="page-link"
-												href="/submission/check?uid=${recruitmentNotice.uid}&page=${i}&pageSize=${pageSize}">${i}</a>
+												href="/submission/check?uid=${recruitmentNotice.uid}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
 										</li>
 									</c:forEach>
 
@@ -234,7 +259,7 @@
 									<c:if test="${currentPage < totalPages}">
 										<li class="page-item">
 											<a class="page-link"
-												href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage + 1}&pageSize=${pageSize}"
+												href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 												aria-label="Next">
 												<i class="fas fa-chevron-right"></i>
 											</a>
@@ -245,7 +270,7 @@
 									<c:if test="${currentBlock < totalBlocks}">
 										<li class="page-item">
 											<a class="page-link"
-												href="/submission/check?uid=${recruitmentNotice.uid}&page=${endPage + 1}&pageSize=${pageSize}"
+												href="/submission/check?uid=${recruitmentNotice.uid}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 												aria-label="Next Block">
 												<i class="fas fa-angle-double-right"></i>
 											</a>
@@ -617,6 +642,18 @@
 			.btn-link {
 				color: #47b2e4;
 			}
+
+			.searchBtn {
+				background-color: #37517e !important;
+				color: white !important;
+				border: none !important;
+			}
+
+			.searchBtn:hover {
+				background-color: #47b2e4 !important;
+				color: white !important;
+				border: none !important;
+			}
 		</style>
 
 		<script>
@@ -768,5 +805,27 @@
 			function showCheckedResumeModal() {
 				$('#modalMessage').text('기업에서 확인중인 이력서는 수정할 수 없습니다.');
 				$('#modal').modal('show');
+			}
+			//---------------------------------------------------------------------------------------------------------------------------------
+			$(document).ready(function () {
+				// 검색 영역 토글
+				$('#searchToggleBtn').click(function () {
+					$('#searchArea').slideToggle(300);
+				});
+
+				// URL에 검색 파라미터가 있으면 검색 영역 표시
+				if ('${param.searchTitle}') {
+					$('#searchArea').show();
+				}
+			});
+
+			// 검색 초기화
+			function clearSearch() {
+				// 검색어 입력창 초기화
+				$('input[name="searchTitle"]').val('');
+				// 검색 영역 숨기기
+				$('#searchArea').slideUp(300);
+				// 검색 결과 초기화를 위해 폼 제출
+				$('#searchForm').submit();
 			}
 		</script>

@@ -36,7 +36,9 @@ public class SubmissionController {
 	@GetMapping("/check")
 	public String submitResumeForm(@RequestParam("uid") int uid,
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "pageSize", defaultValue = "5") int pageSize, Model model, HttpSession session) {
+			@RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
+			@RequestParam(value = "searchTitle", required = false) String searchTitle,
+			Model model, HttpSession session) {
 
 		// 세션에서 사용자 정보 가져오기
 		AccountVO account = (AccountVO) session.getAttribute("account");
@@ -56,7 +58,7 @@ public class SubmissionController {
 			// 사용자의 이력서 목록 조회 (페이징 처리)
 			if (account != null) {
 				// 전체 이력서 수 조회
-				int totalResumes = resumeService.getTotalResumes(account.getUid(), null);
+				int totalResumes = resumeService.getTotalResumes(account.getUid(), searchTitle);
 				int totalPages = (int) Math.ceil((double) totalResumes / pageSize);
 
 				// 페이지 범위 검증
@@ -66,7 +68,7 @@ public class SubmissionController {
 					page = totalPages;
 
 				// 이력서 목록 조회
-				List<ResumeVO> resumeList = resumeService.getResumeList(account.getUid(), page, pageSize, null);
+				List<ResumeVO> resumeList = resumeService.getResumeList(account.getUid(), page, pageSize, searchTitle);
 
 				// 모델에 페이징 정보 추가
 				model.addAttribute("resumeList", resumeList);
