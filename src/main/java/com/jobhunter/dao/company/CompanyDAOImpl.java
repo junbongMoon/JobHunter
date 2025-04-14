@@ -77,7 +77,7 @@ public class CompanyDAOImpl implements CompanyDAO {
 		param.put("start", start);
 		param.put("end", end);
 		param.put("string", string);
-		return ses.selectOne(NS +".", param);
+		return ses.selectOne(NS +".countByCreatedDateBetweenAndRole", param);
 	}
 	
 	

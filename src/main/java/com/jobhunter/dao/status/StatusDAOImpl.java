@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 public class StatusDAOImpl implements StatusDAO {
 	
 	private final SqlSession ses;
-	private final String NS = "2";
+	private final String NS = "com.jobhunter.mapper.statusmapper";
 
 	@Override
 	public void insertStatusDate(StatusVODTO status) {

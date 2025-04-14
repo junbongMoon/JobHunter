@@ -20,12 +20,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StatusServiceImpl implements StatusService {
 
-	private UserDAO userDAO;
-	private CompanyDAO companyDAO;
-	private RecruitmentNoticeDAO recruitmentNoticeDAO;
-	private SubmitDAO submitDAO;
-	private ReviewBoardDAO reviewBoardDAO;
-	private StatusDAO statusDAO;
+	private final UserDAO userDAO;
+	private final CompanyDAO companyDAO;
+	private final RecruitmentNoticeDAO recruitmentNoticeDAO;
+	private final SubmitDAO submitDAO;
+	private final ReviewBoardDAO reviewBoardDAO;
+	private final StatusDAO statusDAO;
 	
 
 	@Override
@@ -43,11 +43,11 @@ public class StatusServiceImpl implements StatusService {
 
         StatusVODTO status = StatusVODTO.builder()
                 .statusDate(LocalDateTime.now())
-                .new_Users(newUsers)
-                .new_Companies(newCompanies)
-                .new_RecruitmentNoticeCnt(newRecruitmentNoticeCnt)
-                .new_Registration(newRegistration)
-                .new_ReviewBoard(newReviewBoard)
+                .newUsers(newUsers)
+                .newCompanies(newCompanies)
+                .newRecruitmentNoticeCnt(newRecruitmentNoticeCnt)
+                .newRegistration(newRegistration)
+                .newReviewBoard(newReviewBoard)
                 .build();
 
         statusDAO.insertStatusDate(status);

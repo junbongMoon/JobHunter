@@ -599,6 +599,7 @@ function showThumbnail(file) {
 		const payType = $("input[name='payType']:checked").val();
 		const pay = getRawPay();
 		const militaryService = $("input[name='militaryService']:checked").val();
+		console.log(" militaryService:", militaryService);
 		const dueDate = $("#date").val();
 		const detail = $("#summernote").val();
 		const sigungu = $(".Sigungu").val();

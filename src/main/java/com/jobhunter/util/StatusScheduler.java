@@ -21,12 +21,18 @@ public class StatusScheduler {
 	// StatusService 와야할 자리
 	
 	
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 일일 통계 insert하는 메서드
+	 * </p>
+	 * 
+	 *
+	 */
 	@Scheduled(cron = "0 0 0 * * *")  // 매일 00:00:00에 실행
 	public void saveDateStatus() {
-		
-		// 구해야 할 것 : 오늘 가입한 일반 유저의 수, 오늘 가입한 기업 유저의 수, 오늘 작성 된 공고의 갯수,
-		// 오늘 이력서의 제출 수, 오늘 작성된 리뷰글의 갯 수 
-		
+
 		statusService.saveDateStatusByToDay();
 		
 	}

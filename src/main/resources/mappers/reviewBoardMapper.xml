@@ -205,6 +205,6 @@
 		SELECT COUNT(*)
 		FROM reviewBoard
 		WHERE
-		regDate BETWEEN #{start} AND #{end}
+		postDate BETWEEN #{start} AND #{end}
 	</select>
 </mapper>

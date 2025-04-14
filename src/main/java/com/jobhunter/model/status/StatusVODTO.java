@@ -18,10 +18,10 @@ public class StatusVODTO {
 
 	private LocalDateTime statusDate;
 
-	private int new_Users;
-	private int new_Companies;
-	private int new_RecruitmentNoticeCnt;
-	private int new_Registration;
-	private int new_ReviewBoard;
+	private int newUsers;
+	private int newCompanies;
+	private int newRecruitmentNoticeCnt;
+	private int newRegistration;
+	private int newReviewBoard;
 
 }
