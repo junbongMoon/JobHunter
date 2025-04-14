@@ -1,5 +1,7 @@
 package com.jobhunter.dao.status;
 
+import java.time.LocalDate;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +20,12 @@ public class StatusDAOImpl implements StatusDAO {
 	public void insertStatusDate(StatusVODTO status) {
 		ses.insert(NS + ".saveDateStatus", status);
 
+	}
+
+	@Override
+	public StatusVODTO selectStatusByYesterDay(LocalDate yesterday) {
+		
+		return ses.selectOne(NS + ".getDateStatusByYesterDay", yesterday);
 	}
 
 }

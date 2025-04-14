@@ -25,4 +25,9 @@
 
 	</insert>
 
+	<select id="getDateStatusByYesterDay"
+		resultType="com.jobhunter.model.status.StatusVODTO">
+		SELECT * FROM status WHERE DATE(statusDate) = #{yesterday}
+	</select>
+
 </mapper>

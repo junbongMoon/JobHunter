@@ -54,4 +54,26 @@ public class StatusServiceImpl implements StatusService {
 
 	}
 
+
+	@Override
+	public StatusVODTO getTotalStatusUntilYesterday() {
+	    LocalDate yesterday = LocalDate.now().minusDays(1);
+	    StatusVODTO result = statusDAO.selectStatusByYesterDay(yesterday);
+
+	    if (result == null) {
+	        // 예외 처리 또는 기본 객체 반환
+	        return StatusVODTO.builder()
+	        		.statusNo(0)
+	                .statusDate(yesterday.atStartOfDay())
+	                .newUsers(0)
+	                .newCompanies(0)
+	                .newRecruitmentNoticeCnt(0)
+	                .newRegistration(0)
+	                .newReviewBoard(0)
+	                .build();
+	    }
+
+	    return result;
+	}
+
 }
