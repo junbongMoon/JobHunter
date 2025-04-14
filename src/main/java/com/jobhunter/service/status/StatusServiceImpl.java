@@ -13,6 +13,7 @@ import com.jobhunter.dao.status.StatusDAO;
 import com.jobhunter.dao.submit.SubmitDAO;
 import com.jobhunter.dao.user.UserDAO;
 import com.jobhunter.model.status.StatusVODTO;
+import com.jobhunter.model.status.TotalStatusVODTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,11 +28,9 @@ public class StatusServiceImpl implements StatusService {
 	private final ReviewBoardDAO reviewBoardDAO;
 	private final StatusDAO statusDAO;
 	
-
 	@Override
 	public void saveDateStatusByToDay() {
-		// 
-        LocalDate today = LocalDate.now().minusDays(1);  // 어제 날짜
+        LocalDate today = LocalDate.now().minusDays(1);
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.plusDays(1).atStartOfDay();
 
@@ -51,29 +50,39 @@ public class StatusServiceImpl implements StatusService {
                 .build();
 
         statusDAO.insertStatusDate(status);
-
 	}
 
-
 	@Override
-	public StatusVODTO getTotalStatusUntilYesterday() {
+	public TotalStatusVODTO getTotalStatusUntilYesterday() {
 	    LocalDate yesterday = LocalDate.now().minusDays(1);
-	    StatusVODTO result = statusDAO.selectStatusByYesterDay(yesterday);
-
-	    if (result == null) {
-	        // 예외 처리 또는 기본 객체 반환
-	        return StatusVODTO.builder()
-	        		.statusNo(0)
-	                .statusDate(yesterday.atStartOfDay())
-	                .newUsers(0)
-	                .newCompanies(0)
-	                .newRecruitmentNoticeCnt(0)
-	                .newRegistration(0)
-	                .newReviewBoard(0)
-	                .build();
-	    }
-
+	    TotalStatusVODTO result = statusDAO.selectTotalStatusByYesterDay(yesterday);
 	    return result;
 	}
 
+	@Override
+	public StatusVODTO getTodayIncrement() {
+	    LocalDate today = LocalDate.now().minusDays(1);
+	    LocalDateTime start = today.atStartOfDay();
+	    LocalDateTime end = today.plusDays(1).atStartOfDay();
+
+	    int newUsers = userDAO.countByCreatedDateBetweenAndRole(start, end, "USERS");
+	    int newCompanies = companyDAO.countByCreatedDateBetweenAndRole(start, end, "COMPANY");
+	    int newRecruitmentNoticeCnt = recruitmentNoticeDAO.countByCreatedDateBetween(start, end);
+	    int newRegistration = submitDAO.countBySubmittedDateBetween(start, end);
+	    int newReviewBoard = reviewBoardDAO.countByCreatedDateBetween(start, end);
+
+	    return StatusVODTO.builder()
+	            .statusDate(LocalDateTime.now())
+	            .newUsers(newUsers)
+	            .newCompanies(newCompanies)
+	            .newRecruitmentNoticeCnt(newRecruitmentNoticeCnt)
+	            .newRegistration(newRegistration)
+	            .newReviewBoard(newReviewBoard)
+	            .build();
+	}
+
+	@Override
+	public void saveEntireStatus(TotalStatusVODTO todayTotal) {
+	    statusDAO.insertTotalStatus(todayTotal);
+	}
 }

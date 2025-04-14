@@ -1,6 +1,7 @@
 package com.jobhunter.util;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.jobhunter.model.status.StatusVODTO;
+import com.jobhunter.model.status.TotalStatusVODTO;
 import com.jobhunter.service.status.StatusService;
 
 /**
@@ -31,33 +33,38 @@ public class StatusScheduler {
 	 * 
 	 *
 	 */
-	@Scheduled(cron = "0 0 0 * * *")  // 매일 00:00:00에 실행
-	public void saveDateStatus() {
+    @Scheduled(cron = "0 0 0 * * *")
+    public void saveEntireStatus() {
+    	
+    	statusService.saveDateStatusByToDay();
+    	
+        TotalStatusVODTO yesterdayTotal = statusService.getTotalStatusUntilYesterday();
+        StatusVODTO todayIncrement = statusService.getTodayIncrement();
 
-		statusService.saveDateStatusByToDay();
-		
-	}
-	
-	@Scheduled(cron = "0 0 0 * * *")  // 매일 00:00:00에 실행
-	public void saveEntireStatus() {
-		// 어제 올라온 총 합계 테이블 select해서 오늘 올라온 것들을 더해서 insert
-		
-		// 1. 전날까지의 누적 합계 select
-		StatusVODTO yesterdayTotal = statusService.getTotalStatusUntilYesterday();
-		// 이거 StatusVODTO 아님 바꿔야댐
-		
+        TotalStatusVODTO todayTotal;
 
-		// 2. 오늘 하루 증가량 select
-//		StatusVODTO todayIncrement = statusService.getTodayIncrement();
+        if (yesterdayTotal == null) {
+            todayTotal = TotalStatusVODTO.builder()
+                .statusDate(LocalDateTime.now())
+                .totalUsers(todayIncrement.getNewUsers())
+                .totalCompanies(todayIncrement.getNewCompanies())
+                .totalRecruitmentNoticeCnt(todayIncrement.getNewRecruitmentNoticeCnt())
+                .totalRegistration(todayIncrement.getNewRegistration())
+                .totalReviewBoard(todayIncrement.getNewReviewBoard())
+                .build();
+        } else {
+            todayTotal = TotalStatusVODTO.builder()
+                .statusDate(LocalDateTime.now())
+                .totalUsers(yesterdayTotal.getTotalUsers() + todayIncrement.getNewUsers())
+                .totalCompanies(yesterdayTotal.getTotalCompanies() + todayIncrement.getNewCompanies())
+                .totalRecruitmentNoticeCnt(yesterdayTotal.getTotalRecruitmentNoticeCnt() + todayIncrement.getNewRecruitmentNoticeCnt())
+                .totalRegistration(yesterdayTotal.getTotalRegistration() + todayIncrement.getNewRegistration())
+                .totalReviewBoard(yesterdayTotal.getTotalReviewBoard() + todayIncrement.getNewReviewBoard())
+                .build();
+        }
 
-		// 3. 두 값을 합쳐서 새로운 누적값 생성
-//		StatusVODTO todayTotal = yesterdayTotal.plus(todayIncrement);
-
-		// 4. DB에 insert
-//		statusService.insertTodayTotal(todayTotal);
-
-		
-	}
+        statusService.saveEntireStatus(todayTotal);
+    }
 	
 	
 }

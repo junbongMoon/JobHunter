@@ -3,6 +3,7 @@ package com.jobhunter.dao.status;
 import java.time.LocalDate;
 
 import com.jobhunter.model.status.StatusVODTO;
+import com.jobhunter.model.status.TotalStatusVODTO;
 
 public interface StatusDAO {
 
@@ -29,6 +30,13 @@ public interface StatusDAO {
 	 * @return StatusVODTO 어제 통계
 	 *
 	 */
-	StatusVODTO selectStatusByYesterDay(LocalDate yesterday);
+	public StatusVODTO selectStatusByYesterDay(LocalDate yesterday);
+	
+    
+    public TotalStatusVODTO selectTotalStatusByYesterDay(LocalDate yesterday);
+
+    
+    public void insertTotalStatus(TotalStatusVODTO status);
+    
 
 }

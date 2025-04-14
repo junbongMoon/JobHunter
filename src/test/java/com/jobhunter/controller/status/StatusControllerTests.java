@@ -1,11 +1,15 @@
 package com.jobhunter.controller.status;
 
+import java.time.LocalDateTime;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.jobhunter.model.status.StatusVODTO;
+import com.jobhunter.model.status.TotalStatusVODTO;
 import com.jobhunter.service.status.StatusService;
 
 @RunWith(SpringJUnit4ClassRunner.class) // 아래의 객체가 Junit4 클래스와 함께 동작하도록
@@ -16,9 +20,37 @@ public class StatusControllerTests {
 	@Autowired
 	private StatusService statusService;
 	
-//	@Test
+	@Test
 	public void testSaveDateStatus() {
 		statusService.saveDateStatusByToDay();
-	}
+		
+		 TotalStatusVODTO yesterdayTotal = statusService.getTotalStatusUntilYesterday();
+	        StatusVODTO todayIncrement = statusService.getTodayIncrement();
+
+	        TotalStatusVODTO todayTotal;
+
+	        if (yesterdayTotal == null) {
+	            todayTotal = TotalStatusVODTO.builder()
+	                .statusDate(LocalDateTime.now())
+	                .totalUsers(todayIncrement.getNewUsers())
+	                .totalCompanies(todayIncrement.getNewCompanies())
+	                .totalRecruitmentNoticeCnt(todayIncrement.getNewRecruitmentNoticeCnt())
+	                .totalRegistration(todayIncrement.getNewRegistration())
+	                .totalReviewBoard(todayIncrement.getNewReviewBoard())
+	                .build();
+	        } else {
+	            todayTotal = TotalStatusVODTO.builder()
+	                .statusDate(LocalDateTime.now())
+	                .totalUsers(yesterdayTotal.getTotalUsers() + todayIncrement.getNewUsers())
+	                .totalCompanies(yesterdayTotal.getTotalCompanies() + todayIncrement.getNewCompanies())
+	                .totalRecruitmentNoticeCnt(yesterdayTotal.getTotalRecruitmentNoticeCnt() + todayIncrement.getNewRecruitmentNoticeCnt())
+	                .totalRegistration(yesterdayTotal.getTotalRegistration() + todayIncrement.getNewRegistration())
+	                .totalReviewBoard(yesterdayTotal.getTotalReviewBoard() + todayIncrement.getNewReviewBoard())
+	                .build();
+	        }
+
+	        statusService.saveEntireStatus(todayTotal);
+	    }
+	
 
 }

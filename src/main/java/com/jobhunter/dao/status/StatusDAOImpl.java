@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.status.StatusVODTO;
+import com.jobhunter.model.status.TotalStatusVODTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,5 +28,15 @@ public class StatusDAOImpl implements StatusDAO {
 		
 		return ses.selectOne(NS + ".getDateStatusByYesterDay", yesterday);
 	}
+	
+    @Override
+    public TotalStatusVODTO selectTotalStatusByYesterDay(LocalDate yesterday) {
+        return ses.selectOne(NS + ".getTotalStatusByYesterDay", yesterday);
+    }
+
+    @Override
+    public void insertTotalStatus(TotalStatusVODTO status) {
+        ses.insert(NS + ".insertTotalStatus", status);
+    }
 
 }
