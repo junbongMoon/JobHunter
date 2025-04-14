@@ -629,8 +629,9 @@
 						<span class="spinner-border spinner-border-sm text-light d-none" role="status"
 							aria-hidden="true"></span></button>
 
-					<button type="button" class="btn btn-secondary" id="testBtn">코드
-						테스트용 버튼</button>
+					<!-- <button type="button" class="btn btn-secondary" id="testBtn">코드
+						테스트용 버튼</button> -->
+					<button type="button" class="btn btn-secondary" id="returnBtn">목록으로</button>
 				</form>
 				<div>
 					<!-- 재사용 공용 경고 모달창 -->
@@ -2507,5 +2508,16 @@
 					$('label[for="photoUpload"]').hide();
 					$('#removePhoto').show();
 				</c:if>
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 돌아가기 버튼
+				$('#returnBtn').on('click', function () {
+					const urlParams = new URLSearchParams(window.location.search);
+					const uid = urlParams.get('uid');
+					if (uid) {
+						window.location.href = '/submission/check?uid=' + uid;
+					} else {
+						window.location.href = '/resume/list';
+					}
+				});
 			});
 		</script>
