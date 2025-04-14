@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.customenum.Gender;
-import com.jobhunter.model.customenum.MilitaryService;
+import com.jobhunter.model.customenum.MilitaryServe;
 import com.jobhunter.model.customenum.Nationality;
 
 import lombok.AccessLevel;

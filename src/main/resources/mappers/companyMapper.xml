@@ -9,18 +9,11 @@
         <result column="companyName" property="accountName"/>
     </resultMap>
 
-    <update id="setVerificationFalse" parameterType="map">
+    <update id="setVerificationFalse">
         UPDATE company
         SET requiresVerification = 'N'
         WHERE
-        <choose>
-            <when test="type eq 'email'">
-                email = #{value}
-            </when>
-            <when test="type eq 'mobile'">
-                mobile = #{value}
-            </when>
-        </choose>
+        uid = #{uid}
     </update>
 
     <select id="isAuthVerifi" resultType="String">

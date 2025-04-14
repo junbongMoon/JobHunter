@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.customenum.Gender;
-import com.jobhunter.model.customenum.MilitaryService;
+import com.jobhunter.model.customenum.MilitaryServe;
 import com.jobhunter.model.customenum.Nationality;
 
 import lombok.AccessLevel;
@@ -44,7 +44,7 @@ public class UserVO {
     private Integer pay; // 희망 급여 금액
     private String introduce; // 자기소개
     private String isSocial; // 소셜 로그인 여부 ("Y": 소셜 로그인 사용자, "N": 일반 사용자)
-    private MilitaryService militaryService; // 병역 사항 (NOT_COMPLETED: 미필, COMPLETED: 군필, EXEMPTED: 면제)
+    private MilitaryServe militaryService; // 병역 사항 (NOT_COMPLETED: 미필, COMPLETED: 군필, EXEMPTED: 면제)
     private Nationality nationality; // 국적 (KOREAN: 한국인, FOREIGNER: 외국인)
     private String disability; // 장애 여부
 }

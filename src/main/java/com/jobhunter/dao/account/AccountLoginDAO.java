@@ -1,7 +1,5 @@
 package com.jobhunter.dao.account;
 
-import java.util.Map;
-
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
 
@@ -19,7 +17,7 @@ public interface AccountLoginDAO {
 
 	void resetFailCount(String accountId) throws Exception;
 	
-	void setRequiresVerificationFalse(Map<String, String> param) throws Exception;
+	void setRequiresVerificationFalse(int uid) throws Exception;
 
 	Boolean existsAccountId(String accountId) throws Exception;
 

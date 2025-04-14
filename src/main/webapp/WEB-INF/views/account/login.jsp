@@ -351,71 +351,6 @@
 	<div class="login-container">
 		<form action="${pageContext.request.contextPath}/account/login"
 			method="post">
-			<c:choose>
-				<c:when test="${sessionScope.requiresVerification}">
-					<!-- 인증 방법 선택 -->
-					<div class="verification-methods">
-						<h2 class="login-title">인증 방법 선택</h2>
-						<div>계정이 잠금상태입니다. 인증을 통해 잠금을 해제해주세요.</div>
-						<div class="method-buttons">
-							<button type="button" class="btn-method active"
-								data-method="email">이메일 인증</button>
-							<button type="button" class="btn-method" data-method="phone">
-								전화번호 인증</button>
-						</div>
-					</div>
-
-					<!-- 이메일 인증 컨텐츠 -->
-					<div id="emailContent" class="verification-content">
-
-						<div id="emailVerificationContent">
-							<div class="target-info">
-								인증 이메일 주소: <strong>${sessionScope.account.email}</strong>
-							</div>
-							<div id="emailSendSection" class="verification-step">
-								<button type="button" id="emailSendBtn"
-									class="btn-confirm full-width">인증 메일 발송</button>
-							</div>
-						</div>
-
-						<div id="emailVerifySection" class="verification-step"
-							style="display: none;">
-							<input type="text" id="emailCode" name="emailCode"
-								placeholder="인증번호 입력" />
-							<button type="button" id="emailVerifyBtn"
-								class="btn-confirm full-width">인증 완료</button>
-						</div>
-					</div>
-
-					<!-- 전화번호 인증 컨텐츠 -->
-					<div id="phoneContent" class="verification-content"
-						style="display: none;">
-
-						<div id="phoneVerificationContent">
-							<div class="target-info">
-								인증 전화번호: <strong>${sessionScope.account.mobile}</strong>
-							</div>
-							<div id="phoneSendSection" class="verification-step">
-								<button type="button" id="phoneSendBtn"
-									class="btn-confirm full-width">인증번호 발송</button>
-							</div>
-						</div>
-
-						<div id="phoneVerifySection" class="verification-step"
-							style="display: none;">
-							<input type="text" id="phoneCode" name="phoneCode"
-								placeholder="인증번호 입력" />
-							<button type="button" id="phoneVerifyBtn"
-								class="btn-confirm full-width">인증 완료</button>
-						</div>
-
-					</div>
-
-					<input type="hidden" id="method" name="method" value="email" />
-					<input type="hidden" id="accountType"
-						value="${sessionScope.account.accountType}" />
-				</c:when>
-				<c:otherwise>
 					<!-- 일반 로그인 시 보여줄 탭 -->
 					<div class="account-type-tabs">
 						<label class="account-type-tab active"> <input
@@ -463,23 +398,9 @@
 					</div>
 
 					<button type="submit" class="btn-confirm full-width">로그인</button>
-				</c:otherwise>
-			</c:choose>
 		</form>
 	</div>
-	<!-- 파이어베이스 캡챠 넣을곳 -->
-	<div id="recaptcha-container"></div>
 </main>
-
-<!-- 알럿 모달 추가 -->
-<div id="alertModalOverlay" class="alert-modal-overlay"
-	style="display: none;"></div>
-<div id="alertModal" class="alert-modal-box" style="display: none;">
-	<div class="alert-modal-content">
-		<div class="alert-modal-message"></div>
-		<div class="alert-modal-buttons"></div>
-	</div>
-</div>
 
 <script>
 // #region 전역변수 및 API용
@@ -504,32 +425,6 @@ Kakao.isInitialized();
 		});
 	}
 // #endregion 카톡
-// #region 파이어베이스
-const firebaseConfig = {
-    apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
-    authDomain: "jobhunter-672dd.firebaseapp.com",
-    projectId: "jobhunter-672dd",
-    storageBucket: "jobhunter-672dd.appspot.com",
-    messagingSenderId: "686284302067",
-    appId: "1:686284302067:web:30c6bc60e91aeea963b986",
-    measurementId: "G-RHVS9BGBQ7"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-let confirmationResult = null;
-
-//캡챠기능 파이어베이스 기본 제공
-function firebaseCaptcha() {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-          size: 'invisible',
-          callback: () => {}
-        });
-    }
-}
-// #endregion 파이어베이스
 
 // JS에서 enum타입처럼 쓰는거
 const METHOD = {
@@ -538,206 +433,8 @@ const METHOD = {
 };
 // #endregion 전역변수 및 API용
 
-// #region 포매팅 함수
-// 국제번호로 변환 (Firebase 용)
-function formatPhoneNumberForFirebase(koreanNumber) {
-  const cleaned = koreanNumber.replace(/-/g, '');
-  return cleaned.startsWith('0') ? '+82' + cleaned.substring(1) : cleaned;
-}
-// 국제번호를 한국 형식으로 되돌림 (서버 전송용)
-function formatToKoreanPhoneNumber(internationalNumber) {
-  return internationalNumber.startsWith("+82")
-    ? internationalNumber.replace("+82", "0").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
-    : internationalNumber;
-}
-// #endregion 포매팅 함수
-
-// 알럿 모달 유틸리티
-const alertUtils = {
-  show: (message, options = {}) => {
-    const {
-      confirmText = '확인',
-      cancelText = null,
-      onConfirm = null,
-      onCancel = null
-    } = options;
-
-    const overlay = document.getElementById('alertModalOverlay');
-    const modal = document.getElementById('alertModal');
-    const messageEl = modal.querySelector('.alert-modal-message');
-    const buttonsEl = modal.querySelector('.alert-modal-buttons');
-
-    messageEl.textContent = message;
-    
-    let buttonsHTML = '';
-    if (cancelText) {
-      buttonsHTML += `<button class="alert-modal-button cancel">${cancelText}</button>`;
-    }
-    buttonsHTML += `<button class="alert-modal-button confirm">${confirmText}</button>`;
-    
-    buttonsEl.innerHTML = buttonsHTML;
-
-    overlay.style.display = 'block';
-    modal.style.display = 'block';
-
-    const confirmBtn = modal.querySelector('.alert-modal-button.confirm');
-    const cancelBtn = modal.querySelector('.alert-modal-button.cancel');
-
-    confirmBtn.onclick = () => {
-      if (onConfirm) onConfirm();
-      alertUtils.hide();
-    };
-
-    if (cancelBtn) {
-      cancelBtn.onclick = () => {
-        if (onCancel) onCancel();
-        alertUtils.hide();
-      };
-    }
-  },
-  hide: () => {
-    document.getElementById('alertModalOverlay').style.display = 'none';
-    document.getElementById('alertModal').style.display = 'none';
-  }
-};
-
-// 이메일 인증 코드 전송
-function sendEmailVerification() {
-    
-    const email = "${sessionScope.account.email}";
-
-    $.ajax({
-        url: "/account/auth/email",
-		method: "POST",
-		contentType: "application/json",
-        data: JSON.stringify({ email }),
-        success: (res) => {
-			window.publicModals.show("메일이 전송되었습니다. 인증번호를 입력해주세요.")
-			document.getElementById('emailVerifySection').style.display = 'block';
-			document.getElementById('emailVerificationContent').style.display = 'none';
-        },
-        error: (xhr) => {
-			window.publicModals.show("메일 전송 중 오류가 발생했습니다. 잠시 후 새로고침 뒤 다시 시도해주세요.")
-		}
-    });
-}
-
-// 전화번호 인증 코드 전송
-async function sendPhoneVerification() {
-
-	const phoneNumber = formatPhoneNumberForFirebase("${sessionScope.account.mobile}");
-
-    // 캡챠_firebase에서 제공해줌
-    firebaseCaptcha() 
-
-    try {
-		confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-        window.publicModals.show("메시지가 전송되었습니다. 인증번호를 입력해주세요.")
-        document.getElementById('phoneSendSection').style.display = 'none';
-        document.getElementById('phoneVerifySection').style.display = 'block';
-        document.getElementById('phoneVerificationContent').style.display = 'none';
-    } catch (error) {
-        window.publicModals.show("메시지 전송 중 오류가 발생했습니다. 잠시 후 새로고침 뒤 다시 시도해주세요.")
-    }
-}
-
-async function verifyPhoneCode(code) {
-    try {
-      await confirmationResult.confirm(code);
-      onVerificationSuccess(METHOD.PHONE); // 성공 후 콜백 실행
-    } catch (error) {
-      console.error("코드 인증 실패:", error);
-      alertUtils.show("잘못된 인증 코드입니다.");
-    }
-}
-
-async function verifyEmailCode(code) {
-    const email = "${sessionScope.account.email}";
-    $.ajax({
-		url: `/account/auth/email/${code}`,
-		method: "POST",
-		contentType: "application/json",
-		data: JSON.stringify({
-		email: email
-	}),
-		success: () => onVerificationSuccess(METHOD.EMAIL),
-		error: (xhr) => alertUtils.show("이메일 인증 실패: " + xhr.responseText)
-    });
-}
-
-function onVerificationSuccess(method) {
-    const accountType = "${sessionScope.account.accountType}";
-    if (!accountType) {
-    	alertUtils.show("세션이 만료되었습니다. 새로고침 후 다시 시도해 주세요.")
-        return;
-    }
-
-    let value;
-    if (method === METHOD.PHONE) {
-        const intlPhone = "${sessionScope.account.mobile}";
-        if (!intlPhone) {
-          alertUtils.show("세션이 만료되었습니다. 새로고침 후 다시 시도해 주세요.")
-            return;
-        }
-      value = formatToKoreanPhoneNumber(intlPhone);
-    } else {
-            const email = "${sessionScope.account.email}";
-            if (!email) {
-              alertUtils.show("세션이 만료되었습니다. 새로고침 후 다시 시도해 주세요.")
-                return;
-            }
-            value = email;
-    }
-
-    const dto = {
-    type: method === METHOD.PHONE ? "mobile" : "email",
-    value,
-    accountType
-    };
-
-    $.ajax({
-    url: "/account/auth",
-    method: "POST",
-    contentType: "application/json",
-    data: JSON.stringify(dto),
-    success: (redirectUrl) => {
-                console.log(redirectUrl);
-                alertUtils.show("인증이 완료되었습니다.", {
-                    onConfirm: () => {
-                window.location.href = redirectUrl || "/";
-                    }
-                });
-    },
-    error: (xhr) => {
-                alertUtils.show("인증 처리 중 오류가 발생했습니다.");
-      console.error(xhr.responseText);
-    }
-    });
-}
-
 //DOM 로딩 후 버튼 이벤트 연결
 window.onload=()=>{
-  document.getElementById("emailSendBtn")?.addEventListener("click", () => {
-    sendEmailVerification();
-  });
-
-  document.getElementById("phoneSendBtn")?.addEventListener("click", () => {
-    sendPhoneVerification()
-  });
-
-  document.getElementById("emailVerifyBtn")?.addEventListener("click", () => {
-    const code = document.getElementById("emailCode").value;
-    verifyEmailCode(code);
-  });
-
-  document.getElementById("phoneVerifyBtn")?.addEventListener('click', function() {
-    const code = document.getElementById('phoneCode')?.value;
-    if (code) {
-    verifyPhoneCode(code);
-    } else {
-      alertUtils.show("인증 코드를 입력해주세요.");
-    }
-  });
 
   // 회원 유형 탭 전환
   const tabs = document.querySelectorAll('.account-type-tab');
@@ -766,26 +463,6 @@ window.onload=()=>{
 	  $('.btn-kakao').hide(100)
     }
   });
-
-  // 인증 방법 전환 (이메일/전화번호)
-  const methodButtons = document.querySelectorAll('.btn-method');
-  const methodInput = document.getElementById('method');
-
-  methodButtons.forEach(button => {
-    button.addEventListener('click', function () {
-      const method = this.dataset.method;
-
-      methodButtons.forEach(btn => btn.classList.remove('active'));
-      this.classList.add('active');
-
-      methodInput.value = method;
-
-      document.getElementById('emailContent').style.display = method === 'email' ? 'block' : 'none';
-      document.getElementById('phoneContent').style.display = method === 'phone' ? 'block' : 'none';
-    });
-  });
-
-  
 
   // URL 쿼리 파라미터 처리
   const urlParams = new URLSearchParams(window.location.search);

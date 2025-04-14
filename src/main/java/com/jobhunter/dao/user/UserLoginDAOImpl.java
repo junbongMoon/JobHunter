@@ -1,7 +1,5 @@
 package com.jobhunter.dao.user;
 
-import java.util.Map;
-
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
@@ -19,9 +17,9 @@ public class UserLoginDAOImpl implements AccountLoginDAO {
 	private final String NS = "com.jobhunter.mapper.usermapper";
 	
 	@Override
-	public void setRequiresVerificationFalse(Map<String, String> param) throws Exception {
+	public void setRequiresVerificationFalse(int uid) throws Exception {
 		// 맵에서 타입(이메일, 전화번호)이랑 값 받아와서 인증필요여부 해제
-	    ses.update(NS + ".setVerificationFalse", param);
+	    ses.update(NS + ".setVerificationFalse", uid);
 	}
 
 	@Override

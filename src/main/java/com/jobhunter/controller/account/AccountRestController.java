@@ -111,20 +111,16 @@ public class AccountRestController {
 	public ResponseEntity<String> verify(@RequestBody VerificationRequestDTO dto, HttpSession session) {
 
 		// type들 통일
-		String type = dto.getType();
-		String value = dto.getValue();
+		int uid = dto.getUid();
 		AccountType accountType = dto.getAccountType();
 
 		try {
-			accountService.setRequiresVerificationFalse(type, value, accountType);
+			accountService.setRequiresVerificationFalse(uid, accountType);
 
 			session.removeAttribute("requiresVerification");
-			session.removeAttribute("authTargetEmail");
-			session.removeAttribute("authTargetMobile");
 
 			String redirectUrl = (String) session.getAttribute("redirectUrl");
-			session.removeAttribute("redirectUrl");
-
+			session.removeAttribute("unlockDTO");
 			return ResponseEntity.ok(redirectUrl != null ? redirectUrl : "/");
 		} catch (Exception e) {
 			e.printStackTrace();

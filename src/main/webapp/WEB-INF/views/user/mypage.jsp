@@ -742,9 +742,9 @@ async function pwdToMobile() {
         showNewPwdModal('')
         return false;
       },
-    confirmText: "백도어",
-    cancelText: "닫기"
-  });
+      confirmText: "백도어",
+      cancelText: "닫기"
+    });
   }
 }
 
