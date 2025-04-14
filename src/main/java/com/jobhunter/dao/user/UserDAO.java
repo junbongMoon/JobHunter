@@ -1,5 +1,6 @@
 package com.jobhunter.dao.user;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
@@ -33,5 +34,7 @@ public interface UserDAO {
 	AccountVO findByEmail(KakaoUserInfoDTO userInfo) throws Exception;
 
 	int registUser(UserRegisterDTO dto) throws Exception;
+
+	int countByCreatedDateBetweenAndRole(LocalDateTime start, LocalDateTime end, String string);
 
 }

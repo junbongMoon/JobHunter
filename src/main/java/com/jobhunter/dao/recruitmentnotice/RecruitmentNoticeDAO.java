@@ -1,5 +1,6 @@
 package com.jobhunter.dao.recruitmentnotice;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.jobhunter.model.customenum.Method;
@@ -79,4 +80,6 @@ public interface RecruitmentNoticeDAO {
 	RecruitmentNotice selectPreviousPost(int uid) throws Exception;
 
 	RecruitmentNotice selectNextPost(int uid) throws Exception;
+
+	int countByCreatedDateBetween(LocalDateTime start, LocalDateTime end);
 }

@@ -10,6 +10,10 @@ import org.springframework.stereotype.Component;
 import com.jobhunter.service.submit.SubmitService;
 import com.jobhunter.service.submit.SubmitServiceImpl;
 
+/**
+ * @author 문준봉
+ * 이력서 제출에 관한 스케쥴러
+ */
 @Component
 public class SubmitScheduler {
 	

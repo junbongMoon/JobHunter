@@ -48,14 +48,14 @@
 		JOIN company c ON rn.refCompany =
 		c.uid
 		WHERE res.userUid = #{res.userUid}
-		AND reg.status in('PASS','FAILURE','EXPIRED','CHECKED')
+		AND reg.status
+		in('PASS','FAILURE','EXPIRED','CHECKED')
 
 	</select>
 	<!-- 작성페이지 인서트 -->
 	<insert id="insertReview"
 		parameterType="com.jobhunter.model.reviewboard.WriteBoardDTO"
-	useGeneratedKeys="true"
-	keyProperty="boardNo">
+		useGeneratedKeys="true" keyProperty="boardNo">
 		insert into reviewBoard
 		(gonggoUid,
 		writer,
@@ -178,10 +178,12 @@
 
 	<select id="selectModifyReviewBoard" parameterType="int"
 		resultType="com.jobhunter.model.reviewboard.WriteBoardDTO">
-		SELECT boardNo, gonggoUid, writer, companyName, reviewResult, reviewType,
+		SELECT boardNo, gonggoUid, writer, companyName,
+		reviewResult, reviewType,
 		reviewLevel, content
 		FROM reviewBoard
-		WHERE boardNo = #{boardNo}
+		WHERE
+		boardNo = #{boardNo}
 	</select>
 
 
@@ -191,9 +193,18 @@
 		gonggoUid = #{gonggoUid},
 		reviewType= #{reviewType},
 		reviewResult =#{reviewResult},
-		content =#{content},
+		content
+		=#{content},
 		postDate= NOW()
 		WHERE boardNo =
 		#{boardNo}
 	</update>
+
+	<select id="countByCreatedDateBetweenAndRole"
+		parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM reviewBoard
+		WHERE
+		regDate BETWEEN #{start} AND #{end}
+	</select>
 </mapper>

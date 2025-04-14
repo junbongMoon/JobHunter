@@ -162,12 +162,22 @@
 	<update id="updateStatusToExpired">
 		UPDATE registration
 		SET status = 'EXPIRED'
-		WHERE status = 'WAITING'
+		WHERE status
+		= 'WAITING'
 		AND recruitmentNoticePk IN (
 		SELECT uid
-		FROM recruitmentnotice
+		FROM
+		recruitmentnotice
 		WHERE due_date = #{yesterDayStr}
 		)
 	</update>
+
+	<select id="countByCreatedDateBetweenAndRole"
+		parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM registration
+		WHERE
+		regDate BETWEEN #{start} AND #{end}
+	</select>
 
 </mapper>

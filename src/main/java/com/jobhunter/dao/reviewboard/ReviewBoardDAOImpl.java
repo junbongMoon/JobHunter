@@ -104,5 +104,13 @@ import com.jobhunter.model.reviewboard.WriteBoardDTO;
 		return ses.update(NS + ".updateReviewBoard" ,modify);
 	}
 
+	@Override
+	public int countByCreatedDateBetween(LocalDateTime start, LocalDateTime end) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("start", start);
+		param.put("end", end);
+		return ses.selectOne(NS + ".countByCreatedDateBetweenAndRole", param);
+	}
+
 
 }

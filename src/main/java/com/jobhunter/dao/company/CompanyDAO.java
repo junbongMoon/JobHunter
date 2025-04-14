@@ -1,5 +1,6 @@
 package com.jobhunter.dao.company;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
@@ -21,5 +22,7 @@ public interface CompanyDAO {
 	boolean findIsCompanyById(String companyId) throws Exception;
 
 	Integer registCompany(CompanyRegisterDTO dto) throws Exception;
+
+	int countByCreatedDateBetweenAndRole(LocalDateTime start, LocalDateTime end, String string);
 
 }

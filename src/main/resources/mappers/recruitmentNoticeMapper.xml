@@ -440,7 +440,8 @@
 		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentNotice">
 		SELECT uid, title, regDate
 		FROM recruitmentnotice
-		WHERE uid &lt; #{uid} AND status = 'Y'
+		WHERE uid
+		&lt; #{uid} AND status = 'Y'
 		ORDER BY uid DESC
 		LIMIT 1
 	</select>
@@ -450,9 +451,18 @@
 		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentNotice">
 		SELECT uid, title, regDate
 		FROM recruitmentnotice
-		WHERE uid &gt; #{uid} AND status = 'Y'
+		WHERE uid
+		&gt; #{uid} AND status = 'Y'
 		ORDER BY uid ASC
 		LIMIT 1
+	</select>
+
+	<select id="countByCreatedDateBetweenAndRole"
+		parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM recruitmentnotice
+		WHERE
+		regDate BETWEEN #{start} AND #{end}
 	</select>
 
 </mapper>

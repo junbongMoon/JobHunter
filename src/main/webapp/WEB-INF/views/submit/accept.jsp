@@ -4,6 +4,7 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <script>
   // 작성자의 pk
   let companyUid = '${sessionScope.account.uid}';
@@ -81,7 +82,12 @@ $(function() {
       if (files && files.length > 0) {
         files.forEach(file => {
           $('#detailFileList').append(
-            `<li><a href="/resume/files/${file.newFileName}" target="_blank">${file.originFileName}</a></li>`
+            `<a href="\${file.newFileName}" 
+												 download="\${file.originalFileName}"
+												 class="badge-custom attachment-badge"
+												 title="Download">
+												 <i class="fa-solid fa-download"></i> \${file.originalFileName}
+											  </a>`
           );
         });
       } else {
@@ -424,6 +430,33 @@ label {
   justify-content: center; /* 가로 가운데 정렬 */
   white-space: nowrap;
 }
+
+.badge-custom {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 1rem; /* 크기 조절 가능 */
+  font-weight: 600;
+  color: #3d4d6a;
+  background-color: white;
+  border: 2px solid #3d4d6a;
+  border-radius: 10px;
+  margin: 0.25rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.attachment-badge {
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.attachment-badge:hover {
+  background-color: #e9ecef; /* 밝은 회색 */
+  color: #1a237e;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
 </style>
 
 <body>
@@ -487,9 +520,9 @@ label {
           <input type="text" class="form-control" id="detailSubcategory" readonly>
 
           <label>첨부파일</label>
-          <ul id="detailFileList" class="form-control" style="list-style: none; padding-left: 0;" readonly>
+          <div id="detailFileList" class="form-control" style="list-style: none; padding-left: 0;">
 
-          </ul>
+          </div>
           <div class="d-flex justify-content-end gap-2 mt-3">
             <button type="button" id="passedBtn" class="btn btn-success btn-sm fixed-width-btn" style="width: 20%;">합격</button>
             <button type="button" id="failedBtn" class="btn btn-danger btn-sm fixed-width-btn" style="width: 20%;">불합격</button>

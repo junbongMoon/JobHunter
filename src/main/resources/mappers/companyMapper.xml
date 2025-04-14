@@ -136,4 +136,13 @@
 	 VALUES 
 	 (#{companyName}, #{companyId}, sha1(md5(#{password})), #{businessNum}, #{representative}, #{email}, #{mobile});
 	</insert>
+	
+		<!-- 가입 날짜와 계정 타입(USER, COMPANY 등)에 따른 회원 수 -->
+	<select id="countByCreatedDateBetweenAndRole"
+		parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM company
+		WHERE regDate BETWEEN #{start} AND #{end}
+		AND accountType = #{string}
+	</select>
 </mapper>

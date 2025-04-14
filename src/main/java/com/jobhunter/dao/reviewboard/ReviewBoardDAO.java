@@ -32,4 +32,6 @@ public interface ReviewBoardDAO {
 
 	int updateReviewBoard(WriteBoardDTO modify) throws Exception;
 
+	int countByCreatedDateBetween(LocalDateTime start, LocalDateTime end);
+
 }

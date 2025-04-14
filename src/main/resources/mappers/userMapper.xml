@@ -42,12 +42,14 @@
 	<update id="setLastLoginDate">
 		UPDATE users
 		SET lastLoginDate = NOW()
-		where uid = #{uid}
+		where uid =
+		#{uid}
 	</update>
 
 	<update id="setAutoLogin">
 		UPDATE users SET autoLogin = #{autoLogin}
-		where userId = #{id} and
+		where userId
+		= #{id} and
 		password = sha1(md5(#{password}))
 	</update>
 
@@ -82,12 +84,13 @@
 		from users
 		where uid = #{uid}
 	</select>
-	
+
 	<select id="getAccountByAutoLogin" resultMap="accountMap">
 		select *, userId as
 		accountId, userName as accountName
 		from users
-		where autoLogin = #{sessionId}
+		where autoLogin =
+		#{sessionId}
 	</select>
 
 	<!-- 여기까진 로그인용 -->
@@ -103,7 +106,8 @@
 		FROM users
 		WHERE uid = #{uid}
 		AND password
-		= SHA1(MD5(#{password}))
+		=
+		SHA1(MD5(#{password}))
 	</select>
 
 	<update id="updatePassword" parameterType="map">
@@ -126,59 +130,80 @@
 		UPDATE users
 		SET
 		addr = #{addr},
-		detailAddr = #{detailAddr},
+		detailAddr =
+		#{detailAddr},
 		gender = #{gender},
 		age = #{age},
 		payType = #{payType},
 		pay = #{pay},
 		introduce = #{introduce},
-		militaryService = #{militaryService},
+		militaryService =
+		#{militaryService},
 		nationality = #{nationality},
-		disability = #{disability}
+		disability =
+		#{disability}
 		WHERE uid = #{uid}
 	</update>
-	
+
 	<select id="findByKakao" resultType="java.lang.Integer">
-		SELECT uid FROM users WHERE socialId = #{kakaoId}
+		SELECT uid FROM users WHERE
+		socialId = #{kakaoId}
 	</select>
-	
-	<insert id="registKakao" useGeneratedKeys="true" keyProperty="uid">
-		INSERT INTO `users` (`userName`, `socialId`, `email`, `accountType`, `isSocial`) 
+
+	<insert id="registKakao" useGeneratedKeys="true"
+		keyProperty="uid">
+		INSERT INTO `users` (`userName`, `socialId`, `email`,
+		`accountType`, `isSocial`)
 		VALUES (#{nickname}, #{kakaoId}, #{email}, 'USER', 'Y');
 	</insert>
-	
+
 	<select id="loginByKakaoId" resultMap="accountMap">
 		select *, userId as
 		accountId, userName as accountName
 		from users
-		where socialId = #{kakaoId}
+		where socialId =
+		#{kakaoId}
 	</select>
-	
-	<select id="findIsUserById" resultType="boolean" parameterType="string">
+
+	<select id="findIsUserById" resultType="boolean"
+		parameterType="string">
 		SELECT EXISTS (
-            SELECT 1 FROM users WHERE userId = #{userId}
-        )
+		SELECT 1 FROM users WHERE userId = #{userId}
+		)
 	</select>
-	
+
 	<select id="findByEmail" resultMap="accountMap">
 		select *, userId as
 		accountId, userName as accountName
 		from users
 		where email = #{email}
 	</select>
-	
+
 	<select id="findByMobile" resultMap="accountMap">
 		select *, userId as
 		accountId, userName as accountName
 		from users
 		where mobile = #{mobile}
 	</select>
-	
-	<insert id="registUser" parameterType="com.jobhunter.model.user.UserRegisterDTO"
-        useGeneratedKeys="true" keyProperty="uid">
-	INSERT INTO `users` 
-		(`userName`, `userId`, `password`, `mobile`, `email`, `accountType`, `requiresVerification`, `isSocial`, `nationality`)
-	 VALUES 
-	 (#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N', #{nationality});
+
+	<insert id="registUser"
+		parameterType="com.jobhunter.model.user.UserRegisterDTO"
+		useGeneratedKeys="true" keyProperty="uid">
+		INSERT INTO `users`
+		(`userName`, `userId`, `password`, `mobile`, `email`, `accountType`,
+		`requiresVerification`, `isSocial`, `nationality`)
+		VALUES
+		(#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N',
+		#{nationality});
 	</insert>
+
+	<!-- 가입 날짜와 계정 타입(USER, COMPANY 등)에 따른 회원 수 -->
+	<select id="countByCreatedDateBetweenAndRole"
+		parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM users
+		WHERE regDate BETWEEN #{start} AND #{end}
+		AND accountType = #{string}
+	</select>
+
 </mapper>

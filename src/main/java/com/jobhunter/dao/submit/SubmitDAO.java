@@ -1,5 +1,6 @@
 package com.jobhunter.dao.submit;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.jobhunter.model.page.PageResponseDTO;
@@ -85,4 +86,7 @@ public interface SubmitDAO {
 	 *
 	 */
 	int updateStatusToExpired(String yesterDayStr);
+
+
+	int countBySubmittedDateBetween(LocalDateTime start, LocalDateTime end);
 }

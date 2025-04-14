@@ -1,5 +1,6 @@
 package com.jobhunter.dao.recruitmentnotice;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -197,6 +198,15 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	public RecruitmentNotice selectNextPost(int uid) throws Exception {
 		// TODO Auto-generated method stub
 		return ses.selectOne(NS + ".selectNextPost", uid);
+	}
+
+
+	@Override
+	public int countByCreatedDateBetween(LocalDateTime start, LocalDateTime end) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("start", start);
+		param.put("end", end);
+		return ses.selectOne(NS +".countByCreatedDateBetweenAndRole", param);
 	}
 
 	

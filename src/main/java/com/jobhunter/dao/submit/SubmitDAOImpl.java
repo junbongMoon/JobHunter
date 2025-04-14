@@ -1,5 +1,6 @@
 package com.jobhunter.dao.submit;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,6 +142,15 @@ public class SubmitDAOImpl implements SubmitDAO {
 	public int updateStatusToExpired(String yesterDayStr) {
 		
 		return ses.update(NS + ".updateStatusToExpired", yesterDayStr);
+	}
+
+
+	@Override
+	public int countBySubmittedDateBetween(LocalDateTime start, LocalDateTime end) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("start", start);
+		param.put("end", end);
+		return ses.selectOne(NS + ".countByCreatedDateBetweenAndRole", param);
 	}
 	
 	
