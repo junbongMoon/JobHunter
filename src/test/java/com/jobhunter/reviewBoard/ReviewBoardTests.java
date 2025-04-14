@@ -70,7 +70,7 @@ public class ReviewBoardTests {
 //    }
     
     
-    //@Test
+    @Test
     public void testInsertDummyReviews() throws Exception {
         String[] userId = { "tester123","gosue125" };
         String[] reviewTypes = { "FACE_TO_FACE", "VIDEO", "PHONE", "OTHER" };
