@@ -508,14 +508,20 @@ button.btn-resume {
 												<div class="d-flex gap-2 justify-content-end w-100">
 													<button type="button" class="btn-list"
 													onclick="location.href='/recruitmentnotice/listAll'">목록으로</button>
+													<c:choose>
+														<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 													<button type="button" class="btn btn-primary"
 														onclick="location.href='/recruitmentnotice/modify?uid=${RecruitmentDetailInfo.uid}'">수정</button>
 													<button type="button" class="btn btn-danger"
 														onclick="deleteRecruitment('${RecruitmentDetailInfo.uid}')">삭제</button>
+													</c:when>
+													<c:when test="${sessionScope.account.accountType == 'USER'}">
 														<button type="button" class="btn-resume" id="submitResumeBtn"
 														onclick="location.href='/submission/check?uid=${RecruitmentDetailInfo.uid}'">
 														이력서 제출
 													</button>
+												</c:when>
+												</c:choose>
 												</div>
 											</div>
 										</div>
