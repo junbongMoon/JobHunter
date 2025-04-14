@@ -88,6 +88,24 @@
             </a>
         </li>
 
+        <!-- 🔹 유저 관리 섹션 -->
+        <div class="sidebar-heading">유저 관리</div>
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUser"
+                aria-expanded="true" aria-controls="collapseUser">
+                <i class="fas fa-fw fa-folder"></i>
+                <span>유저 관리</span>
+            </a>
+            <div id="collapseUser" class="collapse" aria-labelledby="headingUser"
+                data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">유저 관련:</h6>
+                    <a class="collapse-item" href="adminUserList.jsp">유저 목록</a>
+                    <a class="collapse-item" href="adminUserBlockList.jsp">차단 유저 목록</a>
+                </div>
+            </div>
+        </li>
+
         <!-- 🔹 사이드바 토글 버튼 -->
         <div class="text-center d-none d-md-inline">
             <button class="rounded-circle border-0" id="sidebarToggle"></button>
