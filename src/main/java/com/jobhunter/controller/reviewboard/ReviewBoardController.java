@@ -7,10 +7,10 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.jobhunter.model.account.AccountVO;
-import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.reviewboard.Likes;
 import com.jobhunter.model.reviewboard.MassageCallDTO;
 import com.jobhunter.model.reviewboard.RPageRequestDTO;
@@ -43,19 +42,16 @@ public class ReviewBoardController {
 
 	private static Logger logger = LoggerFactory.getLogger(ReviewBoardController.class);
 
-	
 	@GetMapping("/allBoard")
 	public String listBoard(@ModelAttribute RPageRequestDTO pageRequestDTO, Model model) {
-	    try {
-	       RPageResponseDTO<ReviewBoardDTO> response = service.getPagedBoardList(pageRequestDTO);
-	        model.addAttribute("pageResult", response);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return "reviewBoard/allBoard";
+		try {
+			RPageResponseDTO<ReviewBoardDTO> response = service.getPagedBoardList(pageRequestDTO);
+			model.addAttribute("pageResult", response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "reviewBoard/allBoard";
 	}
-
-
 
 	// 공고글 게시물을 조회
 	@GetMapping("/write")
@@ -96,7 +92,8 @@ public class ReviewBoardController {
 	}
 
 	@GetMapping("/detail")
-	public String showReviewDetail(@RequestParam("boardNo") int boardNo, ModelMap model, HttpSession session) {
+	public String showReviewDetail(@RequestParam("boardNo") int boardNo, Model model, HttpSession session,
+			HttpServletRequest request , int page) {
 		logger.info("상세조회 요청 boardNo: " + boardNo);
 		try {
 			System.out.println("받은 boardNo = " + boardNo);
@@ -105,7 +102,6 @@ public class ReviewBoardController {
 			if (account != null) {
 				int userId = account.getUid();
 
-				
 				service.insertViewCount(userId, boardNo);
 			}
 
@@ -118,7 +114,8 @@ public class ReviewBoardController {
 			}
 
 			model.addAttribute("detail", detail);
-
+			model.addAttribute("page", page);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("상세페이지 처리 중 오류", e);
@@ -221,6 +218,29 @@ public class ReviewBoardController {
 			redirectAttributes.addFlashAttribute("result", new MassageCallDTO("삭제 중 오류가 발생했습니다.", false));
 		}
 		return "redirect:/reviewBoard/allBoard";
+	}
+
+	@GetMapping("/viewCount")
+	public ResponseEntity<MassageCallDTO> getViewCount(@RequestParam("boardNo") int boardNo, HttpSession session) {
+		try {
+			AccountVO account = (AccountVO) session.getAttribute("account");
+
+			if (account == null) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+						.body(MassageCallDTO.builder().message("로그인이 필요합니다.").success(false).build());
+			}
+
+			int userId = account.getUid();
+			service.insertViewCount(userId, boardNo); // 24시간 제한 로직 포함
+			int views = service.getReviewDetail(boardNo).getViews();
+
+			return ResponseEntity.ok(MassageCallDTO.builder().message(String.valueOf(views)).success(true).build());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(MassageCallDTO.builder().message("조회수 처리 중 오류").success(false).build());
+		}
 	}
 
 }

@@ -71,7 +71,6 @@ h2 {
 .btn-write:hover {
 	background-color: #0b5ed7;
 }
-
 </style>
 </head>
 <body>
@@ -90,29 +89,30 @@ h2 {
 			<th>면접 결과</th>
 			<th>좋아요</th>
 			<th>조회수</th>
-			<th>등록날짜<th>
+			<th>등록날짜
+			<th>
 		</tr>
 		<c:forEach var="board" items="${pageResult.boardList}">
-			<tr onclick="location.href='./detail?boardNo=${board.boardNo}';" style="cursor: pointer;">
+			<tr onclick="location.href='${pageContext.request.contextPath}/reviewBoard/detail?boardNo=${board.boardNo}&page=${pageResult.page}'" style="cursor:pointer;">
 
 				<td>${board.boardNo}</td>
 				<td>${board.writer}</td>
 				<td>${board.companyName}</td>
-				<td>
-				<c:choose>
-				 <c:when test="${board.reviewResult eq 'PASSED'}">합격</c:when>
-				 <c:when test="${board.reviewResult eq 'FAILED'}">불합격</c:when>
-				 <c:when test="${board.reviewResult eq 'PENDING'}">진행중</c:when>
-					<c:otherwise>미선택</c:otherwise>
-				</c:choose></td>
+				<td><c:choose>
+						<c:when test="${board.reviewResult eq 'PASSED'}">합격</c:when>
+						<c:when test="${board.reviewResult eq 'FAILED'}">불합격</c:when>
+						<c:when test="${board.reviewResult eq 'PENDING'}">진행중</c:when>
+						<c:otherwise>미선택</c:otherwise>
+					</c:choose></td>
 				<td>${board.likes}</td>
-				<td>${board.views}</td>
+				<td class="views-cell" data-board-no="${board.boardNo}">
+					${board.views}</td>
 				<td class="postDate()">${board.postDate}</td>
 			</tr>
 		</c:forEach>
 	</table>
 
-	
+
 	<!-- 페이징 영역 -->
 	<c:set var="page" value="${pageResult.page}" />
 	<c:set var="size" value="${pageResult.size}" />
@@ -120,37 +120,32 @@ h2 {
 	<c:set var="endPage" value="${pageResult.endPage}" />
 	<c:set var="hasPrev" value="${pageResult.hasPrev}" />
 	<c:set var="hasNext" value="${pageResult.hasNext}" />
-	
+
 	<nav aria-label="Page navigation">
-  <ul class="pagination justify-content-center">
+		<ul class="pagination justify-content-center">
 
-    <!-- 이전 페이지 블록 -->
-    <c:if test="${hasPrev}">
-      <li class="page-item">
-        <a class="page-link" href="?page=${startPage - 1}&size=${size}" aria-label="Previous">
-          &laquo;
-        </a>
-      </li>
-    </c:if>
+			<!-- 이전 페이지 블록 -->
+			<c:if test="${hasPrev}">
+				<li class="page-item"><a class="page-link"
+					href="?page=${startPage - 1}&size=${size}" aria-label="Previous">
+						&laquo; </a></li>
+			</c:if>
 
-    <!-- 페이지 번호 -->
-    <c:forEach var="i" begin="${startPage}" end="${endPage}">
-      <li class="page-item ${i == page ? 'active' : ''}">
-        <a class="page-link" href="?page=${i}&size=${size}">${i}</a>
-      </li>
-    </c:forEach>
+			<!-- 페이지 번호 -->
+			<c:forEach var="i" begin="${startPage}" end="${endPage}">
+				<li class="page-item ${i == page ? 'active' : ''}"><a
+					class="page-link" href="?page=${i}&size=${size}">${i}</a></li>
+			</c:forEach>
 
-    <!-- 다음 페이지 블록 -->
-    <c:if test="${hasNext}">
-      <li class="page-item">
-        <a class="page-link" href="?page=${endPage + 1}&size=${size}" aria-label="Next">
-          &raquo;
-        </a>
-      </li>
-    </c:if>
+			<!-- 다음 페이지 블록 -->
+			<c:if test="${hasNext}">
+				<li class="page-item"><a class="page-link"
+					href="?page=${endPage + 1}&size=${size}" aria-label="Next">
+						&raquo; </a></li>
+			</c:if>
 
-  </ul>
-</nav>
+		</ul>
+	</nav>
 
 	<!-- 글쓰기 버튼 -->
 	<button onclick="location.href='/reviewBoard/write'" class="btn-write">글
@@ -187,7 +182,23 @@ h2 {
 			});
 		});
 	});
-		
+		// 조회수 증감 확인 
+		$.ajax({
+		  url: '/reviewBoard/viewCount',
+		  method: 'GET',
+		  data: { boardNo: boardNo },
+		  success: function(res) {
+		    if (res.success) {
+		      $('#views-' + boardNo).text(res.message); // 조회수 갱신
+		    } else {
+		      alert(res.message);
+		    }
+		  },
+		  error: function() {
+		    alert("조회 실패");
+		  }
+		});
+
 </script>
 </body>
 </html>

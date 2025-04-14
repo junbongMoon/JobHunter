@@ -184,7 +184,7 @@
 		SET
 		gonggoUid = #{gonggoUid},
 		reviewType= #{reviewType},
-		reviewResult =#{reviewResult},
+		reviewLevl =#{reviewLevl},
 		typeOtherText
 		= #{typeOtherText},
 		reviewLevel= #{reviewLevel},

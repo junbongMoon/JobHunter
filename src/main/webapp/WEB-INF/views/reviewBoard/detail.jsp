@@ -182,10 +182,13 @@
 
 		<!-- 버튼 영역 -->
 		<div class="d-flex gap-2">
-			<button id="likeBtn" class="btn-accent btn-small">❤️ 추천수</button>
-			<button id="unlikeBtn" class="btn-outline-accent btn-small">💔
+			<span id="likeCount" class="ms-2 fw-bold text-danger">
+    		👍 ${detail.likes}개</span>
+			
+			<button id="likeBtn" class="btn-accent btn-small">👍️ 추천수</button>
+			<button id="unlikeBtn" class="btn-outline-accent btn-small"> 👎
 				추천 취소</button>
-
+	         
 			<a
 				href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
 				class="btn-outline-accent btn-small">✏️ 수정</a>
@@ -196,9 +199,8 @@
 				<button type="submit" class="btn-red btn-small">🗑 삭제</button>
 			</form>
 
-			<a
-				href="${pageContext.request.contextPath}/reviewBoard/allBoard?updatedBoardNo=${detail.boardNo}"
-				class="btn-outline-accent btn-small">← 목록으로</a>
+			<a href="${pageContext.request.contextPath}/reviewBoard/allBoard?page=${param.page}"
+   class="btn btn-outline-accent btn-small">← 목록으로</a>
 		</div>
 
 
@@ -224,7 +226,7 @@
 	</div>
 
 	<script>
-	document.addEventListener("DOMContentLoaded", () => {
+	document.addEventListener("formData", () => {
 		  const form = document.getElementById("reviewForm");
 
 		  if (form === null) {
