@@ -354,6 +354,18 @@
 .search-area button {
 	min-width: 100px;
 }
+
+.searchBtn {
+	background-color: #37517e !important;
+	color: white !important;
+	border: none !important;
+}
+
+.searchBtn:hover {
+	background-color: #47b2e4 !important;
+	color: white !important;
+	border: none !important;
+}
 </style>
 </head>
 
@@ -382,26 +394,29 @@
 					<button id="searchToggleBtn" class="btn-custom btn-search">
 						<i class="fas fa-search"></i> 검색
 					</button>
-					<a href="/resume/form" class="btn-custom btn-create">
-						<i class="fas fa-plus"></i> 새 이력서 작성
+					<a href="/resume/form" class="btn-custom btn-create"> <i
+						class="fas fa-plus"></i> 새 이력서 작성
 					</a>
 				</div>
 			</div>
-			
+
 			<!-- 검색 영역 -->
 			<div id="searchArea" class="search-area mb-4" style="display: none;">
 				<div class="card">
 					<div class="card-body">
-						<form id="searchForm" action="/resume/list" method="get" class="d-flex gap-2">
-							<input type="hidden" name="page" value="1">
-							<input type="hidden" name="pageSize" value="${pageSize}">
+						<form id="searchForm" action="/resume/list" method="get"
+							class="d-flex gap-2">
+							<input type="hidden" name="page" value="1"> <input
+								type="hidden" name="pageSize" value="${pageSize}">
 							<div class="flex-grow-1">
-								<input type="text" name="searchTitle" class="form-control" placeholder="이력서 제목을 입력하세요" value="${param.searchTitle}">
+								<input type="text" name="searchTitle" class="form-control"
+									placeholder="이력서 제목을 입력하세요" value="${param.searchTitle}">
 							</div>
-							<button type="submit" class="btn btn-primary">
+							<button type="submit" class="btn btn-primary searchBtn">
 								<i class="fas fa-search"></i> 검색
 							</button>
-							<button type="button" class="btn btn-secondary" onclick="clearSearch()">
+							<button type="button" class="btn btn-secondary"
+								onclick="clearSearch()">
 								<i class="fas fa-times"></i> 초기화
 							</button>
 						</form>
@@ -514,45 +529,43 @@
 				<ul class="pagination">
 					<!-- 이전 블록으로 이동 -->
 					<c:if test="${currentBlock > 1}">
-						<li class="page-item">
-							<a class="page-link" href="/resume/list?page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}" aria-label="Previous Block">
-								<i class="fas fa-angle-double-left"></i>
-							</a>
-						</li>
+						<li class="page-item"><a class="page-link"
+							href="/resume/list?page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+							aria-label="Previous Block"> <i
+								class="fas fa-angle-double-left"></i>
+						</a></li>
 					</c:if>
-					
+
 					<!-- 이전 페이지로 이동 -->
 					<c:if test="${currentPage > 1}">
-						<li class="page-item">
-							<a class="page-link" href="/resume/list?page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}" aria-label="Previous">
-								<i class="fas fa-chevron-left"></i>
-							</a>
-						</li>
+						<li class="page-item"><a class="page-link"
+							href="/resume/list?page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+							aria-label="Previous"> <i class="fas fa-chevron-left"></i>
+						</a></li>
 					</c:if>
 
 					<!-- 페이지 번호 -->
 					<c:forEach begin="${startPage}" end="${endPage}" var="i">
-						<li class="page-item ${currentPage == i ? 'active' : ''}">
-							<a class="page-link" href="/resume/list?page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
+						<li class="page-item ${currentPage == i ? 'active' : ''}"><a
+							class="page-link"
+							href="/resume/list?page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
 						</li>
 					</c:forEach>
 
 					<!-- 다음 페이지로 이동 -->
 					<c:if test="${currentPage < totalPages}">
-						<li class="page-item">
-							<a class="page-link" href="/resume/list?page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}" aria-label="Next">
-								<i class="fas fa-chevron-right"></i>
-							</a>
-						</li>
+						<li class="page-item"><a class="page-link"
+							href="/resume/list?page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+							aria-label="Next"> <i class="fas fa-chevron-right"></i>
+						</a></li>
 					</c:if>
-					
+
 					<!-- 다음 블록으로 이동 -->
 					<c:if test="${currentBlock < totalBlocks}">
-						<li class="page-item">
-							<a class="page-link" href="/resume/list?page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}" aria-label="Next Block">
-								<i class="fas fa-angle-double-right"></i>
-							</a>
-						</li>
+						<li class="page-item"><a class="page-link"
+							href="/resume/list?page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+							aria-label="Next Block"> <i class="fas fa-angle-double-right"></i>
+						</a></li>
 					</c:if>
 				</ul>
 			</nav>
@@ -629,12 +642,12 @@
 					$('#resultModal').modal('show');
 				}
 
-				$(document).ready(function() {
+				$(document).ready(function () {
 					// 검색 영역 토글
-					$('#searchToggleBtn').click(function() {
+					$('#searchToggleBtn').click(function () {
 						$('#searchArea').slideToggle(300);
 					});
-					
+
 					// URL에 검색 파라미터가 있으면 검색 영역 표시
 					if ('${param.searchTitle}') {
 						$('#searchArea').show();
