@@ -12,6 +12,7 @@
 		r.boardNo,
 		u.userId AS writer,
 		c.companyName,
+		r.reviewResult,
 		r.likes,
 		r.views,
 		r.postDate
