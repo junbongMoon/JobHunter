@@ -1,5 +1,7 @@
 package com.jobhunter.service.submit;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -150,12 +152,16 @@ public class SubmitServiceImpl implements SubmitService {
 	 *
 	 */
 	@Override
-	@Transactional
-	public int expiredToSubmit(String yesterDayStr) throws Exception {
-	    int updateCount = submitDAO.updateStatusToExpired(yesterDayStr);
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public int expiredToSubmitBetween(LocalDateTime start, LocalDateTime end) throws Exception {
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("start", start);
+	    param.put("end", end);
+
+	    int updateCount = submitDAO.updateStatusToExpiredBetween(param);
 
 	    if (updateCount > 0) {
-	        List<Map<String, Object>> msgTargets = submitDAO.selectExpiredSubmitUserMessageInfo(yesterDayStr);
+	        List<Map<String, Object>> msgTargets = submitDAO.selectExpiredSubmitUserMessageInfoBetween(param);
 
 	        for (Map<String, Object> row : msgTargets) {
 	            int toUser = (Integer) row.get("userNo");
@@ -164,15 +170,18 @@ public class SubmitServiceImpl implements SubmitService {
 	            String noticeTitle = (String) row.get("noticeTitle");
 
 	            MessageDTO msgDTO = MessageDTO.builder()
-	                    .to(toUser)
-	                    .from(fromCompany)
+	                    .toWho(toUser)
+	                    .fromWho(fromCompany)
 	                    .toUserType(USERTYPE.USER)
 	                    .fromUserType(USERTYPE.COMPANY)
 	                    .title("공고 마감 알림")
 	                    .content(String.format("[%s]의 [%s] 공고가 마감되었습니다.", companyName, noticeTitle))
 	                    .build();
-
-	            messageDAO.insertMessage(msgDTO); 
+	            
+	            System.out.println(msgDTO.getContent());
+	            
+	            messageDAO.insertMessage(msgDTO);
+	            
 	        }
 	    }
 

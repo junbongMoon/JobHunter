@@ -90,8 +90,12 @@ public interface SubmitDAO {
 
 
 	int countBySubmittedDateBetween(LocalDateTime start, LocalDateTime end);
-	
-	List<Map<String, Object>> selectExpiredSubmitUserMessageInfo(String yesterDayStr);
+
+
+	int updateStatusToExpiredBetween(Map<String, Object> param);
+
+
+	List<Map<String, Object>> selectExpiredSubmitUserMessageInfoBetween(Map<String, Object> param);
 	
 	
 }

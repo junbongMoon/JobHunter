@@ -1,6 +1,7 @@
 package com.jobhunter.util;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +39,15 @@ public class SubmitScheduler {
 	 */
 	@Scheduled(cron = "0 0 0 * * *")  // 매일 00:00:00에 실행
 	public void updateStatusExpiredToSubmit() {
-		LocalDate yesterday = LocalDate.now().minusDays(1);
-		String yesterdayStr = yesterday.format(DateTimeFormatter.ISO_DATE);
+		LocalDate today = LocalDate.now();
+		LocalDateTime start = today.minusDays(1).atStartOfDay(); // 어제 00:00
+		LocalDateTime end = today.atTime(23, 59, 59);            // 오늘 23:59:59
 
-		System.out.println("[SubmitScheduler] 실행됨 - 대상 날짜: " + yesterdayStr);
+		
 
-		int result;
+		int result = 0;
 		try {
-			result = submitService.expiredToSubmit(yesterdayStr);
+			result = submitService.expiredToSubmitBetween(start, end);
 			System.out.println("[SubmitScheduler] EXPIRED 처리된 제출 수: " + result);
 		} catch (Exception e) {
 			

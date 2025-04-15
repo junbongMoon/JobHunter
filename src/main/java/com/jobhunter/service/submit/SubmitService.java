@@ -1,5 +1,7 @@
 package com.jobhunter.service.submit;
 
+import java.time.LocalDateTime;
+
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
@@ -58,5 +60,5 @@ public interface SubmitService {
 	 * @throws Exception
 	 *
 	 */
-	public int expiredToSubmit(String yesterDayStr) throws Exception;
+	public int expiredToSubmitBetween(LocalDateTime start, LocalDateTime end) throws Exception;
 }

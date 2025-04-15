@@ -154,10 +154,19 @@ public class SubmitDAOImpl implements SubmitDAO {
 	}
 
 
+
 	@Override
-	public List<Map<String, Object>> selectExpiredSubmitUserMessageInfo(String yesterDayStr) {
-	    return ses.selectList(NS + ".selectExpiredSubmitUserMessageInfo", yesterDayStr);
+	public int updateStatusToExpiredBetween(Map<String, Object> param) {
+	    return ses.update(NS + ".updateStatusToExpiredBetween", param);
 	}
+
+	@Override
+	public List<Map<String, Object>> selectExpiredSubmitUserMessageInfoBetween(Map<String, Object> param) {
+	    return ses.selectList(NS + ".selectExpiredSubmitUserMessageInfoBetween", param);
+	}
+
+
+
 	
 	
 	
