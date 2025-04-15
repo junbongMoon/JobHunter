@@ -185,9 +185,9 @@
 								<c:if test="${not empty sessionScope.account}">
 							<li class="nav-item dropdown position-relative mypage-hover-area">
 								<c:choose>
-									<c:when test="${sessionScope.account.accountType == 'ADMIN'}">
-										<a class="nav-link dropdown-toggle" href="#" id="mypageDropdown"
-											role="button">My Page</a>
+									<c:when test="${sessionScope.account.isAdmin.toString() == 'Y'}">
+										<a class="nav-link dropdown-toggle" href="/admin" id="mypageDropdown"
+											role="button">👑Admin Page</a>
 									</c:when>
 									<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 										<a class="nav-link dropdown-toggle"
@@ -217,6 +217,12 @@
 
 									<!-- accountType에 따라 처리 -->
 									<c:choose>
+										<c:when test="${sessionScope.account.isAdmin.toString() == 'Y'}">
+											<a href="/admin"
+												class="d-block border p-2 mb-2 text-decoration-none text-dark rounded hover-effect">
+												⚙️ 관리자 대시보드
+											</a>
+										</c:when>
 										<c:when test="${sessionScope.account.accountType == 'USER'}">
 											<a href="/resume/form"
 												class="d-block border p-2 mb-2 text-decoration-none text-dark rounded hover-effect">
@@ -227,7 +233,6 @@
 												📑 이력서 조회
 											</a>
 										</c:when>
-
 										<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 											<a href="/recruitmentnotice/write"
 												class="d-block border p-2 mb-2 text-decoration-none text-dark rounded hover-effect">
@@ -237,10 +242,6 @@
 												class="d-block border p-2 text-decoration-none text-dark rounded hover-effect">
 												📋 공고 조회
 											</a>
-										</c:when>
-
-										<c:when test="${sessionScope.account.accountType == 'ADMIN'}">
-											<div class="border p-2 text-center">👑 관리자 계정</div>
 										</c:when>
 									</c:choose>
 								</div>
