@@ -104,5 +104,19 @@ public class UserDAOImpl implements UserDAO {
 		return ses.selectList(NS + ".getAllUsers");
 	}
 
-	
+	@Override
+	public UserVO getUserById(int uid) throws Exception {
+		return ses.selectOne(NS + ".getUserById", uid);
+	}
+
+	@Override
+	public List<UserVO> getUsersBySearch(Map<String, Object> params) throws Exception {
+		return ses.selectList(NS + ".getUsersBySearch", params);
+	}
+
+	@Override
+	public int getTotalUserCount(Map<String, Object> params) throws Exception {
+		return ses.selectOne(NS + ".getTotalUserCount", params);
+	}
+
 }

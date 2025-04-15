@@ -31,4 +31,10 @@ public interface UserService {
 	AccountVO registUser(UserRegisterDTO dto) throws Exception;
 
 	List<UserVO> getAllUsers() throws Exception;
+
+	UserVO getUserById(int uid) throws Exception;
+
+	List<UserVO> getUsersBySearch(String searchType, String searchKeyword, int page, int pageSize) throws Exception;
+
+	int getTotalUserCount(String searchType, String searchKeyword) throws Exception;
 }

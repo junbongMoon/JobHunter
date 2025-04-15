@@ -36,4 +36,10 @@ public interface UserDAO {
 	int registUser(UserRegisterDTO dto) throws Exception;
 
 	List<UserVO> getAllUsers() throws Exception;
+
+	UserVO getUserById(int uid) throws Exception;
+
+	List<UserVO> getUsersBySearch(Map<String, Object> params) throws Exception;
+
+	int getTotalUserCount(Map<String, Object> params) throws Exception;
 }

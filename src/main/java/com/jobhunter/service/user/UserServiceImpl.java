@@ -173,4 +173,29 @@ public class UserServiceImpl implements UserService {
 	public List<UserVO> getAllUsers() throws Exception {
 		return dao.getAllUsers();
 	}
+
+	@Override
+	public UserVO getUserById(int uid) throws Exception {
+		return dao.getUserById(uid);
+	}
+
+	@Override
+	public List<UserVO> getUsersBySearch(String searchType, String searchKeyword, int page, int pageSize) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("searchType", searchType);
+		params.put("searchKeyword", searchKeyword);
+		params.put("offset", (page - 1) * pageSize);
+		params.put("pageSize", pageSize);
+		
+		return dao.getUsersBySearch(params);
+	}
+
+	@Override
+	public int getTotalUserCount(String searchType, String searchKeyword) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("searchType", searchType);
+		params.put("searchKeyword", searchKeyword);
+		
+		return dao.getTotalUserCount(params);
+	}
 }
