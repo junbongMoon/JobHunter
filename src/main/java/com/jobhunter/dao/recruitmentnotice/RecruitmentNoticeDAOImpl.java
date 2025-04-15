@@ -209,6 +209,20 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		return ses.selectOne(NS +".countByCreatedDateBetweenAndRole", param);
 	}
 
+
+	@Override
+	public void insertCDLogForRecruitment(int recNo) {
+		ses.insert(NS + ".insertCreateRecruitmentLog", recNo);
+		
+	}
+
+
+	@Override
+	public void insertDeleteLogByRecruitment(int uid) {
+		ses.insert(NS + ".insertDeleteRecruitmentLog", uid);
+		
+	}
+
 	
 
 }

@@ -121,6 +121,8 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 				recdao.insertRecruitmentFile(file);
 			}
 		}
+		
+		recdao.insertCDLogForRecruitment(recNo);
 
 		return result;
 	}
@@ -261,12 +263,15 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	 *
 	 */
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean removeRecruitmentByUid(int uid) throws Exception {
 		boolean result = false;
 
 		if (recdao.deleteRecruitmentByUid(uid) > 0) {
 			result = true;
 		}
+		// 삭제 로그 추가
+		recdao.insertDeleteLogByRecruitment(uid);
 
 		return result;
 	}

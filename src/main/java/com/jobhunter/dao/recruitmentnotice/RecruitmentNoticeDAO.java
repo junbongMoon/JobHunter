@@ -82,4 +82,28 @@ public interface RecruitmentNoticeDAO {
 	RecruitmentNotice selectNextPost(int uid) throws Exception;
 
 	int countByCreatedDateBetween(LocalDateTime start, LocalDateTime end);
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고 글 작성 시 로그를 입력하는 메서드
+	 * </p>
+	 * 
+	 * @param recNo
+	 *
+	 */
+	void insertCDLogForRecruitment(int recNo);
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고 글 삭제 시 로그를 입력하는 메서드
+	 * </p>
+	 * 
+	 * @param uid
+	 *
+	 */
+	void insertDeleteLogByRecruitment(int uid);
 }
