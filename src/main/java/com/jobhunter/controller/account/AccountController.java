@@ -47,9 +47,9 @@ public class AccountController {
 		session.removeAttribute("unlockDTO");
 		return "redirect:/account/login";
 	}
-	
-//	session.getAttribute("unlockDTO");
-//	return "account/unlock";
+
+	// session.getAttribute("unlockDTO");
+	// return "account/unlock";
 
 	// 로그인 페이지로 이동
 	@GetMapping("/login")
@@ -57,33 +57,35 @@ public class AccountController {
 			@RequestParam(value = "redirect", required = false) String redirect) {
 
 		AccountVO account = (AccountVO) session.getAttribute("account");
-	    UnlockDTO unlock = (UnlockDTO) session.getAttribute("unlockDTO");
+		UnlockDTO unlock = (UnlockDTO) session.getAttribute("unlockDTO");
 
-	    // 1. 로그인 완료 + 인증도 완료된 경우
-	    if (account != null && !"Y".equals(account.getRequiresVerification())) {
-	        String redirectUrl = (String) session.getAttribute("redirectUrl");
-	        session.removeAttribute("redirectUrl");
-	        return "redirect:" + (redirectUrl != null ? redirectUrl : "/");
-	    }
+		// 1. 로그인 완료 + 인증도 완료된 경우
+		if (account != null && !"Y".equals(account.getRequiresVerification())) {
+			String redirectUrl = (String) session.getAttribute("redirectUrl");
+			session.removeAttribute("redirectUrl");
+			return "redirect:" + (redirectUrl != null ? redirectUrl : "/");
+		}
 
-	    // 2. 로그인은 됐는데 계정이 잠겨있는 경우
-	    if (account != null && "Y".equals(account.getRequiresVerification())) {
-	        unlock = new UnlockDTO(account);
-	        session.setAttribute("unlockDTO", unlock);
-	    }
+		// 2. 로그인은 됐는데 계정이 잠겨있는 경우
+		if (account != null && "Y".equals(account.getRequiresVerification())) {
+			unlock = new UnlockDTO(account);
+			session.setAttribute("unlockDTO", unlock);
+		}
 
-	    // 3. 계정 잠금 정보가 있을 경우 잠금 화면
-	    if (unlock != null) {
-	        return "account/unlock";
-	    }
+		// 3. 계정 잠금 정보가 있을 경우 잠금 화면
+		if (unlock != null) {
+			return "account/unlock";
+		}
 
-	    // 4. 아무것도 없으면 로그인 페이지로
-	    return "account/login";
+		// 4. 아무것도 없으면 로그인 페이지로
+		return "account/login";
 	}
 
 	// 실제 로그인
 	@PostMapping("/login")
 	public String login(@ModelAttribute LoginDTO loginDto, HttpSession session, HttpServletResponse response) {
+
+		session.removeAttribute("remainingSeconds");
 
 		// 자동로그인용 세팅
 		String sessionId = session.getId();
@@ -107,24 +109,23 @@ public class AccountController {
 			session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
 			return "redirect:" + (redirectUrl != null ? redirectUrl : "/");
 
-		} catch (LoginBlockedException blocked) { // 세션 하나에서 로그인시도 많아서 막아둠
-			session.setAttribute("remainingSeconds", blocked.getRemainingSeconds());
-			return "account/login";
 		} catch (AccountLockException accLock) { // 계정 하나에 로그인시도 많아서 잠김
 			session.setAttribute("unlockDTO", accLock.getUnlockDTO());
 			return "account/unlock";
+		} catch (LoginBlockedException blocked) { // 세션 하나에서 로그인시도 많아서 막아둠
+			session.setAttribute("remainingSeconds", blocked.getRemainingSeconds());
 		} catch (Exception e) { // 아이디나 비번 틀림 혹은 서버문제
-
-			// 기존 유저가 체크한 옵션 복구용
-			String queryStr = "?error=true&accountType=" + loginDto.getAccountType();
-
-			if (loginDto.isRemember()) {
-				queryStr += "&autoLogin=true";
-			}
-
-			// 로그인 실패시 다시 로그인페이지 로딩(인증 필요한지 체크용)
-			return "redirect:/account/login" + queryStr;
+			e.printStackTrace();
 		}
+		// 기존 유저가 체크한 옵션 복구용
+		String queryStr = "?error=true&accountType=" + loginDto.getAccountType();
+
+		if (loginDto.isRemember()) {
+			queryStr += "&autoLogin=true";
+		}
+
+		// 로그인 실패시 다시 로그인페이지 로딩(인증 필요한지 체크용)
+		return "redirect:/account/login" + queryStr;
 	}
 
 	@GetMapping("/logout")

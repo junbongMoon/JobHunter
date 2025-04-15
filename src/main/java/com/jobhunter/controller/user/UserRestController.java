@@ -1,7 +1,6 @@
 package com.jobhunter.controller.user;
 
 import java.util.Collections;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jobhunter.customexception.NeedLoginException;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.user.ContactUpdateDTO;
 import com.jobhunter.model.user.PasswordDTO;
@@ -47,25 +47,24 @@ public class UserRestController {
 	}
 
 	@PostMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
-	public ResponseEntity<?> updateUserInfo(@RequestBody UserInfoDTO userInfo, @PathVariable("uid") Integer uid,
+	public ResponseEntity<?> updateUserInfo(@RequestBody UserInfoDTO userInfoDTO, @PathVariable("uid") Integer uid,
 			HttpSession session) {
-
-		System.out.println("/info_userInfo : " + userInfo);
-
-		if (uid == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Collections.singletonMap("result", "잘못된 계정입니다."));
-		}
-
-		userInfo.setUid(uid);
-		boolean success = false;
 		try {
-			success = service.updateUserInfo(userInfo);
+			
+			if (uid == null) { throw new NeedLoginException();}
+
+			userInfoDTO.setUid(uid);
+
+			service.updateUserInfo(userInfoDTO);
 			return ResponseEntity.ok(Collections.singletonMap("result", "success"));
+
+		} catch (NeedLoginException n) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Collections.singletonMap("result", "잘못된 요청입니다."));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return ResponseEntity.ok(Collections.singletonMap("result", "서버 오류 발생"));
+			return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+					.body(Collections.singletonMap("result", "연결 상태가 불안정합니다."));
 		}
 	}
 
