@@ -166,20 +166,6 @@
 		)
 	</select>
 
-	<select id="findByEmail" resultMap="accountMap">
-		select *, userId as
-		accountId, userName as accountName
-		from users
-		where email = #{email}
-	</select>
-
-	<select id="findByMobile" resultMap="accountMap">
-		select *, userId as
-		accountId, userName as accountName
-		from users
-		where mobile = #{mobile}
-	</select>
-
 	<insert id="registUser"
 		parameterType="com.jobhunter.model.user.UserRegisterDTO"
 		useGeneratedKeys="true" keyProperty="uid">
@@ -190,9 +176,12 @@
 		(#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N',
 		#{nationality});
 	</insert>
-
-	<select id="getIdByContect" resultType="string">
-		select userId from users where
+	
+	<select id="findByContect" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where
 		<choose>
 			<when test="targetType == 'email'">
 				email = #{targetValue}

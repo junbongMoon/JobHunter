@@ -1,5 +1,8 @@
 package com.jobhunter.dao.user;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
@@ -89,19 +92,28 @@ public class UserLoginDAOImpl implements AccountLoginDAO {
 
 	@Override
 	public AccountVO findAccountByEmail(String email) throws Exception {
-		AccountVO result = ses.selectOne(NS + ".findByEmail", email);
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("targetType", "email");
+		map.put("targetValue", email);
+		
+		AccountVO result = ses.selectOne(NS + ".findByContect", map);
 		return result;
 	}
 	
 	@Override
 	public AccountVO findAccountByMobile(String mobile) throws Exception {
-		AccountVO result = ses.selectOne(NS + ".findByMobile", mobile);
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("targetType", "mobile");
+		map.put("targetValue", mobile);
+		
+		AccountVO result = ses.selectOne(NS + ".findByContect", map);
 		return result;
 	}
 	
 	@Override
 	public String getIdByContect(findIdDTO dto) throws Exception {
-		return ses.selectOne(NS + ".getIdByContect", dto);
+		AccountVO result = ses.selectOne(NS + ".findByContect", dto);
+		return result.getAccountId();
 	}
 
 }
