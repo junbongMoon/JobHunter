@@ -69,6 +69,7 @@
 		FROM CDLog
 		WHERE logRegDate BETWEEN #{start} AND #{end}
 		AND targetType = #{targetType}
+		AND logType = #{logType}
 	</select>
 
 </mapper>
