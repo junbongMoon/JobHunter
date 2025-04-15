@@ -62,7 +62,7 @@ public class UserController {
 			}
 		} catch (DuplicateEmailException d) {
 			// 카카오계정은 아닌데 중복되는 이메일 있음
-			System.out.println("이메일중복은 어떻게 처리하지...마이페이지에 계정연동넣고...아이디찾기 페이지로 넘기나?");
+			return "redirect:/?kakao=emailDuplicate";
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

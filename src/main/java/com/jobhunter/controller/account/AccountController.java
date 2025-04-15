@@ -48,9 +48,6 @@ public class AccountController {
 		return "redirect:/account/login";
 	}
 
-	// session.getAttribute("unlockDTO");
-	// return "account/unlock";
-
 	// 로그인 페이지로 이동
 	@GetMapping("/login")
 	public String showLoginForm(HttpServletRequest request, HttpSession session,
@@ -94,7 +91,7 @@ public class AccountController {
 			AccountVO account = accountService.loginAccount(loginDto, sessionId);
 
 			session.removeAttribute("remainingSeconds");
-
+			
 			session.setAttribute("account", account);
 
 			if (loginDto.getAutoLogin() != null) { // 자동로그인 쿠키발급

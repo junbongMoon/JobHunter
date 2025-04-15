@@ -114,7 +114,19 @@
 
 
 	</main>
-<!-- 풋터 -->
+	
+	<script>
+		const urlParams = new URLSearchParams(window.location.search);
+	  	const kakao = urlParams.get('kakao');
+	  	if (kakao == "emailDuplicate") {
+	  		window.publicModals.show("이미 등록된 이메일입니다. 계정찾기로 이동하시겠습니까?", {onConfirm: redirectSearchAccountPage},cancelText:"취소")
+	  	}
+	  	function redirectSearchAccountPage() {
+			location.href = "/account/find/id";
+	  	}
+	</script>
+
+	<!-- 풋터 -->
 	<jsp:include page="footer.jsp"></jsp:include>
 </div>
 </body>
