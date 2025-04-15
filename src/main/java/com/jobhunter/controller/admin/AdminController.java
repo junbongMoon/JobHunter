@@ -39,7 +39,7 @@ public class AdminController {
 			// 페이지 번호가 1보다 작으면 1로 설정
 			page = Math.max(1, page);
 			
-			int pageSize = 1; // 페이지당 표시할 게시물 수
+			int pageSize = 10; // 페이지당 표시할 게시물 수
 			
 			// 전체 게시물 수 조회
 			int totalCount = userService.getTotalUserCount(searchType, searchKeyword);
