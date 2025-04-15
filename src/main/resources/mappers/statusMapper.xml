@@ -25,30 +25,42 @@
 
 	</insert>
 
-    <select id="getDateStatusByYesterDay" resultType="com.jobhunter.model.status.StatusVODTO">
-        SELECT * FROM status WHERE DATE(statusDate) = #{yesterday}
-    </select>
+	<select id="getDateStatusByYesterDay"
+		resultType="com.jobhunter.model.status.StatusVODTO">
+		SELECT * FROM status WHERE DATE(statusDate) = #{yesterday} LIMIT 1
+	</select>
 
-    <select id="getTotalStatusByYesterDay" resultType="com.jobhunter.model.status.TotalStatusVODTO">
-        SELECT * FROM total_status WHERE DATE(statusDate) = #{yesterday}
-    </select>
+	<select id="getTotalStatusByYesterDay" parameterType="map"
+		resultType="com.jobhunter.model.status.TotalStatusVODTO">
+    SELECT 
+        total_statusNo AS totalStatusNo,
+        statusDate,
+        total_users AS totalUsers,
+        total_companies AS totalCompanies,
+        total_recruitmentNoticeCnt AS totalRecruitmentNoticeCnt,
+        total_registration AS totalRegistration,
+        total_reviewBoard AS totalReviewBoard
+    FROM total_status
+    WHERE statusDate BETWEEN #{start} AND #{end}
+	</select>
 
-    <insert id="insertTotalStatus" parameterType="com.jobhunter.model.status.TotalStatusVODTO">
-        INSERT INTO total_status (
-            statusDate,
-            total_users,
-            total_companies,
-            total_recruitmentNoticeCnt,
-            total_registration,
-            total_reviewBoard
-        ) VALUES (
-            #{statusDate},
-            #{totalUsers},
-            #{totalCompanies},
-            #{totalRecruitmentNoticeCnt},
-            #{totalRegistration},
-            #{totalReviewBoard}
-        )
-    </insert>
+	<insert id="insertTotalStatus"
+		parameterType="com.jobhunter.model.status.TotalStatusVODTO">
+		INSERT INTO total_status (
+		statusDate,
+		total_users,
+		total_companies,
+		total_recruitmentNoticeCnt,
+		total_registration,
+		total_reviewBoard
+		) VALUES (
+		#{statusDate},
+		#{totalUsers},
+		#{totalCompanies},
+		#{totalRecruitmentNoticeCnt},
+		#{totalRegistration},
+		#{totalReviewBoard}
+		)
+	</insert>
 
 </mapper>

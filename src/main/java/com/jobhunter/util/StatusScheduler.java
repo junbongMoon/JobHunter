@@ -33,38 +33,42 @@ public class StatusScheduler {
 	 * 
 	 *
 	 */
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 10 0 * * *")
     public void saveEntireStatus() {
     	
-    	statusService.saveDateStatusByToDay();
-    	
-        TotalStatusVODTO yesterdayTotal = statusService.getTotalStatusUntilYesterday();
-        StatusVODTO todayIncrement = statusService.getTodayIncrement();
+		statusService.saveDateStatusByToDay();
+		
+		 TotalStatusVODTO yesterdayTotal = statusService.getTotalStatusUntilYesterday();
+	        StatusVODTO todayIncrement = statusService.getTodayIncrement();
 
-        TotalStatusVODTO todayTotal;
+	        TotalStatusVODTO todayTotal;
 
-        if (yesterdayTotal == null) {
-            todayTotal = TotalStatusVODTO.builder()
-                .statusDate(LocalDateTime.now())
-                .totalUsers(todayIncrement.getNewUsers())
-                .totalCompanies(todayIncrement.getNewCompanies())
-                .totalRecruitmentNoticeCnt(todayIncrement.getNewRecruitmentNoticeCnt())
-                .totalRegistration(todayIncrement.getNewRegistration())
-                .totalReviewBoard(todayIncrement.getNewReviewBoard())
-                .build();
-        } else {
-            todayTotal = TotalStatusVODTO.builder()
-                .statusDate(LocalDateTime.now())
-                .totalUsers(yesterdayTotal.getTotalUsers() + todayIncrement.getNewUsers())
-                .totalCompanies(yesterdayTotal.getTotalCompanies() + todayIncrement.getNewCompanies())
-                .totalRecruitmentNoticeCnt(yesterdayTotal.getTotalRecruitmentNoticeCnt() + todayIncrement.getNewRecruitmentNoticeCnt())
-                .totalRegistration(yesterdayTotal.getTotalRegistration() + todayIncrement.getNewRegistration())
-                .totalReviewBoard(yesterdayTotal.getTotalReviewBoard() + todayIncrement.getNewReviewBoard())
-                .build();
-        }
+	        if (yesterdayTotal == null) {
+	            todayTotal = TotalStatusVODTO.builder()
+	            	.statusDate(LocalDate.now().minusDays(1).atStartOfDay())
+	                .totalUsers(todayIncrement.getNewUsers())
+	                .totalCompanies(todayIncrement.getNewCompanies())
+	                .totalRecruitmentNoticeCnt(todayIncrement.getNewRecruitmentNoticeCnt())
+	                .totalRegistration(todayIncrement.getNewRegistration())
+	                .totalReviewBoard(todayIncrement.getNewReviewBoard())
+	                .build();
+	        } else {
+	            todayTotal = TotalStatusVODTO.builder()
+	            	.statusDate(LocalDate.now().minusDays(1).atStartOfDay())
+	                .totalUsers(yesterdayTotal.getTotalUsers() + todayIncrement.getNewUsers())
+	                .totalCompanies(yesterdayTotal.getTotalCompanies() + todayIncrement.getNewCompanies())
+	                .totalRecruitmentNoticeCnt(yesterdayTotal.getTotalRecruitmentNoticeCnt() + todayIncrement.getNewRecruitmentNoticeCnt())
+	                .totalRegistration(yesterdayTotal.getTotalRegistration() + todayIncrement.getNewRegistration())
+	                .totalReviewBoard(yesterdayTotal.getTotalReviewBoard() + todayIncrement.getNewReviewBoard())
+	                .build();
+	        }
+	        System.out.println("어제 total : " + yesterdayTotal); // 안찍힌다.
+	        System.out.println("오늘 증가량 : " + todayIncrement);
+	        
+	        System.out.println("오늘 증가량 + 어제 total : " +todayTotal);
 
-        statusService.saveEntireStatus(todayTotal);
-    }
+	        statusService.saveEntireStatus(todayTotal);
+	    }
 	
 	
 }

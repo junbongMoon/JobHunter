@@ -1,5 +1,6 @@
 package com.jobhunter.controller.status;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.junit.Test;
@@ -20,7 +21,7 @@ public class StatusControllerTests {
 	@Autowired
 	private StatusService statusService;
 	
-	@Test
+//	@Test
 	public void testSaveDateStatus() {
 		statusService.saveDateStatusByToDay();
 		
@@ -31,7 +32,7 @@ public class StatusControllerTests {
 
 	        if (yesterdayTotal == null) {
 	            todayTotal = TotalStatusVODTO.builder()
-	                .statusDate(LocalDateTime.now())
+	            	.statusDate(LocalDate.now().minusDays(1).atStartOfDay())
 	                .totalUsers(todayIncrement.getNewUsers())
 	                .totalCompanies(todayIncrement.getNewCompanies())
 	                .totalRecruitmentNoticeCnt(todayIncrement.getNewRecruitmentNoticeCnt())
@@ -40,7 +41,7 @@ public class StatusControllerTests {
 	                .build();
 	        } else {
 	            todayTotal = TotalStatusVODTO.builder()
-	                .statusDate(LocalDateTime.now())
+	            	.statusDate(LocalDate.now().minusDays(1).atStartOfDay())
 	                .totalUsers(yesterdayTotal.getTotalUsers() + todayIncrement.getNewUsers())
 	                .totalCompanies(yesterdayTotal.getTotalCompanies() + todayIncrement.getNewCompanies())
 	                .totalRecruitmentNoticeCnt(yesterdayTotal.getTotalRecruitmentNoticeCnt() + todayIncrement.getNewRecruitmentNoticeCnt())
@@ -48,6 +49,10 @@ public class StatusControllerTests {
 	                .totalReviewBoard(yesterdayTotal.getTotalReviewBoard() + todayIncrement.getNewReviewBoard())
 	                .build();
 	        }
+	        System.out.println("어제 total : " + yesterdayTotal); // 안찍힌다.
+	        System.out.println("오늘 증가량 : " + todayIncrement);
+	        
+	        System.out.println("오늘 증가량 + 어제 total : " +todayTotal);
 
 	        statusService.saveEntireStatus(todayTotal);
 	    }

@@ -52,10 +52,23 @@ public class StatusServiceImpl implements StatusService {
         statusDAO.insertStatusDate(status);
 	}
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 *	어제 작성된 누적 통계를 조회하는 메서드
+	 * </p>
+	 * 
+	 * @return TotalStatusVODTO 어제의 누적 통계
+	 *
+	 */
 	@Override
 	public TotalStatusVODTO getTotalStatusUntilYesterday() {
 	    LocalDate yesterday = LocalDate.now().minusDays(1);
-	    TotalStatusVODTO result = statusDAO.selectTotalStatusByYesterDay(yesterday);
+	    LocalDateTime start = yesterday.atStartOfDay();
+	    LocalDateTime end = yesterday.plusDays(1).atStartOfDay();
+	    
+	    TotalStatusVODTO result = statusDAO.selectTotalStatusByYesterDay(yesterday, start, end);
 	    return result;
 	}
 

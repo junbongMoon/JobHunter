@@ -2,6 +2,7 @@ package com.jobhunter.model.status;
 
 import java.time.LocalDateTime;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Data  // getter/setter, toString, equals 등 자동 생성
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class TotalStatusVODTO {
 

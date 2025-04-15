@@ -1,6 +1,9 @@
 package com.jobhunter.dao.status;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
@@ -30,8 +33,13 @@ public class StatusDAOImpl implements StatusDAO {
 	}
 	
     @Override
-    public TotalStatusVODTO selectTotalStatusByYesterDay(LocalDate yesterday) {
-        return ses.selectOne(NS + ".getTotalStatusByYesterDay", yesterday);
+    public TotalStatusVODTO selectTotalStatusByYesterDay
+    (LocalDate yesterday, LocalDateTime start, LocalDateTime end){
+        Map<String, Object> params = new HashMap<>();
+        params.put("start", start);
+        params.put("end", end);
+        System.out.println(params);
+        return ses.selectOne(NS + ".getTotalStatusByYesterDay", params);
     }
 
     @Override
