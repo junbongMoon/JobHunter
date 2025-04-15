@@ -581,7 +581,12 @@ async function sendPhoneCode() {
     	});
     } catch (error) {
         console.error("전화번호 인증 실패:", error);
-        window.publicModals.show("전화번호 인증 중 오류 발생.");
+        window.publicModals.show("인증번호 발송에 실패했습니다. http이슈 혹은 firebase횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.(포트폴리오용)",
+        	{
+        		confirmText: "백도어",
+        		cancelText: "취소",
+        		onConfirm: okMobile
+        	});
     }
 }
 
