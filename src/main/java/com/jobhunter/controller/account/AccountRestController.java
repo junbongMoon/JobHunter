@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.EmailAuth;
 import com.jobhunter.model.account.VerificationRequestDTO;
+import com.jobhunter.model.account.findIdDTO;
 import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.service.account.AccountService;
 import com.jobhunter.util.AccountUtil;
@@ -131,7 +132,7 @@ public class AccountRestController {
 	// 이메일로 코드보내기
 	@PostMapping(value = "/auth/email", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> sendMail(@RequestBody Map<String, String> emailTmp, HttpSession session) {
-		
+
 		String email = emailTmp.get("email");
 		Boolean duple = Boolean.parseBoolean(emailTmp.getOrDefault("checkDuplicate", "false"));
 		AccountType accountType = AccountType.valueOf(emailTmp.getOrDefault("accountType", "USER"));
@@ -154,7 +155,7 @@ public class AccountRestController {
 		Timestamp expireAt = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000); // 5분 후
 
 		try {
-			System.out.println("이메일보내기 : " + email +", 코드 : " + code);
+			System.out.println("이메일보내기 : " + email + ", 코드 : " + code);
 			SendMailService mailService = new SendMailService(email, code);
 			mailService.send();
 
@@ -178,7 +179,7 @@ public class AccountRestController {
 
 		System.out.println("이메일 인증하기 : " + emailAuth);
 		System.out.println("인증 이메일 : " + email);
-		
+
 		if (emailAuth == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("인증 코드가 존재하지 않거나 만료되었습니다.");
 		}
@@ -209,7 +210,8 @@ public class AccountRestController {
 
 	// 전화번호 중복 확인
 	@PostMapping("/check/mobile")
-	public ResponseEntity<String> checkDuplicateMobile(@RequestBody Map<String, String> mobileTmp, HttpSession session) {
+	public ResponseEntity<String> checkDuplicateMobile(@RequestBody Map<String, String> mobileTmp,
+			HttpSession session) {
 		String mobile = mobileTmp.get("mobile");
 		AccountType accountType = AccountType.valueOf(mobileTmp.getOrDefault("accountType", "USER"));
 
@@ -221,6 +223,21 @@ public class AccountRestController {
 			return ResponseEntity.ok("사용 가능한 전화번호");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("연결이 불안정합니다. 잠시 후 다시 시도해주세요.");
+		}
+	}
+
+	// 이메일이나 전화번호로 아이디 찾아주는 API
+	@PostMapping(value = "/find/id", produces = "text/plain;charset=UTF-8;")
+	public ResponseEntity<String> findId(@RequestBody findIdDTO dto, HttpSession session) {
+
+		String targetType = dto.getTargetType();
+		try {
+			String id = accountService.getIdByContect(dto);
+			
+			return ResponseEntity.status(HttpStatus.OK).body(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error");
 		}
 	}
 

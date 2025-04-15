@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.jobhunter.dao.account.AccountLoginDAO;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
+import com.jobhunter.model.account.findIdDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -96,6 +97,11 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 	public AccountVO findAccountByMobile(String mobile) throws Exception {
 		AccountVO result = ses.selectOne(NS + ".findByMobile", mobile);
 		return result;
+	}
+
+	@Override
+	public String getIdByContect(findIdDTO dto) throws Exception {
+		return ses.selectOne(NS + ".getIdByContect", dto);
 	}
 
 }

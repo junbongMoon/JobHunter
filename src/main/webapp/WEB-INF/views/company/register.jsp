@@ -501,7 +501,7 @@ mark {
 </main>
 
 <script>
-// 파이어베이스
+// #region 파이어베이스
 const firebaseConfig = {
     apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
     authDomain: "jobhunter-672dd.firebaseapp.com",
@@ -529,7 +529,7 @@ function firebaseCaptcha() {
         });
     }
 }
-// 파이어베이스
+// #endregion 파이어베이스
 function checkDuplicateId() {
 	$('#checkDuplicateIdBtn').prop('disabled', true);
     const companyId = $("#id").val();

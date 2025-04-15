@@ -2,6 +2,7 @@ package com.jobhunter.service.account;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
+import com.jobhunter.model.account.findIdDTO;
 import com.jobhunter.model.customenum.AccountType;
 
 public interface AccountService {
@@ -17,4 +18,6 @@ public interface AccountService {
 	Boolean checkDuplicateEmail(String email, AccountType type) throws Exception;
 
 	Boolean checkDuplicateMobile(String mobile, AccountType type) throws Exception;
+
+	String getIdByContect(findIdDTO dto) throws Exception;
 }

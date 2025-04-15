@@ -19,6 +19,7 @@ import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
 import com.jobhunter.model.account.LoginFailedDTO;
 import com.jobhunter.model.account.UnlockDTO;
+import com.jobhunter.model.account.findIdDTO;
 import com.jobhunter.model.customenum.AccountType;
 
 import lombok.RequiredArgsConstructor;
@@ -54,9 +55,9 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public void setRequiresVerificationFalse(int uid, AccountType accountType) throws Exception {
 		AccountLoginDAO dao = getDAO(accountType);
-				dao.setRequiresVerificationFalse(uid);
-				dao.getAccountByUid(uid);
-		
+		dao.setRequiresVerificationFalse(uid);
+		dao.getAccountByUid(uid);
+
 	}
 
 	// 인증 필요 여부 들고가려고 맵으로 반환_그냥 널 체크하면 5번 실패한건지도 모르니까
@@ -75,7 +76,9 @@ public class AccountServiceImpl implements AccountService {
 		if (loginFailedDTO.getLoginFailCnt() >= 5) {
 			Timestamp now = new Timestamp(System.currentTimeMillis());
 			if (loginFailedDTO.getBlockTime() != null && now.before(loginFailedDTO.getBlockTime())) {
-				int remainingSeconds = (int) ((loginFailedDTO.getBlockTime().getTime() - now.getTime()) / 1000); // 초 단위로 변환
+				int remainingSeconds = (int) ((loginFailedDTO.getBlockTime().getTime() - now.getTime()) / 1000); // 초
+																													// 단위로
+																													// 변환
 
 				throw new LoginBlockedException(remainingSeconds);
 			} else {
@@ -111,11 +114,11 @@ public class AccountServiceImpl implements AccountService {
 			loginFailedDTO.setLoginFailCnt(newFailCount);
 
 			if (newFailCount >= 5) {
-			    int blockSeconds = 30;
-			    Timestamp blockUntil = new Timestamp(System.currentTimeMillis() + blockSeconds * 1000L);
-			    loginFailedDTO.setBlockTime(blockUntil);
-			    failedMap.put(sessionId, loginFailedDTO);
-			    throw new LoginBlockedException(blockSeconds);
+				int blockSeconds = 30;
+				Timestamp blockUntil = new Timestamp(System.currentTimeMillis() + blockSeconds * 1000L);
+				loginFailedDTO.setBlockTime(blockUntil);
+				failedMap.put(sessionId, loginFailedDTO);
+				throw new LoginBlockedException(blockSeconds);
 			}
 
 			failedMap.put(sessionId, loginFailedDTO);
@@ -126,15 +129,15 @@ public class AccountServiceImpl implements AccountService {
 			UnlockDTO unlockDTO = new UnlockDTO(account);
 
 			throw new AccountLockException(unlockDTO);
-			
+
 		} else {
 			// 로그인 성공
-			
+
 			// 마지막 로그인일자 갱신
 			dao.resetFailCount(account.getAccountId());
 			dao.setLoginTime(account.getUid());
 			failedMap.remove(sessionId);
-			
+
 			// 자동로그인
 			if (loginDto.isRemember()) {
 				loginDto.setAutoLogin(sessionId);
@@ -182,6 +185,14 @@ public class AccountServiceImpl implements AccountService {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getIdByContect(findIdDTO dto) throws Exception {
+		AccountLoginDAO dao = getDAO(dto.getAccountType());
+		String id = dao.getIdByContect(dto);
+
+		return id.substring(0, 2) + "****" + id.substring(id.length() - 2);
 	}
 
 }

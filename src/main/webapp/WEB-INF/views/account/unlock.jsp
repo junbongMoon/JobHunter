@@ -240,7 +240,7 @@
 		</div>
 
 		<div class="form-group">
-			<input type="text" id="targetValue" value="연동된 연락처 : dbrrmsdn51@naver.com" readonly/>
+			<input type="text" id="targetValue" value="연동된 연락처 :" readonly/>
 		</div>
 		<hr>
 

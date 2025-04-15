@@ -2,6 +2,7 @@ package com.jobhunter.dao.account;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
+import com.jobhunter.model.account.findIdDTO;
 
 public interface AccountLoginDAO {
 
@@ -32,5 +33,7 @@ public interface AccountLoginDAO {
 	AccountVO findAccountByEmail(String email) throws Exception;
 
 	AccountVO findAccountByMobile(String mobile) throws Exception;
+
+	String getIdByContect(findIdDTO dto) throws Exception;
 
 }

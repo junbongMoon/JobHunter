@@ -29,7 +29,7 @@ public class AccountController {
 
 	private final AccountService accountService;
 
-	@GetMapping("unlock")
+	@GetMapping("/unlock")
 	public void unlock() {
 	}
 
@@ -108,7 +108,7 @@ public class AccountController {
 
 		} catch (AccountLockException accLock) { // 계정 하나에 로그인시도 많아서 잠김
 			session.setAttribute("unlockDTO", accLock.getUnlockDTO());
-			return "account/unlock";
+			return "redirect:/account/unlock";
 		} catch (LoginBlockedException blocked) { // 세션 하나에서 로그인시도 많아서 막아둠
 			session.setAttribute("remainingSeconds", blocked.getRemainingSeconds());
 		} catch (Exception e) { // 아이디나 비번 틀림 혹은 서버문제
@@ -148,8 +148,7 @@ public class AccountController {
 
 	@GetMapping("/find/id")
 	public String findId() {
-		System.out.println("미구현");
-		return "redirect:/";
+		return "account/searchAccount";
 	}
 
 	@GetMapping("/find/password")

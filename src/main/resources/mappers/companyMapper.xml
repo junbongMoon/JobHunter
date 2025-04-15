@@ -141,4 +141,20 @@
 		scale = #{scale}
 		WHERE uid = #{uid}
 	</update>
+	
+	<select id="getIdByContect" resultType="string">
+		select companyId from company where
+		<choose>
+			<when test="targetType == 'email'">
+				email = #{targetValue} and 
+			</when>
+			<when test="targetType == 'mobile'">
+				mobile = #{targetValue}
+			</when>
+			<otherwise>
+				1 = 0 <!-- 예외 처리용, 조건이 없으면 무조건 실패하게 -->
+			</otherwise>
+		</choose>
+		AND businessNum = #{businessNum}
+	</select>
 </mapper>

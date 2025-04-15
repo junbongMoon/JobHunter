@@ -36,24 +36,32 @@
 }
 
 .form-group {
-	margin-bottom: 20px;
+	display:flex;
 }
 
 .form-group input[type="text"] {
 	text-align: center;
-	width: 100%;
+	flex:1;
 	padding: 12px;
 	border: 1px solid #ddd;
-	font-size: 24px;
-}
-
-.full-width {
-	width: 100%;
+	font-size: 18px;
 }
 
 .form-group input:focus {
 	border-color: #47b2e4;
 	outline: none;
+}
+
+.form-group select {
+	text-align: center;
+	width:25%;
+	padding: 12px;
+	border: 1px solid #ddd;
+	font-size: 18px;
+}
+
+.full-width {
+	width: 100%;
 }
 
 .radio-group {
@@ -356,25 +364,25 @@
     transition: all 0.3s ease;
 }
 
-.phone-input-group input {
-	width: 30%;
+.phone-input-group {
+	flex:1;
 }
 
 .phone-input-group span {
-	font-size: 27px;
-	font-weight: 600;
+	font-size: 25px;
+	font-weight: 400;
+	padding: 5px;
 	text-align: center;
-	flex: 1;
+}
+
+.phone-input-group input {
+	max-width: 150px;
 }
 
 mark {
 	margin-left: 5px;
 	font-size: 0.7em;
 	background-color: transparent;
-}
-
-.spacer {
-	margin: auto;
 }
 
 .info-defalt{
@@ -397,25 +405,45 @@ mark {
 <main class="main">
 	<div class="login-container">
 		<div class="flex-x-container between-con">
-			<h2 class="login-title">계정 잠금 해제</h2>
+			<h2 class="login-title">계정 찾기</h2>
 		</div>
 		
 		<br/>
-		<h4>${unlockDTO.loginCnt}번의 로그인 실패로 인하여 계정이 잠금조치 되었습니다.</h4>
-		<h4>인증을 통해 잠금을 해제해주세요.</h4>
+		<h4>아이디찾기</h4>
 		
 		<hr>
 
 		<div class="account-type-tabs">
 			<label class="account-type-tab active"> <input type="radio"
-				name="method" value="mobile" checked> 메시지
+				name="targetType" value="USER" checked> 개인 회원
 			</label> <label class="account-type-tab"> <input type="radio"
-				name="method" value="email"> 이메일
+				name="targetType" value="COMPANY"> 기업 회원
 			</label>
 		</div>
 
 		<div class="form-group">
-			<input type="text" id="targetValue" value="연동된 연락처 : dbrrmsdn51@naver.com" readonly/>
+		
+			<div id="targetMobile" class="phone-input-group flex-x-container between-con" style="display: none;">
+				<input type="text" maxlength="3" placeholder="000"
+						oninput="handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
+					<span>⁃⁃</span> 
+				<input type="text" maxlength="4" placeholder="0000"
+						oninput="if(this.value.length >= 4) handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
+					<span>⁃⁃</span> 
+				<input type="text" maxlength="4" placeholder="0000"
+						oninput="handlePhoneInput(this, null)">
+			</div>
+			
+			<input type="text" id="targetEmail" placeholder="연락처를 입력해주세요"/>
+			
+			<select id="targetMethod">
+				<option value="email">이메일인증</option>
+                <option value="mobile">모바일인증</option>
+            </select>
+            
+		</div>
+		<div class="form-group">
+			<input style="width: 100%; display:none;" type="text" id="businessNum" placeholder="사업자 등록번호를 입력해주세요"/>
 		</div>
 		<hr>
 
@@ -426,10 +454,6 @@ mark {
 </main>
 
 <script>
-
-$(()=>{
-	selectedValues()
-})
 
 // #region API 및 포메팅
 // 파이어베이스
@@ -445,6 +469,24 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 let confirmationResult = null;
+//캡챠기능 파이어베이스 기본 제공 (1회용이라 초기화)
+function firebaseCaptcha() {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+          size: 'invisible',
+          callback: () => {}
+        });
+    }
+}
+//국제번호로 변환 (Firebase 용)
+function formatPhoneNumberForFirebase(koreanNumber) {
+	if(koreanNumber) {
+		const cleaned = koreanNumber.replace(/-/g, '');
+		return cleaned.startsWith('0') ? '+82' + cleaned.substring(1) : cleaned;
+	}
+	return null;
+}
+// 파이어베이스
 // JS에서 enum타입처럼 쓰는거
 const METHOD = {
   EMAIL: "email",
@@ -455,27 +497,27 @@ const codeInput = {
 		placeholder="인증번호를 입력해주세요." required />`,
 	failed:`<div class="warning">인증번호 6자리를 입력해주세요.</div>`
 }
-//캡챠기능 파이어베이스 기본 제공 (1회용이라 초기화)
-function firebaseCaptcha() {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-          size: 'invisible',
-          callback: () => {}
-        });
+
+// 전화번호 입력 처리 함수
+function handlePhoneInput(input, nextInput) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+    if (input.value.length >= 3 && nextInput) {
+      	nextInput.focus();
     }
 }
-// 파이어베이스
-//국제번호로 변환 (Firebase 용)
-function formatPhoneNumberForFirebase(koreanNumber) {
-	const cleaned = koreanNumber.replace(/-/g, '');
-	return cleaned.startsWith('0') ? '+82' + cleaned.substring(1) : cleaned;
+// 전화번호 포맷팅 함수
+function formatPhoneNumber(input1, input2, input3) {
+    const num1 = input1.value;
+    const num2 = input2.value;
+    const num3 = input3.value;
+    
+    if (num1.length === 3 && num2.length === 4 && num3.length === 4) {
+      	return `\${num1}-\${num2}-\${num3}`;
+    }
+    return null;
 }
-// #endregion
 
-const targetUid = '${unlockDTO.uid}'
-const targetAccountType = '${unlockDTO.accountType}'
-const targetMobile = '${unlockDTO.mobile}'
-const targetEmail = '${unlockDTO.email}'
+// #endregion
 
 // 인증 유형 탭 전환
 const tabs = document.querySelectorAll('.account-type-tab');
@@ -490,47 +532,64 @@ tabs.forEach(tab => {
 		}
 	});
 });
-
 // 인증 유형 전환시 이벤트
-$('input[name="method"]').on('change', function() {
-	selectedValues()
+$('input[name="targetType"]').on('change', () => {
+	const selectedValue = $('input[name="targetType"]:checked').val();
+
+	if (selectedValue === 'user') {
+		$('#businessNum').hide(250)
+	} else if (selectedValue === 'company') {
+		$('#businessNum').show(250)
+	}
 });
 
-function selectedValues() {
-	const selectedValue = $('input[name="method"]:checked').val();
-	console.log('selectedValue: ', selectedValue);
+$('#targetMethod').on('change', () => {
+	const selectedValue = $('#targetMethod').val();
 
-  if (selectedValue === 'mobile') {
-	if (targetMobile) {
-		$('#targetValue').val('연동된 연락처 : ' + targetMobile)
-		$('#modalOpenBtn').prop('disabled', false);
-	} else {
-		$('#targetValue').val('연동된 전화번호가 없습니다.')
-		$('#modalOpenBtn').prop('disabled', true);
+	if (selectedValue === 'email') {
+		$('#targetMobile').hide()
+		$('#targetEmail').show()
+	} else if (selectedValue === 'mobile') {
+		$('#targetEmail').hide()
+		$('#targetMobile').show()
 	}
-  } else if (selectedValue === 'email') {
-	if (targetEmail) {
-		$('#targetValue').val('연동된 연락처 : ' + targetEmail)
-		$('#modalOpenBtn').prop('disabled', false);
-	} else {
-		$('#targetValue').val('연동된 이메일이 없습니다.')
-		$('#modalOpenBtn').prop('disabled', true);
-	}
-  }
-}
+})
+
 
 function sendCode() {
 	$('#modalOpenBtn').prop('disabled', true);
-	const selectedValue = $('input[name="method"]:checked').val();
-	if (selectedValue === 'mobile') {
-		sendMobileCode()
-	} else if (selectedValue === 'email') {
+
+	const selectedType = $('input[name="targetType"]:checked').val();
+	const value = $('#businessNum').val().replace(/[^\d]/g, '');
+
+	if (selectedType === 'COMPANY' && value.length != 10) {
+		window.publicModals.show("정확한 사업자 등록번호를 입력해주세요.")
+		$('#modalOpenBtn').prop('disabled', false);
+		return;
+	}
+
+	const selectedMethod = $('#targetMethod').val();
+
+	if (selectedMethod === 'mobile') {
+		sendPhoneCode()
+	} else {
 		sendEmailCode()
 	}
 }
 
-async function sendMobileCode() {
-    const phoneNumber = formatPhoneNumberForFirebase(targetMobile);
+// 모바일 인증번호 전송
+async function sendPhoneCode() {
+	const phoneInputs = document.querySelectorAll('#targetMobile input');
+    const formattedNumber = formatPhoneNumber(phoneInputs[0], phoneInputs[1], phoneInputs[2]);
+
+    const phoneNumber = formatPhoneNumberForFirebase(formattedNumber);
+
+	if (phoneNumber == null || phoneNumber.length <= 10) {
+		window.publicModals.show("올바른 전화번호를 입력해주세요")
+		$('#modalOpenBtn').prop('disabled', false);
+		return;
+	}
+
  	// 캡챠_firebase에서 제공해줌
     firebaseCaptcha() 
 
@@ -543,39 +602,15 @@ async function sendMobileCode() {
 			onConfirm: verifyPhoneCode
     	});
     } catch (error) {
-        window.publicModals.show("인증번호 전송중 오류가 발생했습니다. fireBase http이슈 혹은 사용횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.", {
-			onConfirm: okAuth,
-			confirmText: "백도어",
-			cancelText: "취소"
-		});
+        console.error("전화번호 인증 실패:", error);
+        window.publicModals.show("인증번호 발송에 실패했습니다. http이슈 혹은 firebase횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.(포트폴리오용)",
+        	{
+        		confirmText: "백도어",
+        		cancelText: "취소",
+        		onConfirm: okMobile
+        	});
     }
 	$('#modalOpenBtn').prop('disabled', false);
-}
-
-// 이메일 인증 코드 전송
-function sendEmailCode() {
-    $.ajax({
-        url: "/account/auth/email",
-        method: "POST",
-		contentType: "application/json",
-		data: JSON.stringify({ 
-			email: targetEmail
-		}),
-        success: (res) => {
-			window.publicModals.show(codeInput.defalt,
-			{
-				confirmText: '인증완료',
-				cancelText: '취소',
-				onConfirm: verifyEmailCode
-            });
-        },
-        error: (xhr) => {
-			window.publicModals.show("인증번호 발송에 실패하였습니다. 이메일을 확인하시고 잠시 후 다시 시도해주세요.")
-		},
-		complete: () => {
-			$('#modalOpenBtn').prop('disabled', false);
-		}
-    });
 }
 
 async function verifyPhoneCode() {
@@ -592,24 +627,104 @@ async function verifyPhoneCode() {
 	}
 
     try {
-      await confirmationResult.confirm(code);
-      okAuth();
+		await confirmationResult.confirm(code);
+		okMobile();
     } catch (error) {
-      console.error("코드 인증 실패:", error);
-      window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.");
+		window.publicModals.show(codeInput.defalt + codeInput.failed,
+			{
+				confirmText: '인증완료',
+				cancelText: '취소',
+				onConfirm: verifyPhoneCode
+    		});
+		return true;
     }
+}
+
+// 인증성공
+function okMobile() {
+	const phoneInputs = document.querySelectorAll('#targetMobile input');
+    const formattedNumber = formatPhoneNumber(phoneInputs[0], phoneInputs[1], phoneInputs[2]);
+	const selectedType = $('input[name="targetType"]:checked').val();
+	const businessNum = $('#businessNum').val().replace(/[^\d]/g, '');
+
+	$.ajax({
+        url: "/account/find/id",
+        method: "POST",
+		dataType: 'text',
+  		contentType: "application/json",
+		data: JSON.stringify({ 
+			targetType: "mobile",
+			targetValue: formattedNumber,
+			accountType: selectedType,
+			businessNum: businessNum
+		}),
+        success: (res) => {
+			if (!res) {
+				window.publicModals.show("해당 연락처를 사용중인 아이디가 존재하지 않습니다.")
+			} else {
+				window.publicModals.show("해당 연락처를 사용중인 아이디 : " + res,
+			{
+				confirmText: '로그인페이지로 이동',
+				cancelText: '취소',
+				onConfirm: () => {location.href = "/account/login";}
+    		});
+			}
+        },
+        error: (xhr) => {
+			console.log(xhr);
+			window.publicModals.show("아이디 검색에 실패하였습니다.")
+		}
+    });
+}
+
+
+// 이메일
+
+// 이메일 인증 코드 전송
+function sendEmailCode() {
+	const email = $("#targetEmail").val();
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailRegex.test(email)) {
+		window.publicModals.show("올바르지 않은 이메일 형식입니다.")
+		$('#modalOpenBtn').prop('disabled', false);
+		return;
+    }
+
+    $.ajax({
+        url: "/account/auth/email",
+        method: "POST",
+  		contentType: "application/json",
+		data: JSON.stringify({ 
+			email: email
+		}),
+        success: (res) => {
+			window.publicModals.show(codeInput.defalt,
+			{
+				confirmText: '인증완료',
+				cancelText: '취소',
+				onConfirm: verifyEmailCode
+    		});
+        },
+        error: (xhr) => {
+			window.publicModals.show("이메일 전송에 실패하였습니다. 잠시뒤 다시 시도해주세요.")
+		},
+		complete: () => {$('#modalOpenBtn').prop('disabled', false);}
+    });
 }
 
 function verifyEmailCode() {
 	const code = $("#confirmCode").val();
+
+    const email = $("#targetEmail").val();
 
 	if (code.length != 6) {
 		window.publicModals.show(codeInput.defalt + codeInput.failed,
 			{
 				confirmText: '인증완료',
 				cancelText: '취소',
-				onConfirm: verifyEmailCode,
-				onCancel: () => {$('#sendEmailBtn').prop('disabled', false)}
+				onConfirm: verifyEmailCode
     		});
 		return false;
 	}
@@ -619,35 +734,75 @@ function verifyEmailCode() {
 		method: "POST",
 		contentType: "application/json",
 		data: JSON.stringify({
-		email: targetEmail
+		email: email
 		}),
-		success: () => {okAuth()},
+		success: () => okEmail(),
 		error: (xhr) => {
-			window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
+			window.publicModals.show(codeInput.defalt + codeInput.failed,
+			{
+				confirmText: '인증완료',
+				cancelText: '취소',
+				onConfirm: verifyEmailCode
+    		});
+			return false;
 		}
     });
 }
 
-function okAuth() {
+function okEmail() {
+	const email = $("#targetEmail").val();
+	const selectedType = $('input[name="targetType"]:checked').val();
+	const businessNum = $('#businessNum').val().replace(/[^\d]/g, '');
+
 	$.ajax({
-        url: "/account/auth",
+        url: "/account/find/id",
         method: "POST",
-		contentType: "application/json",
+		dataType: 'text',
+  		contentType: "application/json",
 		data: JSON.stringify({ 
-			uid: targetUid,
-			accountType: targetAccountType
+			targetType: "email",
+			targetValue: email,
+			accountType: selectedType,
+			businessNum: businessNum
 		}),
         success: (res) => {
-			window.publicModals.show("인증에 성공하였습니다.",
-			{
-				confirmText: '확인',
-				onConfirm: (()=>{location.href = "/account/login";})
-            });
+			if (!res) {
+				window.publicModals.show("해당 연락처를 사용중인 아이디가 존재하지 않습니다.")
+			} else {
+				window.publicModals.show("해당 연락처를 사용중인 아이디 : " + res,
+				{
+					confirmText: '로그인페이지로 이동',
+					cancelText: '취소',
+					onConfirm: () => {location.href = "/account/login";}
+				});
+			}
         },
         error: (xhr) => {
-			window.publicModals.show("인증중 문제가 발생하였습니다. 잠시 후 새로고침 뒤 다시 시도해주세요.")
-		}
+			console.log(xhr);
+			window.publicModals.show("아이디 검색에 실패하였습니다.")
+		},
+		complete: () => {$('#modalOpenBtn').prop('disabled', false);}
     });
+}
+
+document.getElementById('businessNum').addEventListener('input', formatNumber);
+// 숫자 포맷팅 함수 (사업자번호)
+function formatNumber(e) {
+    // 숫자 이외의 문자 제거
+    let value = e.target.value.replace(/[^\d]/g, '');
+    // 길이 제한 (10자리까지만)
+    if (value.length > 10) {
+        value = value.substring(0, 10);
+    }
+    // 포맷: 123-45-67890
+    let formatted = value;
+    if (value.length > 3 && value.length <= 5) {
+        formatted = value.slice(0, 3) + '-' + value.slice(3);
+    } else if (value.length > 5) {
+        formatted = value.slice(0, 3) + '-' + value.slice(3, 5) + '-' + value.slice(5);
+    }
+
+    e.target.value = formatted;
 }
 
 </script>
