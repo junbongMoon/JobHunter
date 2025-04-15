@@ -57,6 +57,7 @@ public class StatusControllerTests {
 //	        statusService.saveEntireStatus(todayTotal);
 		
 		statusService.runDailyStatistics();
+		
 	    }
 	
 

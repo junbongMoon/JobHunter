@@ -38,6 +38,23 @@ public interface StatusDAO {
 
     
     public void insertTotalStatus(TotalStatusVODTO status);
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 두개의 날짜값을 주고 그 사이의 targetType과 logType인 Log의 수를 조회하는 메서드
+	 * </p>
+	 * 
+	 * @param start 시작 시간
+	 * @param end 끝 시간
+	 * @param String targetType
+	 * @param logType
+	 * @return int start ~ end 사이의 targetType과 logType인 Log의 수
+	 *
+	 */
+	
+	int selectLogCntBetweenAndRole(LocalDateTime start, LocalDateTime end, String tagetType, String logType);
     
 
 }

@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.company.CompanyDAO;
@@ -22,33 +24,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StatusServiceImpl implements StatusService {
 
-	private final UserDAO userDAO;
-	private final CompanyDAO companyDAO;
-	private final RecruitmentNoticeDAO recruitmentNoticeDAO;
 	private final SubmitDAO submitDAO;
-	private final ReviewBoardDAO reviewBoardDAO;
 	private final StatusDAO statusDAO;
 	
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 일일 통계를 입력하는 메서드
+	 * </p>
+	 * 
+	 *
+	 */
 	@Override
 	public void saveDateStatusByToDay() {
-        LocalDate today = LocalDate.now().minusDays(1);
-        LocalDateTime start = today.atStartOfDay();
-        LocalDateTime end = today.plusDays(1).atStartOfDay();
 
-        int newUsers = userDAO.countByCreatedDateBetweenAndRole(start, end, "USERS");
-        int newCompanies = companyDAO.countByCreatedDateBetweenAndRole(start, end, "COMPANY");
-        int newRecruitmentNoticeCnt = recruitmentNoticeDAO.countByCreatedDateBetween(start, end);
-        int newRegistration = submitDAO.countBySubmittedDateBetween(start, end);
-        int newReviewBoard = reviewBoardDAO.countByCreatedDateBetween(start, end);
-
-        StatusVODTO status = StatusVODTO.builder()
-                .statusDate(LocalDateTime.now())
-                .newUsers(newUsers)
-                .newCompanies(newCompanies)
-                .newRecruitmentNoticeCnt(newRecruitmentNoticeCnt)
-                .newRegistration(newRegistration)
-                .newReviewBoard(newReviewBoard)
-                .build();
+        StatusVODTO status = this.getTodayIncrement();
 
         statusDAO.insertStatusDate(status);
 	}
@@ -67,23 +58,47 @@ public class StatusServiceImpl implements StatusService {
 	public TotalStatusVODTO getTotalStatusUntilYesterday() {
 	    LocalDate yesterday = LocalDate.now().minusDays(1);
 	    LocalDateTime start = yesterday.atStartOfDay();
-	    LocalDateTime end = yesterday.plusDays(1).atStartOfDay();
+	    LocalDateTime end = yesterday.plusDays(1).atStartOfDay().minusSeconds(1);
 	    
 	    TotalStatusVODTO result = statusDAO.selectTotalStatusByYesterDay(yesterday, start, end);
 	    return result;
 	}
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 오늘 통계 증가량을 조회하는 메서드
+	 * </p>
+	 * 
+	 * @return StatusVODTO 일일 유저, 기업, 공고, 제출, 리뷰의 합계
+	 *
+	 */
 	@Override
 	public StatusVODTO getTodayIncrement() {
 	    LocalDate today = LocalDate.now().minusDays(1);
 	    LocalDateTime start = today.atStartOfDay();
-	    LocalDateTime end = today.plusDays(1).atStartOfDay();
+	    LocalDateTime end = today.plusDays(1).atStartOfDay().minusSeconds(1);
+	    
+        int todayCreateUsers = statusDAO.selectLogCntBetweenAndRole(start, end, "USER", "CREATE");
+        int todayDeleteUsers = statusDAO.selectLogCntBetweenAndRole(start, end, "USER", "DELETE");
+        
+        System.out.println("todayCreateUsers : " + todayCreateUsers +"todayDeleteUsers : " + todayDeleteUsers);
+        
+        int todayCreateCompanies = statusDAO.selectLogCntBetweenAndRole(start, end, "COMPANY", "CREATE");
+        int todayDeleteCompanies = statusDAO.selectLogCntBetweenAndRole(start, end, "COMPANY", "DELETE");
+        
+        int todayCreateRecruitments = statusDAO.selectLogCntBetweenAndRole(start, end, "RECRUITMENT", "CREATE");
+        int todayDeleteRecruitments = statusDAO.selectLogCntBetweenAndRole(start, end, "RECRUITMENT", "DELETE");
+        
+        int todayCreateReviews = statusDAO.selectLogCntBetweenAndRole(start, end, "REVIEW", "CREATE");
+        int todayDeleteReviews = statusDAO.selectLogCntBetweenAndRole(start, end, "REVIEW", "DELETE");
 
-	    int newUsers = userDAO.countByCreatedDateBetweenAndRole(start, end, "USERS");
-	    int newCompanies = companyDAO.countByCreatedDateBetweenAndRole(start, end, "COMPANY");
-	    int newRecruitmentNoticeCnt = recruitmentNoticeDAO.countByCreatedDateBetween(start, end);
+        int newUsers = todayCreateUsers - todayDeleteUsers;
+	    int newCompanies = todayCreateCompanies - todayDeleteCompanies;
+	    int newRecruitmentNoticeCnt = todayCreateRecruitments - todayDeleteRecruitments;
 	    int newRegistration = submitDAO.countBySubmittedDateBetween(start, end);
-	    int newReviewBoard = reviewBoardDAO.countByCreatedDateBetween(start, end);
+	    int newReviewBoard = todayCreateReviews - todayDeleteReviews;
 
 	    return StatusVODTO.builder()
 	            .statusDate(LocalDateTime.now())
@@ -95,13 +110,23 @@ public class StatusServiceImpl implements StatusService {
 	            .build();
 	}
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 누적 통계를 입력하는 메서드
+	 * </p>
+	 * 
+	 * @param todayTotal
+	 *
+	 */
 	@Override
 	public void saveEntireStatus(TotalStatusVODTO todayTotal) {
 	    statusDAO.insertTotalStatus(todayTotal);
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public void runDailyStatistics() {
 	    // 1. 일일 증가량 저장 (status 테이블)
 	    this.saveDateStatusByToDay();
@@ -139,7 +164,7 @@ public class StatusServiceImpl implements StatusService {
 	    // 5. 누적 통계 저장 (total_status 테이블)
 	    this.saveEntireStatus(todayTotal);
 
-	    // ✅ 로그로 확인
+	    // 로그로 확인
 	    System.out.println("어제 누적 통계 : " + yesterdayTotal);
 	    System.out.println("오늘 증가량 : " + todayIncrement);
 	    System.out.println("오늘 누적 통계 : " + todayTotal);
