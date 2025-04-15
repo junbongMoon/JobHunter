@@ -456,10 +456,10 @@ window.onload=()=>{
 	console.log('selectedValue: ', selectedValue);
 
     if (selectedValue === 'USER') {
-      // 여기에 개인 회원 관련 동작 추가
+      // 개인 회원 관련 동작
 	  $('.btn-kakao').show(100)
     } else if (selectedValue === 'COMPANY') {
-      // 여기에 기업 회원 관련 동작 추가
+      // 기업 회원 관련 동작
 	  $('.btn-kakao').hide(100)
     }
   });
@@ -471,7 +471,7 @@ window.onload=()=>{
   const autoLogin = urlParams.get('autoLogin');
 
   if (error === 'true') {
-    alertUtils.show('아이디 또는 비밀번호가 일치하지 않습니다.');
+    window.publicModals.show('아이디 또는 비밀번호가 일치하지 않습니다.');
   }
 
   if (prevAccountType === 'USER' || prevAccountType === 'COMPANY') {
@@ -483,6 +483,10 @@ window.onload=()=>{
         radio.checked = true;
       }
     });
+
+	if (prevAccountType === 'COMPANY') {
+		$('.btn-kakao').hide(100)
+	}
   }
 
   if (autoLogin === "true") {
