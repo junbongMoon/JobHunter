@@ -1,6 +1,5 @@
 package com.jobhunter.dao.user;
 
-import java.util.List;
 import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
@@ -34,12 +33,4 @@ public interface UserDAO {
 	AccountVO findByEmail(KakaoUserInfoDTO userInfo) throws Exception;
 
 	int registUser(UserRegisterDTO dto) throws Exception;
-
-	List<UserVO> getAllUsers() throws Exception;
-
-	UserVO getUserById(int uid) throws Exception;
-
-	List<UserVO> getUsersBySearch(Map<String, Object> params) throws Exception;
-
-	int getTotalUserCount(Map<String, Object> params) throws Exception;
 }

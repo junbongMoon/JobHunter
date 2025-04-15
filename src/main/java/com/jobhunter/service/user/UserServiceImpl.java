@@ -1,7 +1,6 @@
 package com.jobhunter.service.user;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpEntity;
@@ -167,39 +166,5 @@ public class UserServiceImpl implements UserService {
 	public AccountVO registUser(UserRegisterDTO dto) throws Exception {
 		Integer uid = dao.registUser(dto);
 		return dao.findByUidAndPassword(uid.toString(), dto.getPassword());
-	}
-
-	@Override
-	public List<UserVO> getAllUsers() throws Exception {
-		return dao.getAllUsers();
-	}
-
-	@Override
-	public UserVO getUserById(int uid) throws Exception {
-		return dao.getUserById(uid);
-	}
-
-	@Override
-	public List<UserVO> getUsersBySearch(String searchType, String searchKeyword, String statusFilter, int page, int pageSize) throws Exception {
-		Map<String, Object> params = new HashMap<>();
-		params.put("searchType", searchType);
-		params.put("searchKeyword", searchKeyword);
-		params.put("statusFilter", statusFilter);
-		
-		int validPage = Math.max(1, page);
-		params.put("offset", (validPage - 1) * pageSize);
-		params.put("pageSize", pageSize);
-		
-		return dao.getUsersBySearch(params);
-	}
-
-	@Override
-	public int getTotalUserCount(String searchType, String searchKeyword, String statusFilter) throws Exception {
-		Map<String, Object> params = new HashMap<>();
-		params.put("searchType", searchType);
-		params.put("searchKeyword", searchKeyword);
-		params.put("statusFilter", statusFilter);
-		
-		return dao.getTotalUserCount(params);
 	}
 }
