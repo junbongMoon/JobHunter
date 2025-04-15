@@ -182,13 +182,16 @@
 
 
 	<update id="updateStatusToExpiredBetween" parameterType="map">
-		UPDATE registration
+		UPDATE
+		registration
 		SET status = 'EXPIRED'
 		WHERE status = 'WAITING'
-		AND recruitmentNoticePk IN (
+		AND
+		recruitmentNoticePk IN (
 		SELECT uid
 		FROM recruitmentnotice
-		WHERE duedate BETWEEN #{start} AND #{end}
+		WHERE duedate
+		BETWEEN #{start} AND #{end}
 		)
 	</update>
 
@@ -196,19 +199,35 @@
 		parameterType="map" resultType="map">
 		SELECT
 		u.uid AS userNo,
-		c.uid AS companyNo,
+		c.uid AS
+		companyNo,
 		c.companyName,
 		r.title AS noticeTitle
 		FROM registration rg
 		JOIN recruitmentnotice r ON rg.recruitmentNoticePk = r.uid
-		JOIN resume rs ON rg.resumePk = rs.resumeNo
+		JOIN resume
+		rs ON rg.resumePk = rs.resumeNo
 		JOIN users u ON rs.userUid = u.uid
-		JOIN company c ON r.refCompany = c.uid
+		JOIN
+		company c ON r.refCompany = c.uid
 		WHERE rg.status = 'EXPIRED'
-		AND r.dueDate BETWEEN #{start} AND #{end}
+		AND
+		r.dueDate BETWEEN #{start} AND #{end}
 	</select>
 
 
-
+	<select id="selectMessageTargetInfo" resultType="com.jobhunter.model.message.MessageTargetInfoDTO">
+		SELECT
+		r.userUid AS userNo,
+		c.uid AS companyNo,
+		c.companyName,
+		rc.title AS noticeTitle
+		FROM registration rg
+		JOIN resume r ON rg.resumePk = r.resumeNo
+		JOIN recruitmentnotice rc ON rg.recruitmentNoticePk = rc.uid
+		JOIN company c ON rc.refCompany = c.uid
+		WHERE rg.resumePk = #{resumePk}
+		AND rg.recruitmentNoticePk = #{recruitmentNoticePk}
+	</select>
 
 </mapper>

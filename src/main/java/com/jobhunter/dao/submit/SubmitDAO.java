@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import com.jobhunter.model.message.MessageTargetInfoDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
@@ -96,6 +97,9 @@ public interface SubmitDAO {
 
 
 	List<Map<String, Object>> selectExpiredSubmitUserMessageInfoBetween(Map<String, Object> param);
+
+
+	MessageTargetInfoDTO selectMessageTargetInfo(int resumePk, int recruitmentNoticePk);
 	
 	
 }

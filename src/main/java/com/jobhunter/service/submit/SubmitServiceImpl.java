@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 import com.jobhunter.dao.message.MessageDAO;
 import com.jobhunter.dao.submit.SubmitDAO;
 import com.jobhunter.model.message.MessageDTO;
+import com.jobhunter.model.message.MessageTargetInfoDTO;
 import com.jobhunter.model.message.USERTYPE;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
@@ -127,16 +128,62 @@ public class SubmitServiceImpl implements SubmitService {
 	 * @return 변경이 성공 됬으면 true, 실패했으면 false
 	 *
 	 */
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public boolean changeStatus(Status status, int resumePk, int recruitmentNoticePk) {
-		boolean result = false;
-		System.out.println("서비스 단" + status + ", " + resumePk + ", " + recruitmentNoticePk);
-		
-		
-		if(submitDAO.updateStatusByRegistration(status, resumePk, recruitmentNoticePk) > 0) {
-			result = true;
-		}
-		return result;
+	    boolean result = false;
+	    System.out.println("서비스 단" + status + ", " + resumePk + ", " + recruitmentNoticePk);
+
+	    if (submitDAO.updateStatusByRegistration(status, resumePk, recruitmentNoticePk) > 0) {
+	        result = true;
+
+	        // 상태 변경 후 메시지 전송
+	        if (result) {
+	            // 필요한 메시지 대상 정보 조회 (예: 유저 번호, 회사 번호 등)
+	            MessageTargetInfoDTO info = submitDAO.selectMessageTargetInfo(resumePk, recruitmentNoticePk); 
+	            if (info != null) {
+	                int toUser = info.getUserNo();
+	                int fromCompany = info.getCompanyNo();
+	                String companyName = info.getCompanyName();
+	                String noticeTitle = info.getNoticeTitle();
+
+	                String title = "지원 상태 변경 알림";
+	                String content = "";
+
+	                // 상태별 메시지 분기 처리
+	                switch (status) {
+	                    case PASS:
+	                        content = String.format("[%s]의 [%s] 공고에 지원이 합격 처리되었습니다.", companyName, noticeTitle);
+	                        break;
+	                    case FAILURE:
+	                        content = String.format("[%s]의 [%s] 공고에 지원이 불합격 처리되었습니다.", companyName, noticeTitle);
+	                        break;
+	                    case CHECKED:
+	                        content = String.format("[%s]의 [%s] 공고에 제출된 이력서가 조회 되었습니다.", companyName, noticeTitle);
+	                        break;
+	                    case EXPIRED:
+	                        content = String.format("[%s]의 [%s] 공고가 마감 되어 자동으로 상태가 변경되었습니다.", companyName, noticeTitle);
+	                        break;
+	                    default:
+	                        content = String.format("[%s]의 [%s] 공고 지원 상태가 변경되었습니다.", companyName, noticeTitle);
+	                        break;
+	                }
+
+	                MessageDTO msgDTO = MessageDTO.builder()
+	                        .toWho(toUser)
+	                        .fromWho(fromCompany)
+	                        .toUserType(USERTYPE.USER)
+	                        .fromUserType(USERTYPE.COMPANY)
+	                        .title(title)
+	                        .content(content)
+	                        .build();
+
+	                messageDAO.insertMessage(msgDTO);
+	            }
+	        }
+	    }
+
+	    return result;
 	}
 	
 	/**

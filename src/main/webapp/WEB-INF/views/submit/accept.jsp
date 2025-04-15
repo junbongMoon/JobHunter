@@ -97,6 +97,8 @@ $(function() {
       if(registrationStatusByResume == "WAITING"){
         changeStatusByregistration("CHECKED", selectedResumeNo, recruitmentNoticePk);
       }
+
+      
     }
   }
 });

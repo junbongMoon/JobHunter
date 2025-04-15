@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.jobhunter.model.message.MessageTargetInfoDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
@@ -163,6 +164,16 @@ public class SubmitDAOImpl implements SubmitDAO {
 	@Override
 	public List<Map<String, Object>> selectExpiredSubmitUserMessageInfoBetween(Map<String, Object> param) {
 	    return ses.selectList(NS + ".selectExpiredSubmitUserMessageInfoBetween", param);
+	}
+
+
+	@Override
+	public MessageTargetInfoDTO selectMessageTargetInfo(int resumePk, int recruitmentNoticePk) {
+		Map<String, Integer> param = new HashMap<>();
+		param.put("resumePk", resumePk);
+		param.put("recruitmentNoticePk", recruitmentNoticePk);
+		
+		return ses.selectOne(NS +".selectMessageTargetInfo", param);
 	}
 
 
