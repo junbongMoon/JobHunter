@@ -27,21 +27,22 @@
 
 	<select id="getDateStatusByYesterDay"
 		resultType="com.jobhunter.model.status.StatusVODTO">
-		SELECT * FROM status WHERE DATE(statusDate) = #{yesterday} LIMIT 1
+		SELECT * FROM status WHERE DATE(statusDate) = #{yesterday}
+		LIMIT 1
 	</select>
 
 	<select id="getTotalStatusByYesterDay" parameterType="map"
 		resultType="com.jobhunter.model.status.TotalStatusVODTO">
-    SELECT 
-        total_statusNo AS totalStatusNo,
-        statusDate,
-        total_users AS totalUsers,
-        total_companies AS totalCompanies,
-        total_recruitmentNoticeCnt AS totalRecruitmentNoticeCnt,
-        total_registration AS totalRegistration,
-        total_reviewBoard AS totalReviewBoard
-    FROM total_status
-    WHERE statusDate BETWEEN #{start} AND #{end}
+		SELECT
+		total_statusNo AS totalStatusNo,
+		statusDate,
+		total_users AS totalUsers,
+		total_companies AS totalCompanies,
+		total_recruitmentNoticeCnt AS totalRecruitmentNoticeCnt,
+		total_registration AS totalRegistration,
+		total_reviewBoard AS totalReviewBoard
+		FROM total_status
+		WHERE statusDate BETWEEN #{start} AND #{end}
 	</select>
 
 	<insert id="insertTotalStatus"
@@ -62,5 +63,12 @@
 		#{totalReviewBoard}
 		)
 	</insert>
+
+	<select id="getCountLogBetweenStartAndEndByTarget">
+		SELECT COUNT(*)
+		FROM CDLog
+		WHERE logRegDate BETWEEN #{start} AND #{end}
+		AND targetType = #{targetType}
+	</select>
 
 </mapper>
