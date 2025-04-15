@@ -1083,10 +1083,10 @@ function changeEmailFunc(changeEmail) {
     if (beforeAddress && beforeAddress !== '') {
       document.getElementById('selectedAddress').value = beforeAddress;
       document.getElementById('selectedAddress').style.display = 'block';
-        document.getElementById('addressDetail').style.display = 'block';
+      document.getElementById('addressDetail').style.display = 'block';
     }
     if (beforeDetailAddress) {
-        document.getElementById('addressDetail').value = beforeDetailAddress;
+      document.getElementById('addressDetail').value = beforeDetailAddress;
     }
   }
 

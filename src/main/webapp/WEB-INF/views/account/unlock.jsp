@@ -9,9 +9,6 @@
 	src="https://www.gstatic.com/firebasejs/11.5.0/firebase-app-compat.js"></script>
 <script
 	src="https://www.gstatic.com/firebasejs/11.5.0/firebase-auth-compat.js"></script>
-<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.5/kakao.min.js"
-	integrity="sha384-dok87au0gKqJdxs7msEdBPNnKSRT+/mhTVzq+qOhcL464zXwvcrpjeWvyj1kCdq6"
-	crossorigin="anonymous"></script>
 
 <style>
 .main {
@@ -211,122 +208,6 @@
 	margin-top: 20px;
 }
 
-/* 알럿 모달 스타일 */
-.alert-modal-overlay {
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.3);
-	z-index: 9998;
-}
-
-.alert-modal-box {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 300px;
-	background: white;
-	padding: 20px;
-	border-radius: 12px;
-	box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
-	z-index: 9999;
-	text-align: center;
-}
-
-.alert-modal-content {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 15px;
-}
-
-.alert-modal-message {
-	font-size: 16px;
-	color: #2c3e50;
-	line-height: 1.5;
-}
-
-.alert-modal-buttons {
-	display: flex;
-	justify-content: center;
-	gap: 10px;
-}
-
-.alert-modal-button {
-	padding: 8px 20px;
-	border: none;
-	border-radius: 6px;
-	font-size: 14px;
-	cursor: pointer;
-	transition: all 0.2s ease;
-}
-
-.alert-modal-button.confirm {
-	background: #47b2e4;
-	color: white;
-}
-
-.alert-modal-button.cancel {
-	background: #f8f9fa;
-	color: #666;
-}
-
-.alert-modal-button:hover {
-	opacity: 0.9;
-}
-
-.login-options {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin: 20px 0;
-	padding: 15px 0;
-	border-top: 1px solid #eee;
-	border-bottom: 1px solid #eee;
-}
-
-.find-account {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-}
-
-.find-account a {
-	color: #666;
-	text-decoration: none;
-	font-size: 14px;
-}
-
-.find-account a:hover {
-	color: #47b2e4;
-}
-
-.find-account .divider {
-	color: #ddd;
-	font-size: 12px;
-}
-
-.social-login {
-	margin-top: 20px;
-}
-
-@media ( max-width : 768px) {
-	.login-options {
-		flex-direction: column;
-		gap: 15px;
-		align-items: flex-start;
-	}
-	.find-account {
-		width: 100%;
-		justify-content: center;
-	}
-}
-
-.login-failed-massege {
-	font-size: 14px;
-	color: var(- -bs-red);
-}
-
 .flex-x-container {
 	display: flex;
 	flex-direction: row;
@@ -336,62 +217,6 @@
 	justify-content: space-between;
 }
 
-.sub-title {
-	text-align: center;
-}
-
-.btn-kakao {
-	margin-bottom: 9px;
-}
-
-.btn-otherType {
-	margin-left: 30px;
-    height: 47px;
-    padding: 10px 20px;
-    background: var(--bs-gray-300);
-    color: var(--default-color);
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.phone-input-group input {
-	width: 30%;
-}
-
-.phone-input-group span {
-	font-size: 27px;
-	font-weight: 600;
-	text-align: center;
-	flex: 1;
-}
-
-mark {
-	margin-left: 5px;
-	font-size: 0.7em;
-	background-color: transparent;
-}
-
-.spacer {
-	margin: auto;
-}
-
-.info-defalt{
-	color: #666;
-}
-.info-message{
-	color: black;
-}
-.info-ok{
-	color: green;
-}
-.info-next{
-	color: blue;
-}
-.info-warning{
-	color: red;
-}
 </style>
 
 <main class="main">

@@ -40,7 +40,7 @@ public class AutoLoginInterceptor implements HandlerInterceptor {
                 		AccountType type = ("userAutoLogin".equals(name))?AccountType.USER:AccountType.COMPANY;
 
                         AccountVO account = accountService.findAccountByAutoLogin(sessionId, type);
-                        if (account != null) {
+                        if (session != null && account != null) {
                         	session.setAttribute("account", account);
                             return true;
                         }

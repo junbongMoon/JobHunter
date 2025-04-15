@@ -73,7 +73,7 @@ public class AccountRestController {
 		AccountType required = AccountType.valueOf(type.toUpperCase());
 
 		if (required == AccountType.ADMIN) {
-			if (account.getIsAdmin().equals('Y')) {
+			if (account.getIsAdmin().equals("Y")) {
 				return ResponseEntity.ok(true);
 			}
 		}

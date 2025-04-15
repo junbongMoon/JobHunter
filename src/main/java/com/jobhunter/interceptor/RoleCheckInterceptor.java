@@ -1,7 +1,5 @@
 package com.jobhunter.interceptor;
 
-import java.time.Instant;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -13,11 +11,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.customenum.AccountType;
-import com.jobhunter.service.account.AccountService;
 import com.jobhunter.util.AccountUtil;
 import com.jobhunter.util.RedirectUtil;
-
-import lombok.RequiredArgsConstructor;
 
 @Component
 public class RoleCheckInterceptor implements HandlerInterceptor {
@@ -65,7 +60,7 @@ AccountVO account = (AccountVO) session.getAttribute("account");
             boolean isEqType = account.getAccountType() == type;
             // 어드민 허용 페이지고 내가 어드민인지 체크
             boolean isAdminAllowed = "true".equalsIgnoreCase(allowAdminParam)
-                    && account.getIsAdmin() == 'Y';
+                    && account.getIsAdmin() == "Y";
 
             if (isEqType || isAdminAllowed) {
                 return true;
