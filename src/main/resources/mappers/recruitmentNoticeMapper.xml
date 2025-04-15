@@ -465,4 +465,19 @@
 		regDate BETWEEN #{start} AND #{end}
 	</select>
 
+	<insert id="insertCreateRecruitmentLog">
+		insert into CDLog
+		(targetId, targetType, logType)
+		values
+		(#{recNo}, 'RECRUITMENT', 'CREATE')
+	</insert>
+
+	<insert id="insertDeleteRecruitmentLog">
+		insert into CDLog
+		(targetId, targetType, logType)
+		values
+		(#{recNo}, 'RECRUITMENT', 'DELETE')
+	</insert>
+
+
 </mapper>
