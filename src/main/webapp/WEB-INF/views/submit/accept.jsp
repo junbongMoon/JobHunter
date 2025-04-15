@@ -54,6 +54,7 @@ $(function() {
     const selectedData = window.latestResumeList?.find(item => item.resumeNo === selectedResumeNo);
 
     if (selectedData) {
+      
       $('#detailTitle').val(selectedData.title);
       $('#detailPayType').val(selectedData.payType);
       $('#detailPay').val(selectedData.pay);
@@ -77,7 +78,11 @@ $(function() {
       $('#detailFileList').empty();
       const files = selectedData.files;
 
-      registrationStatusByResume = selectedData.registrationVO.status;
+      const registrationStatusByResume = selectedData.registrationVO.status;
+      console.log("상태 (enum):", registrationStatusByResume);
+
+      const translatedStatus = translateStatusEnum(registrationStatusByResume);
+      $('#registrationStatus').val(translatedStatus);
 
       if (files && files.length > 0) {
         files.forEach(file => {
@@ -105,6 +110,17 @@ $(function() {
   
 });
 
+function translateStatusEnum(status) {
+  const statusMap = {
+    PASS: '합격',
+    FAILURE: '불합격',
+    EXPIRED: '만료됨',
+    CHECKED: '조회됨',
+    WAITING: '조회되지 않음'
+  };
+
+  return statusMap[status] || '알 수 없음';
+}
 
 function changeStatusByregistration(status, resumePk, recruitmentNoticePk) {
   if(!$('#detailTitle').val()){ // 출력된 값이 없을 때 호출 되면..
@@ -121,9 +137,13 @@ function changeStatusByregistration(status, resumePk, recruitmentNoticePk) {
       success: function (response) {
       console.log("상태 변경 성공:", response);
       // 성공 후 사용자에게 알림 또는 상태 갱신 로직 등 추가 가능
+        // 리스트 초기화
         $('#resumeList').val('-1');
         $('#resumeDetailForm input').val('');
         $('#resumeDetailForm textarea').val('');
+
+        // 최신 상태 반영 위해 이력서 리스트 다시 로딩
+        loadSubmittedResumes(recruitmentNoticePk);
         
       },
       error: function (xhr, status, error) {
@@ -525,6 +545,10 @@ label {
           <div id="detailFileList" class="form-control" style="list-style: none; padding-left: 0;">
 
           </div>
+
+          <label>상태</label>
+          <input type="text" class="form-control" id="registrationStatus" readonly>
+
           <div class="d-flex justify-content-end gap-2 mt-3">
             <button type="button" id="passedBtn" class="btn btn-success btn-sm fixed-width-btn" style="width: 20%;">합격</button>
             <button type="button" id="failedBtn" class="btn btn-danger btn-sm fixed-width-btn" style="width: 20%;">불합격</button>

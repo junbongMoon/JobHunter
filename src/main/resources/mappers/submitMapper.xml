@@ -11,7 +11,7 @@
 		r.resumeNo, r.title, r.payType, r.pay, r.introduce,
 		r.saveType, r.userUid,
 
-		reg.registrationNo, reg.status AS regStatus,
+		reg.registrationNo, reg.status,
 		reg.recruitmentNoticePk
 		AS regRecruitmentNoticePk,
 		reg.regDate,
@@ -32,8 +32,12 @@
 
 		FROM resume r
 
-		LEFT JOIN registration
-		reg ON r.resumeNo = reg.resumePk
+		LEFT JOIN registration reg ON r.resumeNo = reg.resumePk
+		AND reg.registrationNo = (
+		  SELECT MAX(r2.registrationNo)
+		  FROM registration r2
+		  WHERE r2.resumePk = r.resumeNo AND r2.recruitmentNoticePk = #{recruitmentUid}
+		)
 		LEFT JOIN jobform jf ON r.resumeNo =
 		jf.resumeNo
 		LEFT JOIN merit m ON r.resumeNo = m.resumeNo
@@ -82,11 +86,12 @@
 		<association property="registrationVO"
 			javaType="com.jobhunter.model.submit.RegistrationVO">
 			<id property="registrationNo" column="registrationNo" />
-			<result property="status" column="regStatus" />
+			<result property="status" column="status" />
 			<result property="recruitmentNoticePk"
 				column="regRecruitmentNoticePk" />
 			<result property="regDate" column="regDate" />
 			<result property="resumePk" column="regResumePk" />
+			
 		</association>
 
 		<collection property="jobForms"

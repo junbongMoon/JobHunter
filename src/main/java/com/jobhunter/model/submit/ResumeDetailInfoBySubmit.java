@@ -66,6 +66,5 @@ public class ResumeDetailInfoBySubmit {
     
     // 직업군
     private List<SubCategory> subcategoryList;
-    
-    private Status status;
+
 }
