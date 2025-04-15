@@ -278,23 +278,122 @@
 	<!-- 푸터 포함 -->
 	<jsp:include page="adminfooter.jsp"></jsp:include>
 
+	<!-- 정지 모달 -->
+	<div class="modal fade" id="blockUserModal" tabindex="-1" aria-labelledby="blockUserModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="blockUserModalLabel">유저 정지</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form id="blockUserForm">
+						<input type="hidden" id="blockUserId" name="uid">
+						<div class="mb-3">
+							<label class="form-label">정지 기간</label>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="blockDuration" id="duration3days" value="3">
+								<label class="form-check-label" for="duration3days">3일</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="blockDuration" id="duration7days" value="7">
+								<label class="form-check-label" for="duration7days">7일</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="blockDuration" id="duration30days" value="30">
+								<label class="form-check-label" for="duration30days">30일</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="blockDuration" id="durationPermanent" value="permanent">
+								<label class="form-check-label" for="durationPermanent">영구</label>
+							</div>
+						</div>
+						<div class="mb-3">
+							<label for="blockReason" class="form-label">정지 사유</label>
+							<textarea class="form-control" id="blockReason" name="reason" rows="3" required></textarea>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-danger" onclick="submitBlockUser()">확인</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<!-- 페이지 로드 시 실행되는 스크립트 -->
 	<script>
-                    // 유저 계정 정지
-                    function blockUser(uid) {
-                        if (confirm("정말로 이 유저의 계정을 정지하시겠습니까?")) {
-                            // 계정 정지 로직 구현
-                            alert("유저 ID: " + uid + " 계정을 정지합니다.");
-                        }
-                    }
+                    // 유저 계정 정지 모달 열기
+					function blockUser(uid) {
+						document.getElementById('blockUserId').value = uid;
+						document.getElementById('blockReason').value = '';
+						document.querySelector('input[name="blockDuration"][value="3"]').checked = true;
+						new bootstrap.Modal(document.getElementById('blockUserModal')).show();
+					}
 
-                    // 유저 계정 정지 해제
-                    function unblockUser(uid) {
-                        if (confirm("정말로 이 유저의 계정 정지를 해제하시겠습니까?")) {
-                            // 계정 정지 해제 로직 구현
-                            alert("유저 ID: " + uid + " 계정 정지를 해제합니다.");
-                        }
-                    }
+					// 유저 계정 정지 제출
+					function submitBlockUser() {
+						const uid = document.getElementById('blockUserId').value;
+						const duration = document.querySelector('input[name="blockDuration"]:checked').value;
+						const reason = document.getElementById('blockReason').value;
+
+						if (!reason) {
+							alert('정지 사유를 입력해주세요.');
+							return;
+						}
+
+						// AJAX로 정지 요청 보내기
+						fetch('/admin/blockUser/' + uid, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({
+								duration: duration,
+								reason: reason
+							})
+						})
+						.then(response => response.json())
+						.then(data => {
+							if (data.success) {
+								alert('유저가 정지되었습니다.');
+								location.reload();
+							} else {
+								alert('유저 정지에 실패했습니다.');
+							}
+						})
+						.catch(error => {
+							console.error('Error:', error);
+							alert('처리 중 오류가 발생했습니다.');
+						});
+					}
+
+					// 유저 계정 정지 해제
+					function unblockUser(uid) {
+						if (confirm('정말로 이 유저의 정지를 해제하겠습니까?')) {
+							// AJAX로 정지 해제 요청 보내기
+							fetch('/admin/unblockUser/' + uid, {
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json'
+								}
+							})
+							.then(response => response.json())
+							.then(data => {
+								if (data.success) {
+									alert('유저의 정지가 해제되었습니다.');
+									location.reload();
+								} else {
+									alert('유저 정지 해제에 실패했습니다.');
+								}
+							})
+							.catch(error => {
+								console.error('Error:', error);
+								alert('처리 중 오류가 발생했습니다.');
+							});
+						}
+					}
                 </script>
 </body>
 
