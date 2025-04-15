@@ -7,9 +7,9 @@
 	<insert id="saveMessage"
 		parameterType="com.jobhunter.model.message.MessageDTO">
 		INSERT INTO message
-		(to, from, toUserType, fromUserType, title, content)
+		(toWho, fromWho, toUserType, fromUserType, title, content)
 		VALUES
-		(#{to}, #{from}, #{toUserType}, #{fromUserType}, #{title}, #{content})
+		(#{toWho}, #{fromWho}, #{toUserType}, #{fromUserType}, #{title}, #{content})
 	</insert>
 
 </mapper>

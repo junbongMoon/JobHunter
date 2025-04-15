@@ -17,8 +17,8 @@ import lombok.ToString;
 @Builder
 public class MessageDTO {
 	
-	private int to;
-	private int from;
+	private int toWho;
+	private int fromWho;
 	private USERTYPE toUserType;
 	private USERTYPE fromUserType;
 	private String title;
