@@ -180,21 +180,25 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserVO> getUsersBySearch(String searchType, String searchKeyword, int page, int pageSize) throws Exception {
+	public List<UserVO> getUsersBySearch(String searchType, String searchKeyword, String statusFilter, int page, int pageSize) throws Exception {
 		Map<String, Object> params = new HashMap<>();
 		params.put("searchType", searchType);
 		params.put("searchKeyword", searchKeyword);
-		params.put("offset", (page - 1) * pageSize);
+		params.put("statusFilter", statusFilter);
+		
+		int validPage = Math.max(1, page);
+		params.put("offset", (validPage - 1) * pageSize);
 		params.put("pageSize", pageSize);
 		
 		return dao.getUsersBySearch(params);
 	}
 
 	@Override
-	public int getTotalUserCount(String searchType, String searchKeyword) throws Exception {
+	public int getTotalUserCount(String searchType, String searchKeyword, String statusFilter) throws Exception {
 		Map<String, Object> params = new HashMap<>();
 		params.put("searchType", searchType);
 		params.put("searchKeyword", searchKeyword);
+		params.put("statusFilter", statusFilter);
 		
 		return dao.getTotalUserCount(params);
 	}
