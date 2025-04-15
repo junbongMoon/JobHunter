@@ -255,20 +255,6 @@
 
 
 					<c:if test="${not empty sessionScope.account}">
-						<!-- <c:choose>
-							<c:when test="${sessionScope.account.accountType == 'ADMIN'}">
-								<a class="accountName" style="margin-left: 20px;"
-									href="#">${sessionScope.account.accountName}</a>
-							</c:when>
-							<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
-								<a class="accountName" style="margin-left: 20px;"
-									href="/company/companyHome?uid=${sessionScope.account.uid}&accountType=company">${sessionScope.account.accountName}</a>
-							</c:when>
-							<c:otherwise>
-								<a class="accountName" style="margin-left: 20px;"
-									href="/user/mypage?uid=${sessionScope.account.uid}&accountType=user">${sessionScope.account.accountName}</a>
-							</c:otherwise>
-						</c:choose> -->
 						<a class="btn-getstarted" href="/account/logout">로그아웃</a>
 					</c:if>
 					<c:if test="${empty sessionScope.account}">
