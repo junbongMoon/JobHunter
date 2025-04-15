@@ -181,4 +181,9 @@
 	 VALUES 
 	 (#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N', #{nationality});
 	</insert>
+
+	<!-- 관리자 페이지 모든 유저 조회 -->
+	<select id="getAllUsers" resultType="com.jobhunter.model.user.UserVO">
+		SELECT * FROM users
+	</select>
 </mapper>

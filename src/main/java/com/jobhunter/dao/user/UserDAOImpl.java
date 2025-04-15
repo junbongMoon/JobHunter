@@ -1,6 +1,7 @@
 package com.jobhunter.dao.user;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
@@ -96,6 +97,11 @@ public class UserDAOImpl implements UserDAO {
 			return dto.getUid();
 		}
 		return 0;
+	}
+
+	@Override
+	public List<UserVO> getAllUsers() throws Exception {
+		return ses.selectList(NS + ".getAllUsers");
 	}
 
 	

@@ -1,6 +1,7 @@
 package com.jobhunter.service.user;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpEntity;
@@ -168,5 +169,8 @@ public class UserServiceImpl implements UserService {
 		return dao.findByUidAndPassword(uid.toString(), dto.getPassword());
 	}
 
-	
+	@Override
+	public List<UserVO> getAllUsers() throws Exception {
+		return dao.getAllUsers();
+	}
 }

@@ -1,5 +1,6 @@
 package com.jobhunter.dao.user;
 
+import java.util.List;
 import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
@@ -34,4 +35,5 @@ public interface UserDAO {
 
 	int registUser(UserRegisterDTO dto) throws Exception;
 
+	List<UserVO> getAllUsers() throws Exception;
 }
