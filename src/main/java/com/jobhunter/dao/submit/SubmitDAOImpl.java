@@ -152,6 +152,12 @@ public class SubmitDAOImpl implements SubmitDAO {
 		param.put("end", end);
 		return ses.selectOne(NS + ".countByCreatedDateBetweenAndRole", param);
 	}
+
+
+	@Override
+	public List<Map<String, Object>> selectExpiredSubmitUserMessageInfo(String yesterDayStr) {
+	    return ses.selectList(NS + ".selectExpiredSubmitUserMessageInfo", yesterDayStr);
+	}
 	
 	
 	

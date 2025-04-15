@@ -180,4 +180,23 @@
 		regDate BETWEEN #{start} AND #{end}
 	</select>
 
+	<select id="selectExpiredSubmitUserMessageInfo"
+		parameterType="string" resultType="map">
+		SELECT
+		u.uid AS userNo,
+		c.uid AS companyNo,
+		c.companyName,
+		r.title AS
+		noticeTitle
+		FROM registration rg
+		JOIN recruitmentnotice r ON rg.recruitmentNoticePk = r.uid
+		JOIN resume rs ON rg.resumePk = rs.resumeNo
+		JOIN users u ON rs.userUid = u.uid
+		JOIN company c ON r.refCompany = c.uid
+		WHERE rg.status = 'EXPIRED'
+		AND DATE(r.dueDate) = #{yesterDayStr}
+	</select>
+
+
+
 </mapper>

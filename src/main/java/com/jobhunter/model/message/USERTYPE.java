@@ -1,5 +1,5 @@
 package com.jobhunter.model.message;
 
 public enum USERTYPE {
-	USER, COMPANY, ADMIN
+	USER, COMPANY
 }

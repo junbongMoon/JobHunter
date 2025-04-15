@@ -1,6 +1,7 @@
 package com.jobhunter.service.submit;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -8,7 +9,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.jobhunter.dao.message.MessageDAO;
 import com.jobhunter.dao.submit.SubmitDAO;
+import com.jobhunter.model.message.MessageDTO;
+import com.jobhunter.model.message.USERTYPE;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
@@ -32,6 +36,8 @@ public class SubmitServiceImpl implements SubmitService {
 	 * </p>
 	 */
 	private final SubmitDAO submitDAO;
+	
+	private final MessageDAO messageDAO;
 	
  
 	/**
@@ -135,7 +141,7 @@ public class SubmitServiceImpl implements SubmitService {
 	 *  @author 문준봉
 	 *
 	 * <p>
-	 *	
+	 *	마감기한이 지난 공고의 제출 상태가 WATING 인 것들을 EXPIRED로 변경하고 메세지를 보내는 기능
 	 * </p>
 	 * 
 	 * @param yesterDayStr
@@ -144,9 +150,33 @@ public class SubmitServiceImpl implements SubmitService {
 	 *
 	 */
 	@Override
+	@Transactional
 	public int expiredToSubmit(String yesterDayStr) throws Exception {
-	    // 어제 마감된 공고를 기준으로 WATING 상태를 EXPIRED로 변경
-	    return submitDAO.updateStatusToExpired(yesterDayStr);
+	    int updateCount = submitDAO.updateStatusToExpired(yesterDayStr);
+
+	    if (updateCount > 0) {
+	        List<Map<String, Object>> msgTargets = submitDAO.selectExpiredSubmitUserMessageInfo(yesterDayStr);
+
+	        for (Map<String, Object> row : msgTargets) {
+	            int toUser = (Integer) row.get("userNo");
+	            int fromCompany = (Integer) row.get("companyNo");
+	            String companyName = (String) row.get("companyName");
+	            String noticeTitle = (String) row.get("noticeTitle");
+
+	            MessageDTO msgDTO = MessageDTO.builder()
+	                    .to(toUser)
+	                    .from(fromCompany)
+	                    .toUserType(USERTYPE.USER)
+	                    .fromUserType(USERTYPE.COMPANY)
+	                    .title("공고 마감 알림")
+	                    .content(String.format("[%s]의 [%s] 공고가 마감되었습니다.", companyName, noticeTitle))
+	                    .build();
+
+	            messageDAO.insertMessage(msgDTO); 
+	        }
+	    }
+
+	    return updateCount;
 	}
 
 }

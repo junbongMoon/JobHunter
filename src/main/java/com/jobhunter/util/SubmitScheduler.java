@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.jobhunter.service.submit.SubmitService;
-import com.jobhunter.service.submit.SubmitServiceImpl;
 
 /**
  * @author 문준봉

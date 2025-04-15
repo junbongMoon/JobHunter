@@ -2,6 +2,7 @@ package com.jobhunter.dao.submit;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
@@ -89,4 +90,8 @@ public interface SubmitDAO {
 
 
 	int countBySubmittedDateBetween(LocalDateTime start, LocalDateTime end);
+	
+	List<Map<String, Object>> selectExpiredSubmitUserMessageInfo(String yesterDayStr);
+	
+	
 }
