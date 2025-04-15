@@ -101,6 +101,7 @@
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">유저 관련:</h6>
                     <a class="collapse-item" href="/admin/userList">일반 유저 목록</a>
+                    <a class="collapse-item" href="/admin/companyList">기업 유저 목록</a>
                 </div>
             </div>
         </li>

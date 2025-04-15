@@ -13,7 +13,7 @@
 
 	<!-- 본문 내용 -->
 	<div class="container-fluid">
-		<h1 class="h3 mb-4 text-gray-800">차단 유저 목록 예정</h1>
+		<h1 class="h3 mb-4 text-gray-800">기업 유저 목록 예정</h1>
 	</div>
 
 	<!-- 푸터 포함 -->

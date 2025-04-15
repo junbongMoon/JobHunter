@@ -74,9 +74,9 @@ public class AdminController {
 		return "admin/adminUserDetail";
 	}
 	
-	@GetMapping("/admin/userBlockList")
+	@GetMapping("/admin/companyList")
 	public String adminUserBlockList(Locale locale, Model model) {
-		return "admin/adminUserBlockList";
+		return "admin/adminCompanyList";
 	}
 	
 	
