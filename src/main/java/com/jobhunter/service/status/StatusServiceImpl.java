@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.company.CompanyDAO;
 import com.jobhunter.dao.recruitmentnotice.RecruitmentNoticeDAO;
@@ -97,5 +98,50 @@ public class StatusServiceImpl implements StatusService {
 	@Override
 	public void saveEntireStatus(TotalStatusVODTO todayTotal) {
 	    statusDAO.insertTotalStatus(todayTotal);
+	}
+	
+	@Override
+	@Transactional
+	public void runDailyStatistics() {
+	    // 1. 일일 증가량 저장 (status 테이블)
+	    this.saveDateStatusByToDay();
+
+	    // 2. 어제 누적 통계 조회
+	    TotalStatusVODTO yesterdayTotal = this.getTotalStatusUntilYesterday();
+
+	    // 3. 오늘의 증가량 계산
+	    StatusVODTO todayIncrement = this.getTodayIncrement();
+
+	    // 4. 오늘 누적 통계 계산
+	    TotalStatusVODTO todayTotal;
+	    LocalDateTime targetDate = LocalDate.now().minusDays(1).atStartOfDay();
+
+	    if (yesterdayTotal == null) {
+	        todayTotal = TotalStatusVODTO.builder()
+	                .statusDate(targetDate)
+	                .totalUsers(todayIncrement.getNewUsers())
+	                .totalCompanies(todayIncrement.getNewCompanies())
+	                .totalRecruitmentNoticeCnt(todayIncrement.getNewRecruitmentNoticeCnt())
+	                .totalRegistration(todayIncrement.getNewRegistration())
+	                .totalReviewBoard(todayIncrement.getNewReviewBoard())
+	                .build();
+	    } else {
+	        todayTotal = TotalStatusVODTO.builder()
+	                .statusDate(targetDate)
+	                .totalUsers(yesterdayTotal.getTotalUsers() + todayIncrement.getNewUsers())
+	                .totalCompanies(yesterdayTotal.getTotalCompanies() + todayIncrement.getNewCompanies())
+	                .totalRecruitmentNoticeCnt(yesterdayTotal.getTotalRecruitmentNoticeCnt() + todayIncrement.getNewRecruitmentNoticeCnt())
+	                .totalRegistration(yesterdayTotal.getTotalRegistration() + todayIncrement.getNewRegistration())
+	                .totalReviewBoard(yesterdayTotal.getTotalReviewBoard() + todayIncrement.getNewReviewBoard())
+	                .build();
+	    }
+
+	    // 5. 누적 통계 저장 (total_status 테이블)
+	    this.saveEntireStatus(todayTotal);
+
+	    // ✅ 로그로 확인
+	    System.out.println("어제 누적 통계 : " + yesterdayTotal);
+	    System.out.println("오늘 증가량 : " + todayIncrement);
+	    System.out.println("오늘 누적 통계 : " + todayTotal);
 	}
 }

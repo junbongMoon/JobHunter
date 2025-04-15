@@ -58,5 +58,5 @@ public interface StatusService {
 	 */
 	public void saveEntireStatus(TotalStatusVODTO todayTotal);
 	
-	
+	public void runDailyStatistics();
 }
