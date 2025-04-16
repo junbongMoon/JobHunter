@@ -16,4 +16,10 @@ public class AdminController {
 
 		return "admin/adminhome";
 	}
+	
+	@RequestMapping(value = "/admin/admincharts", method = RequestMethod.GET)
+	public String showCharts(Locale locale, Model model){
+		
+		return "/admin/admincharts";
+	}
 }

@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
+<jsp:include page="adminheader.jsp"></jsp:include>
+<body>
 <!-- 차트 콘텐츠 -->
 <div class="container-fluid">
 
@@ -73,6 +74,7 @@
             </div>
         </div>
     </div>
+    
 
     <!-- ===== 차트 관련 JavaScript ===== -->
     <script src="${pageContext.request.contextPath}/resources/adminpagematerials/vendor/chart.js/Chart.min.js"></script>
@@ -129,3 +131,5 @@
     </script>
 
 </div>
+</body>
+<jsp:include page="adminfooter.jsp"></jsp:include>
