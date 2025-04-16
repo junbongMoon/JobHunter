@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.admin.AdminDAO;
+import com.jobhunter.model.company.CompanyVO;
 import com.jobhunter.model.user.UserVO;
 
 import lombok.RequiredArgsConstructor;
@@ -70,5 +71,57 @@ public class AdminServiceImpl implements AdminService {
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean unblockUser(int uid) throws Exception {
 		return dao.unblockUser(uid) > 0;
+	}
+	
+	// 기업 관련 메서드 구현
+	@Override
+	public List<CompanyVO> getAllCompanies() throws Exception {
+		return dao.getAllCompanies();
+	}
+	
+	@Override
+	public CompanyVO getCompanyById(int uid) throws Exception {
+		return dao.getCompanyById(uid);
+	}
+	
+	@Override
+	public List<CompanyVO> getCompaniesBySearch(String searchType, String searchKeyword, String statusFilter, int page, int pageSize) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("searchType", searchType);
+		params.put("searchKeyword", searchKeyword);
+		params.put("statusFilter", statusFilter);
+		
+		int validPage = Math.max(1, page);
+		params.put("offset", (validPage - 1) * pageSize);
+		params.put("pageSize", pageSize);
+		
+		return dao.getCompaniesBySearch(params);
+	}
+	
+	@Override
+	public int getTotalCompanyCount(String searchType, String searchKeyword, String statusFilter) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("searchType", searchType);
+		params.put("searchKeyword", searchKeyword);
+		params.put("statusFilter", statusFilter);
+		
+		return dao.getTotalCompanyCount(params);
+	}
+	
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public boolean blockCompany(int uid, Timestamp blockDeadline, String reason) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uid", uid);
+		params.put("blockDeadline", blockDeadline);
+		params.put("blockReason", reason);
+		
+		return dao.blockCompany(params) > 0;
+	}
+	
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public boolean unblockCompany(int uid) throws Exception {
+		return dao.unblockCompany(uid) > 0;
 	}
 }
