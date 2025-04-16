@@ -124,7 +124,12 @@ public class SubmitDAOImpl implements SubmitDAO {
 		params.put("resumePk", resumePk);
 		params.put("recruitmentNoticePk", recruitmentNoticePk);
 		
-		return ses.update(NS + ".modifyStatus", params);
+		System.out.println("[DEBUG] 상태 변경 시도 >> " + params);
+
+		int affected = ses.update(NS + ".modifyStatus", params);
+		System.out.println("[DEBUG] 영향 받은 행 수: " + affected);
+		
+		return affected;
 		
 	}
 

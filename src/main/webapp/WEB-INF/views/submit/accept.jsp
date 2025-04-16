@@ -122,7 +122,9 @@ $(function() {
       }
       
       if(registrationStatusByResume == "WAITING"){
+        console.log("변경 전 상태 값 : " + registrationStatusByResume);
         changeStatusByregistration("CHECKED", selectedResumeNo, recruitmentNoticePk);
+        console.log("변경 후 상태 값 : " + registrationStatusByResume);
       }
 
       
