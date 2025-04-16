@@ -223,6 +223,13 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		
 	}
 
+
+	@Override
+	public int updateDuedateExpireByUid(int uid) {
+		
+		return ses.update(NS + ".ExpiredDueDateByUid", uid);
+	}
+
 	
 
 }

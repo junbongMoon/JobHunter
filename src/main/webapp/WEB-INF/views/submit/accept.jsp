@@ -279,14 +279,16 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
           <input type="text" class="form-control" value="\${translateJobFormCode(data.workType)}" readonly>
 
           <label>급여 유형</label>
-          <input type="text" class="form-control" value="$\{data.payType}" readonly>
+          <input type="text" class="form-control" value="\${translatePayType(data.payType)}" readonly>
 
           <label>급여</label>
           <input type="text" class="form-control" value="\${data.pay}" readonly>
 
           <label>근무 기간</label>
           <input type="text" class="form-control" value="\${data.period}" readonly>
-          <button type='button' class="dueDateExpireBtn" onclick = "dueDateExpired(\${data.uid})">공고 마감</button>
+           <div class="text-end mt-3">
+          <button type='button' class="dueDateExpireBtn btn-navy" onclick = "dueDateExpired(\${data.uid})">공고 마감</button>
+          </div>
         </div>
       `;
 
@@ -298,6 +300,21 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
     }
   });
 }
+  function dueDateExpired(uid){
+
+    $.ajax({
+    url: `/recruitmentnotice/rest/detail/\${selectedRecruitmentNo}`,
+    type: "GET",
+    success: function (data) {
+      console.log("공고 마감 완료:", data);
+
+    },
+    error: function (xhr, status, error) {
+      console.error("공고 마감 실패:", error);
+      
+    }
+  });
+  }
 
 
   // 페이징 하는 함수
@@ -332,6 +349,17 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
     const pageNo = parseInt($(this).data('page'));
     loadRecruitmentList(pageNo, data.rowCntPerPage);
   });
+}
+
+function translatePayType(code){
+  const map = {
+    HOUR: '시급',
+    DATE: '일급',
+    WEEK: '주급',
+    MONTH: '월급',
+    YEAR: '연봉'
+  };
+  return map[code] || code; // 혹시 없는 코드면 그대로 출력
 }
 
 function translateJobFormCode(code) {
@@ -530,6 +558,24 @@ label {
 
 .recruitmentByselectedArea{
   margin-top: 20px;
+}
+
+.btn-navy {
+  background-color: #3d4d6a; /* 진한 남색 */
+  color: #fff;
+  padding: 0.5rem 1.2rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-navy:hover {
+  background-color: #1a252f; /* 더 진한 남색 hover */
+  color: #ffffff;
+  transform: translateY(-1px);
 }
 </style>
 

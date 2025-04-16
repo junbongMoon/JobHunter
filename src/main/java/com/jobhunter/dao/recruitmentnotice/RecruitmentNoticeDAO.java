@@ -106,4 +106,17 @@ public interface RecruitmentNoticeDAO {
 	 *
 	 */
 	void insertDeleteLogByRecruitment(int uid);
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 *  공고의 마감기한을 now()로 변경하는 메서드
+	 * </p>
+	 * 
+	 * @param uid 공고번호
+	 * @return 변화한 row의 갯수
+	 *
+	 */
+	int updateDuedateExpireByUid(int uid) throws Exception;
 }

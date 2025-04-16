@@ -127,10 +127,49 @@ public interface RecruitmentNoticeService {
 	PageResponseDTO<RecruitmentNotice> getRecruitmentByCompanyUid(int companyUid, PageRequestDTO pageRequestDTO);
 
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 이전 공고를 조회하는 메서드
+	 * </p>
+	 * 
+	 * @param uid 현재 공고번호
+	 * @return RecruitmentNotice 이전 공고
+	 * @throws Exception
+	 *
+	 */
 	RecruitmentNotice getPreviousPost(int uid) throws Exception;
 
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 다음 공고를 조회하는 메서드
+	 * </p>
+	 * 
+	 * @param uid 다음 공고 번호
+	 * @return RecruitmentNotice 다음 공고
+	 * @throws Exception
+	 *
+	 */
 	RecruitmentNotice getNextPost(int uid) throws Exception;
+
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고의 마감기한을 만료 시키는 메서드
+	 * </p>
+	 * 
+	 * @param uid (공고의 pk)
+	 * @return 성공하면 true, 실패하면 false
+	 * @throws Exception
+	 *
+	 */
+	boolean modifyDueDateByUid(int uid) throws Exception;
 	
 
 }

@@ -479,5 +479,11 @@
 		(#{recNo}, 'RECRUITMENT', 'DELETE')
 	</insert>
 
+	<update id="ExpiredDueDateByUid">
+		update recruitmentnotice
+		set dueDate = now()
+		WHERE uid = #{uid}
+	</update>
+
 
 </mapper>

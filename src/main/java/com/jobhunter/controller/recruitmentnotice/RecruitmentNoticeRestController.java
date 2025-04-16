@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -71,6 +72,20 @@ public class RecruitmentNoticeRestController {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				result = ResponseEntity.badRequest().body(null);
+			}
+			
+			return result;
+		}
+		
+		@PutMapping("/dueDate/{uid}")
+		public ResponseEntity<Boolean> ExpiredDueDateByUid(@PathVariable("uid") int uid){
+			ResponseEntity<Boolean> result = null;
+			
+			try {
+				recService.modifyDueDateByUid(uid); // 여기서 수정
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			
 			return result;
