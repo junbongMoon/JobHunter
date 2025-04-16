@@ -129,7 +129,7 @@
                 <!-- 🔹 네비게이션 바 -->
                 <ul class="navbar-nav ml-auto">
 
-                    <!-- 🔔 알림(Notification) -->
+                    <!-- 🔔 알림(Notification) 
                     <li class="nav-item dropdown no-arrow mx-1">
                         <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -151,9 +151,9 @@
                                 </div>
                             </a>
                         </div>
-                    </li>
+                    </li> -->
 
-                    <!-- ✉ 메시지(Messages) -->
+                    <!-- ✉ 메시지(Messages) 
                     <li class="nav-item dropdown no-arrow mx-1">
                         <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -162,13 +162,13 @@
                         </a>
                     </li>
 
-                    <div class="topbar-divider d-none d-sm-block"></div>
+                    <div class="topbar-divider d-none d-sm-block"></div> -->
 
                     <!-- 👤 사용자 정보 -->
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">${sessionScope.account.accountName}</span>
                             <img class="img-profile rounded-circle" 
                                 src="${pageContext.request.contextPath}/resources/adminpagematerials/img/undraw_profile.svg">
                         </a>
