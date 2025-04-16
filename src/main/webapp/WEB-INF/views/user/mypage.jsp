@@ -10,6 +10,9 @@
 <!-- Firebase UMD 방식 -->
 <script src="https://www.gstatic.com/firebasejs/11.5.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.5.0/firebase-auth-compat.js"></script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.5/kakao.min.js"
+	integrity="sha384-dok87au0gKqJdxs7msEdBPNnKSRT+/mhTVzq+qOhcL464zXwvcrpjeWvyj1kCdq6"
+	crossorigin="anonymous"></script>
 
 <link href="/resources/css/mypage.css" rel="stylesheet">
 
@@ -30,6 +33,16 @@
           <div>이메일</div><div id="nowEmail">로딩중...</div>
           <div>가입일</div><div id="regDate">로딩중...</div>
           <div>최근 로그인</div><div id="lastLoginDate">로딩중...</div>
+
+          <c:if test="${sessionScope.account.isSocial == 'N'}">
+            <hr><hr>
+            <h4 style="margin-top:7px;">카카오 연동 :</h4>
+            <div class="btn-kakao" onclick="linkToKakaoBtn()">
+              <img src="/resources/forKakao/kakao_login_medium_narrow.png"
+                alt="kakao">
+            </div>
+          </c:if>
+
         </div>
 
         <div class="spacer">
@@ -47,7 +60,7 @@
           <h2><i class="bi bi-person-vcard section-icon"></i>상세 정보</h2>
         </div>
         <div class="info-grid" id="userDetailInfo">
-            <div>주소</div><div>로딩중...</div>
+            <div>주소<i class="bi bi-exclamation-circle" style="color:red; margin:0px 0.3em"></i></div><div>로딩중...</div>
             <div>상세주소</div><div>로딩중...</div>
             <div>성별</div><div>로딩중...</div>
             <div>나이</div><div>로딩중...</div>
@@ -201,6 +214,38 @@
 </main>
 
 <script>
+// #region 카톡
+function linkToKakaoBtn() {
+  window.publicModals.show("<div>연동한 카카오 계정의 이메일로 고정되며,</div><br><div>동일한 이메일을 다른 계정이 사용중이면</div><div>카카오 계정 연동에 실패할 수 있습니다.</div><br><div>카카오 계정에 연동하시겠습니까?</div>", 
+  {
+    onConfirm: linkToKakao,
+    confirmText: "연동하기",
+    size_x: "400px",
+  })
+}
+
+Kakao.init('b50a2700ff109d1ab2de2eca4e07fa23');
+Kakao.isInitialized();
+
+	function linkToKakao() {
+		// JSP에서 contextPath 동적으로 주입
+		let contextPath = '${pageContext.request.contextPath}';
+		if (contextPath) {
+			contextPath = '/' + contextPath;
+		}
+		const redirectUri = `\${location.protocol}//\${location.host}\${contextPath}/user/kakao/link`;
+
+		Kakao.Auth.authorize({
+		redirectUri: redirectUri,
+		scope: 'profile_nickname, account_email'
+		});
+	}
+// #endregion 카톡
+
+
+
+
+
 $(()=>{
   getInfo();
 })

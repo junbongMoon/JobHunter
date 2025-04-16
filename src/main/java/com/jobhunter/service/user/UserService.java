@@ -28,4 +28,6 @@ public interface UserService {
 
 	AccountVO registUser(UserRegisterDTO dto) throws Exception;
 
+	void linkToKakao(KakaoUserInfoDTO userInfo) throws Exception;
+
 }

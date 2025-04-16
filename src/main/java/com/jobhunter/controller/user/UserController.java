@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,12 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.jobhunter.customexception.DuplicateEmailException;
 import com.jobhunter.model.account.AccountVO;
-import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.user.KakaoUserInfoDTO;
 import com.jobhunter.model.user.UserRegisterDTO;
 import com.jobhunter.service.user.UserService;
+import com.jobhunter.util.AccountUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
 	private final UserService service;
+	private final AccountUtil accountUtil;
 
 	@GetMapping("/mypage")
 	public void showMypage() {
@@ -60,7 +61,7 @@ public class UserController {
 				session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
 				return "redirect:" + (redirectUrl != null ? redirectUrl : "/");
 			}
-		} catch (DuplicateEmailException d) {
+		} catch (DataIntegrityViolationException d) {
 			// 카카오계정은 아닌데 중복되는 이메일 있음
 			return "redirect:/?kakao=emailDuplicate";
 		} catch (Exception e) {
@@ -71,6 +72,44 @@ public class UserController {
 		String referer = request.getHeader("Referer");
          
 	    return "redirect:" + (referer != null ? referer : "/");
+	}
+	
+	@GetMapping("/kakao/link")
+	public String linkToKakao(@RequestParam("code") String code, Model model, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+		
+	    // 카카오 주소 찾기
+	    String redirectUri = formatKakaoUri(request) + "/link";
+		
+        String accessToken = null;
+        KakaoUserInfoDTO userInfo = null;
+        
+        AccountVO account = (AccountVO) session.getAttribute("account");
+        
+        
+        
+		try {
+			// 1. 인가 코드로 Access Token 요청
+			accessToken = service.getKakaoToken(code, redirectUri);
+		
+			// 2. Access Token으로 사용자 정보 요청
+			userInfo = service.getKakaoInfo(accessToken);
+			
+			userInfo.setUid(account.getUid());
+			
+			service.linkToKakao(userInfo);
+			
+			account = accountUtil.refreshAccount(account);
+			session.setAttribute("account", account);
+			
+		} catch (DataIntegrityViolationException e) {
+		    // 이메일 중복인 경우 등 제약 조건 위반
+			return "redirect:/?kakao=emailDuplicate";
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+         
+	    return "redirect:/user/mypage?uid="+ account.getUid() +"&accountType=user";
 	}
 	
 	private String formatKakaoUri(HttpServletRequest request) {

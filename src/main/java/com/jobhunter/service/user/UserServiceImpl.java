@@ -142,18 +142,20 @@ public class UserServiceImpl implements UserService {
 		AccountVO accountVo = null;
 		Integer uid = dao.findByKakao(userInfo);
 		if (uid == null) {
-			AccountVO emailAccount = dao.findByEmail(userInfo);
-			if(emailAccount == null) {
-				uid = dao.registKakao(userInfo);
-			} else {
-				throw new DuplicateEmailException();
-			}
+			uid = dao.registKakao(userInfo);
 		}
 		
 		if (uid != null) {
 			accountVo = dao.loginByKakaoId(userInfo.getKakaoId());
 		}
 		return accountVo;
+	}
+	
+	@Override
+	public void linkToKakao(KakaoUserInfoDTO userInfo) throws Exception {
+		if (dao.linkToKakao(userInfo) != 1) {
+			throw new Exception();
+		}
 	}
 
 	@Override

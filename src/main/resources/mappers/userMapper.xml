@@ -197,4 +197,8 @@
 			AND userId = #{targetId}
 		</if>
 	</select>
+	
+	<update id="linkToKakao" parameterType="com.jobhunter.model.user.KakaoUserInfoDTO">
+		UPDATE users SET socialId = #{kakaoId}, email = #{email}, isSocial = 'Y' WHERE (uid = #{uid})
+	</update>
 </mapper>

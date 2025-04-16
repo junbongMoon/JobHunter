@@ -10,7 +10,6 @@ import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
-import com.jobhunter.model.user.UserInfoDTO;
 
 import lombok.RequiredArgsConstructor;
 
