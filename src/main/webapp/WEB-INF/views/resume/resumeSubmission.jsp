@@ -191,7 +191,7 @@
 						</div>
 					</div>
 
-					<c:if test="${totalPages > 1}">
+					<c:if test="${totalResumes > 0}">
 						<!-- 개인정보 제3자 제공 동의 -->
 						<div class="privacy-consent card">
 							<div class="card-header d-flex justify-content-between align-items-center">
