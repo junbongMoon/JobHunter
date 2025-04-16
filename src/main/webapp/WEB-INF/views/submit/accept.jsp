@@ -329,6 +329,16 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
     success: function (data) {
       console.log("공고 마감 완료:", data);
 
+      // 공고 상세 초기화
+      $('.recruitDetailInfo').html('<p style="text-align:center; color:gray;">공고를 선택하면 상세정보가 표시됩니다.</p>');
+
+      // 이력서 셀렉트 초기화
+      $('#resumeList').empty().append(`<option value="-1">이력서를 선택하세요</option>`);
+      $('#resumePagination').empty();
+
+      // 이력서 상세 폼 초기화
+      clearResumeDetailForm();
+
     },
     error: function (xhr, status, error) {
       console.error("공고 마감 실패:", error);
