@@ -80,12 +80,15 @@ public class RecruitmentNoticeRestController {
 		@PutMapping("/dueDate/{uid}")
 		public ResponseEntity<Boolean> ExpiredDueDateByUid(@PathVariable("uid") int uid){
 			ResponseEntity<Boolean> result = null;
-			
+			boolean isSuccess = false;
 			try {
-				recService.modifyDueDateByUid(uid); // 여기서 수정
+				isSuccess = recService.modifyDueDateByUid(uid); // 여기서 수정
+				result = ResponseEntity.ok().body(isSuccess);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				result = ResponseEntity.badRequest().body(isSuccess);
+				
 			}
 			
 			return result;

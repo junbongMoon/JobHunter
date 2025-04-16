@@ -32,27 +32,36 @@
 
 		FROM resume r
 
-		LEFT JOIN registration reg ON r.resumeNo = reg.resumePk
+		LEFT JOIN registration
+		reg ON r.resumeNo = reg.resumePk
 		AND reg.registrationNo = (
-		  SELECT MAX(r2.registrationNo)
-		  FROM registration r2
-		  WHERE r2.resumePk = r.resumeNo AND r2.recruitmentNoticePk = #{recruitmentUid}
+		SELECT MAX(r2.registrationNo)
+		FROM registration r2
+		WHERE r2.resumePk = r.resumeNo AND r2.recruitmentNoticePk =
+		#{recruitmentUid}
 		)
 		LEFT JOIN jobform jf ON r.resumeNo =
 		jf.resumeNo
-		LEFT JOIN merit m ON r.resumeNo = m.resumeNo
-		LEFT JOIN
-		education e ON r.resumeNo = e.resumeNo
-		LEFT JOIN personalhistory h ON
-		r.resumeNo = h.resumeNo
-		LEFT JOIN license l ON r.resumeNo = l.resumeNo
-		LEFT JOIN where_resume_sigungu sr ON r.resumeNo = sr.refResumeNo
 		LEFT
-		JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
+		JOIN merit m ON r.resumeNo = m.resumeNo
 		LEFT JOIN
-		jobtype_resume_sub jrs ON r.resumeNo = jrs.refResumeNo
+		education e ON
+		r.resumeNo = e.resumeNo
+		LEFT JOIN personalhistory h ON
+		r.resumeNo =
+		h.resumeNo
+		LEFT JOIN license l ON r.resumeNo = l.resumeNo
 		LEFT JOIN
-		subcategory sc ON jrs.refSubNo = sc.subcategoryNo
+		where_resume_sigungu sr ON r.resumeNo = sr.refResumeNo
+		LEFT
+		JOIN sigungu
+		s ON sr.refSigunguNo = s.sigunguNo
+		LEFT JOIN
+		jobtype_resume_sub jrs ON
+		r.resumeNo = jrs.refResumeNo
+		LEFT JOIN
+		subcategory sc ON jrs.refSubNo =
+		sc.subcategoryNo
 
 		WHERE r.resumeNo IN (
 		SELECT resumePk FROM registration
@@ -91,7 +100,7 @@
 				column="regRecruitmentNoticePk" />
 			<result property="regDate" column="regDate" />
 			<result property="resumePk" column="regResumePk" />
-			
+
 		</association>
 
 		<collection property="jobForms"
@@ -221,18 +230,43 @@
 	</select>
 
 
-	<select id="selectMessageTargetInfo" resultType="com.jobhunter.model.message.MessageTargetInfoDTO">
+	<select id="selectMessageTargetInfo"
+		resultType="com.jobhunter.model.message.MessageTargetInfoDTO">
 		SELECT
 		r.userUid AS userNo,
 		c.uid AS companyNo,
 		c.companyName,
 		rc.title AS noticeTitle
 		FROM registration rg
-		JOIN resume r ON rg.resumePk = r.resumeNo
-		JOIN recruitmentnotice rc ON rg.recruitmentNoticePk = rc.uid
+		JOIN resume r
+		ON rg.resumePk = r.resumeNo
+		JOIN recruitmentnotice rc ON
+		rg.recruitmentNoticePk = rc.uid
 		JOIN company c ON rc.refCompany = c.uid
 		WHERE rg.resumePk = #{resumePk}
-		AND rg.recruitmentNoticePk = #{recruitmentNoticePk}
+		AND rg.recruitmentNoticePk =
+		#{recruitmentNoticePk}
+	</select>
+
+	<update id="ExpiredByEntireWatingRegistration">
+		update registration
+		SET status = 'EXPIRED'
+		WHERE status = 'WAITING'
+		AND recruitmentNoticePk = ${uid}
+	</update>
+
+	<select id="getRegistrationVOLisByUidAndStatus"
+		parameterType="map"
+		resultType="com.jobhunter.model.submit.RegistrationVO">
+		SELECT
+		registrationNo,
+		status,
+		recruitmentNoticePk,
+		regDate,
+		resumePk
+		FROM registration
+		WHERE recruitmentNoticePk = #{uid}
+		AND status = #{status}
 	</select>
 
 </mapper>

@@ -301,6 +301,7 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
   });
 }
   function dueDateExpired(uid){
+    const selectedRecruitmentNo = uid;
 
     $.ajax({
     url: `/recruitmentnotice/rest/detail/\${selectedRecruitmentNo}`,

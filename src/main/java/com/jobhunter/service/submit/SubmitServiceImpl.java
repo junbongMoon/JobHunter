@@ -19,6 +19,7 @@ import com.jobhunter.model.message.USERTYPE;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
+import com.jobhunter.model.submit.RegistrationVO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 import com.jobhunter.model.submit.Status;
 
@@ -233,6 +234,57 @@ public class SubmitServiceImpl implements SubmitService {
 	    }
 
 	    return updateCount;
+	}
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고에 제출이력의 상태가 WAITING인 것들을 전부 EXPIRED로 변경하고 메세지를 보내는 기능
+	 * </p>
+	 * 
+	 * @param uid 공고번호
+	 * @throws Exception
+	 *
+	 */
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	@Override
+	public void expiredEntireWatingRegByRecUid(int uid) throws Exception {
+	    // WAITING 상태인 제출 내역 조회
+	    List<RegistrationVO> result = submitDAO.selectRegistrationByUidAndStatus(uid, Status.WAITING);
+
+	    for (RegistrationVO reg : result) {
+	        if (reg.getStatus().equals(Status.WAITING)) {
+	            int resumePk = reg.getResumePk();
+	            int recruitmentNoticePk = reg.getRecruitmentNoticePk();
+
+	            // 대상자 정보 조회
+	            MessageTargetInfoDTO info = submitDAO.selectMessageTargetInfo(resumePk, recruitmentNoticePk);
+
+	            if (info != null) {
+	                int toUser = info.getUserNo();
+	                int fromCompany = info.getCompanyNo();
+	                String companyName = info.getCompanyName();
+	                String noticeTitle = info.getNoticeTitle();
+
+	                String content = String.format("[%s]의 [%s] 공고가 마감 되어 자동으로 상태가 변경되었습니다.", companyName, noticeTitle);
+
+	                MessageDTO msgDTO = MessageDTO.builder()
+	                        .toWho(toUser)
+	                        .fromWho(fromCompany)
+	                        .toUserType(USERTYPE.USER)
+	                        .fromUserType(USERTYPE.COMPANY)
+	                        .title("공고 마감 알림")
+	                        .content(content)
+	                        .build();
+
+	                messageDAO.insertMessage(msgDTO);
+	            }
+	        }
+	    }
+
+	    // 상태 일괄 변경 (WAITING → EXPIRED)
+	    submitDAO.updateExpiredByRecUid(uid);
 	}
 
 }
