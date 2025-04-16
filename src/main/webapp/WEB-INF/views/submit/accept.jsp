@@ -19,6 +19,7 @@
 $(function() {
   console.log("companyUid:", companyUid);
   loadRecruitmentList(1, 10); // 페이지 로딩 시 자동 호출
+  
 
   // 공고 리스트의 값이 바뀌었을 때
   $('#recruitmentnoticeList').on('change', function () {
@@ -26,6 +27,7 @@ $(function() {
 
   if (selectedRecruitmentNo !== '-1') {
     loadSubmittedResumes(selectedRecruitmentNo); // 기본 1페이지 호출
+    loadRecruitmentDetail();
   } else {
     $('#resumeList').empty().append(`<option value="-1">이력서를 선택하세요</option>`);
   }
@@ -243,6 +245,8 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
           $('#recruitmentnoticeList').append(option);
         });
 
+        loadRecruitmentDetail();
+
         // 페이징 영역 업데이트
         renderPagination(data);
       },
@@ -251,6 +255,50 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
       }
     });
   }
+
+  // 공고를 출력하는 함수
+  function loadRecruitmentDetail() {
+  const selectedRecruitmentNo = $('#recruitmentnoticeList').val();
+  if (selectedRecruitmentNo === '-1') {
+    $('.recruitDetailInfo').html('<p style="text-align:center; color:gray;">공고를 선택하면 상세정보가 표시됩니다.</p>');
+    return;
+  }
+
+  $.ajax({
+    url: `/recruitmentnotice/rest/detail/\${selectedRecruitmentNo}`,
+    type: "GET",
+    success: function (data) {
+      console.log("공고 상세정보:", data);
+
+      const html = `
+        <div class="form-section">
+          <label>공고 제목</label>
+          <input type="text" class="form-control" value="\${data.title}" readonly>
+
+          <label>근무 형태</label>
+          <input type="text" class="form-control" value="\${translateJobFormCode(data.workType)}" readonly>
+
+          <label>급여 유형</label>
+          <input type="text" class="form-control" value="$\{data.payType}" readonly>
+
+          <label>급여</label>
+          <input type="text" class="form-control" value="\${data.pay}" readonly>
+
+          <label>근무 기간</label>
+          <input type="text" class="form-control" value="\${data.period}" readonly>
+          <button type='button' class="dueDateExpireBtn" onclick = "dueDateExpired(\${data.uid})">공고 마감</button>
+        </div>
+      `;
+
+      $('.recruitDetailInfo').html(html);
+    },
+    error: function (xhr, status, error) {
+      console.error("공고 상세 불러오기 실패:", error);
+      $('.recruitDetailInfo').html('<p style="color: red;">공고 정보를 불러오는 중 오류가 발생했습니다.</p>');
+    }
+  });
+}
+
 
   // 페이징 하는 함수
   function renderPagination(data) {
@@ -479,6 +527,10 @@ label {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
+
+.recruitmentByselectedArea{
+  margin-top: 20px;
+}
 </style>
 
 <body>
@@ -514,6 +566,14 @@ label {
 					</div>
 				</div>
 			</form>
+
+      <form class="recruitmentByselectedArea">
+      <div class="form-section recruitDetailInfo">
+        <!-- 여기서 그냥 recruitment 출력하자 -->
+
+
+      </div>
+    </form>
 
       <form id="resumeDetailForm" style="margin-top: 2rem;">
         <div class="form-section">

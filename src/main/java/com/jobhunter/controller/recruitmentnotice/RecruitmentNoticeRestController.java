@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 
@@ -57,6 +58,22 @@ public class RecruitmentNoticeRestController {
 			
 			return result;
 			
+		}
+		
+		@GetMapping("/detail/{uid}")
+		public ResponseEntity<RecruitmentDetailInfo> showRecruitmentDetailByUid(@PathVariable("uid") int uid){
+			ResponseEntity<RecruitmentDetailInfo> result = null;
+			
+			try {
+				RecruitmentDetailInfo detailInfo = recService.getRecruitmentByUid(uid);
+				result = ResponseEntity.ok().body(detailInfo);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				result = ResponseEntity.badRequest().body(null);
+			}
+			
+			return result;
 		}
 	
 	   
