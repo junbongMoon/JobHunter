@@ -6,6 +6,9 @@
 <head>
 <meta charset="UTF-8">
 <title>면접 후기 상세보기</title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/assets/css/main.css">
+
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 	rel="stylesheet">
@@ -17,6 +20,35 @@
 	font-weight: bold;
 	margin-bottom: 20px;
 	color: #003366;
+}
+
+.btn-getstarted {
+	background-color: #47b2e4;
+	color: #ffffff;
+	padding: 6px 20px;
+	font-size: 14px;
+	font-weight: 500;
+	border: none;
+	border-radius: 50px;
+	transition: 0.3s;
+	font-family: var(- -default-font);
+}
+
+.btn-getstarted:hover {
+	background-color: color-mix(in srgb, #47b2e4, black 10%);
+	color: #ffffff;
+}
+
+.btn-rounded {
+	background-color: #47b2e4; color : #ffffff;
+	padding: 6px 20px;
+	font-size: 14px;
+	font-weight: 500;
+	border: none;
+	border-radius: 50px;
+	transition: 0.3s;
+	font-family: var(- -default-font);
+	color: #ffffff;
 }
 
 .table th {
@@ -38,53 +70,6 @@
 	vertical-align: top;
 	white-space: pre-line;
 	line-height: 1.5;
-}
-
-.btn-accent {
-	background-color: transparent;
-	border: 2px solid #47b2e4;
-	color: #47b2e4;
-	border-radius: 25px;
-	padding: 6px 18px;
-	font-weight: 500;
-	transition: 0.3s;
-}
-
-.btn-accent:hover  {
-	background-color: #3aa4d2;
-}
-
-.btn-outline-accent {
-	background-color: transparent;
-	border: 2px solid #47b2e4;
-	color: #47b2e4;
-	border-radius: 25px;
-	padding: 6px 18px;
-	font-weight: 500;
-	transition: 0.3s;
-}
-
-.btn-outline-accent:hover {
-	background-color: #47b2e4;
-	color: white;
-}
-
-.btn-red {
-	background-color: #dc3545;
-	color: white;
-	border-radius: 25px;
-	padding: 6px 18px;
-	font-weight: 500;
-	transition: 0.3s;
-}
-
-.btn-red:hover {
-	background-color: #bb2d3b;
-}
-
-.btn-small {
-	font-size: 14px;
-	padding: 5px 12px;
 }
 </style>
 
@@ -148,21 +133,19 @@
 		<table class="table table-bordered">
 			<tbody>
 				<tr>
-				  <th>면접 유형</th>
-				  <td>
-				    <c:choose>
-				      <c:when test="${detail.reviewType eq 'FACE_TO_FACE'}">대면면접</c:when>
-				      <c:when test="${detail.reviewType eq 'VIDEO'}">비대면</c:when>
-				      <c:when test="${detail.reviewType eq 'PHONE'}">전화면접</c:when>
-				      <c:when test="${detail.reviewType eq 'OTHER'}">
+					<th>면접 유형</th>
+					<td><c:choose>
+							<c:when test="${detail.reviewType eq 'FACE_TO_FACE'}">대면면접</c:when>
+							<c:when test="${detail.reviewType eq 'VIDEO'}">비대면</c:when>
+							<c:when test="${detail.reviewType eq 'PHONE'}">전화면접</c:when>
+							<c:when test="${detail.reviewType eq 'OTHER'}">
 				        기타
 				        <c:if test="${not empty detail.typeOtherText}">
 				          (<span>${detail.typeOtherText}</span>)
 				        </c:if>
-				      </c:when>
-				      <c:otherwise>미선택</c:otherwise>
-				    </c:choose>
-				  </td>
+							</c:when>
+							<c:otherwise>미선택</c:otherwise>
+						</c:choose></td>
 				</tr>
 				<tr>
 					<th>면접 난이도</th>
@@ -180,49 +163,53 @@
 			</tbody>
 		</table>
 
+
 		<!-- 버튼 영역 -->
-		<div class="d-flex gap-2">
-			<span id="likeCount" class="ms-2 fw-bold text-danger">
-    		👍 ${detail.likes}개</span>
-			
-			<button id="likeBtn" class="btn-accent btn-small">👍️ 추천수</button>
-			<button id="unlikeBtn" class="btn-outline-accent btn-small"> 👎
-				추천 취소</button>
-	         
-			<a
-				href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
-				class="btn-outline-accent btn-small">✏️ 수정</a>
+		<!-- 추천 영역 -->
 
-			<form action="${pageContext.request.contextPath}/reviewBoard/delete"
-				method="post" style="display: inline;">
-				<input type="hidden" name="boardNo" value="${detail.boardNo}" />
-				<button type="submit" class="btn-red btn-small">🗑 삭제</button>
-			</form>
+		<button id="likeBtn" class="btn-getstarted btn-sm">👍 추천</button>
+		<button id="unlikeBtn" class="btn-getstarted btn-sm">👎 추천 취소</button>
 
-			<a href="${pageContext.request.contextPath}/reviewBoard/allBoard?page=${param.page}"
-   class="btn btn-outline-accent btn-small">← 목록으로</a>
-		</div>
+		<!-- 수정 버튼 -->
+		<a
+			href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
+			class="btn-getstarted btn-sm">✏️ 수정</a>
+
+		<!-- 삭제 버튼 -->
+		<form action="${pageContext.request.contextPath}/reviewBoard/delete"
+			method="post" style="display: inline;">
+			<input type="hidden" name="boardNo" value="${detail.boardNo}" />
+			<button type="button" class="btn-getstarted btn-sm delete-btn" data-boardno="${detail.boardNo}">🗑 삭제
+				</button>
+		</form>
 
 
-		<input type="hidden" id="boardNo" value="${detail.boardNo}" /> <input
-			type="hidden" id="userId" value="${sessionScope.account.uid}" />
+		<!-- 목록으로 -->
+		<a
+			href="/reviewBoard/allBoard?page=${pageRequestDTO.page}&searchType=${pageRequestDTO.searchType}&keyword=${pageRequestDTO.keyword}"
+			class="btn btn-secondary btn-sm btn-rounded">목록으로 돌아가기</a>
 
-		<!-- 좋아요 알림 모달 -->
-		<div class="modal fade" id="likeModal" tabindex="-1"
-			aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content text-center">
-					<div class="modal-header">
-						<h5 class="modal-title" id="likeModalLabel">알림</h5>
-					</div>
-					<div class="modal-body" id="likeModalMessage"></div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-primary"
-							data-bs-dismiss="modal">확인</button>
-					</div>
+
+	</div>
+
+	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
+	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
+
+	<!-- 좋아요 알림 모달 -->
+	<div class="modal fade" id="likeModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content text-center">
+				<div class="modal-header">
+					<h5 class="modal-title" id="likeModalLabel">알림</h5>
+				</div>
+				<div class="modal-body" id="likeModalMessage"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"
+						data-bs-dismiss="modal">확인</button>
 				</div>
 			</div>
 		</div>
+	</div>
 	</div>
 
 	<script>
@@ -309,6 +296,32 @@ $(function () {
     });
   });
 });
+
+
+$(document).ready(function () {
+	  $(".delete-btn").click(function () {
+	    const boardNo = $(this).data("boardno");
+
+	    if (confirm("정말 삭제하시겠습니까?")) {
+	      $.ajax({
+	        url: "${pageContext.request.contextPath}/reviewBoard/delete", // 컨텍스트 반영
+	        type: "POST",
+	        data: { boardNo: boardNo },
+	        success: function (res) {
+	          alert(res.message);
+	          if (res.success) {
+	            // 삭제 후 목록으로 이동
+	            window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
+	          }
+	        },
+	        error: function (xhr, status, error) {
+	          console.error("삭제 실패:", error);
+	          alert("삭제 중 오류가 발생했습니다.");
+	        }
+	      });
+	    }
+	  });
+	});
 </script>
 </body>
 </html>

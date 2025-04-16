@@ -44,7 +44,12 @@ public class ReviewBoardController {
 
 	@GetMapping("/allBoard")
 	public String listBoard(@ModelAttribute RPageRequestDTO pageRequestDTO, Model model) {
+
+		System.out.println("검색 타입: " + pageRequestDTO.getSearchType());
+		System.out.println("검색어: " + pageRequestDTO.getKeyword());
+
 		try {
+
 			RPageResponseDTO<ReviewBoardDTO> response = service.getPagedBoardList(pageRequestDTO);
 			model.addAttribute("pageResult", response);
 		} catch (Exception e) {
@@ -92,30 +97,30 @@ public class ReviewBoardController {
 	}
 
 	@GetMapping("/detail")
-	public String showReviewDetail(@RequestParam("boardNo") int boardNo, Model model, HttpSession session,
-			HttpServletRequest request , int page) {
-		logger.info("상세조회 요청 boardNo: " + boardNo);
+	public String showReviewDetail(@RequestParam("boardNo") int boardNo, @ModelAttribute RPageRequestDTO pageRequestDTO,
+			Model model, HttpSession session, HttpServletRequest request) {
+		logger.info("상세조회 요청 boardNo: {}", boardNo);
+
 		try {
-			System.out.println("받은 boardNo = " + boardNo);
 			AccountVO account = (AccountVO) session.getAttribute("account");
 
 			if (account != null) {
 				int userId = account.getUid();
-
 				service.insertViewCount(userId, boardNo);
 			}
-
-			// 상세 정보 가져오기
+				
 			ReviewDetailViewDTO detail = service.getReviewDetail(boardNo);
+			System.out.println("조회가 없네요:  "+detail);
+
 			if (detail == null) {
 				logger.warn("조회 결과 없음!");
 			} else {
-				logger.info("조회 성공: " + detail.toString());
+				logger.info("조회 성공: {}", detail);
 			}
 
 			model.addAttribute("detail", detail);
-			model.addAttribute("page", page);
-			
+			model.addAttribute("pageRequestDTO", pageRequestDTO);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("상세페이지 처리 중 오류", e);
@@ -209,15 +214,24 @@ public class ReviewBoardController {
 		return returnPage;
 	}
 
-	@PostMapping("/delete")
-	public String deleteBoard(@RequestParam("boardNo") int boardNo, RedirectAttributes redirectAttributes) {
-		try {
-			service.deleteBoard(boardNo);
-			redirectAttributes.addFlashAttribute("result", new MassageCallDTO("게시글이 성공적으로 삭제되었습니다.", true));
-		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("result", new MassageCallDTO("삭제 중 오류가 발생했습니다.", false));
-		}
-		return "redirect:/reviewBoard/allBoard";
+	@PostMapping(value = "/delete", produces = "application/json")
+	public ResponseEntity<MassageCallDTO> deleteBoardNo(@RequestParam("boardNo") int boardNo) {
+	    try {
+	        service.deleteBoard(boardNo);
+	        return ResponseEntity.ok(
+	            MassageCallDTO.builder()
+	                .message("게시글이 삭제되었습니다.")
+	                .success(true)
+	                .build()
+	        );
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	            .body(MassageCallDTO.builder()
+	                .message("삭제 중 오류 발생")
+	                .success(false)
+	                .build());
+	    }
 	}
 
 	@GetMapping("/viewCount")
