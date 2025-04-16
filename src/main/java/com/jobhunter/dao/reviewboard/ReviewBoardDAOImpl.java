@@ -48,15 +48,11 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 
 	@Override
 	public ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception {
-		ReviewDetailViewDTO result = ses.selectOne(NS + ".detailAll", boardNo);
+		 
 
-	    if (result == null) {
-	        logger.warn("상세조회 실패: 해당 boardNo={} 에 대한 데이터가 없습니다.", boardNo);
-	    } else {
-	        logger.info("상세조회 성공: boardNo={}, 조회결과={}", boardNo, result);
-	    }
+	   
 
-	    return result;
+	    return ses.selectOne(NS + ".detailAll", boardNo);
 	}
 
 	@Override

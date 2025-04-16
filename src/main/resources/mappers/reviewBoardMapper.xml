@@ -99,8 +99,10 @@
 		JOIN resume res ON reg.resumePk =
 		res.resumeNo
 		JOIN users u ON r.writer = u.uid
-		WHERE r.boardNo =
-		#{boardNo}
+		WHERE r.boardNo
+		=#{r.boardNo}
+		ORDER BY reg.regDate DESC
+		LIMIT 1
 	</select>
 
 	<resultMap id="ReviewDetailViewDTOMap"
@@ -181,14 +183,11 @@
 		UPDATE reviewBoard
 		SET
 		gonggoUid = #{gonggoUid},
+		reviewLevel = #{reviewLevel},
 		reviewType= #{reviewType},
-		reviewLevl =#{reviewLevl},
-		typeOtherText
-		=
+		typeOtherText =
 		#{typeOtherText},
-		reviewLevel= #{reviewLevel},
-		content
-		=#{content},
+		content=#{content},
 		postDate= NOW()
 		WHERE boardNo =
 		#{boardNo}
