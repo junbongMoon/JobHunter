@@ -3,11 +3,13 @@ package com.jobhunter.dao.status;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.status.StatusVODTO;
 import com.jobhunter.model.status.TotalStatusVODTO;
 
@@ -70,6 +72,16 @@ public class StatusDAOImpl implements StatusDAO {
 		
 	    return ses.selectOne(NS + ".getCountLogBetweenStartAndEndByTarget", params);
 		
+	}
+
+	@Override
+	public List<StatusVODTO> getStatusBetweenAndRole(LocalDateTime start, LocalDateTime end) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("start", start);
+		param.put("end", end);
+		
+
+		return ses.selectList(NS + ".getDailyStatusBetweenStartAndEndByTarget", param);
 	}
 
 }

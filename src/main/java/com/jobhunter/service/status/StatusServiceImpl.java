@@ -2,11 +2,13 @@ package com.jobhunter.service.status;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.jobhunter.dao.company.CompanyDAO;
 import com.jobhunter.dao.recruitmentnotice.RecruitmentNoticeDAO;
@@ -15,6 +17,8 @@ import com.jobhunter.dao.reviewboard.ReviewBoardDAO;
 import com.jobhunter.dao.status.StatusDAO;
 import com.jobhunter.dao.submit.SubmitDAO;
 import com.jobhunter.dao.user.UserDAO;
+import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.status.StatusVODTO;
 import com.jobhunter.model.status.TotalStatusVODTO;
 
@@ -169,4 +173,30 @@ public class StatusServiceImpl implements StatusService {
 	    System.out.println("오늘 증가량 : " + todayIncrement);
 	    System.out.println("오늘 누적 통계 : " + todayTotal);
 	}
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 일일 통계를 페이징해서 가져오는 메서드
+	 * </p>
+	 * 
+	 * @param pageRequestDTO
+	 * @return
+	 * @throws Exception
+	 *
+	 */
+	@Override
+	public List<StatusVODTO> getDailyChartByPaging(LocalDateTime start, LocalDateTime end) throws Exception {
+		
+		List<StatusVODTO> result = null;
+		
+		result = statusDAO.getStatusBetweenAndRole(start, end);
+		
+
+		
+		return result;
+	}
+	
+
 }

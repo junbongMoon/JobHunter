@@ -1,16 +1,11 @@
 package com.jobhunter.controller.status;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.jobhunter.model.status.StatusVODTO;
-import com.jobhunter.model.status.TotalStatusVODTO;
 import com.jobhunter.service.status.StatusService;
 
 @RunWith(SpringJUnit4ClassRunner.class) // 아래의 객체가 Junit4 클래스와 함께 동작하도록
@@ -21,7 +16,7 @@ public class StatusControllerTests {
 	@Autowired
 	private StatusService statusService;
 	
-//	@Test
+	@Test
 	public void testSaveDateStatus() {
 //		statusService.saveDateStatusByToDay();
 //		
