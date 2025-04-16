@@ -25,6 +25,21 @@ $(function() {
   $('#recruitmentnoticeList').on('change', function () {
   const selectedRecruitmentNo = $(this).val();
 
+  clearResumeDetailForm();
+
+  if (selectedRecruitmentNo === '-1') {
+    // 이력서 셀렉트 초기화
+    $('#resumeList').empty().append(`<option value="-1">이력서를 선택하세요</option>`);
+    $('#resumePagination').empty();
+
+    // 상세 공고 정보 영역 초기화
+    $('.recruitDetailInfo').html('<p style="text-align:center; color:gray;">공고를 선택하면 상세정보가 표시됩니다.</p>');
+
+    // 이력서 상세 폼 초기화
+    clearResumeDetailForm();
+    return;
+  }
+
   if (selectedRecruitmentNo !== '-1') {
     loadSubmittedResumes(selectedRecruitmentNo); // 기본 1페이지 호출
     loadRecruitmentDetail();
@@ -50,6 +65,11 @@ $(function() {
   selectedResumeNo = parseInt($(this).val());
   const selectedRecruitmentNo = $('#recruitmentnoticeList').val();
   recruitmentNoticePk = selectedRecruitmentNo;
+
+  if (selectedResumeNo === -1) {
+    clearResumeDetailForm();
+    return;
+  }
 
   if (selectedResumeNo !== -1) {
     // 저장한 데이터 불러오기
@@ -316,6 +336,13 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
     }
   });
   }
+
+  // 공통 이력서 폼 초기화 함수
+function clearResumeDetailForm() {
+  $('#resumeDetailForm input').val('');
+  $('#resumeDetailForm textarea').val('');
+  $('#detailFileList').empty().append('<li style="color: gray;">첨부된 파일이 없습니다.</li>');
+}
 
 
   // 페이징 하는 함수

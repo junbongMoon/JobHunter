@@ -72,6 +72,7 @@ public class SubmitServiceImpl implements SubmitService {
 			List<ResumeUpfileDTO> fileList = submitDAO.selectUpfileListByResume(resume.getResumeNo());
 			resume.setFiles(fileList);
 		}
+		System.out.println(resumeList);
 
 		pageResponseDTO.setBoardList(resumeList);
 
