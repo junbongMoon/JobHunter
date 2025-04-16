@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.reviewboard.RPageRequestDTO;
+import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -47,7 +48,15 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 
 	@Override
 	public ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception {
-		return ses.selectOne(NS + ".detailAll", boardNo);
+		ReviewDetailViewDTO result = ses.selectOne(NS + ".detailAll", boardNo);
+
+	    if (result == null) {
+	        logger.warn("상세조회 실패: 해당 boardNo={} 에 대한 데이터가 없습니다.", boardNo);
+	    } else {
+	        logger.info("상세조회 성공: boardNo={}, 조회결과={}", boardNo, result);
+	    }
+
+	    return result;
 	}
 
 	@Override
@@ -98,8 +107,8 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 	}
 
 	@Override
-	public void deletBoardNo(int boardNo) throws Exception {
-		ses.delete(NS + ".deleteById", boardNo);
+	public int deletBoardNo(int boardNo) throws Exception {
+		return ses.delete(NS + ".deleteById", boardNo);
 
 	}
 
@@ -133,9 +142,37 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 	    return ses.selectOne(NS + ".countAllBoards");
 	}
 
+
 	@Override
-	public List<ReviewBoardDTO> selectPagedBoards(RPageRequestDTO pageRequestDTO) throws Exception {
-	    return ses.selectList(NS + ".selectPagedBoards", pageRequestDTO);
+	public List<ReviewBoardDTO> selectPagedReviewBoard(RPageRequestDTO pageRequestDTO) throws Exception {
+		// TODO Auto-generated method stub
+		return ses.selectList(NS + ".selectPagedBoards", pageRequestDTO);
+	}
+
+	@Override
+	public int countReviewBoard(RPageRequestDTO pageRequestDTO) throws Exception {
+		
+		return ses.selectOne(NS + ".countReviewBoard",pageRequestDTO );
+	}
+
+	@Override
+	public int selectUserIdByBoardNo(int boardNo) {
+		// TODO Auto-generated method stub
+		return ses.selectOne(NS + ".selectUserIdByBoardNo", boardNo);
+	}
+
+	@Override
+	public void insertLog(int uid, String targetType, String logType) {
+		Map<String, Object> param = new HashMap<>();
+        param.put("uid", uid);
+        param.put("targetType", targetType);
+
+        if ("CREATE".equalsIgnoreCase(logType)) {
+            ses.insert(NS + ".logInsertCreate", param);
+        } else if ("DELETE".equalsIgnoreCase(logType)) {
+            ses.insert(NS + ".logInsertDelete", param);
+        }
+		
 	}
 
 

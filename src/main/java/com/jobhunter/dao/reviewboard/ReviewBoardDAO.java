@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.jobhunter.model.reviewboard.RPageRequestDTO;
+import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -33,7 +34,7 @@ public interface ReviewBoardDAO {
 
 	int updateReviewBoard(WriteBoardDTO modify) throws Exception;
 
-	void deletBoardNo(int boardNo) throws Exception;
+	int deletBoardNo(int boardNo) throws Exception;
 
 	int checkViewedWithHours(int userId, int boardNo) throws Exception;	
 
@@ -43,7 +44,15 @@ public interface ReviewBoardDAO {
 
 	int countAllBoards() throws Exception;
     
-	List<ReviewBoardDTO> selectPagedBoards(RPageRequestDTO pageRequestDTO) throws Exception;
+
+	List<ReviewBoardDTO> selectPagedReviewBoard(RPageRequestDTO pageRequestDTO) throws Exception;
+
+	int countReviewBoard(RPageRequestDTO pageRequestDTO) throws Exception;
+
+	int selectUserIdByBoardNo(int boardNo);
+
+	void insertLog(int uid, String targetType, String logType);
+
 
 
 

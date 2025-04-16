@@ -51,6 +51,7 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	}
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean saveReview(WriteBoardDTO writeBoardDTO) throws Exception {
 		boolean result = false;
 		int boardInsert = Rdao.insertBoard(writeBoardDTO);
@@ -59,6 +60,7 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 		if (boardInsert > 0) {
 			System.out.println("리뷰 등록 성공");
+			Rdao.insertLog(writeBoardDTO.getUserId(), "REVIEW", "CREATE");
 			result = true;
 		} else {
 			System.out.println("리뷰 등록 실패");
@@ -69,7 +71,9 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 	@Override
 	public ReviewDetailViewDTO getReviewDetail(int boardNo) throws Exception {
-
+	
+		
+		
 		return Rdao.selectReviewInfo(boardNo);
 	}
 
@@ -134,10 +138,13 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	}
 
 	@Override
-	public void deleteBoard(int boardNo) throws Exception {
-			
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public boolean deleteBoard(int boardNo) throws Exception {
+		int userId = Rdao.selectUserIdByBoardNo(boardNo);
+		Rdao.insertLog(userId, "REVIEW", "DELETE");
 		Rdao.deletBoardNo(boardNo);
-		
+		return true;
+
 	}
 	
 	@Override
@@ -157,11 +164,18 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	}
 
 
+
 	@Override
 	public RPageResponseDTO<ReviewBoardDTO> getPagedBoardList(RPageRequestDTO pageRequestDTO) throws Exception {
-	    int total = Rdao.countAllBoards();  // 총 게시글 수
-	    List<ReviewBoardDTO> list = Rdao.selectPagedBoards(pageRequestDTO);
-	    return new RPageResponseDTO<>(list, total, pageRequestDTO);
+				
+		// 1. 전체 게시글 수 (검색 조건 포함)
+	    int totalCount = Rdao.countReviewBoard(pageRequestDTO);
+
+	    // 2. 현재 페이지에 해당하는 게시글 목록
+	    List<ReviewBoardDTO> boardList = Rdao.selectPagedReviewBoard(pageRequestDTO);
+
+	    // 3. 응답 DTO 생성 및 반환
+	    return new RPageResponseDTO<ReviewBoardDTO>(boardList, totalCount, pageRequestDTO);
 	}
 
 }

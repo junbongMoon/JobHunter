@@ -36,7 +36,7 @@ public interface ReviewBoardService {
 	// 수정 저장
 	boolean updateReviewBoard(WriteBoardDTO modify) throws Exception;
 
-	void deleteBoard(int boardNo) throws Exception;
+	boolean deleteBoard(int boardNo) throws Exception;
 
 	// 조회수 조회
 	boolean oneViewCount(int userId, int boardNo) throws Exception;
@@ -47,7 +47,5 @@ public interface ReviewBoardService {
 	RPageResponseDTO<ReviewBoardDTO> getPagedBoardList(RPageRequestDTO pageRequestDTO) throws Exception;
 
 	
-
-
 
 }
