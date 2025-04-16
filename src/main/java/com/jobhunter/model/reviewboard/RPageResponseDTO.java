@@ -19,12 +19,21 @@ public class RPageResponseDTO<T> {
 	    private int endPage;
 	    private boolean hasPrev;
 	    private boolean hasNext;
+	    
+	    
+	    //검색 기능 변수 
+	    private String searchType;  
+	    private String keyword;
 
 	    public RPageResponseDTO(List<T> boardList, int totalCount, RPageRequestDTO requestDTO) {
 	        this.boardList = boardList;
 	        this.totalCount = totalCount;
 	        this.page = requestDTO.getPage();
 	        this.size = requestDTO.getSize();
+	        
+	        this.searchType = requestDTO.getSearchType();
+	        this.keyword = requestDTO.getKeyword();
+	        
 
 	        int tempEnd = (int)(Math.ceil(page / 10.0)) * 10;
 	        this.startPage = tempEnd - 9;
@@ -32,5 +41,5 @@ public class RPageResponseDTO<T> {
 	        this.hasPrev = startPage > 1;
 	        this.hasNext = totalCount > endPage * size;
 	    }
-
+	    
 }
