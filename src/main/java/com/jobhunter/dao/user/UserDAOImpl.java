@@ -85,7 +85,11 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public AccountVO findByEmail(KakaoUserInfoDTO userInfo) throws Exception {
-		AccountVO result = ses.selectOne(NS + ".findByEmail", userInfo.getEmail());
+		Map<String, Object> param = new HashMap<>();
+		param.put("targetType", "email");
+		param.put("targetValue", userInfo.getEmail());
+		
+		AccountVO result = ses.selectOne(NS + ".findByContact", param);
 		return result;
 	}
 	

@@ -446,7 +446,7 @@ mark {
 			<input style="width: 100%; display:none;" type="text" id="businessNum" placeholder="사업자 등록번호를 입력해주세요"/>
 		</div>
 		<hr>
-
+		<a href="/account/find/password" style="float:right">비밀번호 찾기</a>
 		<button id="modalOpenBtn" type="button" class="btn-confirm full-width" onclick="sendCode()">인증번호 발송</button>
 	</div>
 	<!-- 파이어베이스 캡챠 넣을곳 -->
@@ -536,9 +536,9 @@ tabs.forEach(tab => {
 $('input[name="targetType"]').on('change', () => {
 	const selectedValue = $('input[name="targetType"]:checked').val();
 
-	if (selectedValue === 'user') {
+	if (selectedValue === 'USER') {
 		$('#businessNum').hide(250)
-	} else if (selectedValue === 'company') {
+	} else if (selectedValue === 'COMPANY') {
 		$('#businessNum').show(250)
 	}
 });
@@ -650,7 +650,6 @@ function okMobile() {
 	$.ajax({
         url: "/account/find/id",
         method: "POST",
-		dataType: 'text',
   		contentType: "application/json",
 		data: JSON.stringify({ 
 			targetType: "mobile",
@@ -659,15 +658,18 @@ function okMobile() {
 			businessNum: businessNum
 		}),
         success: (res) => {
-			if (!res) {
+			console.log('res: ', res);
+			if (!res.Id) {
 				window.publicModals.show("해당 연락처를 사용중인 아이디가 존재하지 않습니다.")
 			} else {
-				window.publicModals.show("해당 연락처를 사용중인 아이디 : " + res,
-			{
-				confirmText: '로그인페이지로 이동',
-				cancelText: '취소',
-				onConfirm: () => {location.href = "/account/login";}
-    		});
+				window.publicModals.show(
+						"<div>해당 연락처를 사용중인 아이디 : " + res.Id + "</div>" +
+						`<a href="/account/find/password">비밀번호 찾기</a>`,
+					{
+						confirmText: '로그인페이지로 이동',
+						cancelText: '취소',
+						onConfirm: () => {location.href = "/account/login";}
+					});
 			}
         },
         error: (xhr) => {
@@ -757,7 +759,6 @@ function okEmail() {
 	$.ajax({
         url: "/account/find/id",
         method: "POST",
-		dataType: 'text',
   		contentType: "application/json",
 		data: JSON.stringify({ 
 			targetType: "email",
@@ -766,12 +767,14 @@ function okEmail() {
 			businessNum: businessNum
 		}),
         success: (res) => {
-			console.log('res: ', res);
+			console.log('res: ', res.Id);
 			if (!res.Id) {
 				window.publicModals.show("해당 연락처를 사용중인 아이디가 존재하지 않습니다.")
 			} else {
 				window.publicModals.show(
-					"<div>해당 연락처를 사용중인 아이디 : " + res.Id + "</div>",
+					"<div>해당 연락처를 사용중인 아이디 : " + res.Id + "</div>" +
+					`<a href="/account/find/password">비밀번호 찾기</a>`
+					,
 					{
 						confirmText: '로그인페이지로 이동',
 						cancelText: '취소',

@@ -778,8 +778,6 @@ function confirmAll() {
 		return false;
 	}
 
-	console.log($("#mobile").val());
-	console.log($("#email").val());
 	if(!$("#mobile").val() && !$("#email").val()) {
 		window.publicModals.show("이메일 혹은 전화번호 인증을 진행해 주세요.")
 		$("#pwdcheckInfoMark")[0].scrollIntoView({ behavior: 'smooth' });
@@ -790,7 +788,7 @@ function confirmAll() {
 		window.publicModals.show("개인정보 이용 동의에 체크해주세요.")
 		return false;
 	}
-
+	$("#businessNum").val($("#businessNum").val().replace(/[^\d]/g, ''))
 	return true;
 }
 

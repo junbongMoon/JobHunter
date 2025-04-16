@@ -8,6 +8,7 @@ import lombok.Data;
 public class findIdDTO {
 	private String targetType;
 	private String targetValue;
+	private String targetId;
 	private AccountType accountType;
 	private String businessNum;
 }

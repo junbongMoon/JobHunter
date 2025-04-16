@@ -83,6 +83,7 @@ public class UserRestController {
 	@PatchMapping(value = "/password", consumes = "application/json")
 	public ResponseEntity<Void> changePassword(@RequestBody PasswordDTO dto) {
 		try {
+			System.out.println(dto);
 			service.updatePassword(dto.getUid(), dto.getPassword());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

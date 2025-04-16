@@ -160,5 +160,8 @@
 		<if test="businessNum != null and businessNum != ''">
 			AND businessNum = #{businessNum}
 		</if>
+		<if test="targetId != null and targetId != ''">
+			AND companyId = #{targetId}
+		</if>
 	</select>
 </mapper>

@@ -409,7 +409,7 @@ mark {
 		</div>
 		
 		<br/>
-		<h4>아이디찾기</h4>
+		<h4>비밀번호 찾기</h4>
 		
 		<hr>
 
@@ -443,13 +443,13 @@ mark {
             
 		</div>
 		<div class="form-group">
-			<input style="width: 100%; display:none;" type="text" id="accountId" placeholder="아이디를 입력해주세요"/>
+			<input style="width: 100%;" type="text" id="accountId" placeholder="아이디를 입력해주세요"/>
 		</div>
 		<div class="form-group">
 			<input style="width: 100%; display:none;" type="text" id="businessNum" placeholder="사업자 등록번호를 입력해주세요"/>
 		</div>
 		<hr>
-
+		<a href="/account/find/id" style="float:right">아이디 찾기</a>
 		<button id="modalOpenBtn" type="button" class="btn-confirm full-width" onclick="sendCode()">인증번호 발송</button>
 	</div>
 	<!-- 파이어베이스 캡챠 넣을곳 -->
@@ -539,9 +539,9 @@ tabs.forEach(tab => {
 $('input[name="targetType"]').on('change', () => {
 	const selectedValue = $('input[name="targetType"]:checked').val();
 
-	if (selectedValue === 'user') {
+	if (selectedValue === 'USER') {
 		$('#businessNum').hide(250)
-	} else if (selectedValue === 'company') {
+	} else if (selectedValue === 'COMPANY') {
 		$('#businessNum').show(250)
 	}
 });
@@ -564,9 +564,16 @@ function sendCode() {
 
 	const selectedType = $('input[name="targetType"]:checked').val();
 	const value = $('#businessNum').val().replace(/[^\d]/g, '');
+	const targetId = $('#accountId').val();
 
 	if (selectedType === 'COMPANY' && value.length != 10) {
 		window.publicModals.show("정확한 사업자 등록번호를 입력해주세요.")
+		$('#modalOpenBtn').prop('disabled', false);
+		return;
+	}
+
+	if (targetId == null || targetId.length <= 6) {
+		window.publicModals.show("올바른 전화번호를 입력해주세요")
 		$('#modalOpenBtn').prop('disabled', false);
 		return;
 	}
@@ -649,33 +656,29 @@ function okMobile() {
     const formattedNumber = formatPhoneNumber(phoneInputs[0], phoneInputs[1], phoneInputs[2]);
 	const selectedType = $('input[name="targetType"]:checked').val();
 	const businessNum = $('#businessNum').val().replace(/[^\d]/g, '');
+	const accountId = $('accountId').val()
 
 	$.ajax({
         url: "/account/find/id",
         method: "POST",
-		dataType: 'text',
   		contentType: "application/json",
 		data: JSON.stringify({ 
+			targetId: accountId,
 			targetType: "mobile",
 			targetValue: formattedNumber,
 			accountType: selectedType,
 			businessNum: businessNum
 		}),
         success: (res) => {
-			if (!res) {
+			if (!res.Uid) {
 				window.publicModals.show("해당 연락처를 사용중인 아이디가 존재하지 않습니다.")
 			} else {
-				window.publicModals.show("해당 연락처를 사용중인 아이디 : " + res,
-			{
-				confirmText: '로그인페이지로 이동',
-				cancelText: '취소',
-				onConfirm: () => {location.href = "/account/login";}
-    		});
+				showNewPwdModal('', res.Uid)
 			}
         },
         error: (xhr) => {
 			console.log(xhr);
-			window.publicModals.show("아이디 검색에 실패하였습니다.")
+			window.publicModals.show("해당 계정이 존재하지 않습니다.")
 		}
     });
 }
@@ -761,7 +764,6 @@ function okEmail() {
 	$.ajax({
         url: "/account/find/id",
         method: "POST",
-		dataType: 'text',
   		contentType: "application/json",
 		data: JSON.stringify({ 
 			targetId: accountId,
@@ -779,7 +781,7 @@ function okEmail() {
         },
         error: (xhr) => {
 			console.log(xhr);
-			window.publicModals.show("아이디 검색에 실패하였습니다.")
+			window.publicModals.show("해당 계정이 존재하지 않습니다.")
 		},
 		complete: () => {$('#modalOpenBtn').prop('disabled', false);}
     });
@@ -788,21 +790,20 @@ function okEmail() {
 
 
 function showNewPwdModal(text, uid) {
+	const modalText = `
+	<input id="changePassword" type="text" style="min-width: 300px;" placeholder="변경할 비밀번호를 입력하세요.">
+	<input id="checkPassword" type="text" style="min-width: 300px;" placeholder="비밀번호를 다시 한번 입력해주세요.">
+	<input id="changeUid" type="hidden" value='\${uid}'>
+	`
 
-const modalText = `
-<input id="changePassword" type="text" style="min-width: 300px;" placeholder="변경할 비밀번호를 입력하세요.">
-<input id="checkPassword" type="text" style="min-width: 300px;" placeholder="비밀번호를 다시 한번 입력해주세요.">
-<input id="changeUid" type="hidden" value='\${uid}'>
-`
+	const failedText = modalText + text;
 
-const failedText = modalText + text;
-
-window.publicModals.show(failedText,{
-  onConfirm: () => {changePassword(); return false;},
-  confirmText:'변경완료',
-  cancelText:'취소',
-  size_x:'350px'
-})
+	window.publicModals.show(failedText,{
+	onConfirm: () => {changePassword(); return false;},
+	confirmText:'변경완료',
+	cancelText:'취소',
+	size_x:'350px'
+	})
 }
 
 function changePassword() {
@@ -829,7 +830,7 @@ if (changePassword !== checkPassword) {
 let targetUrl = "/user/password"
 
 if (selectedType === 'COMPANY') {
-	targetUrl = "/conpany/password"
+	targetUrl = "/company/password"
 }
 
 $.ajax({

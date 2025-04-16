@@ -179,6 +179,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public Map<String, Object> getIdByContect(findIdDTO dto) throws Exception {
 		AccountLoginDAO dao = getDAO(dto.getAccountType());
+		
 		AccountVO account = dao.getIdByContect(dto);
 		String id = account.getAccountId();
 		

@@ -193,5 +193,8 @@
 				1 = 0 <!-- 예외 처리용, 조건이 없으면 무조건 실패하게 -->
 			</otherwise>
 		</choose>
+		<if test="targetId != null and targetId != ''">
+			AND userId = #{targetId}
+		</if>
 	</select>
 </mapper>
