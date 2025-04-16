@@ -247,56 +247,7 @@
     <!-- ===== 차트 관련 JavaScript ===== -->
     <script src="${pageContext.request.contextPath}/resources/adminpagematerials/vendor/chart.js/Chart.min.js"></script>
 
-    <!-- 🎯 영역 차트 데이터 수정 -->
-    <script>
-        var ctx = document.getElementById("myAreaChart");
-        var myAreaChart = new Chart(ctx, {
-            type: 'line', // 차트 타입 (선 그래프)
-            data: {
-                labels: ["1월", "2월", "3월", "4월", "5월", "6월", "7월"], // 📌 X축 레이블 (월별)
-                datasets: [{
-                    label: "월별 수익", // 📌 데이터 제목
-                    lineTension: 0.3,
-                    backgroundColor: "rgba(78, 115, 223, 0.05)",
-                    borderColor: "rgba(78, 115, 223, 1)",
-                    pointRadius: 3,
-                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
-                    pointBorderColor: "rgba(78, 115, 223, 1)",
-                    pointHoverRadius: 3,
-                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-                    pointHitRadius: 10,
-                    pointBorderWidth: 2,
-                    data: [10000, 15000, 12000, 17000, 18000, 20000, 22000], // 📌 Y축 데이터 (수익 값)
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false // ✨ 이 옵션 추가
-            }
-        });
-    </script>
 
-    <!-- 🎯 원형 차트 데이터 수정 -->
-    <script>
-        var ctx = document.getElementById("myPieChart");
-        var myPieChart = new Chart(ctx, {
-            type: 'doughnut', // 차트 타입 (도넛형 차트)
-            data: {
-                labels: ["직접 방문", "소셜 미디어", "추천"], // 📌 데이터 종류
-                datasets: [{
-                    data: [50, 30, 20], // 📌 각 데이터 값 (퍼센트)
-                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
-                    hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
-                    hoverBorderColor: "rgba(234, 236, 244, 1)",
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false // ✨ 이 옵션 추가
-            }
-        });
-    </script>
 
 </div>
 </body>
