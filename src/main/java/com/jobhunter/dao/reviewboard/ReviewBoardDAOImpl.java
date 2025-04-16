@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.jobhunter.model.reviewboard.Likes;
 import com.jobhunter.model.reviewboard.RPageRequestDTO;
 import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
@@ -56,19 +57,15 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 	}
 
 	@Override
-	public LocalDateTime selectLike(int userId, int boardNo) throws Exception {
-		Map<String, Object> selectMap = new HashMap<>();
-		selectMap.put("userId", userId);
-		selectMap.put("boardNo", boardNo);
-		return ses.selectOne(NS + ".selectLastLikeTime", selectMap);
+	public LocalDateTime selectLike(Likes like) throws Exception {
+		
+		return ses.selectOne(NS + ".selectLastLikeTime", like);
 	}
 
 	@Override
-	public int insertLike(int userId, int boardNo) {
-		Map<String, Object> insertMap = new HashMap<>();
-		insertMap.put("userId", userId);
-		insertMap.put("boardNo", boardNo);
-		return ses.insert(NS + ".insertLike", insertMap);
+	public int insertLike(Likes like) {
+		
+		return ses.insert(NS + ".insertLike", like);
 	}
 
 	@Override
@@ -118,10 +115,11 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
     }
 
 	@Override
-	public int saveViewRecord(int userId, int boardNo) throws Exception {
+	public int insertOrUpdateReviewView(int userId, int boardNo, String viewType) throws Exception {
 		Map<String, Object> param = new HashMap<>();
         param.put("userId", userId);
         param.put("boardNo", boardNo);
+        param.put("viewType", viewType);
 
         return ses.insert(NS + ".insertReviewView", param);
 	}

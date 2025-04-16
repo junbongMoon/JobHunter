@@ -3,6 +3,7 @@ package com.jobhunter.dao.reviewboard;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.jobhunter.model.reviewboard.Likes;
 import com.jobhunter.model.reviewboard.RPageRequestDTO;
 import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
@@ -20,9 +21,9 @@ public interface ReviewBoardDAO {
 
 	ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception;
 
-	LocalDateTime selectLike(int userId, int boardNo) throws Exception;
+	LocalDateTime selectLike(Likes like) throws Exception;
 
-	int insertLike(int userId, int boardNo) throws Exception;
+	int insertLike(Likes like) throws Exception;
 
 	int updateBoardLikes(int boardNo) throws Exception;
 
@@ -38,8 +39,7 @@ public interface ReviewBoardDAO {
 
 	int checkViewedWithHours(int userId, int boardNo) throws Exception;	
 
-	int saveViewRecord(int userId, int boardNo) throws Exception;
-
+	
 	int incrementViews(int boardNo) throws Exception;
 
 	int countAllBoards() throws Exception;
@@ -52,6 +52,12 @@ public interface ReviewBoardDAO {
 	int selectUserIdByBoardNo(int boardNo);
 
 	void insertLog(int uid, String targetType, String logType);
+
+	int insertOrUpdateReviewView(int userId, int boardNo, String viewType) throws Exception;
+
+	
+
+	
 
 
 

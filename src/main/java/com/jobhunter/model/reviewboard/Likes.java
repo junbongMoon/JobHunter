@@ -20,5 +20,6 @@ public class Likes {
 	private int likeId;
 	private int userId;
 	private int boardNo;
+	private String likeType;
 
 }

@@ -133,15 +133,16 @@
 		WHERE userId = #{userId}
 		AND
 		boardNo = #{boardNo}
+		AND LikeType = #{likeType}
 		ORDER BY createdAt DESC
 		LIMIT 1
 	</select>
 
 	<!-- 2. 좋아요 등록 -->
 	<insert id="insertLike">
-		INSERT INTO LikesLog (userId, boardNo)
+		INSERT INTO LikesLog (userId, boardNo,LikeType)
 		VALUES
-		(#{userId}, #{boardNo})
+		(#{userId}, #{boardNo}, #{likeType})
 	</insert>
 
 	<!-- 3. 좋아요 수 증가 -->
@@ -211,9 +212,10 @@
 
 	<!-- 2. 조회 기록 저장 -->
 	<insert id="insertReviewView">
-		INSERT INTO ViewsLog (userId, boardNo)
-		VALUES
-		(#{userId}, #{boardNo})
+		INSERT INTO ViewsLog (userId, boardNo, viewedAt,
+		ViewType)
+		VALUES (#{userId}, #{boardNo}, NOW(), #{viewType})
+		ON DUPLICATE KEY UPDATE viewedAt = NOW()
 	</insert>
 
 	<!-- 3. 게시판 조회수 증가 -->

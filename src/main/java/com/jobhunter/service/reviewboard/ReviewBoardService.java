@@ -42,7 +42,7 @@ public interface ReviewBoardService {
 	boolean oneViewCount(int userId, int boardNo) throws Exception;
 
 	// 조회수 증가
-	void insertViewCount(int userId, int boardNo) throws Exception;
+	void insertViewCount(int userId, int boardNo, String viewType) throws Exception;
 
 	RPageResponseDTO<ReviewBoardDTO> getPagedBoardList(RPageRequestDTO pageRequestDTO) throws Exception;
 

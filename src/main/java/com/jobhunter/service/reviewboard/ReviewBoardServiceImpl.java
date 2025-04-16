@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.reviewboard.ReviewBoardDAO;
 import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.reviewboard.Likes;
 import com.jobhunter.model.reviewboard.RPageRequestDTO;
 import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
@@ -80,9 +82,14 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean addlikes(int userId, int boardNo) throws Exception {
-
+		Likes like = Likes.builder()
+				.userId(userId)
+				.boardNo(boardNo)
+				.likeType("REBOARD")
+				.build();
+		
 		// 1. 마지막 좋아요 시간 조회-> 유저가(userId) 어떤 게시글(boardNo)에 마지막으로 좋아요를 누른 시간이 언제인지
-		LocalDateTime lastLikeTime = Rdao.selectLike(userId, boardNo);
+		LocalDateTime lastLikeTime = Rdao.selectLike(like);
 
 		// 2. 24시간 제한 체크
 		// if문으로 마지막으로 좋아요 누른 시간이 있다면
@@ -101,7 +108,8 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 		// 3. 좋아요 추가
 
-		Rdao.insertLike(userId, boardNo);
+		
+		Rdao.insertLike(like);
 
 		// 4. 게시글 좋아요 수 증가
 		Rdao.updateBoardLikes(boardNo);
@@ -148,20 +156,21 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	}
 	
 	@Override
-	public boolean oneViewCount(int userId, int boardNo) throws Exception {
+	public boolean oneViewCount(int userId, int boardNo ) throws Exception {
 		int count = Rdao.checkViewedWithHours(userId, boardNo);
 	    return count == 0;  //조회 기록이 없다
 	}
 
-	@Transactional
-	public void insertViewCount(int userId, int boardNo)throws Exception {
+	public void insertViewCount(int userId, int boardNo,String viewType) throws Exception {
+		// 최근 24시간 이내 조회했는지 검사
 		int count = Rdao.checkViewedWithHours(userId, boardNo);
-	    if (count == 0) {
-	    	Rdao.saveViewRecord(userId, boardNo); 
-	    	Rdao.incrementViews(boardNo);     
-	    }
-
+		if (count == 0) {
+			// INSERT or UPDATE 처리
+			Rdao.insertOrUpdateReviewView(userId, boardNo, "REBOARD");
+			Rdao.incrementViews(boardNo);
+		}
 	}
+
 
 
 
