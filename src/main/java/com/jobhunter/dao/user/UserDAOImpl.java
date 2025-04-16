@@ -96,6 +96,16 @@ public class UserDAOImpl implements UserDAO {
 	public int linkToKakao(KakaoUserInfoDTO userInfo) throws Exception {
 		return ses.update(NS + ".linkToKakao", userInfo);
 	}
+	
+	@Override
+	public int deleteMobile(String uid) throws Exception {
+		return ses.update(NS + ".deleteMobile", uid);
+	}
+	
+	@Override
+	public int deleteEmail(String uid) throws Exception {
+		return ses.update(NS + ".deleteEmail", uid);
+	}
 
 	
 }

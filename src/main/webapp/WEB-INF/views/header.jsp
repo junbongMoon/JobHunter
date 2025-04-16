@@ -12,6 +12,7 @@
 
 			<!-- 공용 모달 -->
 			<script src="/resources/assets/js/publicModal.js"></script>
+			<script src="/resources/assets/js/reportAccount.js"></script>
 			<link href="/resources/assets/css/publicModal.css" rel="stylesheet">
 
 			<!-- Favicons -->

@@ -16,7 +16,6 @@
 <style>
 .main {
 	padding: 60px 20px;
-	background: #f8f9fa;
 	min-height: calc(100vh - 200px);
 }
 
@@ -24,7 +23,6 @@
 	padding: 40px 60px;
 	background: white;
 	border-radius: 20px;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 	max-width: 600px;
 	margin: 0 auto;
 }

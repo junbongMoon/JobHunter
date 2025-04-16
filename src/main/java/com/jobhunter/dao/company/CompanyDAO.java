@@ -25,4 +25,8 @@ public interface CompanyDAO {
 
 	int updateCompanyInfo(CompanyInfoDTO companyInfo) throws Exception;
 
+	int deleteMobile(String uid) throws Exception;
+
+	int deleteEmail(String uid) throws Exception;
+
 }

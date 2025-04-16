@@ -34,4 +34,8 @@ public interface UserDAO {
 
 	int linkToKakao(KakaoUserInfoDTO userInfo) throws Exception;
 
+	int deleteEmail(String uid) throws Exception;
+
+	int deleteMobile(String uid) throws Exception;
+
 }

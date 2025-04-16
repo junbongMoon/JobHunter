@@ -134,4 +134,17 @@ public class CompanyServiceImpl implements CompanyService {
 		return dao.findByUidAndPassword(uid.toString(), dto.getPassword());
 	}
 	
+	@Override
+	public void deleteContact(String uid, String type) throws Exception {
+		if(type.equals("mobile")) {
+			if(dao.deleteMobile(uid) != 1) {
+				throw new Exception();
+			}
+		} else {
+			if(dao.deleteEmail(uid) != 1) {
+				throw new Exception();
+			}
+		}
+	}
+	
 }

@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -114,6 +115,19 @@ public class UserRestController {
 			e.printStackTrace();
 		}
 		return ResponseEntity.ok(exists);
+	}
+	
+	@DeleteMapping(value = "/contact", consumes = "application/json")
+	public ResponseEntity<HttpStatus> deleteContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
+		try {
+			service.deleteContact(dto.getUid(), dto.getType());
+			
+			accUtil.refreshAccount((AccountVO) session.getAttribute("account"));
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 
 }

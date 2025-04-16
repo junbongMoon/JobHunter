@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.servlet.http.HttpSession;
 
@@ -141,7 +142,9 @@ public class AccountRestController {
 		if (duple) {
 			try {
 				// 중복이면 true반환
-				if (accountService.checkDuplicateContact(email, accountType, "email")) {
+				Boolean dupleEmail =accountService.checkDuplicateContact(email, accountType, "email");
+				System.out.println("dupleEmail : "+ dupleEmail);
+				if (dupleEmail) {
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미 가입된 이메일입니다.");
 				}
 			} catch (Exception e) {
@@ -232,6 +235,8 @@ public class AccountRestController {
 			result = accountService.getIdByContect(dto);
 			
 			return ResponseEntity.status(HttpStatus.OK).body(result);
+		} catch (NoSuchElementException e) {
+			return ResponseEntity.status(HttpStatus.OK).body(null);
 		} catch (Exception e) {
 			e.printStackTrace();
 			result.put("status", "error");

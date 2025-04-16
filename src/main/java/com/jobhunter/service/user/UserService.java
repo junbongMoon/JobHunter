@@ -30,4 +30,6 @@ public interface UserService {
 
 	void linkToKakao(KakaoUserInfoDTO userInfo) throws Exception;
 
+	void deleteContact(String uid, String type) throws Exception;
+
 }

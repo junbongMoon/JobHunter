@@ -78,9 +78,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public String getKakaoToken(String code, String redirectUri) throws Exception {
 		
-		System.out.println("code : " + code);
-		System.out.println("redirectUri : " + redirectUri);
-		
 	    RestTemplate restTemplate = new RestTemplate();
 
 	    HttpHeaders headers = new HttpHeaders();
@@ -97,8 +94,6 @@ public class UserServiceImpl implements UserService {
 	    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
 	    ResponseEntity<Map> response = restTemplate.postForEntity("https://kauth.kakao.com/oauth/token", request, Map.class);
-
-	    System.out.println("response : " + response);
 	    
 	    return (String) response.getBody().get("access_token");
 	}
@@ -132,7 +127,6 @@ public class UserServiceImpl implements UserService {
 	    		.kakaoId(kakaoId)
 	    		.build();
 	    
-	    System.out.println(kakaoUserInfo);
 	    return kakaoUserInfo;
 	}
 
@@ -168,6 +162,19 @@ public class UserServiceImpl implements UserService {
 	public AccountVO registUser(UserRegisterDTO dto) throws Exception {
 		Integer uid = dao.registUser(dto);
 		return dao.findByUidAndPassword(uid.toString(), dto.getPassword());
+	}
+
+	@Override
+	public void deleteContact(String uid, String type) throws Exception {
+		if(type.equals("mobile")) {
+			if(dao.deleteMobile(uid) != 1) {
+				throw new Exception();
+			}
+		} else {
+			if(dao.deleteEmail(uid) != 1) {
+				throw new Exception();
+			}
+		}
 	}
 
 	

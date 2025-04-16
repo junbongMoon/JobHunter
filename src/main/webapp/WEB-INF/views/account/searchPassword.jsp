@@ -16,14 +16,12 @@
 <style>
 .main {
 	padding: 60px 20px;
-	background: #f8f9fa;
 	min-height: calc(100vh - 200px);
 }
 
 .login-container {
 	background: white;
 	border-radius: 20px;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 	max-width: 700px;
 	margin: 0 auto;
 }
@@ -449,6 +447,8 @@ mark {
 			<input style="width: 100%; display:none;" type="text" id="businessNum" placeholder="사업자 등록번호를 입력해주세요"/>
 		</div>
 		<hr>
+		<a href="/account/login" style="float:right; margin-right:10px">로그인</a>
+		<span style="float:right">|</span>
 		<a href="/account/find/id" style="float:right">아이디 찾기</a>
 		<button id="modalOpenBtn" type="button" class="btn-confirm full-width" onclick="sendCode()">인증번호 발송</button>
 	</div>
@@ -565,6 +565,7 @@ function sendCode() {
 	const selectedType = $('input[name="targetType"]:checked').val();
 	const value = $('#businessNum').val().replace(/[^\d]/g, '');
 	const targetId = $('#accountId').val();
+	const targetMethod = $('#targetMethod').val();
 
 	if (selectedType === 'COMPANY' && value.length != 10) {
 		window.publicModals.show("정확한 사업자 등록번호를 입력해주세요.")
@@ -572,15 +573,13 @@ function sendCode() {
 		return;
 	}
 
-	if (targetId == null || targetId.length <= 6) {
-		window.publicModals.show("올바른 전화번호를 입력해주세요")
+	if (targetId == null || targetId.length < 6) {
+		window.publicModals.show("올바른 아이디를 입력해주세요")
 		$('#modalOpenBtn').prop('disabled', false);
 		return;
 	}
 
-	const selectedMethod = $('#targetMethod').val();
-
-	if (selectedMethod === 'mobile') {
+	if (targetMethod === 'mobile') {
 		sendPhoneCode()
 	} else {
 		sendEmailCode()
@@ -791,8 +790,8 @@ function okEmail() {
 
 function showNewPwdModal(text, uid) {
 	const modalText = `
-	<input id="changePassword" type="text" style="min-width: 300px;" placeholder="변경할 비밀번호를 입력하세요.">
-	<input id="checkPassword" type="text" style="min-width: 300px;" placeholder="비밀번호를 다시 한번 입력해주세요.">
+	<input id="changePassword" type="password" style="min-width: 300px;" placeholder="변경할 비밀번호를 입력하세요.">
+	<input id="checkPassword" type="password" style="min-width: 300px;" placeholder="비밀번호를 다시 한번 입력해주세요.">
 	<input id="changeUid" type="hidden" value='\${uid}'>
 	`
 

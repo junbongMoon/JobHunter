@@ -201,4 +201,20 @@
 	<update id="linkToKakao" parameterType="com.jobhunter.model.user.KakaoUserInfoDTO">
 		UPDATE users SET socialId = #{kakaoId}, email = #{email}, isSocial = 'Y' WHERE (uid = #{uid})
 	</update>
+	
+	<update id="deleteEmail">
+		UPDATE users
+		SET email = NULL
+		WHERE uid = #{uid}
+		AND mobile IS NOT NULL
+		AND mobile != ''
+	</update>
+	
+	<update id="deleteMobile">
+		UPDATE users
+		SET mobile = NULL
+		WHERE uid = #{uid}
+		AND email IS NOT NULL
+		AND email != ''
+	</update>
 </mapper>

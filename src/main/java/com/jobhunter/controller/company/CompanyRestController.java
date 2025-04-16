@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.company.BusinessRequestDTO;
 import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyVO;
 import com.jobhunter.model.user.ContactUpdateDTO;
 import com.jobhunter.model.user.PasswordDTO;
 import com.jobhunter.service.company.CompanyService;
+import com.jobhunter.util.AccountUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CompanyRestController {
 	private final CompanyService service;
+	private final AccountUtil accUtil;
 
 	@GetMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<CompanyVO> myinfo(@PathVariable("uid") String uid) {
@@ -53,9 +57,8 @@ public class CompanyRestController {
 		}
 
 		companyInfo.setUid(uid);
-		boolean success = false;
 		try {
-			success = service.updateCompanyInfo(companyInfo);
+			service.updateCompanyInfo(companyInfo);
 			return ResponseEntity.ok(Collections.singletonMap("result", "success"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -127,5 +130,18 @@ public class CompanyRestController {
 			e.printStackTrace();
 		}
 		return ResponseEntity.ok(exists);
+	}
+	
+	@DeleteMapping(value = "/contact", consumes = "application/json")
+	public ResponseEntity<HttpStatus> deleteContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
+		try {
+			service.deleteContact(dto.getUid(), dto.getType());
+			
+			accUtil.refreshAccount((AccountVO) session.getAttribute("account"));
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 }

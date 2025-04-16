@@ -181,6 +181,9 @@ public class AccountServiceImpl implements AccountService {
 		AccountLoginDAO dao = getDAO(dto.getAccountType());
 		
 		AccountVO account = dao.getIdByContect(dto);
+		if (account == null) {
+			throw new NoSuchElementException();
+		}
 		String id = account.getAccountId();
 		
 		String maskingId = id.substring(0, 2) + "****" + id.substring(id.length() - 2);

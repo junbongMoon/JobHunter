@@ -28,7 +28,7 @@
           <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
         </div>
         <div class="info-grid" id="basicInfo">
-          <div>이름</div><div><strong id="userName">로딩중...</strong></div>
+          <div>이름<i class="flagAccBtn" data-uid="1" data-type="USER"></i></div><div><strong id="userName">로딩중...</strong></div>
           <div>전화번호</div><div id="nowMobile">로딩중...</div>
           <div>이메일</div><div id="nowEmail">로딩중...</div>
           <div>가입일</div><div id="regDate">로딩중...</div>
@@ -97,7 +97,7 @@
                   </ul>
                 </div>
                 <input type="text" class="form-control" id="selectedAddress" style="display: none;" readonly>
-                  <input type="text" class="form-control" id="addressDetail" placeholder="상세주소를 입력하세요">
+                  <input type="text" class="form-control" id="addressDetail" placeholder="상세주소를 입력하세요" style="display: none;">
                   <div class="edit-buttons">
                     <button class="btn-search" id="resetAddressBtn" onclick="resetAddress()">초기화</button>
                     <button class="btn-cancel" id="deleteAddressBtn" onclick="deleteAddress()">주소 삭제</button>
@@ -241,10 +241,6 @@ Kakao.isInitialized();
 		});
 	}
 // #endregion 카톡
-
-
-
-
 
 $(()=>{
   getInfo();
@@ -487,7 +483,7 @@ function resetUserModifyForm() {
   // 주소 초기화
   $('#addressSearch').val('');
   $('#selectedAddress').val('').hide();
-  $('#addressDetail').val('');
+  $('#addressDetail').val('').hide();
   $('#addressSelect').empty().append('<li class="address-dropdown-item" data-value="">주소를 선택하세요</li>');
 
   // select박스 초기화 (성별, 병역사항, 국적, 급여유형)
@@ -518,6 +514,7 @@ function updateUserModifyInfo(result) {
     document.getElementById('addressBackup').value = result.addr;
     document.getElementById('selectedAddress').value = result.addr || '';
     document.getElementById('selectedAddress').style.display = 'block'; // 표시
+    document.getElementById('addressDetail').style.display = 'block'; // 표시
   }
   if (result.detailAddr) {
     document.getElementById('detailAddressBackup').value = result.detailAddr;
@@ -548,12 +545,12 @@ function updateUserModifyInfo(result) {
     document.getElementById('payType').value = result.payType;
   }
 
-  if (result.payType == '회사 내규에 따름') {
-    document.getElementById('payTitleDiv').style.display = 'none';
-    document.getElementById('payDiv').style.display = 'none';
-  } else {
+  if (result.payType == '연봉' || result.payType == '월급') {
     document.getElementById('payTitleDiv').style.display = 'block';
     document.getElementById('payDiv').style.display = 'block';
+  } else {
+    document.getElementById('payTitleDiv').style.display = 'none';
+    document.getElementById('payDiv').style.display = 'none';
   }
 
   // 희망급여
@@ -602,6 +599,7 @@ function bindPayTypeChangeEvent() {
     document.getElementById('pay').placeholder = '연봉을 입력해주세요';
   
     switch (this.value) {
+      case -1:
       case '회사 내규에 따름':
         document.getElementById('payDiv').style.display = 'none';
         document.getElementById('payTitleDiv').style.display = 'none';
@@ -804,7 +802,7 @@ async function checkCodePwdToMobile() {
     await confirmationResult.confirm(code);
     showNewPwdModal('');
   } catch (error) {
-    showCodeModal(checkCodePwdToEmail, true);
+    window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
   }
 }
 
@@ -853,8 +851,8 @@ async function checkCodePwdToEmail() {
 function showNewPwdModal (text) {
 
   const modalText = `
-  <input id="changePassword" type="text" style="min-width: 300px;" placeholder="변경할 비밀번호를 입력하세요.">
-  <input id="checkPassword" type="text" style="min-width: 300px;" placeholder="비밀번호를 다시 한번 입력해주세요.">
+  <input id="changePassword" type="password" style="min-width: 300px;" placeholder="변경할 비밀번호를 입력하세요.">
+  <input id="checkPassword" type="password" style="min-width: 300px;" placeholder="비밀번호를 다시 한번 입력해주세요.">
   `
 
   const failedText = modalText + text;
@@ -914,6 +912,76 @@ function getPhoneInputHTML() {
   `;
 }
 
+function deleteMobileModal() {
+  $.ajax({
+    url: '/user/contact',
+    type: 'DELETE',
+    contentType: 'application/json',
+    data: JSON.stringify({
+      uid: uid,
+      type: 'mobile'
+    }),
+    success: function () {
+      window.publicModals.show("연락처가 성공적으로 삭제되었습니다.");
+      sessionMobile = null;
+      $('#nowMobile').html('등록된 전화번호 없음')
+      getInfo()
+    },
+    error: function (xhr) {
+      window.publicModals.show("삭제에 실패했습니다. 다시 시도해주세요.");
+    }
+  });
+}
+
+function deleteEmailModal() {
+  $.ajax({
+    url: '/user/contact',
+    type: 'DELETE',
+    contentType: 'application/json',
+    data: JSON.stringify({
+      uid: uid,
+      type: 'email'
+    }),
+    success: function () {
+      window.publicModals.show("연락처가 성공적으로 삭제되었습니다.");
+      sessionEmail = null;
+      $('#nowEmail').html('등록된 이메일 없음')
+      getInfo()
+    },
+    error: function (xhr) {
+      window.publicModals.show("삭제에 실패했습니다. 다시 시도해주세요.");
+    }
+  });
+}
+
+function deleteContactModal() {
+  let modalText = `<h2>연락처 삭제</h2>`
+  modalText +=
+    `<button style="width: 160px;" class="btn-search" onclick="
+      window.publicModals.show('정말로 삭제하시겠습니까?',
+        {confirmText:'예', cancelText:'아니오', onConfirm:deleteMobileModal}
+      )">
+    전화번호 삭제</button>`
+
+    if (isSocial) {
+      modalText +=
+      `<button style="width: 160px;" class="btn-search" onclick="window.publicModals.show('소셜계정은 이메일 삭제가 불가능합니다.')">
+      이메일 삭제</button>`
+    } else {
+      modalText +=
+      `<button style="width: 160px;" class="btn-search" onclick="
+        window.publicModals.show('정말로 삭제하시겠습니까?',
+          {confirmText:'예', cancelText:'아니오', onConfirm:deleteEmailModal}
+        )">
+      이메일 삭제</button>`
+    }
+  modalText +=
+    `<div style="color:red; margin-top: 10px; text-size:0.8em"><i class="bi bi-exclamation-circle"></i>반드시 하나의 연락처는 남아있어야합니다.</div>`
+
+  window.publicModals.show(modalText,{confirmText:'취소', size_x:'400px'})
+  return false;
+}
+
 // 연락처 수정 모달
 function openContactModal() {
 
@@ -923,15 +991,28 @@ function openContactModal() {
       <button style="width: 130px;" class="btn-search" onclick="verifiToNewMobile()">전화인증</button>
   `;
 
-  const emailText = `
+  let emailText = `
 	  <div>변경할 이메일을 입력해주세요.</div>
       <input type="text" id="newEmail" style="min-width: 400px; font-size:1.1em; padding:7px 20px" placeholder="변경할 이메일을 입력해주세요.">
         <button style="width: 130px;" class="btn-search" onclick="verifiToNewEmail()">이메일인증</button>
     `
 
+  if (isSocial) {
+    emailText = `
+	  <div>카카오톡 로그인 계정입니다.</div>
+      <input type="text" style="min-width: 530px; font-size:1.1em; padding:7px 20px" value="소셜 계정은 이메일을 변경할 수 없습니다." readonly>
+    `
+  }
+
   const modalText = headText + `<hr>` + mobileText + `<hr>` + emailText + `<hr>`
 
-  window.publicModals.show(modalText,{confirmText:'취소', size_x:'700px'})
+  if (sessionMobile && sessionEmail) {
+    window.publicModals.show(modalText,{cancelText:'취소', size_x:'700px', confirmText:"연락처 삭제", onConfirm:deleteContactModal})
+  } else {
+    window.publicModals.show(modalText,{confirmText:'취소', size_x:'700px'})
+  }
+
+  $('.public-modal-button.confirm').css('background-color', 'var(--bs-red)');
 }
 
 // 전화번호 중복 체크
@@ -984,8 +1065,35 @@ async function verifiToNewMobile() {
     confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
     showCodeModal(()=>{changeMobile(formattedNumber)});
   } catch (error) {
-    window.publicModals.show("인증번호 전송중 오류가 발생했습니다. fireBase 사용횟수 초과등의 가능성이 높으니 나중에 다시 시도해주세요.", {onConfirm:()=>{openContactModal(); return false;}});
+    window.publicModals.show("인증번호 전송중 오류가 발생했습니다. fireBase 사용횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.", {
+      onConfirm: backdoor,
+      confirmText: "백도어",
+      cancelText: "닫기"
+    });
   }
+}
+
+function backdoor() {
+  const dto = {
+      type: "mobile",
+      value: formattedNumber,
+      uid
+    };
+  
+    $.ajax({
+      url: "/user/contact",
+      method: "patch",
+      contentType: "application/json",
+      data: JSON.stringify(dto),
+      success: (val) => {
+        sessionMobile = formattedNumber;
+        $('#nowMobile').text( sessionMobile || '등록된 전화번호 없음')
+        window.publicModals.show("전화번호가 성공적으로 변경되었습니다.");
+      },
+      error: (xhr) => {
+        window.publicModals.show("서버가 불안정합니다. 잠시 후 다시 시도해주세요.");
+      }
+    });
 }
 
 async function changeMobile(formattedNumber) {
@@ -1020,20 +1128,17 @@ async function changeMobile(formattedNumber) {
       }
     });
   } catch (error) {
-    showCodeModal(()=>{changeMobile(formattedNumber)}, true);
+    window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
   }
 }
 
 function verifiToNewEmail() {
   const emailInputs = $('#newEmail').val();
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-  if (emailInputs || !emailRegex.test(emailInputs)) {
+  if (!emailInputs || !emailRegex.test(emailInputs)) {
     window.publicModals.show('올바른 이메일을 입력해주세요.', {onConfirm:()=>{openContactModal(); return false;}});
     return;
   }
-
-  // todo : 이메일 중복체크
 
   $.ajax({
     url: "/account/auth/email",
@@ -1119,6 +1224,7 @@ function changeEmailFunc(changeEmail) {
     document.getElementById('addressDetail').value = '';
     document.getElementById('addressSelect').innerHTML = '';
     document.getElementById('selectedAddress').style.display = 'none';
+    document.getElementById('addressDetail').style.display = 'none';
   }
 
   function resetAddress() {
@@ -1129,9 +1235,9 @@ function changeEmailFunc(changeEmail) {
       document.getElementById('selectedAddress').value = beforeAddress;
       document.getElementById('selectedAddress').style.display = 'block';
       document.getElementById('addressDetail').style.display = 'block';
-    }
-    if (beforeDetailAddress) {
-      document.getElementById('addressDetail').value = beforeDetailAddress;
+      if (beforeDetailAddress) {
+        document.getElementById('addressDetail').value = beforeDetailAddress;
+      }
     }
   }
 
@@ -1174,6 +1280,8 @@ function changeEmailFunc(changeEmail) {
             
             // 검색창에 선택된 주소 표시
             document.getElementById('selectedAddress').value = this.dataset.value;
+            
+            $("#addressDetail").show();
 
             // 드롭다운 숨김
             addressSelect.classList.remove('show');

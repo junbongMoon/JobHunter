@@ -82,7 +82,7 @@
                   </ul>
                 </div>
                 <input type="text" class="form-control" id="selectedAddress" style="display: none;" readonly>
-                  <input type="text" class="form-control" id="addressDetail" placeholder="상세주소를 입력하세요">
+                  <input type="text" class="form-control" id="addressDetail" placeholder="상세주소를 입력하세요" style="display: none;">
                   <div class="edit-buttons">
                     <button class="btn-search" id="resetAddressBtn" onclick="resetAddress()">초기화</button>
                     <button class="btn-cancel" id="deleteAddressBtn" onclick="deleteAddress()">주소 삭제</button>
@@ -313,7 +313,7 @@ function resetUserModifyForm() {
   // 주소 초기화
   $('#addressSearch').val('');
   $('#selectedAddress').val('').hide();
-  $('#addressDetail').val('');
+  $('#addressDetail').val('').hide();
   $('#addressSelect').empty().append('<li class="address-dropdown-item" data-value="">주소를 선택하세요</li>');
 
   $('#scale').val('-1');
@@ -331,7 +331,8 @@ function updateCompanyModifyInfo(result) {
     // 초기화용 주소 저장
     document.getElementById('addressBackup').value = result.addr;
     document.getElementById('selectedAddress').value = result.addr || '';
-    document.getElementById('selectedAddress').style.display = 'block'; // 표시
+    $('#selectedAddress').show()
+    $('#addressDetail').show()
   }
   if (result.detailAddr) {
     document.getElementById('detailAddressBackup').value = result.detailAddr;
@@ -550,13 +551,14 @@ async function checkCodePwdToMobile() {
   
   if (code.length != 6) {
     showCodeModal(checkCodePwdToEmail, true);
+    return;
   }
 
   try {
     await confirmationResult.confirm(code);
     showNewPwdModal('');
   } catch (error) {
-    showCodeModal(checkCodePwdToEmail, true);
+    window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
   }
 }
 
@@ -666,6 +668,72 @@ function getPhoneInputHTML() {
   `;
 }
 
+
+
+function deleteMobileModal() {
+  $.ajax({
+    url: '/company/contact',
+    type: 'DELETE',
+    contentType: 'application/json',
+    data: JSON.stringify({
+      uid: uid,
+      type: 'mobile'
+    }),
+    success: function () {
+      window.publicModals.show("연락처가 성공적으로 삭제되었습니다.");
+      sessionMobile = null;
+      $('#nowMobile').html('등록된 전화번호 없음')
+      getInfo()
+    },
+    error: function (xhr) {
+      window.publicModals.show("삭제에 실패했습니다. 다시 시도해주세요.");
+    }
+  });
+}
+
+function deleteEmailModal() {
+  $.ajax({
+    url: '/company/contact',
+    type: 'DELETE',
+    contentType: 'application/json',
+    data: JSON.stringify({
+      uid: uid,
+      type: 'email'
+    }),
+    success: function () {
+      window.publicModals.show("연락처가 성공적으로 삭제되었습니다.");
+      sessionEmail = null;
+      $('#nowEmail').html('등록된 이메일 없음')
+      getInfo()
+    },
+    error: function (xhr) {
+      window.publicModals.show("삭제에 실패했습니다. 다시 시도해주세요.");
+    }
+  });
+}
+
+function deleteContactModal() {
+  const modalText = `<h2>연락처 삭제</h2>
+
+    <button style="width: 160px;" class="btn-search" onclick="
+      window.publicModals.show('정말로 삭제하시겠습니까?',
+        {confirmText:'예', cancelText:'아니오', onConfirm:deleteMobileModal}
+      )">
+    전화번호 삭제</button>
+
+    <button style="width: 160px;" class="btn-search" onclick="
+      window.publicModals.show('정말로 삭제하시겠습니까?',
+        {confirmText:'예', cancelText:'아니오', onConfirm:deleteEmailModal}
+      )">
+    이메일 삭제</button>
+
+    <div style="color:red; margin-top: 10px; text-size:0.8em"><i class="bi bi-exclamation-circle"></i>반드시 하나의 연락처는 남아있어야합니다.</div>`
+
+  window.publicModals.show(modalText,{confirmText:'취소', size_x:'400px'})
+  return false;
+}
+
+
 // 연락처 수정 모달
 function openContactModal() {
 
@@ -683,7 +751,13 @@ function openContactModal() {
 
   const modalText = headText + `<hr>` + mobileText + `<hr>` + emailText + `<hr>`
 
-  window.publicModals.show(modalText,{confirmText:'취소', size_x:'700px'})
+  if (sessionMobile && sessionEmail) {
+    window.publicModals.show(modalText,{cancelText:'취소', size_x:'700px', confirmText:"연락처 삭제", onConfirm:deleteContactModal})
+  } else {
+    window.publicModals.show(modalText,{confirmText:'취소', size_x:'700px'})
+  }
+
+  $('.public-modal-button.confirm').css('background-color', 'var(--bs-red)');
 }
 
 // 전화번호 중복 체크
@@ -874,7 +948,8 @@ function changeEmailFunc(changeEmail) {
     document.getElementById('selectedAddress').value = '';
     document.getElementById('addressDetail').value = '';
     document.getElementById('addressSelect').innerHTML = '';
-    document.getElementById('selectedAddress').style.display = 'none';
+    $('#selectedAddress').hide();
+    $('#addressDetail').hide();
   }
 
   function resetAddress() {
@@ -884,10 +959,10 @@ function changeEmailFunc(changeEmail) {
     if (beforeAddress && beforeAddress !== '') {
       document.getElementById('selectedAddress').value = beforeAddress;
       document.getElementById('selectedAddress').style.display = 'block';
-        document.getElementById('addressDetail').style.display = 'block';
+      document.getElementById('addressDetail').style.display = 'block';
     }
     if (beforeDetailAddress) {
-        document.getElementById('addressDetail').value = beforeDetailAddress;
+      document.getElementById('addressDetail').value = beforeDetailAddress;
     }
   }
 
@@ -934,7 +1009,8 @@ function changeEmailFunc(changeEmail) {
             // 드롭다운 숨김
             addressSelect.classList.remove('show');
 
-            document.getElementById('selectedAddress').style.display = 'block';
+            $('#selectedAddress').show();
+            $('#addressDetail').show()
         });
         addressSelect.appendChild(li);
     });

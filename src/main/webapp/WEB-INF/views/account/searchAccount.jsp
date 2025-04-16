@@ -16,14 +16,11 @@
 <style>
 .main {
 	padding: 60px 20px;
-	background: #f8f9fa;
 	min-height: calc(100vh - 200px);
 }
 
 .login-container {
-	background: white;
 	border-radius: 20px;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 	max-width: 700px;
 	margin: 0 auto;
 }
@@ -446,6 +443,8 @@ mark {
 			<input style="width: 100%; display:none;" type="text" id="businessNum" placeholder="사업자 등록번호를 입력해주세요"/>
 		</div>
 		<hr>
+		<a href="/account/login" style="float:right; margin-right:10px">로그인</a>
+		<span style="float:right">|</span>
 		<a href="/account/find/password" style="float:right">비밀번호 찾기</a>
 		<button id="modalOpenBtn" type="button" class="btn-confirm full-width" onclick="sendCode()">인증번호 발송</button>
 	</div>

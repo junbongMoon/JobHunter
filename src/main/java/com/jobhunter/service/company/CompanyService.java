@@ -24,4 +24,6 @@ public interface CompanyService {
 
 	boolean updateCompanyInfo(CompanyInfoDTO companyInfo) throws Exception;
 
+	void deleteContact(String uid, String type) throws Exception;
+
 }

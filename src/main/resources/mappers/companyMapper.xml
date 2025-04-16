@@ -164,4 +164,20 @@
 			AND companyId = #{targetId}
 		</if>
 	</select>
+	
+	<update id="deleteEmail">
+		UPDATE company
+		SET email = NULL
+		WHERE uid = #{uid}
+		AND mobile IS NOT NULL
+		AND mobile != ''
+	</update>
+	
+	<update id="deleteMobile">
+		UPDATE company
+		SET mobile = NULL
+		WHERE uid = #{uid}
+		AND email IS NOT NULL
+		AND email != ''
+	</update>
 </mapper>
