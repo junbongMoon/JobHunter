@@ -20,7 +20,7 @@
 
         <!-- 🔹 대시보드 (메인 페이지로 이동) -->
         <li class="nav-item">
-            <a class="nav-link" href="index.jsp">
+            <a class="nav-link" href="/admin">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>대시보드</span>
             </a>
