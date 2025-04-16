@@ -443,7 +443,7 @@ mark {
             
 		</div>
 		<div class="form-group">
-			<input style="width: 100%; display:none;" type="text" id="businessNum" placeholder="아이디를 입력해주세요"/>
+			<input style="width: 100%; display:none;" type="text" id="accountId" placeholder="아이디를 입력해주세요"/>
 		</div>
 		<div class="form-group">
 			<input style="width: 100%; display:none;" type="text" id="businessNum" placeholder="사업자 등록번호를 입력해주세요"/>
@@ -733,7 +733,7 @@ function verifyEmailCode() {
 	}
 
     $.ajax({
-		url: `/account/auth/email/\${code}`,
+		url: `/account/auth/email/verify/\${code}`,
 		method: "POST",
 		contentType: "application/json",
 		data: JSON.stringify({
@@ -747,12 +747,13 @@ function verifyEmailCode() {
 				cancelText: '취소',
 				onConfirm: verifyEmailCode
     		});
-			return false;
 		}
     });
+	return false;
 }
 
 function okEmail() {
+	const accountId = $("#accountId").val();
 	const email = $("#targetEmail").val();
 	const selectedType = $('input[name="targetType"]:checked').val();
 	const businessNum = $('#businessNum').val().replace(/[^\d]/g, '');
@@ -763,21 +764,17 @@ function okEmail() {
 		dataType: 'text',
   		contentType: "application/json",
 		data: JSON.stringify({ 
+			targetId: accountId,
 			targetType: "email",
 			targetValue: email,
 			accountType: selectedType,
 			businessNum: businessNum
 		}),
         success: (res) => {
-			if (!res) {
-				window.publicModals.show("해당 연락처를 사용중인 아이디가 존재하지 않습니다.")
+			if (!res.Uid) {
+				window.publicModals.show("해당 계정이 존재하지 않습니다.")
 			} else {
-				window.publicModals.show("해당 연락처를 사용중인 아이디 : " + res,
-				{
-					confirmText: '로그인페이지로 이동',
-					cancelText: '취소',
-					onConfirm: () => {location.href = "/account/login";}
-				});
+				showNewPwdModal('', res.Uid)
 			}
         },
         error: (xhr) => {
@@ -787,6 +784,76 @@ function okEmail() {
 		complete: () => {$('#modalOpenBtn').prop('disabled', false);}
     });
 }
+
+
+
+function showNewPwdModal(text, uid) {
+
+const modalText = `
+<input id="changePassword" type="text" style="min-width: 300px;" placeholder="변경할 비밀번호를 입력하세요.">
+<input id="checkPassword" type="text" style="min-width: 300px;" placeholder="비밀번호를 다시 한번 입력해주세요.">
+<input id="changeUid" type="hidden" value='\${uid}'>
+`
+
+const failedText = modalText + text;
+
+window.publicModals.show(failedText,{
+  onConfirm: () => {changePassword(); return false;},
+  confirmText:'변경완료',
+  cancelText:'취소',
+  size_x:'350px'
+})
+}
+
+function changePassword() {
+const changePassword = $('#changePassword').val();
+const checkPassword = $('#checkPassword').val();
+const changeUid = $('#changeUid').val();
+
+const selectedType = $('input[name="targetType"]:checked').val();
+
+const pwdRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[a-zA-Z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,20}$/;
+
+if (!pwdRegex.test(changePassword)) {
+  const failedText = `<div style="color:red; margin-top: 10px; font-size:0.8em">비밀번호는 영어와 숫자, 특수문자를 전부 포함한 6~20자여야 합니다.</div>`
+  showNewPwdModal(failedText, changeUid)
+  return;
+}
+
+if (changePassword !== checkPassword) {
+  const failedText = `<div style="color:red; margin-top: 10px; text-size:0.8em">비밀번호 재입력란을 다시 한번 확인해주세요.</div>`
+  showNewPwdModal(failedText, changeUid)
+  return;
+}
+
+let targetUrl = "/user/password"
+
+if (selectedType === 'COMPANY') {
+	targetUrl = "/conpany/password"
+}
+
+$.ajax({
+  url: targetUrl,
+  method: "patch",
+  contentType: "application/json",
+  data: JSON.stringify({ uid: changeUid, password: changePassword }),
+  success: () => {
+	window.publicModals.show(
+		"비밀번호가 변경되었습니다. 로그인페이지로 이동하시겠습니까?",
+		{
+			confirmText: '이동',
+			cancelText: '취소',
+			onConfirm: () => {location.href = "/account/login";}
+		});
+  },
+  error: (xhr) => {
+	const failedText = `<div style="color:red; margin-top: 10px; text-size:0.8em">비밀번호 변경중 오류가 발생했습니다. 잠시후 다시 시도해 주세요.</div>`
+	showNewPwdModal(failedText, changeUid)
+	return;
+  }
+});
+}
+
 
 document.getElementById('businessNum').addEventListener('input', formatNumber);
 // 숫자 포맷팅 함수 (사업자번호)

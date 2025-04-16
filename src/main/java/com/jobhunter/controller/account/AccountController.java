@@ -153,8 +153,7 @@ public class AccountController {
 
 	@GetMapping("/find/password")
 	public String findPassword() {
-		System.out.println("미구현");
-		return "redirect:/";
+		return "account/searchPassword";
 	}
 
 	@GetMapping("/doc")

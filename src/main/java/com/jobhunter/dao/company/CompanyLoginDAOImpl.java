@@ -1,5 +1,6 @@
 package com.jobhunter.dao.company;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
@@ -88,20 +89,17 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 	}
 	
 	@Override
-	public AccountVO findAccountByEmail(String email) throws Exception {
-		AccountVO result = ses.selectOne(NS + ".findByEmail", email);
-		return result;
-	}
-	
-	@Override
-	public AccountVO findAccountByMobile(String mobile) throws Exception {
-		AccountVO result = ses.selectOne(NS + ".findByMobile", mobile);
+	public AccountVO findAccountByContact(String target, String targetType) throws Exception {
+		Map<String, Object> param = new HashMap<>();
+		param.put("targetType", targetType);
+		param.put("targetValue", target);
+		AccountVO result = ses.selectOne(NS + ".findByContact", param);
 		return result;
 	}
 
 	@Override
-	public String getIdByContect(findIdDTO dto) throws Exception {
-		return ses.selectOne(NS + ".getIdByContect", dto);
+	public AccountVO getIdByContect(findIdDTO dto) throws Exception {
+		return ses.selectOne(NS + ".findByContact", dto);
 	}
 
 }

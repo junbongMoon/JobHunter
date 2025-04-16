@@ -165,11 +165,11 @@ public class AccountServiceImpl implements AccountService {
 		}
 		return account;
 	}
-
+	
 	@Override
-	public Boolean checkDuplicateEmail(String email, AccountType type) throws Exception {
+	public Boolean checkDuplicateContact(String target, AccountType type, String targetType) throws Exception {
 		AccountLoginDAO dao = getDAO(type);
-		AccountVO account = dao.findAccountByEmail(email);
+		AccountVO account = dao.findAccountByContact(target, targetType);
 		if (account != null) {
 			return true;
 		}
@@ -177,22 +177,19 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public Boolean checkDuplicateMobile(String mobile, AccountType type) throws Exception {
-		AccountLoginDAO dao = getDAO(type);
-		AccountVO account = dao.findAccountByMobile(mobile);
-
-		if (account != null) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public String getIdByContect(findIdDTO dto) throws Exception {
+	public Map<String, Object> getIdByContect(findIdDTO dto) throws Exception {
 		AccountLoginDAO dao = getDAO(dto.getAccountType());
-		String id = dao.getIdByContect(dto);
+		AccountVO account = dao.getIdByContect(dto);
+		String id = account.getAccountId();
+		
+		String maskingId = id.substring(0, 2) + "****" + id.substring(id.length() - 2);
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+		result.put("Id", maskingId);
+		result.put("Uid", account.getUid());
 
-		return id.substring(0, 2) + "****" + id.substring(id.length() - 2);
+		return result;
 	}
 
 }

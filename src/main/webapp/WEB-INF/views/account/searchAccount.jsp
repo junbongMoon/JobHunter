@@ -730,7 +730,7 @@ function verifyEmailCode() {
 	}
 
     $.ajax({
-		url: `/account/auth/email/\${code}`,
+		url: `/account/auth/email/verify/\${code}`,
 		method: "POST",
 		contentType: "application/json",
 		data: JSON.stringify({
@@ -766,15 +766,17 @@ function okEmail() {
 			businessNum: businessNum
 		}),
         success: (res) => {
-			if (!res) {
+			console.log('res: ', res);
+			if (!res.Id) {
 				window.publicModals.show("해당 연락처를 사용중인 아이디가 존재하지 않습니다.")
 			} else {
-				window.publicModals.show("해당 연락처를 사용중인 아이디 : " + res,
-				{
-					confirmText: '로그인페이지로 이동',
-					cancelText: '취소',
-					onConfirm: () => {location.href = "/account/login";}
-				});
+				window.publicModals.show(
+					"<div>해당 연락처를 사용중인 아이디 : " + res.Id + "</div>",
+					{
+						confirmText: '로그인페이지로 이동',
+						cancelText: '취소',
+						onConfirm: () => {location.href = "/account/login";}
+					});
 			}
         },
         error: (xhr) => {

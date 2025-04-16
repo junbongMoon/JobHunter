@@ -1,5 +1,7 @@
 package com.jobhunter.service.account;
 
+import java.util.Map;
+
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
 import com.jobhunter.model.account.findIdDTO;
@@ -15,9 +17,7 @@ public interface AccountService {
 
 	AccountVO findAccountByAutoLogin(String sessionId, AccountType type) throws Exception;
 
-	Boolean checkDuplicateEmail(String email, AccountType type) throws Exception;
+	Boolean checkDuplicateContact(String target, AccountType type, String targetType) throws Exception;
 
-	Boolean checkDuplicateMobile(String mobile, AccountType type) throws Exception;
-
-	String getIdByContect(findIdDTO dto) throws Exception;
+	Map<String, Object> getIdByContect(findIdDTO dto) throws Exception;
 }

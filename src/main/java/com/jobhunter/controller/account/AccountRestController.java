@@ -3,6 +3,7 @@ package com.jobhunter.controller.account;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -140,7 +141,7 @@ public class AccountRestController {
 		if (duple) {
 			try {
 				// 중복이면 true반환
-				if (accountService.checkDuplicateEmail(email, accountType)) {
+				if (accountService.checkDuplicateContact(email, accountType, "email")) {
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미 가입된 이메일입니다.");
 				}
 			} catch (Exception e) {
@@ -169,16 +170,13 @@ public class AccountRestController {
 	}
 
 	// 이메일 코드 인증용(인증 성공했다고 반환하는거, 계정잠금 해제는 /verify)
-	@PostMapping(value = "/auth/email/{code}", produces = "text/plain;charset=UTF-8")
+	@PostMapping(value = "/auth/email/verify/{code}", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> verifyCode(@PathVariable("code") String code,
 			@RequestBody Map<String, String> emailTmp, HttpSession session) {
 
 		String email = emailTmp.get("email");
 
 		EmailAuth emailAuth = (EmailAuth) session.getAttribute("emailCode:" + email);
-
-		System.out.println("이메일 인증하기 : " + emailAuth);
-		System.out.println("인증 이메일 : " + email);
 
 		if (emailAuth == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("인증 코드가 존재하지 않거나 만료되었습니다.");
@@ -217,7 +215,7 @@ public class AccountRestController {
 
 		try {
 			// 중복이면 true반환
-			if (accountService.checkDuplicateMobile(mobile, accountType)) {
+			if (accountService.checkDuplicateContact(mobile, accountType, "mobile")) {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미 가입된 전화번호입니다.");
 			}
 			return ResponseEntity.ok("사용 가능한 전화번호");
@@ -227,17 +225,17 @@ public class AccountRestController {
 	}
 
 	// 이메일이나 전화번호로 아이디 찾아주는 API
-	@PostMapping(value = "/find/id", produces = "text/plain;charset=UTF-8;")
-	public ResponseEntity<String> findId(@RequestBody findIdDTO dto, HttpSession session) {
-
-		String targetType = dto.getTargetType();
+	@PostMapping(value = "/find/id", produces = "application/json;charset=UTF-8;")
+	public ResponseEntity<Map<String, Object>> findId(@RequestBody findIdDTO dto, HttpSession session) {
+		Map<String, Object> result = new HashMap<>();
 		try {
-			String id = accountService.getIdByContect(dto);
+			result = accountService.getIdByContect(dto);
 			
-			return ResponseEntity.status(HttpStatus.OK).body(id);
+			return ResponseEntity.status(HttpStatus.OK).body(result);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error");
+			result.put("status", "error");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
 		}
 	}
 

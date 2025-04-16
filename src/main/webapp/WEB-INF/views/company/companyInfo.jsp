@@ -588,7 +588,7 @@ async function checkCodePwdToEmail() {
   }
 
   $.ajax({
-      url: `/account/auth/email/\${code}`,
+      url: `/account/auth/email/verify/\${code}`,
       method: "POST",
       contentType: "application/json",
       data: JSON.stringify({ email: sessionEmail }),
@@ -825,7 +825,7 @@ async function confirmEmail(changeEmail) {
   }
 
   $.ajax({
-    url: `/account/auth/email/\${code}`,
+    url: `/account/auth/email/verify/\${code}`,
     method: "POST",
     contentType: "application/json",
     data: JSON.stringify({ email: changeEmail }),

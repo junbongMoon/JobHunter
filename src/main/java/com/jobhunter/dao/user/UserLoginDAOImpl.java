@@ -89,31 +89,19 @@ public class UserLoginDAOImpl implements AccountLoginDAO {
 	public AccountVO getAccountByAutoLogin(String sessionId) throws Exception {
 		return ses.selectOne(NS + ".getAccountByAutoLogin", sessionId);
 	}
+	
+	@Override
+	public AccountVO findAccountByContact(String target, String targetType) throws Exception {
+		Map<String, Object> param = new HashMap<>();
+		param.put("targetType", targetType);
+		param.put("targetValue", target);
+		AccountVO result = ses.selectOne(NS + ".findByContact", param);
+		return result;
+	}
 
 	@Override
-	public AccountVO findAccountByEmail(String email) throws Exception {
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("targetType", "email");
-		map.put("targetValue", email);
-		
-		AccountVO result = ses.selectOne(NS + ".findByContect", map);
-		return result;
-	}
-	
-	@Override
-	public AccountVO findAccountByMobile(String mobile) throws Exception {
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("targetType", "mobile");
-		map.put("targetValue", mobile);
-		
-		AccountVO result = ses.selectOne(NS + ".findByContect", map);
-		return result;
-	}
-	
-	@Override
-	public String getIdByContect(findIdDTO dto) throws Exception {
-		AccountVO result = ses.selectOne(NS + ".findByContect", dto);
-		return result.getAccountId();
+	public AccountVO getIdByContect(findIdDTO dto) throws Exception {
+		return ses.selectOne(NS + ".findByContact", dto);
 	}
 
 }

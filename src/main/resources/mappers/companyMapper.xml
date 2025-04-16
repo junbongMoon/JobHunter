@@ -4,71 +4,74 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.companymapper">
 
-    <resultMap id="accountMap" type="com.jobhunter.model.account.AccountVO">
-        <result column="companyId" property="accountId"/>
-        <result column="companyName" property="accountName"/>
-    </resultMap>
+	<resultMap id="accountMap"
+		type="com.jobhunter.model.account.AccountVO">
+		<result column="companyId" property="accountId" />
+		<result column="companyName" property="accountName" />
+	</resultMap>
 
-    <update id="setVerificationFalse">
-        UPDATE company
-        SET requiresVerification = 'N'
-        WHERE
-        uid = #{uid}
-    </update>
-
-    <select id="isAuthVerifi" resultType="String">
-        select requiresVerification from company where companyId = #{id}
-    </select>
-
-    <select id="loginAccount" resultMap="accountMap">
-        select *, companyId as accountId, companyName as accountName,
-               NULL as socialId, NULL as isSocial
-        from company
-        where companyId = #{id} and password = sha1(md5(#{password}))
-    </select>
-    
-    <update id="setLastLoginDate">
-	    UPDATE company
-	    SET lastLoginDate = NOW()
-	    where uid = #{uid}
+	<update id="setVerificationFalse">
+		UPDATE company
+		SET requiresVerification = 'N'
+		WHERE
+		uid = #{uid}
 	</update>
-    
-    <update id="setAutoLogin">
-		UPDATE company SET autoLogin = #{autoLogin} 
+
+	<select id="isAuthVerifi" resultType="String">
+		select requiresVerification from company where companyId = #{id}
+	</select>
+
+	<select id="loginAccount" resultMap="accountMap">
+		select *, companyId as accountId, companyName as accountName,
+		NULL as socialId, NULL as isSocial
+		from company
+		where companyId = #{id} and password = sha1(md5(#{password}))
+	</select>
+
+	<update id="setLastLoginDate">
+		UPDATE company
+		SET lastLoginDate = NOW()
+		where uid = #{uid}
+	</update>
+
+	<update id="setAutoLogin">
+		UPDATE company SET autoLogin = #{autoLogin}
 		where companyId = #{id} and
 		password = sha1(md5(#{password}))
 	</update>
 
-    <select id="existsAccountId" parameterType="String" resultType="boolean">
-        SELECT EXISTS (SELECT 1 FROM company WHERE companyId = #{id})
-    </select>
+	<select id="existsAccountId" parameterType="String"
+		resultType="boolean">
+		SELECT EXISTS (SELECT 1 FROM company WHERE companyId = #{id})
+	</select>
 
-    <update id="increaseFailCount" parameterType="String">
-        UPDATE company SET loginCnt = loginCnt + 1 WHERE companyId = #{id}
-    </update>
+	<update id="increaseFailCount" parameterType="String">
+		UPDATE company SET loginCnt = loginCnt + 1 WHERE companyId = #{id}
+	</update>
 
-    <select id="getFailCount" parameterType="String" resultType="int">
-        SELECT loginCnt FROM company WHERE companyId = #{id}
-    </select>
+	<select id="getFailCount" parameterType="String"
+		resultType="int">
+		SELECT loginCnt FROM company WHERE companyId = #{id}
+	</select>
 
-    <update id="setRequiresVerification" parameterType="String">
-        UPDATE company SET requiresVerification = 'Y' WHERE companyId = #{id}
-    </update>
+	<update id="setRequiresVerification" parameterType="String">
+		UPDATE company SET requiresVerification = 'Y' WHERE companyId = #{id}
+	</update>
 
-    <update id="resetFailCount" parameterType="String">
-        UPDATE company SET loginCnt = 0 WHERE companyId = #{id}
-    </update>
-    
-    <select id="getAccountByUid" resultMap="accountMap">
-        select *, companyId as accountId, companyName as accountName,
-               NULL as socialId, NULL as isSocial
-        from company
-        where uid = #{uid}
-    </select>
-    
-    <!-- 여기까진 로그인용 -->
-    
-    <select id="getCompanyInfo" parameterType="String"
+	<update id="resetFailCount" parameterType="String">
+		UPDATE company SET loginCnt = 0 WHERE companyId = #{id}
+	</update>
+
+	<select id="getAccountByUid" resultMap="accountMap">
+		select *, companyId as accountId, companyName as accountName,
+		NULL as socialId, NULL as isSocial
+		from company
+		where uid = #{uid}
+	</select>
+
+	<!-- 여기까진 로그인용 -->
+
+	<select id="getCompanyInfo" parameterType="String"
 		resultType="com.jobhunter.model.company.CompanyVO">
 		SELECT * FROM company where uid = #{uid};
 	</select>
@@ -79,7 +82,8 @@
 		FROM company
 		WHERE uid = #{uid}
 		AND password
-		= SHA1(MD5(#{password}))
+		=
+		SHA1(MD5(#{password}))
 	</select>
 
 	<update id="updatePassword" parameterType="map">
@@ -88,73 +92,73 @@
 	</update>
 
 	<update id="updateEmail" parameterType="map">
-		UPDATE company SET email = #{email} WHERE uid = #{uid}
+		UPDATE company SET email
+		= #{email} WHERE uid = #{uid}
 	</update>
 
 	<update id="updateMobile" parameterType="map">
-		UPDATE company SET mobile = #{mobile} WHERE uid = #{uid}
+		UPDATE company SET
+		mobile = #{mobile} WHERE uid = #{uid}
 	</update>
-	
+
 	<select id="getAccountByAutoLogin" resultMap="accountMap">
-        select *, companyId as accountId, companyName as accountName,
-               NULL as socialId, NULL as isSocial
-        from company
-        where autoLogin = #{sessionId}
-    </select>
-    
-    <select id="findByEmail" resultMap="accountMap">
-		select *, companyId as
-		accountId, companyName as accountName
+		select *, companyId as accountId, companyName as accountName,
+		NULL as socialId, NULL as isSocial
 		from company
-		where email = #{email}
+		where autoLogin = #{sessionId}
 	</select>
-	
-	<select id="findByMobile" resultMap="accountMap">
-		select *, companyId as
-		accountId, companyName as accountName
-		from company
-		where mobile = #{mobile}
-	</select>
-	
-	<select id="findIsCompanyById" resultType="boolean" parameterType="string">
+
+	<select id="findIsCompanyById" resultType="boolean"
+		parameterType="string">
 		SELECT EXISTS (
-            SELECT 1 FROM company WHERE companyId = #{companyId}
-        )
+		SELECT 1 FROM company WHERE companyId = #{companyId}
+		)
 	</select>
-    
-    <insert id="registCompany" parameterType="com.jobhunter.model.company.CompanyRegisterDTO"
-        useGeneratedKeys="true" keyProperty="uid">
-	INSERT INTO `company` 
-		(`companyName`, `companyId`, `password`, `businessNum`, `representative`, `email`, `mobile`)
-	 VALUES 
-	 (#{companyName}, #{companyId}, sha1(md5(#{password})), #{businessNum}, #{representative}, #{email}, #{mobile});
+
+	<insert id="registCompany"
+		parameterType="com.jobhunter.model.company.CompanyRegisterDTO"
+		useGeneratedKeys="true" keyProperty="uid">
+		INSERT INTO `company`
+		(`companyName`, `companyId`, `password`, `businessNum`, `representative`, `email`,
+		`mobile`)
+		VALUES
+		(#{companyName}, #{companyId}, sha1(md5(#{password})), #{businessNum},
+		#{representative}, #{email}, #{mobile});
 	</insert>
-	
+
 	<update id="updateCompanyInfo"
 		parameterType="com.jobhunter.model.company.CompanyInfoDTO">
 		UPDATE company
 		SET
 		addr = #{addr},
-		detailAddr = #{detailAddr},
+		detailAddr =
+		#{detailAddr},
 		introduce = #{introduce},
 		homePage = #{homePage},
-		scale = #{scale}
+		scale =
+		#{scale}
 		WHERE uid = #{uid}
 	</update>
-	
-	<select id="getIdByContect" resultType="string">
-		select companyId from company where
+
+	<select id="findByContact" resultMap="accountMap">
+		select *, companyId as
+		accountId, companyName as accountName
+		from
+		company
+		WHERE
 		<choose>
 			<when test="targetType == 'email'">
-				email = #{targetValue} and 
+				email = #{targetValue}
 			</when>
 			<when test="targetType == 'mobile'">
 				mobile = #{targetValue}
 			</when>
 			<otherwise>
-				1 = 0 <!-- 예외 처리용, 조건이 없으면 무조건 실패하게 -->
+				1 = 0
 			</otherwise>
 		</choose>
-		AND businessNum = #{businessNum}
+		<if test="businessNum != null and businessNum != ''">
+			AND businessNum = #{businessNum}
+		</if>
 	</select>
 </mapper>

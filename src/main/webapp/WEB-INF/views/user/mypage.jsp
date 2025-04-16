@@ -791,7 +791,7 @@ async function checkCodePwdToEmail() {
   }
 
   $.ajax({
-      url: `/account/auth/email/\${code}`,
+      url: `/account/auth/email/verify/\${code}`,
       method: "POST",
       contentType: "application/json",
       data: JSON.stringify({ email: sessionEmail }),
@@ -815,14 +815,14 @@ function showNewPwdModal (text) {
   const failedText = modalText + text;
 
   window.publicModals.show(failedText,{
-    onConfirm: () => {changePassword(modalText); return false;},
+    onConfirm: () => {changePassword(); return false;},
     confirmText:'변경완료',
     cancelText:'취소',
     size_x:'350px'
   })
 }
 
-function changePassword(modalText) {
+function changePassword() {
   const changePassword = $('#changePassword').val();
   const checkPassword = $('#checkPassword').val();
   const pwdRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[a-zA-Z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,20}$/;
@@ -1023,7 +1023,7 @@ async function confirmEmail(changeEmail) {
   }
 
   $.ajax({
-    url: `/account/auth/email/\${code}`,
+    url: `/account/auth/email/verify/\${code}`,
     method: "POST",
     contentType: "application/json",
     data: JSON.stringify({ email: changeEmail }),

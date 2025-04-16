@@ -177,7 +177,7 @@
 		#{nationality});
 	</insert>
 	
-	<select id="findByContect" resultMap="accountMap">
+	<select id="findByContact" resultMap="accountMap">
 		select *, userId as
 		accountId, userName as accountName
 		from users
