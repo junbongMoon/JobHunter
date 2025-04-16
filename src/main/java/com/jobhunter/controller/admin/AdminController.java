@@ -26,19 +26,42 @@ import com.jobhunter.model.user.UserVO;
 import com.jobhunter.service.admin.AdminService;
 
 import lombok.RequiredArgsConstructor;
-
+/**
+ * 관리자 페이지 관련 컨트롤러입니다.
+ * <p>
+ * 관리자 페이지에서 홈페이지에 대한 관리를 맡습니다.
+ * </p>
+ */
 @Controller
 @RequiredArgsConstructor
 public class AdminController {
 
 	private final AdminService adminService;
 	
+	/**
+	 * 관리자 홈 페이지를 반환합니다.
+	 * 
+	 * @param locale 클라이언트 로케일 정보
+	 * @param model 뷰에 전달할 데이터
+	 * @return 관리자 홈 JSP 페이지 경로
+	 */
 	@RequestMapping(value = "/admin", method = RequestMethod.GET)
 	public String home(Locale locale, Model model) {
 
 		return "admin/adminhome";
 	}
 	
+	/**
+	 * 일반유저 목록을 조회하고 페이징 및 검색 조건을 적용합니다.
+	 * @param page 현재 페이지 번호
+	 * @param searchType 검색 타입 (예: name, email)
+	 * @param searchKeyword 검색어
+	 * @param statusFilter 상태 필터 (예: all, normal, blocked 등)
+	 * @param model 뷰에 전달할 데이터
+	 * @return 일반유저 목록 JSP 페이지 경로
+	 * 
+	 * @author 유지원
+	 */
 	@GetMapping("/admin/userList")
 	public String adminUserList(
 			@RequestParam(value = "page", defaultValue = "1") int page,
@@ -73,6 +96,15 @@ public class AdminController {
 		return "admin/adminUserList";
 	}
 	
+	/**
+	 * 특정 일반유저의 상세 정보를 조회합니다.
+	 *
+	 * @param model 뷰에 전달할 데이터
+	 * @param uid 일반유저 고유 번호
+	 * @return 일반유저 상세 정보 JSP 경로
+	 * 
+	 * @author 유지원
+	 */
 	@GetMapping("/admin/userDetail/{uid}")
 	public String adminUserDetail(Model model, @PathVariable("uid") int uid) {
 		try {
@@ -84,6 +116,18 @@ public class AdminController {
 		return "admin/adminUserDetail";
 	}
 	
+	/**
+	 * 기업유저 목록을 조회하고 페이징 및 검색 조건을 적용합니다.
+	 *
+	 * @param page 현재 페이지 번호
+	 * @param searchType 검색 타입 (예: companyName)
+	 * @param searchKeyword 검색어
+	 * @param statusFilter 상태 필터 (예: all, blocked 등)
+	 * @param model 뷰에 전달할 데이터
+	 * @return 기업유저 목록 JSP 페이지 경로
+	 * 
+	 * @author 유지원
+	 */
 	@GetMapping("/admin/companyList")
 	public String adminCompanyList(
 			@RequestParam(value = "page", defaultValue = "1") int page,
@@ -118,6 +162,15 @@ public class AdminController {
 		return "admin/adminCompanyList";
 	}
 	
+	/**
+	 * 특정 기업유저의 상세 정보를 조회합니다.
+	 *
+	 * @param model 뷰에 전달할 데이터
+	 * @param uid 기업유저 고유 번호
+	 * @return 기업유저 상세 정보 JSP 경로
+	 * 
+	 * @author 유지원
+	 */
 	@GetMapping("/admin/companyDetail/{uid}")
 	public String adminCompanyDetail(Model model, @PathVariable("uid") int uid) {
 		try {
@@ -129,6 +182,15 @@ public class AdminController {
 		return "admin/adminCompanyDetail";
 	}
 	
+	/**
+	 * 일반유저를 일정 기간 또는 영구적으로 정지시킵니다.
+	 *
+	 * @param uid 일반유저 고유 번호
+	 * @param request 요청 바디에 포함된 정지 기간(duration)과 정지 사유(reason)
+	 * @return 처리 결과를 담은 JSON 응답
+	 * 
+	 * @author 유지원
+	 */
 	@PostMapping("/admin/blockUser/{uid}")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> blockUser(
@@ -171,6 +233,14 @@ public class AdminController {
 	    }
 	}
 
+	/**
+	 * 일반유저 정지를 해제합니다.
+	 *
+	 * @param uid 일반유저 고유 번호
+	 * @return 처리 결과를 담은 JSON 응답
+	 * 
+	 * @author 유지원
+	 */
 	@PostMapping("/admin/unblockUser/{uid}")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> unblockUser(@PathVariable("uid") int uid) {
@@ -196,6 +266,15 @@ public class AdminController {
 	    }
 	}
 	
+	/**
+	 * 기업유저를 일정 기간 또는 영구적으로 정지시킵니다.
+	 *
+	 * @param uid 기업유저 고유 번호
+	 * @param request 요청 바디에 포함된 정지 기간(duration)과 사유(reason)
+	 * @return 처리 결과를 담은 JSON 응답
+	 * 
+	 * @author 유지원
+	 */
 	@PostMapping("/admin/blockCompany/{uid}")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> blockCompany(
@@ -238,6 +317,14 @@ public class AdminController {
 	    }
 	}
 
+	/**
+	 * 기업유저 정지를 해제합니다.
+	 *
+	 * @param uid 기업유저 고유 번호
+	 * @return 처리 결과를 담은 JSON 응답
+	 * 
+	 * @author 유지원
+	 */
 	@PostMapping("/admin/unblockCompany/{uid}")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> unblockCompany(@PathVariable("uid") int uid) {
