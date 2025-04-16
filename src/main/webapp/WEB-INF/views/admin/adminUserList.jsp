@@ -219,12 +219,14 @@
 				<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
 				<!-- 정지 모달 -->
-				<div class="modal fade" id="blockUserModal" tabindex="-1" aria-labelledby="blockUserModalLabel" aria-hidden="true">
+				<div class="modal fade" id="blockUserModal" tabindex="-1" aria-labelledby="blockUserModalLabel"
+					aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="blockUserModalLabel">유저 정지</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								<button type="button" class="btn-close" onclick="closeBlockUserModal()"
+									aria-label="Close"></button>
 							</div>
 							<div class="modal-body">
 								<form id="blockUserForm">
@@ -232,30 +234,36 @@
 									<div class="mb-3">
 										<label class="form-label">정지 기간</label>
 										<div class="form-check">
-											<input class="form-check-input" type="radio" name="blockDuration" id="duration3days" value="3">
+											<input class="form-check-input" type="radio" name="blockDuration"
+												id="duration3days" value="3">
 											<label class="form-check-label" for="duration3days">3일</label>
 										</div>
 										<div class="form-check">
-											<input class="form-check-input" type="radio" name="blockDuration" id="duration7days" value="7">
+											<input class="form-check-input" type="radio" name="blockDuration"
+												id="duration7days" value="7">
 											<label class="form-check-label" for="duration7days">7일</label>
 										</div>
 										<div class="form-check">
-											<input class="form-check-input" type="radio" name="blockDuration" id="duration30days" value="30">
+											<input class="form-check-input" type="radio" name="blockDuration"
+												id="duration30days" value="30">
 											<label class="form-check-label" for="duration30days">30일</label>
 										</div>
 										<div class="form-check">
-											<input class="form-check-input" type="radio" name="blockDuration" id="durationPermanent" value="permanent">
+											<input class="form-check-input" type="radio" name="blockDuration"
+												id="durationPermanent" value="permanent">
 											<label class="form-check-label" for="durationPermanent">영구</label>
 										</div>
 									</div>
 									<div class="mb-3">
 										<label for="blockReason" class="form-label">정지 사유</label>
-										<textarea class="form-control" id="blockReason" name="reason" rows="3" required></textarea>
+										<textarea class="form-control" id="blockReason" name="reason" rows="3"
+											required></textarea>
 									</div>
 								</form>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+								<button type="button" class="btn btn-secondary"
+									onclick="closeBlockUserModal()">취소</button>
 								<button type="button" class="btn btn-danger" onclick="submitBlockUser()">확인</button>
 							</div>
 						</div>
@@ -281,12 +289,26 @@
 						window.location.href = '/admin/userDetail/' + uid;
 					}
 
+					let blockUserModalInstance = null;
 					// 유저 계정 정지 모달 열기
 					function blockUser(uid) {
 						document.getElementById('blockUserId').value = uid;
 						document.getElementById('blockReason').value = '';
 						document.querySelector('input[name="blockDuration"][value="3"]').checked = true;
-						new bootstrap.Modal(document.getElementById('blockUserModal')).show();
+
+						const modalElement = document.getElementById('blockUserModal');
+						blockUserModalInstance = new bootstrap.Modal(modalElement, {
+							backdrop: 'static',
+							keyboard: false
+						});
+						blockUserModalInstance.show();
+					}
+
+					// 모달 닫기
+					function closeBlockUserModal() {
+						if (blockUserModalInstance) {
+							blockUserModalInstance.hide();
+						}
 					}
 
 					// 유저 계정 정지 제출
@@ -311,19 +333,19 @@
 								reason: reason
 							})
 						})
-						.then(response => response.json())
-						.then(data => {
-							if (data.success) {
-								alert('유저가 정지되었습니다.');
-								location.reload();
-							} else {
-								alert('유저 정지에 실패했습니다.');
-							}
-						})
-						.catch(error => {
-							console.error('Error:', error);
-							alert('처리 중 오류가 발생했습니다.');
-						});
+							.then(response => response.json())
+							.then(data => {
+								if (data.success) {
+									alert('유저가 정지되었습니다.');
+									location.reload();
+								} else {
+									alert('유저 정지에 실패했습니다.');
+								}
+							})
+							.catch(error => {
+								console.error('Error:', error);
+								alert('처리 중 오류가 발생했습니다.');
+							});
 					}
 
 					// 유저 계정 정지 해제
@@ -336,19 +358,19 @@
 									'Content-Type': 'application/json'
 								}
 							})
-							.then(response => response.json())
-							.then(data => {
-								if (data.success) {
-									alert('유저의 정지가 해제되었습니다.');
-									location.reload();
-								} else {
-									alert('유저 정지 해제에 실패했습니다.');
-								}
-							})
-							.catch(error => {
-								console.error('Error:', error);
-								alert('처리 중 오류가 발생했습니다.');
-							});
+								.then(response => response.json())
+								.then(data => {
+									if (data.success) {
+										alert('유저의 정지가 해제되었습니다.');
+										location.reload();
+									} else {
+										alert('유저 정지 해제에 실패했습니다.');
+									}
+								})
+								.catch(error => {
+									console.error('Error:', error);
+									alert('처리 중 오류가 발생했습니다.');
+								});
 						}
 					}
 				</script>
