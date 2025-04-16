@@ -41,6 +41,10 @@ public class AdminController {
 			System.out.println(monthchart);
 			model.addAttribute("daliyCharts", monthchart);
 			model.addAttribute("totalCharts", totalMonthchart);
+			if (!totalMonthchart.isEmpty()) {
+			    TotalStatusVODTO latestTotal = totalMonthchart.get(totalMonthchart.size() - 1);
+			    model.addAttribute("latestTotal", latestTotal);
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
