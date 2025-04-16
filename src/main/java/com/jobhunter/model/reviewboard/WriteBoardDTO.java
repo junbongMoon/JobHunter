@@ -15,7 +15,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class WriteBoardDTO {
-	
+	private int userId;
 	private int boardNo;
 	private int gonggoUid;
 	private int writer;
