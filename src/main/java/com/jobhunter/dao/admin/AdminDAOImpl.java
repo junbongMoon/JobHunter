@@ -1,5 +1,6 @@
 package com.jobhunter.dao.admin;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,17 +30,36 @@ public class AdminDAOImpl implements AdminDAO {
 	}
 
 	@Override
-	public List<UserVO> getUsersBySearch(Map<String, Object> params) throws Exception {
+	public List<UserVO> getUsersBySearch(String searchType, String searchKeyword, String statusFilter, int page, int pageSize) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("searchType", searchType);
+		params.put("searchKeyword", searchKeyword);
+		params.put("statusFilter", statusFilter);
+		
+		int validPage = Math.max(1, page);
+		params.put("offset", (validPage - 1) * pageSize);
+		params.put("pageSize", pageSize);
+		
 		return ses.selectList(NS + ".getUsersBySearch", params);
 	}
 
 	@Override
-	public int getTotalUserCount(Map<String, Object> params) throws Exception {
+	public int getTotalUserCount(String searchType, String searchKeyword, String statusFilter) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("searchType", searchType);
+		params.put("searchKeyword", searchKeyword);
+		params.put("statusFilter", statusFilter);
+		
 		return ses.selectOne(NS + ".getTotalUserCount", params);
 	}
 
 	@Override
-	public int blockUser(Map<String, Object> params) throws Exception {
+	public int blockUser(int uid, String blockDeadline, String reason) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uid", uid);
+		params.put("blockDeadline", blockDeadline);
+		params.put("reason", reason);
+		
 		return ses.update(NS + ".blockUser", params);
 	}
 	
@@ -59,17 +79,36 @@ public class AdminDAOImpl implements AdminDAO {
 	}
 
 	@Override
-	public List<CompanyVO> getCompaniesBySearch(Map<String, Object> params) throws Exception {
+	public List<CompanyVO> getCompaniesBySearch(String searchType, String searchKeyword, String statusFilter, int page, int pageSize) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("searchType", searchType);
+		params.put("searchKeyword", searchKeyword);
+		params.put("statusFilter", statusFilter);
+		
+		int validPage = Math.max(1, page);
+		params.put("offset", (validPage - 1) * pageSize);
+		params.put("pageSize", pageSize);
+		
 		return ses.selectList(NS + ".getCompaniesBySearch", params);
 	}
 
 	@Override
-	public int getTotalCompanyCount(Map<String, Object> params) throws Exception {
+	public int getTotalCompanyCount(String searchType, String searchKeyword, String statusFilter) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("searchType", searchType);
+		params.put("searchKeyword", searchKeyword);
+		params.put("statusFilter", statusFilter);
+		
 		return ses.selectOne(NS + ".getTotalCompanyCount", params);
 	}
 
 	@Override
-	public int blockCompany(Map<String, Object> params) throws Exception {
+	public int blockCompany(int uid, String blockDeadline, String reason) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uid", uid);
+		params.put("blockDeadline", blockDeadline);
+		params.put("reason", reason);
+		
 		return ses.update(NS + ".blockCompany", params);
 	}
 

@@ -1,9 +1,7 @@
 package com.jobhunter.service.admin;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -34,37 +32,18 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public List<UserVO> getUsersBySearch(String searchType, String searchKeyword, String statusFilter, int page, int pageSize) throws Exception {
-		Map<String, Object> params = new HashMap<>();
-		params.put("searchType", searchType);
-		params.put("searchKeyword", searchKeyword);
-		params.put("statusFilter", statusFilter);
-		
-		int validPage = Math.max(1, page);
-		params.put("offset", (validPage - 1) * pageSize);
-		params.put("pageSize", pageSize);
-		
-		return dao.getUsersBySearch(params);
+		return dao.getUsersBySearch(searchType, searchKeyword, statusFilter, page, pageSize);
 	}
 
 	@Override
 	public int getTotalUserCount(String searchType, String searchKeyword, String statusFilter) throws Exception {
-		Map<String, Object> params = new HashMap<>();
-		params.put("searchType", searchType);
-		params.put("searchKeyword", searchKeyword);
-		params.put("statusFilter", statusFilter);
-		
-		return dao.getTotalUserCount(params);
+		return dao.getTotalUserCount(searchType, searchKeyword, statusFilter);
 	}
 	
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean blockUser(int uid, Timestamp blockDeadline, String reason) throws Exception {
-		Map<String, Object> params = new HashMap<>();
-		params.put("uid", uid);
-		params.put("blockDeadline", blockDeadline);
-		params.put("blockReason", reason);
-		
-		return dao.blockUser(params) > 0;
+		return dao.blockUser(uid, blockDeadline.toString(), reason) > 0;
 	}
 	
 	@Override
@@ -86,37 +65,18 @@ public class AdminServiceImpl implements AdminService {
 	
 	@Override
 	public List<CompanyVO> getCompaniesBySearch(String searchType, String searchKeyword, String statusFilter, int page, int pageSize) throws Exception {
-		Map<String, Object> params = new HashMap<>();
-		params.put("searchType", searchType);
-		params.put("searchKeyword", searchKeyword);
-		params.put("statusFilter", statusFilter);
-		
-		int validPage = Math.max(1, page);
-		params.put("offset", (validPage - 1) * pageSize);
-		params.put("pageSize", pageSize);
-		
-		return dao.getCompaniesBySearch(params);
+		return dao.getCompaniesBySearch(searchType, searchKeyword, statusFilter, page, pageSize);
 	}
 	
 	@Override
 	public int getTotalCompanyCount(String searchType, String searchKeyword, String statusFilter) throws Exception {
-		Map<String, Object> params = new HashMap<>();
-		params.put("searchType", searchType);
-		params.put("searchKeyword", searchKeyword);
-		params.put("statusFilter", statusFilter);
-		
-		return dao.getTotalCompanyCount(params);
+		return dao.getTotalCompanyCount(searchType, searchKeyword, statusFilter);
 	}
 	
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean blockCompany(int uid, Timestamp blockDeadline, String reason) throws Exception {
-		Map<String, Object> params = new HashMap<>();
-		params.put("uid", uid);
-		params.put("blockDeadline", blockDeadline);
-		params.put("blockReason", reason);
-		
-		return dao.blockCompany(params) > 0;
+		return dao.blockCompany(uid, blockDeadline.toString(), reason) > 0;
 	}
 	
 	@Override
