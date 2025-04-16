@@ -121,6 +121,11 @@
 
             <!-- =================== [📌 헤더(네비게이션 바) 시작] =================== -->
             <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <!-- 잡헌터 홈으로 가기 -->
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home"></i>
+                    <span>홈페이지로...</span>
+                </a>
                 <!-- 📌 사이드바 토글 버튼 (모바일) -->
                 <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                     <i class="fa fa-bars"></i>
@@ -172,17 +177,6 @@
                             <img class="img-profile rounded-circle" 
                                 src="${pageContext.request.contextPath}/resources/adminpagematerials/img/undraw_profile.svg">
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                            aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                프로필
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                로그아웃
-                            </a>
-                        </div>
                     </li>
                 </ul>
             </nav>
