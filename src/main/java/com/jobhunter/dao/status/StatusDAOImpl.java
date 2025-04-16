@@ -84,4 +84,15 @@ public class StatusDAOImpl implements StatusDAO {
 		return ses.selectList(NS + ".getDailyStatusBetweenStartAndEndByTarget", param);
 	}
 
+	@Override
+	public List<TotalStatusVODTO> getTotalStatusBetweenAndRole(LocalDateTime start, LocalDateTime end)
+			throws Exception {
+		Map<String, Object> param = new HashMap<>();
+		param.put("start", start);
+		param.put("end", end);
+		
+		
+		return ses.selectList(NS + ".getTotalStatusBetweenStartAndEndByTarget", param);
+	}
+
 }

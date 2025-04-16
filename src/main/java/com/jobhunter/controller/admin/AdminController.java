@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.jobhunter.model.status.StatusVODTO;
+import com.jobhunter.model.status.TotalStatusVODTO;
 import com.jobhunter.service.status.StatusService;
 
 import lombok.RequiredArgsConstructor;
@@ -35,9 +36,11 @@ public class AdminController {
 		LocalDateTime end = now.plusDays(1).atStartOfDay().minusSeconds(1); // 오늘 23:59:59
 
 		try {
-			List<StatusVODTO> Monthchart = statusService.getDailyChartByPaging(start, end);
-			System.out.println(Monthchart);
-			model.addAttribute("daliyCharts", Monthchart);
+			List<StatusVODTO> monthchart = statusService.getDailyChartByPaging(start, end);
+			List<TotalStatusVODTO> totalMonthchart = statusService.getTotalStatusBetweenStartAndEnd(start, end);
+			System.out.println(monthchart);
+			model.addAttribute("daliyCharts", monthchart);
+			model.addAttribute("totalCharts", totalMonthchart);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

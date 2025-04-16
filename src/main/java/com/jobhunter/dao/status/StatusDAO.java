@@ -69,6 +69,8 @@ public interface StatusDAO {
 	 *
 	 */
 	List<StatusVODTO> getStatusBetweenAndRole(LocalDateTime start, LocalDateTime end) throws Exception;
+
+	List<TotalStatusVODTO> getTotalStatusBetweenAndRole(LocalDateTime start, LocalDateTime end) throws Exception;
     
 
 }

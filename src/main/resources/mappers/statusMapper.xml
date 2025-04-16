@@ -32,19 +32,10 @@
 	</select>
 
 	<select id="getTotalStatusByYesterDay" parameterType="map"
-		resultType="com.jobhunter.model.status.TotalStatusVODTO">
-		SELECT
-		total_statusNo AS totalStatusNo,
-		statusDate,
-		total_users AS totalUsers,
-		total_companies AS totalCompanies,
-		total_recruitmentNoticeCnt AS totalRecruitmentNoticeCnt,
-		total_registration AS totalRegistration,
-		total_reviewBoard AS
-		totalReviewBoard
+		resultMap="TotalStatusVODTOMap">
+		SELECT *
 		FROM total_status
-		WHERE statusDate BETWEEN #{start} AND
-		#{end}
+		WHERE statusDate BETWEEN #{start} AND #{end}
 	</select>
 
 	<insert id="insertTotalStatus"
@@ -97,6 +88,29 @@
 			column="new_recruitmentNoticeCnt" />
 		<result property="newRegistration" column="new_registration" />
 		<result property="newReviewBoard" column="new_reviewBoard" />
+	</resultMap>
+
+	<select id="getTotalStatusBetweenStartAndEndByTarget"
+		resultMap="TotalStatusVODTOMap">
+		SELECT *
+		FROM total_status
+		WHERE statusDate BETWEEN
+		#{start}
+		AND
+		#{end}
+	</select>
+
+	<resultMap id="TotalStatusVODTOMap"
+		type="com.jobhunter.model.status.TotalStatusVODTO">
+		<id property="totalStatusNo" column="total_statusNo" />
+		<result property="statusDate" column="statusDate" />
+		<result property="totalUsers" column="total_users" />
+		<result property="totalCompanies" column="total_companies" />
+		<result property="totalRecruitmentNoticeCnt"
+			column="total_recruitmentNoticeCnt" />
+		<result property="totalRegistration"
+			column="total_registration" />
+		<result property="totalReviewBoard" column="total_reviewBoard" />
 	</resultMap>
 
 </mapper>

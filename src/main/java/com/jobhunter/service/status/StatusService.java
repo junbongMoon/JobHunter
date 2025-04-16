@@ -87,4 +87,7 @@ public interface StatusService {
 	 *
 	 */
 	public List<StatusVODTO> getDailyChartByPaging(LocalDateTime start, LocalDateTime end) throws Exception;
+
+
+	public List<TotalStatusVODTO> getTotalStatusBetweenStartAndEnd(LocalDateTime start, LocalDateTime end) throws Exception;
 }
