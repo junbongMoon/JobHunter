@@ -61,6 +61,17 @@ public class RecruitmentNoticeRestController {
 			
 		}
 		
+		/**
+		 *  @author 문준봉
+		 *
+		 * <p>
+		 * 공고 상세정보를 조회하는 메서드
+		 * </p>
+		 * 
+		 * @param uid 공고 pk
+		 * @return ResponseEntity와 RecruitmentDetailInfo 공고 상세정보
+		 *
+		 */
 		@GetMapping("/detail/{uid}")
 		public ResponseEntity<RecruitmentDetailInfo> showRecruitmentDetailByUid(@PathVariable("uid") int uid){
 			ResponseEntity<RecruitmentDetailInfo> result = null;
@@ -77,6 +88,17 @@ public class RecruitmentNoticeRestController {
 			return result;
 		}
 		
+		/**
+		 *  @author 문준봉
+		 *
+		 * <p>
+		 * 공고를 마감시키는 메서드
+		 * </p>
+		 * 
+		 * @param uid 공고 pk
+		 * @return ResponseEntity와 성공했는지 여부
+		 *
+		 */
 		@PutMapping("/dueDate/{uid}")
 		public ResponseEntity<Boolean> ExpiredDueDateByUid(@PathVariable("uid") int uid){
 			ResponseEntity<Boolean> result = null;
