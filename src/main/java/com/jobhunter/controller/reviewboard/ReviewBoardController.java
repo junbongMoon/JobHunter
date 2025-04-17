@@ -106,7 +106,7 @@ public class ReviewBoardController {
 
 			if (account != null) {
 				int userId = account.getUid();
-				service.insertViewCount(userId, boardNo);
+				
 			}
 				
 			ReviewDetailViewDTO detail = service.getReviewDetail(boardNo);
@@ -130,7 +130,7 @@ public class ReviewBoardController {
 	}
 
 	@PostMapping(value = "/like", produces = "text/plain;charset=UTF-8")
-	public ResponseEntity<String> addLike(@RequestBody Likes likes, HttpSession session) {
+	public ResponseEntity<String> addLike(@RequestBody Likes likes, HttpSession session,Model model) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 
 		if (account == null || account.getUid() == 0) {
@@ -138,7 +138,8 @@ public class ReviewBoardController {
 		}
 
 		try {
-			service.addlikes(likes.getUserId(), likes.getBoardNo());
+			boolean liked = service.addlikes(likes.getUserId(), likes.getBoardNo());
+			model.addAttribute("isLiked", liked);
 			return ResponseEntity.ok("좋아요가 등록되었습니다.");
 		} catch (IllegalArgumentException e) {
 			// 여기에서 명확하게 메시지 설정
@@ -245,7 +246,7 @@ public class ReviewBoardController {
 			}
 
 			int userId = account.getUid();
-			service.insertViewCount(userId, boardNo); // 24시간 제한 로직 포함
+			service.insertViews(userId, boardNo,"REBOARD"); // 24시간 제한 로직 포함
 			int views = service.getReviewDetail(boardNo).getViews();
 
 			return ResponseEntity.ok(MassageCallDTO.builder().message(String.valueOf(views)).success(true).build());

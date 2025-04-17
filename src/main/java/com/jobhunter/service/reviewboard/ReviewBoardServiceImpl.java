@@ -161,7 +161,7 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	    return count == 0;  //조회 기록이 없다
 	}
 
-	public void insertViewCount(int userId, int boardNo,String viewType) throws Exception {
+	public void insertViews(int userId, int boardNo,String viewType) throws Exception {
 		// 최근 24시간 이내 조회했는지 검사
 		int count = Rdao.checkViewedWithHours(userId, boardNo);
 		if (count == 0) {
