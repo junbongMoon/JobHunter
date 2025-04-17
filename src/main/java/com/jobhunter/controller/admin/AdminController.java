@@ -1,9 +1,9 @@
 package com.jobhunter.controller.admin;
 
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -23,18 +23,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-
-import com.jobhunter.model.status.StatusVODTO;
-import com.jobhunter.model.status.TotalStatusVODTO;
-import com.jobhunter.service.status.StatusService;
-
-import lombok.RequiredArgsConstructor;
-
-
 import com.jobhunter.model.admin.Pagination;
 import com.jobhunter.model.company.CompanyVO;
+import com.jobhunter.model.status.StatusVODTO;
+import com.jobhunter.model.status.TotalStatusVODTO;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.service.admin.AdminService;
+import com.jobhunter.service.status.StatusService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -89,7 +84,7 @@ public class AdminController {
 		}
 
 		return "/admin/admincharts";
-
+	}
 	
 	/**
 	 * 일반유저 목록을 조회하고 페이징 및 검색 조건을 적용합니다.
