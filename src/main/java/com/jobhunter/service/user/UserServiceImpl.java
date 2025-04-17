@@ -169,6 +169,7 @@ public class UserServiceImpl implements UserService {
 		return dao.findByUidAndPassword(uid.toString(), dto.getPassword());
 	}
 
+
 	@Override
 	public void deleteContact(String uid, String type) throws Exception {
 		if(type.equals("mobile")) {
@@ -187,5 +188,5 @@ public class UserServiceImpl implements UserService {
 		dao.setDeleteAccount(uid);
 	}
 
-	
+
 }

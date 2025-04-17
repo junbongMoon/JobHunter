@@ -40,4 +40,5 @@ public interface UserDAO {
 
 	void setDeleteAccount(Integer uid) throws Exception;
 
+
 }

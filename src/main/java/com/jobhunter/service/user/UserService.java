@@ -1,6 +1,10 @@
 package com.jobhunter.service.user;
 
+
 import java.util.Map;
+
+import java.util.List;
+
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.user.KakaoUserInfoDTO;
@@ -29,6 +33,7 @@ public interface UserService {
 	boolean isUserIdExists(String userId) throws Exception;
 
 	AccountVO registUser(UserRegisterDTO dto) throws Exception;
+
 
 	void linkToKakao(KakaoUserInfoDTO userInfo) throws Exception;
 

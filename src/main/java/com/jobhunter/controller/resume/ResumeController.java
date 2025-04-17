@@ -42,14 +42,39 @@ import com.jobhunter.util.resume.FileProcessForResume;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 이력서 관련 기능을 처리하는 컨트롤러 클래스입니다.
+ * <p>
+ * 이력서 작성 폼 화면 출력 
+ * 이력서 최종 제출 및 저장
+ * 이력서 수정 및 업데이트
+ * 이력서 삭제
+ * 첨부파일 업로드 및 삭제
+ * </p>
+ * 
+ * @author 유지원
+ */
 @Controller
 @RequestMapping("/resume")
 @RequiredArgsConstructor
 public class ResumeController {
-
+	
+	/** 이력서 관련 서비스 */
 	private final ResumeService resumeService;
+	/** 이력서 파일 처리 클래스 */
 	private final FileProcessForResume fileProcessForResume;
 
+	/**
+	 * 이력서 작성 폼 페이지를 출력합니다.
+	 * <p>
+	 * 사용자는 이 페이지에서 이력서를 새로 작성할 수 있습니다.
+	 * 지역, 업직종, ENUM 정보, 사용자 정보 등을 미리 조회해서 View에 전달합니다.
+	 * </p>
+	 * 
+	 * @param model JSP에 전달할 데이터
+	 * @param session 로그인한 사용자 세션 정보
+	 * @return 이력서 작성 JSP 경로
+	 */
 	// 이력서 작성 폼 연결
 	@GetMapping("/form")
 	public String resumeForm(Model model, HttpSession session) {
@@ -86,18 +111,31 @@ public class ResumeController {
 		return "resume/resumeForm";
 	}
 
+	/**
+	 * 이력서 목록 페이지를 출력합니다.
+	 * <p>
+	 * 로그인한 사용자의 이력서 목록을 페이징 처리해서 보여줍니다.
+	 * <p>
+	 * 
+	 * @param session      로그인 세션
+	 * @param model        View에 전달할 데이터
+	 * @param page         현재 페이지 번호 (기본값 1)
+	 * @param pageSize     페이지당 표시할 이력서 수 (기본값 10)
+	 * @param searchTitle  제목 검색 키워드 (선택)
+	 * @return 이력서 목록 JSP 경로
+	 */
 	// 이력서 목록 페이지
 	@GetMapping("/list")
 	public String resumeFormList(HttpSession session, Model model, @RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "10") int pageSize) {
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(required = false) String searchTitle) {
 		try {
 			AccountVO account = (AccountVO) session.getAttribute("account");
 
 			int userUid = account.getUid();
-			List<ResumeVO> resumeList = resumeService.getResumeList(userUid, page, pageSize);
-			int totalResumes = resumeService.getTotalResumes(userUid);
+			List<ResumeVO> resumeList = resumeService.getResumeList(userUid, page, pageSize, searchTitle);
+			int totalResumes = resumeService.getTotalResumes(userUid, searchTitle);
 			int totalPages = (int) Math.ceil((double) totalResumes / pageSize);
-			
+
 			// 페이징 블록 계산
 			int blockSize = 5;
 			int currentBlock = (page - 1) / blockSize;
@@ -106,6 +144,7 @@ public class ResumeController {
 			if (endPage > totalPages) {
 				endPage = totalPages;
 			}
+			int totalBlocks = (int) Math.ceil((double) totalPages / blockSize);
 
 			model.addAttribute("resumeList", resumeList);
 			model.addAttribute("account", account);
@@ -115,6 +154,10 @@ public class ResumeController {
 			model.addAttribute("totalResumes", totalResumes);
 			model.addAttribute("startPage", startPage);
 			model.addAttribute("endPage", endPage);
+			model.addAttribute("currentBlock", currentBlock + 1);
+			model.addAttribute("totalBlocks", totalBlocks);
+			model.addAttribute("searchTitle", searchTitle);
+
 			return "resume/resumeFormList";
 		} catch (Exception e) {
 			model.addAttribute("error", "이력서 목록을 불러오는 중 오류가 발생했습니다.");
@@ -122,6 +165,15 @@ public class ResumeController {
 		}
 	}
 
+	/**
+	 * 선택된 지역(시/도)의 하위 지역(시/군/구) 리스트를 반환합니다.
+	 * <p>
+	 * AJAX로 동작하며 JSON 형태로 데이터를 반환합니다.
+	 * </p>
+	 * 
+	 * @param regionNo 선택된 지역 번호
+	 * @return 시/군/구 목록 (JSON)
+	 */
 	// 희망 근무 지역: 시/군/구 가져오기
 	@GetMapping("/getSigungu")
 	@ResponseBody
@@ -136,6 +188,15 @@ public class ResumeController {
 		}
 	}
 
+	/**
+	 * 선택된 업직종 대분류의 하위 소분류 리스트를 반환합니다.
+	 * <p>
+	 * AJAX로 동작하며 JSON 형태로 데이터를 반환합니다.
+	 * </p>
+	 * 
+	 * @param majorNo 선택된 대분류 번호
+	 * @return 소분류 목록 (JSON)
+	 */
 	// 희망 업직종: 소분류 가져오기
 	@GetMapping("/getSubCategory")
 	@ResponseBody
@@ -150,6 +211,15 @@ public class ResumeController {
 		}
 	}
 
+	/**
+	 * 이력서를 최종 저장합니다.
+	 * <p>
+	 * 유효성 검사를 통과한 이력서를 DB에 저장합니다.
+	 * </p>
+	 * 
+	 * @param resumeDTO 저장할 이력서 정보(JSON)
+	 * @return 저장 성공/실패 여부를 담은 응답 (JSON)
+	 */
 	// 저장
 	@PostMapping("/submit-final")
 	@ResponseBody
@@ -169,6 +239,16 @@ public class ResumeController {
 		}
 	}
 
+	/**
+	 * 이력서에 첨부할 파일을 서버에 업로드합니다.
+	 * <p>
+	 * 드래그 앤 드롭으로 업로드된 파일을 처리합니다.
+	 * </p>
+	 * 
+	 * @param file 업로드할 파일
+	 * @param request 요청 객체
+	 * @return 업로드 결과 (성공 여부, 파일 정보 포함 JSON)
+	 */
 	// 이력서 첨부파일 업로드
 	@PostMapping(value = "/uploadFile", produces = "application/json; charset=UTF-8")
 	@ResponseBody
@@ -195,6 +275,16 @@ public class ResumeController {
 		return result;
 	}
 
+	/**
+	 * 업로드된 파일을 삭제합니다.
+	 * <p>
+	 * 서버에 저장된 파일을 제거하고, 결과를 JSON으로 반환합니다.
+	 *</p>
+	 *
+	 * @param fileDTO 삭제할 파일 정보
+	 * @param request 요청 객체
+	 * @return 삭제 결과 (JSON)
+	 */
 	@PostMapping(value = "/deleteFile", produces = "application/json; charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> deleteFile(@RequestBody ResumeUpfileDTO fileDTO, HttpServletRequest request) {
@@ -210,6 +300,18 @@ public class ResumeController {
 		return result;
 	}
 
+	/**
+	 * 기존에 작성된 이력서를 수정할 수 있는 폼을 보여줍니다.
+	 * <p>
+	 * 사용자가 입력했던 내용들을 DB에서 불러와 view에 출력합니다.
+	 * 단, 기업이 확인 중인 이력서는 수정할 수 없습니다.
+	 * </p>
+	 * 
+	 * @param resumeNo 수정할 이력서 번호
+	 * @param model    View에 전달할 데이터
+	 * @param session  사용자 세션
+	 * @return 이력서 수정 폼 JSP 경로 또는 오류 페이지
+	 */
 	// 이력서 수정 페이지 -> /form과 합침 작업 예정
 	@GetMapping("/edit/{resumeNo}")
 	public String editResumeForm(@PathVariable int resumeNo, Model model, HttpSession session) {
@@ -221,7 +323,7 @@ public class ResumeController {
 				model.addAttribute("error", "기업에서 확인중인 이력서는 수정할 수 없습니다.");
 				return "error";
 			}
-			
+
 			// 기존 이력서 정보 조회
 			ResumeDetailDTO resumeDetail = resumeService.getResumeDetailWithAll(resumeNo);
 			model.addAttribute("resumeDetail", resumeDetail);
@@ -266,12 +368,23 @@ public class ResumeController {
 		}
 	}
 
+	/**
+	 * 기존에 작성된 이력서를 수정(저장)합니다.
+	 * <p>
+	 * 사용자가 이력서 수정 폼에서 입력한 내용을 받아와 DB에 반영합니다.
+	 * 수정 성공 시 이력서 목록 페이지로 리다이렉트 URL을 함께 반환합니다.
+	 * <p>
+	 * 
+	 * @param resumeNo   수정할 이력서의 번호
+	 * @param resumeDTO  클라이언트에서 보낸 이력서 데이터 (JSON 형식)
+	 * @return 수정 성공 여부와 메시지를 포함한 JSON 응답
+	 */
 	// 이력서 수정 처리
 	@PostMapping("/update/{resumeNo}")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> updateResume(@PathVariable int resumeNo,
 			@RequestBody ResumeDTO resumeDTO) {
-		try {			
+		try {
 			resumeDTO.setResumeNo(resumeNo);
 			resumeService.updateResume(resumeDTO);
 			Map<String, Object> response = new HashMap<>();

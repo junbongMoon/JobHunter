@@ -166,16 +166,7 @@
 		)
 	</select>
 
-	<insert id="registUser"
-		parameterType="com.jobhunter.model.user.UserRegisterDTO"
-		useGeneratedKeys="true" keyProperty="uid">
-		INSERT INTO `users`
-		(`userName`, `userId`, `password`, `mobile`, `email`, `accountType`,
-		`requiresVerification`, `isSocial`, `nationality`)
-		VALUES
-		(#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N',
-		#{nationality});
-	</insert>
+	
 	
 	<select id="findByContact" resultMap="accountMap">
 		select *, userId as
@@ -202,6 +193,7 @@
 		UPDATE users SET socialId = #{kakaoId}, email = #{email}, isSocial = 'Y' WHERE (uid = #{uid})
 	</update>
 	
+
 	<update id="deleteEmail">
 		UPDATE users
 		SET email = NULL
@@ -223,4 +215,17 @@
 		SET deleteDeadline = NOW() + INTERVAL 3 DAY 
 		WHERE uid = #{uid}
 	</update>
+	
+
+<insert id="registUser"
+		parameterType="com.jobhunter.model.user.UserRegisterDTO"
+		useGeneratedKeys="true" keyProperty="uid">
+		INSERT INTO `users`
+		(`userName`, `userId`, `password`, `mobile`, `email`, `accountType`,
+		`requiresVerification`, `isSocial`, `nationality`)
+		VALUES
+		(#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N',
+		#{nationality});
+	</insert>
+
 </mapper>
