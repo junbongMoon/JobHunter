@@ -26,7 +26,9 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ResumeDetailInfoBySubmit {
-	// pk
+	// 제출 pk
+	private int registrationNo;
+	// 이력서 pk
 	private int resumeNo;
 	// 제목
 	private String title;

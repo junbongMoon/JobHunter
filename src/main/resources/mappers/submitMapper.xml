@@ -4,7 +4,7 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.submitmapper">
 
-	<!-- 이력서 리스트 조회 -->
+	<!-- 이력서 리스트 조회 (공고에 제출된 전체 이력서 조회) -->
 	<select id="selectRecruitmentsByRecruitmentUid"
 		resultMap="ResumeDetailInfoBySubmitMap">
 		SELECT
@@ -12,57 +12,41 @@
 		r.saveType, r.userUid,
 
 		reg.registrationNo, reg.status,
-		reg.recruitmentNoticePk
-		AS regRecruitmentNoticePk,
-		reg.regDate,
-		reg.resumePk AS regResumePk,
+		reg.recruitmentNoticePk AS regRecruitmentNoticePk,
+		reg.regDate, reg.resumePk AS regResumePk,
 
 		jf.jobFormNo, jf.form AS jobForm,
 		m.meritNo, m.meritContent,
 		e.educationNo, e.educationLevel,
 		e.educationStatus, e.graduationDate, e.customInput,
-		h.historyNo,
-		h.companyName, h.position, h.jobDescription, h.startDate,
-		h.endDate,
+		h.historyNo, h.companyName, h.position, h.jobDescription, h.startDate, h.endDate,
 		l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
-
 		s.sigunguNo, s.name AS sigunguName, s.regionNo,
-		sc.subcategoryNo,
-		sc.jobName, sc.refMajorcategoryNo
+		sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo
 
-		FROM resume r
+		FROM (
+		SELECT r.resumeNo
+		FROM registration reg
+		JOIN resume r ON reg.resumePk = r.resumeNo
+		WHERE reg.recruitmentNoticePk = #{recruitmentUid}
+		ORDER BY r.resumeNo DESC
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
+		) AS pageResume
 
-		LEFT JOIN registration reg ON r.resumeNo = reg.resumePk
-		AND reg.registrationNo = (
-		  SELECT MAX(r2.registrationNo)
-		  FROM registration r2
-		  WHERE r2.resumePk = r.resumeNo AND r2.recruitmentNoticePk = #{recruitmentUid}
-		)
-		LEFT JOIN jobform jf ON r.resumeNo =
-		jf.resumeNo
+		JOIN resume r ON pageResume.resumeNo = r.resumeNo
+		JOIN registration reg ON reg.resumePk = r.resumeNo AND
+		reg.recruitmentNoticePk = #{recruitmentUid}
+		LEFT JOIN jobform jf ON r.resumeNo = jf.resumeNo
 		LEFT JOIN merit m ON r.resumeNo = m.resumeNo
-		LEFT JOIN
-		education e ON r.resumeNo = e.resumeNo
-		LEFT JOIN personalhistory h ON
-		r.resumeNo = h.resumeNo
+		LEFT JOIN education e ON r.resumeNo = e.resumeNo
+		LEFT JOIN personalhistory h ON r.resumeNo = h.resumeNo
 		LEFT JOIN license l ON r.resumeNo = l.resumeNo
 		LEFT JOIN where_resume_sigungu sr ON r.resumeNo = sr.refResumeNo
-		LEFT
-		JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
-		LEFT JOIN
-		jobtype_resume_sub jrs ON r.resumeNo = jrs.refResumeNo
-		LEFT JOIN
-		subcategory sc ON jrs.refSubNo = sc.subcategoryNo
-
-		WHERE r.resumeNo IN (
-		SELECT resumePk FROM registration
-		WHERE recruitmentNoticePk =
-		#{recruitmentUid}
-		)
+		LEFT JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
+		LEFT JOIN jobtype_resume_sub jrs ON r.resumeNo = jrs.refResumeNo
+		LEFT JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
 
 		ORDER BY r.resumeNo DESC
-		LIMIT #{startRowIndex},
-		#{rowCntPerPage}
 	</select>
 
 	<!-- 전체 개수 -->
@@ -76,6 +60,7 @@
 	<resultMap id="ResumeDetailInfoBySubmitMap"
 		type="com.jobhunter.model.submit.ResumeDetailInfoBySubmit">
 		<id property="resumeNo" column="resumeNo" />
+		<id property="registrationNo" column="registrationNo" />
 		<result property="title" column="title" />
 		<result property="payType" column="payType" />
 		<result property="pay" column="pay" />
@@ -91,7 +76,7 @@
 				column="regRecruitmentNoticePk" />
 			<result property="regDate" column="regDate" />
 			<result property="resumePk" column="regResumePk" />
-			
+
 		</association>
 
 		<collection property="jobForms"
@@ -221,18 +206,45 @@
 	</select>
 
 
-	<select id="selectMessageTargetInfo" resultType="com.jobhunter.model.message.MessageTargetInfoDTO">
+	<select id="selectMessageTargetInfo"
+		resultType="com.jobhunter.model.message.MessageTargetInfoDTO">
 		SELECT
 		r.userUid AS userNo,
 		c.uid AS companyNo,
 		c.companyName,
 		rc.title AS noticeTitle
 		FROM registration rg
-		JOIN resume r ON rg.resumePk = r.resumeNo
-		JOIN recruitmentnotice rc ON rg.recruitmentNoticePk = rc.uid
+		JOIN resume r
+		ON rg.resumePk = r.resumeNo
+		JOIN recruitmentnotice rc ON
+		rg.recruitmentNoticePk = rc.uid
 		JOIN company c ON rc.refCompany = c.uid
 		WHERE rg.resumePk = #{resumePk}
-		AND rg.recruitmentNoticePk = #{recruitmentNoticePk}
+		AND rg.recruitmentNoticePk =
+		#{recruitmentNoticePk}
+	</select>
+
+	<update id="ExpiredByEntireWatingRegistration">
+		update registration
+		SET status = 'EXPIRED'
+		WHERE status
+		= 'WAITING'
+		AND recruitmentNoticePk = ${uid}
+	</update>
+
+	<select id="getRegistrationVOLisByUidAndStatus"
+		parameterType="map"
+		resultType="com.jobhunter.model.submit.RegistrationVO">
+		SELECT
+		registrationNo,
+		status,
+		recruitmentNoticePk,
+		regDate,
+		resumePk
+		FROM registration
+		WHERE recruitmentNoticePk = #{uid}
+		AND status
+		= #{status}
 	</select>
 
 </mapper>

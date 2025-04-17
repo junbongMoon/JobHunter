@@ -19,13 +19,30 @@
 $(function() {
   console.log("companyUid:", companyUid);
   loadRecruitmentList(1, 10); // 페이지 로딩 시 자동 호출
+  
 
   // 공고 리스트의 값이 바뀌었을 때
   $('#recruitmentnoticeList').on('change', function () {
   const selectedRecruitmentNo = $(this).val();
 
+  clearResumeDetailForm();
+
+  if (selectedRecruitmentNo === '-1') {
+    // 이력서 셀렉트 초기화
+    $('#resumeList').empty().append(`<option value="-1">이력서를 선택하세요</option>`);
+    $('#resumePagination').empty();
+
+    // 상세 공고 정보 영역 초기화
+    $('.recruitDetailInfo').html('<p style="text-align:center; color:gray;">공고를 선택하면 상세정보가 표시됩니다.</p>');
+
+    // 이력서 상세 폼 초기화
+    clearResumeDetailForm();
+    return;
+  }
+
   if (selectedRecruitmentNo !== '-1') {
     loadSubmittedResumes(selectedRecruitmentNo); // 기본 1페이지 호출
+    loadRecruitmentDetail();
   } else {
     $('#resumeList').empty().append(`<option value="-1">이력서를 선택하세요</option>`);
   }
@@ -48,6 +65,11 @@ $(function() {
   selectedResumeNo = parseInt($(this).val());
   const selectedRecruitmentNo = $('#recruitmentnoticeList').val();
   recruitmentNoticePk = selectedRecruitmentNo;
+
+  if (selectedResumeNo === -1) {
+    clearResumeDetailForm();
+    return;
+  }
 
   if (selectedResumeNo !== -1) {
     // 저장한 데이터 불러오기
@@ -100,7 +122,9 @@ $(function() {
       }
       
       if(registrationStatusByResume == "WAITING"){
+        console.log("변경 전 상태 값 : " + registrationStatusByResume);
         changeStatusByregistration("CHECKED", selectedResumeNo, recruitmentNoticePk);
+        console.log("변경 후 상태 값 : " + registrationStatusByResume);
       }
 
       
@@ -243,6 +267,8 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
           $('#recruitmentnoticeList').append(option);
         });
 
+        loadRecruitmentDetail();
+
         // 페이징 영역 업데이트
         renderPagination(data);
       },
@@ -251,6 +277,85 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
       }
     });
   }
+
+  // 공고를 출력하는 함수
+  function loadRecruitmentDetail() {
+  const selectedRecruitmentNo = $('#recruitmentnoticeList').val();
+  if (selectedRecruitmentNo === '-1') {
+    $('.recruitDetailInfo').html('<p style="text-align:center; color:gray;">공고를 선택하면 상세정보가 표시됩니다.</p>');
+    return;
+  }
+
+  $.ajax({
+    url: `/recruitmentnotice/rest/detail/\${selectedRecruitmentNo}`,
+    type: "GET",
+    success: function (data) {
+      console.log("공고 상세정보:", data);
+
+      const html = `
+        <div class="form-section">
+          <label>공고 제목</label>
+          <input type="text" class="form-control" value="\${data.title}" readonly>
+
+          <label>근무 형태</label>
+          <input type="text" class="form-control" value="\${translateJobFormCode(data.workType)}" readonly>
+
+          <label>급여 유형</label>
+          <input type="text" class="form-control" value="\${translatePayType(data.payType)}" readonly>
+
+          <label>급여</label>
+          <input type="text" class="form-control" value="\${data.pay}" readonly>
+
+          <label>근무 기간</label>
+          <input type="text" class="form-control" value="\${data.period}" readonly>
+           <div class="text-end mt-3">
+          <button type='button' class="dueDateExpireBtn btn-navy" onclick = "dueDateExpired(\${data.uid})">공고 마감</button>
+          </div>
+        </div>
+      `;
+
+      $('.recruitDetailInfo').html(html);
+    },
+    error: function (xhr, status, error) {
+      console.error("공고 상세 불러오기 실패:", error);
+      $('.recruitDetailInfo').html('<p style="color: red;">공고 정보를 불러오는 중 오류가 발생했습니다.</p>');
+    }
+  });
+}
+  function dueDateExpired(uid){
+    const selectedRecruitmentNo = uid;
+
+    $.ajax({
+    url: `/recruitmentnotice/rest/detail/\${selectedRecruitmentNo}`,
+    type: "GET",
+    success: function (data) {
+      console.log("공고 마감 완료:", data);
+
+      // 공고 상세 초기화
+      $('.recruitDetailInfo').html('<p style="text-align:center; color:gray;">공고를 선택하면 상세정보가 표시됩니다.</p>');
+
+      // 이력서 셀렉트 초기화
+      $('#resumeList').empty().append(`<option value="-1">이력서를 선택하세요</option>`);
+      $('#resumePagination').empty();
+
+      // 이력서 상세 폼 초기화
+      clearResumeDetailForm();
+
+    },
+    error: function (xhr, status, error) {
+      console.error("공고 마감 실패:", error);
+      
+    }
+  });
+  }
+
+  // 공통 이력서 폼 초기화 함수
+function clearResumeDetailForm() {
+  $('#resumeDetailForm input').val('');
+  $('#resumeDetailForm textarea').val('');
+  $('#detailFileList').empty().append('<li style="color: gray;">첨부된 파일이 없습니다.</li>');
+}
+
 
   // 페이징 하는 함수
   function renderPagination(data) {
@@ -284,6 +389,17 @@ function loadRecruitmentList(pageNo, rowCntPerPage) {
     const pageNo = parseInt($(this).data('page'));
     loadRecruitmentList(pageNo, data.rowCntPerPage);
   });
+}
+
+function translatePayType(code){
+  const map = {
+    HOUR: '시급',
+    DATE: '일급',
+    WEEK: '주급',
+    MONTH: '월급',
+    YEAR: '연봉'
+  };
+  return map[code] || code; // 혹시 없는 코드면 그대로 출력
 }
 
 function translateJobFormCode(code) {
@@ -479,6 +595,28 @@ label {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
+
+.recruitmentByselectedArea{
+  margin-top: 20px;
+}
+
+.btn-navy {
+  background-color: #3d4d6a; /* 진한 남색 */
+  color: #fff;
+  padding: 0.5rem 1.2rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-navy:hover {
+  background-color: #1a252f; /* 더 진한 남색 hover */
+  color: #ffffff;
+  transform: translateY(-1px);
+}
 </style>
 
 <body>
@@ -514,6 +652,14 @@ label {
 					</div>
 				</div>
 			</form>
+
+      <form class="recruitmentByselectedArea">
+      <div class="form-section recruitDetailInfo">
+        <!-- 여기서 그냥 recruitment 출력하자 -->
+
+
+      </div>
+    </form>
 
       <form id="resumeDetailForm" style="margin-top: 2rem;">
         <div class="form-section">

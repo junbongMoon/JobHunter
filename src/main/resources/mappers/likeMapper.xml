@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jobhunter.mapper.likemapper">
+	<!-- 좋아요 수 조회 -->
+	<select id="selectLikeCnt" resultType="int">
+		SELECT COUNT(*)
+		FROM LikesLog
+		WHERE boardNo = #{uid}
+		AND likeType = #{boardType}
+	</select>
+
+	<!-- 좋아요 여부 확인 -->
+	<select id="selectHasLike" resultType="int">
+		SELECT COUNT(*)
+		FROM LikesLog
+		WHERE userId = #{userId}
+		AND boardNo = #{uid}
+		AND likeType = #{boardType}
+	</select>
+
+	<!-- 좋아요 등록 -->
+	<insert id="insertLikeLog">
+		INSERT INTO LikesLog (userId, boardNo, likeType)
+		VALUES (#{userId}, #{uid}, #{boardType})
+	</insert>
+
+	<!-- 좋아요 취소 -->
+	<delete id="deleteLikeLog">
+		DELETE FROM LikesLog
+		WHERE userId = #{userId}
+		AND boardNo = #{uid}
+		AND likeType = #{boardType}
+	</delete>
+
+</mapper>

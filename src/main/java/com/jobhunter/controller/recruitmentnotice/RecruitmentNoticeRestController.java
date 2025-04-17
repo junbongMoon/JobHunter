@@ -6,11 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 
@@ -57,6 +59,61 @@ public class RecruitmentNoticeRestController {
 			
 			return result;
 			
+		}
+		
+		/**
+		 *  @author 문준봉
+		 *
+		 * <p>
+		 * 공고 상세정보를 조회하는 메서드
+		 * </p>
+		 * 
+		 * @param uid 공고 pk
+		 * @return ResponseEntity와 RecruitmentDetailInfo 공고 상세정보
+		 *
+		 */
+		@GetMapping("/detail/{uid}")
+		public ResponseEntity<RecruitmentDetailInfo> showRecruitmentDetailByUid(@PathVariable("uid") int uid){
+			ResponseEntity<RecruitmentDetailInfo> result = null;
+			
+			try {
+				RecruitmentDetailInfo detailInfo = recService.getRecruitmentByUid(uid);
+				result = ResponseEntity.ok().body(detailInfo);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				result = ResponseEntity.badRequest().body(null);
+			}
+			
+			return result;
+		}
+		
+		/**
+		 *  @author 문준봉
+		 *
+		 * <p>
+		 * 공고를 마감시키는 메서드
+		 * </p>
+		 * 
+		 * @param uid 공고 pk
+		 * @return ResponseEntity와 성공했는지 여부
+		 *
+		 */
+		@PutMapping("/dueDate/{uid}")
+		public ResponseEntity<Boolean> ExpiredDueDateByUid(@PathVariable("uid") int uid){
+			ResponseEntity<Boolean> result = null;
+			boolean isSuccess = false;
+			try {
+				isSuccess = recService.modifyDueDateByUid(uid); // 여기서 수정
+				result = ResponseEntity.ok().body(isSuccess);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				result = ResponseEntity.badRequest().body(isSuccess);
+				
+			}
+			
+			return result;
 		}
 	
 	   

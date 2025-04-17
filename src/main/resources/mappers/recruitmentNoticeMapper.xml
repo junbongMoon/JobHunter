@@ -479,5 +479,37 @@
 		(#{recNo}, 'RECRUITMENT', 'DELETE')
 	</insert>
 
+	<update id="ExpiredDueDateByUid">
+		update recruitmentnotice
+		set dueDate = now()
+		WHERE uid
+		= #{uid}
+	</update>
+
+	<insert id="insertViewsLog" parameterType="map">
+		INSERT INTO ViewsLog
+		(userId, boardNo, viewType)
+		VALUES (#{userId}, #{boardNo}, #{viewType})
+	</insert>
+
+	<select id="isRecentlyViewed" parameterType="map"
+		resultType="boolean">
+		SELECT EXISTS (
+		SELECT 1
+		FROM ViewsLog
+		WHERE userId =
+		#{userId}
+		AND boardNo = #{boardNo}
+		AND viewType = #{viewType}
+		AND
+		viewedAt >= NOW() - INTERVAL 24 HOUR
+		)
+	</select>
+
+	<update id="increaseRecruitmentViewCnt" parameterType="int">
+		UPDATE recruitmentnotice
+		SET count = count + 1
+		WHERE uid = #{boardNo}
+	</update>
 
 </mapper>

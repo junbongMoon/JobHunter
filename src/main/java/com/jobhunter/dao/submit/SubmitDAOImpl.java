@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.jobhunter.model.message.MessageTargetInfoDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
+import com.jobhunter.model.submit.RegistrationVO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 import com.jobhunter.model.submit.Status;
 
@@ -123,7 +124,12 @@ public class SubmitDAOImpl implements SubmitDAO {
 		params.put("resumePk", resumePk);
 		params.put("recruitmentNoticePk", recruitmentNoticePk);
 		
-		return ses.update(NS + ".modifyStatus", params);
+		System.out.println("[DEBUG] 상태 변경 시도 >> " + params);
+
+		int affected = ses.update(NS + ".modifyStatus", params);
+		System.out.println("[DEBUG] 영향 받은 행 수: " + affected);
+		
+		return affected;
 		
 	}
 
@@ -174,6 +180,26 @@ public class SubmitDAOImpl implements SubmitDAO {
 		param.put("recruitmentNoticePk", recruitmentNoticePk);
 		
 		return ses.selectOne(NS +".selectMessageTargetInfo", param);
+	}
+
+
+	@Override
+	public void updateExpiredByRecUid(int uid) throws Exception {
+		// TODO Auto-generated method stub
+		ses.update(NS +".ExpiredByEntireWatingRegistration", uid);
+		
+	}
+
+
+	@Override
+	public List<RegistrationVO> selectRegistrationByUidAndStatus(int uid, Status status) {
+		Map<String, Object> param = new HashMap<>();
+		
+		param.put("uid", uid);
+		param.put("status", status);
+		
+		
+		return ses.selectList(NS + ".getRegistrationVOLisByUidAndStatus", param);
 	}
 
 

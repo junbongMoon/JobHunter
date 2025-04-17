@@ -61,4 +61,18 @@ public interface SubmitService {
 	 *
 	 */
 	public int expiredToSubmitBetween(LocalDateTime start, LocalDateTime end) throws Exception;
+
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 해당 공고에 지원한 상태가 WAITING인 제출 된 이력서들의 상태를 만료(EXPIRED) 상태로 변경 하는 메서드
+	 * </p>
+	 * 
+	 * @param uid 공고 uid
+	 * @throws Exception
+	 *
+	 */
+	public void expiredEntireWatingRegByRecUid(int uid) throws Exception;
 }

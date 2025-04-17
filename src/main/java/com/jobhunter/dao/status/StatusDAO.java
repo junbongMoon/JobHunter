@@ -2,7 +2,9 @@ package com.jobhunter.dao.status;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.status.StatusVODTO;
 import com.jobhunter.model.status.TotalStatusVODTO;
 
@@ -55,6 +57,20 @@ public interface StatusDAO {
 	 */
 	
 	int selectLogCntBetweenAndRole(LocalDateTime start, LocalDateTime end, String tagetType, String logType);
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 조건에 해당 되는 status List를 조회하는 메서드
+	 * </p>
+	 * 
+	 * @param pageRequestDTO
+	 *
+	 */
+	List<StatusVODTO> getStatusBetweenAndRole(LocalDateTime start, LocalDateTime end) throws Exception;
+
+	List<TotalStatusVODTO> getTotalStatusBetweenAndRole(LocalDateTime start, LocalDateTime end) throws Exception;
     
 
 }

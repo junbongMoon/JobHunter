@@ -43,4 +43,10 @@ public class TotalStatusVODTO {
      * 총 리뷰 수
      */
     private int totalReviewBoard;
+    
+    
+    
+    public String getFormattedDate() {
+        return statusDate.toLocalDate().toString(); // 또는 DateTimeFormatter.ofPattern("yyyy-MM-dd") 적용 가능
+    }
 }

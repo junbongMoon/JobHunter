@@ -419,15 +419,91 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	}
 
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 *  이전 공고를 조회하는 메서드
+	 * </p>
+	 * 
+	 * @param uid 현재공고번호
+	 * @return RecruitmentNotice 이전공고
+	 * @throws Exception
+	 *
+	 */
 	@Override
 	public RecruitmentNotice getPreviousPost(int uid) throws Exception {
 	    return recdao.selectPreviousPost(uid);
 	}
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 다음 공고를 조회하는 메서드
+	 * </p>
+	 * 
+	 * @param uid 현재공고번호
+	 * @return RecruitmentNotice 다음공고
+	 * @throws Exception
+	 *
+	 */
 	@Override
 	public RecruitmentNotice getNextPost(int uid) throws Exception {
 	    return recdao.selectNextPost(uid);
 	}
+
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고의 마감기한을 now()로 만드는 메서드
+	 * </p>
+	 * 
+	 * @param uid
+	 * @return
+	 * @throws Exception
+	 *
+	 */
+	@Override
+	public boolean modifyDueDateByUid(int uid) throws Exception {
+		boolean result = false;
+		if(recdao.updateDuedateExpireByUid(uid) > 0) {
+			result = true;
+		}
+		
+		return result;
+	}
+	
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 조회수 처리를 위한 메서드 
+	 * </p>
+	 * 
+	 * @param uid 공고의 pk
+	 * @param viewerUid 유저의 pk
+	 * @return 공고의 상세 정보
+	 * @throws Exception
+	 *
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public RecruitmentDetailInfo getRecruitmentWithViewLog(int uid, int viewerUid) throws Exception {
+	    // 조회 중복 체크
+	    boolean alreadyViewed = recdao.isRecentlyViewed(viewerUid, uid, "RECRUIT");
+
+	    if (!alreadyViewed && viewerUid > 0) {
+	        recdao.insertViewsLog(uid, viewerUid, "RECRUIT");
+	        recdao.increaseRecruitmentViewCnt(uid);
+	    }
+
+	    return getRecruitmentByUid(uid);
+	}
+
+
 
 
 }

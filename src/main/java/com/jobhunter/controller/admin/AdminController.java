@@ -1,5 +1,8 @@
 package com.jobhunter.controller.admin;
 
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -20,12 +23,21 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+
+import com.jobhunter.model.status.StatusVODTO;
+import com.jobhunter.model.status.TotalStatusVODTO;
+import com.jobhunter.service.status.StatusService;
+
+import lombok.RequiredArgsConstructor;
+
+
 import com.jobhunter.model.admin.Pagination;
 import com.jobhunter.model.company.CompanyVO;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.service.admin.AdminService;
 
 import lombok.RequiredArgsConstructor;
+
 /**
  * 관리자 페이지 관련 컨트롤러입니다.
  * <p>
@@ -36,6 +48,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminController {
 
+
+	private final StatusService statusService;
 	private final AdminService adminService;
 	
 	/**
@@ -50,6 +64,32 @@ public class AdminController {
 
 		return "admin/adminhome";
 	}
+
+  // 문준봉
+	@RequestMapping(value = "/admin/admincharts", method = RequestMethod.GET)
+	public String showCharts(Locale locale, Model model) {
+
+		LocalDate now = LocalDate.now();
+		LocalDateTime start = now.withDayOfMonth(1).atStartOfDay(); // 이번 달 1일 00:00:00
+		LocalDateTime end = now.plusDays(1).atStartOfDay().minusSeconds(1); // 오늘 23:59:59
+
+		try {
+			List<StatusVODTO> monthchart = statusService.getDailyChartByPaging(start, end);
+			List<TotalStatusVODTO> totalMonthchart = statusService.getTotalStatusBetweenStartAndEnd(start, end);
+			System.out.println(monthchart);
+			model.addAttribute("daliyCharts", monthchart);
+			model.addAttribute("totalCharts", totalMonthchart);
+			if (!totalMonthchart.isEmpty()) {
+			    TotalStatusVODTO latestTotal = totalMonthchart.get(totalMonthchart.size() - 1);
+			    model.addAttribute("latestTotal", latestTotal);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return "/admin/admincharts";
+
 	
 	/**
 	 * 일반유저 목록을 조회하고 페이징 및 검색 조건을 적용합니다.
@@ -348,5 +388,6 @@ public class AdminController {
 	        error.put("message", "처리 중 오류가 발생했습니다.");
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
 	    }
+
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import com.jobhunter.model.message.MessageTargetInfoDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
+import com.jobhunter.model.submit.RegistrationVO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 import com.jobhunter.model.submit.Status;
 
@@ -100,6 +101,11 @@ public interface SubmitDAO {
 
 
 	MessageTargetInfoDTO selectMessageTargetInfo(int resumePk, int recruitmentNoticePk);
+
+
+	List<RegistrationVO> selectRegistrationByUidAndStatus(int uid, Status status);
+	
+	void updateExpiredByRecUid(int uid) throws Exception;
 	
 	
 }

@@ -10,11 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
-import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 import com.jobhunter.model.submit.Status;
-import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
-import com.jobhunter.service.resume.ResumeService;
 import com.jobhunter.service.submit.SubmitService;
 
 import lombok.RequiredArgsConstructor;
@@ -66,10 +63,24 @@ public class SubmitController {
 		ResponseEntity<Boolean> result = null;
 		
 		submitService.changeStatus(status, resumePk, recruitmentNoticePk);
-		
-		
-		
+	
 		result = ResponseEntity.ok().body(true);
+		
+		return result;
+	}
+	
+	// 해당 공고에 제출된 모든 제출이력의 상태 중 WAITING인 것을 EXPIRED를 변경해주는 메서드
+	@PutMapping("/expire/{uid}")
+	public ResponseEntity<Boolean> expiredEntireWatingRegByRecUid(@PathVariable("uid") int uid){
+		ResponseEntity<Boolean> result = null;
+		
+		try {
+			submitService.expiredEntireWatingRegByRecUid(uid);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		return result;
 	}

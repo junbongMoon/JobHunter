@@ -32,15 +32,8 @@
 	</select>
 
 	<select id="getTotalStatusByYesterDay" parameterType="map"
-		resultType="com.jobhunter.model.status.TotalStatusVODTO">
-		SELECT
-		total_statusNo AS totalStatusNo,
-		statusDate,
-		total_users AS totalUsers,
-		total_companies AS totalCompanies,
-		total_recruitmentNoticeCnt AS totalRecruitmentNoticeCnt,
-		total_registration AS totalRegistration,
-		total_reviewBoard AS totalReviewBoard
+		resultMap="TotalStatusVODTOMap">
+		SELECT *
 		FROM total_status
 		WHERE statusDate BETWEEN #{start} AND #{end}
 	</select>
@@ -64,12 +57,60 @@
 		)
 	</insert>
 
-	<select id="getCountLogBetweenStartAndEndByTarget">
+	<select id="getCountLogBetweenStartAndEndByTarget"
+		resultType="int">
 		SELECT COUNT(*)
 		FROM CDLog
-		WHERE logRegDate BETWEEN #{start} AND #{end}
+		WHERE logRegDate BETWEEN
+		#{start}
+		AND #{end}
 		AND targetType = #{targetType}
-		AND logType = #{logType}
+		AND logType =
+		#{logType}
 	</select>
+
+	<select id="getDailyStatusBetweenStartAndEndByTarget"
+		resultMap="StatusVODTOMap">
+		SELECT *
+		FROM status
+		WHERE statusDate BETWEEN
+		#{start} AND
+		#{end}
+	</select>
+
+	<resultMap id="StatusVODTOMap"
+		type="com.jobhunter.model.status.StatusVODTO">
+		<id property="statusNo" column="statusNo" />
+		<result property="statusDate" column="statusDate" />
+		<result property="newUsers" column="new_users" />
+		<result property="newCompanies" column="new_companies" />
+		<result property="newRecruitmentNoticeCnt"
+			column="new_recruitmentNoticeCnt" />
+		<result property="newRegistration" column="new_registration" />
+		<result property="newReviewBoard" column="new_reviewBoard" />
+	</resultMap>
+
+	<select id="getTotalStatusBetweenStartAndEndByTarget"
+		resultMap="TotalStatusVODTOMap">
+		SELECT *
+		FROM total_status
+		WHERE statusDate BETWEEN
+		#{start}
+		AND
+		#{end}
+	</select>
+
+	<resultMap id="TotalStatusVODTOMap"
+		type="com.jobhunter.model.status.TotalStatusVODTO">
+		<id property="totalStatusNo" column="total_statusNo" />
+		<result property="statusDate" column="statusDate" />
+		<result property="totalUsers" column="total_users" />
+		<result property="totalCompanies" column="total_companies" />
+		<result property="totalRecruitmentNoticeCnt"
+			column="total_recruitmentNoticeCnt" />
+		<result property="totalRegistration"
+			column="total_registration" />
+		<result property="totalReviewBoard" column="total_reviewBoard" />
+	</resultMap>
 
 </mapper>
