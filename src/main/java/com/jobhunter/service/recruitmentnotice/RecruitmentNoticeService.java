@@ -170,6 +170,9 @@ public interface RecruitmentNoticeService {
 	 *
 	 */
 	boolean modifyDueDateByUid(int uid) throws Exception;
+
+
+	public RecruitmentDetailInfo getRecruitmentWithViewLog(int uid, int viewerUid) throws Exception;
 	
 
 }

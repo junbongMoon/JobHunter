@@ -119,4 +119,35 @@ public interface RecruitmentNoticeDAO {
 	 *
 	 */
 	int updateDuedateExpireByUid(int uid) throws Exception;
+	
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 조회기록을 insert하는 메서드
+	 * </p>
+	 * 
+	 * @param boardNo 게시물 pk값
+	 * @param userId 유저 pk값
+	 * @param viewType 게시물타입
+	 *
+	 */
+	public void insertViewsLog(int boardNo, int userId, String viewType);
+	
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 24시간 이내 게시물이 해당 유저에게 조회 됬는지 여부를 확인 하는 메서드
+	 * </p>
+	 * 
+	 * @param userId 유저 pk값
+	 * @param boardNo 게시물 pk값
+	 * @param viewType 게시물 타입
+	 * @return 24시간 이내 봤다면 true, 보지 않았다면 false
+	 *
+	 */
+	public boolean isRecentlyViewed(int userId, int boardNo, String viewType);
+	
+	public int increaseRecruitmentViewCnt(int boardNo);
 }

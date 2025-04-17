@@ -458,7 +458,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	 *  @author 문준봉
 	 *
 	 * <p>
-	 *
+	 * 공고의 마감기한을 now()로 만드는 메서드
 	 * </p>
 	 * 
 	 * @param uid
@@ -474,6 +474,33 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 조회수 처리를 위한 메서드 
+	 * </p>
+	 * 
+	 * @param uid 공고의 pk
+	 * @param viewerUid 유저의 pk
+	 * @return 공고의 상세 정보
+	 * @throws Exception
+	 *
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public RecruitmentDetailInfo getRecruitmentWithViewLog(int uid, int viewerUid) throws Exception {
+	    // 조회 중복 체크
+	    boolean alreadyViewed = recdao.isRecentlyViewed(viewerUid, uid, "RECRUIT");
+
+	    if (!alreadyViewed && viewerUid > 0) {
+	        recdao.insertViewsLog(uid, viewerUid, "RECRUIT");
+	        recdao.increaseRecruitmentViewCnt(uid);
+	    }
+
+	    return getRecruitmentByUid(uid);
 	}
 
 

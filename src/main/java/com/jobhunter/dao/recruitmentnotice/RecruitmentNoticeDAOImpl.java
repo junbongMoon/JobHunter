@@ -229,6 +229,40 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		
 		return ses.update(NS + ".ExpiredDueDateByUid", uid);
 	}
+	
+	public void insertViewsLog(int boardNo, int userId, String viewType) {
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("boardNo", boardNo);
+	    param.put("userId", userId);
+	    param.put("viewType", viewType); // ex) "RECRUITMENT"
+
+	    ses.insert(NS +".insertViewsLog", param);
+	}
+
+	public boolean isRecentlyViewed(int userId, int boardNo, String viewType) {
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("userId", userId);
+	    param.put("boardNo", boardNo);
+	    param.put("viewType", viewType);
+	    return ses.selectOne(NS + ".isRecentlyViewed", param);
+	}
+
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고의 조회 수를 1 올려주는 메서드
+	 * </p>
+	 * 
+	 * @param boardNo
+	 * @return 영향 받은 row의 수
+	 *
+	 */
+	@Override
+	public int increaseRecruitmentViewCnt(int boardNo) {
+	    return ses.update(NS + ".increaseRecruitmentViewCnt", boardNo);
+	}
 
 	
 

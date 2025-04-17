@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.Advantage;
@@ -427,6 +428,14 @@ public class RecruitmentNoticeController {
 		try {
 			RecruitmentDetailInfo detailInfo = recruitmentService.getRecruitmentByUid(uid);
 			
+			 if (req.getRequestURI().contains("detail")) {
+		            AccountVO loginUser = (AccountVO) req.getSession().getAttribute("account");
+		            int viewerUid = loginUser != null ? loginUser.getUid() : 0;
+
+		            detailInfo = recruitmentService.getRecruitmentWithViewLog(uid, viewerUid);
+		        } else {
+		            detailInfo = recruitmentService.getRecruitmentByUid(uid);
+		        }
 			
 			
 			// 우대 조건
