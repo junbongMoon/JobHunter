@@ -1,6 +1,5 @@
 package com.jobhunter.dao.company;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +64,6 @@ public class CompanyDAOImpl implements CompanyDAO {
 	@Override
 	public boolean findIsCompanyById(String companyId) throws Exception {
 		Boolean result = ses.selectOne(NS + ".findIsCompanyById", companyId);
-		System.out.println(result);
 	    return Boolean.TRUE.equals(result);
 	}
 
@@ -76,15 +74,6 @@ public class CompanyDAOImpl implements CompanyDAO {
 			return dto.getUid();
 		}
 		return 0;
-	}
-
-	@Override
-	public int countByCreatedDateBetweenAndRole(LocalDateTime start, LocalDateTime end, String string) {
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("start", start);
-		param.put("end", end);
-		param.put("string", string);
-		return ses.selectOne(NS +".countByCreatedDateBetweenAndRole", param);
 	}
 	
 	@Override
