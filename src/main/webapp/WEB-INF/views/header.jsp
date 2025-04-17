@@ -45,6 +45,9 @@
 			<!-- Swiper -->
 			<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 
+			<!-- jQuery -->
+			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 			<style>
 				.mypage-profile-card {
 					display: none;
@@ -185,7 +188,7 @@
 		</div>
 		</div>
 		<!-- 알럿 모달 -->
-		 
+		
 		<div class="index-page">
 			<header id="header" class="header d-flex align-items-center">
 				<div class="container-fluid container-xl position-relative d-flex align-items-center header-background">
@@ -199,7 +202,7 @@
 
 					<nav id="navmenu" class="navmenu">
 						<ul>
-							<li><a href="#hero" class="active">Home</a></li>
+							<li><a href="/" class="active">Home</a></li>
 							<li class="dropdown"><a href="#"><span>채용정보</span> <i
 										class="bi bi-chevron-down toggle-dropdown"></i></a>
 								<ul>
@@ -215,8 +218,8 @@
 									<c:when test="${sessionScope.account.isAdmin.toString() == 'Y'}">
 										<a class="nav-link dropdown-toggle" href="/admin" id="mypageDropdown"
 											role="button">👑Admin Page</a>
-										<!-- 메시지가 있을 때 띄울예정 -->
-										<div class="notification-home">💬</div>
+										<!-- 메시지가 있을 때-->
+											<div class="notification-home" style="display: none;">💬</div>
 									</c:when>
 									<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 										<a class="nav-link dropdown-toggle"
@@ -224,8 +227,8 @@
 											id="mypageDropdown" role="button">
 											My Page
 										</a>
-										<!-- 메시지가 있을 때 띄울예정 -->
-										<div class="notification-home">💬</div>
+										<!-- 메시지가 있을 때-->
+											<div class="notification-home" style="display: none;">💬</div>
 									</c:when>
 									<c:otherwise>
 										<a class="nav-link dropdown-toggle"
@@ -233,8 +236,8 @@
 											id="mypageDropdown" role="button">
 											My Page
 										</a>
-										<!-- 메시지가 있을 때 띄울예정 -->
-										<div class="notification-home">💬</div>
+										<!-- 메시지가 있을 때-->
+											<div class="notification-home" style="display: none;">💬</div>
 									</c:otherwise>
 								</c:choose>
 
@@ -305,6 +308,9 @@
 
 		</html>
 
+		<!-- 로그인 상태를 저장할 숨겨진 요소 추가 uid로 확인 -->
+		<div id="loginStatus" style="display: none;" data-uid="${sessionScope.account.uid}"></div>
+		
 		<script>
 			function openNotifications() {
 				const popup = window.open('/notification/list', 'notifications',
@@ -315,12 +321,58 @@
 			}
 
 
-			// 알림 개수 업데이트 함수 (추후 서버에서 받아온 데이터로 업데이트)
+			// 알림 개수 업데이트 함수
 			function updateNotificationCount(count) {
-				const countElement = document.querySelector('.notification-count');
-				if (countElement) {
-					countElement.textContent = count;
-					countElement.style.display = count > 0 ? 'flex' : 'none';
+				console.log("알림 개수 업데이트:", count);
+				
+				// 모든 알림 아이콘 요소 가져오기
+				const notificationHomes = document.querySelector('.notification-home');
+				// 모든 알림 개수 요소 가져오기
+				const countElements = document.querySelector('.notification-count');
+				
+				if(count > 0) {
+					notificationHomes.style.display = 'flex';
+					countElements.style.display = 'flex';
+				} else {
+					notificationHomes.style.display = 'none';
+					countElements.style.display = 'none';
 				}
+
+				countElements.textContent = count;
+
 			}
+			
+			// 페이지 로드 시 읽지 않은 알림 개수 가져오기
+			$(document).ready(function() {
+				console.log("페이지 로드 완료");
+				
+				// 초기에는 모든 알림 요소를 숨김
+				$('.notification-count').hide();
+				$('.notification-home').hide();
+				
+				const uid = document.getElementById('loginStatus').getAttribute('data-uid');
+
+				// 로그인한 사용자인 경우에만 알림 개수 가져오기
+				if(uid) {
+					console.log("로그인 사용자 감지, 알림 개수 요청");
+					$.ajax({
+						url: '/notification/unreadCount',
+						type: 'GET',
+						data: {
+							uid: uid
+						},
+						success: function(response) {
+							console.log("알림 개수 응답:", response);
+							if (response && response.count !== undefined) {
+								updateNotificationCount(response.count);
+							}
+						},
+						error: function(xhr, status, error) {
+							console.error('알림 개수 가져오기 실패:', error);
+						}
+					});
+				} else {
+					console.log("로그인 사용자 아님");
+				}
+			});
 		</script>
