@@ -1,5 +1,9 @@
 package com.jobhunter.util;
 
+import java.nio.file.AccessDeniedException;
+
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Component;
 
 import com.jobhunter.model.account.AccountVO;
@@ -30,5 +34,11 @@ public class AccountUtil {
 			e.printStackTrace();
 			return sessionAccount;
 		}
+	}
+	
+	public Boolean checkUid(HttpSession session, int uid) {
+		AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
+		
+		return sessionAccount != null && sessionAccount.getUid() == uid;
 	}
 }

@@ -20,7 +20,7 @@
 
         <!-- 🔹 대시보드 (메인 페이지로 이동) -->
         <li class="nav-item">
-            <a class="nav-link" href="index.jsp">
+            <a class="nav-link" href="/admin">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>대시보드</span>
             </a>
@@ -88,6 +88,24 @@
             </a>
         </li>
 
+        <!-- 🔹 유저 관리 섹션 -->
+        <div class="sidebar-heading">유저 관리</div>
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUser"
+                aria-expanded="true" aria-controls="collapseUser">
+                <i class="fas fa-fw fa-folder"></i>
+                <span>유저 관리</span>
+            </a>
+            <div id="collapseUser" class="collapse" aria-labelledby="headingUser"
+                data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">유저 관련:</h6>
+                    <a class="collapse-item" href="/admin/userList">일반 유저 목록</a>
+                    <a class="collapse-item" href="/admin/companyList">기업 유저 목록</a>
+                </div>
+            </div>
+        </li>
+
         <!-- 🔹 사이드바 토글 버튼 -->
         <div class="text-center d-none d-md-inline">
             <button class="rounded-circle border-0" id="sidebarToggle"></button>
@@ -103,6 +121,11 @@
 
             <!-- =================== [📌 헤더(네비게이션 바) 시작] =================== -->
             <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <!-- 잡헌터 홈으로 가기 -->
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home"></i>
+                    <span>홈페이지로...</span>
+                </a>
                 <!-- 📌 사이드바 토글 버튼 (모바일) -->
                 <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                     <i class="fa fa-bars"></i>
@@ -111,7 +134,7 @@
                 <!-- 🔹 네비게이션 바 -->
                 <ul class="navbar-nav ml-auto">
 
-                    <!-- 🔔 알림(Notification) -->
+                    <!-- 🔔 알림(Notification) 
                     <li class="nav-item dropdown no-arrow mx-1">
                         <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -133,9 +156,9 @@
                                 </div>
                             </a>
                         </div>
-                    </li>
+                    </li> -->
 
-                    <!-- ✉ 메시지(Messages) -->
+                    <!-- ✉ 메시지(Messages) 
                     <li class="nav-item dropdown no-arrow mx-1">
                         <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -144,27 +167,16 @@
                         </a>
                     </li>
 
-                    <div class="topbar-divider d-none d-sm-block"></div>
+                    <div class="topbar-divider d-none d-sm-block"></div> -->
 
                     <!-- 👤 사용자 정보 -->
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">${sessionScope.account.accountName}</span>
                             <img class="img-profile rounded-circle" 
                                 src="${pageContext.request.contextPath}/resources/adminpagematerials/img/undraw_profile.svg">
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                            aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                프로필
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                로그아웃
-                            </a>
-                        </div>
                     </li>
                 </ul>
             </nav>

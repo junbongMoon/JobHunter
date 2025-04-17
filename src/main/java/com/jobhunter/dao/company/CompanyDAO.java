@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
 
@@ -23,6 +24,13 @@ public interface CompanyDAO {
 
 	Integer registCompany(CompanyRegisterDTO dto) throws Exception;
 
-	int countByCreatedDateBetweenAndRole(LocalDateTime start, LocalDateTime end, String string);
+	int updateCompanyInfo(CompanyInfoDTO companyInfo) throws Exception;
+
+	int deleteMobile(String uid) throws Exception;
+
+	int deleteEmail(String uid) throws Exception;
+	
+	void setDeleteAccount(Integer uid) throws Exception;
+
 
 }

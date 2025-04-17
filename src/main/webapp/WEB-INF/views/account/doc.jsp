@@ -13,6 +13,317 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <section style="padding: 30px; background-color: #f8f9fa; border-radius: 12px;">
+  <h2 style="color: #2c3e50; font-family: 'Poppins', sans-serif;">🔐 공용모달 사용 설명서</h2>
+  <hr>
+
+  <h3>📌 기본 변수 선언</h3>
+  <p><strong>설명 :</strong> 원하는값 넣어서 사용. 필요한 요소만 쓰고 기본 문자만 출력할때는 사용안해도 무관합니다.</p>
+  <pre style="background: #eee; padding: 10px; border-radius: 8px;"><code>
+  <mark>{
+      confirmText : 확인버튼에 쓸 문구,
+      cancelText : 취소버튼에 쓸 문구,
+      onConfirm : 확인버튼 누르면 실행될 함수,
+      onCancel : 취소버튼 누르면 실행될 함수,
+      size_x : 모달창 좌우크기_ex. 10px,
+      size_y : 모달창 좌우크기_ex. 30px
+  };</mark>
+  </code></pre>
+
+  <hr>
+
+  <h3>✅ 1. 기본 호출 <small>(따로 기능 없음)</small></h3>
+  <p><strong>설명 :</strong> 그냥 문자만 출력하는 용도</p>
+  <p><strong>사용 :</strong> window.publicModals.show("원하는 문자 메시지")</p>
+  <p><strong>🚨 주의:</strong> 기본적으로 확인 버튼 하나만 같이 붙어나오고 확인 누르면 모달창 닫힘.</p>
+
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시 (기본출력)</strong><br>
+      <pre><code>
+          window.publicModals.show("여기에 원하는 메시지를 적어주세요");
+          
+          let message = "&lt;span&gt;HTML태그도 정상 동작합니다.&lt;/span&gt;"
+          
+          window.publicModals.show(message);
+      </code></pre>
+  </div>
+  <br/>
+
+  <hr>
+
+  <h3>✅ 2. 속성 변경 방법</h3>
+
+  <p><strong>속성 변경:</strong> <code>show(a, b)에 2번째 매개변수(b)에다 객체로해서 이름맞춰서 사용</code></p>
+  <p><strong>참고:</strong> <code>순서 상관없이 key 이름만 맞으면 됩니다.</code></p>
+  <p><strong>참고:</strong> <code>여러개 쓸때는 [ , ]로 구분해서 사용.</code></p>
+
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시 (확인버튼 변경)</strong><br>
+      <pre><code>
+      		let message = `잡다한 내용.`
+          	window.publicModals.show ( message, {confirmText:"이것은 확인버튼입니다."} );
+          	
+          	window.publicModals.show ( message, {
+          	                                       confirmText:"이것은 확인버튼입니다.",
+          	                                       onCancel:"취소버튼도 같이 사용 가능"
+          	                                    }
+          	                          );
+      </code></pre>
+  </div>
+
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시 (객체 만들어서 사용)</strong><br>
+      <pre><code>
+      		let message = `잡다한 내용.`
+      		
+      		const attr = {
+      			confirmText: "이것은 확인버튼입니다.",
+      			cancelText: "이것은 취소버튼입니다.",
+      			size_x: "50px"
+      		}
+      		
+      		
+          	window.publicModals.show ( message, attr );
+          
+      </code></pre>
+  </div>
+
+  <br>
+  
+  <hr>
+
+  <h3>✅ 3. 속성들</h3>
+
+  <p><strong>confirmText :</strong> <code>확인버튼에 들어가는 문구</code></p>
+  <p><strong>참고 : </strong>따로 안넣으면 그냥 "확인"이라고 나옵니다.</p>
+
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시</strong><br>
+      <pre><code>
+      		let message = `잡다한 내용.`
+      
+          	window.publicModals.show ( message, { confirmText: "확인하기" } );
+      </code></pre>
+  </div>
+
+  <br>
+  <br>
+  <hr>
+  <p><strong>cancelText :</strong> <code>취소버튼에 들어가는 문구</code></p>
+  <p><strong>참고 : </strong>이거 따로 안넣으면 취소버튼 없습니다. 이걸로 글자 넣어야 생겨요.</p>
+
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시</strong><br>
+      <pre><code>
+      		let message = `잡다한 내용.`
+      
+          	window.publicModals.show ( message, { cancelText: "취소!!!" } );
+      </code></pre>
+  </div>
+
+  <br>
+  <br>
+  <hr>
+  <p><strong>size_x :</strong> <code>모달창 좌우 크기</code></p>
+  <p><strong>참고 : </strong>css의 width에 넣는 크기단위(px, cm, %, em, v2, ...) 아무거나 넣어도 됩니다.</p>
+
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시</strong><br>
+      <pre><code>
+      		let message = `잡다한 내용.`
+      
+          	window.publicModals.show ( message, { size_x: "50px" } );
+      </code></pre>
+  </div>
+  
+  <br>
+  <br>
+  <hr>
+  <p><strong>size_y :</strong> <code>모달창 상하 크기</code></p>
+  <p><strong>참고 : </strong>css의 height에 넣는 크기단위(px, cm, %, em, v2, ...) 아무거나 넣어도 됩니다.</p>
+
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시</strong><br>
+      <pre><code>
+      		let message = `잡다한 내용.`
+      
+          	window.publicModals.show ( message, { size_y: "15em" } );
+      </code></pre>
+  </div>
+  
+  <br>
+  <br>
+  <hr>
+  <p><strong>onConfirm :</strong> <code>확인버튼 눌렀을때 실행될 함수</code></p>
+  <p><strong>참고 : </strong>()괄호 빼고 함수 이름만 넣어주세요. 괄호 넣으면 확인버튼없이 바로 실행됩니다.</p>
+  <p><strong>참고 : </strong>기본적으로 모달창 닫히는거까지 같이 있으니까 넣어둔 함수에서 return false하면 창 안닫힙니다.</p>
+
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시</strong><br>
+      <pre><code>
+      		let message = `잡다한 내용.`
+      		
+      		function okBtn() { console.log("확인버튼 눌림!") }
+      
+          	window.publicModals.show ( message, { onConfirm: okBtn } );
+          	
+          	=============================================================================
+          	
+          	function okBtn_noClose() { 
+          		console.log("확인버튼 눌렀는데도 창이 안닫혀요");
+          		return false;
+          	}
+      
+          	window.publicModals.show ( message, { onConfirm: okBtn_noClose } );
+      </code></pre>
+  </div>
+    
+  <br>
+  <br>
+  <hr>
+  <p><strong>onCancel :</strong> <code>취소버튼 눌렀을때 실행될 함수</code></p>
+  <p><strong>참고 : </strong>()괄호 빼고 함수 이름만 넣어주세요. 괄호 넣으면 확인버튼없이 바로 실행됩니다.</p>
+  <p><strong>참고 : </strong>cancelText로 취소버튼에 글자 달아줘야 취소버튼이 생겨서 이것도 넣을수있어요.</p>
+  <p><strong>참고 : </strong>취소버튼은 무조건 모달창 닫기도 같이 실행됩니다.</p>
+
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시</strong><br>
+      <pre><code>
+      		let message = `잡다한 내용.`
+      		
+      		function cancleBtn() { console.log("취소버튼 눌림!") }
+      
+          	window.publicModals.show ( message, { 
+          											cancelText: "이건 취소버튼이다."
+          											onConfirm: cancleBtn
+          										} );
+      </code></pre>
+  </div>
+  
+  <hr>
+
+  <h3>✅ 4. 함수사용</h3>
+
+  <p><strong>기본 :</strong> <code>함수 이름만 넣어서 사용</code></p>
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시 (인터셉터 매핑)</strong><br>
+      <pre><code>
+          let message = `잡다한 내용.`
+      		
+      		function okBtn() { console.log("확인버튼 눌림!") }
+      
+          	window.publicModals.show ( message, { onConfirm: okBtn } );
+      </code></pre>
+  </div>
+  <br>
+  <br>
+  <hr>
+  
+  <p><strong>함수에 다른함수넣기 :</strong> <code>함수 여러개 쓰고싶을경우 사용</code></p>
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시</strong><br>
+      <pre><code>
+          let message = `잡다한 내용.`
+          
+      		function okConsole() { 
+      			console.log("확인버튼 눌림!") 
+      		}
+      		
+      		function okAlert() { 
+      			alert("확인버튼 눌림!") 
+      		}
+      		
+      		
+      		function okBtn() { 
+      			okConsole();
+      			okAlert();
+      		}
+      
+          	window.publicModals.show ( message, { 
+          											onConfirm: okBtn 
+          										} );
+      </code></pre>
+  </div>
+  <br>
+  <br>
+  <hr>
+  
+  <p><strong>익명함수로 사용 :</strong> <code>() => {} 간단한 함수 사용하기 좋음</code></p>
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시</strong><br>
+      <pre><code>
+          let message = `잡다한 내용.`
+          
+      		function okConsole() { 
+      			console.log("확인버튼 눌림!") 
+      		}
+      		
+      		function okAlert() { 
+      			alert("확인버튼 눌림!") 
+      		}
+      		
+      
+          	window.publicModals.show ( message, { 
+          											onConfirm: () => {
+          												okConsole();
+          												okAlert();
+          											} 
+          										} 
+          							 );
+      </code></pre>
+  </div>
+  <br>
+  <br>
+  <hr>
+  
+  <p><strong>매개변수 필요한 함수 :</strong> <code>익명함수 응용</code></p>
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시 (인터셉터 매핑)</strong><br>
+      <pre><code>
+           let message = `잡다한 내용.`
+          
+      		function okConsole(okMessage) { 
+      			console.log(okMessage) 
+      		}
+      
+          	window.publicModals.show ( message, { 
+          											onConfirm: () => {
+          												okConsole("확인버튼 눌림!");
+          											} 
+          										} 
+          							 );
+      </code></pre>
+  </div>
+  <br>
+  <br>
+  <hr>
+  
+  <p><strong>모달창 안닫고 함수만 실행하기 :</strong> <code>함수 내부에서 return이 가장 좋지만 다른곳에도 사용할 함수라 return안되면 익명함수 응용으로 편하게</code></p>
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시 (인터셉터 매핑)</strong><br>
+      <pre><code>
+          let message = `잡다한 내용.`
+          
+      		function okConsole() { 
+      			console.log("모달창 안닫기!") 
+      		}
+      
+          	window.publicModals.show ( message, { 
+          											onConfirm: () => {
+          												okConsole();
+          												return false;
+          											} 
+          										} 
+          							 );
+      </code></pre>
+  </div>
+  <br>
+  <br>
+  <hr>
+</section>
+
+ <hr> <hr> <hr> <hr>
+
+<section style="padding: 30px; background-color: #f8f9fa; border-radius: 12px;">
   <h2 style="color: #2c3e50; font-family: 'Poppins', sans-serif;">🔐 권한 체크기 사용 설명서</h2>
   <hr>
 

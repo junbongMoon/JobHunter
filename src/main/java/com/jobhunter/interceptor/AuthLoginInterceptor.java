@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.jobhunter.customexception.NeedLoginException;
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.account.UnlockDTO;
 import com.jobhunter.util.RedirectUtil;
 
 @Component
@@ -18,8 +19,6 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
 	@Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-		
-		System.out.println("로그인체커");
 
         HttpSession session = request.getSession();
         AccountVO account = (AccountVO) session.getAttribute("account");
@@ -30,6 +29,10 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
         // 로그인 안 했거나 인증이 필요할 때
         if (account == null || "Y".equals(account.getRequiresVerification())) {
             RedirectUtil.saveRedirectUrl(request, session);
+            
+            if(account != null) {
+    	        session.setAttribute("unlockDTO", new UnlockDTO(account));
+            }
             
             if (isAsync) { // 비동기면 에러코드 보내서 뷰단에서 알아서 로그인페이지로 보내도록 유도
                 NeedLoginException.writeToResponse(response);

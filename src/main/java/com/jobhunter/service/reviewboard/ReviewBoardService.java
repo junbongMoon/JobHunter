@@ -2,6 +2,9 @@ package com.jobhunter.service.reviewboard;
 
 import java.util.List;
 
+import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.reviewboard.RPageRequestDTO;
+import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -32,5 +35,22 @@ public interface ReviewBoardService {
 
 	// 수정 저장
 	boolean updateReviewBoard(WriteBoardDTO modify) throws Exception;
+
+	boolean deleteBoard(int boardNo) throws Exception;
+
+	// 조회수 조회
+	boolean oneViewCount(int userId, int boardNo) throws Exception;
+
+	// 조회수 증가
+	void insertViews(int userId, int boardNo, String viewType) throws Exception;
+
+	RPageResponseDTO<ReviewBoardDTO> getPagedBoardList(RPageRequestDTO pageRequestDTO) throws Exception;
+
+	
+	
+
+	
+
+	
 
 }

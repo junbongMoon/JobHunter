@@ -2,6 +2,7 @@ package com.jobhunter.dao.user;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
@@ -83,12 +84,6 @@ public class UserDAOImpl implements UserDAO {
 		Boolean result = ses.selectOne(NS + ".findIsUserById", userId);
 	    return Boolean.TRUE.equals(result);
 	}
-
-	@Override
-	public AccountVO findByEmail(KakaoUserInfoDTO userInfo) throws Exception {
-		AccountVO result = ses.selectOne(NS + ".findByEmail", userInfo.getEmail());
-		return result;
-	}
 	
 	@Override
 	public int registUser(UserRegisterDTO dto) throws Exception {
@@ -100,12 +95,24 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public int countByCreatedDateBetweenAndRole(LocalDateTime start, LocalDateTime end, String string) {
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("start", start);
-		param.put("end", end);
-		param.put("string", string);
-		return ses.selectOne(NS + ".countByCreatedDateBetweenAndRole", param);
+	public int linkToKakao(KakaoUserInfoDTO userInfo) throws Exception {
+		return ses.update(NS + ".linkToKakao", userInfo);
+	}
+	
+	@Override
+	public int deleteMobile(String uid) throws Exception {
+		return ses.update(NS + ".deleteMobile", uid);
+	}
+	
+	@Override
+	public int deleteEmail(String uid) throws Exception {
+		return ses.update(NS + ".deleteEmail", uid);
+	}
+
+	@Override
+	public void setDeleteAccount(Integer uid) throws Exception {
+		ses.update(NS + ".setDeleteAccount", uid);
+
 	}
 
 	

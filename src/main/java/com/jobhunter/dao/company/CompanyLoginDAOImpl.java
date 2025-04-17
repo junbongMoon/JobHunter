@@ -1,5 +1,6 @@
 package com.jobhunter.dao.company;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.jobhunter.dao.account.AccountLoginDAO;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
+import com.jobhunter.model.account.findIdDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,9 +21,9 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 	private final String NS = "com.jobhunter.mapper.companymapper";
 	
 	@Override
-	public void setRequiresVerificationFalse(Map<String, String> param) throws Exception {
+	public void setRequiresVerificationFalse(int uid) throws Exception {
 		// 맵에서 타입(이메일, 전화번호)이랑 값 받아와서 인증필요여부 해제
-	    ses.update(NS + ".setVerificationFalse", param);
+	    ses.update(NS + ".setVerificationFalse", uid);
 	}
 
 	@Override
@@ -87,15 +89,17 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 	}
 	
 	@Override
-	public AccountVO findAccountByEmail(String email) throws Exception {
-		AccountVO result = ses.selectOne(NS + ".findByEmail", email);
+	public AccountVO findAccountByContact(String target, String targetType) throws Exception {
+		Map<String, Object> param = new HashMap<>();
+		param.put("targetType", targetType);
+		param.put("targetValue", target);
+		AccountVO result = ses.selectOne(NS + ".findByContact", param);
 		return result;
 	}
-	
+
 	@Override
-	public AccountVO findAccountByMobile(String mobile) throws Exception {
-		AccountVO result = ses.selectOne(NS + ".findByMobile", mobile);
-		return result;
+	public AccountVO getIdByContect(findIdDTO dto) throws Exception {
+		return ses.selectOne(NS + ".findByContact", dto);
 	}
 
 }

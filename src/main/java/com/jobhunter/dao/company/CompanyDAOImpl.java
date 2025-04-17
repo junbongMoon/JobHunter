@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
 
@@ -23,6 +24,12 @@ public class CompanyDAOImpl implements CompanyDAO {
 	@Override
 	public CompanyVO getCompanyInfo(String uid) throws Exception {
 		return ses.selectOne(NS+".getCompanyInfo", uid);
+	}
+	
+	@Override
+	public int updateCompanyInfo(CompanyInfoDTO companyInfo) throws Exception {
+		System.out.println(companyInfo);
+		return ses.update(NS + ".updateCompanyInfo", companyInfo);
 	}
 
 	@Override
@@ -78,6 +85,21 @@ public class CompanyDAOImpl implements CompanyDAO {
 		param.put("end", end);
 		param.put("string", string);
 		return ses.selectOne(NS +".countByCreatedDateBetweenAndRole", param);
+	}
+	
+	@Override
+	public int deleteMobile(String uid) throws Exception {
+		return ses.update(NS + ".deleteMobile", uid);
+	}
+	
+	@Override
+	public int deleteEmail(String uid) throws Exception {
+		return ses.update(NS + ".deleteEmail", uid);
+	}
+	
+	@Override
+	public void setDeleteAccount(Integer uid) throws Exception {
+		ses.update(NS + ".setDeleteAccount", uid);
 	}
 	
 	

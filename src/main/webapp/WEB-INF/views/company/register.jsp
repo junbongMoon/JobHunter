@@ -16,14 +16,12 @@
 <style>
 .main {
 	padding: 60px 20px;
-	background: #f8f9fa;
 	min-height: calc(100vh - 200px);
 }
 
 .login-container {
 	background: white;
 	border-radius: 20px;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 	max-width: 700px;
 	margin: 0 auto;
 }
@@ -438,7 +436,7 @@ mark {
 			<input class="full-width" type="text" id="representative" name="representative"
 				placeholder="대표자성명을 입력해주세요." required />
 			<input class="full-width" type="text" id="openDate"
-				placeholder="개업일자를 입력해주세요." required />
+				placeholder="개업일자를 입력해주세요.(YYYY-mm-dd)" required />
 			<input class="full-width" type="text" id="businessNum" name="businessNum"
 				placeholder="사업자등록번호를 입력해주세요." required />
 			<button type="button" id="businessBtn" class="btn-confirm full-width" onclick="business()">사업자확인</button>
@@ -501,7 +499,7 @@ mark {
 </main>
 
 <script>
-// 파이어베이스
+// #region 파이어베이스
 const firebaseConfig = {
     apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
     authDomain: "jobhunter-672dd.firebaseapp.com",
@@ -529,7 +527,7 @@ function firebaseCaptcha() {
         });
     }
 }
-// 파이어베이스
+// #endregion 파이어베이스
 function checkDuplicateId() {
 	$('#checkDuplicateIdBtn').prop('disabled', true);
     const companyId = $("#id").val();
@@ -581,7 +579,12 @@ async function sendPhoneCode() {
     	});
     } catch (error) {
         console.error("전화번호 인증 실패:", error);
-        window.publicModals.show("전화번호 인증 중 오류 발생.");
+        window.publicModals.show("인증번호 발송에 실패했습니다. http이슈 혹은 firebase횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.(포트폴리오용)",
+        	{
+        		confirmText: "백도어",
+        		cancelText: "취소",
+        		onConfirm: okMobile
+        	});
     }
 }
 
@@ -720,7 +723,7 @@ function verifyEmailCode() {
 	}
 
     $.ajax({
-		url: `/account/auth/email/\${code}`,
+		url: `/account/auth/email/verify/\${code}`,
 		method: "POST",
 		contentType: "application/json",
 		data: JSON.stringify({
@@ -773,8 +776,6 @@ function confirmAll() {
 		return false;
 	}
 
-	console.log($("#mobile").val());
-	console.log($("#email").val());
 	if(!$("#mobile").val() && !$("#email").val()) {
 		window.publicModals.show("이메일 혹은 전화번호 인증을 진행해 주세요.")
 		$("#pwdcheckInfoMark")[0].scrollIntoView({ behavior: 'smooth' });
@@ -785,7 +786,7 @@ function confirmAll() {
 		window.publicModals.show("개인정보 이용 동의에 체크해주세요.")
 		return false;
 	}
-
+	$("#businessNum").val($("#businessNum").val().replace(/[^\d]/g, ''))
 	return true;
 }
 
@@ -877,10 +878,15 @@ function confirmEmail() {
     }
 }
 
+document.getElementById('representative').addEventListener('input', ()=>{
+	$('#businessInfoMark').text(`* 포트폴리오 테스트용 : 사업자번호에 000-00-00000을 입력시 검사를 건너뜁니다.`).removeClass().addClass("info-defalt");
+});
+
 // 기업정보
 document.getElementById('openDate').addEventListener('input', formatDate);
 // 숫자 포맷팅 함수 (사업자번호)
 function formatDate(e) {
+	$('#businessInfoMark').text(`* 포트폴리오 테스트용 : 사업자번호에 000-00-00000을 입력시 검사를 건너뜁니다.`).removeClass().addClass("info-defalt");
     // 숫자 이외의 문자 제거
     let value = e.target.value.replace(/[^\d]/g, '');
     // 길이 제한 (8자리까지만)
@@ -901,6 +907,7 @@ function formatDate(e) {
 document.getElementById('businessNum').addEventListener('input', formatNumber);
 // 숫자 포맷팅 함수 (사업자번호)
 function formatNumber(e) {
+	$('#businessInfoMark').text(`* 포트폴리오 테스트용 : 사업자번호에 000-00-00000을 입력시 검사를 건너뜁니다.`).removeClass().addClass("info-defalt");
     // 숫자 이외의 문자 제거
     let value = e.target.value.replace(/[^\d]/g, '');
     // 길이 제한 (10자리까지만)
@@ -917,6 +924,7 @@ function formatNumber(e) {
 
     e.target.value = formatted;
 }
+
 // 사업자번호
 function business() {
 	let b_no = $('#businessNum').val();
@@ -977,9 +985,19 @@ function business() {
 }
 
 function okBusiness() {
+	$('#representative').prop('readonly', true);
+	$('#openDate').prop('readonly', true);
+	$('#businessNum').prop('readonly', true);
+
 	$('#businessBtn').hide()
 	$('#deleteBusinessBtn').show()
 	$('#businessInfoMark').text(`확인되었습니다.`).removeClass().addClass("info-ok");
+}
+
+function deleteBusiness() {
+	$('#representative').val('').prop('readonly', false);
+	$('#openDate').val('').prop('readonly', false);
+	$('#businessNum').val('').prop('readonly', false);
 }
 
 // ==유효성검사==
