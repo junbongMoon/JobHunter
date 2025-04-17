@@ -42,7 +42,7 @@
         </div>
       </section>
 
-      <!-- UserVO 상세 정보 섹션 -->
+      <!-- CompanyVO 상세 정보 섹션 -->
       <section data-aos="fade-up" data-aos-delay="150">
         <div class="section-title">
           <h2><i class="bi bi-person-vcard section-icon"></i>상세 정보</h2>
@@ -54,13 +54,13 @@
             <div>회사 홈페이지</div><div>로딩중...</div>
             <div class="introduce-section"><div class="introduce-title">회사소개</div><div class="introduce-content">로딩중...</div></div>
             <div class="edit-buttons">
-            <button class="btn-edit" onclick="modyfiInfoTapOpen()"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
+            <button class="btn-edit" onclick="modyfiInfoTapOpen(this)"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
             <button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
             </div>
         </div>
       </section>
       
-      <!-- UserVO 상세 정보 섹션 -->
+      <!-- CompanyVO 상세 정보 수정 섹션 -->
       <section data-aos="fade-up" data-aos-delay="200" style="display: none;" id="modifySection">
         <div class="section-title">
           <h2><i class="bi bi-person-vcard section-icon"></i>정보수정</h2>
@@ -82,7 +82,7 @@
                   </ul>
                 </div>
                 <input type="text" class="form-control" id="selectedAddress" style="display: none;" readonly>
-                  <input type="text" class="form-control" id="addressDetail" placeholder="상세주소를 입력하세요" style="display: none;">
+                  <input type="text" class="form-control" id="addressDetail" placeholder="상세주소를 입력하세요" style="display: none;" maxlength="190">
                   <div class="edit-buttons">
                     <button class="btn-search" id="resetAddressBtn" onclick="resetAddress()">초기화</button>
                     <button class="btn-cancel" id="deleteAddressBtn" onclick="deleteAddress()">주소 삭제</button>
@@ -102,7 +102,7 @@
               </div>
               
               <div>회사 홈페이지</div>
-              <div><input type="text" class="form-control" id="homePage" placeholder="홈페이지 링크를 입력하세요"></div>
+              <div><input type="text" class="form-control" id="homePage" placeholder="홈페이지 링크를 입력하세요" maxlength="190"></div>
               
             </div>
           </div>
@@ -113,7 +113,7 @@
           
           <div class="edit-buttons">
             <button onclick="cancleModify()" class="btn-cancel">취소</button>
-            <button onclick="confirmModify()" class="btn-confirm">변경 확인</button>
+            <button onclick="confirmModify(this)" class="btn-confirm">변경 확인</button>
           </div>
         </div>
       </section>
@@ -155,8 +155,6 @@ $(()=>{
 const uid = "${sessionScope.account.uid}"
 let sessionMobile = "${sessionScope.account.mobile}";
 let sessionEmail = "${sessionScope.account.email}";
-
-console.log(uid);
 
 const METHOD = {
   EMAIL: "email",
@@ -266,8 +264,14 @@ function getInfo() {
         updateBasicInfo(result);
         updateCompanyDetailInfo(result);
         updateCompanyModifyInfo(result);
+        
       },
-      error: (xhr) => window.publicModals.show("정보 로딩에 실패하였습니다. 잠시후 새로고침해 주세요.")
+      error: (xhr) => {
+        if (xhr.status == 404) {
+        	window.publicModals.show("장시간 대기로 로그인이 해제되었습니다.<br>새로고침 후 다시 시도해주세요.",{size_x:"350px"})
+        }
+        window.publicModals.show("서버와의 연결이 불안정하여<br>정보 로딩에 실패하였습니다.<br>잠시 후 다시 시도해주세요.")
+      }
   });
 }
 
@@ -283,8 +287,6 @@ function updateBasicInfo(companyInfo) {
 
 // 상세정보 로딩
 function updateCompanyDetailInfo(companyInfo) {
-  console.log(companyInfo);
-
   const companyDetailInfo = document.getElementById('companyDetailInfo');
 
   const values = [
@@ -329,29 +331,29 @@ function updateCompanyModifyInfo(result) {
 
   if (result.addr) {
     // 초기화용 주소 저장
-    document.getElementById('addressBackup').value = result.addr;
-    document.getElementById('selectedAddress').value = result.addr || '';
+    $('#addressBackup').val(result.addr);
+    $('#selectedAddress').val(result.addr || '');
     $('#selectedAddress').show()
     $('#addressDetail').show()
   }
   if (result.detailAddr) {
-    document.getElementById('detailAddressBackup').value = result.detailAddr;
-    document.getElementById('addressDetail').value = result.detailAddr || '';
+    $('detailAddressBackup').val(result.detailAddr);
+    $('addressDetail').val(result.detailAddr || '');
   }
 
   // 기업규모
   if (result.scale) {
-    document.getElementById('scale').value = result.scale;
+    $('#scale').val(result.scale);
   }
 
   // 홈페이지
   if (result.homePage) {
-    document.getElementById('homePage').value = result.homePage;
+    $('#homePage').val(result.homePage);
   }
 
   // 자기소개
   if (result.introduce) {
-    document.getElementById('introduce').value = result.introduce;
+    $('#introduce').val(result.introduce);
   }
 }
 
@@ -375,7 +377,10 @@ function modyfiInfoTapOpen () {
 }
 
 // 수정완료
-function confirmModify() {
+function confirmModify(btn) {
+
+  console.log(btn);
+
   const nullIfInvalid = (v) => (v === '-1' || v == null || v === '') ? null : v;
   const parseValidNumber = (v) => {
     const n = parseInt(removeComma(v), 10);
@@ -400,23 +405,20 @@ function confirmModify() {
     introduce
   };
 
-  console.log("${sessionScope.account.uid}");
   $.ajax({
     url: '/company/info/${sessionScope.account.uid}',
     type: 'POST',
     contentType: 'application/json',
     data: JSON.stringify(data),
     success: function (response) {
-      if (response.result == 'success') {
-        window.publicModals.show('정보가 성공적으로 수정되었습니다.');
-        cancleModify();
-      } else {
-        window.publicModals.show('정보 수정에 실패했습니다.');
-      }
+      window.publicModals.show('정보가 성공적으로 수정되었습니다.');
+      cancleModify();
     },
-    error: function (xhr, status, error) {
-      console.error(error);
-      window.publicModals.show('서버 오류가 발생했습니다.');
+    error: function (xhr) {
+      if (xhr.status == 404) {
+        window.publicModals.show("장시간 대기로 로그인이 해제되었습니다.<br>새로고침 후 다시 시도해주세요.",{size_x:"350px"})
+      }
+      window.publicModals.show("서버와의 연결이 불안정하여<br>정보 로딩에 실패하였습니다.<br>잠시 후 다시 시도해주세요.")
     }
   });
 }
@@ -432,7 +434,7 @@ function confirmModify() {
 
   function checkedDeleteAccount() {
     $.ajax({
-      url: `/company/delete/${sessionScope.account.uid}`,
+      url: `/company/info/${sessionScope.account.uid}`,
       method: "DELETE",
       contentType: "application/json",
       success: () => {window.publicModals.show("삭제 대기중...", {onConfirm : getInfo})},
@@ -490,14 +492,14 @@ function checkPassword() {
     contentType: "application/json",
     data: JSON.stringify({ uid, password: nowPassword }),
     success: (result) => {
-      if (result === true) {
+      if (result == true) {
         showVerificationOptions();
       } else {
         window.publicModals.show("비밀번호가 틀렸습니다.", failedDTO);
       }
     },
     error: (xhr) => {
-      window.publicModals.show("비밀번호 확인 중 오류 발생", failedDTO);
+      window.publicModals.show("서버가 불안정합니다. 잠시후 다시 시도해주세요.", failedDTO);
     }
   });
 
@@ -647,6 +649,9 @@ function changePassword(modalText) {
       window.publicModals.show("비밀번호 변경이 완료되었습니다.");
     },
     error: (xhr) => {
+      if (xhr.status == 404) {
+        window.publicModals.show("접속이 오래되어 로그인이 해제됐거나 잘못된 접근방식입니다. 새로고침 후 다시 시도해주세요.");
+      }
       const failedText = `<div style="color:red; margin-top: 10px; text-size:0.8em">비밀번호 변경중 오류가 발생했습니다. 잠시후 다시 시도해 주세요.</div>`
       showNewPwdModal(failedText)
       return;
@@ -683,9 +688,11 @@ function deleteMobileModal() {
       window.publicModals.show("연락처가 성공적으로 삭제되었습니다.");
       sessionMobile = null;
       $('#nowMobile').html('등록된 전화번호 없음')
-      getInfo()
     },
     error: function (xhr) {
+      if (xhr.status == 404) {
+        window.publicModals.show("접속이 오래되어 로그인이 해제됐거나 잘못된 접근방식입니다. 새로고침 후 다시 시도해주세요.");
+      }
       window.publicModals.show("삭제에 실패했습니다. 다시 시도해주세요.");
     }
   });
@@ -704,7 +711,6 @@ function deleteEmailModal() {
       window.publicModals.show("연락처가 성공적으로 삭제되었습니다.");
       sessionEmail = null;
       $('#nowEmail').html('등록된 이메일 없음')
-      getInfo()
     },
     error: function (xhr) {
       window.publicModals.show("삭제에 실패했습니다. 다시 시도해주세요.");
@@ -824,8 +830,6 @@ async function changeMobile(formattedNumber) {
     showCodeModal(()=>{changeMobile(formattedNumber)}, true);
     return
   }
-
-  console.log("6자리는 넘어왔는데");
 
   try {
     await confirmationResult.confirm(code); // 코드 틀렸으면 여기서  catch로 넘어감

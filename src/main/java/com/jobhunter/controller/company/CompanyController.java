@@ -15,6 +15,14 @@ import com.jobhunter.service.company.CompanyService;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 기업회원 관련 컨트롤러
+ * <p>
+ * 기업회원에 관련된 매핑을 담당하는 rest하지 않은 컨트롤러
+ * </p>
+ * 
+ * @author 육근우
+ */
 @Controller
 @RequestMapping("/company")
 @RequiredArgsConstructor
@@ -22,7 +30,7 @@ public class CompanyController {
 	private final CompanyService service;
 	
 	@GetMapping("/companyInfo")
-	public void showMypage() {
+	public void showCompanyInfo() {
 		
 	}
 	
@@ -35,7 +43,7 @@ public class CompanyController {
     public String processRegister(@ModelAttribute CompanyRegisterDTO dto, HttpServletRequest request, HttpSession session) {
         // 실제 회원가입 처리
         try {
-			AccountVO registAccount = service.registUser(dto);
+			AccountVO registAccount = service.registCompany(dto);
 			if (registAccount != null) {
 				session.setAttribute("account", registAccount);
 			}
@@ -44,7 +52,17 @@ public class CompanyController {
 		}
 
         String redirectUrl = (String) session.getAttribute("redirectUrl");
-		session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
-		return "redirect:" + (redirectUrl != null ? redirectUrl : "/");
+        session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
+
+        // 기본 경로 설정
+        if (redirectUrl == null || redirectUrl.isBlank()) {
+            redirectUrl = "/";
+        }
+
+        // 이미 쿼리스트링이 있는 경우 ?가 있으므로 &로 추가, 없으면 ?로 시작
+        String joinChar = redirectUrl.contains("?") ? "&" : "?";
+        redirectUrl += joinChar + "firstLogin=company";
+
+        return "redirect:" + redirectUrl;
     }
 }

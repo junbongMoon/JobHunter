@@ -132,17 +132,22 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-	public AccountVO loginOrRegisterKakao(KakaoUserInfoDTO userInfo) throws Exception {
+	public Map<String, Object> loginOrRegisterKakao(KakaoUserInfoDTO userInfo) throws Exception {
+		Map<String, Object> result = new HashMap<String, Object>();
+		
 		AccountVO accountVo = null;
 		Integer uid = dao.findByKakao(userInfo);
+		
 		if (uid == null) {
 			uid = dao.registKakao(userInfo);
+			result.put("isFirst", true);
 		}
 		
 		if (uid != null) {
 			accountVo = dao.loginByKakaoId(userInfo.getKakaoId());
+			result.put("accountVo", accountVo);
 		}
-		return accountVo;
+		return result;
 	}
 	
 	@Override
@@ -175,6 +180,11 @@ public class UserServiceImpl implements UserService {
 				throw new Exception();
 			}
 		}
+	}
+	
+	@Override
+	public void setDeleteAccount(Integer uid) throws Exception {
+		dao.setDeleteAccount(uid);
 	}
 
 	

@@ -31,6 +31,10 @@ public class CompanyInfoDTO {
     }
 
     public void setDetailAddr(String detailAddr) {
+    	if (detailAddr != null && detailAddr.length() > 190) {
+            detailAddr = detailAddr.substring(0, 190);
+        }
+    	
         this.detailAddr = nullIfEmpty(detailAddr);
     }
 
@@ -39,6 +43,10 @@ public class CompanyInfoDTO {
     }
 
     public void setHomePage(String homePage) {
+    	if (homePage != null && homePage.length() > 190) {
+    		homePage = homePage.substring(0, 190);
+        }
+    	
         this.homePage = nullIfEmpty(homePage);
     }
 

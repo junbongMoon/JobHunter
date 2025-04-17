@@ -753,3 +753,10 @@
     flex-direction: column;
     height: 100%;
   }
+
+  .nameChangeBtn {
+    font-size: 0.8em;
+    color: var(--accent-color);
+    margin-left: 0.3em;
+    cursor: pointer;
+  }

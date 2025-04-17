@@ -87,5 +87,10 @@ public class CompanyDAOImpl implements CompanyDAO {
 		return ses.update(NS + ".deleteEmail", uid);
 	}
 	
+	@Override
+	public void setDeleteAccount(Integer uid) throws Exception {
+		ses.update(NS + ".setDeleteAccount", uid);
+	}
+	
 	
 }

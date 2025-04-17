@@ -1,5 +1,6 @@
 package com.jobhunter.controller.user;
 
+import java.nio.file.AccessDeniedException;
 import java.util.Collections;
 
 import javax.servlet.http.HttpSession;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jobhunter.customexception.NeedLoginException;
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.etc.ResponseJsonMsg;
 import com.jobhunter.model.user.ContactUpdateDTO;
 import com.jobhunter.model.user.PasswordDTO;
 import com.jobhunter.model.user.UserInfoDTO;
@@ -127,6 +129,25 @@ public class UserRestController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+	
+	@DeleteMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<ResponseJsonMsg> deleteCompany(@PathVariable("uid") Integer uid, HttpSession session) {
+		try {
+
+			if (!accUtil.checkUid(session, uid)) {
+				throw new AccessDeniedException("잘못된 사용자");
+			}
+
+			service.setDeleteAccount(uid);
+			return ResponseEntity.ok().body(ResponseJsonMsg.success());
+		} catch (AccessDeniedException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseJsonMsg.notFound());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseJsonMsg.error());
 		}
 	}
 

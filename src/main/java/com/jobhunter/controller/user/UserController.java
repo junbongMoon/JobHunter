@@ -1,5 +1,7 @@
 package com.jobhunter.controller.user;
 
+import java.util.Map;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,7 +49,11 @@ public class UserController {
 			accessToken = service.getKakaoToken(code, redirectUri);
 			// 2. Access Token으로 사용자 정보 요청
 			userInfo = service.getKakaoInfo(accessToken);
-			AccountVO account = service.loginOrRegisterKakao(userInfo);
+			Map<String, Object> result = service.loginOrRegisterKakao(userInfo);
+			
+			AccountVO account = (AccountVO) result.get("accountVo");
+			Boolean isFirst = (Boolean) result.get("isFirst");
+			
 			if (account != null) {
 				session.setAttribute("account", account);
 				
@@ -56,6 +62,22 @@ public class UserController {
 				autoLoginCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
 				autoLoginCookie.setPath("/");
 				response.addCookie(autoLoginCookie);
+				
+				if (isFirst) {
+					String redirectUrl = (String) session.getAttribute("redirectUrl");
+					session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
+
+					// 기본 경로 설정
+					if (redirectUrl == null || redirectUrl.isBlank()) {
+					    redirectUrl = "/";
+					}
+
+					// 이미 쿼리스트링이 있는 경우 ?가 있으므로 &로 추가, 없으면 ?로 시작
+					String joinChar = redirectUrl.contains("?") ? "&" : "?";
+					redirectUrl += joinChar + "firstLogin=true";
+
+					return "redirect:" + redirectUrl;
+				}
 				
 				String redirectUrl = (String) session.getAttribute("redirectUrl");
 				session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
@@ -143,7 +165,17 @@ public class UserController {
 		}
 
         String redirectUrl = (String) session.getAttribute("redirectUrl");
-		session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
-		return "redirect:" + (redirectUrl != null ? redirectUrl : "/");
+        session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
+
+        // 기본 경로 설정
+        if (redirectUrl == null || redirectUrl.isBlank()) {
+            redirectUrl = "/";
+        }
+
+        // 이미 쿼리스트링이 있는 경우 ?가 있으므로 &로 추가, 없으면 ?로 시작
+        String joinChar = redirectUrl.contains("?") ? "&" : "?";
+        redirectUrl += joinChar + "firstLogin=true";
+
+        return "redirect:" + redirectUrl;
     }
 }

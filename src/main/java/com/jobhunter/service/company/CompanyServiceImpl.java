@@ -24,7 +24,6 @@ import com.jobhunter.model.company.BusinessRequestDTO;
 import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
-import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.util.PropertiesTask;
 
 import lombok.RequiredArgsConstructor;
@@ -100,7 +99,6 @@ public class CompanyServiceImpl implements CompanyService {
             businesses.add(business);
             requestBody.put("businesses", businesses);
 
-            System.out.println("requestBody : " + requestBody);
             // HttpClient 구성
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -129,7 +127,7 @@ public class CompanyServiceImpl implements CompanyService {
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public 
-	AccountVO registUser(CompanyRegisterDTO dto) throws Exception {
+	AccountVO registCompany(CompanyRegisterDTO dto) throws Exception {
 		Integer uid = dao.registCompany(dto);
 		return dao.findByUidAndPassword(uid.toString(), dto.getPassword());
 	}
@@ -145,6 +143,11 @@ public class CompanyServiceImpl implements CompanyService {
 				throw new Exception();
 			}
 		}
+	}
+
+	@Override
+	public void setDeleteAccount(Integer uid) throws Exception {
+		dao.setDeleteAccount(uid);
 	}
 	
 }

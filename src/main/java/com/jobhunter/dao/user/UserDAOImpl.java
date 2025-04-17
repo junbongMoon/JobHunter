@@ -107,5 +107,10 @@ public class UserDAOImpl implements UserDAO {
 		return ses.update(NS + ".deleteEmail", uid);
 	}
 
+	@Override
+	public void setDeleteAccount(Integer uid) throws Exception {
+		ses.update(NS + ".setDeleteAccount", uid);
+	}
+
 	
 }

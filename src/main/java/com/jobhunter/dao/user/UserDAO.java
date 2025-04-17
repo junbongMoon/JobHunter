@@ -38,4 +38,6 @@ public interface UserDAO {
 
 	int deleteMobile(String uid) throws Exception;
 
+	void setDeleteAccount(Integer uid) throws Exception;
+
 }

@@ -20,10 +20,12 @@ public interface CompanyService {
 
 	boolean isCompanyIdExists(String companyId) throws Exception;
 
-	AccountVO registUser(CompanyRegisterDTO dto) throws Exception;
+	AccountVO registCompany(CompanyRegisterDTO dto) throws Exception;
 
 	boolean updateCompanyInfo(CompanyInfoDTO companyInfo) throws Exception;
 
 	void deleteContact(String uid, String type) throws Exception;
+
+	void setDeleteAccount(Integer uid) throws Exception;
 
 }

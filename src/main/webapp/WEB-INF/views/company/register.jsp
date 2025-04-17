@@ -436,7 +436,7 @@ mark {
 			<input class="full-width" type="text" id="representative" name="representative"
 				placeholder="대표자성명을 입력해주세요." required />
 			<input class="full-width" type="text" id="openDate"
-				placeholder="개업일자를 입력해주세요." required />
+				placeholder="개업일자를 입력해주세요.(YYYY-mm-dd)" required />
 			<input class="full-width" type="text" id="businessNum" name="businessNum"
 				placeholder="사업자등록번호를 입력해주세요." required />
 			<button type="button" id="businessBtn" class="btn-confirm full-width" onclick="business()">사업자확인</button>
@@ -878,10 +878,15 @@ function confirmEmail() {
     }
 }
 
+document.getElementById('representative').addEventListener('input', ()=>{
+	$('#businessInfoMark').text(`* 포트폴리오 테스트용 : 사업자번호에 000-00-00000을 입력시 검사를 건너뜁니다.`).removeClass().addClass("info-defalt");
+});
+
 // 기업정보
 document.getElementById('openDate').addEventListener('input', formatDate);
 // 숫자 포맷팅 함수 (사업자번호)
 function formatDate(e) {
+	$('#businessInfoMark').text(`* 포트폴리오 테스트용 : 사업자번호에 000-00-00000을 입력시 검사를 건너뜁니다.`).removeClass().addClass("info-defalt");
     // 숫자 이외의 문자 제거
     let value = e.target.value.replace(/[^\d]/g, '');
     // 길이 제한 (8자리까지만)
@@ -902,6 +907,7 @@ function formatDate(e) {
 document.getElementById('businessNum').addEventListener('input', formatNumber);
 // 숫자 포맷팅 함수 (사업자번호)
 function formatNumber(e) {
+	$('#businessInfoMark').text(`* 포트폴리오 테스트용 : 사업자번호에 000-00-00000을 입력시 검사를 건너뜁니다.`).removeClass().addClass("info-defalt");
     // 숫자 이외의 문자 제거
     let value = e.target.value.replace(/[^\d]/g, '');
     // 길이 제한 (10자리까지만)
@@ -918,6 +924,7 @@ function formatNumber(e) {
 
     e.target.value = formatted;
 }
+
 // 사업자번호
 function business() {
 	let b_no = $('#businessNum').val();
@@ -978,9 +985,19 @@ function business() {
 }
 
 function okBusiness() {
+	$('#representative').prop('readonly', true);
+	$('#openDate').prop('readonly', true);
+	$('#businessNum').prop('readonly', true);
+
 	$('#businessBtn').hide()
 	$('#deleteBusinessBtn').show()
 	$('#businessInfoMark').text(`확인되었습니다.`).removeClass().addClass("info-ok");
+}
+
+function deleteBusiness() {
+	$('#representative').val('').prop('readonly', false);
+	$('#openDate').val('').prop('readonly', false);
+	$('#businessNum').val('').prop('readonly', false);
 }
 
 // ==유효성검사==

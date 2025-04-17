@@ -1,5 +1,7 @@
 package com.jobhunter.service.user;
 
+import java.util.Map;
+
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.user.KakaoUserInfoDTO;
 import com.jobhunter.model.user.UserInfoDTO;
@@ -22,7 +24,7 @@ public interface UserService {
 
 	String getKakaoToken(String code, String redirectUri) throws Exception;
 
-	AccountVO loginOrRegisterKakao(KakaoUserInfoDTO userInfo) throws Exception;
+	Map<String, Object> loginOrRegisterKakao(KakaoUserInfoDTO userInfo) throws Exception;
 
 	boolean isUserIdExists(String userId) throws Exception;
 
@@ -31,5 +33,7 @@ public interface UserService {
 	void linkToKakao(KakaoUserInfoDTO userInfo) throws Exception;
 
 	void deleteContact(String uid, String type) throws Exception;
+
+	void setDeleteAccount(Integer uid) throws Exception;
 
 }

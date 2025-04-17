@@ -28,7 +28,7 @@
           <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
         </div>
         <div class="info-grid" id="basicInfo">
-          <div>이름<i class="flagAccBtn" data-uid="1" data-type="USER"></i></div><div><strong id="userName">로딩중...</strong></div>
+          <div>이름</div><div><span id="userName">로딩중...</span><i class="nameChangeBtn">변경</i></div>
           <div>전화번호</div><div id="nowMobile">로딩중...</div>
           <div>이메일</div><div id="nowEmail">로딩중...</div>
           <div>가입일</div><div id="regDate">로딩중...</div>
@@ -60,7 +60,7 @@
           <h2><i class="bi bi-person-vcard section-icon"></i>상세 정보</h2>
         </div>
         <div class="info-grid" id="userDetailInfo">
-            <div>주소<i class="bi bi-exclamation-circle" style="color:red; margin:0px 0.3em"></i></div><div>로딩중...</div>
+            <div>주소</div><div>로딩중...</div>
             <div>상세주소</div><div>로딩중...</div>
             <div>성별</div><div>로딩중...</div>
             <div>나이</div><div>로딩중...</div>
@@ -71,6 +71,8 @@
             <div class="introduce-section"><div class="introduce-title">자기소개</div><div class="introduce-content">로딩중...</div></div>
             <div class="edit-buttons">
             <button class="btn-edit" onclick="modyfiInfoTapOpen()"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
+
+            <div>장애여부</div>
             <button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
             </div>
         </div>
@@ -677,10 +679,10 @@ function confirmModify() {
 
   function checkedDeleteAccount() {
     $.ajax({
-      url: `/user/delete/${sessionScope.account.uid}`,
+      url: `/user/info/${sessionScope.account.uid}`,
       method: "DELETE",
       contentType: "application/json",
-      success: () => {window.publicModals.show("삭제 대기중...", {onConfirm : getInfo})},
+      success: () => {window.publicModals.show("계정은 3일 뒤 삭제됩니다.")},
       error: (xhr) => {window.publicModals.show("연결 실패! 새로고침 후 다시 시도해주세요")}
     });
   }

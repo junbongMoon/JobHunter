@@ -180,4 +180,10 @@
 		AND email IS NOT NULL
 		AND email != ''
 	</update>
+	
+	<update id="setDeleteAccount">
+		UPDATE company
+		SET deleteDeadline = NOW() + INTERVAL 3 DAY 
+		WHERE uid = #{uid}
+	</update>
 </mapper>
