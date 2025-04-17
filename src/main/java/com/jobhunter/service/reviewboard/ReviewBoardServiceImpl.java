@@ -187,4 +187,6 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	    return new RPageResponseDTO<ReviewBoardDTO>(boardList, totalCount, pageRequestDTO);
 	}
 
+	
+
 }

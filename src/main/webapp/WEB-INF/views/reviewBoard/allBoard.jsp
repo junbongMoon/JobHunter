@@ -6,6 +6,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <title>면접 후 게시판</title>
 <style>
 h2 {
@@ -79,6 +80,36 @@ h2 {
 
 	<h2>면접 후기 목록</h2>
 
+	<form method="get" action="/reviewBoard/allBoard" class="row g-2 mb-4">
+	<div class="col-auto">
+		<select name="searchType" class="form-select" id="searchType">
+			<option value="">-- 검색 기준 선택 --</option>
+			<option value="companyName" ${pageResult.searchType == 'companyName' ? 'selected' : ''}>회사명</option>
+			<option value="reviewResult" ${pageResult.searchType == 'reviewResult' ? 'selected' : ''}>면접 결과</option>
+		</select>
+	</div>
+
+	<div class="col-auto">
+		<c:choose>
+			<c:when test="${pageResult.searchType == 'reviewResult'}">
+				<select name="keyword" class="form-select">
+					<option value="PASSED" ${pageResult.keyword == 'PASSED' ? 'selected' : ''}>합격</option>
+					<option value="FAILED" ${pageResult.keyword == 'FAILED' ? 'selected' : ''}>불합격</option>
+					<option value="PENDING" ${pageResult.keyword == 'PENDING' ? 'selected' : ''}>진행중</option>
+				</select>
+			</c:when>
+			<c:otherwise>
+				<input type="text" name="keyword" class="form-control"
+					placeholder="검색어 입력"
+					value="${pageResult.keyword != null ? pageResult.keyword : ''}">
+			</c:otherwise>
+		</c:choose>
+	</div>
+
+	<div class="col-auto">
+		<button type="submit" class="btn btn-primary">검색</button>
+	</div>
+</form>
 
 
 	<table class="table-container">
@@ -93,7 +124,9 @@ h2 {
 			<th>
 		</tr>
 		<c:forEach var="board" items="${pageResult.boardList}">
-			<tr onclick="location.href='${pageContext.request.contextPath}/reviewBoard/detail?boardNo=${board.boardNo}&page=${pageResult.page}'" style="cursor:pointer;">
+			<tr
+				onclick="location.href='${pageContext.request.contextPath}/reviewBoard/detail?boardNo=${board.boardNo}&page=${pageResult.page}'"
+				style="cursor: pointer;">
 
 				<td>${board.boardNo}</td>
 				<td>${board.writer}</td>
@@ -105,8 +138,8 @@ h2 {
 						<c:otherwise>미선택</c:otherwise>
 					</c:choose></td>
 				<td>${board.likes}</td>
-				<td class="views-cell" data-board-no="${board.boardNo}">
-					${board.views}</td>
+				<td class="views-cell" data-board-no="${board.boardNo}">${board.views}</td>
+
 				<td class="postDate()">${board.postDate}</td>
 			</tr>
 		</c:forEach>
@@ -124,29 +157,32 @@ h2 {
 	<nav aria-label="Page navigation">
 		<ul class="pagination justify-content-center">
 
-			<!-- 이전 페이지 블록 -->
-			<c:if test="${hasPrev}">
+			<!-- 이전 블록 -->
+			<c:if test="${pageResult.hasPrev}">
 				<li class="page-item"><a class="page-link"
-					href="?page=${startPage - 1}&size=${size}" aria-label="Previous">
+					href="?page=${pageResult.startPage - 1}&size=${pageResult.size}&searchType=${pageResult.searchType}&keyword=${pageResult.keyword}">
 						&laquo; </a></li>
 			</c:if>
 
 			<!-- 페이지 번호 -->
-			<c:forEach var="i" begin="${startPage}" end="${endPage}">
-				<li class="page-item ${i == page ? 'active' : ''}"><a
-					class="page-link" href="?page=${i}&size=${size}">${i}</a></li>
+			<c:forEach var="i" begin="${pageResult.startPage}"
+				end="${pageResult.endPage}">
+				<li class="page-item ${i == pageResult.page ? 'active' : ''}">
+					<a class="page-link"
+					href="?page=${i}&size=${pageResult.size}&searchType=${pageResult.searchType}&keyword=${pageResult.keyword}">
+						${i} </a>
+				</li>
 			</c:forEach>
 
-			<!-- 다음 페이지 블록 -->
-			<c:if test="${hasNext}">
+			<!-- 다음 블록 -->
+			<c:if test="${pageResult.hasNext}">
 				<li class="page-item"><a class="page-link"
-					href="?page=${endPage + 1}&size=${size}" aria-label="Next">
+					href="?page=${pageResult.endPage + 1}&size=${pageResult.size}&searchType=${pageResult.searchType}&keyword=${pageResult.keyword}">
 						&raquo; </a></li>
 			</c:if>
 
 		</ul>
 	</nav>
-
 	<!-- 글쓰기 버튼 -->
 	<button onclick="location.href='/reviewBoard/write'" class="btn-write">글
 		작성</button>
@@ -182,22 +218,25 @@ h2 {
 			});
 		});
 	});
-		// 조회수 증감 확인 
-		$.ajax({
-		  url: '/reviewBoard/viewCount',
-		  method: 'GET',
-		  data: { boardNo: boardNo },
-		  success: function(res) {
-		    if (res.success) {
-		      $('#views-' + boardNo).text(res.message); // 조회수 갱신
-		    } else {
-		      alert(res.message);
+	
+	document.querySelectorAll(".views-cell").forEach(cell => {
+		  const boardNo = cell.dataset.boardNo;
+
+		  if (!boardNo) return; // 값이 없으면 패스
+
+		  $.ajax({
+		    url: '/reviewBoard/viewCount',
+		    method: 'GET',
+		    data: { boardNo: boardNo },
+		    success: function(res) {
+		      if (res.success) {
+		        $(cell).text(res.message);
+		      }
 		    }
-		  },
-		  error: function() {
-		    alert("조회 실패");
-		  }
+		  });
 		});
+
+
 
 </script>
 </body>

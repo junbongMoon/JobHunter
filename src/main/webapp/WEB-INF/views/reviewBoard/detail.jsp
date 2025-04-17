@@ -40,7 +40,8 @@
 }
 
 .btn-rounded {
-	background-color: #47b2e4; color : #ffffff;
+	background-color: #47b2e4;
+	color: #ffffff;
 	padding: 6px 20px;
 	font-size: 14px;
 	font-weight: 500;
@@ -154,21 +155,30 @@
 				</tr>
 				<tr>
 					<th>조회수</th>
-					<td><span id="viewCount">👁️ ${detail.views}회</span></td>
+					<td><span id="likeCount">👁️ ${detail.views}회</span></td>
 				</tr>
 				<tr>
 					<th>후기 내용</th>
 					<td class="review-content">${detail.content}</td>
 				</tr>
 			</tbody>
+
+
+
+			<!-- 버튼 영역 -->
+			<!-- 추천 영역 -->
+			<tr>
+				<th>추천 수</th>
+				<td><span id="likeCountText">👍 ${detail.likes}명 추천</span></td>
+			</tr>
+			<!-- 추천 버튼 -->
 		</table>
+		<div id="likeBtns">
+			<button id="likeBtn" class="btn-getstarted btn-sm">👍 추천</button>
+			<button id="unlikeBtn" class="btn-getstarted btn-sm">👎 추천
+				취소</button>
+		</div>
 
-
-		<!-- 버튼 영역 -->
-		<!-- 추천 영역 -->
-
-		<button id="likeBtn" class="btn-getstarted btn-sm">👍 추천</button>
-		<button id="unlikeBtn" class="btn-getstarted btn-sm">👎 추천 취소</button>
 
 		<!-- 수정 버튼 -->
 		<a
@@ -179,10 +189,9 @@
 		<form action="${pageContext.request.contextPath}/reviewBoard/delete"
 			method="post" style="display: inline;">
 			<input type="hidden" name="boardNo" value="${detail.boardNo}" />
-			<button type="button" class="btn-getstarted btn-sm delete-btn" data-boardno="${detail.boardNo}">🗑 삭제
-				</button>
+			<button type="button" class="btn-getstarted btn-sm delete-btn"
+				data-boardno="${detail.boardNo}">🗑 삭제</button>
 		</form>
-
 
 		<!-- 목록으로 -->
 		<a
@@ -194,6 +203,8 @@
 
 	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
 	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
+	<input type="hidden" id="isLiked" value="${isLiked}" />
+
 
 	<!-- 좋아요 알림 모달 -->
 	<div class="modal fade" id="likeModal" tabindex="-1" aria-hidden="true">
@@ -210,7 +221,7 @@
 			</div>
 		</div>
 	</div>
-	</div>
+
 
 	<script>
 	document.addEventListener("formData", () => {
@@ -247,55 +258,64 @@
 
 
 
-$(function () {
-  $('#likeBtn').on('click', function () {
-    const boardNo = $('#boardNo').val();
-    const userId = $('#userId').val();
+	$(document).ready(function () {
+		  const isLiked = $('#isLiked').val() === 'true'; // 문자열 'true' 비교
 
-    $.ajax({
-      url: '${pageContext.request.contextPath}/reviewBoard/like',
-      method: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({ boardNo: boardNo, userId: userId }),
-      success: function (message) {
-        alert(message);
-        location.reload();
-      },
-      error: function (xhr) {
-        if (xhr.status === 401) {
-          alert("로그인이 필요합니다.");
-          window.location.href = '${pageContext.request.contextPath}/account/login';
-        } else if (xhr.status === 400) {
-          alert(xhr.responseText);
-        } else {
-          alert("서버 오류가 발생했습니다.");
-        }
-      }
-    });
-  });
+		  // 처음 로드 시 버튼 상태 설정
+		  if (isLiked) {
+		    $('#likeBtn').hide();
+		    $('#unlikeBtn').show();
+		  } else {
+		    $('#likeBtn').show();
+		    $('#unlikeBtn').hide();
+		  }
 
-  $('#unlikeBtn').on('click', function () {
-    const boardNo = $('#boardNo').val();
-    const userId = $('#userId').val();
+		  // 추천 클릭
+		  $('#likeBtn').on('click', function () {
+		    const boardNo = $('#boardNo').val();
+		    const userId = $('#userId').val();
 
-    $.ajax({
-      url: '${pageContext.request.contextPath}/reviewBoard/unlike',
-      method: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({ userId: userId, boardNo: boardNo }),
-      success: function (message) {
-        $('#likeModalMessage').text(message);
-        $('#likeModal').modal('show');
-        setTimeout(() => location.reload(), 1000);
-      },
-      error: function (xhr) {
-        const msg = xhr.status === 400 ? xhr.responseText : "에러 발생";
-        $('#likeModalMessage').text(msg);
-        $('#likeModal').modal('show');
-      }
-    });
-  });
-});
+		    $.ajax({
+		      url: '${pageContext.request.contextPath}/reviewBoard/like',
+		      method: 'POST',
+		      contentType: 'application/json',
+		      data: JSON.stringify({ boardNo: boardNo, userId: userId }),
+		      success: function (res) {
+		    	  alert(res.message);
+		    	  // 추천 수 증가: 그냥 새로고침이 아니라 숫자만 갱신하고 싶을 때
+		    	  const currentCount = parseInt($('#likeCountText').text().replace(/[^0-9]/g, ''));
+		    	  $('#likeCountText').text(`👍 ${currentCount + 1}명 추천`);
+		    	  $('#likeBtn').hide();
+		    	  $('#unlikeBtn').show();
+		    	},
+		      error: function (xhr) {
+		        alert(xhr.responseText || '오류 발생');
+		      }
+		    });
+		  });
+
+		  // 추천 취소 클릭
+		  $('#unlikeBtn').on('click', function () {
+		    const boardNo = $('#boardNo').val();
+		    const userId = $('#userId').val();
+
+		    $.ajax({
+		      url: '${pageContext.request.contextPath}/reviewBoard/unlike',
+		      method: 'POST',
+		      contentType: 'application/json',
+		      data: JSON.stringify({ userId: userId, boardNo: boardNo }),
+		      success: function (res) {
+		    	  const currentCount = parseInt($('#likeCountText').text().replace(/[^0-9]/g, ''));
+		    	  $('#likeCountText').text(`👍 ${currentCount > 0 ? currentCount : '조회 없음'}`);
+		    	    $('#likeBtn').show();
+		    	    $('#unlikeBtn').hide();
+		      },
+		      error: function (xhr) {
+		        alert(xhr.responseText || '오류 발생');
+		      }
+		    });
+		  });
+		});
 
 
 $(document).ready(function () {
