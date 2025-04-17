@@ -1,9 +1,12 @@
 package com.jobhunter.dao.message;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.message.MessageDTO;
+import com.jobhunter.model.message.USERTYPE;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +20,41 @@ public class MessageDAOImpl implements MessageDAO {
 	@Override
 	public void insertMessage(MessageDTO messageDTO) {
 		ses.insert(NS + ".saveMessage", messageDTO);
-
+	}
+	
+	@Override
+	public List<MessageDTO> getAllMessages() throws Exception {
+		return ses.selectList(NS + ".getAllMessages");
+	}
+	
+	@Override
+	public List<MessageDTO> getMessagesByUserId(int userId, String userType) throws Exception {
+		MessageDTO params = new MessageDTO();
+		params.setToWho(userId);
+		params.setToUserType(USERTYPE.valueOf(userType));
+		return ses.selectList(NS + ".getMessagesByUserId", params);
+	}
+	
+	@Override
+	public void updateMessageReadStatus(int messageNo, String isRead) throws Exception {
+		MessageDTO params = new MessageDTO();
+		params.setMessageNo(messageNo);
+		params.setIsRead(isRead);
+		ses.update(NS + ".updateMessageReadStatus", params);
+	}
+	
+	@Override
+	public void updateAllMessagesReadStatus(String isRead) throws Exception {
+		ses.update(NS + ".updateAllMessagesReadStatus", isRead);
+	}
+	
+	@Override
+	public void deleteMessage(int messageNo) throws Exception {
+		ses.delete(NS + ".deleteMessage", messageNo);
 	}
 
+	@Override
+	public int getUnreadCount(String uid) throws Exception {
+		return ses.selectOne(NS + ".getUnreadCount", uid);
+	}
 }
