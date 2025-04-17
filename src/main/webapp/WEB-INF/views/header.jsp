@@ -100,6 +100,24 @@
 					font-size: 18px;
 				}
 
+				.notification-home {
+					position: absolute;
+					top: 10px;
+					right: -20px;
+					background-color: #ff4444;
+					color: white;
+					border-radius: 50%;
+					width: 20px;
+					height: 20px;
+					font-size: 10px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					border: 1px solid white;
+					padding-left: 1px;
+					padding-top: 2px;
+				}
+
 				.notification-count {
 					position: absolute;
 					top: -5px;
@@ -176,8 +194,7 @@
 										class="bi bi-chevron-down toggle-dropdown"></i></a>
 								<ul>
 									<li><a href="/recruitmentnotice/listAll">전체 채용정보</a></li>
-									<li><a href="#">지역별 채용정보</a></li>
-									<li><a href="#">직업별 채용정보</a></li>
+									<li><a href="#">공공기관 제공 채용정보</a></li>
 								</ul>
 							</li>
 							<li><a href="/reviewBoard/allBoard">면접후기</a></li>
@@ -188,6 +205,8 @@
 									<c:when test="${sessionScope.account.isAdmin.toString() == 'Y'}">
 										<a class="nav-link dropdown-toggle" href="/admin" id="mypageDropdown"
 											role="button">👑Admin Page</a>
+										<!-- 메시지가 있을 때 띄울예정 -->
+										<div class="notification-home">💬</div>
 									</c:when>
 									<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 										<a class="nav-link dropdown-toggle"
@@ -195,6 +214,8 @@
 											id="mypageDropdown" role="button">
 											My Page
 										</a>
+										<!-- 메시지가 있을 때 띄울예정 -->
+										<div class="notification-home">💬</div>
 									</c:when>
 									<c:otherwise>
 										<a class="nav-link dropdown-toggle"
@@ -202,6 +223,8 @@
 											id="mypageDropdown" role="button">
 											My Page
 										</a>
+										<!-- 메시지가 있을 때 띄울예정 -->
+										<div class="notification-home">💬</div>
 									</c:otherwise>
 								</c:choose>
 
@@ -210,6 +233,7 @@
 									<div class="profile-img-container">
 										<div class="profile-img"></div>
 										<div class="speech-bubble" onclick="openNotifications()">
+											<!-- 메시지 카운트 들어오게 -->
 											<div class="notification-count">0</div>
 										</div>
 									</div>
