@@ -26,6 +26,8 @@
 		const detail = '${RecruitmentDetailInfo.detail}';
 		const dueDateRaw = '${RecruitmentDetailInfo.dueDate}';
 		const dueDate = new Date(dueDateRaw);
+		const regDateRaw = '${RecruitmentDetailInfo.regDate}';
+		const regDate = new Date(regDateRaw)
 		const fileList = '${RecruitmentDetailInfo.fileList}';
 		const count = '${RecruitmentDetailInfo.count}';
 
@@ -41,6 +43,18 @@
 		} else {
 			$('#dueDateSpan').text('유효하지 않은 날짜');
 		}
+
+		// 작성일 출력
+		if (!isNaN(regDate.getTime())) {
+			const formattedRegDate = regDate.toLocaleDateString('ko-KR', {
+				year: 'numeric',
+				month: 'long',
+				day: '2-digit'
+			});
+			$('#regDateSpan').text(formattedRegDate);
+			} else {
+			$('#regDateSpan').text('유효하지 않은 날짜');
+			}
 
 		$('#detail').html(detail);
 
@@ -333,6 +347,81 @@ button.btn-resume {
   justify-content: flex-end !important;
 }
 
+.info-inline-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.info-inline-box .info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-inline-box .info-item img {
+  width: 20px;  /* 기존 40px → 절반 */
+  height: 20px;
+  margin-bottom: 0.25rem;
+  object-fit: contain;
+}
+
+.info-inline-box .info-item span {
+  font-size: 1rem;
+  color: #3d4d6a;
+  font-weight: 600;
+}
+
+.search-widget.widget-item {
+  padding: 0.5rem 1rem;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: auto; /* 높이 제한 제거 */
+  height: auto;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.search-widget.widget-item img {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.search-widget.widget-item img:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.info-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.icon-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem; /* 아이콘과 숫자 사이 간격 */
+}
+
+.icon-row img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.count-number {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3d4d6a;
+}
 </style>
 <body>
 	<!-- 헤더 -->
@@ -367,8 +456,7 @@ button.btn-resume {
 											<div class="post-meta">
 												<span class="dueDate"><i class="bi bi-calendar3"></i>마감
 													<span id="dueDateSpan"></span></span> <span class="divider">•</span>
-												<span class="comments"><i class="bi bi-chat-text"></i>
-													18 Comments(제출된 이력서 수)</span>
+													<span class="regDateArea"><i class="bi bi-calendar3"></i> 작성일 <span id="regDateSpan"></span></span>
 											</div>
 										</div>
 									</div>
@@ -584,31 +672,44 @@ button.btn-resume {
 
 					<div class="widgets-container" data-aos="fade-up"
 						data-aos-delay="200">
+												<!-- Search Widget -->
+											<c:if test="${sessionScope.account.uid > 0}">
+												<div class="search-widget widget-item">
 
-						<!-- Search Widget -->
-						<div class="search-widget widget-item">
-
-							<h3 class="widget-title"></h3>
-							<c:choose>
-								<c:when test="${hasLiked}">
-								  <img src="/resources/images_mjb/bad100.png" onclick="deleteLike('${sessionScope.account.uid}', '${RecruitmentDetailInfo.uid}')" alt="좋아요 취소" />
-								</c:when>
-								<c:otherwise>
-								  <img src="/resources/images_mjb/like100.png"  onclick="saveLike('${sessionScope.account.uid}', '${RecruitmentDetailInfo.uid}')" alt="좋아요" />
-								</c:otherwise>
-							  </c:choose>
-						</div>
-						<!--/Search Widget -->
+													<h3 class="widget-title"></h3>
+													<c:choose>
+														<c:when test="${hasLiked}">
+														  <img src="/resources/images_mjb/bad100.png" onclick="deleteLike('${sessionScope.account.uid}', '${RecruitmentDetailInfo.uid}')" alt="좋아요 취소" />
+														</c:when>
+														<c:otherwise>
+														  <img src="/resources/images_mjb/like100.png"  onclick="saveLike('${sessionScope.account.uid}', '${RecruitmentDetailInfo.uid}')" alt="좋아요" />
+														</c:otherwise>
+													  </c:choose>
+												</div>
+											</c:if>
+												<!--/Search Widget -->
 
 						<!-- Categories Widget -->
 						<div class="categories-widget widget-item">
 
 							<h3 class="widget-title">Info</h3>
-							<div>
-								<div class="likeCnt"><img src="/resources/images_mjb/good100.png"/><p>${likeCnt}</p></div>
-								<div class="likeCnt"><img src="/resources/images_mjb/eye100.png"/><p></p></div>
-								<div class="submitCnt"></div>
-							</div>
+
+								<div class="info-stat-box">
+									<div class="info-item">
+										<div class="icon-row">
+										  <img src="/resources/images_mjb/good100.png" alt="좋아요 수" />
+										  <span class="count-number">${likeCnt}</span>
+										</div>
+									  </div>
+									  
+									  <div class="info-item">
+										<div class="icon-row">
+										  <img src="/resources/images_mjb/eye100.png" alt="조회수" />
+										  <span class="count-number">${RecruitmentDetailInfo.count}</span>
+										</div>
+									  </div>
+								</div>
+
 
 						</div>
 						<!--/Categories Widget -->
