@@ -42,14 +42,36 @@ import com.jobhunter.util.resume.FileProcessForResume;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * 이력서 관련 기능을 처리하는 컨트롤러 클래스입니다.
+ * <p>
+ * - 이력서 작성 폼 화면 출력 - 이력서 최종 제출 및 저장 - 이력서 수정 및 업데이트 - 이력서 삭제 - 첨부파일 업로드 및 삭제
+ * </p>
+ * 
+ * @author 유지원
+ */
 @Controller
 @RequestMapping("/resume")
 @RequiredArgsConstructor
 public class ResumeController {
-
+	
+	/** 이력서 관련 서비스 */
 	private final ResumeService resumeService;
+	/** 이력서 파일 처리 클래스 */
 	private final FileProcessForResume fileProcessForResume;
 
+	/**
+	 * 이력서 작성 폼 페이지를 요청합니다.
+	 * <p>
+	 * 사용자에게 빈 이력서 작성 화면을 보여주기 위해 호출됩니다. 서버에서는 다음 데이터를 조회하여 View에 전달합니다 
+	 * 지역 카테고리 (시/도, 시/군/구) 
+	 * 업직종 카테고리 (대분류, 소분류) 
+	 * ENUM 값들 (예: 고용형태, 경력형태 등)
+	 * </p>
+	 *
+	 * @param model View에서 사용할 데이터를 담는 객체
+	 * @return resumeForm.jsp 파일 경로
+	 */
 	// 이력서 작성 폼 연결
 	@GetMapping("/form")
 	public String resumeForm(Model model, HttpSession session) {
@@ -88,10 +110,8 @@ public class ResumeController {
 
 	// 이력서 목록 페이지
 	@GetMapping("/list")
-	public String resumeFormList(HttpSession session, Model model, 
-			@RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "10") int pageSize,
-			@RequestParam(required = false) String searchTitle) {
+	public String resumeFormList(HttpSession session, Model model, @RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(required = false) String searchTitle) {
 		try {
 			AccountVO account = (AccountVO) session.getAttribute("account");
 
@@ -99,7 +119,7 @@ public class ResumeController {
 			List<ResumeVO> resumeList = resumeService.getResumeList(userUid, page, pageSize, searchTitle);
 			int totalResumes = resumeService.getTotalResumes(userUid, searchTitle);
 			int totalPages = (int) Math.ceil((double) totalResumes / pageSize);
-			
+
 			// 페이징 블록 계산
 			int blockSize = 5;
 			int currentBlock = (page - 1) / blockSize;
@@ -121,7 +141,7 @@ public class ResumeController {
 			model.addAttribute("currentBlock", currentBlock + 1);
 			model.addAttribute("totalBlocks", totalBlocks);
 			model.addAttribute("searchTitle", searchTitle);
-			
+
 			return "resume/resumeFormList";
 		} catch (Exception e) {
 			model.addAttribute("error", "이력서 목록을 불러오는 중 오류가 발생했습니다.");
@@ -228,7 +248,7 @@ public class ResumeController {
 				model.addAttribute("error", "기업에서 확인중인 이력서는 수정할 수 없습니다.");
 				return "error";
 			}
-			
+
 			// 기존 이력서 정보 조회
 			ResumeDetailDTO resumeDetail = resumeService.getResumeDetailWithAll(resumeNo);
 			model.addAttribute("resumeDetail", resumeDetail);
@@ -278,7 +298,7 @@ public class ResumeController {
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> updateResume(@PathVariable int resumeNo,
 			@RequestBody ResumeDTO resumeDTO) {
-		try {			
+		try {
 			resumeDTO.setResumeNo(resumeNo);
 			resumeService.updateResume(resumeDTO);
 			Map<String, Object> response = new HashMap<>();
