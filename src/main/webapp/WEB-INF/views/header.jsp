@@ -115,7 +115,7 @@
 					justify-content: center;
 					border: 1px solid white;
 					padding-left: 1px;
-					padding-top: 2px;
+					padding-top: 1px;
 				}
 
 				.notification-count {
