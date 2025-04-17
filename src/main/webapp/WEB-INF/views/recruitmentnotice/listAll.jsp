@@ -4,72 +4,262 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script>
-	// 페이지 로드시 초기 실행
-	$(function () {
-	const selectedVal = $('#searchType').val();
-	const keywordBox = document.querySelector('#keywordBox');
-
-	// 페이지 로딩 시 input 없으면 렌더링
-	if (["region", "jobType", "advantage", "jobform"].includes(selectedVal)) {
-		if (!keywordBox.querySelector('input')) {
-			const input = document.createElement('input');
-			input.type = 'text';
-			input.name = 'searchWord';
-			input.placeholder = '검색어를 입력하세요';
-			input.className = 'form-control';
-			input.value = '${param.searchWord}';
-			keywordBox.appendChild(input);
-		}
-	}
-
-	$(document).on('change', '#searchType', function () {
-		const selectedVal = $('#searchType').val();
-		keywordBox.innerHTML = '';
-
-		if (["region", "jobType", "advantage", "jobform"].includes(selectedVal)) {
-			const input = document.createElement('input');
-			input.type = 'text';
-			input.name = 'searchWord';
-			input.placeholder = '검색어를 입력하세요';
-			input.className = 'form-control';
-			keywordBox.appendChild(input);
-		}
-	});
-});
-</script>
 
 <style>
-.rectext strong {
-	color: #47b2e4;;
-}
+	.search-bar {
+	width: 100%;
+	max-width: 100%;
+	padding: 1rem 0;
+	}
 
-.recruitmentList {
-	margin-top: 20px;
-}
 
-.write-btn-container {
-	width: 95%;
-	margin-bottom: 50px;
-}
+  .form-header {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+  }
 
-.write-btn {
-	background-color: #47b2e4;
-	color: white;
-	padding: 10px 20px;
-	border-radius: 8px;
-	text-decoration: none;
-	font-weight: bold;
-	transition: background-color 0.3s ease;
-}
+  .form-header h3 {
+    color: var(--secondary-color);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
 
-.write-btn:hover {
-	background-color: #1f9fd2;
-}
+  .form-header p {
+    color: var(--text-color);
+    margin-bottom: 0;
+  }
 
-.recruitment {
-	margin-bottom: 30px;
-}
+  .form-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+  }
+  
+  .custom-select-wrapper label {
+    color: var(--secondary-color);
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+  }
+
+	.form-control,
+	.form-select {
+	height: 50px;
+	font-size: 1rem;
+	border-radius: 12px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+	padding: 0.8rem 1.2rem;
+	}
+
+	.form-select {
+	appearance: none;
+	background-color: #ffffff;
+	border: 2px solid var(--secondary-color);
+	border-radius: 12px;
+	padding: 1rem 1.5rem;
+	font-size: 1.05rem;
+	color: var(--secondary-color);
+	font-weight: 500;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%233d4d6a' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5.5l6 6 6-6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 1.2rem center;
+	background-size: 18px 18px;
+	transition: border-color 0.3s ease;
+	}
+
+	.form-select:focus {
+	border-color: var(--primary-color);
+	outline: none;
+	}
+
+	.form-check-input[type="radio"] {
+	appearance: none;
+	width: 18px;
+	height: 18px;
+	border: 2px solid #3d4d6a;
+	border-radius: 50%;
+	position: relative;
+	margin-top: 0.1rem;
+	margin-right: 0.5rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	}
+
+	.form-check-input[type="radio"]:checked {
+	background-color: #3d4d6a;
+	box-shadow: 0 0 0 2px white inset;
+	}
+
+	.form-check-label {
+	font-weight: 500;
+	color: #3d4d6a;
+	margin-right: 1.2rem;
+	font-weight: 500;
+	}
+
+	.input-group {
+		margin-bottom: 1.5rem;
+	}
+	.input-group label {
+		color: var(--secondary-color);
+		font-weight: 600;
+		margin-bottom: 0.8rem;
+	}
+
+	.serchBtn {
+	height: 50px;
+	padding: 0.75rem 1.5rem;
+	font-size: 1.05rem;
+	font-weight: 600;
+	color: #2e6fa9;
+	background: #ffffff;
+	border: 2px solid #3a9fd1; /* 테두리 선명하게 */
+	border-radius: 12px;
+	box-shadow: 0 0 0 1px #3a9fd1 inset; /* 안쪽 그림자 강조 */
+	transition: all 0.2s ease;
+	}
+
+	.serchBtn:hover {
+	background: #e7f3fb;
+	color: #1b4c7f;
+	border-color: #2e6fa9;
+	box-shadow: 0 0 0 2px #2e6fa9 inset;
+	}
+
+  .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+    transform: translateY(-2px);
+  }
+
+
+   .modal-content {
+     border-radius: 15px;
+     border: none;
+   }
+
+   .modal-header {
+     background-color: var(--primary-color);
+     color: white;
+     border-radius: 15px 15px 0 0;
+   }
+
+   .modal-title {
+     font-weight: 600;
+   }
+
+   .btn-close {
+     color: white;
+   }
+
+	.form-control {
+	border: 2px solid var(--secondary-color);
+	border-radius: 12px;
+	padding: 1rem 1.5rem;
+	font-size: 1.05rem;
+	color: var(--secondary-color);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	transition: border-color 0.3s ease;
+	}
+
+	.form-control::placeholder {
+	color: #888;
+	font-weight: 400;
+	}
+
+	.form-control:focus {
+	border-color: var(--primary-color);
+	box-shadow: 0 0 0 0.2rem rgba(71, 178, 228, 0.15);
+	}
+
+	.badge-custom {
+	background-color: #f5f8fc;
+	color: #2c3e50;
+	border: 1px solid #cfd8e3;
+	font-size: 0.85rem;
+	padding: 0.4em 0.9em;
+	border-radius: 1.2rem;
+	display: inline-block;
+	font-weight: 500;
+	margin: 0.2rem 0.3rem 0.2rem 0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	}
+
+	.large-radio {
+	width: 20px;
+	height: 20px;
+	margin-right: 0.5rem;
+	border: 2px solid #3d4d6a;
+	border-radius: 50%;
+	appearance: none;
+	position: relative;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	}
+
+	.large-radio:checked {
+	background-color: #3d4d6a;
+	box-shadow: 0 0 0 3px white inset;
+	}
+
+	.read-more a{
+		background: linear-gradient(135deg, #3a9fd1, #2e6fa9);
+	}
+
+	.sort-label {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #3d4d6a;
+	}
+
+		.pagination .page-link {
+	color: #3d4d6a !important;
+	background-color: #fff !important;
+	border: 1px solid #dee2e6 !important;
+	border-radius: 0.4rem !important;
+	font-weight: 500 !important;
+	transition: all 0.3s ease;
+	}
+
+	.pagination .page-link:hover {
+	background-color: #e6f3fb !important;
+	color: #3a9fd1 !important;
+	border-color: #3a9fd1 !important;
+	}
+
+	.pagination .page-item.active .page-link {
+	background-color: #3a9fd1 !important;
+	color: white !important;
+	border-color: #3a9fd1 !important;
+	font-weight: bold !important;
+	}
+
+	.pagination .page-item.disabled .page-link {
+	background-color: #f9f9f9 !important;
+	color: #ccc !important;
+	pointer-events: none;
+	}
+
+	.sort-options .form-check {
+	display: flex;
+	align-items: center;
+	margin-bottom: 0.6rem;
+	}
+
 </style>
 <body>
 	<!-- 헤더 -->
@@ -88,46 +278,61 @@
 						</c:when>
 					</c:choose>
 				</div>
-				<form action="/recruitmentnotice/listAll" method="get" class="mb-4"
-					style="width: 90%; margin: 0 auto;">
-					<div class="row">
-						<div class="col-md-3">
-							<select class="form-select" name="searchType" id="searchType">
-								<option value="">검색 조건 없음</option>
-								<option value="region"
-									${param.searchType == 'region' ? 'selected' : ''}>지역</option>
-								<option value="jobType"
-									${param.searchType == 'jobType' ? 'selected' : ''}>직업군</option>
-								<option value="advantage"
-									${param.searchType == 'advantage' ? 'selected' : ''}>우대조건</option>
-								<option value="jobform"
-									${param.searchType == 'jobform' ? 'selected' : ''}>근무형태</option>
-								<option value="highPay"
-									${param.searchType == 'highPay' ? 'selected' : ''}>높은금액
-									순</option>
-								<option value="lowPay"
-									${param.searchType == 'lowPay' ? 'selected' : ''}>낮은금액
-									순</option>
+				<form action="/recruitmentnotice/listAll" method="get" class="search-bar mb-4">
+					<div class="d-flex align-items-start gap-3 w-100 flex-wrap">
+						
+						<div class="sort-options" style="flex-basis: 25%;">
+							<label class="form-label sort-label d-block mb-2">정렬 기준</label>
+							<div class="form-check sort-radio">
+								<input class="form-check-input large-radio" type="radio" name="sortOption" id="Notsort" value="">
+								<label class="form-check-label" for="sortHigh">기본</label>
+							  </div>
+							<div class="form-check sort-radio">
+							  <input class="form-check-input large-radio" type="radio" name="sortOption" id="sortHigh" value="highPay"
+								${param.sortOption == 'highPay' ? 'checked' : ''}>
+							  <label class="form-check-label" for="sortHigh">높은 금액 순</label>
+							</div>
+							<div class="form-check sort-radio">
+							  <input class="form-check-input large-radio" type="radio" name="sortOption" id="sortLow" value="lowPay"
+								${param.sortOption == 'lowPay' ? 'checked' : ''}>
+							  <label class="form-check-label" for="sortLow">낮은 금액 순</label>
+							</div>
+							<div class="form-checksort-radio">
+							  <input class="form-check-input large-radio" type="radio" name="sortOption" id="sortdeudate" value="deadlineSoon"
+								${param.sortOption == 'deadlineSoon' ? 'checked' : ''}>
+							  <label class="form-check-label" for="sortdeudate">마감기한 임박</label>
+							</div>
+						  </div>
+					  
+
+						<!-- 검색 조건 선택 -->
+						<div class="flex-grow-1" style="flex-basis: 25%;">
+							<label class="form-label sort-label d-block mb-2">검색 기준</label> <!-- 추가된 라벨 -->
+							<select class="form-select w-100" name="searchType" id="searchType">
+							  <option value="">검색 조건 없음</option>
+							  <option value="region" ${param.searchType == 'region' ? 'selected' : ''}>지역</option>
+							  <option value="jobType" ${param.searchType == 'jobType' ? 'selected' : ''}>직업군</option>
+							  <option value="advantage" ${param.searchType == 'advantage' ? 'selected' : ''}>우대조건</option>
+							  <option value="jobform" ${param.searchType == 'jobform' ? 'selected' : ''}>근무형태</option>
 							</select>
-						</div>
+						  </div>
 
-						<div class="col-md-6" id="keywordBox">
-							<c:if test="${not empty param.searchWord 
-										&& not empty param.searchType 
-										&& param.searchType != 'highPay' 
-										&& param.searchType != 'lowPay'}">
-								<input type="text" name="searchWord" class="form-control"
-									   placeholder="검색어를 입력하세요"
-									   value="${param.searchWord}" />
-							</c:if>
+						<!-- 키워드 입력 -->
+						<div class="flex-grow-1" style="flex-basis: 55%;">
+							<input type="text" name="searchWord" class="form-control w-100"
+								placeholder="검색어를 입력하세요"
+								value="${param.searchWord}" />
 						</div>
+					
+						<!-- 검색 버튼 -->
+						<div class="flex-grow-1 text-end" style="flex-basis: 20%;">
+							<button type="submit" class="btn serchBtn w-100">검색</button>
+						</div>
+  
 
-						<div class="col-md-3 text-end">
-							<button type="submit" class="btn btn-primary">검색</button>
-						</div>
 					</div>
 				</form>
-				<div class="row gy-4 gx-4">
+				<div class="row gy-4 gx-4 recruitmentContainer">
 
 					<c:forEach var="rec" items="${boardList}">
 						<div class="col-lg-6 recruitment">
@@ -143,39 +348,32 @@
 										</li>
 										<li class="d-flex align-items-center"><i
 											class="bi bi-clock"></i> <a href="#"><time>
-													<fmt:formatDate value="${rec.dueDate}" pattern="yyyy-MM-dd" />
+													<fmt:formatDate value="${rec.regDate}" pattern="yyyy-MM-dd" />
 												</time></a></li>
 									</ul>
 								</div>
 
 								<div class="content recruitmentList">
 									<p class="rectext">
-										<strong>지역:</strong> <span class="badge bg-primary me-2"><c:out
-												value="${rec.region.name}" default="-" /></span> <strong>시군구:</strong>
-										<span class="badge bg-info me-2"><c:out
-												value="${rec.sigungu.name}" default="-" /></span> <br /> <strong>산업군:</strong>
-										<span class="badge bg-success me-2"><c:out
-												value="${rec.majorCategory.jobName}" default="-" /></span> <strong>직업:</strong>
-										<span class="badge bg-warning text-dark me-2"><c:out
-												value="${rec.subcategory.jobName}" default="-" /></span> <br /> <strong>우대조건:</strong>
-										<c:forEach var="adv" items="${rec.advantage}"
-											varStatus="status">
-											<c:if test="${status.index < 2}">
-												<span class="badge bg-danger me-2">${adv.advantageType}</span>
-											</c:if>
+										<span class="badge-custom">${rec.region.name}</span>
+										<span class="badge-custom">${rec.sigungu.name}</span>
+										<span class="badge-custom">${rec.majorCategory.jobName}</span>
+										<span class="badge-custom">${rec.subcategory.jobName}</span>
+										<c:forEach var="adv" items="${rec.advantage}" varStatus="status">
+										  <c:if test="${status.index < 2}">
+											<span class="badge-custom">${adv.advantageType}</span>
+										  </c:if>
 										</c:forEach>
-										<br /> <strong>면접방식:</strong>
-										<c:forEach var="app" items="${rec.application}"
-											varStatus="status">
-											<c:if test="${status.index < 2}">
-												<span class="badge bg-secondary me-2">${app.method}</span>
-											</c:if>
+										<c:forEach var="app" items="${rec.application}" varStatus="status">
+										  <c:if test="${status.index < 2}">
+											<span class="badge-custom">${app.method}</span>
+										  </c:if>
 										</c:forEach>
 									</p>
 
 									<div class="read-more">
 
-										<a href="/recruitmentnotice/detail/?uid=${rec.uid}">바로 가기</a>
+										<a href="/recruitmentnotice/detail/?uid=${rec.uid}" >조회하기</a>
 									</div>
 								</div>
 							</article>
@@ -188,47 +386,74 @@
 				</div>
 				<!-- End blog posts list -->
 		</div>
-		<!-- 페이지 블럭 -->
-		<div class="pagination justify-content-center mt-4">
-			<ul class="pagination">
 
-				<!-- ◀ 이전 블럭 -->
-				<c:if test="${pageResponse.startPageNumPerBlock > 1}">
-					<li class="page-item"><a class="page-link"
-						href="?pageNo=${pageResponse.startPageNumPerBlock - 1}&searchType=${pageResponse.searchType}&searchWord=${pageResponse.searchWord}"
-						aria-label="Previous"> <span aria-hidden="true">«</span>
-					</a></li>
-				</c:if>
+		<!--  관찰할 대상 요소 (보이지 않게 해도 무방) -->
+		<div id="observeTarget" style="height: 40px;"></div>
 
-				<!-- 페이지 번호 반복 출력 -->
-				<c:forEach begin="${pageResponse.startPageNumPerBlock}"
-					end="${pageResponse.endPageNumPerBlock}" var="i">
-					<li class="page-item ${i == pageResponse.pageNo ? 'active' : ''}">
-						<a class="page-link"
-						href="?pageNo=${i}&searchType=${pageResponse.searchType}&searchWord=${pageResponse.searchWord}">${i}</a>
-					</li>
-				</c:forEach>
-
-				<!-- ▶ 다음 블럭 -->
-				<c:if
-					test="${pageResponse.endPageNumPerBlock < pageResponse.totalPageCnt}">
-					<li class="page-item"><a class="page-link"
-						href="?pageNo=${pageResponse.endPageNumPerBlock + 1}&searchType=${pageResponse.searchType}&searchWord=${pageResponse.searchWord}"
-						aria-label="Next"> <span aria-hidden="true">»</span>
-					</a></li>
-				</c:if>
-			</ul>
-
-
-
-		</div>
+		<!-- 로딩 표시 -->
+		<div id="loadingIndicator" style="text-align:center; display:none;">로딩 중...</div>
 
 		</section>
 
 
 	</main>
+	<script>
+	
+		// 현재 페이지
+		let currentPage = 1;
+		let isLoading = false;
+		let lastPage = false;
+	
+		const target = document.querySelector('#observeTarget');
+	
+		const observer = new IntersectionObserver((entries) => {
+		if (entries[0].isIntersecting && !isLoading && !lastPage) {
+			isLoading = true;
+			$('#loadingIndicator').show();
+			loadMore();
+		}
+		}, {
+		threshold: 1.0 // 타겟 요소가 100% 화면에 들어오면 실행
+		});
+	
+		observer.observe(target);
+	
+		function loadMore() {
+		currentPage++; // 페이지 증가
+	
+		$.ajax({
+			url: "/recruitmentnotice/listMore",
+			type: "GET",
+			data: {
+			pageNo: currentPage,
+			searchType: "${param.searchType}",
+			searchWord: "${param.searchWord}",
+			sortOption: "${param.sortOption}"
+			},
+			success: function (data) {
+			if (data.trim() === "") {
+				lastPage = true;
+				$('#loadingIndicator').text("더 이상 불러올 데이터가 없습니다.");
+				observer.unobserve(target); // 타겟 감시 해제
+				return;
+			}
+	
+			$('.recruitmentContainer').append(data);
+			},
+			error: function () {
+			console.error("불러오기 실패");
+			},
+			complete: function () {
+			isLoading = false;
+			$('#loadingIndicator').hide();
+			}
+		});
+		}
+	
+	</script>
+	
 	<!-- 풋터 -->
 	<jsp:include page="../footer.jsp"></jsp:include>
-
+	
 </body>
 </html>

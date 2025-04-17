@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
@@ -166,6 +166,136 @@ h3 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
 }
+
+.badge-custom {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 1rem; /* 크기 조절 가능 */
+  font-weight: 600;
+  color: #3d4d6a;
+  background-color: white;
+  border: 2px solid #3d4d6a;
+  border-radius: 10px;
+  margin: 0.25rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.badge-custom i {
+  margin-right: 0.4rem;
+  color: #3d4d6a;
+  font-size: 1.1em;
+}
+
+.attachment-badge {
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.attachment-badge:hover {
+  background-color: #e9ecef; /* 밝은 회색 */
+  color: #1a237e;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 목록으로 버튼 스타일 */
+button.btn-list {
+  background-color: #3d4d6a !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.5rem 1rem;
+  border-radius: 7px; /* ⬅ 여기를 12px로 조정 */
+  transition: all 0.3s ease;
+}
+
+
+.btn-list:hover {
+  background-color: #2a344a;
+  transform: translateY(-2px);
+}
+
+/* 이력서 제출 버튼 스타일 */
+button.btn-resume {
+  background-color: #47b2e4 !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.5rem 1rem;
+  border-radius: 7px; /* ⬅ 여기도 동일하게 */
+  transition: all 0.3s ease;
+}
+
+.btn-resume:hover {
+  background-color: #349fcc;
+  transform: translateY(-2px);
+}
+
+.post-navigation-card-style {
+  width: 80%;
+  margin: 0 auto;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.post-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.post-row:last-child {
+  border-bottom: none;
+}
+
+.post-row .label {
+  font-weight: bold;
+  color: #47b2e4;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.post-row .title {
+  flex-grow: 1;
+  text-align: left;
+  padding: 0 1rem;
+  font-weight: 600;
+  color: #3d4d6a;
+}
+
+.post-row .title a {
+  color: #3d4d6a;
+  text-decoration: none;
+}
+
+.post-row .title a:hover {
+  color: #47b2e4;
+  text-decoration: underline;
+}
+
+.post-row .date {
+  font-size: 0.95rem;
+  color: #888;
+  flex-shrink: 0;
+}
+
+.post-row.current {
+  background-color: white !important; 
+  border: 2px solid #47b2e4; 
+  border-radius: 8px;
+  color: #3d4d6a;
+  font-weight: bold;
+}
+
+.share-section .social-links .d-flex {
+  justify-content: flex-end !important;
+}
+
 </style>
 <body>
 	<!-- 헤더 -->
@@ -207,25 +337,24 @@ h3 {
 									</div>
 
 									<div class="content">
-										<p class="companyIntroduce">회사 기본 소개</p>
+
 										<div class="categories-widget widget-item card">
 											<h3 class="widget-title">지역</h3>
 											<p id="region">
-												<span class="badge rounded-pill text-bg-primary">${RecruitmentDetailInfo.region.name}</span>
-												<span class="badge rounded-pill text-bg-info">${RecruitmentDetailInfo.sigungu.name}</span>
+												<span class="badge-custom"><i class="fa-solid fa-building"></i>${RecruitmentDetailInfo.region.name}</span>
+												<span class="badge-custom"><i class="fa-regular fa-building"></i>${RecruitmentDetailInfo.sigungu.name}</span>
+											  
+											
 											</p>
-										</div>
 
-										<div class="categories-widget widget-item card">
 											<h3 class="widget-title">직업</h3>
 											<p id="jobType">
-												<span class="badge rounded-pill text-bg-primary">${RecruitmentDetailInfo.majorCategory.jobName}</span>
-												<span class="badge rounded-pill text-bg-info">${RecruitmentDetailInfo.subcategory.jobName}</span>
+												<span class="badge-custom"><i class="fa-solid fa-helmet-safety"></i>${RecruitmentDetailInfo.majorCategory.jobName}</span>
+												<span class="badge-custom"><i class="fa-solid fa-suitcase"></i>${RecruitmentDetailInfo.subcategory.jobName}</span>
+											  
 											</p>
-										</div>
 
-										<div class="card categories-widget widget-item">
-											<h5 class="widget-title">근무</h5>
+											<h5 class="widget-title">근무 형태</h5>
 											<p class="mb-1 fw-semibold" id="workType">
 												<c:choose>
 													<c:when
@@ -244,9 +373,7 @@ h3 {
 												</c:choose>
 											</p>
 											<p class="text-muted" id="period">${RecruitmentDetailInfo.period}</p>
-										</div>
 
-										<div class="card categories-widget widget-item">
 											<h5 class="widget-title">급여</h5>
 											<p class="mb-1 fw-semibold" id="payType">
 												<c:choose>
@@ -258,24 +385,31 @@ h3 {
 													<c:otherwise>기타</c:otherwise>
 												</c:choose>
 											</p>
+
 											<p class="fs-5 fw-bold text-success" id="pay">
 												<fmt:formatNumber value="${RecruitmentDetailInfo.pay}"
 													type="number" groupingUsed="true" />
 												원
 											</p>
-										</div>
 
-
-										<div class="categories-widget widget-item card">
 											<h3 class="widget-title">조건</h3>
 											<p id="personalHistory">
-												<span class="badge rounded-pill text-bg-primary">${RecruitmentDetailInfo.personalHistory}</span>
+												<span class="badge-custom"><i class="fa-solid fa-clipboard"></i>${RecruitmentDetailInfo.personalHistory}</span>
+												<span class="badge-custom"><i class="fa-solid fa-person-rifle"></i>  <c:choose>
+													<c:when test="${RecruitmentDetailInfo.militaryService eq 'SERVED'}">군필 이상</c:when>
+													<c:when test="${RecruitmentDetailInfo.militaryService eq 'NOT_SERVED'}">미필 이상</c:when>
+													<c:when test="${RecruitmentDetailInfo.militaryService eq 'EXEMPTED'}">면제 이상</c:when>
+													<c:otherwise>기타</c:otherwise>
+												  </c:choose></span>
 												<c:forEach var="item"
 													items="${RecruitmentDetailInfo.advantage}">
-													<span class="badge rounded-pill text-bg-info">${item.advantageType}</span>
+													<span class="badge-custom"><i class="fa-solid fa-user-plus"></i>${item.advantageType}</span>
 												</c:forEach>
 											</p>
+
+											
 										</div>
+
 
 										<div class="categories-widget widget-item card">
 											<h2 class="widget-title">상세 정보</h2>
@@ -286,20 +420,22 @@ h3 {
 										</div>
 										<h3>첨부 파일</h3>
 										<p id="fileList">
-											<c:if test="${not empty RecruitmentDetailInfo.fileList}">
-												<c:forEach var="file"
-													items="${RecruitmentDetailInfo.fileList}">
-													<span class="badge rounded-pill text-bg-secondary singleFile"
-														><a href="${file.newFileName}" download="${file.newFileName}">
-														${file.originalFileName}</a></span>
-												</c:forEach>
-											</c:if>
+										  <c:if test="${not empty RecruitmentDetailInfo.fileList}">
+											<c:forEach var="file" items="${RecruitmentDetailInfo.fileList}">
+											  <a href="${file.newFileName}" 
+												 download="${file.originalFileName}"
+												 class="badge-custom attachment-badge"
+												 title="Download">
+												 <i class="fa-solid fa-download"></i> ${file.originalFileName}
+											  </a>
+											</c:forEach>
+										  </c:if>
 										</p>
 									</div>
 
 									<div class="meta-bottom">
 										<div class="tags-section">
-											<h4>Related Topics</h4>
+											<h4>면접 방법</h4>
 											<div class="tags">
 												<ul class="trend-list">
 													<c:forEach var="app"
@@ -339,30 +475,66 @@ h3 {
 											</div>
 										</div>
 
-										<div class="share-section">
-											<h4>Share Article</h4>
-											<div class="social-links mt-2">
-												<div class="d-flex gap-2">
-													<button type="button" class="btn btn-secondary"
-														onclick="location.href='/recruitmentnotice/listAll'">목록으로</button>
+										<div class="post-navigation-card-style mt-5">
+											<!-- 이전 글 -->
+											<c:if test="${not empty prevPost}">
+											  <div class="post-row">
+												<div class="label">이전 글</div>
+												<div class="title"><a href="/recruitmentnotice/detail?uid=${prevPost.uid}">${prevPost.title}</a></div>
+												<div class="date"><fmt:formatDate value="${prevPost.regDate}" pattern="yyyy-MM-dd" /></div>
+											  </div>
+											</c:if>
+										  
+											<!-- 현재 글 -->
+											<div class="post-row current">
+											  <div class="label">현재 글</div>
+											  <div class="title">${RecruitmentDetailInfo.title}</div>
+											  <div class="date"><fmt:formatDate value="${RecruitmentDetailInfo.regDate}" pattern="yyyy-MM-dd" /></div>
+											</div>
+										  
+											<!-- 다음 글 -->
+											<c:if test="${not empty nextPost}">
+											  <div class="post-row">
+												<div class="label">다음 글</div>
+												<div class="title"><a href="/recruitmentnotice/detail?uid=${nextPost.uid}">${nextPost.title}</a></div>
+												<div class="date"><fmt:formatDate value="${nextPost.regDate}" pattern="yyyy-MM-dd" /></div>
+											  </div>
+											</c:if>
+										  </div>
+
+										<div class="share-section ">
+											<h4>More</h4>
+											<div class="social-links mt-2 w-100">
+												<div class="d-flex gap-2 justify-content-end w-100">
+													<button type="button" class="btn-list"
+													onclick="location.href='/recruitmentnotice/listAll'">목록으로</button>
+													<c:choose>
+														<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 													<button type="button" class="btn btn-primary"
 														onclick="location.href='/recruitmentnotice/modify?uid=${RecruitmentDetailInfo.uid}'">수정</button>
 													<button type="button" class="btn btn-danger"
 														onclick="deleteRecruitment('${RecruitmentDetailInfo.uid}')">삭제</button>
+													</c:when>
+													<c:when test="${sessionScope.account.accountType == 'USER'}">
+														<button type="button" class="btn-resume" id="submitResumeBtn"
+														onclick="location.href='/submission/check?uid=${RecruitmentDetailInfo.uid}'">
+														이력서 제출
+													</button>
+												</c:when>
+												</c:choose>
 												</div>
 											</div>
 										</div>
 									</div>
-									<!-- 이력서 제출 버튼 -->
-												<div class="container">
-													<button type="button" class="btn btn-success" id="submitResumeBtn"
-														onclick="location.href='/submission/check?uid=${RecruitmentDetailInfo.uid}'">
-														이력서 제출</button>
-												</div>
+
+									
+
+
+
+
 								</div>
 
-
-
+								
 							</article>
 						</div>
 					</section>

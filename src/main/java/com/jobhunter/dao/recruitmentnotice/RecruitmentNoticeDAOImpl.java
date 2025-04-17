@@ -1,5 +1,6 @@
 package com.jobhunter.dao.recruitmentnotice;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -183,6 +184,43 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	    param.put("rowCntPerPage", pageResponseDTO.getRowCntPerPage());
 
 	    return ses.selectList(NS + ".selectRecruitmentByCompanyUid", param);
+	}
+
+
+	@Override
+	public RecruitmentNotice selectPreviousPost(int uid) throws Exception {
+		// TODO Auto-generated method stub
+		return ses.selectOne(NS + ".selectPreviousPost", uid);
+	}
+
+
+	@Override
+	public RecruitmentNotice selectNextPost(int uid) throws Exception {
+		// TODO Auto-generated method stub
+		return ses.selectOne(NS + ".selectNextPost", uid);
+	}
+
+
+	@Override
+	public int countByCreatedDateBetween(LocalDateTime start, LocalDateTime end) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("start", start);
+		param.put("end", end);
+		return ses.selectOne(NS +".countByCreatedDateBetweenAndRole", param);
+	}
+
+
+	@Override
+	public void insertCDLogForRecruitment(int recNo) {
+		ses.insert(NS + ".insertCreateRecruitmentLog", recNo);
+		
+	}
+
+
+	@Override
+	public void insertDeleteLogByRecruitment(int uid) {
+		ses.insert(NS + ".insertDeleteRecruitmentLog", uid);
+		
 	}
 
 	

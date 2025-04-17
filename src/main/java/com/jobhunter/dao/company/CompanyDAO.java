@@ -1,5 +1,6 @@
 package com.jobhunter.dao.company;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
@@ -30,5 +31,6 @@ public interface CompanyDAO {
 	int deleteEmail(String uid) throws Exception;
 	
 	void setDeleteAccount(Integer uid) throws Exception;
+
 
 }

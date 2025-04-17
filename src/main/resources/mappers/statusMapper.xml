@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jobhunter.mapper.statusmapper">
+
+	<insert id="saveDateStatus"
+		parameterType="com.jobhunter.model.status.StatusVODTO">
+		INSERT INTO status (
+		statusDate,
+		new_users,
+		new_companies,
+		new_recruitmentNoticeCnt,
+		new_registration,
+		new_reviewBoard
+		)
+		VALUES (
+		#{statusDate},
+		#{newUsers},
+		#{newCompanies},
+		#{newRecruitmentNoticeCnt},
+		#{newRegistration},
+		#{newReviewBoard}
+		)
+
+	</insert>
+
+	<select id="getDateStatusByYesterDay"
+		resultType="com.jobhunter.model.status.StatusVODTO">
+		SELECT * FROM status WHERE DATE(statusDate) = #{yesterday}
+		LIMIT 1
+	</select>
+
+	<select id="getTotalStatusByYesterDay" parameterType="map"
+		resultType="com.jobhunter.model.status.TotalStatusVODTO">
+		SELECT
+		total_statusNo AS totalStatusNo,
+		statusDate,
+		total_users AS totalUsers,
+		total_companies AS totalCompanies,
+		total_recruitmentNoticeCnt AS totalRecruitmentNoticeCnt,
+		total_registration AS totalRegistration,
+		total_reviewBoard AS totalReviewBoard
+		FROM total_status
+		WHERE statusDate BETWEEN #{start} AND #{end}
+	</select>
+
+	<insert id="insertTotalStatus"
+		parameterType="com.jobhunter.model.status.TotalStatusVODTO">
+		INSERT INTO total_status (
+		statusDate,
+		total_users,
+		total_companies,
+		total_recruitmentNoticeCnt,
+		total_registration,
+		total_reviewBoard
+		) VALUES (
+		#{statusDate},
+		#{totalUsers},
+		#{totalCompanies},
+		#{totalRecruitmentNoticeCnt},
+		#{totalRegistration},
+		#{totalReviewBoard}
+		)
+	</insert>
+
+	<select id="getCountLogBetweenStartAndEndByTarget">
+		SELECT COUNT(*)
+		FROM CDLog
+		WHERE logRegDate BETWEEN #{start} AND #{end}
+		AND targetType = #{targetType}
+		AND logType = #{logType}
+	</select>
+
+</mapper>

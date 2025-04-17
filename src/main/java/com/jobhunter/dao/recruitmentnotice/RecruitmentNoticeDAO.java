@@ -1,5 +1,6 @@
 package com.jobhunter.dao.recruitmentnotice;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.jobhunter.model.customenum.Method;
@@ -75,4 +76,34 @@ public interface RecruitmentNoticeDAO {
 	// 내가 작성한 공고 리스트를 조회하는 메서드
 	List<RecruitmentNotice> selectRecruitmentByCompanyUid(int companyUid,
 			PageResponseDTO<RecruitmentNotice> pageResponseDTO);
+
+	RecruitmentNotice selectPreviousPost(int uid) throws Exception;
+
+	RecruitmentNotice selectNextPost(int uid) throws Exception;
+
+	int countByCreatedDateBetween(LocalDateTime start, LocalDateTime end);
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고 글 작성 시 로그를 입력하는 메서드
+	 * </p>
+	 * 
+	 * @param recNo
+	 *
+	 */
+	void insertCDLogForRecruitment(int recNo);
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고 글 삭제 시 로그를 입력하는 메서드
+	 * </p>
+	 * 
+	 * @param uid
+	 *
+	 */
+	void insertDeleteLogByRecruitment(int uid);
 }

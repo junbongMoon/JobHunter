@@ -167,7 +167,6 @@
 	</select>
 
 	
-	
 	<select id="findByContact" resultMap="accountMap">
 		select *, userId as
 		accountId, userName as accountName

@@ -12,6 +12,7 @@ public class PageResponseDTO<T> {
    private int rowCntPerPage; // 1페이지당 보여줄 row갯수
    private String searchType;
    private String searchWord;
+   private String sortOption;
    
    private int totalRowCnt; // 전체 데이터 수
    private int totalPageCnt;  // 전체 페이지 수
@@ -27,6 +28,10 @@ public class PageResponseDTO<T> {
    public PageResponseDTO(int pageNo, int rowCntPerPage) {
       this.pageNo = pageNo;
       this.rowCntPerPage = rowCntPerPage;
+   }
+   
+   public void setSortOption(String sortOption) {
+	   this.sortOption = sortOption;
    }
    
    public void setSearchType(String searchType) {

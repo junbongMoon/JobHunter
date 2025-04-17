@@ -151,7 +151,7 @@
 		</where>
 
 		<choose>
-			<when test="searchType == 'highPay'">
+			<when test="sortOption == 'highPay'">
 				ORDER BY CASE r.payType
 				WHEN 'HOUR' THEN r.pay * 8 *
 				22
@@ -163,7 +163,7 @@
 				ELSE 0
 				END DESC
 			</when>
-			<when test="searchType == 'lowPay'">
+			<when test="sortOption == 'lowPay'">
 				ORDER BY CASE r.payType
 				WHEN 'HOUR' THEN r.pay * 8 *
 				22
@@ -175,6 +175,10 @@
 				ELSE 0
 				END ASC
 			</when>
+			<when test="sortOption == 'deadlineSoon'">
+				ORDER BY r.dueDate ASC
+			</when>
+
 			<otherwise>
 				ORDER BY r.uid DESC
 			</otherwise>
@@ -204,6 +208,7 @@
 		<result property="dueDate" column="dueDate" />
 		<result property="status" column="status" />
 		<result property="count" column="count" />
+		<result property="regDate" column="regDate" />
 		<result property="refCompany" column="refCompany" />
 		<result property="companyName" column="companyName" />
 
@@ -294,8 +299,10 @@
 					<when test="searchType == 'advantage'">
 						AND EXISTS (
 						SELECT 1 FROM advantage a
-						WHERE a.recruitmentNoticeUid = r.uid
-						AND a.advantageType LIKE CONCAT('%', #{searchWord}, '%')
+						WHERE
+						a.recruitmentNoticeUid = r.uid
+						AND a.advantageType LIKE CONCAT('%',
+						#{searchWord}, '%')
 						)
 					</when>
 
@@ -427,5 +434,50 @@
 		ORDER BY uid DESC
 		LIMIT #{startRowIndex}, #{rowCntPerPage}
 	</select>
+
+	<!-- 이전 글 -->
+	<select id="selectPreviousPost"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentNotice">
+		SELECT uid, title, regDate
+		FROM recruitmentnotice
+		WHERE uid
+		&lt; #{uid} AND status = 'Y'
+		ORDER BY uid DESC
+		LIMIT 1
+	</select>
+
+	<!-- 다음 글 -->
+	<select id="selectNextPost"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentNotice">
+		SELECT uid, title, regDate
+		FROM recruitmentnotice
+		WHERE uid
+		&gt; #{uid} AND status = 'Y'
+		ORDER BY uid ASC
+		LIMIT 1
+	</select>
+
+	<select id="countByCreatedDateBetweenAndRole"
+		parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM recruitmentnotice
+		WHERE
+		regDate BETWEEN #{start} AND #{end}
+	</select>
+
+	<insert id="insertCreateRecruitmentLog">
+		insert into CDLog
+		(targetId, targetType, logType)
+		values
+		(#{recNo}, 'RECRUITMENT', 'CREATE')
+	</insert>
+
+	<insert id="insertDeleteRecruitmentLog">
+		insert into CDLog
+		(targetId, targetType, logType)
+		values
+		(#{recNo}, 'RECRUITMENT', 'DELETE')
+	</insert>
+
 
 </mapper>

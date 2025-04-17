@@ -8,42 +8,61 @@
 	<select id="selectRecruitmentsByRecruitmentUid"
 		resultMap="ResumeDetailInfoBySubmitMap">
 		SELECT
-		r.resumeNo, r.title, r.payType, r.pay, r.introduce, r.saveType, r.userUid,
+		r.resumeNo, r.title, r.payType, r.pay, r.introduce,
+		r.saveType, r.userUid,
 
-		reg.registrationNo, reg.status AS regStatus, reg.recruitmentNoticePk
+		reg.registrationNo, reg.status,
+		reg.recruitmentNoticePk
 		AS regRecruitmentNoticePk,
-		reg.regDate, reg.resumePk AS regResumePk,
+		reg.regDate,
+		reg.resumePk AS regResumePk,
 
 		jf.jobFormNo, jf.form AS jobForm,
 		m.meritNo, m.meritContent,
-		e.educationNo, e.educationLevel, e.educationStatus, e.graduationDate, e.customInput,
-		h.historyNo, h.companyName, h.position, h.jobDescription, h.startDate,
+		e.educationNo, e.educationLevel,
+		e.educationStatus, e.graduationDate, e.customInput,
+		h.historyNo,
+		h.companyName, h.position, h.jobDescription, h.startDate,
 		h.endDate,
 		l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
 
 		s.sigunguNo, s.name AS sigunguName, s.regionNo,
-		sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo
+		sc.subcategoryNo,
+		sc.jobName, sc.refMajorcategoryNo
 
 		FROM resume r
 
 		LEFT JOIN registration reg ON r.resumeNo = reg.resumePk
-		LEFT JOIN jobform jf ON r.resumeNo = jf.resumeNo
+		AND reg.registrationNo = (
+		  SELECT MAX(r2.registrationNo)
+		  FROM registration r2
+		  WHERE r2.resumePk = r.resumeNo AND r2.recruitmentNoticePk = #{recruitmentUid}
+		)
+		LEFT JOIN jobform jf ON r.resumeNo =
+		jf.resumeNo
 		LEFT JOIN merit m ON r.resumeNo = m.resumeNo
-		LEFT JOIN education e ON r.resumeNo = e.resumeNo
-		LEFT JOIN personalhistory h ON r.resumeNo = h.resumeNo
+		LEFT JOIN
+		education e ON r.resumeNo = e.resumeNo
+		LEFT JOIN personalhistory h ON
+		r.resumeNo = h.resumeNo
 		LEFT JOIN license l ON r.resumeNo = l.resumeNo
 		LEFT JOIN where_resume_sigungu sr ON r.resumeNo = sr.refResumeNo
-		LEFT JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
-		LEFT JOIN jobtype_resume_sub jrs ON r.resumeNo = jrs.refResumeNo
-		LEFT JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
+		LEFT
+		JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
+		LEFT JOIN
+		jobtype_resume_sub jrs ON r.resumeNo = jrs.refResumeNo
+		LEFT JOIN
+		subcategory sc ON jrs.refSubNo = sc.subcategoryNo
 
 		WHERE r.resumeNo IN (
 		SELECT resumePk FROM registration
-		WHERE recruitmentNoticePk = #{recruitmentUid}
+		WHERE recruitmentNoticePk =
+		#{recruitmentUid}
 		)
 
 		ORDER BY r.resumeNo DESC
-		LIMIT #{startRowIndex}, #{rowCntPerPage}
+		LIMIT #{startRowIndex},
+		#{rowCntPerPage}
 	</select>
 
 	<!-- 전체 개수 -->
@@ -67,11 +86,12 @@
 		<association property="registrationVO"
 			javaType="com.jobhunter.model.submit.RegistrationVO">
 			<id property="registrationNo" column="registrationNo" />
-			<result property="status" column="regStatus" />
+			<result property="status" column="status" />
 			<result property="recruitmentNoticePk"
 				column="regRecruitmentNoticePk" />
 			<result property="regDate" column="regDate" />
 			<result property="resumePk" column="regResumePk" />
+			
 		</association>
 
 		<collection property="jobForms"
@@ -139,8 +159,80 @@
 	<update id="modifyStatus">
 		update registration
 		set status = #{status}
-		where recruitmentNoticePk = #{recruitmentNoticePk} and resumePk =
+		where
+		recruitmentNoticePk = #{recruitmentNoticePk} and resumePk =
 		#{resumePk}
 	</update>
+
+	<update id="updateStatusToExpired">
+		UPDATE registration
+		SET status = 'EXPIRED'
+		WHERE status
+		= 'WAITING'
+		AND recruitmentNoticePk IN (
+		SELECT uid
+		FROM
+		recruitmentnotice
+		WHERE due_date = #{yesterDayStr}
+		)
+	</update>
+
+	<select id="countByCreatedDateBetweenAndRole"
+		parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM registration
+		WHERE
+		regDate BETWEEN #{start} AND #{end}
+	</select>
+
+
+	<update id="updateStatusToExpiredBetween" parameterType="map">
+		UPDATE
+		registration
+		SET status = 'EXPIRED'
+		WHERE status = 'WAITING'
+		AND
+		recruitmentNoticePk IN (
+		SELECT uid
+		FROM recruitmentnotice
+		WHERE duedate
+		BETWEEN #{start} AND #{end}
+		)
+	</update>
+
+	<select id="selectExpiredSubmitUserMessageInfoBetween"
+		parameterType="map" resultType="map">
+		SELECT
+		u.uid AS userNo,
+		c.uid AS
+		companyNo,
+		c.companyName,
+		r.title AS noticeTitle
+		FROM registration rg
+		JOIN recruitmentnotice r ON rg.recruitmentNoticePk = r.uid
+		JOIN resume
+		rs ON rg.resumePk = rs.resumeNo
+		JOIN users u ON rs.userUid = u.uid
+		JOIN
+		company c ON r.refCompany = c.uid
+		WHERE rg.status = 'EXPIRED'
+		AND
+		r.dueDate BETWEEN #{start} AND #{end}
+	</select>
+
+
+	<select id="selectMessageTargetInfo" resultType="com.jobhunter.model.message.MessageTargetInfoDTO">
+		SELECT
+		r.userUid AS userNo,
+		c.uid AS companyNo,
+		c.companyName,
+		rc.title AS noticeTitle
+		FROM registration rg
+		JOIN resume r ON rg.resumePk = r.resumeNo
+		JOIN recruitmentnotice rc ON rg.recruitmentNoticePk = rc.uid
+		JOIN company c ON rc.refCompany = c.uid
+		WHERE rg.resumePk = #{resumePk}
+		AND rg.recruitmentNoticePk = #{recruitmentNoticePk}
+	</select>
 
 </mapper>

@@ -186,6 +186,7 @@
 		gonggoUid = #{gonggoUid},
 		reviewLevel = #{reviewLevel},
 		reviewType= #{reviewType},
+		reviewResult =#{reviewResult},
 		typeOtherText =
 		#{typeOtherText},
 		content=#{content},

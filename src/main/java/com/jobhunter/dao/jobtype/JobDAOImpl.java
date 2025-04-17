@@ -33,7 +33,19 @@ public class JobDAOImpl implements JobDAO {
         sqlSession.insert(NAMESPACE + ".insertSubcategory", params);
     }
     
-    // 공고에 산업군 넣어주는 메서드
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고산업군 정보 테이블에 산업군 입력하는 메서드
+	 * </p>
+	 * 
+	 * @param int refRecNo
+	 * @param int refMajorNo
+	 * @return 성공 하면 1, 실패 하면 0
+	 * @throws Exception
+	 *
+	 */
 	@Override
 	public int insertMajorCategoryWithRecruitmentnotice(int refRecNo, int refMajorNo) throws Exception {
 		Map<String, Integer> param = new HashMap<>();
@@ -44,7 +56,20 @@ public class JobDAOImpl implements JobDAO {
 		return sqlSession.insert(NAMESPACE + ".insertMajorJobTypeWithRecruitmentnotice", param);
 	}
 	
-	// 공고에 직업 입력해주는 메서드
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고에 직업군 입력해주는 메서드
+	 * </p>
+	 * 
+	 * @param int refRecNo
+	 * @param int refSubNo
+	 * @return 성공 하면 1, 실패 하면 0
+	 * @throws Exception
+	 *
+	 */
 	@Override
 	public int insertSubCategoryWithRecruitmentnotice(int refRecNo, int refSubNo) throws Exception {
 		
@@ -56,7 +81,19 @@ public class JobDAOImpl implements JobDAO {
 		return sqlSession.insert(NAMESPACE + ".insertSubJobTypeWithRecruitmentnotice", param);
 	}
 	
-	// 공고에 등록 된 직업군을 수정하는 메서드
+	 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 *  공고에 등록 된 직업군을 수정하는 메서드
+	 * </p>
+	 * 
+	 * @param int uid
+	 * @param int subcategoryNo
+	 * @throws int Exception
+	 *
+	 */
 	@Override
 	public void updateSubCategoryWithRecruitmentnotice(int uid, int subcategoryNo) throws Exception {
 		
@@ -68,7 +105,18 @@ public class JobDAOImpl implements JobDAO {
 		
 	}
 	
-	// 공고에 등록된 산업군을 수정하는 메서드
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고에 등록 된 산업군을 수정하는 메서드
+	 * </p>
+	 * 
+	 * @param int uid
+	 * @param int majorcategoryNo
+	 *
+	 */
 	@Override
 	public void updateMajorCategoryWithRecruitmentnotice(int uid, int majorcategoryNo) {
 		

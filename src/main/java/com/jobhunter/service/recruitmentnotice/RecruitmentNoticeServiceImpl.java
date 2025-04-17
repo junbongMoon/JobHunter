@@ -1,6 +1,7 @@
 package com.jobhunter.service.recruitmentnotice;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -32,12 +33,41 @@ import lombok.RequiredArgsConstructor;
 public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 	// DAO단
+	/**
+	 * <p> 
+	 * 공고 DAO
+	 * </p>
+	 */
 	private final RecruitmentNoticeDAO recdao;
+	/**
+	 * <p> 
+	 * 지역, 시군구 DAO
+	 * </p>
+	 */
 	private final RegionDAO regiondao;
+	/**
+	 * <p> 
+	 * 산업군, 직업군 DAO
+	 * </p>
+	 */
 	private final JobDAO jobdao;
 	
-	
-	// 공고를 저장하는 메서드
+	 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고를 저장하는 메서드
+	 * </p>
+	 * 
+	 * @param RecruitmentNoticeDTO recruitmentNoticeDTO
+	 * @param List<AdvantageDTO> advantageList
+	 * @param List<ApplicationDTO> applicationList
+	 * @param List<RecruitmentnoticeBoardUpfiles> fileList
+	 * @return 저장에 성공 하면 true, 실패하면 false
+	 * @throws Exception
+	 *
+	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean saveRecruitmentNotice(RecruitmentNoticeDTO recruitmentNoticeDTO, List<AdvantageDTO> advantageList,
@@ -91,11 +121,25 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 				recdao.insertRecruitmentFile(file);
 			}
 		}
+		
+		recdao.insertCDLogForRecruitment(recNo);
 
 		return result;
 	}
 
-	// uid(pk)로 공고를 조회하는 메서드
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * uid로 공고를 조회하는 메서드
+	 * </p>
+	 * 
+	 * @param int uid
+	 * @return 공고의 상세정보
+	 * @throws Exception
+	 *
+	 */
 	@Override
 	public RecruitmentDetailInfo getRecruitmentByUid(int uid) throws Exception {
 
@@ -115,57 +159,73 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		return detailInfo;
 	}
 	
-	// 공고를 검색어에 따라 페이징해서 조회 해오는 메서드
+	 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고를 검색어에 따라 페이징해서 조회 해오는 메서드
+	 * </p>
+	 * 
+	 * @param PageRequestDTO pageRequestDTO
+	 * @return 공고의 상세정보 리스트를 담은 페이징에 대한 정보 객체
+	 * @throws Exception
+	 *
+	 */
 	@Override
 	public PageResponseDTO<RecruitmentDetailInfo> getEntireRecruitment(PageRequestDTO pageRequestDTO) throws Exception {
 
 	    String searchType = pageRequestDTO.getSearchType();
 	    String searchWord = pageRequestDTO.getSearchWord();
-	    
+	    String sortOption = pageRequestDTO.getSortOption(); // ⭐ 새로 추가된 정렬 옵션
+
 	    int totalRowCnt;
 
-	    // 정렬만 하고 검색은 하지 않을 경우 (전체 count 조회)
-	    if ("highPay".equals(searchType) || "lowPay".equals(searchType)) {
-	        totalRowCnt = recdao.getTotalCountRow(); // WHERE status = 'Y'만 포함된 쿼리
+	    if ("highPay".equals(sortOption) || "lowPay".equals(sortOption)) {
+	        totalRowCnt = recdao.getTotalCountRow(); // 정렬만 할 경우
 	    } else if (StringUtils.hasText(searchType) && StringUtils.hasText(searchWord)) {
-	        totalRowCnt = recdao.getSearchResultRowCount(pageRequestDTO); // 조건 검색
+	        totalRowCnt = recdao.getSearchResultRowCount(pageRequestDTO); // 검색어 있을 경우
 	    } else {
 	        totalRowCnt = recdao.getTotalCountRow(); // 기본
 	    }
 
-	    // 페이징 계산
 	    PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO = pagingProcess(pageRequestDTO, totalRowCnt);
 
-	    // 실제 공고 목록 조회
+	    // ⚠️ 정렬 기준을 DAO로 전달하기 위해 PageRequestDTO 또는 PageResponseDTO에 sortOption 포함되어야 함
+	    pageResponseDTO.setSortOption(sortOption);
+
 	    List<RecruitmentDetailInfo> boardList = recdao.selectRecruitmentWithKeyword(pageResponseDTO);
 
 	    if (boardList == null) {
 	        boardList = Collections.emptyList();
 	    } else {
 	        for (RecruitmentDetailInfo info : boardList) {
-	            if (info != null) {
-	            	System.out.println(info);
-	                int uid = info.getUid();
-	                List<Application> applications = recdao.getApplications(uid);
-	                List<Advantage> advantages = recdao.getAdvantages(uid);
-	                List<RecruitmentnoticeBoardUpfiles> fileList = recdao.getFileList(uid);
-
-	                info.setApplication(applications != null ? applications : Collections.emptyList());
-	                info.setAdvantage(advantages != null ? advantages : Collections.emptyList());
-	                info.setFileList(fileList != null ? fileList : Collections.emptyList());
-	            } else {
-	                throw new NoSuchElementException("공고 정보가 존재하지 않습니다.");
-	            }
+	            int uid = info.getUid();
+	            info.setApplication(recdao.getApplications(uid));
+	            info.setAdvantage(recdao.getAdvantages(uid));
+	            info.setFileList(recdao.getFileList(uid));
 	        }
 	    }
-	    
-	    System.out.println("boardList.size() = " + boardList.size());
 
 	    pageResponseDTO.setBoardList(boardList);
 	    return pageResponseDTO;
 	}
 
-	// 페이징 하는 메서드
+
+	 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 페이징 하는 메서드
+	 * </p>
+	 * 
+	 * @param <T>
+	 * @param pageRequestDTO
+	 * @param totalRowCount
+	 * @return <T>리스트를 담은 페이징에 대한 정보 객체
+	 *
+	 */
 	private <T> PageResponseDTO<T> pagingProcess(PageRequestDTO pageRequestDTO, int totalRowCount) {
 	    PageResponseDTO<T> pageResponseDTO = new PageResponseDTO<>(
 	        pageRequestDTO.getPageNo(),
@@ -173,7 +233,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	    );
 	    
 	    System.out.println("pageresponsedto : " + pageResponseDTO);
-
+ 
 	    pageResponseDTO.setTotalRowCnt(totalRowCount); // 전체 데이터 수
 
 	    if (StringUtils.hasText(pageRequestDTO.getSearchType())) {
@@ -190,19 +250,49 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	    return pageResponseDTO;
 	}
 
-	// uid를 매개변수로 공고를 삭제하는 메서드
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * uid를 매개변수로 공고를 삭제하는 메서드
+	 * </p>
+	 * 
+	 * @param uid
+	 * @return 공고가 삭제 되면 true, 삭제 되지 않으면 false
+	 * @throws Exception
+	 *
+	 */
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean removeRecruitmentByUid(int uid) throws Exception {
 		boolean result = false;
 
 		if (recdao.deleteRecruitmentByUid(uid) > 0) {
 			result = true;
 		}
+		// 삭제 로그 추가
+		recdao.insertDeleteLogByRecruitment(uid);
 
 		return result;
 	}
 
-	// 공고를 수정하는 메서드
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고를 수정하는 메서드
+	 * </p>
+	 * 
+	 * @param RecruitmentNoticeDTO dto
+	 * @param List<AdvantageDTO> newAdvList
+	 * @param List<ApplicationDTO> newAppList
+	 * @param List<RecruitmentnoticeBoardUpfiles> modifyFileList
+	 * @param RecruitmentDetailInfo existing
+	 * @param int uid
+	 * @throws Exception
+	 *
+	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public void modifyRecruitmentNotice(RecruitmentNoticeDTO dto, List<AdvantageDTO> newAdvList,
@@ -281,14 +371,36 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		regiondao.updateSigunguWithRecruitmentNotice(uid, dto.getSigunguNo());
 	}
     
-	// 파일을 삭제하는 메서드
+	
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 파일을 삭제하는 메서드
+	 * </p>
+	 * 
+	 * @param int boardUpFileNo
+	 *
+	 */
 	@Override
 	public void deleteFileFromDatabase(int boardUpFileNo) {
 		 recdao.deleteFileFromDatabase(boardUpFileNo);
 		
 	}
 	
-	// 내가 작성한 공고글 가져오는 메서드(필요한 정보는 title, 공고의 uid)
+	
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 내가 작성한 공고글 가져오는 메서드
+	 * </p>
+	 * 
+	 * @param int companyUid
+	 * @param PageRequestDTO pageRequestDTO
+	 * @return 공고정보를 담은 페이징에 대한 정보 객체
+	 *
+	 */
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public PageResponseDTO<RecruitmentNotice> getRecruitmentByCompanyUid(int companyUid, PageRequestDTO pageRequestDTO) {
@@ -305,5 +417,17 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	    pageResponseDTO.setBoardList(boardList);
 	    return pageResponseDTO;
 	}
+
+
+	@Override
+	public RecruitmentNotice getPreviousPost(int uid) throws Exception {
+	    return recdao.selectPreviousPost(uid);
+	}
+
+	@Override
+	public RecruitmentNotice getNextPost(int uid) throws Exception {
+	    return recdao.selectNextPost(uid);
+	}
+
 
 }

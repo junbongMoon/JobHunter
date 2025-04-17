@@ -43,6 +43,10 @@ import com.jobhunter.util.RecruitmentFileProcess;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * @author 문준봉
+ * <p> 공고를 담당하는 Controller</p>
+ */
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/recruitmentnotice")
@@ -50,17 +54,42 @@ public class RecruitmentNoticeController {
 	private final RecruitmentNoticeService recruitmentService;
 	private static final Logger logger = LoggerFactory.getLogger(RecruitmentNoticeController.class);
 
-	// 양식을 저장 할 List, 코드들
+	
+	/**
+	 * 우대조건을 저장하는 리스트 필드
+	 */
 	private final List<AdvantageDTO> advantageList = new ArrayList<>();
+	/**
+	 * 면접 방식을 저장하는 리스트 필드
+	 */
 	private final List<ApplicationDTO> applicationList = new ArrayList<>();
 
-	// 게시글 작성시 업로드한 파일객체들을 임시로 저장
+	
+	/**
+	 *  작성 페이지에서 업로드하는 파일들을 저장하는 파일 리스트
+	 */
 	private List<RecruitmentnoticeBoardUpfiles> fileList = new ArrayList<>();
 	// 게시글 수정시 업로한 파일 객체들을 임시로 저장
+	/**
+	 * 수정 페이지에서 수정된 파일을 저장하는 파일 리스트
+	 */
 	private List<RecruitmentnoticeBoardUpfiles> modifyFileList = new ArrayList<>();
+	/**
+	 * 파일 처리 객체
+	 */
 	private final RecruitmentFileProcess fp;
 
-	// 회사가 공고를 등록하는 메서드
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 회사가 공고를 등록하는 메서드
+	 * </p>
+	 * 
+	 * @param dto
+	 * @return 리스트페이지로 이동하는 String을 반환
+	 *
+	 */
 	@PostMapping("/save")
 	public String saveRecruitment(@ModelAttribute RecruitmentNoticeDTO dto) {
 		boolean result = false;
@@ -92,7 +121,18 @@ public class RecruitmentNoticeController {
 	}
 		
 
-	// 전체 공고 리스트를 출력하는 메서드
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 전체 공고 리스트를 출력하는 메서드
+	 * </p>
+	 * 
+	 * @param pageRequestDTO
+	 * @param model
+	 * @return 리스트페이지로 이동하는 String을 반환
+	 *
+	 */
 	@GetMapping("/listAll")
 	public String showRecruitmentList(PageRequestDTO pageRequestDTO, Model model) {
 		try {
@@ -112,8 +152,17 @@ public class RecruitmentNoticeController {
 		return "recruitmentnotice/listAll";
 	}
 
-	// 회사가 공고를 작성할 때 면접방식을 리스트에 누적 해주는 메서드
-	// 같은 면접방식이 중복 저장되는 문제가 생겼다... 해결해보자
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 회사가 공고를 작성할 때 면접방식을 리스트에 누적 해주는 메서드
+	 * </p>
+	 * 
+	 * @param applicationDTO
+	 * @return 면접방식을 담은 리스트를 담은 ResponseEntity
+	 *
+	 */
 	@PostMapping(value = "/application")
 	public ResponseEntity<List<ApplicationDTO>> saveApplicationWithRecruitmentNotice(
 			@RequestBody ApplicationDTO applicationDTO) {
@@ -139,9 +188,47 @@ public class RecruitmentNoticeController {
 
 		return result;
 	}
+	
+	@GetMapping("/listMore")
+	public String loadMoreRecruitments(@RequestParam("pageNo") int pageNo,
+	                                   @RequestParam(required = false) String searchType,
+	                                   @RequestParam(required = false) String searchWord,
+	                                   @RequestParam(required = false) String sortOption,
+	                                   Model model) {
 
-	// 공고를 작성할 때 면접방식을 삭제하는 메서드
+		PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+			    .pageNo(pageNo)
+			    .rowCntPerPage(10) // ★ 반드시 명시해야 함!
+			    .searchType(searchType)
+			    .searchWord(searchWord)
+			    .sortOption(sortOption)
+			    .build();
 
+	    PageResponseDTO<RecruitmentDetailInfo> response;
+		try {
+			response = recruitmentService.getEntireRecruitment(pageRequestDTO);
+			model.addAttribute("boardList", response.getBoardList());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    
+
+	    return "recruitmentnotice/recruitmentListFragment";
+	}
+
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고를 작성할 때 면접방식을 삭제하는 메서드
+	 * </p>
+	 * 
+	 * @param applicationDTO
+	 * @return 면접방식을 담은 리스트를 담은 ResponseEntity
+	 *
+	 */
 	@DeleteMapping("/application")
 	public ResponseEntity<List<ApplicationDTO>> deleteApplicationWithRecruitmentNotice(
 			@RequestBody ApplicationDTO applicationDTO) {
@@ -159,7 +246,18 @@ public class RecruitmentNoticeController {
 		return result;
 	}
 
-	// 파일을 저장하는 메서드
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 파일을 저장하는 메서드
+	 * </p>
+	 * 
+	 * @param file
+	 * @param request
+	 * @return 공고에 저장 된 파일을 담은 리스트를 담은 ResponseEntity
+	 *
+	 */
 	@PostMapping("/file")
 	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadFile(
 	        @RequestParam("file") MultipartFile file,
@@ -183,7 +281,17 @@ public class RecruitmentNoticeController {
 	    }
 	}
 
-	// 파일을 삭제하는 메서드
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 파일을 삭제하는 메서드
+	 * </p>
+	 * 
+	 * @param removeFileName
+	 * @return ResponseEntity<List<RecruitmentnoticeBoardUpfiles>>
+	 *
+	 */
 	@DeleteMapping("/file")
 	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> removeFile(
 	        @RequestParam("removeFileName") String removeFileName) {
@@ -204,7 +312,17 @@ public class RecruitmentNoticeController {
 	    return ResponseEntity.ok(fileList);
 	}
 	
-	// 전체 파일 리스트 초기화 메서드
+
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 필드의 파일 리스트 전체 초기화 메서드
+	 * </p>
+	 * 
+	 * @return ResponseEntity<Void>
+	 *
+	 */
 	@DeleteMapping("/removeAllFiles")
 	public ResponseEntity<Void> removeAllFiles() {
 	    for (RecruitmentnoticeBoardUpfiles f : fileList) {
@@ -214,7 +332,18 @@ public class RecruitmentNoticeController {
 	    return ResponseEntity.ok().build();
 	}
 
-	// 회사가 공고를 작성할 때 우대조건을 리스트에 누적 해주는 메서드
+ 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고를 작성할 때 우대조건을 리스트에 누적 해주는 메서드
+	 * </p>
+	 * 
+	 * @param advantageDTO
+	 * @return 공고에 저장 된 우대조건을 담은 리스트를 담은 ResponseEntity
+	 *
+	 */
 	@PostMapping(value = "/advantage")
 	public ResponseEntity<List<AdvantageDTO>> saveAdvantageWithRecruitmentNotice(
 			@RequestBody AdvantageDTO advantageDTO) {
@@ -232,7 +361,18 @@ public class RecruitmentNoticeController {
 		return result;
 	}
 
-	// 회사가 공고를 작성할 때 우대조건을 리스트에서 삭제 해주는 메서드
+ 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 회사가 공고를 작성할 때 우대조건을 리스트에서 삭제 해주는 메서드
+	 * </p>
+	 * 
+	 * @param advantageType
+	 * @return 공고에 저장 된 우대조건을 담은 리스트를 담은 ResponseEntity
+	 *
+	 */
 	@DeleteMapping(value = "/advantage/{advantageType}")
 	public ResponseEntity<List<AdvantageDTO>> deleteAdvantage(@PathVariable("advantageType") String advantageType) {
 		ResponseEntity<List<AdvantageDTO>> result = null;
@@ -246,18 +386,35 @@ public class RecruitmentNoticeController {
 		return result;
 	}
 
-	// 지역별 공고 리스트를 출력하는 메서드
 
-	// 직종별 공고 리스트를 출력하는 메서드
-
-	// 공고를 작성하는 페이지를 출력하는 메서드
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 *  공고를 작성하는 페이지를 출력하는 메서드
+	 * </p>
+	 * 
+	 *
+	 */
 	@GetMapping("/write")
 	public void showRecruitmentWithWrite() {
 		ListAllClear();
 
 	}
-
-	// 공고 상세 페이지, 수정 페이지를 출력
+ 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고 상세 페이지, 수정 페이지를 출력
+	 * </p>
+	 * 
+	 * @param uid
+	 * @param model
+	 * @param req
+	 * @return 쿼리스트링으로 상태를 알려주고 리스트 페이지를 반환 
+	 *
+	 */
 	@GetMapping(value = {"/detail", "/modify"})
 	public String showRecruitment(@RequestParam("uid") int uid, Model model, HttpServletRequest req) {
 		System.out.println(uid);
@@ -301,9 +458,17 @@ public class RecruitmentNoticeController {
 				
 			}
 			
+		    // 이전/다음 글 추가
+			RecruitmentNotice prevPost = recruitmentService.getPreviousPost(uid);
+			RecruitmentNotice nextPost = recruitmentService.getNextPost(uid);
+
+			
 			String applicationsJson = new ObjectMapper().writeValueAsString(this.applicationList);
 			model.addAttribute("applicationsJson", applicationsJson);
 			model.addAttribute("RecruitmentDetailInfo", detailInfo);
+		    model.addAttribute("prevPost", prevPost);
+		    model.addAttribute("nextPost", nextPost);
+
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -327,7 +492,21 @@ public class RecruitmentNoticeController {
 	}
 	
 	
-	// 공고를 수정하는 메서드 
+	 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 *공고를 수정하는 메서드
+	 * </p>
+	 * 
+	 * @param dto
+	 * @param applicationJson
+	 * @param advantageJson
+	 * @param uid
+	 * @return 쿼리스트링으로 상태를 알려주고 리스트 페이지를 반환
+	 *
+	 */
 	@PostMapping("/modify")
 	public String modifyRecruitment(
 	        @ModelAttribute RecruitmentNoticeDTO dto,
@@ -369,7 +548,17 @@ public class RecruitmentNoticeController {
 	}
 
 
-	// 공고를 삭제하는 메서드
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 공고를 삭제하는 메서드
+	 * </p>
+	 * 
+	 * @param uid
+	 * @return Boolean을 담은 ResponseEntity
+	 *
+	 */
 	@DeleteMapping("/remove/{uid}")
 	public ResponseEntity<Boolean> removeRecruitment(@PathVariable("uid") int uid) {
 		ResponseEntity<Boolean> result = null;
@@ -388,7 +577,19 @@ public class RecruitmentNoticeController {
 	    return result; 
 	}
 	
-    // 파일 상태 업데이트
+ 
+    /**
+     *  @author 문준봉
+     *
+     * <p>
+     * 파일 상태 업데이트
+     * </p>
+     * 
+     * @param fileName
+     * @param status
+     * @return ResponseEntity<Void>
+     *
+     */
     @PostMapping("/file/status")
     public ResponseEntity<Void> updateFileStatus(
             @RequestParam("fileName") String fileName,
@@ -411,7 +612,17 @@ public class RecruitmentNoticeController {
         return ResponseEntity.ok().build();
     }
 
-    // 수정 취소 시 파일 상태 롤백 및 삭제
+     
+    /**
+     *  @author 문준봉
+     *
+     * <p>
+     * 수정 취소 시 파일 상태 롤백 및 삭제
+     * </p>
+     * 
+     * @return ResponseEntity<Void>
+     *
+     */
     @PostMapping("/file/cancel")
     public ResponseEntity<Void> cancelFileModifications() {
         for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
@@ -425,7 +636,17 @@ public class RecruitmentNoticeController {
         return ResponseEntity.ok().build();
     }
 
-    // 파일 수정 최종 반영
+ 
+    /**
+     *  @author 문준봉
+     *
+     * <p>
+     * 파일 수정 최종 반영
+     * </p>
+     * 
+     * @return ResponseEntity<Void>
+     *
+     */
     @PostMapping("/file/finalize")
     public ResponseEntity<Void> finalizeFileModifications() {
         for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
@@ -438,7 +659,19 @@ public class RecruitmentNoticeController {
         return ResponseEntity.ok().build();
     }
 
-    // 수정 시 새로 업로드된 파일 추가
+    // 
+    /**
+     *  @author 문준봉
+     *
+     * <p>
+     * 수정 시 새로 업로드된 파일 추가
+     * </p>
+     * 
+     * @param file
+     * @param request
+     * @return 공고에 저장 된 파일을 담은 리스트를 담은 ResponseEntity
+     *
+     */
     @PostMapping("/file/modify")
     public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadModifyFile(
             @RequestParam("file") MultipartFile file,
@@ -462,7 +695,15 @@ public class RecruitmentNoticeController {
     }
 	
 
-	// 리스트, 필드를 전부 비워주는 메서드 (다 하고 맨 밑으로 내리자)
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 이 컨트롤러의 필드를 전부 비워주는 메서드
+	 * </p>
+	 * 
+	 *
+	 */
 	private void ListAllClear() {
 		this.advantageList.clear();
 		this.applicationList.clear();

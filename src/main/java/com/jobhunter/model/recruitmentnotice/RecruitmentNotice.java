@@ -32,5 +32,6 @@ public class RecruitmentNotice {
 	private String status;
 	// 조회수
 	private int count;
+	private Timestamp regDate;
 	private int refCompany;
 }

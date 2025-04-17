@@ -1,5 +1,6 @@
 package com.jobhunter.dao.user;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,6 @@ public class UserDAOImpl implements UserDAO {
 		return 0;
 	}
 
-
 	@Override
 	public int linkToKakao(KakaoUserInfoDTO userInfo) throws Exception {
 		return ses.update(NS + ".linkToKakao", userInfo);
@@ -112,6 +112,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public void setDeleteAccount(Integer uid) throws Exception {
 		ses.update(NS + ".setDeleteAccount", uid);
+
 	}
 
 	

@@ -67,6 +67,8 @@ public class SubmitController {
 		
 		submitService.changeStatus(status, resumePk, recruitmentNoticePk);
 		
+		
+		
 		result = ResponseEntity.ok().body(true);
 		
 		return result;

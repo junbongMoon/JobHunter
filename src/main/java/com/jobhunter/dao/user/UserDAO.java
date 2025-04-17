@@ -1,5 +1,6 @@
 package com.jobhunter.dao.user;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
@@ -39,6 +40,7 @@ public interface UserDAO {
 	int deleteMobile(String uid) throws Exception;
 
 	void setDeleteAccount(Integer uid) throws Exception;
+
 
 
 }

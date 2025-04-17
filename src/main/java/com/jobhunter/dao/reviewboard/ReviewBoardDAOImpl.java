@@ -169,5 +169,13 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 		
 	}
 
+	@Override
+	public int countByCreatedDateBetween(LocalDateTime start, LocalDateTime end) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("start", start);
+		param.put("end", end);
+		return ses.selectOne(NS + ".countByCreatedDateBetweenAndRole", param);
+	}
+
 
 }
