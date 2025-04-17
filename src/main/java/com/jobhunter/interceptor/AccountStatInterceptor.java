@@ -12,11 +12,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.jobhunter.model.account.AccountVO;
-import com.jobhunter.service.account.AccountService;
 import com.jobhunter.util.AccountUtil;
 import com.jobhunter.util.RedirectUtil;
-
-import lombok.RequiredArgsConstructor;
 
 @Component
 public class AccountStatInterceptor implements HandlerInterceptor {

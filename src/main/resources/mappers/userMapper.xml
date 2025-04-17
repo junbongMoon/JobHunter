@@ -12,18 +12,12 @@
 		<!-- 나머지는 동일 컬럼이므로 자동 매핑 -->
 	</resultMap>
 
-	<update id="setVerificationFalse" parameterType="map">
+	<update id="setVerificationFalse">
 		UPDATE users
 		SET requiresVerification = 'N'
 		WHERE
-		<choose>
-			<when test="type eq 'email'">
-				email = #{value}
-			</when>
-			<when test="type eq 'mobile'">
-				mobile = #{value}
-			</when>
-		</choose>
+		uid =
+		#{uid}
 	</update>
 
 	<select id="isAuthVerifi" resultType="String">
@@ -42,12 +36,14 @@
 	<update id="setLastLoginDate">
 		UPDATE users
 		SET lastLoginDate = NOW()
-		where uid = #{uid}
+		where uid =
+		#{uid}
 	</update>
 
 	<update id="setAutoLogin">
 		UPDATE users SET autoLogin = #{autoLogin}
-		where userId = #{id} and
+		where userId
+		= #{id} and
 		password = sha1(md5(#{password}))
 	</update>
 
@@ -82,12 +78,13 @@
 		from users
 		where uid = #{uid}
 	</select>
-	
+
 	<select id="getAccountByAutoLogin" resultMap="accountMap">
 		select *, userId as
 		accountId, userName as accountName
 		from users
-		where autoLogin = #{sessionId}
+		where autoLogin =
+		#{sessionId}
 	</select>
 
 	<!-- 여기까진 로그인용 -->
@@ -103,7 +100,8 @@
 		FROM users
 		WHERE uid = #{uid}
 		AND password
-		= SHA1(MD5(#{password}))
+		=
+		SHA1(MD5(#{password}))
 	</select>
 
 	<update id="updatePassword" parameterType="map">
@@ -126,60 +124,108 @@
 		UPDATE users
 		SET
 		addr = #{addr},
-		detailAddr = #{detailAddr},
+		detailAddr =
+		#{detailAddr},
 		gender = #{gender},
 		age = #{age},
 		payType = #{payType},
 		pay = #{pay},
 		introduce = #{introduce},
-		militaryService = #{militaryService},
+		militaryService =
+		#{militaryService},
 		nationality = #{nationality},
-		disability = #{disability}
+		disability =
+		#{disability}
 		WHERE uid = #{uid}
 	</update>
-	
+
 	<select id="findByKakao" resultType="java.lang.Integer">
-		SELECT uid FROM users WHERE socialId = #{kakaoId}
+		SELECT uid FROM users WHERE
+		socialId = #{kakaoId}
 	</select>
-	
-	<insert id="registKakao" useGeneratedKeys="true" keyProperty="uid">
-		INSERT INTO `users` (`userName`, `socialId`, `email`, `accountType`, `isSocial`) 
+
+	<insert id="registKakao" useGeneratedKeys="true"
+		keyProperty="uid">
+		INSERT INTO `users` (`userName`, `socialId`, `email`,
+		`accountType`, `isSocial`)
 		VALUES (#{nickname}, #{kakaoId}, #{email}, 'USER', 'Y');
 	</insert>
-	
+
 	<select id="loginByKakaoId" resultMap="accountMap">
 		select *, userId as
 		accountId, userName as accountName
 		from users
-		where socialId = #{kakaoId}
+		where socialId =
+		#{kakaoId}
 	</select>
-	
-	<select id="findIsUserById" resultType="boolean" parameterType="string">
+
+	<select id="findIsUserById" resultType="boolean"
+		parameterType="string">
 		SELECT EXISTS (
-            SELECT 1 FROM users WHERE userId = #{userId}
-        )
+		SELECT 1 FROM users WHERE userId = #{userId}
+		)
 	</select>
+
 	
-	<select id="findByEmail" resultMap="accountMap">
+	
+	<select id="findByContact" resultMap="accountMap">
 		select *, userId as
 		accountId, userName as accountName
 		from users
-		where email = #{email}
+		where
+		<choose>
+			<when test="targetType == 'email'">
+				email = #{targetValue}
+			</when>
+			<when test="targetType == 'mobile'">
+				mobile = #{targetValue}
+			</when>
+			<otherwise>
+				1 = 0 <!-- 예외 처리용, 조건이 없으면 무조건 실패하게 -->
+			</otherwise>
+		</choose>
+		<if test="targetId != null and targetId != ''">
+			AND userId = #{targetId}
+		</if>
 	</select>
 	
-	<select id="findByMobile" resultMap="accountMap">
-		select *, userId as
-		accountId, userName as accountName
-		from users
-		where mobile = #{mobile}
-	</select>
+	<update id="linkToKakao" parameterType="com.jobhunter.model.user.KakaoUserInfoDTO">
+		UPDATE users SET socialId = #{kakaoId}, email = #{email}, isSocial = 'Y' WHERE (uid = #{uid})
+	</update>
 	
-	<insert id="registUser" parameterType="com.jobhunter.model.user.UserRegisterDTO"
-        useGeneratedKeys="true" keyProperty="uid">
-	INSERT INTO `users` 
-		(`userName`, `userId`, `password`, `mobile`, `email`, `accountType`, `requiresVerification`, `isSocial`, `nationality`)
-	 VALUES 
-	 (#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N', #{nationality});
+
+	<update id="deleteEmail">
+		UPDATE users
+		SET email = NULL
+		WHERE uid = #{uid}
+		AND mobile IS NOT NULL
+		AND mobile != ''
+	</update>
+	
+	<update id="deleteMobile">
+		UPDATE users
+		SET mobile = NULL
+		WHERE uid = #{uid}
+		AND email IS NOT NULL
+		AND email != ''
+	</update>
+	
+	<update id="setDeleteAccount">
+		UPDATE users
+		SET deleteDeadline = NOW() + INTERVAL 3 DAY 
+		WHERE uid = #{uid}
+	</update>
+	
+
+<insert id="registUser"
+		parameterType="com.jobhunter.model.user.UserRegisterDTO"
+		useGeneratedKeys="true" keyProperty="uid">
+		INSERT INTO `users`
+		(`userName`, `userId`, `password`, `mobile`, `email`, `accountType`,
+		`requiresVerification`, `isSocial`, `nationality`)
+		VALUES
+		(#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N',
+		#{nationality});
 	</insert>
 
 </mapper>

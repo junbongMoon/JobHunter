@@ -83,12 +83,6 @@ public class UserDAOImpl implements UserDAO {
 		Boolean result = ses.selectOne(NS + ".findIsUserById", userId);
 	    return Boolean.TRUE.equals(result);
 	}
-
-	@Override
-	public AccountVO findByEmail(KakaoUserInfoDTO userInfo) throws Exception {
-		AccountVO result = ses.selectOne(NS + ".findByEmail", userInfo.getEmail());
-		return result;
-	}
 	
 	@Override
 	public int registUser(UserRegisterDTO dto) throws Exception {
@@ -98,4 +92,27 @@ public class UserDAOImpl implements UserDAO {
 		}
 		return 0;
 	}
+
+
+	@Override
+	public int linkToKakao(KakaoUserInfoDTO userInfo) throws Exception {
+		return ses.update(NS + ".linkToKakao", userInfo);
+	}
+	
+	@Override
+	public int deleteMobile(String uid) throws Exception {
+		return ses.update(NS + ".deleteMobile", uid);
+	}
+	
+	@Override
+	public int deleteEmail(String uid) throws Exception {
+		return ses.update(NS + ".deleteEmail", uid);
+	}
+
+	@Override
+	public void setDeleteAccount(Integer uid) throws Exception {
+		ses.update(NS + ".setDeleteAccount", uid);
+	}
+
+	
 }

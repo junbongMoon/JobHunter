@@ -16,14 +16,12 @@
 <style>
 .main {
 	padding: 60px 20px;
-	background: #f8f9fa;
 	min-height: calc(100vh - 200px);
 }
 
 .login-container {
 	background: white;
 	border-radius: 20px;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 	max-width: 700px;
 	margin: 0 auto;
 }
@@ -597,7 +595,12 @@ async function sendPhoneCode() {
     	});
     } catch (error) {
         console.error("전화번호 인증 실패:", error);
-        window.publicModals.show("전화번호 인증 중 오류 발생.");
+        window.publicModals.show("인증번호 발송에 실패했습니다. http이슈 혹은 firebase횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.(포트폴리오용)",
+        	{
+        		confirmText: "백도어",
+        		cancelText: "취소",
+        		onConfirm: okMobile
+        	});
     }
 }
 
@@ -625,7 +628,7 @@ async function checkDuplicateMobile(formattedNumber) {
 
   } catch (e) {
     window.publicModals.show('서버와의 연결이 불안정합니다. 잠시 후 다시 시도해주세요.');
-    return true; // 실패 시 중복된 걸로 취급
+    return true; // 서버 에러
   }
 }
 // 전화번호 입력 처리 함수
@@ -736,7 +739,7 @@ function verifyEmailCode() {
 	}
 
     $.ajax({
-		url: `/account/auth/email/\${code}`,
+		url: `/account/auth/email/verify/\${code}`,
 		method: "POST",
 		contentType: "application/json",
 		data: JSON.stringify({

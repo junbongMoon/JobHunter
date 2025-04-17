@@ -30,7 +30,15 @@ public interface UserDAO {
 
 	boolean findIsUserById(String userId) throws Exception;
 
-	AccountVO findByEmail(KakaoUserInfoDTO userInfo) throws Exception;
-
 	int registUser(UserRegisterDTO dto) throws Exception;
+
+	int linkToKakao(KakaoUserInfoDTO userInfo) throws Exception;
+
+	int deleteEmail(String uid) throws Exception;
+
+	int deleteMobile(String uid) throws Exception;
+
+	void setDeleteAccount(Integer uid) throws Exception;
+
+
 }

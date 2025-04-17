@@ -3,7 +3,7 @@ package com.jobhunter.model.recruitmentnotice;
 import java.sql.Timestamp;
 
 import com.jobhunter.model.customenum.JobForm;
-import com.jobhunter.model.customenum.MilitaryService;
+import com.jobhunter.model.customenum.MilitaryServe;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,7 +35,7 @@ public class RecruitmentNoticeDTO {
 	// 경력
 	private String personalHistory;
 	// 병역 사항('NOT_SERVED', 'SERVED', 'EXEMPTED' : 미필, 군필, 면제)
-	private MilitaryService militaryService;
+	private MilitaryServe militaryService;
 	// 공고 상세 내용
 	private String detail;
 	// 담당자 이름(굳이 company의 userName이 아니어도 됨)

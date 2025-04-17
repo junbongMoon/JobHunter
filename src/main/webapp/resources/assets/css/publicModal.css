@@ -56,7 +56,7 @@
 }
 
 .public-modal-button.cancel {
-  background: #f8f9fa;
+  background: var(--bs-gray-200);
   color: #666;
 }
 

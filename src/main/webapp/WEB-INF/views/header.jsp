@@ -12,6 +12,7 @@
 
 			<!-- 공용 모달 -->
 			<script src="/resources/assets/js/publicModal.js"></script>
+			<script src="/resources/assets/js/reportAccount.js"></script>
 			<link href="/resources/assets/css/publicModal.css" rel="stylesheet">
 
 			<!-- Favicons -->
@@ -175,7 +176,16 @@
   * License: https://bootstrapmade.com/license/
     ======================================================== -->
 		</head>
-
+		<!-- 알럿 모달 -->
+		<div id="publicModalOverlay" class="public-modal-overlay" style="display: none;"></div>
+		<div id="publicModal" class="public-modal-box" style="display: none;">
+		<div class="public-modal-content">
+			<div class="public-modal-message"></div>
+			<div class="public-modal-buttons"></div>
+		</div>
+		</div>
+		<!-- 알럿 모달 -->
+		 
 		<div class="index-page">
 			<header id="header" class="header d-flex align-items-center">
 				<div class="container-fluid container-xl position-relative d-flex align-items-center header-background">
@@ -279,6 +289,7 @@
 
 
 					<c:if test="${not empty sessionScope.account}">
+
 						<a class="btn-getstarted" href="/account/logout">로그아웃</a>
 					</c:if>
 					<c:if test="${empty sessionScope.account}">
