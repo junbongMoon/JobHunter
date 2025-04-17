@@ -1,6 +1,6 @@
 package com.jobhunter.model.reviewboard;
 
-import java.sql.Timestamp;
+
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

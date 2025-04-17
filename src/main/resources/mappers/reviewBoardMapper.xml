@@ -12,13 +12,15 @@
 		r.boardNo,
 		u.userId AS writer,
 		c.companyName,
+		r.reviewResult,
 		r.likes,
 		r.views,
 		r.postDate
 		FROM
 		reviewBoard r
 		JOIN
-		users u ON r.writer = u.uid
+		users u
+		ON r.writer = u.uid
 		JOIN
 		recruitmentnotice rn ON r.gonggoUid = rn.uid
 		JOIN
@@ -48,37 +50,23 @@
 		JOIN company c ON rn.refCompany =
 		c.uid
 		WHERE res.userUid = #{res.userUid}
-		AND reg.status in('PASS','FAILURE','EXPIRED','CHECKED')
+		AND reg.status
+		in('PASS','FAILURE','EXPIRED','CHECKED')
 
 	</select>
 	<!-- 작성페이지 인서트 -->
 	<insert id="insertReview"
 		parameterType="com.jobhunter.model.reviewboard.WriteBoardDTO"
-	useGeneratedKeys="true"
-	keyProperty="boardNo">
-		insert into reviewBoard
-		(gonggoUid,
-		writer,
-		companyName,
-		reviewType,
-		reviewLevel,
-		reviewResult,
-		content,
-		postDate,
-		likes,
-		views
-		)
-		VALUES (
+		useGeneratedKeys="true" keyProperty="boardNo">
+		insert into
+		reviewBoard (
+		gonggoUid, writer, companyName, reviewType, reviewLevel, reviewResult,
+		typeOtherText, content, postDate, likes, views
+		) values (
 		#{gonggoUid},
-		#{writer},
-		#{companyName},
-		#{reviewType},
-		#{reviewLevel},
+		#{writer}, #{companyName}, #{reviewType}, #{reviewLevel},
 		#{reviewResult},
-		#{content},
-		NOW(),
-		0,
-		0
+		#{typeOtherText}, #{content}, NOW(), 0, 0
 		)
 	</insert>
 
@@ -96,60 +84,65 @@
 		com.companyName,
 		r.reviewResult,
 		r.reviewType,
+		r.typeOtherText,
 		r.reviewLevel,
 		r.content,
 		r.likes,
 		r.views
-		FROM reviewBoard r
-		INNER JOIN users u ON
-		r.writer =
-		u.uid
-		INNER JOIN recruitmentnotice rec ON r.gonggoUid =
-		rec.uid
-		INNER
-		JOIN resume res ON rec.uid =res.resumeNo
-		INNER JOIN company
-		com ON
-		rec.refCompany = com.uid
-		WHERE r.boardNo = #{boardNo}
+		FROM
+		reviewBoard r
+		JOIN recruitmentnotice rec ON r.gonggoUid = rec.uid
+		JOIN
+		company com ON rec.refCompany = com.uid
+		JOIN registration reg ON
+		rec.uid = reg.recruitmentNoticePk
+		JOIN resume res ON reg.resumePk =
+		res.resumeNo
+		JOIN users u ON r.writer = u.uid
+		WHERE r.boardNo
+		=#{r.boardNo}
+		ORDER BY reg.regDate DESC
+		LIMIT 1
 	</select>
 
 	<resultMap id="ReviewDetailViewDTOMap"
 		type="com.jobhunter.model.reviewboard.ReviewDetailViewDTO">
-		<result column="boardNo" property="boardNo" /> <!-- 게시글 번호 -->
-		<result column="title" property="title" /> <!-- 공고 제 -->
-		<result column="userId" property="userId" /> <!--유저 아이디 -->
-		<result column="workType" property="workType" /> <!-- 근무 형태 -->
-		<result column="payType" property="payType" /><!-- 급여 형태 -->
-		<result column="personalHistory" property="personalHistory" /> <!--경력사항 -->
-		<result column="period" property="period" /><!--근무기간 -->
-		<result column="detail" property="detail" /><!-- 공고 상세 설명 -->
-		<result column="companyName" property="companyName" /> <!--회사명 -->
-		<result column="reviewResult" property="reviewResult" /><!-- 면접 
-			결과 -->
-		<result column="reviewType" property="reviewType" /> <!-- 면접 유형 -->
-		<result column="reviewLevel" property="reviewLevel" /><!--면접 난이도 -->
-		<result column="content" property="content" /> <!--후기 본문 -->
-		<result column="likes" property="likes" /> <!-- 좋아요 -->
-		<result column="views" property="views" /><!-- 조회수 -->
+		<result column="boardNo" property="boardNo" />
+		<result column="userId" property="userId" />
+		<result column="workType" property="workType" />
+		<result column="payType" property="payType" />
+		<result column="personalHistory" property="personalHistory" />
+		<result column="period" property="period" />
+		<result column="detail" property="detail" />
+		<result column="companyName" property="companyName" />
+		<result column="reviewResult" property="reviewResult" />
+		<result column="reviewType" property="reviewType" />
+		<result column="typeOtherText" property="typeOtherText" />
+		<result column="reviewLevel" property="reviewLevel" />
+		<result column="content" property="content" />
+		<result column="likes" property="likes" />
+		<result column="views" property="views" />
 	</resultMap>
+
 
 	<!-- 1. 최근 24시간 내 좋아요 시간 -->
 	<select id="selectLastLikeTime"
 		resultType="java.time.LocalDateTime">
 		SELECT createdAt
-		FROM reviewLikes
+		FROM LikesLog
 		WHERE userId = #{userId}
-		AND boardNo = #{boardNo}
+		AND
+		boardNo = #{boardNo}
+		AND LikeType = #{likeType}
 		ORDER BY createdAt DESC
 		LIMIT 1
 	</select>
 
 	<!-- 2. 좋아요 등록 -->
 	<insert id="insertLike">
-		INSERT INTO reviewLikes (userId, boardNo)
+		INSERT INTO LikesLog (userId, boardNo,LikeType)
 		VALUES
-		(#{userId}, #{boardNo})
+		(#{userId}, #{boardNo}, #{likeType})
 	</insert>
 
 	<!-- 3. 좋아요 수 증가 -->
@@ -162,7 +155,7 @@
 
 	<!-- 좋아요 취소 (삭제) -->
 	<delete id="deleteLike">
-		DELETE FROM reviewLikes
+		DELETE FROM LikesLog
 		WHERE userId = #{userId}
 		AND
 		boardNo = #{boardNo}
@@ -178,10 +171,12 @@
 
 	<select id="selectModifyReviewBoard" parameterType="int"
 		resultType="com.jobhunter.model.reviewboard.WriteBoardDTO">
-		SELECT boardNo, gonggoUid, writer, companyName, reviewResult, reviewType,
+		SELECT boardNo, gonggoUid, writer, companyName,
+		reviewResult, reviewType,
 		reviewLevel, content
 		FROM reviewBoard
-		WHERE boardNo = #{boardNo}
+		WHERE
+		boardNo = #{boardNo}
 	</select>
 
 
@@ -189,11 +184,128 @@
 		UPDATE reviewBoard
 		SET
 		gonggoUid = #{gonggoUid},
+		reviewLevel = #{reviewLevel},
 		reviewType= #{reviewType},
-		reviewResult =#{reviewResult},
-		content =#{content},
+		typeOtherText =
+		#{typeOtherText},
+		content=#{content},
 		postDate= NOW()
 		WHERE boardNo =
 		#{boardNo}
 	</update>
+
+	<delete id="deleteById" parameterType="int">
+		DELETE FROM reviewBoard
+		WHERE boardNo = #{boardNo}
+	</delete>
+
+
+	<!-- 1. 24시간 내 조회했는지 확인 -->
+	<select id="checkViewedWithHours" resultType="int">
+		SELECT COUNT(*)
+		FROM ViewsLog
+		WHERE userId = #{userId}
+		AND boardNo = #{boardNo}
+		AND
+		viewedAt >= NOW() - INTERVAL 24 HOUR
+	</select>
+
+	<!-- 2. 조회 기록 저장 -->
+	<insert id="insertReviewView">
+		INSERT INTO ViewsLog (userId, boardNo, viewedAt,
+		ViewType)
+		VALUES (#{userId}, #{boardNo}, NOW(), #{viewType})
+		ON DUPLICATE KEY UPDATE viewedAt = NOW()
+	</insert>
+
+	<!-- 3. 게시판 조회수 증가 -->
+	<update id="updateCountViews">
+		UPDATE reviewBoard
+		SET views = views + 1
+		WHERE boardNo
+		= #{boardNo}
+	</update>
+
+
+	<!-- reviewBoardMapper.xml -->
+	<select id="countAllBoards" resultType="int">
+		SELECT COUNT(*) FROM
+		reviewBoard
+	</select>
+
+	<select id="selectPagedBoards"
+		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
+		SELECT * FROM reviewBoard
+		ORDER BY boardNo DESC
+		LIMIT #{size}
+		OFFSET #{offset}
+	</select>
+
+	<!--검색 기능 쿼리 -->
+	<select id="selectPagedReviewBoard"
+		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
+		SELECT
+		r.*,
+		c.companyName
+		FROM
+		reviewBoard r
+		JOIN recruitmentnotice rn ON
+		r.gonggoUid = rn.uid
+		JOIN company c ON
+		rn.refCompany = c.uid
+		<where>
+			<if
+				test="searchType != null and searchType != '' and keyword != null and keyword != ''">
+				<choose>
+					<when test="searchType eq 'companyName'">
+						c.companyName LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<when test="searchType eq 'reviewResult'">
+						r.reviewResult = #{keyword}
+					</when>
+				</choose>
+			</if>
+		</where>
+		ORDER BY r.boardNo DESC
+		LIMIT #{offset}, #{size}
+	</select>
+
+
+	<select id="countReviewBoard" resultType="int">
+		SELECT COUNT(*)
+		FROM reviewBoard r
+		JOIN recruitmentnotice rn ON
+		r.gonggoUid = rn.uid
+		JOIN company c ON rn.refCompany = c.uid
+		<where>
+			<if
+				test="searchType != null and searchType != '' and keyword != null and keyword != ''">
+				<choose>
+					<when test="searchType eq 'companyName'">
+						c.companyName LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<when test="searchType eq 'reviewResult'">
+						r.reviewResult = #{keyword}
+					</when>
+				</choose>
+			</if>
+		</where>
+	</select>
+
+
+	<select id="selectUserIdByBoardNo" parameterType="int"
+		resultType="int">
+		SELECT writer FROM reviewBoard WHERE boardNo = #{boardNo}
+	</select>
+
+	<insert id="logInsertCreate">
+		insert into CDLog (targetId, targetType, logType)
+		values (#{uid}, 'REVIEW', 'CREATE')
+	</insert>
+
+	<insert id="logInsertDelete">
+		insert into CDLog (targetId, targetType, logType)
+		values (#{uid}, 'REVIEW', 'DELETE')
+	</insert>
+
 </mapper>
