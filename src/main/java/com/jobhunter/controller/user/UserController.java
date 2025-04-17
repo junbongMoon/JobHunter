@@ -44,6 +44,7 @@ public class UserController {
 		
         String accessToken = null;
         KakaoUserInfoDTO userInfo = null;
+        
 		try {
 			// 1. 인가 코드로 Access Token 요청
 			accessToken = service.getKakaoToken(code, redirectUri);
@@ -134,19 +135,6 @@ public class UserController {
 	    return "redirect:/user/mypage?uid="+ account.getUid() +"&accountType=user";
 	}
 	
-	private String formatKakaoUri(HttpServletRequest request) {
-		String contextPath = request.getContextPath();
-	    if (contextPath == null || contextPath.equals("/")) {
-	        contextPath = "";
-	    }
-	    // 카카오 주소 찾기
-	    String redirectUri = request.getScheme() + "://" +
-	                         request.getServerName() +
-	                         (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort()) +
-	                         contextPath + "/user/kakao";
-		return redirectUri;
-	}
-	
 	@GetMapping("/register")
 	public void registUser() {
 		
@@ -178,4 +166,27 @@ public class UserController {
 
         return "redirect:" + redirectUrl;
     }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	private String formatKakaoUri(HttpServletRequest request) {
+		String contextPath = request.getContextPath();
+	    if (contextPath == null || contextPath.equals("/")) {
+	        contextPath = "";
+	    }
+	    // 카카오 주소 찾기
+	    String redirectUri = request.getScheme() + "://" +
+	                         request.getServerName() +
+	                         (request.getServerPort() == 80 || request.getServerPort() == 443 ? "" : ":" + request.getServerPort()) +
+	                         contextPath + "/user/kakao";
+		return redirectUri;
+	}
 }
