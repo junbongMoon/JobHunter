@@ -40,11 +40,6 @@
 		password = sha1(md5(#{password}))
 	</update>
 
-	<select id="existsAccountId" parameterType="String"
-		resultType="boolean">
-		SELECT EXISTS (SELECT 1 FROM company WHERE companyId = #{id})
-	</select>
-
 	<update id="increaseFailCount" parameterType="String">
 		UPDATE company SET loginCnt = loginCnt + 1 WHERE companyId = #{id}
 	</update>
