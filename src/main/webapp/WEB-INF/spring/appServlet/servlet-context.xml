@@ -77,8 +77,11 @@
 		<interceptor>
 			<mapping path="/user/mypage" />
 			<mapping path="/reviewBoard/write"/>
+			<mapping path="/company/companyInfo" />
 			<mapping path="/account/testLoginAjax" />
 			<mapping path="/account/testGetLogin" />
+			<mapping path="/resume/**" />
+			<mapping path="/submission/**" />
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
 		
@@ -94,6 +97,7 @@
 
 		<interceptor>
 			<mapping path="/user/mypage" />
+			<mapping path="/company/companyInfo" />
 			<mapping path="/account/testGetOwner" />
 			<beans:ref bean="OwnerInterceptor" />
 		</interceptor>

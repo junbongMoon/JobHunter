@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jobhunter.mapper.adminmapper">
+
+	<!-- 관리자 페이지 모든 유저 조회 -->
+	<select id="getAllUsers" resultType="com.jobhunter.model.user.UserVO">
+		SELECT * FROM users
+	</select>
+	
+	<select id="getUserById" parameterType="int" resultType="com.jobhunter.model.user.UserVO">
+		SELECT * FROM users WHERE uid = #{uid}
+	</select>
+
+	<!-- 검색 조건에 따른 유저 목록 조회 -->
+	<select id="getUsersBySearch" parameterType="map" resultType="com.jobhunter.model.user.UserVO">
+		SELECT * FROM users
+		<where>
+			<!-- 검색 조건 -->
+			<if test="searchType != null and searchKeyword != null and searchKeyword != ''">
+				<choose>
+					<when test="searchType == 'name'">
+						AND userName LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="searchType == 'email'">
+						AND email LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="searchType == 'mobile'">
+						AND mobile LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+				</choose>
+			</if>
+			<!-- 상태 필터 조건 -->
+			<if test="statusFilter != null and statusFilter != 'all'">
+				<choose>
+					<when test="statusFilter == 'normal'">
+						AND blockDeadline IS NULL AND deleteDeadline IS NULL AND requiresVerification = 'N'
+					</when>
+					<when test="statusFilter == 'blocked'">
+						AND blockDeadline IS NOT NULL
+					</when>
+					<when test="statusFilter == 'pending_delete'">
+						AND deleteDeadline IS NOT NULL
+					</when>
+					<when test="statusFilter == 'requires_verification'">
+						AND requiresVerification = 'Y'
+					</when>
+				</choose>
+			</if>
+		</where>
+		ORDER BY uid DESC
+		LIMIT #{offset}, #{pageSize}
+	</select>
+
+	<!-- 검색 조건 및 상태 필터에 따른 전체 유저 수 조회 -->
+	<select id="getTotalUserCount" parameterType="map" resultType="int">
+		SELECT COUNT(*) FROM users
+		<where>
+			<!-- 검색 조건 -->
+			<if test="searchType != null and searchKeyword != null and searchKeyword != ''">
+				<choose>
+					<when test="searchType == 'name'">
+						userName LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="searchType == 'email'">
+						email LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="searchType == 'mobile'">
+						mobile LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+				</choose>
+			</if>
+			<!-- 상태 필터 조건 -->
+			<if test="statusFilter != null and statusFilter != 'all'">
+				<choose>
+					<when test="statusFilter == 'normal'">
+						AND blockDeadline IS NULL AND deleteDeadline IS NULL AND requiresVerification = 'N'
+					</when>
+					<when test="statusFilter == 'blocked'">
+						AND blockDeadline IS NOT NULL
+					</when>
+					<when test="statusFilter == 'pending_delete'">
+						AND deleteDeadline IS NOT NULL
+					</when>
+					<when test="statusFilter == 'requires_verification'">
+						AND requiresVerification = 'Y'
+					</when>
+				</choose>
+			</if>
+		</where>
+	</select>
+
+	<!-- 유저 정지 -->
+	<update id="blockUser" parameterType="map">
+		UPDATE users 
+		SET blockDeadline = #{blockDeadline},
+			blockReason = #{reason}
+		WHERE uid = #{uid}
+	</update>
+	
+	<!-- 유저 정지 해제 -->
+	<update id="unblockUser" parameterType="int">
+		UPDATE users 
+		SET blockDeadline = NULL,
+			blockReason = NULL
+		WHERE uid = #{uid}
+	</update>
+
+	<!-- 기업 관련 쿼리 -->
+	
+	<!-- 모든 기업 조회 -->
+	<select id="getAllCompanies" resultType="com.jobhunter.model.company.CompanyVO">
+		SELECT * FROM company
+	</select>
+	
+	<!-- 특정 기업 조회 -->
+	<select id="getCompanyById" parameterType="int" resultType="com.jobhunter.model.company.CompanyVO">
+		SELECT * FROM company WHERE uid = #{uid}
+	</select>
+	
+	<!-- 검색 조건에 따른 기업 목록 조회 -->
+	<select id="getCompaniesBySearch" parameterType="map" resultType="com.jobhunter.model.company.CompanyVO">
+		SELECT * FROM company
+		<where>
+			<!-- 검색 조건 -->
+			<if test="searchType != null and searchKeyword != null and searchKeyword != ''">
+				<choose>
+					<when test="searchType == 'companyName'">
+						AND companyName LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="searchType == 'companyId'">
+						AND companyId LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="searchType == 'email'">
+						AND email LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="searchType == 'mobile'">
+						AND mobile LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+				</choose>
+			</if>
+			<!-- 상태 필터 조건 -->
+			<if test="statusFilter != null and statusFilter != 'all'">
+				<choose>
+					<when test="statusFilter == 'normal'">
+						AND blockDeadline IS NULL AND deleteDeadline IS NULL AND requiresVerification = 'N'
+					</when>
+					<when test="statusFilter == 'blocked'">
+						AND blockDeadline IS NOT NULL
+					</when>
+					<when test="statusFilter == 'pending_delete'">
+						AND deleteDeadline IS NOT NULL
+					</when>
+					<when test="statusFilter == 'requires_verification'">
+						AND requiresVerification = 'Y'
+					</when>
+				</choose>
+			</if>
+		</where>
+		ORDER BY uid DESC
+		LIMIT #{offset}, #{pageSize}
+	</select>
+	
+	<!-- 검색 조건 및 상태 필터에 따른 전체 기업 수 조회 -->
+	<select id="getTotalCompanyCount" parameterType="map" resultType="int">
+		SELECT COUNT(*) FROM company
+		<where>
+			<!-- 검색 조건 -->
+			<if test="searchType != null and searchKeyword != null and searchKeyword != ''">
+				<choose>
+					<when test="searchType == 'companyName'">
+						companyName LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="searchType == 'companyId'">
+						companyId LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="searchType == 'email'">
+						email LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="searchType == 'mobile'">
+						mobile LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+				</choose>
+			</if>
+			<!-- 상태 필터 조건 -->
+			<if test="statusFilter != null and statusFilter != 'all'">
+				<choose>
+					<when test="statusFilter == 'normal'">
+						AND blockDeadline IS NULL AND deleteDeadline IS NULL AND requiresVerification = 'N'
+					</when>
+					<when test="statusFilter == 'blocked'">
+						AND blockDeadline IS NOT NULL
+					</when>
+					<when test="statusFilter == 'pending_delete'">
+						AND deleteDeadline IS NOT NULL
+					</when>
+					<when test="statusFilter == 'requires_verification'">
+						AND requiresVerification = 'Y'
+					</when>
+				</choose>
+			</if>
+		</where>
+	</select>
+	
+	<!-- 기업 정지 -->
+	<update id="blockCompany" parameterType="map">
+		UPDATE company 
+		SET blockDeadline = #{blockDeadline},
+			blockReason = #{reason}
+		WHERE uid = #{uid}
+	</update>
+	
+	<!-- 기업 정지 해제 -->
+	<update id="unblockCompany" parameterType="int">
+		UPDATE company 
+		SET blockDeadline = NULL,
+			blockReason = NULL
+		WHERE uid = #{uid}
+	</update>
+</mapper>

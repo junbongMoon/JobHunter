@@ -6,13 +6,27 @@ const publicModals = {
       confirmText = '확인',
       cancelText = null,
       onConfirm = null,
-      onCancel = null
+      onCancel = null,
+      size_x = null,
+      size_y = null
     } = options;
 
     const overlay = document.getElementById('publicModalOverlay');
     const modal = document.getElementById('publicModal');
     const messageEl = modal.querySelector('.public-modal-message');
     const buttonsEl = modal.querySelector('.public-modal-buttons');
+
+    if (size_x) {
+      modal.style.width = size_x;
+    } else {
+      modal.style.removeProperty('width');
+    }
+    
+    if (size_y) {
+      modal.style.height = size_y;
+    } else {
+      modal.style.removeProperty('height');
+    }
 
     messageEl.innerHTML = message;
     
@@ -31,9 +45,9 @@ const publicModals = {
     const cancelBtn = modal.querySelector('.public-modal-button.cancel');
 
     confirmBtn.onclick = () => {
+    
       if (onConfirm) {
         const result = onConfirm();
-        console.log(result);
 	    if (result === false) {
 	      return; // false 리턴 시 모달 닫지 않음
 	    }

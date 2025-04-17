@@ -78,9 +78,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public String getKakaoToken(String code, String redirectUri) throws Exception {
 		
-		System.out.println("code : " + code);
-		System.out.println("redirectUri : " + redirectUri);
-		
 	    RestTemplate restTemplate = new RestTemplate();
 
 	    HttpHeaders headers = new HttpHeaders();
@@ -97,8 +94,6 @@ public class UserServiceImpl implements UserService {
 	    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
 	    ResponseEntity<Map> response = restTemplate.postForEntity("https://kauth.kakao.com/oauth/token", request, Map.class);
-
-	    System.out.println("response : " + response);
 	    
 	    return (String) response.getBody().get("access_token");
 	}
@@ -132,28 +127,34 @@ public class UserServiceImpl implements UserService {
 	    		.kakaoId(kakaoId)
 	    		.build();
 	    
-	    System.out.println(kakaoUserInfo);
 	    return kakaoUserInfo;
 	}
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-	public AccountVO loginOrRegisterKakao(KakaoUserInfoDTO userInfo) throws Exception {
+	public Map<String, Object> loginOrRegisterKakao(KakaoUserInfoDTO userInfo) throws Exception {
+		Map<String, Object> result = new HashMap<String, Object>();
+		
 		AccountVO accountVo = null;
 		Integer uid = dao.findByKakao(userInfo);
+		
 		if (uid == null) {
-			AccountVO emailAccount = dao.findByEmail(userInfo);
-			if(emailAccount == null) {
-				uid = dao.registKakao(userInfo);
-			} else {
-				throw new DuplicateEmailException();
-			}
+			uid = dao.registKakao(userInfo);
+			result.put("isFirst", true);
 		}
 		
 		if (uid != null) {
 			accountVo = dao.loginByKakaoId(userInfo.getKakaoId());
+			result.put("accountVo", accountVo);
 		}
-		return accountVo;
+		return result;
+	}
+	
+	@Override
+	public void linkToKakao(KakaoUserInfoDTO userInfo) throws Exception {
+		if (dao.linkToKakao(userInfo) != 1) {
+			throw new Exception();
+		}
 	}
 
 	@Override
@@ -168,5 +169,24 @@ public class UserServiceImpl implements UserService {
 		return dao.findByUidAndPassword(uid.toString(), dto.getPassword());
 	}
 
+
+	@Override
+	public void deleteContact(String uid, String type) throws Exception {
+		if(type.equals("mobile")) {
+			if(dao.deleteMobile(uid) != 1) {
+				throw new Exception();
+			}
+		} else {
+			if(dao.deleteEmail(uid) != 1) {
+				throw new Exception();
+			}
+		}
+	}
 	
+	@Override
+	public void setDeleteAccount(Integer uid) throws Exception {
+		dao.setDeleteAccount(uid);
+	}
+
+
 }

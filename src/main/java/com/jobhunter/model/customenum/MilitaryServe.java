@@ -8,4 +8,5 @@ public enum MilitaryServe {
     SERVED, // 군필
     EXEMPTED // 면제
 
+
 }

@@ -6,12 +6,17 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.reviewboard.ReviewBoardDAO;
+import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.reviewboard.Likes;
+import com.jobhunter.model.reviewboard.RPageRequestDTO;
+import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
@@ -48,6 +53,7 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	}
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean saveReview(WriteBoardDTO writeBoardDTO) throws Exception {
 		boolean result = false;
 		int boardInsert = Rdao.insertBoard(writeBoardDTO);
@@ -56,6 +62,7 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 		if (boardInsert > 0) {
 			System.out.println("리뷰 등록 성공");
+			Rdao.insertLog(writeBoardDTO.getUserId(), "REVIEW", "CREATE");
 			result = true;
 		} else {
 			System.out.println("리뷰 등록 실패");
@@ -66,16 +73,23 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 	@Override
 	public ReviewDetailViewDTO getReviewDetail(int boardNo) throws Exception {
-
+	
+		
+		
 		return Rdao.selectReviewInfo(boardNo);
 	}
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean addlikes(int userId, int boardNo) throws Exception {
-
+		Likes like = Likes.builder()
+				.userId(userId)
+				.boardNo(boardNo)
+				.likeType("REBOARD")
+				.build();
+		
 		// 1. 마지막 좋아요 시간 조회-> 유저가(userId) 어떤 게시글(boardNo)에 마지막으로 좋아요를 누른 시간이 언제인지
-		LocalDateTime lastLikeTime = Rdao.selectLike(userId, boardNo);
+		LocalDateTime lastLikeTime = Rdao.selectLike(like);
 
 		// 2. 24시간 제한 체크
 		// if문으로 마지막으로 좋아요 누른 시간이 있다면
@@ -94,7 +108,8 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 		// 3. 좋아요 추가
 
-		Rdao.insertLike(userId, boardNo);
+		
+		Rdao.insertLike(like);
 
 		// 4. 게시글 좋아요 수 증가
 		Rdao.updateBoardLikes(boardNo);
@@ -130,5 +145,48 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	    return false ; // 수정 실패
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public boolean deleteBoard(int boardNo) throws Exception {
+		int userId = Rdao.selectUserIdByBoardNo(boardNo);
+		Rdao.insertLog(userId, "REVIEW", "DELETE");
+		Rdao.deletBoardNo(boardNo);
+		return true;
+
+	}
+	
+	@Override
+	public boolean oneViewCount(int userId, int boardNo ) throws Exception {
+		int count = Rdao.checkViewedWithHours(userId, boardNo);
+	    return count == 0;  //조회 기록이 없다
+	}
+
+	public void insertViews(int userId, int boardNo,String viewType) throws Exception {
+		// 최근 24시간 이내 조회했는지 검사
+		int count = Rdao.checkViewedWithHours(userId, boardNo);
+		if (count == 0) {
+			// INSERT or UPDATE 처리
+			Rdao.insertOrUpdateReviewView(userId, boardNo, "REBOARD");
+			Rdao.incrementViews(boardNo);
+		}
+	}
+
+
+
+
+	@Override
+	public RPageResponseDTO<ReviewBoardDTO> getPagedBoardList(RPageRequestDTO pageRequestDTO) throws Exception {
+				
+		// 1. 전체 게시글 수 (검색 조건 포함)
+	    int totalCount = Rdao.countReviewBoard(pageRequestDTO);
+
+	    // 2. 현재 페이지에 해당하는 게시글 목록
+	    List<ReviewBoardDTO> boardList = Rdao.selectPagedReviewBoard(pageRequestDTO);
+
+	    // 3. 응답 DTO 생성 및 반환
+	    return new RPageResponseDTO<ReviewBoardDTO>(boardList, totalCount, pageRequestDTO);
+	}
+
+	
 
 }
