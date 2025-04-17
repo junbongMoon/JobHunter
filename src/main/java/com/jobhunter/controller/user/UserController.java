@@ -74,7 +74,7 @@ public class UserController {
 
 					// 이미 쿼리스트링이 있는 경우 ?가 있으므로 &로 추가, 없으면 ?로 시작
 					String joinChar = redirectUrl.contains("?") ? "&" : "?";
-					redirectUrl += joinChar + "firstLogin=true";
+					redirectUrl += joinChar + "firstLogin=user";
 
 					return "redirect:" + redirectUrl;
 				}
@@ -174,7 +174,7 @@ public class UserController {
 
         // 이미 쿼리스트링이 있는 경우 ?가 있으므로 &로 추가, 없으면 ?로 시작
         String joinChar = redirectUrl.contains("?") ? "&" : "?";
-        redirectUrl += joinChar + "firstLogin=true";
+        redirectUrl += joinChar + "firstLogin=user";
 
         return "redirect:" + redirectUrl;
     }
