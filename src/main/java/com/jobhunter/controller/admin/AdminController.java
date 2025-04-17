@@ -54,14 +54,8 @@ public class AdminController {
 	 * @param model 뷰에 전달할 데이터
 	 * @return 관리자 홈 JSP 페이지 경로
 	 */
-	@RequestMapping(value = "/admin", method = RequestMethod.GET)
-	public String home(Locale locale, Model model) {
-
-		return "admin/adminhome";
-	}
-
   // 문준봉
-	@RequestMapping(value = "/admin/admincharts", method = RequestMethod.GET)
+	@RequestMapping(value = "/admin", method = RequestMethod.GET)
 	public String showCharts(Locale locale, Model model) {
 
 		LocalDate now = LocalDate.now();

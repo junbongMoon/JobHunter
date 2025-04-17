@@ -213,4 +213,10 @@ public class StatusServiceImpl implements StatusService {
 		return result;
 	}
 
+	@Override
+	public List<String> getYearAndMonth() throws Exception {
+		
+		return statusDAO.selectYearAndMonthByStatus();
+	}
+
 }

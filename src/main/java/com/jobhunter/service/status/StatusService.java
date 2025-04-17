@@ -2,6 +2,7 @@ package com.jobhunter.service.status;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
@@ -90,4 +91,7 @@ public interface StatusService {
 
 
 	public List<TotalStatusVODTO> getTotalStatusBetweenStartAndEnd(LocalDateTime start, LocalDateTime end) throws Exception;
+
+
+	public List<String> getYearAndMonth() throws Exception;
 }
