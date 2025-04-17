@@ -96,6 +96,43 @@
     modal.show();
 }
 
+function saveLike(userId, boardNo) {
+    $.ajax({
+        url: '/like/save',
+        method: 'POST',
+        data: { userId: userId, boardNo: boardNo },
+        success: function (res) {
+            if (res) {
+                alert("좋아요 완료!");
+                location.reload(); // 상태 갱신
+            } else {
+                alert("이미 좋아요를 눌렀습니다.");
+            }
+        },
+        error: function () {
+            alert("좋아요 처리 중 오류 발생!");
+        }
+    });
+}
+
+function deleteLike(userId, boardNo) {
+    $.ajax({
+        url: '/like/delete?userId=' + userId + '&boardNo=' + boardNo,
+        method: 'DELETE',
+        success: function (res) {
+            if (res) {
+                alert("좋아요 취소 완료!");
+                location.reload();
+            } else {
+                alert("좋아요 취소 실패!");
+            }
+        },
+        error: function () {
+            alert("좋아요 취소 중 오류 발생!");
+        }
+    });
+}
+
 </script>
 <style>
 .badge {
@@ -551,29 +588,27 @@ button.btn-resume {
 						<!-- Search Widget -->
 						<div class="search-widget widget-item">
 
-							<h3 class="widget-title">Search</h3>
-							<form action="">
-								<input type="text">
-								<button type="submit" title="Search">
-									<i class="bi bi-search"></i>
-								</button>
-							</form>
-
+							<h3 class="widget-title"></h3>
+							<c:choose>
+								<c:when test="${hasLiked}">
+								  <img src="/resources/images_mjb/bad100.png" onclick="deleteLike('${sessionScope.account.uid}', '${RecruitmentDetailInfo.uid}')" alt="좋아요 취소" />
+								</c:when>
+								<c:otherwise>
+								  <img src="/resources/images_mjb/like100.png"  onclick="saveLike('${sessionScope.account.uid}', '${RecruitmentDetailInfo.uid}')" alt="좋아요" />
+								</c:otherwise>
+							  </c:choose>
 						</div>
 						<!--/Search Widget -->
 
 						<!-- Categories Widget -->
 						<div class="categories-widget widget-item">
 
-							<h3 class="widget-title">Categories</h3>
-							<ul class="mt-3">
-								<li><a href="#">지역 <span>(25)</span></a></li>
-								<li><a href="#">시군구 <span>(12)</span></a></li>
-								<li><a href="#">산업군 <span>(5)</span></a></li>
-								<li><a href="#">직업군 <span>(22)</span></a></li>
-								<li><a href="#">우대조건 <span>(8)</span></a></li>
-								<li><a href="#">면접방식 <span>(14)</span></a></li>
-							</ul>
+							<h3 class="widget-title">Info</h3>
+							<div>
+								<div class="likeCnt"><img src="/resources/images_mjb/good100.png"/><p>${likeCnt}</p></div>
+								<div class="likeCnt"><img src="/resources/images_mjb/eye100.png"/><p></p></div>
+								<div class="submitCnt"></div>
+							</div>
 
 						</div>
 						<!--/Categories Widget -->

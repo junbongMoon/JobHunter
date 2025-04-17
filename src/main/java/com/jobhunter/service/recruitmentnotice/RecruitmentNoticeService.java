@@ -173,6 +173,8 @@ public interface RecruitmentNoticeService {
 
 
 	public RecruitmentDetailInfo getRecruitmentWithViewLog(int uid, int viewerUid) throws Exception;
-	
+
+
+
 
 }

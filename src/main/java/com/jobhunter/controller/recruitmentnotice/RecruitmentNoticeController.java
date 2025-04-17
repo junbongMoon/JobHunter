@@ -39,6 +39,7 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 import com.jobhunter.model.util.FileStatus;
+import com.jobhunter.service.like.LikeService;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 import com.jobhunter.util.RecruitmentFileProcess;
 
@@ -53,6 +54,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/recruitmentnotice")
 public class RecruitmentNoticeController {
 	private final RecruitmentNoticeService recruitmentService;
+	private final LikeService likeService;
 	private static final Logger logger = LoggerFactory.getLogger(RecruitmentNoticeController.class);
 
 	
@@ -433,6 +435,15 @@ public class RecruitmentNoticeController {
 		            int viewerUid = loginUser != null ? loginUser.getUid() : 0;
 
 		            detailInfo = recruitmentService.getRecruitmentWithViewLog(uid, viewerUid);
+		            
+		            
+		            // ⭐ 좋아요 정보 추가
+		            boolean hasLiked = likeService.hasLiked(viewerUid, uid, "RECRUIT");
+		            int likeCnt = likeService.getLikeCntByRecruitment(uid, "RECRUIT");
+		            
+		            
+		            model.addAttribute("hasLiked", hasLiked);
+		            model.addAttribute("likeCnt", likeCnt);
 		        } else {
 		            detailInfo = recruitmentService.getRecruitmentByUid(uid);
 		        }
