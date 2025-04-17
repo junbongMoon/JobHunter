@@ -79,11 +79,41 @@
 							<h2>
 								<i class="fas fa-file-alt section-icon"></i>제출할 이력서 선택
 							</h2>
-							<a href="/resume/form?uid=${recruitmentNotice.uid}" class="btn newResumeBtn btn-primary"> <i
-									class="fas fa-plus"></i>
-								새 이력서 작성하기
-							</a>
+							<div class="d-flex gap-2">
+								<button id="searchToggleBtn" class="btn-custom btn-search">
+									<i class="fas fa-search"></i> 검색
+								</button>
+								<a href="/resume/form?uid=${recruitmentNotice.uid}" class="btn-custom btn-create"> <i
+										class="fas fa-plus"></i>
+									새 이력서 작성하기
+								</a>
+							</div>
 						</div>
+
+						<!-- 검색 영역 -->
+						<div id="searchArea" class="search-area mb-4" style="display: none;">
+							<div class="card">
+								<div class="card-body">
+									<form id="searchForm" action="/submission/check?uid=${recruitmentNotice.uid}"
+										method="get" class="d-flex gap-2">
+										<input type="hidden" name="page" value="1"> <input type="hidden" name="pageSize"
+											value="${pageSize}">
+										<input type="hidden" name="uid" value="${recruitmentNotice.uid}">
+										<div class="flex-grow-1">
+											<input type="text" name="searchTitle" class="form-control"
+												placeholder="이력서 제목을 입력하세요" value="${param.searchTitle}">
+										</div>
+										<button type="submit" class="btn btn-primary searchBtn">
+											<i class="fas fa-search"></i> 검색
+										</button>
+										<button type="button" class="btn btn-secondary" onclick="clearSearch()">
+											<i class="fas fa-times"></i> 초기화
+										</button>
+									</form>
+								</div>
+							</div>
+						</div>
+
 						<div class="resume-list">
 							<c:choose>
 								<c:when test="${not empty resumeList}">
@@ -161,32 +191,32 @@
 						</div>
 					</div>
 
-					<c:if test="${totalPages > 1}">
-					<!-- 개인정보 제3자 제공 동의 -->
-					<div class="privacy-consent card">
-						<div class="card-header d-flex justify-content-between align-items-center">
-							<div>
-								<input type="checkbox" id="privacyConsentCheckbox"> <label
-									for="privacyConsentCheckbox">[필수] 개인정보 제3자 제공 동의</label>
+					<c:if test="${totalResumes > 0}">
+						<!-- 개인정보 제3자 제공 동의 -->
+						<div class="privacy-consent card">
+							<div class="card-header d-flex justify-content-between align-items-center">
+								<div>
+									<input type="checkbox" id="privacyConsentCheckbox"> <label
+										for="privacyConsentCheckbox">[필수] 개인정보 제3자 제공 동의</label>
+								</div>
+								<button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#consentDetails"
+									aria-expanded="false" aria-controls="consentDetails" id="toggleButton">
+									<span id="toggleText">자세히..</span> <i class="fas fa-chevron-down"></i>
+								</button>
 							</div>
-							<button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#consentDetails"
-								aria-expanded="false" aria-controls="consentDetails" id="toggleButton">
-								<span id="toggleText">자세히..</span> <i class="fas fa-chevron-down"></i>
-							</button>
-						</div>
-						<div id="consentDetails" class="collapse">
-							<div class="card-body">
-								<ol>
-									<li>개인정보를 제공받는 자: ${recruitmentNotice.companyName}</li>
-									<li>개인정보를 제공받는 자의 개인정보 이용 목적: 입사지원 및 채용절차 진행</li>
-									<li>제공하는 개인정보 항목: 입사지원 시 작성한 이력서 정보(이름, 생년월일, 성별, 휴대폰 번호,
-										이메일, 거주지역, 희망 근무지, 희망 업직종, 희망 근무형태, 희망급여, 성격 및 강점, 학력사항, 경력사항,
-										보유 자격증, 자기소개서)</li>
-								</ol>
+							<div id="consentDetails" class="collapse">
+								<div class="card-body">
+									<ol>
+										<li>개인정보를 제공받는 자: ${recruitmentNotice.companyName}</li>
+										<li>개인정보를 제공받는 자의 개인정보 이용 목적: 입사지원 및 채용절차 진행</li>
+										<li>제공하는 개인정보 항목: 입사지원 시 작성한 이력서 정보(이름, 생년월일, 성별, 휴대폰 번호,
+											이메일, 거주지역, 희망 근무지, 희망 업직종, 희망 근무형태, 희망급여, 성격 및 강점, 학력사항, 경력사항,
+											보유 자격증, 자기소개서)</li>
+									</ol>
+								</div>
 							</div>
 						</div>
-					</div>
-					<!-- 페이징 처리 -->
+						<!-- 페이징 처리 -->
 						<div class="submit-button-container text-center mb-4">
 							<button type="button" id="submitResumeBtn" class="btn btn-primary btn-lg" disabled>
 								<i class="fas fa-paper-plane"></i> 이력서 제출하기
@@ -198,16 +228,20 @@
 									<!-- 이전 블록으로 이동 -->
 									<c:if test="${currentBlock > 1}">
 										<li class="page-item">
-											<a class="page-link" href="/submission/check?uid=${recruitmentNotice.uid}&page=${startPage - 1}&pageSize=${pageSize}" aria-label="Previous Block">
+											<a class="page-link"
+												href="/submission/check?uid=${recruitmentNotice.uid}&page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+												aria-label="Previous Block">
 												<i class="fas fa-angle-double-left"></i>
 											</a>
 										</li>
 									</c:if>
-									
+
 									<!-- 이전 페이지로 이동 -->
 									<c:if test="${currentPage > 1}">
 										<li class="page-item">
-											<a class="page-link" href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage - 1}&pageSize=${pageSize}" aria-label="Previous">
+											<a class="page-link"
+												href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+												aria-label="Previous">
 												<i class="fas fa-chevron-left"></i>
 											</a>
 										</li>
@@ -216,23 +250,28 @@
 									<!-- 페이지 번호 -->
 									<c:forEach begin="${startPage}" end="${endPage}" var="i">
 										<li class="page-item ${currentPage == i ? 'active' : ''}">
-											<a class="page-link" href="/submission/check?uid=${recruitmentNotice.uid}&page=${i}&pageSize=${pageSize}">${i}</a>
+											<a class="page-link"
+												href="/submission/check?uid=${recruitmentNotice.uid}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
 										</li>
 									</c:forEach>
 
 									<!-- 다음 페이지로 이동 -->
 									<c:if test="${currentPage < totalPages}">
 										<li class="page-item">
-											<a class="page-link" href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage + 1}&pageSize=${pageSize}" aria-label="Next">
+											<a class="page-link"
+												href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+												aria-label="Next">
 												<i class="fas fa-chevron-right"></i>
 											</a>
 										</li>
 									</c:if>
-									
+
 									<!-- 다음 블록으로 이동 -->
 									<c:if test="${currentBlock < totalBlocks}">
 										<li class="page-item">
-											<a class="page-link" href="/submission/check?uid=${recruitmentNotice.uid}&page=${endPage + 1}&pageSize=${pageSize}" aria-label="Next Block">
+											<a class="page-link"
+												href="/submission/check?uid=${recruitmentNotice.uid}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+												aria-label="Next Block">
 												<i class="fas fa-angle-double-right"></i>
 											</a>
 										</li>
@@ -455,6 +494,7 @@
 
 			.edit-resume:hover {
 				background-color: #47b2e4;
+				border: none;
 				color: white;
 			}
 
@@ -535,20 +575,6 @@
 				border-color: #e4e4e4;
 			}
 
-			.newResumeBtn {
-				background-color: #47b2e4;
-				color: white;
-				height: 40px;
-				font-weight: 500;
-				transition: all 0.3s ease;
-				border-radius: 5px;
-				border: none;
-			}
-
-			.newResumeBtn:hover {
-				background-color: #3592c4;
-			}
-
 			.submit-button-container {
 				margin-top: 30px;
 			}
@@ -573,6 +599,60 @@
 
 			.section-icon {
 				color: #37517e;
+			}
+
+			.btn-search {
+				background-color: #f8f9fa;
+				color: #37517e;
+				border: 1px solid #37517e;
+				transition: all 0.3s ease;
+			}
+
+			.btn-search:hover {
+				background-color: #37517e;
+				color: white;
+				transform: translateY(-2px);
+			}
+
+			.btn-custom {
+				padding: 8px 20px;
+				border-radius: 25px;
+				font-size: 14px;
+				font-weight: 500;
+				transition: all 0.3s ease;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				cursor: pointer;
+				text-decoration: none;
+			}
+
+			.btn-create {
+				background-color: #37517e;
+				color: white;
+				padding: 10px 25px;
+			}
+
+			.btn-create:hover {
+				background-color: #4668a2;
+				color: white;
+				transform: translateY(-2px);
+			}
+
+			.btn-link {
+				color: #47b2e4;
+			}
+
+			.searchBtn {
+				background-color: #37517e !important;
+				color: white !important;
+				border: none !important;
+			}
+
+			.searchBtn:hover {
+				background-color: #47b2e4 !important;
+				color: white !important;
+				border: none !important;
 			}
 		</style>
 
@@ -725,5 +805,27 @@
 			function showCheckedResumeModal() {
 				$('#modalMessage').text('기업에서 확인중인 이력서는 수정할 수 없습니다.');
 				$('#modal').modal('show');
+			}
+			//---------------------------------------------------------------------------------------------------------------------------------
+			$(document).ready(function () {
+				// 검색 영역 토글
+				$('#searchToggleBtn').click(function () {
+					$('#searchArea').slideToggle(300);
+				});
+
+				// URL에 검색 파라미터가 있으면 검색 영역 표시
+				if ('${param.searchTitle}') {
+					$('#searchArea').show();
+				}
+			});
+
+			// 검색 초기화
+			function clearSearch() {
+				// 검색어 입력창 초기화
+				$('input[name="searchTitle"]').val('');
+				// 검색 영역 숨기기
+				$('#searchArea').slideUp(300);
+				// 검색 결과 초기화를 위해 폼 제출
+				$('#searchForm').submit();
 			}
 		</script>

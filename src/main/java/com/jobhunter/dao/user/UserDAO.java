@@ -33,5 +33,4 @@ public interface UserDAO {
 	AccountVO findByEmail(KakaoUserInfoDTO userInfo) throws Exception;
 
 	int registUser(UserRegisterDTO dto) throws Exception;
-
 }

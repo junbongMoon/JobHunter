@@ -167,6 +167,4 @@ public class UserServiceImpl implements UserService {
 		Integer uid = dao.registUser(dto);
 		return dao.findByUidAndPassword(uid.toString(), dto.getPassword());
 	}
-
-	
 }

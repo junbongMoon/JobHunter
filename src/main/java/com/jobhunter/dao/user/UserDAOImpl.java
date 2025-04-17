@@ -1,6 +1,7 @@
 package com.jobhunter.dao.user;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
@@ -97,6 +98,4 @@ public class UserDAOImpl implements UserDAO {
 		}
 		return 0;
 	}
-
-	
 }

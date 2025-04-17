@@ -79,6 +79,8 @@
 			<mapping path="/reviewBoard/write"/>
 			<mapping path="/account/testLoginAjax" />
 			<mapping path="/account/testGetLogin" />
+			<mapping path="/resume/**" />
+			<mapping path="/submission/**" />
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
 		

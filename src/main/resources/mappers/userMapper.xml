@@ -181,4 +181,5 @@
 	 VALUES 
 	 (#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N', #{nationality});
 	</insert>
+
 </mapper>
