@@ -49,22 +49,19 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 
 	@Override
 	public ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception {
-		 
 
-	   
-
-	    return ses.selectOne(NS + ".detailAll", boardNo);
+		return ses.selectOne(NS + ".detailAll", boardNo);
 	}
 
 	@Override
 	public LocalDateTime selectLike(Likes like) throws Exception {
-		
+
 		return ses.selectOne(NS + ".selectLastLikeTime", like);
 	}
 
 	@Override
 	public int insertLike(Likes like) {
-		
+
 		return ses.insert(NS + ".insertLike", like);
 	}
 
@@ -88,6 +85,11 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 	}
 
 	@Override
+	public int hasUserLikeit(Likes like) throws Exception {
+		return ses.selectOne(NS + ".seletHasUserLiked", like);
+	}
+
+	@Override
 	public WriteBoardDTO selectrecruitmentList(int boardNo) throws Exception {
 
 		return ses.selectOne(NS + ".selectModifyReviewBoard", boardNo);
@@ -108,20 +110,20 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 	@Override
 	public int checkViewedWithHours(int userId, int boardNo) throws Exception {
 		Map<String, Object> param = new HashMap<>();
-        param.put("userId", userId);
-        param.put("boardNo", boardNo);
+		param.put("userId", userId);
+		param.put("boardNo", boardNo);
 
-        return ses.selectOne(NS + ".checkViewedWithHours", param);
-    }
+		return ses.selectOne(NS + ".checkViewedWithHours", param);
+	}
 
 	@Override
 	public int insertOrUpdateReviewView(int userId, int boardNo, String viewType) throws Exception {
 		Map<String, Object> param = new HashMap<>();
-        param.put("userId", userId);
-        param.put("boardNo", boardNo);
-        param.put("viewType", viewType);
+		param.put("userId", userId);
+		param.put("boardNo", boardNo);
+		param.put("viewType", viewType);
 
-        return ses.insert(NS + ".insertReviewView", param);
+		return ses.insert(NS + ".insertReviewView", param);
 	}
 
 	@Override
@@ -130,12 +132,10 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 		return ses.update(NS + ".updateCountViews", boardNo);
 	}
 
-	
 	@Override
 	public int countAllBoards() throws Exception {
-	    return ses.selectOne(NS + ".countAllBoards");
+		return ses.selectOne(NS + ".countAllBoards");
 	}
-
 
 	@Override
 	public List<ReviewBoardDTO> selectPagedReviewBoard(RPageRequestDTO pageRequestDTO) throws Exception {
@@ -145,8 +145,8 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 
 	@Override
 	public int countReviewBoard(RPageRequestDTO pageRequestDTO) throws Exception {
-		
-		return ses.selectOne(NS + ".countReviewBoard",pageRequestDTO );
+
+		return ses.selectOne(NS + ".countReviewBoard", pageRequestDTO);
 	}
 
 	@Override
@@ -158,24 +158,15 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 	@Override
 	public void insertLog(int uid, String targetType, String logType) {
 		Map<String, Object> param = new HashMap<>();
-        param.put("uid", uid);
-        param.put("targetType", targetType);
+		param.put("uid", uid);
+		param.put("targetType", targetType);
 
-        if ("CREATE".equalsIgnoreCase(logType)) {
-            ses.insert(NS + ".logInsertCreate", param);
-        } else if ("DELETE".equalsIgnoreCase(logType)) {
-            ses.insert(NS + ".logInsertDelete", param);
-        }
-		
+		if ("CREATE".equalsIgnoreCase(logType)) {
+			ses.insert(NS + ".logInsertCreate", param);
+		} else if ("DELETE".equalsIgnoreCase(logType)) {
+			ses.insert(NS + ".logInsertDelete", param);
+		}
+
 	}
-
-	@Override
-	public int countByCreatedDateBetween(LocalDateTime start, LocalDateTime end) {
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("start", start);
-		param.put("end", end);
-		return ses.selectOne(NS + ".countByCreatedDateBetweenAndRole", param);
-	}
-
 
 }
