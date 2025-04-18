@@ -1,6 +1,5 @@
 package com.jobhunter.dao.company;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +64,6 @@ public class CompanyDAOImpl implements CompanyDAO {
 	@Override
 	public boolean findIsCompanyById(String companyId) throws Exception {
 		Boolean result = ses.selectOne(NS + ".findIsCompanyById", companyId);
-		System.out.println(result);
 	    return Boolean.TRUE.equals(result);
 	}
 

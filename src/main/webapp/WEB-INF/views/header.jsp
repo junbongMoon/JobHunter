@@ -311,6 +311,10 @@
 		<div id="accountType" style="display: none;" data-accountType="${sessionScope.account.accountType}"></div>
 
 		<script>
+
+			window.publicSessionUid = "${sessionScope.account.uid}";
+			window.publicSessionAccType = "${sessionScope.account.accountType}";
+
 			function openNotifications(uid, accountType) {
 				const width = 800;
 				const height = 600;
@@ -318,6 +322,7 @@
 				const left = (window.screen.width - width) / 2;
 
 				const popup = window.open('/notification/list?uid=' + uid + '&accountType=' + accountType, 'notifications',
+
 					`width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);
 
 				if (popup) popup.focus();

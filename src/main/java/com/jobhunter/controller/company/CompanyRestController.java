@@ -168,8 +168,7 @@ public class CompanyRestController {
 	@PatchMapping(value = "/password", consumes = "application/json")
 	public ResponseEntity<Void> changePassword(@RequestBody PasswordDTO dto, HttpSession session) {
 		try {
-			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
-
+			
 			if (!accUtil.checkUid(session, Integer.parseInt(dto.getUid()))) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
@@ -194,21 +193,22 @@ public class CompanyRestController {
 	 * @param dto uid, 바꿀 연락처 종류(전화번호/이메일), 바꿀 값이 담긴 DTO
 	 * @return ResponseEntity<String> 성공적으로 바뀌었다면 바뀐 값을 다시 반환해 페이지의 정보들을 업데이트하는데 사용
 	 * 
-	 *         <ul>
+	 * <ul>
 	 *         <li>성공 : 200</li>
 	 *         <li>페이지의 uid와 세션 안맞음 : 404</li>
 	 *         <li>실패 : 500</li>
-	 *         </ul>
+	 * </ul>
 	 */
 	@PatchMapping(value = "/contact", consumes = "application/json")
 	public ResponseEntity<String> changeContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
 		try {
+			
 			if (!accUtil.checkUid(session, Integer.parseInt(dto.getUid()))) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
-			
+
 			String updatedValue = service.updateContact(dto.getUid(), dto.getType(), dto.getValue());
-			
+
 			return ResponseEntity.ok(updatedValue);
 		} catch (AccessDeniedException e) {
 			e.printStackTrace();
@@ -251,6 +251,20 @@ public class CompanyRestController {
 		}
 	}
 
+	/**
+	 * 기업회원 아이디 중복체크
+	 * <p>
+	 * 회원가입시 입력한 아이디와 중복되는 아이디가 존재하는지 체크하기위한 컨트롤러
+	 * </p>
+	 * 
+	 * @param companyId 가입하려는 회원이 입력한 아이디
+	 * @return ResponseEntity<Boolean> 중복은 false, 중복된 아이디가 없다면 true반환
+	 * 
+	 * <ul>
+	 * 		<li>성공 : 200, true</li>
+	 * 		<li>실패 : 200, false</li>
+	 * </ul>
+	 */
 	@GetMapping(value = "/check/id", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String companyId) {
 
@@ -264,6 +278,20 @@ public class CompanyRestController {
 		return ResponseEntity.ok(exists);
 	}
 
+	/**
+	 * 연락처 변경
+	 * <p>
+	 * 기업회원의 uid, 바꿀 연락처의 종류(전화번호, 이메일)와 값을 입력받아 연락처를 바꿔주는 컨트롤러 
+	 * </p>
+	 * 
+	 * @param dto
+	 * @param session
+	 * @return
+	 * 
+	 * <ul>
+	 * 		<li>반환할 데이터 설멍</li>
+	 * </ul>
+	 */
 	@DeleteMapping(value = "/contact", consumes = "application/json")
 	public ResponseEntity<HttpStatus> deleteContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
 		try {

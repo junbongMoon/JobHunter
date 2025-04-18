@@ -64,9 +64,11 @@
   opacity: 0.9;
 }
 
-.public-modal-message input {
+.public-modal-message input,
+.public-modal-message textarea,
+.public-modal-message select {
 	padding: 12px;
-	border: 1px solid #ddd;
+	border: 1px solid var(--accent-color);
 	border-radius: 8px;
 	font-size: 14px;
 	margin-top: 9px;

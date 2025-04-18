@@ -1,7 +1,5 @@
 package com.jobhunter.util;
 
-import java.nio.file.AccessDeniedException;
-
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Component;

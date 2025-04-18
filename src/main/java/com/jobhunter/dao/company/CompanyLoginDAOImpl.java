@@ -40,7 +40,7 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 	
 	@Override
 	public Boolean existsAccountId(String companyId) throws Exception {
-		return ses.selectOne(NS+".existsAccountId", companyId);
+		return ses.selectOne(NS+".findIsCompanyById", companyId);
 	}
 
 	@Override

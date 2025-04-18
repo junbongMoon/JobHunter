@@ -494,7 +494,7 @@ mark {
 </main>
 
 <script>
-// 카톡
+// #region 카톡
 Kakao.init('b50a2700ff109d1ab2de2eca4e07fa23');
 Kakao.isInitialized();
 function loginWithKakao() {
@@ -510,8 +510,8 @@ function loginWithKakao() {
 		scope: 'profile_nickname, account_email'
 		});
 	}
-// 카톡
-// 파이어베이스
+// #endregion 카톡
+// #region 파이어베이스
 const firebaseConfig = {
     apiKey: "AIzaSyDh4lq9q7JJMuDFTus-sehJvwyHhACKoyA",
     authDomain: "jobhunter-672dd.firebaseapp.com",
@@ -543,7 +543,7 @@ function firebaseCaptcha() {
         });
     }
 }
-// 파이어베이스
+// #endregion 파이어베이스
 function checkDuplicateId() {
 	$('#checkDuplicateIdBtn').prop('disabled', true);
     const userId = $("#id").val();

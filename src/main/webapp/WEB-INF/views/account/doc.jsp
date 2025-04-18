@@ -11,8 +11,29 @@
   }
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<section style="padding: 30px; background-color: #f8f9fa; border-radius: 12px;">
+  <h2 style="color: #2c3e50; font-family: 'Poppins', sans-serif;">🔐 유저 신고기능 사용 설명서</h2>
+  <hr>
+
+  <h3>✅ 1. 기본 호출 <small>유저 이름앞에 저거 복사해서 사용</small></h3>
+  <p><strong>uid :</strong> data-uid="3" 여기에 신고당할 유저 uid 넣어서 사용</p>
+  <p><strong>type :</strong>  data-type="user" 여기에 user 혹은 company 넣어서 사용(대소문자 구분 없음)</p>
+  <p><strong>참고:</strong> 알아서 세션에 로그인했는지 체크해서 버튼 나오거나 안나오게 만듬.</p>
+
+  <div style="background: #fffbe6; padding: 15px; border: 1px solid #ffe58f; border-radius: 8px; margin-bottom: 20px;">
+      <strong>💡 예시 (기본출력)</strong><br>
+      <pre><code>
+          &lt;i class="flagAccBtn" data-uid="3" data-type="user"&gt;&lt;/i&gt;
+      </code></pre>
+  </div>
+  <br/>
+
+</section>
+
+ <hr> <hr> <hr> <hr>
 
 <section style="padding: 30px; background-color: #f8f9fa; border-radius: 12px;">
+  <i class="flagAccBtn" data-uid="3" data-type="user"></i>
   <h2 style="color: #2c3e50; font-family: 'Poppins', sans-serif;">🔐 공용모달 사용 설명서</h2>
   <hr>
 
