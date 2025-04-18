@@ -1,10 +1,73 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <jsp:include page="adminheader.jsp"></jsp:include>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
+
+$(function() {
+    getMonth();
+
+    $("#monthSelect").on("change", function () {
+    const selectedMonth = $(this).val();
+    if (selectedMonth !== "-1") {
+        $.ajax({
+            url: "/status/rest/ym/data",
+            type: "POST",
+            data: { ym: selectedMonth },
+            contentType: "application/x-www-form-urlencoded", // 💡 form 전송 명시
+            success: function (data) {
+                console.log("선택 월 통계 데이터:", data);
+            },
+            error: function (xhr) {
+                console.error("에러 응답:", xhr.responseText);
+                alert("통계 데이터를 불러오는 데 실패했습니다.");
+            }
+        });
+    }
+});
+});
+
+function getMonth() {
+    $.ajax({
+        url: "/status/rest/ym/",
+        type: "GET",
+        success: function (data) {
+            console.log("월 리스트 원본:", data);
+            console.log("타입 확인:", typeof data);
+
+            let resultArray = [];
+
+            // ✅ 객체인 경우 처리
+            if (Array.isArray(data)) {
+                resultArray = data;
+            } else if (typeof data === "object" && data !== null) {
+                const values = Object.values(data);  // 💡 핵심
+                resultArray = values;
+            } else {
+                resultArray = [data];
+            }
+
+            const $select = $("#monthSelect");
+            $select.empty();
+            $select.append(`<option value="-1">출력할 연/월을 선택 하세요</option>`);
+            resultArray.forEach(function (month) {
+                console.log(month);
+                $select.append(`<option value="\${month}">\${month}</option>`);
+            });
+
+            console.log("최종 select 내용:", $select.html());
+        },
+        error: function () {
+            alert("월 리스트를 불러오는 데 실패했습니다.");
+        }
+    });
+}
+
+
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawCharts);
   
@@ -128,6 +191,11 @@
 <body>
 <!-- 차트 콘텐츠 -->
 <div class="container-fluid">
+    <div class="selectMonth">
+        <select id="monthSelect" class="form-control">
+            <option value="-1">출력할 연/월을 선택 하세요</option>
+        </select>
+      </div>
 
     <!-- ===== 차트가 포함될 콘텐츠 영역 ===== -->
     <div class="row">
