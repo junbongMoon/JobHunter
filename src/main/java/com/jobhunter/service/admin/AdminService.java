@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.jobhunter.model.admin.Pagination;
 import com.jobhunter.model.company.CompanyVO;
+import com.jobhunter.model.report.ReportMessageVO;
 import com.jobhunter.model.user.UserVO;
 
 /**
@@ -140,4 +141,12 @@ public interface AdminService {
 	 * @throws Exception 
 	 */
 	List<CompanyVO> getAllCompanies() throws Exception;
+	
+	/**
+	 * reporterAccountType이 USER인 신고 데이터를 조회합니다.
+	 *
+	 * @return 신고 데이터 목록
+	 * @throws Exception
+	 */
+	List<ReportMessageVO> getReportsByUserReporter() throws Exception;
 }

@@ -11,9 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.admin.AdminDAO;
 import com.jobhunter.dao.message.MessageDAO;
+import com.jobhunter.dao.report.ReportDAO;
 import com.jobhunter.model.company.CompanyVO;
 import com.jobhunter.model.message.MessageDTO;
 import com.jobhunter.model.message.USERTYPE;
+import com.jobhunter.model.report.ReportMessageVO;
 import com.jobhunter.model.user.UserVO;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class AdminServiceImpl implements AdminService {
 
 	private final AdminDAO dao;
 	private final MessageDAO messageDAO;
+	private final ReportDAO reportDAO;
 
 	@Override
 	public List<UserVO> getAllUsers() throws Exception {
@@ -146,5 +149,10 @@ public class AdminServiceImpl implements AdminService {
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean unblockCompany(int uid) throws Exception {
 		return dao.unblockCompany(uid) > 0;
+	}
+
+	@Override
+	public List<ReportMessageVO> getReportsByUserReporter() throws Exception {
+		return reportDAO.getReportsByUserReporter();
 	}
 }
