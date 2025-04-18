@@ -165,9 +165,9 @@
                             </c:when>
                             <c:otherwise>
                                 <c:forEach items="${messages}" var="message">
-                                    <div class="notification-item ${message.isRead eq 'N' ? 'unread' : 'read'}" 
-                                         data-message-no="${message.messageNo}" 
-                                         onclick="markAsRead(${message.messageNo})">
+                                    <div class="notification-item ${message.isRead eq 'N' ? 'unread' : 'read'}"
+                                        data-message-no="${message.messageNo}"
+                                        onclick="markAsRead('${message.messageNo}', '${sessionScope.account.accountType}', '${sessionScope.account.uid}')">
                                         <div class="d-flex">
                                             <c:choose>
                                                 <c:when test="${message.fromUserType eq 'USER'}">
@@ -199,13 +199,20 @@
                                                 <span class="notification-badge">N</span>
                                             </c:if>
                                         </div>
-                                        <i class="fas fa-trash delete-icon" onclick="deleteNotification(event, ${message.messageNo})"></i>
+                                        <i class="fas fa-trash delete-icon"
+                                            onclick="deleteNotification(event, '${message.messageNo}')"></i>
                                     </div>
                                 </c:forEach>
                             </c:otherwise>
                         </c:choose>
                     </div>
                 </div>
+
+                <!-- 로그인 상태를 저장할 숨겨진 요소 추가 uid로 확인 -->
+                <div id="loginStatus" style="display: none;" data-uid="${sessionScope.account.uid}"></div>
+                <div id="accountType" style="display: none;" data-accountType="${sessionScope.account.accountType}">
+                </div>
+
 
                 <!-- Bootstrap JS -->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -229,42 +236,44 @@
                         window.moveTo(left, top);
                     }
 
+                    const uid = document.getElementById('loginStatus').getAttribute('data-uid');
+                    const accountType = document.getElementById('accountType').getAttribute('data-accountType');
+
                     // 알림을 읽음 상태로 변경하는 함수
-                    function markAsRead(messageNo) {
+                    function markAsRead(messageNo, accountType, uid) {
                         $.ajax({
                             url: '/notification/markAsRead',
                             type: 'POST',
-                            contentType: 'application/json',
-                            data: JSON.stringify({ messageNo: messageNo }),
-                            success: function() {
+                            data: { messageNo: messageNo, accountType: accountType, uid: uid },
+                            success: function () {
                                 // 알림 항목의 클래스 변경
                                 const notificationItem = $('[data-message-no="' + messageNo + '"]');
                                 notificationItem.removeClass('unread').addClass('read');
-                                
+
                                 // 배지 제거
                                 notificationItem.find('.notification-badge').remove();
                             },
-                            error: function(xhr, status, error) {
+                            error: function (xhr, status, error) {
                                 console.error('Error:', error);
                             }
                         });
                     }
 
                     // 모든 알림을 읽음 상태로 변경하는 함수
-                    $(document).ready(function() {
-                        $('#markAllReadBtn').on('click', function() {
+                    $(document).ready(function () {
+                        $('#markAllReadBtn').on('click', function () {
                             $.ajax({
                                 url: '/notification/markAllAsRead',
                                 type: 'POST',
-                                contentType: 'application/json',
-                                success: function() {
+                                data: { accountType: accountType, uid: uid },
+                                success: function () {
                                     // 모든 알림 항목의 클래스 변경
                                     $('.notification-item.unread').removeClass('unread').addClass('read');
-                                    
+
                                     // 모든 배지 제거
                                     $('.notification-badge').remove();
                                 },
-                                error: function(xhr, status, error) {
+                                error: function (xhr, status, error) {
                                     console.error('Error:', error);
                                 }
                             });
@@ -275,18 +284,18 @@
                     function deleteNotification(event, messageNo) {
                         // 이벤트 버블링 방지
                         event.stopPropagation();
-                        
+
                         if (confirm('이 알림을 삭제하시겠습니까?')) {
                             $.ajax({
                                 url: '/notification/delete',
                                 type: 'POST',
                                 contentType: 'application/json',
                                 data: JSON.stringify({ messageNo: messageNo }),
-                                success: function() {
+                                success: function () {
                                     // 알림 항목 제거
                                     const notificationItem = $('[data-message-no="' + messageNo + '"]');
                                     notificationItem.remove();
-                                    
+
                                     // 모든 알림이 삭제되었는지 확인
                                     if ($('.notification-item').length === 0) {
                                         // 알림이 없으면 빈 메시지 표시
@@ -298,7 +307,7 @@
                                         `);
                                     }
                                 },
-                                error: function(xhr, status, error) {
+                                error: function (xhr, status, error) {
                                     console.error('Error:', error);
                                 }
                             });

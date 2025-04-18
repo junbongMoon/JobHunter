@@ -37,22 +37,22 @@
 			regDate DESC
 	</select>
 	
-	<update id="updateMessageReadStatus" parameterType="com.jobhunter.model.message.MessageDTO">
+	<update id="updateMessageReadStatus" parameterType="com.jobhunter.model.message.MessageRequest">
 		UPDATE 
 			message
 		SET 
-			isRead = #{isRead}
+			isRead = 'Y'
 		WHERE 
-			messageNo = #{messageNo}
+			messageNo = #{messageNo} AND toUserType = #{accountType} AND toWho = #{uid}
 	</update>
 	
-	<update id="updateAllMessagesReadStatus" parameterType="string">
+	<update id="updateAllMessagesReadStatus" parameterType="com.jobhunter.model.message.MessageRequest">
 		UPDATE 
 			message
 		SET 
-			isRead = #{isRead}
+			isRead = 'Y'
 		WHERE 
-			isRead = 'N'
+			toUserType = #{accountType} AND toWho = #{uid}
 	</update>
 	
 	<delete id="deleteMessage" parameterType="int">
@@ -62,10 +62,10 @@
 			messageNo = #{messageNo}
 	</delete>
 
-	<select id="getUnreadCount" parameterType="string" resultType="int">
+	<select id="getUnreadCount" parameterType="map" resultType="int">
 		SELECT COUNT(*)
 		FROM message
-		WHERE isRead = 'N' AND toWho = #{uid}
+		WHERE isRead = 'N' AND toWho = #{uid} AND toUserType = #{accountType}
 	</select>
 
 </mapper>

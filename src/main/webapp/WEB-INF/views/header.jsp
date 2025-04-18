@@ -308,6 +308,7 @@
 
 		<!-- 로그인 상태를 저장할 숨겨진 요소 추가 uid로 확인 -->
 		<div id="loginStatus" style="display: none;" data-uid="${sessionScope.account.uid}"></div>
+		<div id="accountType" style="display: none;" data-accountType="${sessionScope.account.accountType}"></div>
 
 		<script>
 			function openNotifications(uid, accountType) {
@@ -344,7 +345,7 @@
 			}
 
 			// 페이지 로드 시 읽지 않은 알림 개수 가져오기
-			document.addEventListener('DOMContentLoaded', function () {
+			window.onload = function () {
 				console.log("페이지 로드 완료");
 
 				// 초기에는 모든 알림 요소를 숨김
@@ -352,11 +353,12 @@
 				document.querySelector('.notification-home').style.display = 'none';
 
 				const uid = document.getElementById('loginStatus').getAttribute('data-uid');
+				const accountType = document.getElementById('accountType').getAttribute('data-accountType');
 
 				// 로그인한 사용자인 경우에만 알림 개수 가져오기
 				if (uid) {
 					console.log("로그인 사용자 감지, 알림 개수 요청");
-					fetch('/notification/unreadCount?uid=' + uid)
+					fetch('/notification/unreadCount?uid=' + uid + '&accountType=' + accountType)
 						.then(response => response.json())
 						.then(data => {
 							console.log("알림 개수 응답:", data);
@@ -370,5 +372,5 @@
 				} else {
 					console.log("로그인 사용자 아님");
 				}
-			});
+			};
 		</script>

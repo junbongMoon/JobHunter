@@ -7,4 +7,6 @@ import lombok.Setter;
 @Setter
 public class MessageRequest {
     private int messageNo;
+    private String accountType;
+    private String uid;
 } 

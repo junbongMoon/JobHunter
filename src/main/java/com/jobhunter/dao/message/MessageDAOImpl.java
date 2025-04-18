@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.message.MessageDTO;
+import com.jobhunter.model.message.MessageRequest;
 import com.jobhunter.model.message.USERTYPE;
 
 import lombok.RequiredArgsConstructor;
@@ -41,16 +42,20 @@ public class MessageDAOImpl implements MessageDAO {
 	}
 	
 	@Override
-	public void updateMessageReadStatus(int messageNo, String isRead) throws Exception {
-		MessageDTO params = new MessageDTO();
+	public void updateMessageReadStatus(int messageNo, String accountType, String uid) throws Exception {
+		MessageRequest params = new MessageRequest();
 		params.setMessageNo(messageNo);
-		params.setIsRead(isRead);
+		params.setAccountType(accountType);
+		params.setUid(uid);
 		ses.update(NS + ".updateMessageReadStatus", params);
 	}
 	
 	@Override
-	public void updateAllMessagesReadStatus(String isRead) throws Exception {
-		ses.update(NS + ".updateAllMessagesReadStatus", isRead);
+	public void updateAllMessagesReadStatus(String accountType, String uid) throws Exception {
+		MessageRequest params = new MessageRequest();
+		params.setAccountType(accountType);
+		params.setUid(uid);
+		ses.update(NS + ".updateAllMessagesReadStatus", params);
 	}
 	
 	@Override
@@ -59,7 +64,10 @@ public class MessageDAOImpl implements MessageDAO {
 	}
 
 	@Override
-	public int getUnreadCount(String uid) throws Exception {
-		return ses.selectOne(NS + ".getUnreadCount", uid);
+	public int getUnreadCount(String uid, String accountType) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uid", uid);
+		params.put("accountType", accountType);
+		return ses.selectOne(NS + ".getUnreadCount", params);
 	}
 }

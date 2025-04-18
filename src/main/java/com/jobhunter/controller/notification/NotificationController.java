@@ -60,10 +60,10 @@ public class NotificationController {
      */
 	@GetMapping("/unreadCount")
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> getUnreadCount(@RequestParam String uid) {
+	public ResponseEntity<Map<String, Object>> getUnreadCount(@RequestParam String uid, @RequestParam String accountType) {
 		Map<String, Object> response = new HashMap<>();
 		try {
-			int count = notificationService.getUnreadCount(uid);
+			int count = notificationService.getUnreadCount(uid, accountType);
 			response.put("count", count);
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
@@ -81,10 +81,10 @@ public class NotificationController {
      */
 	@PostMapping("/markAsRead")
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> markAsRead(@RequestBody MessageRequest request) {
+	public ResponseEntity<Map<String, Object>> markAsRead(@RequestParam int messageNo, @RequestParam String accountType, @RequestParam String uid) {
 	    Map<String, Object> response = new HashMap<>();
 	    try {
-	        notificationService.markAsRead(request.getMessageNo());
+	        notificationService.markAsRead(messageNo, accountType, uid);
 	        response.put("status", "success");
 	        return ResponseEntity.ok(response);
 	    } catch (Exception e) {
@@ -102,10 +102,10 @@ public class NotificationController {
      */
 	@PostMapping("/markAllAsRead")
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> markAllAsRead() {
+	public ResponseEntity<Map<String, Object>> markAllAsRead(@RequestParam String accountType, @RequestParam String uid) {
 	    Map<String, Object> response = new HashMap<>();
 	    try {
-	        notificationService.markAllAsRead();
+	        notificationService.markAllAsRead(accountType, uid);
 	        response.put("status", "success");
 	        return ResponseEntity.ok(response);
 	    } catch (Exception e) {

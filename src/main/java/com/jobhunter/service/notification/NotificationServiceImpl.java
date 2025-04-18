@@ -42,8 +42,8 @@ public class NotificationServiceImpl implements NotificationService {
      */
 	@Override
 	@Transactional
-	public void markAsRead(int messageNo) throws Exception {
-		messageDAO.updateMessageReadStatus(messageNo, "Y");
+	public void markAsRead(int messageNo, String accountType, String uid) throws Exception {
+		messageDAO.updateMessageReadStatus(messageNo, accountType, uid);
 	}
 	
 	/**
@@ -53,8 +53,8 @@ public class NotificationServiceImpl implements NotificationService {
      */
 	@Override
 	@Transactional
-	public void markAllAsRead() throws Exception {
-		messageDAO.updateAllMessagesReadStatus("Y");
+	public void markAllAsRead(String accountType, String uid) throws Exception {
+		messageDAO.updateAllMessagesReadStatus(accountType, uid);
 	}
 	
 	 /**
@@ -77,7 +77,7 @@ public class NotificationServiceImpl implements NotificationService {
      * @throws Exception 예외 발생 시
      */
 	@Override
-	public int getUnreadCount(String uid) throws Exception {
-		return messageDAO.getUnreadCount(uid);
+	public int getUnreadCount(String uid, String accountType) throws Exception {
+		return messageDAO.getUnreadCount(uid, accountType);
 	}
 }

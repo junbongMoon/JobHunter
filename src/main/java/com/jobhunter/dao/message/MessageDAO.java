@@ -46,14 +46,14 @@ public interface MessageDAO {
 	 * @param isRead 읽음 상태 (Y/N)
 	 * @author 유지원
 	 */
-	public void updateMessageReadStatus(int messageNo, String isRead) throws Exception;
+	public void updateMessageReadStatus(int messageNo, String accountType, String uid) throws Exception;
 	
 	/**
 	 * 모든 메시지의 읽음 상태를 업데이트하는 메서드
 	 * @param isRead 읽음 상태 (Y/N)
 	 * @author 유지원
 	 */
-	public void updateAllMessagesReadStatus(String isRead) throws Exception;
+	public void updateAllMessagesReadStatus(String accountType, String uid) throws Exception;
 	
 	/**
 	 * 메시지를 삭제하는 메서드
@@ -67,5 +67,5 @@ public interface MessageDAO {
 	 * @return 읽지 않은 메시지 개수
 	 * @author 유지원
 	 */
-	public int getUnreadCount(String uid) throws Exception;
+	public int getUnreadCount(String uid, String accountType) throws Exception;
 }
