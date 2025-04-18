@@ -306,6 +306,9 @@
 		</html>
 
 		<script>
+			window.publicSessionUid = "${sessionScope.account.uid}";
+			window.publicSessionAccType = "${sessionScope.account.accountType}";
+
 			function openNotifications() {
 				const popup = window.open('/notification/list', 'notifications',
 					`width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);

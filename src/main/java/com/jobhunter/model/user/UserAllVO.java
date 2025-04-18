@@ -1,7 +1,6 @@
 package com.jobhunter.model.user;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.customenum.Gender;

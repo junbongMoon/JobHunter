@@ -168,8 +168,7 @@ public class CompanyRestController {
 	@PatchMapping(value = "/password", consumes = "application/json")
 	public ResponseEntity<Void> changePassword(@RequestBody PasswordDTO dto, HttpSession session) {
 		try {
-			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
-
+			
 			if (!accUtil.checkUid(session, Integer.parseInt(dto.getUid()))) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
@@ -203,6 +202,7 @@ public class CompanyRestController {
 	@PatchMapping(value = "/contact", consumes = "application/json")
 	public ResponseEntity<String> changeContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
 		try {
+			
 			if (!accUtil.checkUid(session, Integer.parseInt(dto.getUid()))) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}

@@ -64,7 +64,7 @@ public class UserController {
 				autoLoginCookie.setPath("/");
 				response.addCookie(autoLoginCookie);
 				
-				if (isFirst) {
+				if (isFirst != null && isFirst) {
 					String redirectUrl = (String) session.getAttribute("redirectUrl");
 					session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
 
