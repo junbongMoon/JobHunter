@@ -60,7 +60,7 @@ public class AdminController {
 
 		LocalDate now = LocalDate.now();
 		LocalDateTime start = now.withDayOfMonth(1).atStartOfDay(); // 이번 달 1일 00:00:00
-		LocalDateTime end = now.plusDays(1).atStartOfDay().minusSeconds(1); // 오늘 23:59:59
+		LocalDateTime end = now.withDayOfMonth(now.lengthOfMonth()).atTime(23, 59, 59);
 
 		try {
 			List<StatusVODTO> monthchart = statusService.getDailyChartByPaging(start, end);
