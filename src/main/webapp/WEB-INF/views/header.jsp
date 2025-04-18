@@ -182,13 +182,13 @@
 		<!-- 알럿 모달 -->
 		<div id="publicModalOverlay" class="public-modal-overlay" style="display: none;"></div>
 		<div id="publicModal" class="public-modal-box" style="display: none;">
-		<div class="public-modal-content">
-			<div class="public-modal-message"></div>
-			<div class="public-modal-buttons"></div>
-		</div>
+			<div class="public-modal-content">
+				<div class="public-modal-message"></div>
+				<div class="public-modal-buttons"></div>
+			</div>
 		</div>
 		<!-- 알럿 모달 -->
-		
+
 		<div class="index-page">
 			<header id="header" class="header d-flex align-items-center">
 				<div class="container-fluid container-xl position-relative d-flex align-items-center header-background">
@@ -219,7 +219,7 @@
 										<a class="nav-link dropdown-toggle" href="/admin" id="mypageDropdown"
 											role="button">👑Admin Page</a>
 										<!-- 메시지가 있을 때-->
-											<div class="notification-home" style="display: none;">💬</div>
+										<div class="notification-home" style="display: none;">💬</div>
 									</c:when>
 									<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 										<a class="nav-link dropdown-toggle"
@@ -228,7 +228,7 @@
 											My Page
 										</a>
 										<!-- 메시지가 있을 때-->
-											<div class="notification-home" style="display: none;">💬</div>
+										<div class="notification-home" style="display: none;">💬</div>
 									</c:when>
 									<c:otherwise>
 										<a class="nav-link dropdown-toggle"
@@ -237,7 +237,7 @@
 											My Page
 										</a>
 										<!-- 메시지가 있을 때-->
-											<div class="notification-home" style="display: none;">💬</div>
+										<div class="notification-home" style="display: none;">💬</div>
 									</c:otherwise>
 								</c:choose>
 
@@ -245,7 +245,8 @@
 								<div class="mypage-profile-card">
 									<div class="profile-img-container">
 										<div class="profile-img"></div>
-										<div class="speech-bubble" onclick="openNotifications()">
+										<div class="speech-bubble"
+											onclick="openNotifications(${sessionScope.account.uid})">
 											<!-- 메시지 카운트 들어오게 -->
 											<div class="notification-count">0</div>
 										</div>
@@ -310,10 +311,10 @@
 
 		<!-- 로그인 상태를 저장할 숨겨진 요소 추가 uid로 확인 -->
 		<div id="loginStatus" style="display: none;" data-uid="${sessionScope.account.uid}"></div>
-		
+
 		<script>
-			function openNotifications() {
-				const popup = window.open('/notification/list', 'notifications',
+			function openNotifications(uid) {
+				const popup = window.open('/notification/list?uid=' + uid, 'notifications',
 					`width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);
 
 				if (popup) popup.focus();
@@ -324,13 +325,13 @@
 			// 알림 개수 업데이트 함수
 			function updateNotificationCount(count) {
 				console.log("알림 개수 업데이트:", count);
-				
+
 				// 모든 알림 아이콘 요소 가져오기
 				const notificationHomes = document.querySelector('.notification-home');
 				// 모든 알림 개수 요소 가져오기
 				const countElements = document.querySelector('.notification-count');
-				
-				if(count > 0) {
+
+				if (count > 0) {
 					notificationHomes.style.display = 'flex';
 					countElements.style.display = 'flex';
 				} else {
@@ -341,19 +342,19 @@
 				countElements.textContent = count;
 
 			}
-			
+
 			// 페이지 로드 시 읽지 않은 알림 개수 가져오기
-			$(document).ready(function() {
+			$(document).ready(function () {
 				console.log("페이지 로드 완료");
-				
+
 				// 초기에는 모든 알림 요소를 숨김
 				$('.notification-count').hide();
 				$('.notification-home').hide();
-				
+
 				const uid = document.getElementById('loginStatus').getAttribute('data-uid');
 
 				// 로그인한 사용자인 경우에만 알림 개수 가져오기
-				if(uid) {
+				if (uid) {
 					console.log("로그인 사용자 감지, 알림 개수 요청");
 					$.ajax({
 						url: '/notification/unreadCount',
@@ -361,13 +362,13 @@
 						data: {
 							uid: uid
 						},
-						success: function(response) {
+						success: function (response) {
 							console.log("알림 개수 응답:", response);
 							if (response && response.count !== undefined) {
 								updateNotificationCount(response.count);
 							}
 						},
-						error: function(xhr, status, error) {
+						error: function (xhr, status, error) {
 							console.error('알림 개수 가져오기 실패:', error);
 						}
 					});

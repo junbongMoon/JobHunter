@@ -23,8 +23,8 @@ public class MessageDAOImpl implements MessageDAO {
 	}
 	
 	@Override
-	public List<MessageDTO> getAllMessages() throws Exception {
-		return ses.selectList(NS + ".getAllMessages");
+	public List<MessageDTO> getAllMessages(String uid) throws Exception {
+		return ses.selectList(NS + ".getAllMessages", uid);
 	}
 	
 	@Override

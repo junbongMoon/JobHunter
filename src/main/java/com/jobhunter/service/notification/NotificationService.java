@@ -7,7 +7,7 @@ import com.jobhunter.model.message.MessageDTO;
 public interface NotificationService {
 	
 
-	List<MessageDTO> getNotificationList() throws Exception;
+	List<MessageDTO> getNotificationList(String uid) throws Exception;
 	
 	void markAsRead(int messageNo) throws Exception;
 
