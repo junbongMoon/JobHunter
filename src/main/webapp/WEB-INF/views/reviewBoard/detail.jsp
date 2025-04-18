@@ -175,19 +175,19 @@
 			<!-- 추천 영역 -->
 			<tr>
 				<th>추천 수</th>
-				<td><span id="likeCountText"
-					data-count="${detail.likes != null ? detail.likes : 0}"> 👍
-						${detail.likes != null ? detail.likes : 0}명 추천 </span></td>
+				<td><span id="likeCountText"> <span id="likeCountNum">${detail.likes != null ? detail.likes : 0}</span>명
+				</span></td>
 			</tr>
 			<!-- 추천 버튼 -->
 		</table>
-		<div id="likeBtns">
-			<button id="likeBtn" class="btn-getstarted btn-sm">👍 추천</button>
-			<button id="unlikeBtn" class="btn-getstarted btn-sm">👎 추천
-				취소</button>
-		</div>
 
-	
+		<!-- 좋아요 버튼 -->
+
+		<button id="likeBtn" class="btn btn-outline-primary">👍 좋아요</button>
+		<button id="unlikeBtn" class="btn btn-outline-danger"
+			style="display: none;">❌ 취소</button>
+
+
 		<!-- 수정 버튼 -->
 		<a
 			href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
@@ -233,6 +233,7 @@
 
 
 	<script>
+	
 	document.addEventListener("formData", () => {
 		  const form = document.getElementById("reviewForm");
 
@@ -266,92 +267,102 @@
 		});
 
 
+	$(document).ready(function () {
+		  const isLiked = $('#isLiked').val() === 'true';
 
-	$('#likeBtn').on('click', function () {
-		  const boardNo = $('#boardNo').val();
-		  const userId = $('#userId').val();
+		  if (isLiked) {
+		    $('#likeBtn').hide();
+		    $('#unlikeBtn').show();
+		  } else {
+		    $('#likeBtn').show();
+		    $('#unlikeBtn').hide();
+		  }
+		});
 
-		  $.ajax({
-		    url: '${pageContext.request.contextPath}/reviewBoard/like',
-		    method: 'POST',
-		    contentType: 'application/json',
-		    dataType: 'json',
-		    data: JSON.stringify({ boardNo, userId }),
-		    success: function (res) {
-		      alert(res.message);
-		      if (res.success) {
-		        const $likeText = $('#likeCountText');
-		        let count = parseInt($likeText.attr('data-count')) || 0;
-		        count++;
+	
+	// 공통 변수
+	const userId = $('#userId').val();
+	const boardNo = $('#boardNo').val();
+	const likeModal = new bootstrap.Modal(document.getElementById('likeModal'));
 
-		        $likeText.attr('data-count', count);
-		        $likeText.text(`👍 ${count}명 추천`);
+	// 좋아요 등록
+	$('#likeBtn').click(function () {
+	  let currentLikes = parseInt($('#likeCountNum').text()) || 0;
+	  $('#likeCountNum').text(currentLikes + 1);
+	  $('#likeBtn').hide();
+	  $('#unlikeBtn').show();
 
-		        $('#likeBtn').hide();
-		        $('#unlikeBtn').show();
-		      }
-		    },
-		    error: function (xhr) {
-		      alert(xhr.responseText || '오류 발생');
+	  $('#likeModalMessage').text("좋아요가 등록되었습니다!");
+	  likeModal.show();
+
+	  $.ajax({
+	    url: '/reviewBoard/like',
+	    type: 'POST',
+	    contentType: 'application/json',
+	    data: JSON.stringify({ userId: userId, boardNo: boardNo }),
+	    error: function () {
+	      $('#likeCountNum').text(currentLikes);
+	      $('#likeBtn').show();
+	      $('#unlikeBtn').hide();
+	      $('#likeModalMessage').text("좋아요 등록 중 오류가 발생했습니다.");
+	      likeModal.show();
+	    }
+	  });
+	});
+
+	// 좋아요 취소
+	$('#unlikeBtn').click(function () {
+	  let currentLikes = parseInt($('#likeCountNum').text()) || 0;
+	  $('#likeCountNum').text(currentLikes - 1);
+	  $('#unlikeBtn').hide();
+	  $('#likeBtn').show();
+
+	  $('#likeModalMessage').text("좋아요가 취소되었습니다.");
+	  likeModal.show();
+
+	  $.ajax({
+	    url: '/reviewBoard/unlike',
+	    type: 'POST',
+	    contentType: 'application/json',
+	    data: JSON.stringify({ userId: userId, boardNo: boardNo }),
+	    error: function () {
+	      $('#likeCountNum').text(currentLikes);
+	      $('#unlikeBtn').show();
+	      $('#likeBtn').hide();
+	      $('#likeModalMessage').text("좋아요 취소 중 오류가 발생했습니다.");
+	      likeModal.show();
+	    }
+	  });
+	});
+
+
+	
+
+
+	  $(document).ready(function () {
+		  $(".delete-btn").click(function () {
+		    const boardNo = $(this).data("boardno");
+
+		    if (confirm("정말 삭제하시겠습니까?")) {
+		      $.ajax({
+		        url: "${pageContext.request.contextPath}/reviewBoard/delete",
+		        type: "POST",
+		        data: { boardNo: boardNo },
+		        success: function (res) {
+		          alert(res.message);
+		          if (res.success) {
+		            window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
+		          }
+		        },
+		        error: function (xhr, status, error) {
+		          console.error("삭제 실패:", error);
+		          alert("삭제 중 오류가 발생했습니다.");
+		        }
+		      });
 		    }
 		  });
 		});
 
-		  // 👎 추천 취소 버튼 클릭
-		  $('#unlikeBtn').on('click', function () {
-  const boardNo = $('#boardNo').val();
-  const userId = $('#userId').val();
-
-  $.ajax({
-    url: '${pageContext.request.contextPath}/reviewBoard/unlike',
-    method: 'POST',
-    contentType: 'application/json',
-    dataType: 'json',
-    data: JSON.stringify({ boardNo, userId }),
-    success: function (res) {
-      alert(res.message);
-      if (res.success) {
-        const $likeText = $('#likeCountText');
-        let count = parseInt($likeText.attr('data-count')) || 0;
-        count = Math.max(0, count - 1);
-        $likeText.attr('data-count', count);
-        $likeText.text(`👍 ${count}명 추천`);
-
-        $('#likeBtn').show();
-        $('#unlikeBtn').hide();
-      }
-    },
-    error: function (xhr) {
-      alert(xhr.responseText || '오류 발생');
-    }
-  });
-});
-
-
-$(document).ready(function () {
-	  $(".delete-btn").click(function () {
-	    const boardNo = $(this).data("boardno");
-
-
-	    if (confirm("정말 삭제하시겠습니까?")) {
-	      $.ajax({
-	        url: "${pageContext.request.contextPath}/reviewBoard/delete", 
-	        type: "POST",
-	        data: { boardNo: boardNo },
-	        success: function (res) {
-	          alert(res.message);
-	          if (res.success) {
-	           window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
-	          }
-	        },
-	        error: function (xhr, status, error) {
-	          console.error("삭제 실패:", error);
-	          alert("삭제 중 오류가 발생했습니다.");
-	        }
-	      });
-	    }
-	  });
-	});
-</script>
+	</script>
 </body>
 </html>

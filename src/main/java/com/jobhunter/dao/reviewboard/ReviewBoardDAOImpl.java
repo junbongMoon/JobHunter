@@ -53,11 +53,11 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 		return ses.selectOne(NS + ".detailAll", boardNo);
 	}
 
-	@Override
-	public LocalDateTime selectLike(Likes like) throws Exception {
-
-		return ses.selectOne(NS + ".selectLastLikeTime", like);
-	}
+//	@Override
+//	public LocalDateTime selectLike(Likes like) throws Exception {
+//
+//		return ses.selectOne(NS + ".selectLastLikeTime", like);
+//	}
 
 	@Override
 	public int insertLike(Likes like) {

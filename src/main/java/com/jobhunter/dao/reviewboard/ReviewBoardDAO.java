@@ -21,7 +21,7 @@ public interface ReviewBoardDAO {
 
 	ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception;
 
-	LocalDateTime selectLike(Likes like) throws Exception;
+//	boolean selectLike(Likes like) throws Exception;
 
 	int insertLike(Likes like) throws Exception;
 

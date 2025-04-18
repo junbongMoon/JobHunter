@@ -125,7 +125,7 @@
 	</resultMap>
 
 
-	<!-- 1. 최근 24시간 내 좋아요 시간 -->
+<!-- 	
 	<select id="selectLastLikeTime"
 		resultType="java.time.LocalDateTime">
 		SELECT createdAt
@@ -137,7 +137,7 @@
 		ORDER BY createdAt DESC
 		LIMIT 1
 	</select>
-
+ -->
 	<!-- 2. 좋아요 등록 -->
 	<insert id="insertLike">
 		INSERT INTO LikesLog (userId, boardNo,LikeType)
@@ -299,6 +299,9 @@
 					</when>
 					<when test="searchType eq 'reviewResult'">
 						r.reviewResult = #{keyword}
+					</when>
+					<when test="searchType eq 'reviewLikes'">
+						r.reviewLikes LIKE CONCAT('%', #{keyword}, '%')
 					</when>
 				</choose>
 			</if>
