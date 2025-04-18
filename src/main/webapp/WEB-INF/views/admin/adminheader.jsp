@@ -29,7 +29,7 @@
         <!-- 🚧 구분선 -->
         <hr class="sidebar-divider">
 
-        <!-- 🔹 유틸리티 섹션 -->
+        <!-- 🔹 유틸리티 섹션 
         <div class="sidebar-heading">유틸리티</div>
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
@@ -47,7 +47,7 @@
                     <a class="collapse-item" href="utilities-other.jsp">기타</a>
                 </div>
             </div>
-        </li>
+        </li> -->
 
         <!-- 🔹 페이지 관리 섹션 -->
         <div class="sidebar-heading">페이지 관리</div>
@@ -60,26 +60,25 @@
             <div id="collapsePages" class="collapse" aria-labelledby="headingPages"
                 data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">로그인 관련:</h6>
-                    <a class="collapse-item" href="login.jsp">로그인</a>
-                    <a class="collapse-item" href="register.jsp">회원가입</a>
-                    <a class="collapse-item" href="forgot-password.jsp">비밀번호 찾기</a>
+                    <h6 class="collapse-header">유저 신고 관리:</h6>
+                    <a class="collapse-item" href="admin/reportUser">일반 유저</a>
+                    <a class="collapse-item" href="admin/reportCompany">기업 유저</a>
                     <div class="collapse-divider"></div>
-                    <h6 class="collapse-header">기타 페이지:</h6>
-                    <a class="collapse-item" href="404.jsp">404 오류 페이지</a>
-                    <a class="collapse-item" href="blank.jsp">빈 페이지</a>
+                    <h6 class="collapse-header">게시물 신고 관리:</h6>
+                    <a class="collapse-item" href="#">공고 게시물</a>
+                    <a class="collapse-item" href="#">리뷰 게시물</a>
                 </div>
             </div>
         </li>
 
 
-        <!-- 🔹 테이블 페이지 -->
+        <!-- 🔹 테이블 페이지 
         <li class="nav-item">
             <a class="nav-link" href="tables.jsp">
                 <i class="fas fa-fw fa-table"></i>
                 <span>테이블</span>
             </a>
-        </li>
+        </li> -->
 
         <!-- 🔹 유저 관리 섹션 -->
         <div class="sidebar-heading">유저 관리</div>
