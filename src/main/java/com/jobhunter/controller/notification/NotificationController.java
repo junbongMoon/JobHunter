@@ -40,11 +40,11 @@ public class NotificationController {
      * @return 알림 목록 뷰 이름
      */
 	@GetMapping("/list")
-	public String openNotifications(Model model, @RequestParam String uid) {
+	public String openNotifications(Model model, @RequestParam String uid, @RequestParam String accountType) {
 		// 현재 로그인한 사용자의 알림 목록을 가져옵니다.
 		// 실제 구현에서는 세션에서 사용자 정보를 가져와 해당 사용자의 알림만 조회해야 합니다.
 		try {
-			model.addAttribute("messages", notificationService.getNotificationList(uid));
+			model.addAttribute("messages", notificationService.getNotificationList(uid, accountType));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

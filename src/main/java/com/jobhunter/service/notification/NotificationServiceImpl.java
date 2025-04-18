@@ -30,8 +30,8 @@ public class NotificationServiceImpl implements NotificationService {
      * @throws Exception 예외 발생 시
      */
 	@Override
-	public List<MessageDTO> getNotificationList(String uid) throws Exception {
-		return messageDAO.getAllMessages(uid);
+	public List<MessageDTO> getNotificationList(String uid, String accountType) throws Exception {
+		return messageDAO.getAllMessages(uid, accountType);
 	}
 	
 	/**

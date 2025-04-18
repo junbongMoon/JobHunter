@@ -28,7 +28,7 @@ public interface MessageDAO {
 	 * @author 유지원
 	 * @return 메시지 목록
 	 */
-	public List<MessageDTO> getAllMessages(String uid) throws Exception;
+	public List<MessageDTO> getAllMessages(String uid, String accountType) throws Exception;
 	
 	/**
 	 * 특정 사용자의 메시지를 가져오는 메서드

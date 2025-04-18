@@ -1,6 +1,8 @@
 package com.jobhunter.dao.message;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
@@ -23,8 +25,11 @@ public class MessageDAOImpl implements MessageDAO {
 	}
 	
 	@Override
-	public List<MessageDTO> getAllMessages(String uid) throws Exception {
-		return ses.selectList(NS + ".getAllMessages", uid);
+	public List<MessageDTO> getAllMessages(String uid, String accountType) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uid", uid);
+		params.put("accountType", accountType);
+		return ses.selectList(NS + ".getAllMessages", params);
 	}
 	
 	@Override

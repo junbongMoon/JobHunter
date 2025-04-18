@@ -246,7 +246,7 @@
 									<div class="profile-img-container">
 										<div class="profile-img"></div>
 										<div class="speech-bubble"
-											onclick="openNotifications(${sessionScope.account.uid})">
+											onclick="openNotifications('${sessionScope.account.uid}', '${sessionScope.account.accountType}')">
 											<!-- 메시지 카운트 들어오게 -->
 											<div class="notification-count">0</div>
 										</div>
@@ -313,8 +313,8 @@
 		<div id="loginStatus" style="display: none;" data-uid="${sessionScope.account.uid}"></div>
 
 		<script>
-			function openNotifications(uid) {
-				const popup = window.open('/notification/list?uid=' + uid, 'notifications',
+			function openNotifications(uid, accountType) {
+				const popup = window.open('/notification/list?uid=' + uid + '&accountType=' + accountType, 'notifications',
 					`width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);
 
 				if (popup) popup.focus();
