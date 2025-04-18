@@ -45,9 +45,6 @@
 			<!-- Swiper -->
 			<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 
-			<!-- jQuery -->
-			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 			<style>
 				.mypage-profile-card {
 					display: none;
@@ -314,13 +311,17 @@
 
 		<script>
 			function openNotifications(uid, accountType) {
+				const width = 800;
+				const height = 600;
+				const top = (window.screen.height - height) / 2;
+				const left = (window.screen.width - width) / 2;
+
 				const popup = window.open('/notification/list?uid=' + uid + '&accountType=' + accountType, 'notifications',
 					`width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);
 
 				if (popup) popup.focus();
 				else alert("팝업 차단됨. 브라우저 설정 확인해주세요.");
 			}
-
 
 			// 알림 개수 업데이트 함수
 			function updateNotificationCount(count) {
@@ -340,38 +341,32 @@
 				}
 
 				countElements.textContent = count;
-
 			}
 
 			// 페이지 로드 시 읽지 않은 알림 개수 가져오기
-			$(document).ready(function () {
+			document.addEventListener('DOMContentLoaded', function () {
 				console.log("페이지 로드 완료");
 
 				// 초기에는 모든 알림 요소를 숨김
-				$('.notification-count').hide();
-				$('.notification-home').hide();
+				document.querySelector('.notification-count').style.display = 'none';
+				document.querySelector('.notification-home').style.display = 'none';
 
 				const uid = document.getElementById('loginStatus').getAttribute('data-uid');
 
 				// 로그인한 사용자인 경우에만 알림 개수 가져오기
 				if (uid) {
 					console.log("로그인 사용자 감지, 알림 개수 요청");
-					$.ajax({
-						url: '/notification/unreadCount',
-						type: 'GET',
-						data: {
-							uid: uid
-						},
-						success: function (response) {
-							console.log("알림 개수 응답:", response);
-							if (response && response.count !== undefined) {
-								updateNotificationCount(response.count);
+					fetch('/notification/unreadCount?uid=' + uid)
+						.then(response => response.json())
+						.then(data => {
+							console.log("알림 개수 응답:", data);
+							if (data && data.count !== undefined) {
+								updateNotificationCount(data.count);
 							}
-						},
-						error: function (xhr, status, error) {
+						})
+						.catch(error => {
 							console.error('알림 개수 가져오기 실패:', error);
-						}
-					});
+						});
 				} else {
 					console.log("로그인 사용자 아님");
 				}
