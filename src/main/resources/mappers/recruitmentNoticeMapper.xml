@@ -113,7 +113,7 @@
 		ON c.uid = r.refCompany
 
 		<where>
-			r.status = 'Y'
+			r.status = 'Y' AND r.dueDate > now()
 
 			<!-- 검색 조건은 그대로 유지 -->
 			<if test="searchType != null and searchType != ''">
@@ -252,7 +252,7 @@
 	<select id="getTotalCountRow" resultType="int">
 		select count(*) from
 		recruitmentnotice
-		where status = 'Y'
+		where status = 'Y' AND dueDate > now()
 	</select>
 
 	<select id="getSearchResultCountRow" resultType="int">
@@ -276,7 +276,7 @@
 		r.uid
 
 		<where>
-			r.status = 'Y'
+			r.status = 'Y' AND r.dueDate > now()
 
 			<if
 				test="searchType != null and searchWord != null and searchWord != ''">
