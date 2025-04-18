@@ -109,7 +109,7 @@ public class CompanyRestController {
 			@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
 
-			if (uid != null) {
+			if (uid == null) {
 				throw new NoSuchElementException();
 			}
 

@@ -11,6 +11,11 @@
 <script src="https://www.gstatic.com/firebasejs/11.5.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.5.0/firebase-auth-compat.js"></script>
 
+<!-- Summernote CSS/JS (Bootstrap 4 기준) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-ko-KR.min.js"></script>
+
 <link href="/resources/css/mypage.css" rel="stylesheet">
 
 <main class="main" data-aos="fade-up">
@@ -307,7 +312,7 @@ function updateCompanyDetailInfo(companyInfo) {
 
   // 자기소개
   const introduceDiv = companyDetailInfo.querySelector('.introduce-content');
-  introduceDiv.textContent = companyInfo.introduce || '회사소개가 아직 없습니다.';
+  introduceDiv.innerHTML = companyInfo.introduce || '회사소개가 아직 없습니다.';
 }
 
 // 수정창 내용 초기화
@@ -353,7 +358,9 @@ function updateCompanyModifyInfo(result) {
 
   // 자기소개
   if (result.introduce) {
-    $('#introduce').val(result.introduce);
+    $('#introduce').summernote('code', result.introduce);
+  } else {
+    $('#introduce').summernote('code', '');
   }
 }
 
@@ -1154,6 +1161,131 @@ function enableAddressScroll() {
 		}
 	}
 	return true ;
+}
+// #endregion
+
+// #region 썸머노트
+$('#introduce').summernote({
+  height: 300,
+  placeholder: '회사소개를 입력해주세요',
+  callbacks: {
+    onImageUpload: function(files) {
+      summerNoteImgSizeCheck(files)
+    }
+  }
+});
+
+function summerNoteImgSizeCheck(files) {
+  const file = files[0];
+  const maxSize = 1024 * 1024; // 1MB
+
+  if (file.size <= maxSize) {
+    insertSmartImageToSummernote(file, '#introduce'); // 바로 삽입
+  } else {
+    imgCompressModal(file, '#introduce'); // 모달로 압축 물어봄
+  }
+}
+
+// 이미지 압축 질문
+function imgCompressModal(file, targetEditorSelector) {
+  window.publicModals.show("해당 사이트는 요금제에 따라<br>트래픽 제한등의 이유로 큰 용량의<br>파일 업로드가 제한되어있습니다.<br>사진을 압축하여 업로드하시겠습니까?",
+    {
+      cancelText:"아니오",
+      confirmText:"예",
+      onConfirm: ()=>{
+        insertSmartImageToSummernote(file, targetEditorSelector)
+        return false;
+      }
+    }
+  )
+}
+
+let controller = new AbortController(); // 전역 컨트롤러
+
+// 썸머노트 이미지 강제압축 함수
+function insertSmartImageToSummernote(file, targetEditorSelector) {
+  controller = new AbortController(); // 새 컨트롤러로 초기화
+
+  // 1. 로딩 모달 또는 진행 바 표시
+  window.publicModals.show(`
+    <div style="text-align: center;">
+      <strong>이미지 압축 중입니다...<i id="imgCompressPerText">0%</i></strong>
+      <div class="progress" style="height: 10px; margin-top: 15px;">
+        <div id="fakeProgressBar" class="progress-bar" style="width: 0%;"></div>
+      </div>
+      <div style="font-size:0.5em;">사실 진행률은 아니고 기다리기 힘들까봐 보여드릴게요...</div>
+    </div>
+  `, { confirmText: "취소", onConfirm: cancleImgCompress });
+
+  // 2. 가짜 % 증가 로직
+  let percent = 0;
+  const interval = setInterval(() => {
+    if (percent < 90) {
+      percent = Math.min(percent + Math.random() * 8, 90); // 빠르게 90까지
+    } else if (percent < 95) {
+      percent = Math.min(percent + Math.random() * 0.5, 95); // 느리게 95까지
+    } else if (percent < 99) {
+      percent = Math.min(percent + Math.random() * 0.05, 99); // 더느리게 99까지
+    }
+
+    document.getElementById('fakeProgressBar').style.width = percent + '%';
+    document.getElementById('imgCompressPerText').innerText = Math.floor(percent) + '%';
+  }, 200);
+
+  // 3. 서버에 압축 요청
+  const formData = new FormData();
+  formData.append("file", file);
+
+  fetch("/util/compressImg", {
+    method: "POST",
+    body: formData,
+    signal: controller.signal
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("압축 실패");
+      return res.blob();
+    })
+    .then(blob => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // 4. 이미지 삽입
+        $(targetEditorSelector).summernote('insertImage', reader.result);
+
+        clearInterval(interval); // 타이머 제거
+
+        const bar = document.getElementById('fakeProgressBar');
+        const text = document.getElementById('imgCompressPerText');
+
+        if (bar && text) {
+          // 일단 99%로 고정
+          bar.style.width = '99%';
+          text.innerText = '99%';
+
+          // 약간 텀 두고 100%로 변경
+          setTimeout(() => {
+            bar.style.width = '100%';
+            text.innerText = '100%';
+
+            // 그리고 또 텀 두고 모달 닫기
+            setTimeout(() => {
+              window.publicModals.hide?.();
+            }, 500); // 0.5초 정도 기다렸다가 닫기
+          }, 300); // 0.3초 후 100%로
+        }
+      };
+      reader.readAsDataURL(blob);
+    })
+    .catch(err => {
+      clearInterval(interval);
+      console.error("이미지 처리 중 오류:", err);
+      window.publicModals.show("이미지 압축 중 오류가 발생했습니다.");
+      window.publicModals.hide?.();
+    });
+}
+
+function cancleImgCompress() {
+  controller?.abort(); // 요청 취소
+  window.publicModals.hide?.(); // 모달도 닫기
 }
 // #endregion
 

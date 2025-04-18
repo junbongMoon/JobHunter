@@ -220,7 +220,7 @@
 									</c:when>
 									<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 										<a class="nav-link dropdown-toggle"
-											href="/company/companyHome?uid=${sessionScope.account.uid}&accountType=company"
+											href="/company/companyInfo?uid=${sessionScope.account.uid}&accountType=company"
 											id="mypageDropdown" role="button">
 											My Page
 										</a>
