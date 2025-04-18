@@ -72,13 +72,6 @@
             </div>
         </li>
 
-        <!-- 🔹 차트 페이지 -->
-        <li class="nav-item">
-            <a class="nav-link" href="charts.jsp">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>차트</span>
-            </a>
-        </li>
 
         <!-- 🔹 테이블 페이지 -->
         <li class="nav-item">

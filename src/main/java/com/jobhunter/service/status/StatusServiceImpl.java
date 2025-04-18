@@ -19,6 +19,7 @@ import com.jobhunter.dao.submit.SubmitDAO;
 import com.jobhunter.dao.user.UserDAO;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.status.FullStatus;
 import com.jobhunter.model.status.StatusVODTO;
 import com.jobhunter.model.status.TotalStatusVODTO;
 
@@ -212,5 +213,36 @@ public class StatusServiceImpl implements StatusService {
 
 		return result;
 	}
+
+	@Override
+	public List<String> getYearAndMonth() throws Exception {
+		
+		return statusDAO.selectYearAndMonthByStatus();
+	}
+	
+	@Override
+	public FullStatus getFullStatusByMonth(String ym) throws Exception {
+	    LocalDateTime start = getStartOfMonth(ym);
+	    LocalDateTime end = getEndOfMonth(ym);
+
+	    List<StatusVODTO> dailyStats = this.getDailyChartByPaging(start, end);
+	    List<TotalStatusVODTO> totalStats = this.getTotalStatusBetweenStartAndEnd(start, end);
+
+	    return FullStatus.builder()
+	            .statusList(dailyStats)
+	            .totalStatusList(totalStats)
+	            .build();
+	}
+	
+	private LocalDateTime getStartOfMonth(String ym) {
+	    return LocalDate.parse(ym + "-01").atStartOfDay(); // 예: 2025-04-01T00:00:00
+	}
+
+	private LocalDateTime getEndOfMonth(String ym) {
+	    LocalDate start = LocalDate.parse(ym + "-01");
+	    LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+	    return end.atTime(23, 59, 59); // 예: 2025-04-30T23:59:59
+	}
+
 
 }
