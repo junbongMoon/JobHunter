@@ -169,6 +169,16 @@
 		= #{boardNo}
 	</update>
 
+	<!-- 상세페이지용 좋아요 조회 -->
+	<select id="seletHasUserLiked"
+		parameterType="com.jobhunter.model.reviewboard.Likes" resultType="int">
+		SELECT COUNT(*)
+		FROM LikesLog
+		WHERE userId = #{userId}
+		AND boardNo = #{boardNo}
+		AND LikeType = #{likeType}
+	</select>
+
 	<select id="selectModifyReviewBoard" parameterType="int"
 		resultType="com.jobhunter.model.reviewboard.WriteBoardDTO">
 		SELECT boardNo, gonggoUid, writer, companyName,
@@ -186,7 +196,8 @@
 		gonggoUid = #{gonggoUid},
 		reviewLevel = #{reviewLevel},
 		reviewType= #{reviewType},
-		reviewResult =#{reviewResult},
+		reviewResult
+		=#{reviewResult},
 		typeOtherText =
 		#{typeOtherText},
 		content=#{content},
@@ -216,7 +227,8 @@
 		INSERT INTO ViewsLog (userId, boardNo, viewedAt,
 		ViewType)
 		VALUES (#{userId}, #{boardNo}, NOW(), #{viewType})
-		ON DUPLICATE KEY UPDATE viewedAt = NOW()
+		ON
+		DUPLICATE KEY UPDATE viewedAt = NOW()
 	</insert>
 
 	<!-- 3. 게시판 조회수 증가 -->
@@ -293,7 +305,7 @@
 		</where>
 	</select>
 
-
+	<!--CDLog에 띄우는 매퍼 -->
 	<select id="selectUserIdByBoardNo" parameterType="int"
 		resultType="int">
 		SELECT writer FROM reviewBoard WHERE boardNo = #{boardNo}

@@ -17,11 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.reviewboard.Likes;
-import com.jobhunter.model.reviewboard.MassageCallDTO;
+import com.jobhunter.model.reviewboard.MessageCallDTO;
+import com.jobhunter.model.reviewboard.MessageCallDTO;
 import com.jobhunter.model.reviewboard.RPageRequestDTO;
 import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
@@ -62,9 +63,7 @@ public class ReviewBoardController {
 	@GetMapping("/write")
 	public String reviewBoardWrite(HttpSession session, Model model, HttpServletRequest req) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
-//	    if (account == null) {
-//	        return "redirect:/account/login?returnUrl=/reviewBoard/write";
-//	    }
+
 
 		int userUid = account.getUid();
 		try {
@@ -115,16 +114,18 @@ public class ReviewBoardController {
 			} else {
 				logger.info("조회 성공: {}", detail);
 			}
-			  
+			 boolean isLiked = false;
 			if (account != null) {
 				int userId = account.getUid();
 				service.insertViews(userId, boardNo, "REBOARD");
-				
+				 isLiked = service.hasUserLiked(userId, boardNo);  
 			}
 			
+			    
+
 			model.addAttribute("detail", detail);
 			model.addAttribute("pageRequestDTO", pageRequestDTO);
-
+			model.addAttribute("isLiked", isLiked);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("상세페이지 처리 중 오류", e);
@@ -134,51 +135,54 @@ public class ReviewBoardController {
 	}
 
 	@PostMapping(value = "/like", produces = "application/json;charset=UTF-8")
-	public ResponseEntity<MassageCallDTO> addLike(@RequestBody Likes likes, HttpSession session, Model model) {
+	@ResponseBody
+	public ResponseEntity<MessageCallDTO> addLike(@RequestBody Likes likes, HttpSession session, Model model) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 
 		if (account == null || account.getUid() == 0) {
 			return ResponseEntity.status(401)
-				.body(new MassageCallDTO("로그인이 필요합니다.", false));
+				.body(new MessageCallDTO("로그인이 필요합니다.", false));
 		}
 
 		try {
 			boolean liked = service.addlikes(likes.getUserId(), likes.getBoardNo());
-			model.addAttribute("isLiked", liked);
-			return ResponseEntity.ok(new MassageCallDTO("좋아요가 등록되었습니다.", true));
+			model.addAttribute("liked", liked);
+			
+			return ResponseEntity.ok(new MessageCallDTO("좋아요가 등록되었습니다.", true));
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.badRequest()
-				.body(new MassageCallDTO("이미 좋아요를 누르셨습니다. 24시간 후 다시 가능합니다.", false));
+				.body(new MessageCallDTO("이미 좋아요를 누르셨습니다. 24시간 후 다시 가능합니다.", false));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
-			return ResponseEntity.status(500).body(new MassageCallDTO("서버 오류 발생", false));
+			return ResponseEntity.status(500).body(new MessageCallDTO("서버 오류 발생", false));
 		}
 	}
 
 
 	@PostMapping(value = "/unlike", produces = "application/json;charset=UTF-8")
-	public ResponseEntity<MassageCallDTO> cancelLike(@RequestBody Likes likes, HttpSession session) {
+	public ResponseEntity<MessageCallDTO> cancelLike(@RequestBody Likes likes, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 
 		if (account == null || account.getUid() == 0) {
 			return ResponseEntity.status(401)
-				.body(new MassageCallDTO("로그인이 필요합니다.", false));
+				.body(new MessageCallDTO("로그인이 필요합니다.", false));
 		}
 
 		try {
 			boolean success = service.removeLike(likes.getUserId(), likes.getBoardNo());
 			if (success) {
-				return ResponseEntity.ok(new MassageCallDTO("좋아요가 취소되었습니다.", true));
+				return ResponseEntity.ok(new MessageCallDTO("좋아요가 취소되었습니다.", true));
 			} else {
 				return ResponseEntity.status(400)
-					.body(new MassageCallDTO("더이상 취소를 할 수 없습니다.", false));
+					.body(new MessageCallDTO("더이상 취소를 할 수 없습니다.", false));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return ResponseEntity.status(500).body(new MassageCallDTO("서버 오류 발생", false));
+			return ResponseEntity.status(500).body(new MessageCallDTO("서버 오류 발생", false));
 		}
 	}
-
+	
 
 	@GetMapping("/modify")
 	public String showModify(@RequestParam("boardNo") int boardNo, Model model, HttpSession session,
@@ -225,11 +229,12 @@ public class ReviewBoardController {
 	}
 
 	@PostMapping(value = "/delete", produces = "application/json")
-	public ResponseEntity<MassageCallDTO> deleteBoardNo(@RequestParam("boardNo") int boardNo) {
+	@ResponseBody 
+	public ResponseEntity<MessageCallDTO> deleteBoardNo(@RequestParam("boardNo") int boardNo) {
 	    try {
 	        service.deleteBoard(boardNo);
 	        return ResponseEntity.ok(
-	            MassageCallDTO.builder()
+	            MessageCallDTO.builder()
 	                .message("게시글이 삭제되었습니다.")
 	                .success(true)
 	                .build()
@@ -237,7 +242,7 @@ public class ReviewBoardController {
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	            .body(MassageCallDTO.builder()
+	            .body(MessageCallDTO.builder()
 	                .message("삭제 중 오류 발생")
 	                .success(false)
 	                .build());
@@ -245,25 +250,26 @@ public class ReviewBoardController {
 	}
 
 	@GetMapping("/viewCount")
-	public ResponseEntity<MassageCallDTO> getViewCount(@RequestParam("boardNo") int boardNo, HttpSession session) {
+	@ResponseBody
+	public ResponseEntity<MessageCallDTO> getViewCount(@RequestParam("boardNo") int boardNo, HttpSession session) {
 		try {
 			AccountVO account = (AccountVO) session.getAttribute("account");
 
 			if (account == null) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-						.body(MassageCallDTO.builder().message("로그인이 필요합니다.").success(false).build());
+						.body(MessageCallDTO.builder().message("로그인이 필요합니다.").success(false).build());
 			}
 
 			int userId = account.getUid();
 			service.insertViews(userId, boardNo,"REBOARD"); // 24시간 제한 로직 포함
 			int views = service.getReviewDetail(boardNo).getViews();
 
-			return ResponseEntity.ok(MassageCallDTO.builder().message(String.valueOf(views)).success(true).build());
+			return ResponseEntity.ok(MessageCallDTO.builder().message(String.valueOf(views)).success(true).build());
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(MassageCallDTO.builder().message("조회수 처리 중 오류").success(false).build());
+					.body(MessageCallDTO.builder().message("조회수 처리 중 오류").success(false).build());
 		}
 	}
 
