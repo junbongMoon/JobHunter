@@ -87,7 +87,7 @@
 	<select id="selectRecruitmentWithPaging"
 		resultMap="RecruitmentDetailMap">
 		SELECT
-		r.*, c.companyName,
+		r.*, c.companyName, c.addr AS companyAddr,
 		rg.regionNo, rg.name AS regionName, rg.code,
 		sg.sigunguNo, sg.name AS sigunguName, sg.regionNo,
 		mj.majorcategoryNo
@@ -211,6 +211,7 @@
 		<result property="regDate" column="regDate" />
 		<result property="refCompany" column="refCompany" />
 		<result property="companyName" column="companyName" />
+		<result property="companyAddr" column="companyAddr" />
 
 		<!-- Region (도시) -->
 		<association property="region"
@@ -325,7 +326,7 @@
 	<select id="getBoardDetailInfoByUid"
 		resultMap="RecruitmentDetailMap">
 		SELECT
-		r.*, c.companyName,
+		r.*, c.companyName, c.addr AS companyAddr,
 
 		rg.regionNo,
 		rg.name AS regionName,
