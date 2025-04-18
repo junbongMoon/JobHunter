@@ -77,7 +77,6 @@ public class CompanyDAOImpl implements CompanyDAO {
 		}
 		return 0;
 	}
-
 	
 	@Override
 	public int deleteMobile(String uid) throws Exception {

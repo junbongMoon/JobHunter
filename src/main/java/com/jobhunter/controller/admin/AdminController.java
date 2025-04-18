@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.admin.Pagination;
 import com.jobhunter.model.company.CompanyVO;
 import com.jobhunter.model.status.StatusVODTO;
@@ -216,6 +219,7 @@ public class AdminController {
 	 *
 	 * @param uid 일반유저 고유 번호
 	 * @param request 요청 바디에 포함된 정지 기간(duration)과 정지 사유(reason)
+	 * @param session 세션 객체
 	 * @return 처리 결과를 담은 JSON 응답
 	 * 
 	 * @author 유지원
@@ -224,11 +228,17 @@ public class AdminController {
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> blockUser(
 	        @PathVariable("uid") int uid, 
-	        @RequestBody Map<String, String> request) {
+	        @RequestBody Map<String, String> request,
+	        HttpSession session) {
 
 	    try {
 	        String duration = request.get("duration");
 	        String reason = request.get("reason");
+	        
+	        // 세션에서 관리자 정보 가져오기
+	        AccountVO adminAccount = (AccountVO) session.getAttribute("account");
+	        
+	        int adminUid = adminAccount.getUid();
 
 	        // 정지 기간 계산
 	        Timestamp blockDeadline;
@@ -241,7 +251,7 @@ public class AdminController {
 	            blockDeadline = new Timestamp(cal.getTimeInMillis());
 	        }
 
-	        boolean success = adminService.blockUser(uid, blockDeadline, reason);
+	        boolean success = adminService.blockUser(uid, blockDeadline, reason, adminUid);
 
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("success", success);
@@ -300,6 +310,7 @@ public class AdminController {
 	 *
 	 * @param uid 기업유저 고유 번호
 	 * @param request 요청 바디에 포함된 정지 기간(duration)과 사유(reason)
+	 * @param session 세션 객체
 	 * @return 처리 결과를 담은 JSON 응답
 	 * 
 	 * @author 유지원
@@ -308,11 +319,17 @@ public class AdminController {
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> blockCompany(
 	        @PathVariable("uid") int uid, 
-	        @RequestBody Map<String, String> request) {
+	        @RequestBody Map<String, String> request,
+	        HttpSession session) {
 
 	    try {
 	        String duration = request.get("duration");
 	        String reason = request.get("reason");
+	        
+	        // 세션에서 관리자 정보 가져오기
+	        AccountVO adminAccount = (AccountVO) session.getAttribute("account");
+	        
+	        int adminUid = adminAccount.getUid();
 
 	        // 정지 기간 계산
 	        Timestamp blockDeadline;
@@ -325,7 +342,7 @@ public class AdminController {
 	            blockDeadline = new Timestamp(cal.getTimeInMillis());
 	        }
 
-	        boolean success = adminService.blockCompany(uid, blockDeadline, reason);
+	        boolean success = adminService.blockCompany(uid, blockDeadline, reason, adminUid);
 
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("success", success);

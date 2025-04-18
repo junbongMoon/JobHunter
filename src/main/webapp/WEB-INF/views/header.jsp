@@ -179,13 +179,13 @@
 		<!-- 알럿 모달 -->
 		<div id="publicModalOverlay" class="public-modal-overlay" style="display: none;"></div>
 		<div id="publicModal" class="public-modal-box" style="display: none;">
-		<div class="public-modal-content">
-			<div class="public-modal-message"></div>
-			<div class="public-modal-buttons"></div>
-		</div>
+			<div class="public-modal-content">
+				<div class="public-modal-message"></div>
+				<div class="public-modal-buttons"></div>
+			</div>
 		</div>
 		<!-- 알럿 모달 -->
-		 
+
 		<div class="index-page">
 			<header id="header" class="header d-flex align-items-center">
 				<div class="container-fluid container-xl position-relative d-flex align-items-center header-background">
@@ -199,7 +199,7 @@
 
 					<nav id="navmenu" class="navmenu">
 						<ul>
-							<li><a href="#hero" class="active">Home</a></li>
+							<li><a href="/" class="active">Home</a></li>
 							<li class="dropdown"><a href="#"><span>채용정보</span> <i
 										class="bi bi-chevron-down toggle-dropdown"></i></a>
 								<ul>
@@ -215,8 +215,8 @@
 									<c:when test="${sessionScope.account.isAdmin.toString() == 'Y'}">
 										<a class="nav-link dropdown-toggle" href="/admin" id="mypageDropdown"
 											role="button">👑Admin Page</a>
-										<!-- 메시지가 있을 때 띄울예정 -->
-										<div class="notification-home">💬</div>
+										<!-- 메시지가 있을 때-->
+										<div class="notification-home" style="display: none;">💬</div>
 									</c:when>
 									<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 										<a class="nav-link dropdown-toggle"
@@ -224,8 +224,8 @@
 											id="mypageDropdown" role="button">
 											My Page
 										</a>
-										<!-- 메시지가 있을 때 띄울예정 -->
-										<div class="notification-home">💬</div>
+										<!-- 메시지가 있을 때-->
+										<div class="notification-home" style="display: none;">💬</div>
 									</c:when>
 									<c:otherwise>
 										<a class="nav-link dropdown-toggle"
@@ -233,8 +233,8 @@
 											id="mypageDropdown" role="button">
 											My Page
 										</a>
-										<!-- 메시지가 있을 때 띄울예정 -->
-										<div class="notification-home">💬</div>
+										<!-- 메시지가 있을 때-->
+										<div class="notification-home" style="display: none;">💬</div>
 									</c:otherwise>
 								</c:choose>
 
@@ -242,7 +242,8 @@
 								<div class="mypage-profile-card">
 									<div class="profile-img-container">
 										<div class="profile-img"></div>
-										<div class="speech-bubble" onclick="openNotifications()">
+										<div class="speech-bubble"
+											onclick="openNotifications('${sessionScope.account.uid}', '${sessionScope.account.accountType}')">
 											<!-- 메시지 카운트 들어오게 -->
 											<div class="notification-count">0</div>
 										</div>
@@ -305,22 +306,71 @@
 
 		</html>
 
+		<!-- 로그인 상태를 저장할 숨겨진 요소 추가 uid로 확인 -->
+		<div id="loginStatus" style="display: none;" data-uid="${sessionScope.account.uid}"></div>
+		<div id="accountType" style="display: none;" data-accountType="${sessionScope.account.accountType}"></div>
+
 		<script>
-			function openNotifications() {
-				const popup = window.open('/notification/list', 'notifications',
+			function openNotifications(uid, accountType) {
+				const width = 800;
+				const height = 600;
+				const top = (window.screen.height - height) / 2;
+				const left = (window.screen.width - width) / 2;
+
+				const popup = window.open('/notification/list?uid=' + uid + '&accountType=' + accountType, 'notifications',
 					`width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);
 
 				if (popup) popup.focus();
 				else alert("팝업 차단됨. 브라우저 설정 확인해주세요.");
 			}
 
-
-			// 알림 개수 업데이트 함수 (추후 서버에서 받아온 데이터로 업데이트)
+			// 알림 개수 업데이트 함수
 			function updateNotificationCount(count) {
-				const countElement = document.querySelector('.notification-count');
-				if (countElement) {
-					countElement.textContent = count;
-					countElement.style.display = count > 0 ? 'flex' : 'none';
+				console.log("알림 개수 업데이트:", count);
+
+				// 모든 알림 아이콘 요소 가져오기
+				const notificationHomes = document.querySelector('.notification-home');
+				// 모든 알림 개수 요소 가져오기
+				const countElements = document.querySelector('.notification-count');
+
+				if (count > 0) {
+					notificationHomes.style.display = 'flex';
+					countElements.style.display = 'flex';
+				} else {
+					notificationHomes.style.display = 'none';
+					countElements.style.display = 'none';
 				}
+
+				countElements.textContent = count;
 			}
+
+			// 페이지 로드 시 읽지 않은 알림 개수 가져오기
+			window.onload = function () {
+				console.log("페이지 로드 완료");
+
+				// 초기에는 모든 알림 요소를 숨김
+				document.querySelector('.notification-count').style.display = 'none';
+				document.querySelector('.notification-home').style.display = 'none';
+
+				const uid = document.getElementById('loginStatus').getAttribute('data-uid');
+				const accountType = document.getElementById('accountType').getAttribute('data-accountType');
+
+				// 로그인한 사용자인 경우에만 알림 개수 가져오기
+				if (uid) {
+					console.log("로그인 사용자 감지, 알림 개수 요청");
+					fetch('/notification/unreadCount?uid=' + uid + '&accountType=' + accountType)
+						.then(response => response.json())
+						.then(data => {
+							console.log("알림 개수 응답:", data);
+							if (data && data.count !== undefined) {
+								updateNotificationCount(data.count);
+							}
+						})
+						.catch(error => {
+							console.error('알림 개수 가져오기 실패:', error);
+						});
+				} else {
+					console.log("로그인 사용자 아님");
+				}
+			};
 		</script>

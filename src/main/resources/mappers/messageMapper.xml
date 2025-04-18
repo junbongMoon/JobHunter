@@ -11,5 +11,61 @@
 		VALUES
 		(#{toWho}, #{fromWho}, #{toUserType}, #{fromUserType}, #{title}, #{content})
 	</insert>
+	
+	<select id="getAllMessages" parameterType="map" resultType="com.jobhunter.model.message.MessageDTO">
+		SELECT 
+			messageNo, toWho, fromWho, toUserType, fromUserType, 
+			title, content, isRead, regDate
+		FROM 
+			message
+		WHERE
+			toWho = #{uid} AND toUserType = #{accountType}
+		ORDER BY 
+			regDate DESC
+	</select>
+	
+	<select id="getMessagesByUserId" parameterType="com.jobhunter.model.message.MessageDTO" 
+		resultType="com.jobhunter.model.message.MessageDTO">
+		SELECT 
+			messageNo, toWho, fromWho, toUserType, fromUserType, 
+			title, content, isRead, regDate
+		FROM 
+			message
+		WHERE 
+			toWho = #{toWho} AND toUserType = #{toUserType}
+		ORDER BY 
+			regDate DESC
+	</select>
+	
+	<update id="updateMessageReadStatus" parameterType="com.jobhunter.model.message.MessageRequest">
+		UPDATE 
+			message
+		SET 
+			isRead = 'Y'
+		WHERE 
+			messageNo = #{messageNo} AND toUserType = #{accountType} AND toWho = #{uid}
+	</update>
+	
+	<update id="updateAllMessagesReadStatus" parameterType="com.jobhunter.model.message.MessageRequest">
+		UPDATE 
+			message
+		SET 
+			isRead = 'Y'
+		WHERE 
+			toUserType = #{accountType} AND toWho = #{uid}
+	</update>
+	
+	<delete id="deleteMessage" parameterType="int">
+		DELETE FROM 
+			message
+		WHERE 
+			messageNo = #{messageNo}
+	</delete>
+
+	<select id="getUnreadCount" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM message
+		WHERE isRead = 'N' AND toWho = #{uid} AND toUserType = #{accountType}
+	</select>
 
 </mapper>
