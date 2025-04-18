@@ -95,4 +95,10 @@ public class StatusDAOImpl implements StatusDAO {
 		return ses.selectList(NS + ".getTotalStatusBetweenStartAndEndByTarget", param);
 	}
 
+	@Override
+	public List<String> selectYearAndMonthByStatus() throws Exception {
+		
+		return ses.selectList(NS + ".getYearAndMonthStatus");
+	}
+
 }

@@ -35,7 +35,8 @@
 		resultMap="TotalStatusVODTOMap">
 		SELECT *
 		FROM total_status
-		WHERE statusDate BETWEEN #{start} AND #{end}
+		WHERE statusDate BETWEEN #{start}
+		AND #{end}
 	</select>
 
 	<insert id="insertTotalStatus"
@@ -112,5 +113,11 @@
 			column="total_registration" />
 		<result property="totalReviewBoard" column="total_reviewBoard" />
 	</resultMap>
+
+	<select id="getYearAndMonthStatus" resultType="string">
+		SELECT DISTINCT DATE_FORMAT(statusDate, '%Y-%m') AS `ym`
+		FROM status
+		ORDER BY `ym` DESC
+	</select>
 
 </mapper>
