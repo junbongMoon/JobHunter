@@ -2,9 +2,33 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<jsp:useBean id="now" class="java.util.Date" />
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+	$(function(){
+		document.addEventListener("DOMContentLoaded", applyDeadlineIcons);
+	});
 
+  function applyDeadlineIcons() {
+  const titles = document.querySelectorAll(".title:not([data-checked])"); // 중복방지
+  const now = new Date().getTime();
+  const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
+
+  titles.forEach((title) => {
+    const dueDate = parseInt(title.getAttribute("data-duedate"), 10);
+    if (!isNaN(dueDate) && dueDate - now <= threeDaysInMs) {
+      const img = document.createElement("img");
+      img.src = "/resources/images_mjb/countdown100.png";
+      img.alt = "임박";
+      img.style.width = "20px";
+      img.style.marginRight = "8px";
+      title.prepend(img);
+    }
+    title.setAttribute("data-checked", "true"); // 중복 실행 방지
+  });
+}
+</script>
 <style>
 	.search-bar {
 	width: 100%;
@@ -338,6 +362,11 @@
 						<div class="col-lg-6 recruitment">
 							<article>
 								<h2 class="title">
+									<c:choose>
+										<c:when test="${rec.dueDate.time - now.time <= 3 * 24 * 60 * 60 * 1000}">
+										  <img src="/resources/images_mjb/countdown100.png" alt="임박" style="width:20px; height:auto; margin-right:8px;">
+										</c:when>
+									  </c:choose>
 									<a href="/recruitmentnotice/detail?uid=${rec.uid}">${rec.title}</a>
 								</h2>
 
@@ -350,6 +379,12 @@
 											class="bi bi-clock"></i> <a href="#"><time>
 													<fmt:formatDate value="${rec.regDate}" pattern="yyyy-MM-dd" />
 												</time></a></li>
+												<li class="d-flex align-items-center">
+													<i class="bi bi-eye me-1"></i> <a href="#">${rec.count}</a>
+												  </li>
+												  <li class="d-flex align-items-center">
+													<i class="bi bi-heart me-1"></i> <a href="#">${rec.likeCnt}</a>
+												  </li>
 									</ul>
 								</div>
 
@@ -439,6 +474,7 @@
 			}
 	
 			$('.recruitmentContainer').append(data);
+			applyDeadlineIcons();
 			},
 			error: function () {
 			console.error("불러오기 실패");
