@@ -1,10 +1,187 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <jsp:include page="adminheader.jsp"></jsp:include>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
+
+$(function() {
+    getMonth();
+
+    $("#monthSelect").on("change", function () {
+    const selectedMonth = $(this).val();
+    if (selectedMonth !== "-1") {
+        $.ajax({
+            url: "/status/rest/ym/data",
+            type: "POST",
+            data: { ym: selectedMonth },
+            contentType: "application/x-www-form-urlencoded",
+            success: function (data) {
+                console.log("선택 월 통계 데이터:", data);
+                const statusList = data.statusList;
+                const totalList = data.totalStatusList;
+
+                // 차트 다시 그리기
+                drawUserCompanyChartByData(statusList);
+                drawRecruitSubmitReviewChartByData(statusList);
+                drawTotalComboChartByData(totalList);
+                if (totalList.length > 0) {
+                    const latest = totalList[totalList.length - 1];
+                    drawPieChartByLatest(latest);
+                }
+            },
+            error: function (xhr) {
+                console.error("에러 응답:", xhr.responseText);
+                alert("통계 데이터를 불러오는 데 실패했습니다.");
+            }
+        });
+    }
+});
+});
+
+function drawUserCompanyChartByData(statusList) {
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', '날짜');
+    data.addColumn('number', '신규 유저');
+    data.addColumn('number', '신규 기업');
+
+    statusList.forEach(item => {
+        const dateStr = `\${item.statusDate[0]}-\${String(item.statusDate[1]).padStart(2, '0')}-\${String(item.statusDate[2]).padStart(2, '0')}`;
+        data.addRow([dateStr, item.newUsers, item.newCompanies]);
+    });
+
+    const options = {
+        title: '신규 유저/기업 통계',
+        curveType: 'function',
+        legend: { position: 'bottom' },
+        width: '100%',
+        height: 330
+    };
+
+    const chart = new google.visualization.LineChart(document.getElementById('curve_chart_top'));
+    chart.draw(data, options);
+}
+
+function drawRecruitSubmitReviewChartByData(statusList) {
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', '날짜');
+    data.addColumn('number', '공고 등록 수');
+    data.addColumn('number', '이력서 제출 수');
+    data.addColumn('number', '리뷰 수');
+
+    statusList.forEach(item => {
+        const dateStr = `\${item.statusDate[0]}-\${String(item.statusDate[1]).padStart(2, '0')}-\${String(item.statusDate[2]).padStart(2, '0')}`;
+        data.addRow([dateStr, item.newRecruitmentNoticeCnt, item.newRegistration, item.newReviewBoard]);
+    });
+
+    const options = {
+        title: '공고/제출/리뷰 통계',
+        curveType: 'function',
+        legend: { position: 'bottom' },
+        width: '100%',
+        height: 330
+    };
+
+    const chart = new google.visualization.LineChart(document.getElementById('curve_chart_bottom'));
+    chart.draw(data, options);
+}
+
+function drawTotalComboChartByData(totalList) {
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', '날짜');
+    data.addColumn('number', '총 유저');
+    data.addColumn('number', '총 기업');
+    data.addColumn('number', '총 공고');
+    data.addColumn('number', '총 제출');
+    data.addColumn('number', '총 리뷰');
+
+    totalList.forEach(item => {
+        const dateStr = `\${item.statusDate[0]}-\${String(item.statusDate[1]).padStart(2, '0')}-\${String(item.statusDate[2]).padStart(2, '0')}`;
+        data.addRow([
+            dateStr,
+            item.totalUsers,
+            item.totalCompanies,
+            item.totalRecruitmentNoticeCnt,
+            item.totalRegistration,
+            item.totalReviewBoard
+        ]);
+    });
+
+    const options = {
+        title: '일별 누적 통계 변화',
+        vAxis: { title: '합계' },
+        hAxis: { title: '날짜' },
+        seriesType: 'bars',
+        series: { 4: { type: 'line' } },
+        width: '100%',
+        height: 330
+    };
+
+    const chart = new google.visualization.ComboChart(document.getElementById('combo_chart_total'));
+    chart.draw(data, options);
+}
+
+function drawPieChartByLatest(latestTotal) {
+    const data = google.visualization.arrayToDataTable([
+        ['항목', '수치'],
+        ['총 유저 수', latestTotal.totalUsers],
+        ['총 기업 수', latestTotal.totalCompanies],
+        ['총 공고 수', latestTotal.totalRecruitmentNoticeCnt],
+        ['총 제출 수', latestTotal.totalRegistration],
+        ['총 리뷰 수', latestTotal.totalReviewBoard]
+    ]);
+
+    const options = {
+        title: '최신 누적 통계 비율',
+        pieHole: 0.4,
+        width: '100%',
+        height: 320
+    };
+
+    const chart = new google.visualization.PieChart(document.getElementById('donut_total_chart'));
+    chart.draw(data, options);
+}
+
+function getMonth() {
+    $.ajax({
+        url: "/status/rest/ym/",
+        type: "GET",
+        success: function (data) {
+            console.log("월 리스트 원본:", data);
+            console.log("타입 확인:", typeof data);
+
+            let resultArray = [];
+
+            // ✅ 객체인 경우 처리
+            if (Array.isArray(data)) {
+                resultArray = data;
+            } else if (typeof data === "object" && data !== null) {
+                const values = Object.values(data);  // 💡 핵심
+                resultArray = values;
+            } else {
+                resultArray = [data];
+            }
+
+            const $select = $("#monthSelect");
+            $select.empty();
+            $select.append(`<option value="-1">출력할 연/월을 선택 하세요</option>`);
+            resultArray.forEach(function (month) {
+                console.log(month);
+                $select.append(`<option value="\${month}">\${month}</option>`);
+            });
+
+            console.log("최종 select 내용:", $select.html());
+        },
+        error: function () {
+            alert("월 리스트를 불러오는 데 실패했습니다.");
+        }
+    });
+}
+
+
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawCharts);
   
@@ -128,6 +305,11 @@
 <body>
 <!-- 차트 콘텐츠 -->
 <div class="container-fluid">
+    <div class="selectMonth">
+        <select id="monthSelect" class="form-control">
+            <option value="-1">출력할 연/월을 선택 하세요</option>
+        </select>
+      </div>
 
     <!-- ===== 차트가 포함될 콘텐츠 영역 ===== -->
     <div class="row">

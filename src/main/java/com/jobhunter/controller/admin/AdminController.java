@@ -54,19 +54,13 @@ public class AdminController {
 	 * @param model 뷰에 전달할 데이터
 	 * @return 관리자 홈 JSP 페이지 경로
 	 */
-	@RequestMapping(value = "/admin", method = RequestMethod.GET)
-	public String home(Locale locale, Model model) {
-
-		return "admin/adminhome";
-	}
-
   // 문준봉
-	@RequestMapping(value = "/admin/admincharts", method = RequestMethod.GET)
+	@RequestMapping(value = "/admin", method = RequestMethod.GET)
 	public String showCharts(Locale locale, Model model) {
 
 		LocalDate now = LocalDate.now();
 		LocalDateTime start = now.withDayOfMonth(1).atStartOfDay(); // 이번 달 1일 00:00:00
-		LocalDateTime end = now.plusDays(1).atStartOfDay().minusSeconds(1); // 오늘 23:59:59
+		LocalDateTime end = now.withDayOfMonth(now.lengthOfMonth()).atTime(23, 59, 59);
 
 		try {
 			List<StatusVODTO> monthchart = statusService.getDailyChartByPaging(start, end);
