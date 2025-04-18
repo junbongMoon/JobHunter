@@ -98,7 +98,6 @@
 					<div class="row">
 						<div class="col-12">
 							<h1 class="h3 mb-4 text-gray-800">사용자 신고 목록</h1>
-							<p class="mb-4">일반 사용자가 신고한 계정 목록입니다.</p>
 
 							<!-- 필터 섹션 -->
 							<div class="filter-section">
