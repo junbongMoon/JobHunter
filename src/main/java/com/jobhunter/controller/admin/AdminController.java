@@ -31,6 +31,7 @@ import com.jobhunter.model.company.CompanyVO;
 import com.jobhunter.model.status.StatusVODTO;
 import com.jobhunter.model.status.TotalStatusVODTO;
 import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.report.ReportMessageVO;
 import com.jobhunter.service.admin.AdminService;
 import com.jobhunter.service.status.StatusService;
 
@@ -395,5 +396,12 @@ public class AdminController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
 	    }
 
+	}
+
+	@GetMapping("/admin/reportUser")
+	public String adminReportUserList(Model model) throws Exception {
+		List<ReportMessageVO> reportList = adminService.getReportsByUserReporter();
+		model.addAttribute("reportList", reportList);
+		return "admin/adminReportUserList";
 	}
 }
