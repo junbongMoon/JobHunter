@@ -18,9 +18,20 @@ $(function() {
             url: "/status/rest/ym/data",
             type: "POST",
             data: { ym: selectedMonth },
-            contentType: "application/x-www-form-urlencoded", // 💡 form 전송 명시
+            contentType: "application/x-www-form-urlencoded",
             success: function (data) {
                 console.log("선택 월 통계 데이터:", data);
+                const statusList = data.statusList;
+                const totalList = data.totalStatusList;
+
+                // 차트 다시 그리기
+                drawUserCompanyChartByData(statusList);
+                drawRecruitSubmitReviewChartByData(statusList);
+                drawTotalComboChartByData(totalList);
+                if (totalList.length > 0) {
+                    const latest = totalList[totalList.length - 1];
+                    drawPieChartByLatest(latest);
+                }
             },
             error: function (xhr) {
                 console.error("에러 응답:", xhr.responseText);
@@ -30,6 +41,109 @@ $(function() {
     }
 });
 });
+
+function drawUserCompanyChartByData(statusList) {
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', '날짜');
+    data.addColumn('number', '신규 유저');
+    data.addColumn('number', '신규 기업');
+
+    statusList.forEach(item => {
+        const dateStr = `\${item.statusDate[0]}-\${String(item.statusDate[1]).padStart(2, '0')}-\${String(item.statusDate[2]).padStart(2, '0')}`;
+        data.addRow([dateStr, item.newUsers, item.newCompanies]);
+    });
+
+    const options = {
+        title: '신규 유저/기업 통계',
+        curveType: 'function',
+        legend: { position: 'bottom' },
+        width: '100%',
+        height: 330
+    };
+
+    const chart = new google.visualization.LineChart(document.getElementById('curve_chart_top'));
+    chart.draw(data, options);
+}
+
+function drawRecruitSubmitReviewChartByData(statusList) {
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', '날짜');
+    data.addColumn('number', '공고 등록 수');
+    data.addColumn('number', '이력서 제출 수');
+    data.addColumn('number', '리뷰 수');
+
+    statusList.forEach(item => {
+        const dateStr = `\${item.statusDate[0]}-\${String(item.statusDate[1]).padStart(2, '0')}-\${String(item.statusDate[2]).padStart(2, '0')}`;
+        data.addRow([dateStr, item.newRecruitmentNoticeCnt, item.newRegistration, item.newReviewBoard]);
+    });
+
+    const options = {
+        title: '공고/제출/리뷰 통계',
+        curveType: 'function',
+        legend: { position: 'bottom' },
+        width: '100%',
+        height: 330
+    };
+
+    const chart = new google.visualization.LineChart(document.getElementById('curve_chart_bottom'));
+    chart.draw(data, options);
+}
+
+function drawTotalComboChartByData(totalList) {
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', '날짜');
+    data.addColumn('number', '총 유저');
+    data.addColumn('number', '총 기업');
+    data.addColumn('number', '총 공고');
+    data.addColumn('number', '총 제출');
+    data.addColumn('number', '총 리뷰');
+
+    totalList.forEach(item => {
+        const dateStr = `\${item.statusDate[0]}-\${String(item.statusDate[1]).padStart(2, '0')}-\${String(item.statusDate[2]).padStart(2, '0')}`;
+        data.addRow([
+            dateStr,
+            item.totalUsers,
+            item.totalCompanies,
+            item.totalRecruitmentNoticeCnt,
+            item.totalRegistration,
+            item.totalReviewBoard
+        ]);
+    });
+
+    const options = {
+        title: '일별 누적 통계 변화',
+        vAxis: { title: '합계' },
+        hAxis: { title: '날짜' },
+        seriesType: 'bars',
+        series: { 4: { type: 'line' } },
+        width: '100%',
+        height: 330
+    };
+
+    const chart = new google.visualization.ComboChart(document.getElementById('combo_chart_total'));
+    chart.draw(data, options);
+}
+
+function drawPieChartByLatest(latestTotal) {
+    const data = google.visualization.arrayToDataTable([
+        ['항목', '수치'],
+        ['총 유저 수', latestTotal.totalUsers],
+        ['총 기업 수', latestTotal.totalCompanies],
+        ['총 공고 수', latestTotal.totalRecruitmentNoticeCnt],
+        ['총 제출 수', latestTotal.totalRegistration],
+        ['총 리뷰 수', latestTotal.totalReviewBoard]
+    ]);
+
+    const options = {
+        title: '최신 누적 통계 비율',
+        pieHole: 0.4,
+        width: '100%',
+        height: 320
+    };
+
+    const chart = new google.visualization.PieChart(document.getElementById('donut_total_chart'));
+    chart.draw(data, options);
+}
 
 function getMonth() {
     $.ajax({
