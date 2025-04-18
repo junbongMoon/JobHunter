@@ -16,7 +16,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class MassageCallDTO {
+public class MessageCallDTO {
 	private String message;
     private boolean success;
 }
