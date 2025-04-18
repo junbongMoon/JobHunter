@@ -507,9 +507,27 @@
 	</select>
 
 	<update id="increaseRecruitmentViewCnt" parameterType="int">
-		UPDATE recruitmentnotice
+		UPDATE
+		recruitmentnotice
 		SET count = count + 1
 		WHERE uid = #{boardNo}
+	</update>
+
+	<!-- 좋아요 증가 -->
+	<update id="increaseRecruitmentLikeCnt" parameterType="int">
+		UPDATE recruitmentnotice
+		SET likeCnt = likeCnt + 1
+		WHERE uid = #{uid}
+	</update>
+
+	<!-- 좋아요 감소 -->
+	<update id="decreaseRecruitmentLikeCnt" parameterType="int">
+		UPDATE recruitmentnotice
+		SET likeCnt = CASE
+		WHEN likeCnt > 0 THEN likeCnt - 1
+		ELSE 0
+		END
+		WHERE uid = #{uid}
 	</update>
 
 </mapper>

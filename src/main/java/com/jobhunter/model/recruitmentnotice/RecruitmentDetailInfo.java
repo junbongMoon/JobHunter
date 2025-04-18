@@ -129,6 +129,12 @@ public class RecruitmentDetailInfo {
 	 */
 	private String companyName;
 	
+	/**
+	 * <p> 
+	 * 좋아요 수
+	 * </p>
+	 */
+	private int likeCnt;
 	
 	
 	/**

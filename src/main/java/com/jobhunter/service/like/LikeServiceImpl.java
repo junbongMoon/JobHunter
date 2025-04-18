@@ -1,8 +1,12 @@
 package com.jobhunter.service.like;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.like.LikeDAO;
+import com.jobhunter.dao.recruitmentnotice.RecruitmentNoticeDAO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -11,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class LikeServiceImpl implements LikeService {
 	
 	private final LikeDAO likeDAO;
+	private final RecruitmentNoticeDAO recDAO;
 
 
 	/**
@@ -34,15 +39,33 @@ public class LikeServiceImpl implements LikeService {
 	public boolean hasLiked(int userId, int uid, String boardType) throws Exception {
 	    return likeDAO.selectHasLike(userId, uid, boardType) > 0;
 	}
-
+	
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public boolean saveLike(int userId, int uid, String boardType) throws Exception {
-	    return likeDAO.insertLikeLog(userId, uid, boardType) > 0;
+		boolean result = false;
+		
+		if(likeDAO.insertLikeLog(userId, uid, boardType) > 0) {
+			
+			if(recDAO.increaseRecruitmentLikeCnt(uid) > 0 ) {
+				result = true;
+			}
+		}
+		
+	    return result;
 	}
-
+	
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public boolean deleteLike(int userId, int uid, String boardType) throws Exception {
-	    return likeDAO.deleteLikeLog(userId, uid, boardType) > 0;
+		boolean result = false;
+		if(likeDAO.deleteLikeLog(userId, uid, boardType) > 0) {
+			if(recDAO.decreaseRecruitmentLikeCnt(uid) > 0) {
+				result = true;
+			}		
+			
+		}
+	    return result;
 	}
 
 }

@@ -30,8 +30,8 @@ public class RecruitmentNotice {
 	private String miniTitle;
 	private Timestamp dueDate;
 	private String status;
-	// 조회수
 	private int count;
 	private Timestamp regDate;
+	private int likeCnt;
 	private int refCompany;
 }

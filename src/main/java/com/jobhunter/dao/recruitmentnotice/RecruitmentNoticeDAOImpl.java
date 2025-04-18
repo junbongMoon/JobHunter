@@ -264,6 +264,20 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	    return ses.update(NS + ".increaseRecruitmentViewCnt", boardNo);
 	}
 
+
+	@Override
+	public int increaseRecruitmentLikeCnt(int uid) throws Exception {
+		
+		return ses.update(NS + ".increaseRecruitmentLikeCnt",uid);
+	}
+
+
+	@Override
+	public int decreaseRecruitmentLikeCnt(int uid) throws Exception {
+		
+		return ses.update(NS + ".decreaseRecruitmentLikeCnt",uid);
+	}
+
 	
 
 }
