@@ -43,7 +43,6 @@ public interface ReviewBoardDAO {
 	int incrementViews(int boardNo) throws Exception;
 
 	int countAllBoards() throws Exception;
-    
 
 	List<ReviewBoardDTO> selectPagedReviewBoard(RPageRequestDTO pageRequestDTO) throws Exception;
 
@@ -54,6 +53,8 @@ public interface ReviewBoardDAO {
 	void insertLog(int uid, String targetType, String logType);
 
 	int insertOrUpdateReviewView(int userId, int boardNo, String viewType) throws Exception;
+
+	int hasUserLikeit(Likes like) throws Exception;
 
 	
 

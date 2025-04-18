@@ -30,6 +30,9 @@ public interface ReviewBoardService {
 	// 좋아요 취소
 	boolean removeLike(int userId, int boardNo) throws Exception;
 
+	// 상세 페이지에 좋아요가 잇는지 없는지 조회 메서
+	boolean hasUserLiked(int userId, int boardNo) throws Exception;
+
 	// 수정 조회
 	WriteBoardDTO getReviewBoardUpdate(int boardNo) throws Exception;
 

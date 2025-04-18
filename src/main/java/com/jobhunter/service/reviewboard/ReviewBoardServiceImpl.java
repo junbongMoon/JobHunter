@@ -73,21 +73,15 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 	@Override
 	public ReviewDetailViewDTO getReviewDetail(int boardNo) throws Exception {
-	
-		
-		
+
 		return Rdao.selectReviewInfo(boardNo);
 	}
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean addlikes(int userId, int boardNo) throws Exception {
-		Likes like = Likes.builder()
-				.userId(userId)
-				.boardNo(boardNo)
-				.likeType("REBOARD")
-				.build();
-		
+		Likes like = Likes.builder().userId(userId).boardNo(boardNo).likeType("REBOARD").build();
+
 		// 1. 마지막 좋아요 시간 조회-> 유저가(userId) 어떤 게시글(boardNo)에 마지막으로 좋아요를 누른 시간이 언제인지
 		LocalDateTime lastLikeTime = Rdao.selectLike(like);
 
@@ -102,19 +96,27 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 			long hours = ChronoUnit.HOURS.between(lastLikeTime, now);
 			// 마지막 좋아요 이후 24시간이 지나지 않았다면
 			if (hours < 24) {
-				throw new IllegalArgumentException("24시간 이내에 같은 게시글에 좋아요를 할 수 없습니다.");
+
 			}
 		}
 
 		// 3. 좋아요 추가
 
-		
 		Rdao.insertLike(like);
 
 		// 4. 게시글 좋아요 수 증가
 		Rdao.updateBoardLikes(boardNo);
 
 		return true;
+	}
+
+	@Override
+
+	public boolean hasUserLiked(int userId, int boardNo) throws Exception {
+		Likes like = Likes.builder().userId(userId).boardNo(boardNo).likeType("REBOARD") // 좋아요 타입 지정
+				.build();
+
+		return Rdao.hasUserLikeit(like) > 0;
 	}
 
 	@Override
@@ -130,19 +132,18 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 	@Override
 	public WriteBoardDTO getReviewBoardUpdate(int boardNo) throws Exception {
-		
+
 		return Rdao.selectrecruitmentList(boardNo);
 	}
 
-
 	@Override
 	public boolean updateReviewBoard(WriteBoardDTO modify) throws Exception {
-	    int result = Rdao.updateReviewBoard(modify);
+		int result = Rdao.updateReviewBoard(modify);
 
-	    if (result > 0) {
-	        return true; // 수정 성공
-	    }
-	    return false ; // 수정 실패
+		if (result > 0) {
+			return true; // 수정 성공
+		}
+		return false; // 수정 실패
 	}
 
 	@Override
@@ -154,14 +155,14 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 		return true;
 
 	}
-	
+
 	@Override
-	public boolean oneViewCount(int userId, int boardNo ) throws Exception {
+	public boolean oneViewCount(int userId, int boardNo) throws Exception {
 		int count = Rdao.checkViewedWithHours(userId, boardNo);
-	    return count == 0;  //조회 기록이 없다
+		return count == 0; // 조회 기록이 없다
 	}
 
-	public void insertViews(int userId, int boardNo,String viewType) throws Exception {
+	public void insertViews(int userId, int boardNo, String viewType) throws Exception {
 		// 최근 24시간 이내 조회했는지 검사
 		int count = Rdao.checkViewedWithHours(userId, boardNo);
 		if (count == 0) {
@@ -171,22 +172,17 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 		}
 	}
 
-
-
-
 	@Override
 	public RPageResponseDTO<ReviewBoardDTO> getPagedBoardList(RPageRequestDTO pageRequestDTO) throws Exception {
-				
+
 		// 1. 전체 게시글 수 (검색 조건 포함)
-	    int totalCount = Rdao.countReviewBoard(pageRequestDTO);
+		int totalCount = Rdao.countReviewBoard(pageRequestDTO);
 
-	    // 2. 현재 페이지에 해당하는 게시글 목록
-	    List<ReviewBoardDTO> boardList = Rdao.selectPagedReviewBoard(pageRequestDTO);
+		// 2. 현재 페이지에 해당하는 게시글 목록
+		List<ReviewBoardDTO> boardList = Rdao.selectPagedReviewBoard(pageRequestDTO);
 
-	    // 3. 응답 DTO 생성 및 반환
-	    return new RPageResponseDTO<ReviewBoardDTO>(boardList, totalCount, pageRequestDTO);
+		// 3. 응답 DTO 생성 및 반환
+		return new RPageResponseDTO<ReviewBoardDTO>(boardList, totalCount, pageRequestDTO);
 	}
-
-	
 
 }
