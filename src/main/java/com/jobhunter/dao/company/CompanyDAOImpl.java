@@ -22,7 +22,11 @@ public class CompanyDAOImpl implements CompanyDAO {
 	
 	@Override
 	public CompanyVO getCompanyInfo(String uid) throws Exception {
-		return ses.selectOne(NS+".getCompanyInfo", uid);
+		CompanyVO vo = ses.selectOne(NS+".getCompanyInfo", uid);
+		if (vo != null && (vo.getCompanyImg() == null || vo.getCompanyImg().isEmpty())) {
+			vo.setCompanyImg(null); // 세터가 기본이미지 설정함
+		}
+		return vo;
 	}
 	
 	@Override
@@ -37,7 +41,14 @@ public class CompanyDAOImpl implements CompanyDAO {
 		paramMap.put("uid", uid);
 		paramMap.put("password", password);
 
-		return ses.selectOne(NS + ".checkPassword", paramMap);
+		AccountVO account = ses.selectOne(NS + ".checkPassword", paramMap);
+
+		// 후처리: 프로필 이미지가 없으면 기본값 설정
+		if (account != null && (account.getProfileImg() == null || account.getProfileImg().isEmpty())) {
+			account.setProfileImg(null); // 기본 이미지 세터가 작동하도록 null 전달
+		}
+
+		return account;
 	}
 	
 	@Override
@@ -91,5 +102,12 @@ public class CompanyDAOImpl implements CompanyDAO {
 		ses.update(NS + ".setDeleteAccount", uid);
 	}
 	
-	
+	@Override
+	public void updateProfileImg(Integer uid, String base64) throws Exception {
+		Map<String, Object> paramMap = new HashMap<>();
+	    paramMap.put("uid", uid);
+	    paramMap.put("img", base64);
+	    
+		ses.update(NS + ".updateProfileImg", paramMap);
+	}
 }

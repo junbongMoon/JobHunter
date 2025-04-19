@@ -23,7 +23,14 @@ public class UserDAOImpl implements UserDAO {
 	
 	@Override
 	public UserVO getUserInfo(String uid) throws Exception {
-		return ses.selectOne(NS+".getUserInfo", uid);
+		UserVO user = ses.selectOne(NS + ".getUserInfo", uid);
+
+		// 후처리: 프로필 이미지가 없을 경우 기본 이미지로 설정
+		if (user != null && (user.getUserImg() == null || user.getUserImg().isEmpty())) {
+			user.setUserImg(null); // 세터에서 기본값 세팅하도록 null 전달
+		}
+
+		return user;
 	}
 
 	@Override
@@ -32,7 +39,14 @@ public class UserDAOImpl implements UserDAO {
 		paramMap.put("uid", uid);
 		paramMap.put("password", password);
 
-		return ses.selectOne(NS + ".checkPassword", paramMap);
+		AccountVO account = ses.selectOne(NS + ".checkPassword", paramMap);
+
+		// 후처리: 프로필 이미지가 없으면 기본값 설정
+		if (account != null && (account.getProfileImg() == null || account.getProfileImg().isEmpty())) {
+			account.setProfileImg(null); // 기본 이미지 세터가 작동하도록 null 전달
+		}
+
+		return account;
 	}
 	
 	@Override
@@ -74,7 +88,14 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public AccountVO loginByKakaoId(Long kakaoId) throws Exception {
-		return ses.selectOne(NS + ".loginByKakaoId", kakaoId);
+		AccountVO account = ses.selectOne(NS + ".loginByKakaoId", kakaoId);
+
+		// 후처리: 프로필 이미지가 없으면 기본값 설정
+		if (account != null && (account.getProfileImg() == null || account.getProfileImg().isEmpty())) {
+			account.setProfileImg(null); // 기본 이미지 세터가 작동하도록 null 전달
+		}
+
+		return account;
 	}
 
 	@Override
@@ -112,6 +133,13 @@ public class UserDAOImpl implements UserDAO {
 		ses.update(NS + ".setDeleteAccount", uid);
 
 	}
-
 	
+	@Override
+	public void updateProfileImg(Integer uid, String base64) throws Exception {
+		Map<String, Object> paramMap = new HashMap<>();
+	    paramMap.put("uid", uid);
+	    paramMap.put("img", base64);
+	    
+		ses.update(NS + ".updateProfileImg", paramMap);
+	}
 }

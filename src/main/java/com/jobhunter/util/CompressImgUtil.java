@@ -1,8 +1,8 @@
 package com.jobhunter.util;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -18,46 +18,57 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class CompressImgUtil {
-    public byte[] compressToJpg(MultipartFile file, int maxSizeBytes) throws IOException {
-        BufferedImage inputImage = ImageIO.read(file.getInputStream());
+	public byte[] compressToJpg(MultipartFile file, int maxSizeBytes) throws IOException {
+	    BufferedImage inputImage = ImageIO.read(file.getInputStream());
 
-        // 투명 배경 있는 이미지 → RGB로 변환
-        BufferedImage rgbImage = new BufferedImage(
-            inputImage.getWidth(), inputImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = rgbImage.createGraphics();
-        g.drawImage(inputImage, 0, 0, Color.WHITE, null);
-        g.dispose();
+	    // 투명 배경 있는 이미지 → RGB로 변환
+	    BufferedImage rgbImage = new BufferedImage(
+	        inputImage.getWidth(), inputImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+	    Graphics2D g = rgbImage.createGraphics();
+	    g.drawImage(inputImage, 0, 0, Color.WHITE, null);
+	    g.dispose();
 
-        float quality = 1.0f;
-        int width = rgbImage.getWidth();
+	    // [1] 고정 해상도 축소 (예: 최대 1280px)
+	    int targetWidth = rgbImage.getWidth();
+	    int targetHeight = rgbImage.getHeight();
+	    int maxDimension = 1280;
 
-        while (true) {
-            BufferedImage resized = Scalr.resize(rgbImage, Scalr.Method.ULTRA_QUALITY, width);
+	    if (targetWidth > maxDimension || targetHeight > maxDimension) {
+	        if (targetWidth >= targetHeight) {
+	            targetHeight = (int)((double)targetHeight / targetWidth * maxDimension);
+	            targetWidth = maxDimension;
+	        } else {
+	            targetWidth = (int)((double)targetWidth / targetHeight * maxDimension);
+	            targetHeight = maxDimension;
+	        }
+	        rgbImage = Scalr.resize(rgbImage, Scalr.Method.QUALITY, targetWidth, targetHeight);
+	    }
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageWriter jpgWriter = ImageIO.getImageWritersByFormatName("jpg").next();
-            ImageWriteParam param = jpgWriter.getDefaultWriteParam();
-            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            param.setCompressionQuality(quality);
+	    // [2] 압축 반복
+	    float quality = 1.0f;
 
-            jpgWriter.setOutput(new MemoryCacheImageOutputStream(baos));
-            jpgWriter.write(null, new IIOImage(resized, null, null), param);
-            jpgWriter.dispose();
+	    while (true) {
+	        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	        ImageWriter jpgWriter = ImageIO.getImageWritersByFormatName("jpg").next();
+	        ImageWriteParam param = jpgWriter.getDefaultWriteParam();
+	        param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+	        param.setCompressionQuality(quality);
 
-            byte[] result = baos.toByteArray();
-            if (result.length <= maxSizeBytes) {
-                return result;
-            }
+	        jpgWriter.setOutput(new MemoryCacheImageOutputStream(baos));
+	        jpgWriter.write(null, new IIOImage(rgbImage, null, null), param);
+	        jpgWriter.dispose();
 
-            quality -= 0.05f;
-            if (quality < 0.1f) {
-                quality = 1.0f;
-                width *= 0.9;
-            }
+	        byte[] result = baos.toByteArray();
 
-            if (width < 100) {
-                throw new IOException("이미지를 1MB 이하로 압축할 수 없습니다.");
-            }
-        }
-    }
+	        if (result.length <= maxSizeBytes) {
+	            return result;
+	        }
+
+	        quality -= 0.05f;
+
+	        if (quality < 0.1f) {
+	            throw new IOException("압축 실패: 설정한 용량 이하로 줄일 수 없습니다.");
+	        }
+	    }
+	}
 }

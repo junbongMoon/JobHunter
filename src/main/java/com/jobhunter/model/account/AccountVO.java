@@ -1,8 +1,10 @@
 package com.jobhunter.model.account;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 
 import com.jobhunter.model.customenum.AccountType;
+import com.jobhunter.util.PropertiesTask;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,4 +37,17 @@ public class AccountVO {
     private Integer loginCnt; // 로그인 실패 횟수
     private String isSocial; // 소셜 로그인 여부 ("Y": 소셜 로그인 사용자, "N": 일반 사용자)
     private String isAdmin; //  관리자 권한 ("Y": 관리자, "N": 일반 사용자)
+    private String profileImg; // 프로필사진
+    
+    public void setProfileImg(String profileImg) {
+    	if (profileImg == null || profileImg.equals("")) {
+    		try {
+				this.profileImg = PropertiesTask.getPropertiesValue("config/profileImg.properties", "defaltImg");
+			} catch (IOException e) {
+				this.profileImg = null;
+			}
+    	} else {
+    		this.profileImg = profileImg;
+    	}
+	}
 }

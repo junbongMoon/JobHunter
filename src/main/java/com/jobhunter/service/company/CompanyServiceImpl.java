@@ -150,4 +150,9 @@ public class CompanyServiceImpl implements CompanyService {
 		dao.setDeleteAccount(uid);
 	}
 	
+	@Override
+	public void updateProfileImg(Integer uid, String base64) throws Exception {
+		dao.updateProfileImg(uid, base64);
+	}
+	
 }

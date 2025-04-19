@@ -24,13 +24,9 @@ public class UtilController {
 	private final CompressImgUtil compressImgUtil;
 	
 	@PostMapping("/compressImg")
-	public ResponseEntity<byte[]> compressImage(@RequestParam("file") MultipartFile file) {
-		int mbSize = 1024 * 1024;
-		
-		int maxSize = mbSize * 1;
-		
+	public ResponseEntity<byte[]> compressImage(@RequestParam("file") MultipartFile file, @RequestParam("maxSize") int maxSizeBytes) {
 	    try {
-	        byte[] compressedJpg = compressImgUtil.compressToJpg(file, maxSize);
+	        byte[] compressedJpg = compressImgUtil.compressToJpg(file, maxSizeBytes);
 
 	        HttpHeaders headers = new HttpHeaders();
 	        headers.setContentType(MediaType.IMAGE_JPEG);

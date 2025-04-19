@@ -41,4 +41,6 @@ public interface UserService {
 
 	void setDeleteAccount(Integer uid) throws Exception;
 
+	void updateProfileImg(Integer uid, String base64) throws Exception;
+
 }

@@ -6,6 +6,8 @@
 <!-- 헤더 -->
 <jsp:include page="/WEB-INF/views/header.jsp"></jsp:include>
 
+<script src="/resources/js/imgCompress.js"></script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Firebase UMD 방식 -->
 <script src="https://www.gstatic.com/firebasejs/11.5.0/firebase-app-compat.js"></script>
@@ -15,6 +17,10 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-ko-KR.min.js"></script>
+
+<!-- 이미지자르기 Cropper.js -->
+<link rel="stylesheet" href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css">
+<script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
 
 <link href="/resources/css/mypage.css" rel="stylesheet">
 
@@ -29,6 +35,8 @@
         <div class="section-title">
           <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
         </div>
+        <div style="border:1px solid var(--bs-gray-300); width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; text-align: center;" onclick="cropImgModalOpen()" id="profileImgContainer"><span id="profileImg">이미지 로딩중...</span></div>
+        <i style="margin:10px; color:var(--accent-color)">이미지 삭제</i><hr>
         <div class="info-grid" id="basicInfo">
           <div>회사명</div><div><strong id="companyName">로딩중...</strong></div>
           <div>대표자</div><div id="representative">로딩중...</div>
@@ -282,6 +290,7 @@ function getInfo() {
 
 // 기본정보 로딩
 function updateBasicInfo(companyInfo) {
+  $('#profileImg').html(`<img src="\${companyInfo.companyImg}" style="width:100%; height:100%; object-fit:cover;">`);
   $('#companyName').text( companyInfo.companyName || '미입력')
   $('#representative').text( companyInfo.representative || '대표자명 미등록')
   $('#nowMobile').text( companyInfo.mobile || '등록된 전화번호 없음')
@@ -424,6 +433,8 @@ function confirmModify(btn) {
     error: function (xhr) {
       if (xhr.status == 404) {
         window.publicModals.show("장시간 대기로 로그인이 해제되었습니다.<br>새로고침 후 다시 시도해주세요.",{size_x:"350px"})
+      } else if (xhr.status == 507) {
+    	window.publicModals.show("cafe24 요금제 제한등으로 인하여<br>업로드에 실패했습니다.<br>파일갯수등을 줄이고<br>다시 시도해주세요.(6개이하 추천)",{size_x:"350px"})
       }
       window.publicModals.show("서버와의 연결이 불안정하여<br>정보 로딩에 실패하였습니다.<br>잠시 후 다시 시도해주세요.")
     }
@@ -1170,124 +1181,101 @@ $('#introduce').summernote({
   placeholder: '회사소개를 입력해주세요',
   callbacks: {
     onImageUpload: function(files) {
-      summerNoteImgSizeCheck(files)
+      const maxSize = 1024 * 300; // 300kB (압축대상 크기)
+      summerNoteImgSizeCheck(files, maxSize)
     }
   }
 });
 
-function summerNoteImgSizeCheck(files) {
-  const file = files[0];
-  const maxSize = 1024 * 1024; // 1MB
-
-  if (file.size <= maxSize) {
-    insertSmartImageToSummernote(file, '#introduce'); // 바로 삽입
-  } else {
-    imgCompressModal(file, '#introduce'); // 모달로 압축 물어봄
-  }
-}
-
-// 이미지 압축 질문
-function imgCompressModal(file, targetEditorSelector) {
-  window.publicModals.show("해당 사이트는 요금제에 따라<br>트래픽 제한등의 이유로 큰 용량의<br>파일 업로드가 제한되어있습니다.<br>사진을 압축하여 업로드하시겠습니까?",
-    {
-      cancelText:"아니오",
-      confirmText:"예",
-      onConfirm: ()=>{
-        insertSmartImageToSummernote(file, targetEditorSelector)
-        return false;
-      }
-    }
-  )
-}
-
-let controller = new AbortController(); // 전역 컨트롤러
-
-// 썸머노트 이미지 강제압축 함수
-function insertSmartImageToSummernote(file, targetEditorSelector) {
-  controller = new AbortController(); // 새 컨트롤러로 초기화
-
-  // 1. 로딩 모달 또는 진행 바 표시
-  window.publicModals.show(`
-    <div style="text-align: center;">
-      <strong>이미지 압축 중입니다...<i id="imgCompressPerText">0%</i></strong>
-      <div class="progress" style="height: 10px; margin-top: 15px;">
-        <div id="fakeProgressBar" class="progress-bar" style="width: 0%;"></div>
-      </div>
-      <div style="font-size:0.5em;">사실 진행률은 아니고 기다리기 힘들까봐 보여드릴게요...</div>
-    </div>
-  `, { confirmText: "취소", onConfirm: cancleImgCompress });
-
-  // 2. 가짜 % 증가 로직
-  let percent = 0;
-  const interval = setInterval(() => {
-    if (percent < 90) {
-      percent = Math.min(percent + Math.random() * 8, 90); // 빠르게 90까지
-    } else if (percent < 95) {
-      percent = Math.min(percent + Math.random() * 0.5, 95); // 느리게 95까지
-    } else if (percent < 99) {
-      percent = Math.min(percent + Math.random() * 0.05, 99); // 더느리게 99까지
-    }
-
-    document.getElementById('fakeProgressBar').style.width = percent + '%';
-    document.getElementById('imgCompressPerText').innerText = Math.floor(percent) + '%';
-  }, 200);
-
-  // 3. 서버에 압축 요청
-  const formData = new FormData();
-  formData.append("file", file);
-
-  fetch("/util/compressImg", {
-    method: "POST",
-    body: formData,
-    signal: controller.signal
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("압축 실패");
-      return res.blob();
-    })
-    .then(blob => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // 4. 이미지 삽입
-        $(targetEditorSelector).summernote('insertImage', reader.result);
-
-        clearInterval(interval); // 타이머 제거
-
-        const bar = document.getElementById('fakeProgressBar');
-        const text = document.getElementById('imgCompressPerText');
-
-        if (bar && text) {
-          // 일단 99%로 고정
-          bar.style.width = '99%';
-          text.innerText = '99%';
-
-          // 약간 텀 두고 100%로 변경
-          setTimeout(() => {
-            bar.style.width = '100%';
-            text.innerText = '100%';
-
-            // 그리고 또 텀 두고 모달 닫기
-            setTimeout(() => {
-              window.publicModals.hide?.();
-            }, 500); // 0.5초 정도 기다렸다가 닫기
-          }, 300); // 0.3초 후 100%로
-        }
-      };
-      reader.readAsDataURL(blob);
-    })
-    .catch(err => {
-      clearInterval(interval);
-      console.error("이미지 처리 중 오류:", err);
-      window.publicModals.show("이미지 압축 중 오류가 발생했습니다.");
-      window.publicModals.hide?.();
-    });
-}
-
-function cancleImgCompress() {
-  controller?.abort(); // 요청 취소
-  window.publicModals.hide?.(); // 모달도 닫기
-}
 // #endregion
+
+// #region 프로필 이미지 자르기
+function cropImgModalOpen() {
+	const copperTap=`
+    <h2>프로필 이미지 수정</h2>
+		<input type="file" id="imageInput" accept="image/*">
+		<div>
+		  <img id="cropTarget" style="max-width:100%; display:none;">
+		</div>
+	`
+	
+	window.publicModals.show(copperTap,{
+    onConfirm:copperConfirm,
+    confirmText: "자르기",
+    cancelText: "취소"
+  });
+}
+
+let cropper;
+
+$(document).on('change', '#imageInput', (e) => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const img = document.getElementById('cropTarget');
+    img.src = reader.result;
+    img.style.display = 'block';
+
+    if (cropper) cropper.destroy(); // 이전 인스턴스 제거
+    cropper = new Cropper(img, {
+      aspectRatio: 1,
+      viewMode: 1,
+      movable: true,
+      zoomable: true,
+      scalable: true,
+      cropBoxResizable: true
+    });
+  };
+
+	reader.readAsDataURL(file);
+});
+	
+function copperConfirm() {
+  const profileImg = document.getElementById('profileImgContainer');
+
+  // 클릭 비활성화
+  profileImg.onclick = null;
+  profileImg.style.pointerEvents = 'none'; // 추가로 마우스 차단
+  profileImg.style.opacity = '0.6';        // 시각적으로도 비활성 느낌
+
+  const croppedCanvas = cropper.getCroppedCanvas({
+    width: 400,   // 원하는 사이즈 지정 가능
+    height: 400,
+    imageSmoothingQuality: 'row'
+  });
+
+  const croppedDataUrl = croppedCanvas.toDataURL('image/jpeg');
+  
+  croppedCanvas.toBlob(blob => {
+    const formData = new FormData();
+    formData.append('file', blob, 'cropped.jpg');
+    
+    $.ajax({
+      url: "/company/profileImg",
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function (response) {
+        window.publicModals.show("변경 완료!");
+        document.getElementById('profileImg').innerHTML = `<img src="\${response}" style="width:100%; height:100%; object-fit:cover;">`;
+      },
+      error: function (xhr, status, error) {
+        window.publicModals.show("변경에 실패하였습니다. 서버 혹은 업로드한 이미지를 확인 후 다시 시도해주세요.");
+      },
+      complete: () => {
+        // 다시 클릭 가능하게 복원
+        profileImg.onclick = cropImgModalOpen;
+        profileImg.style.pointerEvents = 'auto';
+        profileImg.style.opacity = '1';
+      }
+    });
+  }, 'image/jpeg');
+}
+
+// #endregion 
+
 
 </script>
 <!-- 풋터 -->

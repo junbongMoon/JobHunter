@@ -16,6 +16,11 @@
 
 <link href="/resources/css/mypage.css" rel="stylesheet">
 
+<!-- 이미지자르기 Cropper.js -->
+<link rel="stylesheet" href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css">
+<script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+
+
 <main class="main" data-aos="fade-up">
   <h1 class="page-title">마이페이지</h1>
 
@@ -27,6 +32,8 @@
         <div class="section-title">
           <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
         </div>
+        <div style="border:1px solid var(--bs-gray-300); width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; text-align: center;" onclick="cropImgModalOpen()" id="profileImgContainer"><span id="profileImg">이미지 로딩중...</span></div>
+        <i style="margin:10px; color:var(--accent-color)">이미지 삭제</i><hr>
         <div class="info-grid" id="basicInfo">
           <div>이름</div><div><span id="userName">로딩중...</span><i class="nameChangeBtn">변경</i></div>
           <div>전화번호</div><div id="nowMobile">로딩중...</div>
@@ -369,6 +376,7 @@ function getInfo() {
 
 // 기본정보 로딩
 function updateBasicInfo(userInfo) {
+  $('#profileImg').html(`<img src="\${userInfo.userImg}" style="width:100%; height:100%; object-fit:cover;">`);
   $('#userName').text( userInfo.userName || '미입력')
   $('#nowMobile').text( userInfo.mobile || '등록된 전화번호 없음')
   $('#nowEmail').text( userInfo.email || '등록된 이메일 없음')
@@ -1449,6 +1457,96 @@ document.getElementById('age').addEventListener('input', function(e) {
     let value = e.target.value.replace(/[^\d]/g, '');
     e.target.value = value;
 });
+
+
+// #region 프로필 이미지 자르기
+function cropImgModalOpen() {
+	const copperTap=`
+    <h2>프로필 이미지 수정</h2>
+		<input type="file" id="imageInput" accept="image/*">
+		<div>
+		  <img id="cropTarget" style="max-width:100%; display:none;">
+		</div>
+	`
+	
+	window.publicModals.show(copperTap,{
+    onConfirm:copperConfirm,
+    confirmText: "자르기",
+    cancelText: "취소"
+  });
+}
+
+let cropper;
+
+$(document).on('change', '#imageInput', (e) => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const img = document.getElementById('cropTarget');
+    img.src = reader.result;
+    img.style.display = 'block';
+
+    if (cropper) cropper.destroy(); // 이전 인스턴스 제거
+    cropper = new Cropper(img, {
+      aspectRatio: 1,
+      viewMode: 1,
+      movable: true,
+      zoomable: true,
+      scalable: true,
+      cropBoxResizable: true
+    });
+  };
+
+	reader.readAsDataURL(file);
+});
+	
+function copperConfirm() {
+  const profileImg = document.getElementById('profileImgContainer');
+
+  // 클릭 비활성화
+  profileImg.onclick = null;
+  profileImg.style.pointerEvents = 'none'; // 추가로 마우스 차단
+  profileImg.style.opacity = '0.6';        // 시각적으로도 비활성 느낌
+
+  const croppedCanvas = cropper.getCroppedCanvas({
+    width: 400,   // 원하는 사이즈 지정 가능
+    height: 400,
+    imageSmoothingQuality: 'row'
+  });
+
+  const croppedDataUrl = croppedCanvas.toDataURL('image/jpeg');
+  
+  croppedCanvas.toBlob(blob => {
+    const formData = new FormData();
+    formData.append('file', blob, 'cropped.jpg');
+    
+    $.ajax({
+      url: "/user/profileImg",
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function (response) {
+        window.publicModals.show("변경 완료!");
+        document.getElementById('profileImg').innerHTML = `<img src="\${response}" style="width:100%; height:100%; object-fit:cover;">`;
+      },
+      error: function (xhr, status, error) {
+        window.publicModals.show("변경에 실패하였습니다. 서버 혹은 업로드한 이미지를 확인 후 다시 시도해주세요.");
+      },
+      complete: () => {
+        // 다시 클릭 가능하게 복원
+        profileImg.onclick = cropImgModalOpen;
+        profileImg.style.pointerEvents = 'auto';
+        profileImg.style.opacity = '1';
+      }
+    });
+  }, 'image/jpeg');
+}
+
+// #endregion 
+
+
 
 </script>
 <!-- 풋터 -->
