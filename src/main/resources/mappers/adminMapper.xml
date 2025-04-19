@@ -218,4 +218,43 @@
 			blockReason = NULL
 		WHERE uid = #{uid}
 	</update>
+	
+	<!-- reporterAccountType이 USER인 신고 데이터를 필터링하여 조회합니다. -->
+	<select id="getReportsByUserReporterWithFilter" parameterType="map" resultType="com.jobhunter.model.report.ReportMessageVO">
+		SELECT * FROM reportMessage
+		WHERE reporterAccountType = 'USER'
+		<if test="reportType != null and reportType != 'all'">
+			AND reportType = #{reportType}
+		</if>
+		<if test="readStatus != null and readStatus != 'all'">
+			AND isRead = #{readStatus}
+		</if>
+		<if test="category != null and category != 'all'">
+			AND reportCategory = #{category}
+		</if>
+		<if test="dateFilter != null and dateFilter != 'all'">
+			<choose>
+				<when test="dateFilter == 'today'">
+					AND DATE(regDate) = CURDATE()
+				</when>
+				<when test="dateFilter == 'week'">
+					AND regDate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+				</when>
+				<when test="dateFilter == 'month'">
+					AND regDate >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+				</when>
+			</choose>
+		</if>
+		ORDER BY regDate DESC
+	</select>
+	
+	<!-- 신고 상태를 읽음/미읽음으로 변경합니다. -->
+	<update id="updateReportReadStatus" parameterType="map">
+		UPDATE 
+			reportMessage
+		SET 
+			isRead = #{isRead}
+		WHERE 
+			reportNo = #{reportNo}
+	</update>
 </mapper>

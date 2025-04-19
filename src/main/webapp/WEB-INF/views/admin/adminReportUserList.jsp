@@ -97,7 +97,7 @@
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-12">
-							<h1 class="h3 mb-4 text-gray-800">사용자 신고 목록</h1>
+							<h1 class="h3 mb-4 text-gray-800">신고 목록</h1>
 
 							<!-- 필터 섹션 -->
 							<div class="filter-section">
@@ -105,46 +105,48 @@
 									<div class="col-md-3">
 										<div class="form-group">
 											<label for="reportTypeFilter">신고 유형</label>
-											<select class="form-control" id="reportTypeFilter">
-												<option value="all">전체</option>
-												<option value="USER">일반 사용자</option>
-												<option value="COMPANY">기업</option>
-												<option value="BOARD">게시판</option>
-												<option value="RECRUTMENT">채용공고</option>
+											<select class="form-control" id="reportTypeFilter" name="reportType">
+												<option value="all" ${param.reportType == 'all' || empty param.reportType ? 'selected' : ''}>전체</option>
+												<option value="USER" ${param.reportType == 'USER' ? 'selected' : ''}>일반 사용자</option>
+												<option value="COMPANY" ${param.reportType == 'COMPANY' ? 'selected' : ''}>기업</option>
+												<option value="BOARD" ${param.reportType == 'BOARD' ? 'selected' : ''}>게시판</option>
+												<option value="RECRUTMENT" ${param.reportType == 'RECRUTMENT' ? 'selected' : ''}>채용공고</option>
 											</select>
 										</div>
 									</div>
 									<div class="col-md-3">
 										<div class="form-group">
-											<label for="readStatusFilter">읽음 상태</label>
-											<select class="form-control" id="readStatusFilter">
-												<option value="all">전체</option>
-												<option value="Y">읽음</option>
-												<option value="N">미읽음</option>
+											<label for="readStatusFilter">처리 상태</label>
+											<select class="form-control" id="readStatusFilter" name="readStatus">
+												<option value="all" ${param.readStatus == 'all' || empty param.readStatus ? 'selected' : ''}>전체</option>
+												<option value="Y" ${param.readStatus == 'Y' ? 'selected' : ''}>완료</option>
+												<option value="N" ${param.readStatus == 'N' ? 'selected' : ''}>미완료</option>
 											</select>
 										</div>
 									</div>
 									<div class="col-md-3">
 										<div class="form-group">
 											<label for="categoryFilter">신고 카테고리</label>
-											<select class="form-control" id="categoryFilter">
-												<option value="all">전체</option>
-												<option value="SPAM">스팸</option>
-												<option value="ABUSE">욕설/비방</option>
-												<option value="INAPPROPRIATE">부적절한 내용</option>
-												<option value="FRAUD">사기</option>
-												<option value="OTHER">기타</option>
+											<select class="form-control" id="categoryFilter" name="category">
+												<option value="all" ${param.category == 'all' || empty param.category ? 'selected' : ''}>전체</option>
+												<option value="SPAM" ${param.category == 'SPAM' ? 'selected' : ''}>스팸/광고성 메시지</option>
+												<option value="HARASSMENT" ${param.category == 'HARASSMENT' ? 'selected' : ''}>욕설/괴롭힘</option>
+												<option value="FALSE_INFO" ${param.category == 'FALSE_INFO' ? 'selected' : ''}>허위 정보</option>
+												<option value="ILLEGAL_ACTIVITY" ${param.category == 'ILLEGAL_ACTIVITY' ? 'selected' : ''}>불법 행위</option>
+												<option value="INAPPROPRIATE_CONTENT" ${param.category == 'INAPPROPRIATE_CONTENT' ? 'selected' : ''}>부적절한 프로필/사진</option>
+												<option value="MISCONDUCT" ${param.category == 'MISCONDUCT' ? 'selected' : ''}>부적절한 행동/요구</option>
+												<option value="ETC" ${param.category == 'ETC' ? 'selected' : ''}>기타 사유</option>
 											</select>
 										</div>
 									</div>
 									<div class="col-md-3">
 										<div class="form-group">
 											<label for="dateFilter">기간</label>
-											<select class="form-control" id="dateFilter">
-												<option value="all">전체</option>
-												<option value="today">오늘</option>
-												<option value="week">이번 주</option>
-												<option value="month">이번 달</option>
+											<select class="form-control" id="dateFilter" name="dateFilter">
+												<option value="all" ${param.dateFilter == 'all' || empty param.dateFilter ? 'selected' : ''}>전체</option>
+												<option value="today" ${param.dateFilter == 'today' ? 'selected' : ''}>오늘</option>
+												<option value="week" ${param.dateFilter == 'week' ? 'selected' : ''}>이번 주</option>
+												<option value="month" ${param.dateFilter == 'month' ? 'selected' : ''}>이번 달</option>
 											</select>
 										</div>
 									</div>
@@ -160,11 +162,6 @@
 							<div class="card shadow mb-4">
 								<div class="card-header py-3 d-flex justify-content-between align-items-center">
 									<h6 class="m-0 font-weight-bold text-primary">신고 목록</h6>
-									<div>
-										<span class="badge badge-warning mr-2">미읽음: <span
-												id="unreadCount">0</span></span>
-										<span class="badge badge-success">읽음: <span id="readCount">0</span></span>
-									</div>
 								</div>
 								<div class="card-body">
 									<div class="table-responsive">
@@ -178,7 +175,7 @@
 													<th>신고 카테고리</th>
 													<th>신고 내용</th>
 													<th>신고 URL</th>
-													<th>읽음 여부</th>
+													<th>처리 여부</th>
 													<th>신고 일자</th>
 													<th>관리</th>
 												</tr>
@@ -230,7 +227,34 @@
 															</c:choose>
 														</td>
 														<td>일반 사용자 (${report.reporterAccountUid})</td>
-														<td>${report.reportCategory}</td>
+														<td>
+															<c:choose>
+																<c:when test="${report.reportCategory == 'SPAM'}">
+																	스팸/광고성 메시지
+																</c:when>
+																<c:when test="${report.reportCategory == 'HARASSMENT'}">
+																	욕설/괴롭힘
+																</c:when>
+																<c:when test="${report.reportCategory == 'FALSE_INFO'}">
+																	허위 정보
+																</c:when>
+																<c:when test="${report.reportCategory == 'ILLEGAL_ACTIVITY'}">
+																	불법 행위
+																</c:when>
+																<c:when test="${report.reportCategory == 'INAPPROPRIATE_CONTENT'}">
+																	부적절한 프로필/사진
+																</c:when>
+																<c:when test="${report.reportCategory == 'MISCONDUCT'}">
+																	부적절한 행동/요구
+																</c:when>
+																<c:when test="${report.reportCategory == 'ETC'}">
+																	기타 사유
+																</c:when>
+																<c:otherwise>
+																	${report.reportCategory}
+																</c:otherwise>
+															</c:choose>
+														</td>
 														<td>
 															<c:if test="${not empty report.reportMessage}">
 																<button class="btn btn-sm btn-link view-message"
@@ -247,10 +271,10 @@
 														<td>
 															<c:choose>
 																<c:when test="${report.isRead == 'Y'}">
-																	<span class="badge badge-success">읽음</span>
+																	<span class="badge badge-success">완료</span>
 																</c:when>
 																<c:otherwise>
-																	<span class="badge badge-warning">미읽음</span>
+																	<span class="badge badge-warning">미완료</span>
 																</c:otherwise>
 															</c:choose>
 														</td>
@@ -259,10 +283,6 @@
 																pattern="yyyy-MM-dd HH:mm:ss" />
 														</td>
 														<td class="action-buttons">
-															<button class="btn btn-sm btn-info view-detail"
-																data-report-no="${report.reportNo}">
-																<i class="fas fa-eye"></i>
-															</button>
 															<c:choose>
 																<c:when test="${report.targetAccountType == 'USER'}">
 																	<button class="btn btn-sm btn-danger block-user"
@@ -284,91 +304,6 @@
 															</button>
 														</td>
 													</tr>
-													<tr class="report-detail-row" id="detail-${report.reportNo}">
-														<td colspan="10">
-															<div class="report-detail">
-																<div class="row">
-																	<div class="col-md-6">
-																		<h5>신고 상세 정보</h5>
-																		<p><strong>신고 번호:</strong> ${report.reportNo}
-																		</p>
-																		<p><strong>신고 유형:</strong> ${report.reportType}
-																		</p>
-																		<p><strong>신고 대상:</strong>
-																			<c:choose>
-																				<c:when
-																					test="${report.targetAccountType == 'USER'}">
-																					일반 사용자 (${report.targetAccountUid})
-																				</c:when>
-																				<c:when
-																					test="${report.targetAccountType == 'COMPANY'}">
-																					기업 (${report.targetAccountUid})
-																				</c:when>
-																				<c:otherwise>
-																					${report.targetAccountType}
-																					(${report.targetAccountUid})
-																				</c:otherwise>
-																			</c:choose>
-																		</p>
-																		<p><strong>신고자:</strong> 일반 사용자
-																			(${report.reporterAccountUid})</p>
-																		<p><strong>신고 카테고리:</strong>
-																			${report.reportCategory}</p>
-																		<p><strong>신고 내용:</strong>
-																			${report.reportMessage}</p>
-																		<p><strong>신고 일자:</strong>
-																			<fmt:formatDate value="${report.regDate}"
-																				pattern="yyyy-MM-dd HH:mm:ss" />
-																		</p>
-																	</div>
-																	<div class="col-md-6">
-																		<h5>관리자 조치</h5>
-																		<div class="report-actions">
-																			<c:choose>
-																				<c:when
-																					test="${report.targetAccountType == 'USER'}">
-																					<button
-																						class="btn btn-danger block-user-detail"
-																						data-uid="${report.targetAccountUid}">
-																						<i class="fas fa-ban"></i> 사용자
-																						정지
-																					</button>
-																				</c:when>
-																				<c:when
-																					test="${report.targetAccountType == 'COMPANY'}">
-																					<button
-																						class="btn btn-danger block-company-detail"
-																						data-uid="${report.targetAccountUid}">
-																						<i class="fas fa-ban"></i> 기업 정지
-																					</button>
-																				</c:when>
-																			</c:choose>
-																			<button
-																				class="btn btn-success mark-read-detail"
-																				data-report-no="${report.reportNo}"
-																				data-read-status="${report.isRead}">
-																				<i class="fas fa-check"></i>
-																				<c:choose>
-																					<c:when
-																						test="${report.isRead == 'Y'}">
-																						미읽음으로 표시
-																					</c:when>
-																					<c:otherwise>
-																						읽음으로 표시
-																					</c:otherwise>
-																				</c:choose>
-																			</button>
-																			<button
-																				class="btn btn-secondary close-detail"
-																				data-report-no="${report.reportNo}">
-																				<i class="fas fa-times"></i> 닫기
-																			</button>
-																		</div>
-																	</div>
-																</div>
-															</div>
-														</td>
-													</tr>
 												</c:forEach>
 												<c:if test="${empty reportList}">
 													<tr>
@@ -379,6 +314,76 @@
 										</table>
 									</div>
 								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 정지 모달 -->
+				<div class="modal fade" id="blockUserModal" tabindex="-1" aria-labelledby="blockUserModalLabel"
+					aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="blockUserModalLabel">유저 정지</h5>
+								<button type="button" class="btn-close" onclick="closeBlockUserModal()"
+									aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<form id="blockUserForm">
+									<input type="hidden" id="blockUserId" name="uid">
+									<div class="mb-3">
+										<label class="form-label">정지 기간</label>
+										<div class="form-check">
+											<input class="form-check-input" type="radio" name="blockDuration"
+												id="duration3days" value="3">
+											<label class="form-check-label" for="duration3days">3일</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="radio" name="blockDuration"
+												id="duration7days" value="7">
+											<label class="form-check-label" for="duration7days">7일</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="radio" name="blockDuration"
+												id="duration30days" value="30">
+											<label class="form-check-label" for="duration30days">30일</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="radio" name="blockDuration"
+												id="durationPermanent" value="permanent">
+											<label class="form-check-label" for="durationPermanent">영구</label>
+										</div>
+									</div>
+									<div class="mb-3">
+										<label for="blockReason" class="form-label">정지 사유</label>
+										<textarea class="form-control" id="blockReason" name="reason" rows="3"
+											required></textarea>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary"
+									onclick="closeBlockUserModal()">취소</button>
+								<button type="button" class="btn btn-danger" onclick="submitBlockUser()">확인</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 신고 내용 모달 -->
+				<div class="modal fade" id="reportMessageModal" tabindex="-1" aria-labelledby="reportMessageModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="reportMessageModalLabel">신고 내용</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<p id="reportMessageContent"></p>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
 							</div>
 						</div>
 					</div>
@@ -395,22 +400,6 @@
 
 				<script>
 					$(document).ready(function () {
-						// 읽음/미읽음 카운트 업데이트
-						function updateReadCounts() {
-							const unreadCount = $('.badge-warning').length;
-							const readCount = $('.badge-success').length;
-							$('#unreadCount').text(unreadCount);
-							$('#readCount').text(readCount);
-						}
-
-						// 초기 카운트 업데이트
-						updateReadCounts();
-
-						// 상세 정보 보기 버튼 클릭 이벤트
-						$('.view-detail').click(function () {
-							const reportNo = $(this).data('report-no');
-							$(`#detail-${reportNo}`).toggle();
-						});
 
 						// 상세 정보 닫기 버튼 클릭 이벤트
 						$('.close-detail').click(function () {
@@ -421,44 +410,19 @@
 						// 신고 내용 보기 버튼 클릭 이벤트
 						$('.view-message').click(function () {
 							const message = $(this).data('message');
-							alert(message);
+							$('#reportMessageContent').text(message);
+							$('#reportMessageModal').modal('show');
 						});
 
 						// 일반 사용자 정지 버튼 클릭 이벤트
-						$('.block-user, .block-user-detail').click(function () {
+						$('.block-user').click(function () {
 							const uid = $(this).data('uid');
-							const duration = prompt('정지 기간을 입력하세요 (일 단위, 영구 정지는 "permanent" 입력):', '7');
-
-							if (duration) {
-								const reason = prompt('정지 사유를 입력하세요:');
-
-								if (reason) {
-									$.ajax({
-										url: '/admin/blockUser/' + uid,
-										type: 'POST',
-										contentType: 'application/json',
-										data: JSON.stringify({
-											duration: duration,
-											reason: reason
-										}),
-										success: function (response) {
-											if (response.success) {
-												alert('사용자가 성공적으로 정지되었습니다.');
-												location.reload();
-											} else {
-												alert('사용자 정지에 실패했습니다: ' + response.message);
-											}
-										},
-										error: function () {
-											alert('서버 오류가 발생했습니다.');
-										}
-									});
-								}
-							}
+							$('#blockUserId').val(uid);
+							$('#blockUserModal').modal('show');
 						});
 
 						// 기업 정지 버튼 클릭 이벤트
-						$('.block-company, .block-company-detail').click(function () {
+						$('.block-company').click(function () {
 							const uid = $(this).data('uid');
 							const duration = prompt('정지 기간을 입력하세요 (일 단위, 영구 정지는 "permanent" 입력):', '7');
 
@@ -491,28 +455,49 @@
 						});
 
 						// 읽음 표시 버튼 클릭 이벤트
-						$('.mark-read, .mark-read-detail').click(function () {
+						$('.mark-read').click(function () {
 							const reportNo = $(this).data('report-no');
 							const currentStatus = $(this).data('read-status');
-							const newStatus = currentStatus === 'Y' ? 'N' : 'Y';
-
-							// 실제로는 서버에 상태 변경 요청을 보내야 합니다.
-							// 여기서는 프론트엔드에서만 상태를 변경합니다.
-							const row = $(`tr[data-report-no="${reportNo}"]`);
-							const statusCell = row.find('td:nth-child(8)');
-
-							if (newStatus === 'Y') {
-								statusCell.html('<span class="badge badge-success">읽음</span>');
-								$(this).data('read-status', 'Y');
-								$(this).html('<i class="fas fa-check"></i> 미읽음으로 표시');
-							} else {
-								statusCell.html('<span class="badge badge-warning">미읽음</span>');
-								$(this).data('read-status', 'N');
-								$(this).html('<i class="fas fa-check"></i> 읽음으로 표시');
+							
+							// 현재 상태에 따라 다른 메시지 표시
+							if (currentStatus === 'Y') {
+								alert('이미 처리되었습니다.');
+								return;
 							}
-
-							// 카운트 업데이트
-							updateReadCounts();
+							
+							// 확인 대화상자 표시
+							if (confirm(`읽음 처리로 하시겠습니까?`)) {
+								$.ajax({
+									url: '/admin/updateReportReadStatus',
+									type: 'POST',
+									data: {
+										reportNo: reportNo,
+										isRead: 'Y'
+									},
+									success: function (response) {
+										if (response.success) {
+											// 상태 변경 성공 시 UI 업데이트
+											const row = $(`tr[data-report-no="${reportNo}"]`);
+											const statusCell = row.find('td:nth-child(8)');
+											statusCell.html('<span class="badge badge-success">읽음</span>');
+											
+											// 버튼 상태 업데이트
+											$('.mark-read').each(function() {
+												if ($(this).data('report-no') === reportNo) {
+													$(this).data('read-status', 'Y');
+													// 새로고침
+													location.reload();
+												}
+											});
+										} else {
+											alert('신고 상태 업데이트에 실패했습니다: ' + response.message);
+										}
+									},
+									error: function () {
+										alert('서버 오류가 발생했습니다.');
+									}
+								});
+							}
 						});
 
 						// 필터 적용 버튼 클릭 이벤트
@@ -522,72 +507,63 @@
 							const category = $('#categoryFilter').val();
 							const dateFilter = $('#dateFilter').val();
 
-							// 모든 행 숨기기
-							$('tbody tr:not(.report-detail-row)').hide();
-
-							// 필터 조건에 맞는 행만 표시
-							$('tbody tr:not(.report-detail-row)').each(function () {
-								const row = $(this);
-								const rowReportType = row.data('report-type');
-								const rowReadStatus = row.data('read-status');
-								const rowCategory = row.data('category');
-								const rowDate = new Date(row.data('date'));
-								const today = new Date();
-								const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-								const oneMonthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-
-								let showRow = true;
-
-								// 신고 유형 필터
-								if (reportType !== 'all' && rowReportType !== reportType) {
-									showRow = false;
-								}
-
-								// 읽음 상태 필터
-								if (readStatus !== 'all' && rowReadStatus !== readStatus) {
-									showRow = false;
-								}
-
-								// 카테고리 필터
-								if (category !== 'all' && rowCategory !== category) {
-									showRow = false;
-								}
-
-								// 날짜 필터
-								if (dateFilter !== 'all') {
-									if (dateFilter === 'today' && rowDate.toDateString() !== today.toDateString()) {
-										showRow = false;
-									} else if (dateFilter === 'week' && rowDate < oneWeekAgo) {
-										showRow = false;
-									} else if (dateFilter === 'month' && rowDate < oneMonthAgo) {
-										showRow = false;
-									}
-								}
-
-								if (showRow) {
-									row.show();
-								}
-							});
-
-							// 상세 정보 행도 함께 숨기기
-							$('.report-detail-row').hide();
+							// 서버에 필터링 요청
+							window.location.href = '/admin/reportUserList?reportType=' + reportType + 
+								'&readStatus=' + readStatus + 
+								'&category=' + category + 
+								'&dateFilter=' + dateFilter;
 						});
 
 						// 필터 초기화 버튼 클릭 이벤트
 						$('#resetFilter').click(function () {
-							// 모든 필터 선택 초기화
-							$('#reportTypeFilter').val('all');
-							$('#readStatusFilter').val('all');
-							$('#categoryFilter').val('all');
-							$('#dateFilter').val('all');
-
-							// 모든 행 표시
-							$('tbody tr:not(.report-detail-row)').show();
-
-							// 상세 정보 행 숨기기
-							$('.report-detail-row').hide();
+							// 필터 초기화 후 서버에 요청
+							window.location.href = '/admin/reportUserList';
 						});
 					});
+					
+					// 사용자 정지 모달 관련 함수
+					function closeBlockUserModal() {
+						$('#blockUserModal').modal('hide');
+					}
+					
+					function submitBlockUser() {
+						const uid = $('#blockUserId').val();
+						const duration = $('input[name="blockDuration"]:checked').val();
+						const reason = $('#blockReason').val();
+						
+						if (!duration) {
+							alert('정지 기간을 선택해주세요.');
+							return;
+						}
+						
+						if (!reason) {
+							alert('정지 사유를 입력해주세요.');
+							return;
+						}
+						
+						$.ajax({
+							url: '/admin/blockUser/' + uid,
+							type: 'POST',
+							contentType: 'application/json',
+							data: JSON.stringify({
+								duration: duration,
+								reason: reason
+							}),
+							success: function (response) {
+								if (response.success) {
+									alert('사용자가 성공적으로 정지되었습니다.');
+									location.reload();
+								} else {
+									alert('사용자 정지에 실패했습니다: ' + response.message);
+								}
+							},
+							error: function () {
+								alert('서버 오류가 발생했습니다.');
+							}
+						});
+						
+						closeBlockUserModal();
+					}
 				</script>
 			</body>
 

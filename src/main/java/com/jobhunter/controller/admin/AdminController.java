@@ -398,10 +398,78 @@ public class AdminController {
 
 	}
 
-	@GetMapping("/admin/reportUser")
-	public String adminReportUserList(Model model) throws Exception {
-		List<ReportMessageVO> reportList = adminService.getReportsByUserReporter();
-		model.addAttribute("reportList", reportList);
+	/**
+	 * 사용자 신고 목록을 조회합니다.
+	 *
+	 * @param model 뷰에 전달할 데이터
+	 * @param reportType 신고 유형 필터
+	 * @param readStatus 읽음 상태 필터
+	 * @param category 신고 카테고리 필터
+	 * @param dateFilter 날짜 필터
+	 * @return 사용자 신고 목록 JSP 페이지 경로
+	 * 
+	 * @author 유지원
+	 */
+	@GetMapping("/admin/reportUserList")
+	public String adminReportUserList(
+			@RequestParam(value = "reportType", defaultValue = "all") String reportType,
+			@RequestParam(value = "readStatus", defaultValue = "all") String readStatus,
+			@RequestParam(value = "category", defaultValue = "all") String category,
+			@RequestParam(value = "dateFilter", defaultValue = "all") String dateFilter,
+			Model model) {
+		try {
+			Map<String, String> filterParams = new HashMap<>();
+			filterParams.put("reportType", reportType);
+			filterParams.put("readStatus", readStatus);
+			filterParams.put("category", category);
+			filterParams.put("dateFilter", dateFilter);
+			
+			List<ReportMessageVO> reportList = adminService.getReportsByUserReporterWithFilter(filterParams);
+			model.addAttribute("reportList", reportList);
+			model.addAttribute("reportType", reportType);
+			model.addAttribute("readStatus", readStatus);
+			model.addAttribute("category", category);
+			model.addAttribute("dateFilter", dateFilter);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return "admin/adminReportUserList";
+	}
+
+	/**
+	 * 신고 상태를 읽음/미읽음으로 변경합니다.
+	 *
+	 * @param reportNo 신고 번호
+	 * @param isRead 읽음 상태 (Y/N)
+	 * @return 처리 결과를 담은 JSON 응답
+	 * 
+	 * @author 유지원
+	 */
+	@PostMapping("/admin/updateReportReadStatus")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> updateReportReadStatus(
+			@RequestParam("reportNo") int reportNo,
+			@RequestParam("isRead") String isRead) {
+		
+		Map<String, Object> response = new HashMap<>();
+		
+		try {
+			boolean result = adminService.updateReportReadStatus(reportNo, isRead);
+			
+			if (result) {
+				response.put("success", true);
+				response.put("message", "신고 상태가 성공적으로 업데이트되었습니다.");
+			} else {
+				response.put("success", false);
+				response.put("message", "신고 상태 업데이트에 실패했습니다.");
+			}
+			
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("message", "서버 오류가 발생했습니다: " + e.getMessage());
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

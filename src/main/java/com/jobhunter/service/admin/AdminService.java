@@ -2,6 +2,7 @@ package com.jobhunter.service.admin;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import com.jobhunter.model.admin.Pagination;
 import com.jobhunter.model.company.CompanyVO;
@@ -149,4 +150,23 @@ public interface AdminService {
 	 * @throws Exception
 	 */
 	List<ReportMessageVO> getReportsByUserReporter() throws Exception;
+	
+	/**
+	 * 신고 상태를 읽음/미읽음으로 변경합니다.
+	 *
+	 * @param reportNo 신고 번호
+	 * @param isRead 읽음 상태 (Y/N)
+	 * @return 업데이트 성공 여부
+	 * @throws Exception
+	 */
+	boolean updateReportReadStatus(int reportNo, String isRead) throws Exception;
+
+	/**
+	 * 사용자가 신고한 목록을 필터링하여 조회합니다.
+	 * 
+	 * @param filterParams 필터링 파라미터
+	 * @return 필터링된 신고 목록
+	 * @throws Exception
+	 */
+	List<ReportMessageVO> getReportsByUserReporterWithFilter(Map<String, String> filterParams) throws Exception;
 }

@@ -3,6 +3,7 @@ package com.jobhunter.service.admin;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -154,5 +155,16 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public List<ReportMessageVO> getReportsByUserReporter() throws Exception {
 		return reportDAO.getReportsByUserReporter();
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public boolean updateReportReadStatus(int reportNo, String isRead) throws Exception {
+		return dao.updateReportReadStatus(reportNo, isRead) > 0;
+	}
+
+	@Override
+	public List<ReportMessageVO> getReportsByUserReporterWithFilter(Map<String, String> filterParams) throws Exception {
+		return dao.getReportsByUserReporterWithFilter(filterParams);
 	}
 }

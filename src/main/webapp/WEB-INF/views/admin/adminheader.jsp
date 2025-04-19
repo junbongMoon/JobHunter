@@ -49,7 +49,7 @@
             </div>
         </li> -->
 
-        <!-- 🔹 페이지 관리 섹션 -->
+        <!-- 🔹 페이지 관리 섹션
         <div class="sidebar-heading">페이지 관리</div>
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
@@ -61,7 +61,7 @@
                 data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">유저 신고 관리:</h6>
-                    <a class="collapse-item" href="admin/reportUser">일반 유저</a>
+                    <a class="collapse-item" href="admin/reportUserList">일반 유저</a>
                     <a class="collapse-item" href="admin/reportCompany">기업 유저</a>
                     <div class="collapse-divider"></div>
                     <h6 class="collapse-header">게시물 신고 관리:</h6>
@@ -69,16 +69,16 @@
                     <a class="collapse-item" href="#">리뷰 게시물</a>
                 </div>
             </div>
-        </li>
-
-
-        <!-- 🔹 테이블 페이지 
-        <li class="nav-item">
-            <a class="nav-link" href="tables.jsp">
-                <i class="fas fa-fw fa-table"></i>
-                <span>테이블</span>
-            </a>
         </li> -->
+
+
+        <!-- 🔹 신고관리 페이지  -->
+        <li class="nav-item">
+            <a class="nav-link" href="admin/reportUserList">
+                <i class="fas fa-fw fa-table"></i>
+                <span>신고관리</span>
+            </a>
+        </li>
 
         <!-- 🔹 유저 관리 섹션 -->
         <div class="sidebar-heading">유저 관리</div>
