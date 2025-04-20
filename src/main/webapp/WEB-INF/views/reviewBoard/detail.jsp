@@ -206,12 +206,16 @@
 			href="/reviewBoard/allBoard?page=${pageRequestDTO.page}&searchType=${pageRequestDTO.searchType}&keyword=${pageRequestDTO.keyword}"
 			class="btn btn-secondary btn-sm btn-rounded">목록으로 돌아가기</a>
 
-
+		<button type="button" class="btn btn-danger btn-sm"
+			data-bs-toggle="modal" data-bs-target="#reportModal">🚨 신고하기
+		</button>
 	</div>
 
 	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
 	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
 	<input type="hidden" id="isLiked" value="${isLiked}" />
+
+
 
 
 
@@ -231,6 +235,39 @@
 		</div>
 	</div>
 
+
+	<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportModalLabel">신고하기</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      
+      <div class="modal-body">
+        <input type="hidden" id="boardNo" value="${detail.boardNo}">
+        <input type="hidden" id="loginUserUid" value="${loginUser.uid}">
+        
+        <label for="reportCategory" class="form-label">신고 사유</label>
+        <select class="form-select" id="reportCategory">
+          <option value="INAPPROPRIATE">부적절한 내용</option>
+          <option value="SPAM">스팸</option>
+          <option value="FALSE_INFO">허위 정보</option>
+        </select>
+
+        <label for="reportMessage" class="form-label mt-3">신고 내용</label>
+        <textarea class="form-control" id="reportMessage" rows="4" placeholder="자세한 내용을 입력해주세요"></textarea>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+        <button type="button" id="submitReportBtn" class="btn btn-danger">제출</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
 
 	<script>
 	
@@ -360,6 +397,39 @@
 		        }
 		      });
 		    }
+		  });
+		});
+		
+	  
+	  $(document).ready(function () {
+		  $('#submitReportBtn').on('click', function () {
+		    const boardNo = $('#boardNo').val();
+		    const reporterAccountUid = $('#loginUserUid').val();
+		    const reportCategory = $('#reportCategory').val();
+		    const reportMessage = $('#reportMessage').val();
+
+		    const reportData = {
+		      boardNo: parseInt(boardNo),
+		      reporterAccountUid: parseInt(reporterAccountUid),
+		      reportCategory: reportCategory,
+		      reportMessage: reportMessage,
+		      reportType: "BOARD",
+		      reportTargetURL: `/reviewBoard/detail?boardNo=${boardNo}`
+		    };
+
+		    $.ajax({
+		      type: 'POST',
+		      url: '/report/board',
+		      contentType: 'application/json',
+		      data: JSON.stringify(reportData),
+		      success: function () {
+		        alert('신고가 접수되었습니다.');
+		        $('#reportModal').modal('hide'); // 모달 닫기
+		      },
+		      error: function (xhr) {
+		        alert('신고 처리 중 오류가 발생했습니다: ' + xhr.responseText);
+		      }
+		    });
 		  });
 		});
 

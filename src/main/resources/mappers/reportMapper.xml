@@ -30,4 +30,32 @@
 		)
 	</insert>
 <!-- 계정 신고 관련 매퍼 -->
+
+
+<!-- 게시글  신고 관련 매퍼 -->
+<insert id="insertBoardReport" parameterType="com.jobhunter.model.report.BoardReportDTO">
+  INSERT INTO reportMessage (
+    reportType,
+    targetAccountUid,
+    targetAccountType,
+    reporterAccountUid,
+    reporterAccountType,
+    reportCategory,
+    reportMessage,
+    reportTargetURL
+
+  ) VALUES (
+    #{reportType},
+    #{targetAccountUid},
+    #{targetAccountType},
+    #{reporterAccountUid},
+    #{reporterAccountType},
+    #{reportCategory},
+    #{reportMessage},
+    #{reportTargetURL}
+    
+  )
+</insert>
+
+<!-- 게시글  신고 관련 매퍼 -->
 </mapper>
