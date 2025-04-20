@@ -7,6 +7,7 @@ import java.util.List;
 
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.payment.PaymentLogDTO;
 import com.jobhunter.model.user.KakaoUserInfoDTO;
 import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.model.user.UserRegisterDTO;
@@ -41,6 +42,6 @@ public interface UserService {
 
 	void setDeleteAccount(Integer uid) throws Exception;
 
-	boolean addPoint(String userId, int point) throws Exception;
+	boolean addPoint(String userId, int point, PaymentLogDTO paymentLog) throws Exception;
 
 }

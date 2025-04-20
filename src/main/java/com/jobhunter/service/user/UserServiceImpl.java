@@ -17,8 +17,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.jobhunter.customexception.DuplicateEmailException;
+import com.jobhunter.dao.payment.PaymentDAO;
 import com.jobhunter.dao.user.UserDAO;
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.payment.PaymentLogDTO;
 import com.jobhunter.model.user.KakaoUserInfoDTO;
 import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.model.user.UserRegisterDTO;
@@ -32,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService {
 
 	private final UserDAO dao;
+	private final PaymentDAO paymentDAO;
 	
 	@Override
 	public UserVO showMypage(String uid) throws Exception {
@@ -200,12 +203,16 @@ public class UserServiceImpl implements UserService {
 	 * @throws Exception 
 	 *
 	 */
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
-	public boolean addPoint(String userId, int point) throws Exception {
+	public boolean addPoint(String userId, int point, PaymentLogDTO paymentLog) throws Exception {
 		boolean result = false;
 		int useruid = Integer.parseInt(userId);
 		if( dao.updateUserPoint(useruid, point) > 0) {
-			result = true;
+			if(paymentDAO.insertPanymentLog(paymentLog) > 0) {
+				result = true;
+			}
+			
 		}
 		
 		return result;

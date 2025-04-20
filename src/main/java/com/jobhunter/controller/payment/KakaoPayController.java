@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.payment.PaymentLogDTO;
 import com.jobhunter.service.user.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -64,6 +65,13 @@ public class KakaoPayController {
         params.add("approval_url", "http://localhost:8084/kakao/pay/success");
         params.add("cancel_url", "http://localhost:8084/kakao/pay/cancel");
         params.add("fail_url", "http://localhost:8084/kakao/pay/fail");
+        
+        String itemName = (String) param.get("item_name");
+        int totalAmount = Integer.parseInt(param.get("total_amount").toString());
+
+        // 세션에 결제 정보 저장
+        session.setAttribute("tidItemName", itemName);
+        session.setAttribute("tidAmount", totalAmount);
         
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
@@ -123,8 +131,19 @@ public class KakaoPayController {
         params.add("partner_order_id", "order1234");
         params.add("partner_user_id", Integer.toString(userId)); // 실제 로그인된 사용자
         params.add("pg_token", pgToken);
+        
 
+        String itemName = (String) session.getAttribute("tidItemName");
+        int amount = (int) session.getAttribute("tidAmount");
+        
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+        PaymentLogDTO log = PaymentLogDTO.builder()
+                .useruid(userId)
+                .tid(tid)
+                .amount(amount)
+                .item_name(itemName)
+                .build();
+        
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(
@@ -133,7 +152,7 @@ public class KakaoPayController {
             System.out.println("결제 승인 성공: " + response.getBody());
 
             // 3️⃣ 실제 DB에 포인트 충전
-            userService.addPoint(Integer.toString(userId), 5000); // 트랜잭션 서비스 호출
+            userService.addPoint(Integer.toString(userId), amount, log); // 트랜잭션 서비스 호출
 
             mav.setViewName("payment/paySuccess");
             mav.addObject("pgToken", pgToken);

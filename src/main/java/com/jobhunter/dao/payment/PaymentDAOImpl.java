@@ -15,8 +15,8 @@ public class PaymentDAOImpl implements PaymentDAO {
 
 	@Override
 	public int insertPanymentLog(PaymentLogDTO paymentLogDTO) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return ses.insert(NS + ".savePaymentLog", paymentLogDTO);
 	}
 
 }
