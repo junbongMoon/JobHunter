@@ -33,7 +33,7 @@ public class StatusScheduler {
 	 * 
 	 *
 	 */
-    @Scheduled(cron = "0 52 0 * * *")
+    @Scheduled(cron = "0 20 0 * * *")
     public void saveEntireStatus() {
     	
     	statusService.runDailyStatistics();
