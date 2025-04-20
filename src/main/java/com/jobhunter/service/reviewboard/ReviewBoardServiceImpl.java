@@ -182,12 +182,19 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 		// 1. 전체 게시글 수 (검색 조건 포함)
 		int totalCount = Rdao.countReviewBoard(pageRequestDTO);
-
+		
+		System.out.println("조회된 게시글 수: " + totalCount);
 		// 2. 현재 페이지에 해당하는 게시글 목록
 		List<ReviewBoardDTO> boardList = Rdao.selectPagedReviewBoard(pageRequestDTO);
 
 		// 3. 응답 DTO 생성 및 반환
 		return new RPageResponseDTO<ReviewBoardDTO>(boardList, totalCount, pageRequestDTO);
+	}
+
+	@Override
+	public List<String> getCompanyList() throws Exception {
+	
+		return Rdao.ListCompany();
 	}
 
 }

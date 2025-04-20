@@ -8,6 +8,10 @@
 <meta charset="UTF-8">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <title>면접 후 게시판</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+
 <style>
 h2 {
 	text-align: center;
@@ -80,37 +84,66 @@ h2 {
 
 	<h2>면접 후기 목록</h2>
 
-	<form method="get" action="/reviewBoard/allBoard" class="row g-2 mb-4">
-	<div class="col-auto">
-		<select name="searchType" class="form-select" id="searchType">
-			<option value="">-- 검색 기준 선택 --</option>
-			<option value="companyName" ${pageResult.searchType == 'companyName' ? 'selected' : ''}>회사명</option>
-			<option value="reviewResult" ${pageResult.searchType == 'reviewResult' ? 'selected' : ''}>면접 결과</option>
-		</select>
-	</div>
+	<form method="get"
+		action="${pageContext.request.contextPath}/reviewBoard/allBoard"
+		class="row g-2 align-items-center mb-4">
 
-	<div class="col-auto">
-		<c:choose>
-			<c:when test="${pageResult.searchType == 'reviewResult'}">
-				<select name="keyword" class="form-select">
-					<option value="PASSED" ${pageResult.keyword == 'PASSED' ? 'selected' : ''}>합격</option>
-					<option value="FAILED" ${pageResult.keyword == 'FAILED' ? 'selected' : ''}>불합격</option>
-					<option value="PENDING" ${pageResult.keyword == 'PENDING' ? 'selected' : ''}>진행중</option>
-				</select>
-			</c:when>
-			<c:otherwise>
-				<input type="text" name="keyword" class="form-control"
-					placeholder="검색어 입력"
-					value="${pageResult.keyword != null ? pageResult.keyword : ''}">
-			</c:otherwise>
-		</c:choose>
-	</div>
+		<!-- 정렬 기준 -->
+		<div class="col-auto">
+			<label class="form-label">정렬</label> <select name="sortType"
+				class="form-select">
+				<option value="">-- 정렬 기준 --</option>
+				<option value="likes" ${param.sortType == 'likes' ? 'selected' : ''}>추천순</option>
+				<option value="views" ${param.sortType == 'views' ? 'selected' : ''}>조회순</option>
+			</select>
+		</div>
 
-	<div class="col-auto">
-		<button type="submit" class="btn btn-primary">검색</button>
-	</div>
-</form>
+		<!-- 합격 여부 -->
+		<div class="col-auto">
+			<label class="form-label">합격 여부</label> <select name="resultFilter"
+				class="form-select">
+				<option value="">-- 합격 여부 --</option>
+				<option value="PASSED"
+					${param.resultFilter == 'PASSED' ? 'selected' : ''}>합격</option>
+				<option value="FAILED"
+					${param.resultFilter == 'FAILED' ? 'selected' : ''}>불합격</option>
+				<option value="PENDING"
+					${param.resultFilter == 'PENDING' ? 'selected' : ''}>진행중</option>
+			</select>
+		</div>
 
+		<!-- 회사 필터 -->
+		<div class="col-auto">
+			<label class="form-label">회사명</label> <select name="companyFilter"
+				class="form-select">
+				<option value="">-- 회사 선택 --</option>
+				<c:forEach var="com" items="${companyList}">
+					<option value="${com}"
+						${param.companyFilter == com ? 'selected' : ''}>${com}</option>
+				</c:forEach>
+			</select>
+		</div>
+
+		<!-- 검색 버튼 -->
+		<div class="col-auto mt-4">
+			<button type="submit" class="btn btn-primary">검색</button>
+		</div>
+
+		<div class="col-auto mt-4">
+			<button type="button" class="btn btn-secondary"
+				onclick="window.location.href='${pageContext.request.contextPath}/reviewBoard/allBoard'">
+				초기화</button>
+		</div>
+	</form>
+
+
+
+	<c:forEach var="i" begin="${pageResult.startPage}"
+		end="${pageResult.endPage}">
+		<a
+			href="?page=${i}&sortType=${param.sortType}&resultFilter=${param.resultFilter}&companyFilter=${param.companyFilter}">
+			${i} </a>
+	</c:forEach>
 
 	<table class="table-container">
 		<tr>
@@ -140,7 +173,8 @@ h2 {
 				<td>${board.likes}</td>
 				<td class="views-cell" data-board-no="${board.boardNo}">${board.views}</td>
 
-				<td class="postDate()">${board.postDate}</td>
+				<td class="postDate()" data-created="${board.postDate}">${board.postDate}</td>
+
 			</tr>
 		</c:forEach>
 	</table>
@@ -160,24 +194,25 @@ h2 {
 			<!-- 이전 블록 -->
 			<c:if test="${pageResult.hasPrev}">
 				<li class="page-item"><a class="page-link"
-					href="?page=${pageResult.startPage - 1}&size=${pageResult.size}&searchType=${pageResult.searchType}&keyword=${pageResult.keyword}">
+					href="?page=${pageResult.startPage - 1}&sortType=${param.sortType}&resultFilter=${param.resultFilter}&companyFilter=${param.companyFilter}">
 						&laquo; </a></li>
 			</c:if>
 
-			<!-- 페이지 번호 -->
 			<c:forEach var="i" begin="${pageResult.startPage}"
 				end="${pageResult.endPage}">
 				<li class="page-item ${i == pageResult.page ? 'active' : ''}">
 					<a class="page-link"
-					href="?page=${i}&size=${pageResult.size}&searchType=${pageResult.searchType}&keyword=${pageResult.keyword}">
+					href="?page=${i}&sortType=${param.sortType}&resultFilter=${param.resultFilter}&companyFilter=${param.companyFilter}">
 						${i} </a>
 				</li>
 			</c:forEach>
 
-			<!-- 다음 블록 -->
+
+
+			<!-- 다음 -->
 			<c:if test="${pageResult.hasNext}">
 				<li class="page-item"><a class="page-link"
-					href="?page=${pageResult.endPage + 1}&size=${pageResult.size}&searchType=${pageResult.searchType}&keyword=${pageResult.keyword}">
+					href="?page=${pageResult.endPage + 1}&sortType=${param.sortType}&resultFilter=${param.resultFilter}&companyFilter=${param.companyFilter}">
 						&raquo; </a></li>
 			</c:if>
 
@@ -189,6 +224,16 @@ h2 {
 
 	<script>
 	
+	$('select').change(function () {
+		  $(this).closest('form').submit();
+		});
+	document.querySelectorAll('.postDate').forEach(cell => {
+		  const created = cell.dataset.created;
+		  if (created) {
+		    cell.textContent = postDate(created); // 함수 호출해서 변환된 시간 출력
+		  }
+		});
+
 	function postDate(createdAt) {
 		  const now = new Date();
 		  const postTime = new Date(createdAt.split('.')[0]); 
@@ -225,7 +270,7 @@ h2 {
 		  if (!boardNo) return; // 값이 없으면 패스
 
 		  $.ajax({
-		    url: '/reviewBoard/viewCount',
+		    url: '/reviewBoard/viewCount?boardNo=' + boardNo,
 		    method: 'GET',
 		    data: { boardNo: boardNo },
 		    success: function(res) {
@@ -236,8 +281,10 @@ h2 {
 		  });
 		});
 
+	
 
 
 </script>
+
 </body>
 </html>

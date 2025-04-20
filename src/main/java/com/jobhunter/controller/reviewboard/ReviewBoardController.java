@@ -52,7 +52,13 @@ public class ReviewBoardController {
 		try {
 
 			RPageResponseDTO<ReviewBoardDTO> response = service.getPagedBoardList(pageRequestDTO);
+			List<String> companyList = service.getCompanyList();
+		    model.addAttribute("companyList", companyList);
 			model.addAttribute("pageResult", response);
+			System.out.println("companyFilter: " + pageRequestDTO.getCompanyFilter());
+			System.out.println("resultFilter: " + pageRequestDTO.getResultFilter());
+			System.out.println("DTO: " + pageRequestDTO); //
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

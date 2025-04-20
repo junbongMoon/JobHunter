@@ -145,7 +145,6 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 
 	@Override
 	public int countReviewBoard(RPageRequestDTO pageRequestDTO) throws Exception {
-
 		return ses.selectOne(NS + ".countReviewBoard", pageRequestDTO);
 	}
 
@@ -167,6 +166,17 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 			ses.insert(NS + ".logInsertDelete", param);
 		}
 
+	}
+
+	@Override
+	public List<String> ListCompany() throws Exception {
+			return ses.selectList(NS +".getCompanyList");
+	}
+
+	@Override
+	public Integer findWriterUidByBoardNo(int boardNo) {
+		
+		return ses.selectOne(NS +".findWriterUidByBoardNo",boardNo);
 	}
 
 }

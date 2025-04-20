@@ -49,6 +49,9 @@ public interface ReviewBoardService {
 
 	RPageResponseDTO<ReviewBoardDTO> getPagedBoardList(RPageRequestDTO pageRequestDTO) throws Exception;
 
+	List<String> getCompanyList() throws Exception;
+
+
 	
 	
 
