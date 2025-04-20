@@ -19,7 +19,7 @@
 	<!--  -->
 	<aop:aspectj-autoproxy />
 	
-	<context:property-placeholder location="classpath:config/database.properties" />
+	<context:property-placeholder location="classpath:config/*.properties" />
 	
 	<!-- 데이터베이스와 연결을 담당하는 DataSource 설정하기 마리아 db걸로 변경 하기 -->
 
