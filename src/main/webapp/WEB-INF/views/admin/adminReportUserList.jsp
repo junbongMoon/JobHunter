@@ -315,6 +315,39 @@
 									</div>
 								</div>
 							</div>
+							
+							<!-- 페이징 -->
+							<nav aria-label="Page navigation">
+								<ul class="pagination">
+									<c:if test="${pagination.prev}">
+										<li class="page-item">
+											<a class="page-link"
+												href="/admin/reportUserList?page=${pagination.startPage - 1}&reportType=${param.reportType}&readStatus=${param.readStatus}&category=${param.category}&dateFilter=${param.dateFilter}"
+												aria-label="Previous">
+												<span aria-hidden="true">&laquo;</span>
+											</a>
+										</li>
+									</c:if>
+
+									<c:forEach begin="${pagination.startPage}" end="${pagination.endPage}"
+										var="pageNum">
+										<li class="page-item ${pageNum == pagination.currentPage ? 'active' : ''}">
+											<a class="page-link"
+												href="/admin/reportUserList?page=${pageNum}&reportType=${param.reportType}&readStatus=${param.readStatus}&category=${param.category}&dateFilter=${param.dateFilter}">${pageNum}</a>
+										</li>
+									</c:forEach>
+
+									<c:if test="${pagination.next}">
+										<li class="page-item">
+											<a class="page-link"
+												href="/admin/reportUserList?page=${pagination.endPage + 1}&reportType=${param.reportType}&readStatus=${param.readStatus}&category=${param.category}&dateFilter=${param.dateFilter}"
+												aria-label="Next">
+												<span aria-hidden="true">&raquo;</span>
+											</a>
+										</li>
+									</c:if>
+								</ul>
+							</nav>
 						</div>
 					</div>
 				</div>
@@ -366,6 +399,58 @@
 								<button type="button" class="btn btn-secondary"
 									onclick="closeBlockUserModal()">취소</button>
 								<button type="button" class="btn btn-danger" onclick="submitBlockUser()">확인</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 기업 정지 모달 -->
+				<div class="modal fade" id="blockCompanyModal" tabindex="-1" aria-labelledby="blockCompanyModalLabel"
+					aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="blockCompanyModalLabel">기업 정지</h5>
+								<button type="button" class="btn-close" onclick="closeBlockCompanyModal()"
+									aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<form id="blockCompanyForm">
+									<input type="hidden" id="blockCompanyId" name="uid">
+									<div class="mb-3">
+										<label class="form-label">정지 기간</label>
+										<div class="form-check">
+											<input class="form-check-input" type="radio" name="companyBlockDuration"
+												id="companyDuration3days" value="3">
+											<label class="form-check-label" for="companyDuration3days">3일</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="radio" name="companyBlockDuration"
+												id="companyDuration7days" value="7">
+											<label class="form-check-label" for="companyDuration7days">7일</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="radio" name="companyBlockDuration"
+												id="companyDuration30days" value="30">
+											<label class="form-check-label" for="companyDuration30days">30일</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="radio" name="companyBlockDuration"
+												id="companyDurationPermanent" value="permanent">
+											<label class="form-check-label" for="companyDurationPermanent">영구</label>
+										</div>
+									</div>
+									<div class="mb-3">
+										<label for="blockCompanyReason" class="form-label">정지 사유</label>
+										<textarea class="form-control" id="blockCompanyReason" name="reason" rows="3"
+											required></textarea>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary"
+									onclick="closeBlockCompanyModal()">취소</button>
+								<button type="button" class="btn btn-danger" onclick="submitBlockCompany()">확인</button>
 							</div>
 						</div>
 					</div>
@@ -424,34 +509,8 @@
 						// 기업 정지 버튼 클릭 이벤트
 						$('.block-company').click(function () {
 							const uid = $(this).data('uid');
-							const duration = prompt('정지 기간을 입력하세요 (일 단위, 영구 정지는 "permanent" 입력):', '7');
-
-							if (duration) {
-								const reason = prompt('정지 사유를 입력하세요:');
-
-								if (reason) {
-									$.ajax({
-										url: '/admin/blockCompany/' + uid,
-										type: 'POST',
-										contentType: 'application/json',
-										data: JSON.stringify({
-											duration: duration,
-											reason: reason
-										}),
-										success: function (response) {
-											if (response.success) {
-												alert('기업이 성공적으로 정지되었습니다.');
-												location.reload();
-											} else {
-												alert('기업 정지에 실패했습니다: ' + response.message);
-											}
-										},
-										error: function () {
-											alert('서버 오류가 발생했습니다.');
-										}
-									});
-								}
-							}
+							$('#blockCompanyId').val(uid);
+							$('#blockCompanyModal').modal('show');
 						});
 
 						// 읽음 표시 버튼 클릭 이벤트
@@ -466,7 +525,7 @@
 							}
 							
 							// 확인 대화상자 표시
-							if (confirm(`읽음 처리로 하시겠습니까?`)) {
+							if (confirm(`완료 처리 하시겠습니까?`)) {
 								$.ajax({
 									url: '/admin/updateReportReadStatus',
 									type: 'POST',
@@ -479,16 +538,17 @@
 											// 상태 변경 성공 시 UI 업데이트
 											const row = $(`tr[data-report-no="${reportNo}"]`);
 											const statusCell = row.find('td:nth-child(8)');
-											statusCell.html('<span class="badge badge-success">읽음</span>');
+											statusCell.html('<span class="badge badge-success">완료</span>');
 											
 											// 버튼 상태 업데이트
 											$('.mark-read').each(function() {
 												if ($(this).data('report-no') === reportNo) {
 													$(this).data('read-status', 'Y');
-													// 새로고침
-													location.reload();
 												}
 											});
+											
+											// 페이지 새로고침
+											location.reload();
 										} else {
 											alert('신고 상태 업데이트에 실패했습니다: ' + response.message);
 										}
@@ -563,6 +623,50 @@
 						});
 						
 						closeBlockUserModal();
+					}
+					
+					// 기업 정지 모달 관련 함수
+					function closeBlockCompanyModal() {
+						$('#blockCompanyModal').modal('hide');
+					}
+					
+					function submitBlockCompany() {
+						const uid = $('#blockCompanyId').val();
+						const duration = $('input[name="companyBlockDuration"]:checked').val();
+						const reason = $('#blockCompanyReason').val();
+						
+						if (!duration) {
+							alert('정지 기간을 선택해주세요.');
+							return;
+						}
+						
+						if (!reason) {
+							alert('정지 사유를 입력해주세요.');
+							return;
+						}
+						
+						$.ajax({
+							url: '/admin/blockCompany/' + uid,
+							type: 'POST',
+							contentType: 'application/json',
+							data: JSON.stringify({
+								duration: duration,
+								reason: reason
+							}),
+							success: function (response) {
+								if (response.success) {
+									alert('기업이 성공적으로 정지되었습니다.');
+									location.reload();
+								} else {
+									alert('기업 정지에 실패했습니다: ' + response.message);
+								}
+							},
+							error: function () {
+								alert('서버 오류가 발생했습니다.');
+							}
+						});
+						
+						closeBlockCompanyModal();
 					}
 				</script>
 			</body>

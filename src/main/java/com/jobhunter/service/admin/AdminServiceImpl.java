@@ -164,7 +164,12 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public List<ReportMessageVO> getReportsByUserReporterWithFilter(Map<String, String> filterParams) throws Exception {
-		return dao.getReportsByUserReporterWithFilter(filterParams);
+	public List<ReportMessageVO> getReportsByUserReporterWithFilter(Map<String, String> filterParams, int page, int pageSize) throws Exception {
+		return dao.getReportsByUserReporterWithFilter(filterParams, page, pageSize);
+	}
+
+	@Override
+	public int getTotalReportCount(Map<String, String> filterParams) throws Exception {
+		return dao.getTotalReportCount(filterParams);
 	}
 }

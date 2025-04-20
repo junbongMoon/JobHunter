@@ -402,6 +402,7 @@ public class AdminController {
 	 * 사용자 신고 목록을 조회합니다.
 	 *
 	 * @param model 뷰에 전달할 데이터
+	 * @param page 현재 페이지 번호
 	 * @param reportType 신고 유형 필터
 	 * @param readStatus 읽음 상태 필터
 	 * @param category 신고 카테고리 필터
@@ -412,20 +413,35 @@ public class AdminController {
 	 */
 	@GetMapping("/admin/reportUserList")
 	public String adminReportUserList(
+			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "reportType", defaultValue = "all") String reportType,
 			@RequestParam(value = "readStatus", defaultValue = "all") String readStatus,
 			@RequestParam(value = "category", defaultValue = "all") String category,
 			@RequestParam(value = "dateFilter", defaultValue = "all") String dateFilter,
 			Model model) {
 		try {
+			// 페이지 번호가 1보다 작으면 1로 설정
+			page = Math.max(1, page);
+			
+			int pageSize = 10; // 페이지당 표시할 게시물 수
+			
 			Map<String, String> filterParams = new HashMap<>();
 			filterParams.put("reportType", reportType);
 			filterParams.put("readStatus", readStatus);
 			filterParams.put("category", category);
 			filterParams.put("dateFilter", dateFilter);
 			
-			List<ReportMessageVO> reportList = adminService.getReportsByUserReporterWithFilter(filterParams);
+			// 전체 게시물 수 조회
+			int totalCount = adminService.getTotalReportCount(filterParams);
+			
+			// 페이징 객체 생성
+			Pagination pagination = new Pagination(totalCount, page, pageSize);
+			
+			// 게시물 목록 조회
+			List<ReportMessageVO> reportList = adminService.getReportsByUserReporterWithFilter(filterParams, page, pageSize);
+			
 			model.addAttribute("reportList", reportList);
+			model.addAttribute("pagination", pagination);
 			model.addAttribute("reportType", reportType);
 			model.addAttribute("readStatus", readStatus);
 			model.addAttribute("category", category);

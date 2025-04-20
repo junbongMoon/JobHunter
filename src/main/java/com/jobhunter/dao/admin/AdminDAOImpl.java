@@ -133,7 +133,18 @@ public class AdminDAOImpl implements AdminDAO {
 	}
 
 	@Override
-	public List<ReportMessageVO> getReportsByUserReporterWithFilter(Map<String, String> filterParams) throws Exception {
-		return ses.selectList(NS + ".getReportsByUserReporterWithFilter", filterParams);
+	public List<ReportMessageVO> getReportsByUserReporterWithFilter(Map<String, String> filterParams, int page, int pageSize) throws Exception {
+		Map<String, Object> params = new HashMap<>(filterParams);
+		
+		int offset = (page - 1) * pageSize;
+		params.put("offset", offset);
+		params.put("pageSize", pageSize);
+		
+		return ses.selectList(NS + ".getReportsByUserReporterWithFilter", params);
+	}
+
+	@Override
+	public int getTotalReportCount(Map<String, String> filterParams) throws Exception {
+		return ses.selectOne(NS + ".getTotalReportCount", filterParams);
 	}
 }

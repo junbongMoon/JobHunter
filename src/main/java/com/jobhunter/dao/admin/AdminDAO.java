@@ -55,9 +55,20 @@ public interface AdminDAO {
 	 * 사용자가 신고한 목록을 필터링하여 조회합니다.
 	 * 
 	 * @param filterParams 필터링 파라미터
+	 * @param page 현재 페이지 번호
+	 * @param pageSize 페이지당 표시할 게시물 수
 	 * @return 필터링된 신고 목록
 	 * @throws Exception
 	 */
-	List<ReportMessageVO> getReportsByUserReporterWithFilter(Map<String, String> filterParams) throws Exception;
+	List<ReportMessageVO> getReportsByUserReporterWithFilter(Map<String, String> filterParams, int page, int pageSize) throws Exception;
+
+	/**
+	 * 필터링된 신고 목록의 총 개수를 조회합니다.
+	 * 
+	 * @param filterParams 필터링 파라미터
+	 * @return 필터링된 신고 목록의 총 개수
+	 * @throws Exception
+	 */
+	int getTotalReportCount(Map<String, String> filterParams) throws Exception;
 
 }
