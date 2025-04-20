@@ -41,4 +41,6 @@ public interface UserService {
 
 	void setDeleteAccount(Integer uid) throws Exception;
 
+	boolean addPoint(String userId, int point) throws Exception;
+
 }

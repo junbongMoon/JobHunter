@@ -188,5 +188,29 @@ public class UserServiceImpl implements UserService {
 		dao.setDeleteAccount(uid);
 	}
 
+	/**
+	 *  @author 문준봉
+	 *
+	 * <p>
+	 * 유저의 포인트를 증가 시키는 메서드
+	 * </p>
+	 * 
+	 * @param userId
+	 * @param point
+	 * @throws Exception 
+	 *
+	 */
+	@Override
+	public boolean addPoint(String userId, int point) throws Exception {
+		boolean result = false;
+		int useruid = Integer.parseInt(userId);
+		if( dao.updateUserPoint(useruid, point) > 0) {
+			result = true;
+		}
+		
+		return result;
+		
+	}
+
 
 }

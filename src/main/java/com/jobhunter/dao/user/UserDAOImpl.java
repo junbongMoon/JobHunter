@@ -113,5 +113,15 @@ public class UserDAOImpl implements UserDAO {
 
 	}
 
+	@Override
+	public int updateUserPoint(int userUid, int point) throws Exception {
+		Map<String, Object> param = new HashMap<>();
+		param.put("userUid", userUid);
+		param.put("point", point);
+		
+		
+		return ses.update(NS + ".modifyUserPoint", param);
+	}
+
 	
 }
