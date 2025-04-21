@@ -62,9 +62,9 @@ public class KakaoPayController {
         params.add("total_amount", String.valueOf(param.get("total_amount")));
         params.add("vat_amount", "0");
         params.add("tax_free_amount", "0");
-        params.add("approval_url", "http://localhost:8084/kakao/pay/success");
-        params.add("cancel_url", "http://localhost:8084/kakao/pay/cancel");
-        params.add("fail_url", "http://localhost:8084/kakao/pay/fail");
+        params.add("approval_url", "http://localhost:8085/kakao/pay/success");
+        params.add("cancel_url", "http://localhost:8085/kakao/pay/cancel");
+        params.add("fail_url", "http://localhost:8085/kakao/pay/fail");
         
         String itemName = (String) param.get("item_name");
         int totalAmount = Integer.parseInt(param.get("total_amount").toString());
