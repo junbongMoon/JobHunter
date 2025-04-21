@@ -139,20 +139,43 @@
       <i class="fas fa-list"></i> 목록으로
     </a>
     
-      <a href="/prBoard/modify?prBoardNo=${prBoard.prBoardNo}" class="btn btn-modify">
+      <a href="/prboard/modify?prBoardNo=${prBoard.prBoardNo}" class="btn btn-modify">
         <i class="fas fa-edit"></i> 수정
       </a>
-      <button type="button" class="btn btn-delete" onclick="deletePrBoard(${prBoard.prBoardNo})">
-        <i class="fas fa-trash"></i> 삭제
-      </button>
+		<button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
+		  <i class="fas fa-trash"></i> 삭제
+		</button>
     
   </div>
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">삭제 확인</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+
+      <div class="modal-body">
+        정말로 이 게시물을 삭제하시겠습니까?
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+        <a href="/prboard/remove?prBoardNo=${prBoard.prBoardNo}" class="btn btn-delete">
+          <i class="fas fa-trash"></i> 삭제
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
 </div>
 
 <script>
 function deletePrBoard(prBoardNo) {
   if(confirm('정말로 이 게시물을 삭제하시겠습니까?')) {
-    location.href = '/prBoard/remove?prBoardNo=' + prBoardNo;
+    location.href = '/prboard/remove?prBoardNo=' + prBoardNo;
   }
 }
 </script>
