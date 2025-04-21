@@ -18,6 +18,8 @@ import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 
 import lombok.RequiredArgsConstructor;
@@ -265,5 +267,15 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	}
 
 	
+	@Override
+	public int countRecruitments(RecruitmentWithResumePageDTO dto) {
+		return ses.selectOne(NS + ".countRecruitments", dto);
+	}
+	
+	@Override
+	public List<RecruitmentWithResume> searchRecruitments(RecruitmentWithResumePageDTO dto) {
+		List<RecruitmentWithResume> list = ses.selectList(NS + ".searchRecruitments", dto);
+		return list;
+	}
 
 }

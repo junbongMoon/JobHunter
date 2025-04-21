@@ -11,6 +11,8 @@ import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageVO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 
 public interface RecruitmentNoticeService {
@@ -173,6 +175,9 @@ public interface RecruitmentNoticeService {
 
 
 	public RecruitmentDetailInfo getRecruitmentWithViewLog(int uid, int viewerUid) throws Exception;
+
+
+	RecruitmentWithResumePageVO searchRecruitments(RecruitmentWithResumePageDTO dto) throws Exception;
 
 
 

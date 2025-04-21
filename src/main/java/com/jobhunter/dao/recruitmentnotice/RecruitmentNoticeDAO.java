@@ -311,4 +311,8 @@ public interface RecruitmentNoticeDAO {
      * @return 증가된 조회수
      */
     int increaseRecruitmentViewCnt(int boardNo);
+
+	List<RecruitmentWithResume> searchRecruitments(RecruitmentWithResumePageDTO dto);
+
+	int countRecruitments(RecruitmentWithResumePageDTO dto);
 }

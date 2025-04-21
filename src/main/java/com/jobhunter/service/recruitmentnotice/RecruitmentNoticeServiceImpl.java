@@ -1,9 +1,7 @@
 package com.jobhunter.service.recruitmentnotice;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -23,6 +21,9 @@ import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageVO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 import com.jobhunter.model.util.FileStatus;
 
@@ -503,7 +504,15 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	    return getRecruitmentByUid(uid);
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public RecruitmentWithResumePageVO searchRecruitments(RecruitmentWithResumePageDTO dto) {
+	    int totalItems = recdao.countRecruitments(dto);
+	    List<RecruitmentWithResume> list = recdao.searchRecruitments(dto);
 
+	    RecruitmentWithResumePageVO vo = new RecruitmentWithResumePageVO(list, dto.getPage(), totalItems);
 
+	    return vo;
+	}
 
 }

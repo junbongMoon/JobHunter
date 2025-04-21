@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +16,8 @@ import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageVO;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 
 import lombok.RequiredArgsConstructor;
@@ -129,18 +133,19 @@ public class RecruitmentNoticeRestController {
 		 * @return  공고리스트를 담은 페이징에 정보를 객체를 담은 ResponseEntity
 		 *
 		 */
-		@GetMapping("/list/{companyUid}/{page}")
-		public ResponseEntity<PageResponseDTO<RecruitmentNotice>> showRecruitmentWithResumeByUid(@PathVariable("companyUid") int companyUid,
-				@PathVariable("page") int page){
-			ResponseEntity<PageResponseDTO<RecruitmentNotice>> result = null;		
+		@PostMapping("/withResume")
+	    public RecruitmentWithResumePageVO showRecruitmentWithResumeByUid(@RequestBody RecruitmentWithResumePageDTO dto) {
 			
-			PageResponseDTO<RecruitmentNotice> pageResponseDTO = recService.getRecruitmentByCompanyUid(companyUid, pageRequestDTO);
+			System.out.println(dto);
 			
-			result = ResponseEntity.ok().body(pageResponseDTO);
-			
-			return result;
-			
-		}
+	        try {
+				return recService.searchRecruitments(dto);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        return null;
+	    }
 	
 	
 }

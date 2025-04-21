@@ -145,12 +145,10 @@
       <!-- 아무튼 카드 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
-          <h2><i class="bi bi-heart section-icon"></i>카드 예제</h2>
+          <h2><i class="bi bi-heart section-icon"></i>작성한 공고</h2>
+          <button class="btn-edit" onclick="recruitSearchModal()">공고 검색 옵션</button>
         </div>
-        <div class="empty-state">
-          <i class="bi bi-heart"></i>
-          <p>나중에 필요한거 담을 공간.</p>
-        </div>
+        <div id="recruitSection"></div>
       </section>
 
     </div>
@@ -163,11 +161,264 @@
 <script>
 $(()=>{
   getInfo();
+  getMyRecruit();
 })
+
+function recruitSearchModal() {
+	const text = `
+	<div id="recruitSearchBox">
+	    <h2>공고 검색</h2>
+		<div>
+	      <label style="width:150px"><input type="checkbox" id="noRead"> 신규 신청</label>
+		  <label style="width:150px"><input type="checkbox" id="notClosing"> 모집중</label>
+		  <label style="width:150px"><input type="checkbox" id="applyViaSite"> 사이트 신청</label>
+	  	</div>
+	  	<hr>
+	  	<div>
+	  	<span>
+	  	<label style="width:200px">검색조건 : 
+		  <select id="searchKeywordType">
+		    <option value="title">제목검색</option>
+		    <option value="manager">담당자</option>
+		  </select>
+		</label>
+		</span><span>
+		<label style="width:200px">정렬 : 
+		  <select id="sortBy">
+		    <option value="DUE_SOON">마감임박</option>
+		    <option value="LATEST">최신순</option>
+		    <option value="REG_COUNT">신청서수</option>
+		  </select>
+		</label>
+		</span>
+		</div>
+		
+		<div>
+		  <input type="text" id="searchKeyword" placeholder="검색어를 입력하세요" style="width:450px"/>
+		</div>
+	</div>
+	`
+	
+	// 모달 열고 나서 input 값 채워넣기
+  window.publicModals.show(text, {
+    cancelText: "취소",
+    onConfirm: () => {
+      // 모달 값 → 전역 변수에 반영
+      noRead = $('#noRead').is(':checked');
+      notClosing = $('#notClosing').is(':checked');
+      applyViaSite = $('#applyViaSite').is(':checked');
+      searchKeyword = $('#searchKeyword').val();
+      searchKeywordType = $('#searchKeywordType').val();
+      sortBy = $('#sortBy').val();
+
+      page = 1; // 검색 새로 할 때는 1페이지부터 시작
+
+      getMyRecruit(); // 검색 실행
+    },
+    size_x: "600px"
+  });
+
+  $('#noRead').prop('checked', noRead);
+  $('#notClosing').prop('checked', notClosing);
+  $('#applyViaSite').prop('checked', applyViaSite);
+  $('#searchKeyword').val(searchKeyword);
+  $('#searchKeywordType').val(searchKeywordType);
+  $('#sortBy').val(sortBy);
+
+}
+
+function getMyRecruit() {
+  const data = {
+    uid: uid,
+    page: page,
+    searchKeyword: searchKeyword,
+    searchKeywordType: searchKeywordType,
+    sortBy: sortBy,
+    noRead: noRead,
+    notClosing: notClosing,
+    applyViaSite: applyViaSite
+  };
+
+  $.ajax({
+    url: '/recruitmentnotice/rest/withResume',
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(data),
+    success: function(res) {
+      console.log("공고 결과:", res);
+      renderRecruitList(res.items)
+      renderPagination(res)
+    },
+    error: function(xhr) {
+      console.log("에러 발생", xhr);
+    }
+  });
+}
+
+function goToPage(pageNum) {
+	  page = pageNum;
+	  getMyRecruit();
+	}
+
+function renderRecruitList(items) {
+	  const container = $('#recruitSection');
+	  container.empty();
+
+	  if (!items || items.length === 0) {
+	    container.html(`
+	      <div class="empty-state">
+	        <i class="fas fa-folder-open"></i><br>
+	        검색된 공고가 없습니다.
+	      </div>
+	    `);
+	    return;
+	  }
+
+	  let html = '<div class="recruit-card-list" style="display: flex; flex-direction: column; gap: 12px;">';
+
+	  items.forEach(item => {
+	    html += `
+        <div class="recruit-card-wrapper" data-uid="\${item.uid}">
+          <div class="recruit-card" style="
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2c3e50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+          " onclick="toggleResumeDropdown(\${item.uid})">
+            
+            <div style="flex: 1;">
+              <div><strong>\${item.title}</strong> <span style="color: #888;">(\${item.manager})</span></div>
+              <div style="font-size: 13px; color: #666;">
+                \${formatDate(item.dueDate)} 마감 · 신청서 \${item.registrationCount}건
+                \${item.hasUnreadApplications ? '<span style="color: #e74c3c;"> · 🔔 미확인 있음</span>' : ''}
+                \${item.applyViaSite ? '<span style="color: #47b2e4;"> · 📥 사이트신청</span>' : ''}
+              </div>
+            </div>
+
+            <button class="btn-edit" onclick="event.stopPropagation(); viewRecruitDetail(\${item.uid})">
+              상세조회
+            </button>
+          </div>
+
+          <div class="resume-dropdown" id="dropdown-\${item.uid}" style="
+            display: none;
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            margin-top: 5px;
+            font-size: 13px;
+          ">
+            <em>이력서 불러오는 중...</em>
+          </div>
+        </div>
+      `;
+
+	  });
+
+	  html += '</div>';
+	  container.html(html);
+}
+
+function viewRecruitDetail(uid) {
+  // 예시: 상세 페이지 이동
+  location.href = `/recruitmentnotice/detail?uid=\${uid}`;
+}
+
+function toggleResumeDropdown(uid) {
+	  // 모든 드롭다운 닫기
+	  $('.resume-dropdown').slideUp();
+
+	  // 이미 열려있는 경우면 닫기
+	  const $target = $(`#dropdown-\${uid}`);
+	  if ($target.is(':visible')) {
+	    $target.slideUp();
+	    return;
+	  }
+
+	  // 열기 + AJAX 불러오기
+	  $target.slideDown().html('<em>이력서 불러오는 중...</em>');
+
+	  // 이력서 리스트 불러오기 (예시)
+	  // $.ajax({
+	  //   url: `/recruitmentnotice/${uid}/resumes`,
+	  //   method: 'GET',
+	  //   success: function(res) {
+	  //     if (!res || res.length === 0) {
+	  //       $target.html('<p style="color:#888;">등록된 이력서가 없습니다.</p>');
+	  //       return;
+	  //     }
+
+	  //     let resumeHtml = '<ul style="margin:0; padding-left: 16px;">';
+	  //     res.forEach(r => {
+	  //       resumeHtml += `<li>${r.applicantName} / ${r.title}</li>`;
+	  //     });
+	  //     resumeHtml += '</ul>';
+
+	  //     $target.html(resumeHtml);
+	  //   },
+	  //   error: function() {
+	  //     $target.html('<p style="color:red;">이력서를 불러오는 데 실패했습니다.</p>');
+	  //   }
+	  // });
+	}
+
+
+
+  function renderPagination(res) {
+  const { pageList, currentPage, hasPrevBlock, hasNextBlock, startPage, endPage } = res;
+  const container = $('#recruitSection');
+
+  let html = `
+    <div class="pagination" style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    ">
+  `;
+
+  if (hasPrevBlock) {
+    html += `<button class="btn-edit" onclick="goToPage(\${startPage - 1})">« 이전</button>`;
+  }
+
+  pageList.forEach(p => {
+    html += `<button class="btn-edit \${p === currentPage ? 'active' : ''}" onclick="goToPage(\${p})" style="\${p === currentPage ? 'background:#3a8fb8;' : ''}">\${p}</button>`;
+  });
+
+  if (hasNextBlock) {
+    html += `<button class="btn-edit" onclick="goToPage(\${endPage + 1})">다음 »</button>`;
+  }
+
+  html += '</div>';
+  container.append(html);
+}
+
+
+
+
 // #region 전역 변수 및 초기화
 const uid = "${sessionScope.account.uid}"
 let sessionMobile = "${sessionScope.account.mobile}";
 let sessionEmail = "${sessionScope.account.email}";
+
+let page = 1;
+let searchKeyword = '';
+let searchKeywordType = "title";
+let sortBy = "DUE_SOON";
+let noRead = false;
+let notClosing = false;
+let applyViaSite = false;
 
 const METHOD = {
   EMAIL: "email",

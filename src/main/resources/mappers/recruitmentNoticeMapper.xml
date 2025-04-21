@@ -511,5 +511,97 @@
 		SET count = count + 1
 		WHERE uid = #{boardNo}
 	</update>
+	
+	<select id="searchRecruitments" resultType="com.jobhunter.model.recruitmentnotice.RecruitmentWithResume">
+		SELECT
+		    rn.*,
+		    COUNT(DISTINCT r.registrationNo) AS registrationCount,
+		    EXISTS (
+		        SELECT 1 FROM registration r2
+		        WHERE r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
+		    ) AS hasUnreadApplications,
+		    EXISTS (
+		        SELECT 1 FROM application a
+		        WHERE a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
+		    ) AS isApplyViaSite
+		FROM recruitmentnotice rn
+		LEFT JOIN registration r ON rn.uid = r.recruitmentNoticePk
+		WHERE rn.status = 'Y'
+		
+		<if test="searchKeywordType == 'title' and searchKeyword != null and searchKeyword != ''">
+		    AND (rn.title LIKE CONCAT('%', #{searchKeyword}, '%')
+		         OR rn.miniTitle LIKE CONCAT('%', #{searchKeyword}, '%'))
+		</if>
+		<if test="searchKeywordType == 'manager' and searchKeyword != null and searchKeyword != ''">
+		    AND rn.manager LIKE CONCAT('%', #{searchKeyword}, '%')
+		</if>
+		
+		<if test="isNotClosing">
+		    AND rn.dueDate > NOW()
+		</if>
+		
+		<if test="isNoRead">
+		    AND EXISTS (
+		        SELECT 1 FROM registration r2
+		        WHERE r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
+		    )
+		</if>
+		
+		<if test="isApplyViaSite">
+		    AND EXISTS (
+		        SELECT 1 FROM application a
+		        WHERE a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
+		    )
+		</if>
+		
+		GROUP BY rn.uid
+		
+		<choose>
+		    <when test="sortBy == 'LATEST'">
+		        ORDER BY rn.regDate DESC
+		    </when>
+		    <when test="sortBy == 'DUE_SOON'">
+		        ORDER BY rn.dueDate ASC
+		    </when>
+		    <when test="sortBy == 'REG_COUNT'">
+		        ORDER BY registrationCount DESC
+		    </when>
+		</choose>
+		
+		LIMIT #{offset}, 5
+	</select>
+	
+	<select id="countRecruitments" resultType="int">
+		SELECT COUNT(DISTINCT rn.uid)
+		FROM recruitmentnotice rn
+		LEFT JOIN registration r ON rn.uid = r.recruitmentNoticePk
+		WHERE rn.status = 'Y'
+		
+		<if test="searchKeywordType == 'title' and searchKeyword != null and searchKeyword != ''">
+		    AND (rn.title LIKE CONCAT('%', #{searchKeyword}, '%')
+		         OR rn.miniTitle LIKE CONCAT('%', #{searchKeyword}, '%'))
+		</if>
+		<if test="searchKeywordType == 'manager' and searchKeyword != null and searchKeyword != ''">
+		    AND rn.manager LIKE CONCAT('%', #{searchKeyword}, '%')
+		</if>
+		
+		<if test="isNotClosing">
+		    AND rn.dueDate > NOW()
+		</if>
+		
+		<if test="isNoRead">
+		    AND EXISTS (
+		        SELECT 1 FROM registration r2
+		        WHERE r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
+		    )
+		</if>
+		
+		<if test="isApplyViaSite">
+		    AND EXISTS (
+		        SELECT 1 FROM application a
+		        WHERE a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
+		    )
+		</if>
+	</select>
 
 </mapper>
