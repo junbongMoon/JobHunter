@@ -6,9 +6,44 @@
 
 	<insert id="savePRBoardByMento">
 		insert into prBoard
-		(useruid, title, writer, userId, introduce)
+		(useruid, title, writer, userId,
+		introduce)
 		values
-		(#{useruid}, #{title}, #{writer}, #{userId}, #{introduce})
+		(#{useruid}, #{title}, #{writer}, #{userId},
+		#{introduce})
 	</insert>
+
+	<select id="getTotalCountRow" resultType="int">
+		select count(*) from
+		prBoard
+	</select>
+
+	<select id="getPRBoardListByPaging"
+		resultType="com.jobhunter.model.prboard.PRBoardVO">
+		SELECT
+		prBoardNo, useruid, title, writer, userId, introduce, postDate
+		FROM
+		prBoard
+		<where>
+			<if
+				test="searchType != null and searchWord != null and searchWord != ''">
+				<choose>
+					<when test="searchType == 'title'">
+						AND title LIKE CONCAT('%', #{searchWord}, '%')
+					</when>
+					<when test="searchType == 'writer'">
+						AND writer LIKE CONCAT('%', #{searchWord}, '%')
+					</when>
+					<when test="searchType == 'userId'">
+						AND userId LIKE CONCAT('%', #{searchWord}, '%')
+					</when>
+				</choose>
+			</if>
+		</where>
+		<if test="sortOption != null">
+			ORDER BY ${sortOption}
+		</if>
+		LIMIT #{rowCntPerPage}, #{startRowIndex}
+	</select>
 
 </mapper>

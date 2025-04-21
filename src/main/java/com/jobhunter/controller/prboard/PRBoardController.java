@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.prboard.PRBoardDTO;
+import com.jobhunter.model.prboard.PRBoardVO;
 import com.jobhunter.service.prboard.PRBoardService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +30,14 @@ public class PRBoardController {
     // 목록 페이지
     @GetMapping("/list")
     public String showPrBoardListPage(PageRequestDTO pageRequestDTO, Model model) {
-    	
+    	PageResponseDTO<PRBoardVO> result;
+    	try {
+			result = prBoardService.getprBoardByPagination(pageRequestDTO);
+			model.addAttribute("pageResponseDTO", result);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
     	
         // model.addAttribute("data", ...); // 페이징 데이터 추가 가능

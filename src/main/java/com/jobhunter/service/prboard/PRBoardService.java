@@ -1,6 +1,9 @@
 package com.jobhunter.service.prboard;
 
+import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.prboard.PRBoardDTO;
+import com.jobhunter.model.prboard.PRBoardVO;
 
 public interface PRBoardService {
 	/**
@@ -16,4 +19,6 @@ public interface PRBoardService {
 	 *
 	 */
 	public boolean savePRBoard(PRBoardDTO prBoardDTO) throws Exception;
+
+	public PageResponseDTO<PRBoardVO> getprBoardByPagination(PageRequestDTO pageRequestDTO) throws Exception;
 }

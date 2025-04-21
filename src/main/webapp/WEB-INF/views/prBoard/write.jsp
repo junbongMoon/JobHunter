@@ -18,6 +18,26 @@
 <script>
 	$(function(){
 		$('#summernote').summernote();
+
+		$('form').on('submit', function (e) {
+      // useruid 검증
+      const useruid = $('input[name="useruid"]').val();
+      if (!useruid || isNaN(useruid)) {
+        alert('유효한 사용자 번호가 아닙니다.');
+        e.preventDefault();
+        return;
+      }
+
+      // title 검증
+      const title = $('#title').val().trim();
+      if (title === '') {
+        alert('제목을 입력해 주세요.');
+        $('#title').focus();
+        e.preventDefault();
+        return;
+      }
+    });
+  
 	});
 </script>
 

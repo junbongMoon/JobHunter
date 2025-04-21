@@ -1,6 +1,11 @@
 package com.jobhunter.dao.prboard;
 
+import java.util.List;
+
+import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.prboard.PRBoardDTO;
+import com.jobhunter.model.prboard.PRBoardVO;
 
 public interface PRBoardDAO {
 	
@@ -17,6 +22,10 @@ public interface PRBoardDAO {
 	 *
 	 */
 	int insertPRBoard(PRBoardDTO prBoardDTO) throws Exception;
+
+	int selectTotalCntRow() throws Exception;
+
+	List<PRBoardVO> selectPRBoardListByPaging(PageResponseDTO<PRBoardVO> pageResponseDTO) throws Exception;
 	
 
 }
