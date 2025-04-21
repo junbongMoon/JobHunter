@@ -106,11 +106,16 @@
 										<div class="form-group">
 											<label for="reportTypeFilter">신고 유형</label>
 											<select class="form-control" id="reportTypeFilter" name="reportType">
-												<option value="all" ${param.reportType == 'all' || empty param.reportType ? 'selected' : ''}>전체</option>
-												<option value="USER" ${param.reportType == 'USER' ? 'selected' : ''}>일반 사용자</option>
-												<option value="COMPANY" ${param.reportType == 'COMPANY' ? 'selected' : ''}>기업</option>
-												<option value="BOARD" ${param.reportType == 'BOARD' ? 'selected' : ''}>게시판</option>
-												<option value="RECRUTMENT" ${param.reportType == 'RECRUTMENT' ? 'selected' : ''}>채용공고</option>
+												<option value="all" ${param.reportType=='all' || empty param.reportType
+													? 'selected' : '' }>전체</option>
+												<option value="USER" ${param.reportType=='USER' ? 'selected' : '' }>일반
+													사용자</option>
+												<option value="COMPANY" ${param.reportType=='COMPANY' ? 'selected' : ''
+													}>기업</option>
+												<option value="BOARD" ${param.reportType=='BOARD' ? 'selected' : '' }>
+													게시판</option>
+												<option value="RECRUTMENT" ${param.reportType=='RECRUTMENT' ? 'selected'
+													: '' }>채용공고</option>
 											</select>
 										</div>
 									</div>
@@ -118,9 +123,12 @@
 										<div class="form-group">
 											<label for="readStatusFilter">처리 상태</label>
 											<select class="form-control" id="readStatusFilter" name="readStatus">
-												<option value="all" ${param.readStatus == 'all' || empty param.readStatus ? 'selected' : ''}>전체</option>
-												<option value="Y" ${param.readStatus == 'Y' ? 'selected' : ''}>완료</option>
-												<option value="N" ${param.readStatus == 'N' ? 'selected' : ''}>미완료</option>
+												<option value="all" ${param.readStatus=='all' || empty param.readStatus
+													? 'selected' : '' }>전체</option>
+												<option value="Y" ${param.readStatus=='Y' ? 'selected' : '' }>완료
+												</option>
+												<option value="N" ${param.readStatus=='N' ? 'selected' : '' }>미완료
+												</option>
 											</select>
 										</div>
 									</div>
@@ -128,14 +136,23 @@
 										<div class="form-group">
 											<label for="categoryFilter">신고 카테고리</label>
 											<select class="form-control" id="categoryFilter" name="category">
-												<option value="all" ${param.category == 'all' || empty param.category ? 'selected' : ''}>전체</option>
-												<option value="SPAM" ${param.category == 'SPAM' ? 'selected' : ''}>스팸/광고성 메시지</option>
-												<option value="HARASSMENT" ${param.category == 'HARASSMENT' ? 'selected' : ''}>욕설/괴롭힘</option>
-												<option value="FALSE_INFO" ${param.category == 'FALSE_INFO' ? 'selected' : ''}>허위 정보</option>
-												<option value="ILLEGAL_ACTIVITY" ${param.category == 'ILLEGAL_ACTIVITY' ? 'selected' : ''}>불법 행위</option>
-												<option value="INAPPROPRIATE_CONTENT" ${param.category == 'INAPPROPRIATE_CONTENT' ? 'selected' : ''}>부적절한 프로필/사진</option>
-												<option value="MISCONDUCT" ${param.category == 'MISCONDUCT' ? 'selected' : ''}>부적절한 행동/요구</option>
-												<option value="ETC" ${param.category == 'ETC' ? 'selected' : ''}>기타 사유</option>
+												<option value="all" ${param.category=='all' || empty param.category
+													? 'selected' : '' }>전체</option>
+												<option value="SPAM" ${param.category=='SPAM' ? 'selected' : '' }>스팸/광고성
+													메시지</option>
+												<option value="HARASSMENT" ${param.category=='HARASSMENT' ? 'selected'
+													: '' }>욕설/괴롭힘</option>
+												<option value="FALSE_INFO" ${param.category=='FALSE_INFO' ? 'selected'
+													: '' }>허위 정보</option>
+												<option value="ILLEGAL_ACTIVITY" ${param.category=='ILLEGAL_ACTIVITY'
+													? 'selected' : '' }>불법 행위</option>
+												<option value="INAPPROPRIATE_CONTENT"
+													${param.category=='INAPPROPRIATE_CONTENT' ? 'selected' : '' }>부적절한
+													프로필/사진</option>
+												<option value="MISCONDUCT" ${param.category=='MISCONDUCT' ? 'selected'
+													: '' }>부적절한 행동/요구</option>
+												<option value="ETC" ${param.category=='ETC' ? 'selected' : '' }>기타 사유
+												</option>
 											</select>
 										</div>
 									</div>
@@ -143,10 +160,14 @@
 										<div class="form-group">
 											<label for="dateFilter">기간</label>
 											<select class="form-control" id="dateFilter" name="dateFilter">
-												<option value="all" ${param.dateFilter == 'all' || empty param.dateFilter ? 'selected' : ''}>전체</option>
-												<option value="today" ${param.dateFilter == 'today' ? 'selected' : ''}>오늘</option>
-												<option value="week" ${param.dateFilter == 'week' ? 'selected' : ''}>이번 주</option>
-												<option value="month" ${param.dateFilter == 'month' ? 'selected' : ''}>이번 달</option>
+												<option value="all" ${param.dateFilter=='all' || empty param.dateFilter
+													? 'selected' : '' }>전체</option>
+												<option value="today" ${param.dateFilter=='today' ? 'selected' : '' }>오늘
+												</option>
+												<option value="week" ${param.dateFilter=='week' ? 'selected' : '' }>이번 주
+												</option>
+												<option value="month" ${param.dateFilter=='month' ? 'selected' : '' }>이번
+													달</option>
 											</select>
 										</div>
 									</div>
@@ -238,10 +259,12 @@
 																<c:when test="${report.reportCategory == 'FALSE_INFO'}">
 																	허위 정보
 																</c:when>
-																<c:when test="${report.reportCategory == 'ILLEGAL_ACTIVITY'}">
+																<c:when
+																	test="${report.reportCategory == 'ILLEGAL_ACTIVITY'}">
 																	불법 행위
 																</c:when>
-																<c:when test="${report.reportCategory == 'INAPPROPRIATE_CONTENT'}">
+																<c:when
+																	test="${report.reportCategory == 'INAPPROPRIATE_CONTENT'}">
 																	부적절한 프로필/사진
 																</c:when>
 																<c:when test="${report.reportCategory == 'MISCONDUCT'}">
@@ -264,7 +287,7 @@
 														</td>
 														<td>
 															<c:if test="${not empty report.reportTargetURL}">
-																<a href="${report.reportTargetURL}?reportNo=${report.reportNo}"
+																<a href="${report.reportTargetURL}&reportNo=${report.reportNo}"
 																	target="_blank">보기</a>
 															</c:if>
 														</td>
@@ -315,7 +338,7 @@
 									</div>
 								</div>
 							</div>
-							
+
 							<!-- 페이징 -->
 							<nav aria-label="Page navigation">
 								<ul class="pagination">
@@ -457,12 +480,14 @@
 				</div>
 
 				<!-- 신고 내용 모달 -->
-				<div class="modal fade" id="reportMessageModal" tabindex="-1" aria-labelledby="reportMessageModalLabel" aria-hidden="true">
+				<div class="modal fade" id="reportMessageModal" tabindex="-1" aria-labelledby="reportMessageModalLabel"
+					aria-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="reportMessageModalLabel">신고 내용</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"
+									aria-label="Close"></button>
 							</div>
 							<div class="modal-body">
 								<p id="reportMessageContent"></p>
@@ -517,13 +542,13 @@
 						$('.mark-read').click(function () {
 							const reportNo = $(this).data('report-no');
 							const currentStatus = $(this).data('read-status');
-							
+
 							// 현재 상태에 따라 다른 메시지 표시
 							if (currentStatus === 'Y') {
 								alert('이미 처리되었습니다.');
 								return;
 							}
-							
+
 							// 확인 대화상자 표시
 							if (confirm(`완료 처리 하시겠습니까?`)) {
 								$.ajax({
@@ -539,14 +564,14 @@
 											const row = $(`tr[data-report-no="${reportNo}"]`);
 											const statusCell = row.find('td:nth-child(8)');
 											statusCell.html('<span class="badge badge-success">완료</span>');
-											
+
 											// 버튼 상태 업데이트
-											$('.mark-read').each(function() {
+											$('.mark-read').each(function () {
 												if ($(this).data('report-no') === reportNo) {
 													$(this).data('read-status', 'Y');
 												}
 											});
-											
+
 											// 페이지 새로고침
 											location.reload();
 										} else {
@@ -568,9 +593,9 @@
 							const dateFilter = $('#dateFilter').val();
 
 							// 서버에 필터링 요청
-							window.location.href = '/admin/reportUserList?reportType=' + reportType + 
-								'&readStatus=' + readStatus + 
-								'&category=' + category + 
+							window.location.href = '/admin/reportUserList?reportType=' + reportType +
+								'&readStatus=' + readStatus +
+								'&category=' + category +
 								'&dateFilter=' + dateFilter;
 						});
 
@@ -580,27 +605,27 @@
 							window.location.href = '/admin/reportUserList';
 						});
 					});
-					
+
 					// 사용자 정지 모달 관련 함수
 					function closeBlockUserModal() {
 						$('#blockUserModal').modal('hide');
 					}
-					
+
 					function submitBlockUser() {
 						const uid = $('#blockUserId').val();
 						const duration = $('input[name="blockDuration"]:checked').val();
 						const reason = $('#blockReason').val();
-						
+
 						if (!duration) {
 							alert('정지 기간을 선택해주세요.');
 							return;
 						}
-						
+
 						if (!reason) {
 							alert('정지 사유를 입력해주세요.');
 							return;
 						}
-						
+
 						$.ajax({
 							url: '/admin/blockUser/' + uid,
 							type: 'POST',
@@ -621,30 +646,30 @@
 								alert('서버 오류가 발생했습니다.');
 							}
 						});
-						
+
 						closeBlockUserModal();
 					}
-					
+
 					// 기업 정지 모달 관련 함수
 					function closeBlockCompanyModal() {
 						$('#blockCompanyModal').modal('hide');
 					}
-					
+
 					function submitBlockCompany() {
 						const uid = $('#blockCompanyId').val();
 						const duration = $('input[name="companyBlockDuration"]:checked').val();
 						const reason = $('#blockCompanyReason').val();
-						
+
 						if (!duration) {
 							alert('정지 기간을 선택해주세요.');
 							return;
 						}
-						
+
 						if (!reason) {
 							alert('정지 사유를 입력해주세요.');
 							return;
 						}
-						
+
 						$.ajax({
 							url: '/admin/blockCompany/' + uid,
 							type: 'POST',
@@ -665,7 +690,7 @@
 								alert('서버 오류가 발생했습니다.');
 							}
 						});
-						
+
 						closeBlockCompanyModal();
 					}
 				</script>
