@@ -485,14 +485,17 @@
 											</div>
 											<div class="action-buttons">
 												<!-- 첨삭 테스트용 버튼 -->
+												<!-- 멘토 첨삭 기능 하는데 로그인 uid랑 resume.userUid가 다르면 readonly 붙음 -->
 												<a href="/resume/advice/${resume.resumeNo}" class="btn-custom btn-edit">
 													<i class="fas fa-edit"></i>
-													첨삭 작성 test 하기
+													첨삭 작성 하기 (멘토)
 												</a>
+												<!-- 멘티 첨삭 기능 하는데 로그인 uid랑 resume.userUid가 같으면 수정까지 가능 
+												만약 다르다면 첨삭 부분만 수정 가능-->
 												<a href="/resume/checkAdvice/${resume.resumeNo}"
 													class="btn-custom btn-edit">
 													<i class="fas fa-edit"></i>
-													첨삭 조회 test 하기
+													첨삭 조회 하기 (멘티&멘토) + 수정까지
 												</a>
 												<c:choose>
 													<c:when test="${resume.checked}">
