@@ -42,6 +42,8 @@ public class PRBoardServiceImpl implements PRBoardService {
 		
 		pageResponseDTO.setBoardList(boardList);
 		
+		System.out.println(boardList);
+		
 		return pageResponseDTO;
 	}
 	

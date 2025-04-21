@@ -43,7 +43,7 @@
 		<if test="sortOption != null">
 			ORDER BY ${sortOption}
 		</if>
-		LIMIT #{rowCntPerPage}, #{startRowIndex}
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
 	</select>
 
 </mapper>
