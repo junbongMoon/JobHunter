@@ -20,7 +20,9 @@
 				<!-- resume.userUid 남기기 -->
 				<input type="hidden" id="userUid" value="${ resumeDetail.resume.userUid }">
 				<!-- session.userUid 남기기 -->
-				<input type="hidden" id="sessionUserUid" value="${ sessionScope.user.userUid }">
+				<input type="hidden" id="sessionUserUid" value="${ sessionScope.account.uid }">
+				<!-- session.userUid와 resume.userUid가 같은지 확인 -->
+				<c:set var="isSameUser" value="${sessionScope.account.uid == resumeDetail.resume.userUid}" />
 
 				<div class="container my-5">
 					<c:if test="${mode == 'advice'}">
@@ -41,12 +43,12 @@
 								<div class="input-group">
 									<span class="input-group-text bg-light"> <i class="bi bi-pencil-square"></i>
 									</span>
-									<c:if test="${mode == 'advice'}">
+									<c:if test="${!isSameUser}">
 										<input type="text" class="form-control form-control-lg" id="title" name="title"
 											placeholder="예: 자바 개발자 지원" maxlength="30"
 											value="${resumeDetail.resume.title}" readonly>
 									</c:if>
-									<c:if test="${mode != 'advice'}">
+									<c:if test="${isSameUser}">
 										<input type="text" class="form-control form-control-lg" id="title" name="title"
 											placeholder="예: 자바 개발자 지원" maxlength="30"
 											value="${resumeDetail.resume.title}">
@@ -72,7 +74,7 @@
 											style="height: 200px; background-color: #f8f9fa;">
 											<input type="file" id="photoUpload" style="display: none;" accept="image/*">
 											<label for="photoUpload" class="text-center" style="cursor: pointer;">
-												<c:if test="${mode != 'advice'}">
+												<c:if test="${isSameUser}">
 													<i class="bi bi-plus-circle"
 														style="font-size: 2rem; color: #6c757d;"></i><br>
 													증명 사진 등록<span class="essentialPoint">*</span>
@@ -81,7 +83,7 @@
 
 											<img id="photoPreview" src="#" alt="사진 미리보기"
 												style="display: none; max-height: 100%; max-width: 100%;" />
-											<c:if test="${mode != 'advice'}">
+											<c:if test="${isSameUser}">
 												<button type="button"
 													class="btn-close position-absolute top-0 end-0 m-2 pCloseBtn"
 													id="removePhoto"
@@ -227,7 +229,7 @@
 							<div class="card-body">
 								<div class="row">
 									<!-- 시/도 목록 -->
-									<c:if test="${mode != 'advice'}">
+									<c:if test="${isSameUser}">
 										<div class="col-md-4">
 											<div class="region-list-container"
 												style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
@@ -241,7 +243,7 @@
 										</div>
 									</c:if>
 									<!-- 시/군/구 목록 -->
-									<c:if test="${mode != 'advice'}">
+									<c:if test="${isSameUser}">
 										<div class="col-md-4">
 											<div class="sigungu-list-container"
 												style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
@@ -254,7 +256,7 @@
 
 									<!-- 선택한 지역 표시 영역 -->
 									<div class="col-md-4">
-										<c:if test="${mode != 'advice'}">
+										<c:if test="${isSameUser}">
 											<label class="form-label">선택한 지역</label>
 										</c:if>
 										<div id="selectedRegions" class="mt-2">
@@ -263,7 +265,7 @@
 													data-region="${selectedRegion.regionNo}"
 													data-sigungu="${selectedRegion.sigunguNo}">
 													${selectedRegion.regionName} ${selectedRegion.name}
-													<c:if test="${mode != 'advice'}">
+													<c:if test="${isSameUser}">
 														<button class="btn-close ms-2" aria-label="삭제"></button>
 													</c:if>
 												</span>
@@ -282,7 +284,7 @@
 							<div class="card-body">
 								<div class="row">
 									<!-- 대분류 목록 -->
-									<c:if test="${mode != 'advice'}">
+									<c:if test="${isSameUser}">
 										<div class="col-md-4">
 											<div class="major-list-container"
 												style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
@@ -297,7 +299,7 @@
 									</c:if>
 
 									<!-- 소분류 목록 -->
-									<c:if test="${mode != 'advice'}">
+									<c:if test="${isSameUser}">
 										<div class="col-md-4">
 											<div class="sub-list-container"
 												style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
@@ -310,7 +312,7 @@
 
 									<!-- 선택한 업직종 표시 영역 -->
 									<div class="col-md-4">
-										<c:if test="${mode != 'advice'}">
+										<c:if test="${isSameUser}">
 											<label class="form-label">선택한 업직종</label>
 										</c:if>
 										<div id="selectedJobTypes" class="mt-2">
@@ -325,7 +327,7 @@
 													data-major="${selectedJob.majorCategoryNo}"
 													data-sub="${selectedJob.subcategoryNo}">
 													${selectedJob.jobName}
-													<c:if test="${mode != 'advice'}">
+													<c:if test="${isSameUser}">
 														<button class="btn-close ms-2" aria-label="삭제"></button>
 													</c:if>
 												</span>
@@ -340,7 +342,7 @@
 						<div class="card mb-4">
 							<div class="card-header d-flex justify-content-between align-items-center">
 								<span id=myMerits>성격 및 강점<span class="essentialPoint">*</span></span>
-								<c:if test="${mode != 'advice'}">
+								<c:if test="${isSameUser}">
 									<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
 										data-bs-target="#meritModal">추가하기</button>
 								</c:if>
@@ -350,7 +352,7 @@
 									<c:forEach var="merit" items="${resumeDetail.merits}">
 										<span class="badge bg-primary me-2 mb-2" data-merit="${merit.meritContent}">
 											${merit.meritContent}
-											<c:if test="${mode != 'advice'}">
+											<c:if test="${isSameUser}">
 												<button class="btn-close ms-2" aria-label="삭제"></button>
 											</c:if>
 										</span>
@@ -463,7 +465,7 @@
 							<div class="card-header d-flex justify-content-between align-items-center"
 								id="myEducationBox">
 								<span>학력사항</span>
-								<c:if test="${mode != 'advice'}">
+								<c:if test="${isSameUser}">
 									<button type="button" class="btn btn-primary btn-sm"
 										id="addEducationBtn">추가하기</button>
 								</c:if>
@@ -480,7 +482,7 @@
 						<template id="educationTemplate">
 							<div class="education-item border rounded p-3 mb-3 position-relative">
 								<!-- 삭제 버튼 (X) -->
-								<c:if test="${mode != 'advice'}">
+								<c:if test="${isSameUser}">
 									<button type="button"
 										class="btn-close position-absolute top-0 end-0 m-3 remove-education"
 										aria-label="삭제"></button>
@@ -534,7 +536,7 @@
 							<div class="card-header d-flex justify-content-between align-items-center"
 								id="myHistoryBox">
 								<span>경력사항</span>
-								<c:if test="${mode != 'advice'}">
+								<c:if test="${isSameUser}">
 									<button type="button" class="btn btn-primary btn-sm"
 										id="addHistoryBtn">추가하기</button>
 								</c:if>
@@ -556,7 +558,7 @@
 						<template id="historyTemplate">
 							<div class="history-item border rounded p-3 mb-3 position-relative">
 								<!-- 삭제 버튼 (X) -->
-								<c:if test="${mode != 'advice'}">
+								<c:if test="${isSameUser}">
 									<button type="button"
 										class="btn-close position-absolute top-0 end-0 m-3 remove-history"
 										aria-label="삭제"></button>
@@ -618,7 +620,7 @@
 							<div class="card-header d-flex justify-content-between align-items-center"
 								id="myLicenseBox">
 								<span>자격증</span>
-								<c:if test="${mode != 'advice'}">
+								<c:if test="${isSameUser}">
 									<button type="button" class="btn btn-primary btn-sm"
 										id="addLicenseBtn">추가하기</button>
 								</c:if>
@@ -635,7 +637,7 @@
 						<template id="licenseTemplate">
 							<div class="license-item border rounded p-3 mb-3 position-relative">
 								<!-- 삭제 버튼 (X) -->
-								<c:if test="${mode != 'advice'}">
+								<c:if test="${isSameUser}">
 									<button type="button"
 										class="btn-close position-absolute top-0 end-0 m-3 remove-license"
 										aria-label="삭제"></button>
@@ -688,7 +690,7 @@
 						<div class="card mb-4">
 							<div class="card-header d-flex justify-content-between align-items-center">
 								<span>첨부파일</span>
-								<c:if test="${mode != 'advice'}">
+								<c:if test="${isSameUser}">
 									<label for="fileInput" class="btn btn-primary btn-sm mb-0">파일
 										선택</label>
 									<input type="file" id="fileInput" style="display: none;" multiple>
@@ -696,12 +698,12 @@
 							</div>
 							<div class="card-body">
 								<div id="fileContainer" class="border rounded p-3">
-									<c:if test="${mode != 'advice'}">
+									<c:if test="${isSameUser}">
 										<div class="text-center text-muted fileText">
 											여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br> (최대 10MB)
 										</div>
 									</c:if>
-									<c:if test="${mode == 'advice'}">
+									<c:if test="${!isSameUser}">
 										<div class="text-center text-muted fileText">
 											첨부 된 파일이 없습니다.
 										</div>
@@ -739,7 +741,7 @@
 							<div class="card mb-4">
 								<div class="card-header-advice d-flex justify-content-between align-items-center">
 									<span>첨삭 전용 파일 첨부</span>
-									<c:if test="${mode != 'checkAdvice'}">
+									<c:if test="${!isSameUser}">
 										<label for="fileInput-advice" class="btn btn-sm mb-0 advice-file-input">파일
 											선택</label>
 										<input type="file" id="fileInput-advice" style="display: none;" multiple>
@@ -748,21 +750,18 @@
 								<div class="card-body">
 									<div id="fileContainer-advice" class="border rounded p-3">
 										<c:if test="${empty adviceFiles}">
-											<div class="text-center text-muted advice-file-text">
-												여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br> (최대 10MB)
-											</div>
+											<c:if test="${!isSameUser}">
+												<div class="text-center text-muted advice-file-text">
+													여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br> (최대 10MB)
+												</div>
+											</c:if>
+											<c:if test="${isSameUser}">
+												<div class="text-center text-muted advice-file-text">
+													첨삭 전용 파일이 없습니다.
+												</div>
+											</c:if>
 										</c:if>
 										<div id="previewContainer-advice" class="mt-3">
-											<c:forEach var="file" items="${adviceFiles}">
-												<div class="d-flex align-items-center mb-2 p-2 border rounded">
-													<i class="bi bi-file-earmark me-2"></i>
-													<span class="flex-grow-1">${file.originalFileName}</span>
-													<a href="/resources/resumeUpfiles/${file.adviceFileName}" download
-														class="btn btn-sm btn-primary ms-2">
-														<i class="bi bi-download"></i>
-													</a>
-												</div>
-											</c:forEach>
 										</div>
 									</div>
 									<small class="text-muted">* 이미지 외 파일은 10MB 까지 업로드 가능합니다.</small><br>
@@ -773,13 +772,16 @@
 
 
 						<!-- 저장 버튼 -->
-						<c:if test="${mode != 'advice' && mode == 'checkAdvice'}">
+						<!-- 테스트 종료 후 isSameUser 달기 -->
+						<!-- <c:if test="${isSameUser}"></c:if> -->
+						<c:if test="${mode != 'advice' && mode == 'checkAdvice' && isSameUser}">
 							<button type="button" class="btn btn-primary" id="finalSaveBtn"><span
 									class="btn-text">저장하기</span>
 								<span class="spinner-border spinner-border-sm text-light d-none" role="status"
 									aria-hidden="true"></span></button>
 						</c:if>
-						<c:if test="${mode == 'advice'}">
+						<!-- <c:if test="${!isSameUser}"></c:if> -->
+						<c:if test="${mode == 'advice' || !isSameUser}">
 							<button type="button" class="btn btn-primary" id="adviceSaveBtn"><span class="btn-text">첨삭
 									저장하기</span>
 								<span class="spinner-border spinner-border-sm text-light d-none" role="status"
@@ -2292,19 +2294,19 @@
 						<c:if test="${not empty resumeDetail.files}">
 							<c:forEach var="file" items="${resumeDetail.files}">
 								uploadedFiles.push({
-									originalFileName: '${file.originalFileName}',
-								newFileName: '${file.newFileName}',
-								ext: '${file.ext}',
-								size: ${file.size},
-								base64Image: '${file.base64Image}'
-							});
+									"originalFileName": "${file.originalFileName}",
+									"newFileName": "${file.newFileName}",
+									"ext": "${file.ext}",
+									"size": Number("${file.size}"),
+									"base64Image": "${file.base64Image}"
+								});
 								showFilePreview({
-									originalFileName: '${file.originalFileName}',
-								newFileName: '${file.newFileName}',
-								ext: '${file.ext}',
-								size: ${file.size},
-								base64Image: '${file.base64Image}'
-							});
+									"originalFileName": "${file.originalFileName}",
+									"newFileName": "${file.newFileName}",
+									"ext": "${file.ext}",
+									"size": Number("${file.size}"),
+									"base64Image": "${file.base64Image}"
+								});
 							</c:forEach>
 							updateFileText();
 						</c:if>
@@ -2335,17 +2337,17 @@
 						e.preventDefault();
 						e.stopPropagation();
 						$(this).removeClass('border-primary');
-						if (${ mode != 'advice' }) {
-						const files = e.originalEvent.dataTransfer.files;
-						handleFiles(files);
-					}
-				});
+						if (${isSameUser}) {
+							const files = e.originalEvent.dataTransfer.files;
+							handleFiles(files);
+						}
+					});
 				// 파일 처리 함수
 				function handleFiles(files) {
 					if (uploadedFiles.length + pendingFiles.length + files.length > MAX_FILES) {
 						showValidationModal("최대 10개의 파일만 업로드할 수 있습니다.");
-						return;
-					}
+							return;
+						}
 
 					Array.from(files).forEach(file => {
 						// 👉 이미지 파일이면 2.5MB 제한
@@ -2442,7 +2444,7 @@
 
 					let $deleteBtn = null;
 					let $downloadBtn = null;
-					if (${ mode != 'advice' }) {
+					if (${isSameUser}) {
 						$deleteBtn = $('<button>')
 							.addClass('btn btn-sm btn-danger ms-2')
 							.attr('type', 'button')
@@ -2455,7 +2457,7 @@
 					}
 
 					// a태그로 정적으로 서버 하드에 저장된 파일 다운로드 버튼
-					if (${ mode == 'advice' }) {
+					if (${!isSameUser}) {
 						$downloadBtn = $('<a>')
 							.addClass('btn btn-sm btn-primary ms-2')
 							.attr({
@@ -2612,7 +2614,7 @@
 						$majorItem.trigger('click');
 
 						// Ajax 완료 후 해당 소분류들 체크
-						$.ajax({
+									$.ajax({
 							url: "/resume/getSubCategory",
 							type: "GET",
 							data: { majorNo: majorNo },
@@ -2621,9 +2623,9 @@
 								for (let i = 0; i < subNos.length; i++) {
 									$(`#sub_${subNos[i]}`).prop('checked', true);
 								}
-							}
-						});
-					});
+										}
+									});
+								});
 
 					// 삭제 버튼 이벤트 처리
 					$('#selectedJobTypes').on('click', '.btn-close', function (e) {
@@ -2706,7 +2708,7 @@
 					const uid = urlParams.get('uid');
 					if (uid) {
 						window.location.href = '/submission/check?uid=' + uid;
-					} else {
+						} else {
 						window.location.href = '/resume/list';
 					}
 				});
@@ -2714,153 +2716,369 @@
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 첨삭 모드 첨부파일 기능
 				// 첨삭 모드 파일 업로드 관련 변수
-				let adviceFiles = [];
-				const maxFileSize = 10 * 1024 * 1024; // 10MB
-				const maxImageSize = 2.5 * 1024 * 1024; // 2.5MB
+				let uploadedAdviceFiles = [];
+				const MAX_ADVICE_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+				const MAX_ADVICE_FILES = 10;
+				// 삭제된 첨삭 파일 목록 초기화
+				let deletedAdviceFiles = [];
+				// 임시 저장된 첨삭 파일 목록 (서버에 아직 업로드되지 않은 파일)
+				let pendingAdviceFiles = [];
 
-				// 파일 선택 버튼 클릭 이벤트
+				// 페이지 로드 시 기존 첨삭 파일 표시
+				function initializeAdviceFiles() {
+					<c:if test="${not empty adviceFiles}">
+						<c:forEach var="file" items="${adviceFiles}">
+							uploadedAdviceFiles.push({
+								"originalFileName": "${file.originalFileName}",
+								"newFileName": "${file.newFileName}",
+								"ext": "${file.ext}",
+								"size": Number("${file.size}"),
+								"base64Image": "${file.base64Image}",
+								"adviceFileNo": Number("${file.adviceUpfileNo}")
+							});
+							showAdviceFilePreview({
+								"originalFileName": "${file.originalFileName}",
+								"newFileName": "${file.newFileName}",
+								"ext": "${file.ext}",
+								"size": Number("${file.size}"),
+								"base64Image": "${file.base64Image}",
+								"adviceFileNo": Number("${file.adviceUpfileNo}")
+							});
+						</c:forEach>
+						updateAdviceFileText();
+					</c:if>
+				}
+
+				// 페이지 로드 시 첨삭 파일 초기화
+				initializeAdviceFiles();
+
+				// 파일 입력 이벤트
 				$('#fileInput-advice').on('change', function (e) {
 					handleAdviceFiles(e.target.files);
 				});
 
 				// 드래그 앤 드롭 이벤트
-				$('#fileContainer-advice').on('dragover', function (e) {
+				$('#fileContainer-advice').on('dragenter dragover', function (e) {
 					e.preventDefault();
+					e.stopPropagation();
 					$(this).addClass('border-primary');
 				}).on('dragleave', function (e) {
 					e.preventDefault();
+					e.stopPropagation();
 					$(this).removeClass('border-primary');
 				}).on('drop', function (e) {
 					e.preventDefault();
+					e.stopPropagation();
 					$(this).removeClass('border-primary');
-					handleAdviceFiles(e.originalEvent.dataTransfer.files);
+					if (${!isSameUser}) {
+						const files = e.originalEvent.dataTransfer.files;
+						handleAdviceFiles(files);
+					}
 				});
 
-				// 파일 처리 함수
+				// 첨삭 파일 처리 함수
 				function handleAdviceFiles(files) {
+					if (uploadedAdviceFiles.length + pendingAdviceFiles.length + files.length > MAX_ADVICE_FILES) {
+						showValidationModal("최대 10개의 파일만 업로드할 수 있습니다.");
+						return;
+					}
+
 					Array.from(files).forEach(file => {
+						// 이미지 파일이면 2.5MB 제한
+						if (file.type.startsWith("image/") && file.size > 2.5 * 1024 * 1024) {
+							showValidationModal('이미지의 크기가 2.5MB를 초과합니다.');
+							return;
+						}
+
 						// 파일 크기 체크
-						if (file.size > maxFileSize) {
-							alert('파일 크기는 10MB를 초과할 수 없습니다.');
+						if (file.size > MAX_ADVICE_FILE_SIZE) {
+							showValidationModal(`파일의 크기가 10MB를 초과합니다.`);
 							return;
 						}
 
-						// 이미지 파일인 경우 2.5MB 제한
-						if (file.type.startsWith('image/') && file.size > maxImageSize) {
-							alert('이미지 파일은 2.5MB를 초과할 수 없습니다.');
+						// 중복 체크
+						if (uploadedAdviceFiles.some(f => f.originalFileName === file.name) ||
+							pendingAdviceFiles.some(f => f.originalFileName === file.name)) {
+							showValidationModal(`이미 업로드된 파일입니다.`);
 							return;
 						}
 
-						// 파일 추가
-						adviceFiles.push(file);
-						updateAdviceFilePreview();
+						// 파일 정보 생성
+						const fileInfo = {
+							file: file,
+							originalFileName: file.name,
+							ext: file.name.split('.').pop(),
+							size: file.size
+						};
+
+						// 대기 중인 파일 목록에 추가
+						pendingAdviceFiles.push(fileInfo);
+						// 미리보기 표시
+						showAdviceFilePreview(fileInfo);
+						updateAdviceFileText();
 					});
 				}
 
-				// 파일 미리보기 업데이트
-				function updateAdviceFilePreview() {
-					const container = $('#previewContainer-advice');
-					container.empty();
+				// 첨삭 파일 업로드 함수 (Promise 기반)
+				function uploadAdviceFile(fileInfo) {
+					return new Promise((resolve, reject) => {
+						const formData = new FormData();
+						formData.append("file", fileInfo.file);
 
-					adviceFiles.forEach((file, index) => {
-						const fileItem = $('<div>').addClass('d-flex align-items-center mb-2 p-2 border rounded');
+						$.ajax({
+							url: "/resume/uploadFile",
+							type: "POST",
+							data: formData,
+							processData: false,
+							contentType: false,
+							success: function (result) {
+								if (result.success) {
+									// 업로드된 파일 정보 저장
+									const uploadedFile = {
+										originalFileName: result.originalFileName,
+										newFileName: result.newFileName,
+										ext: result.ext,
+										size: result.size,
+										base64Image: result.base64Image,
+										status: 'SAVE'
+									};
+									uploadedAdviceFiles.push(uploadedFile);
+									resolve(uploadedFile);
+								} else {
+									reject(result.message || "파일 업로드에 실패했습니다.");
+								}
+							},
+							error: function () {
+								reject("파일 업로드 중 오류가 발생했습니다.");
+							}
+						});
+					});
+				}
 
-						// 파일 아이콘 또는 이미지 미리보기
-						$('<i>').addClass('bi bi-file-earmark me-2').appendTo(fileItem);
+				// 첨삭 파일 미리보기 표시
+				function showAdviceFilePreview(fileInfo) {
+					const $previewContainer = $('#previewContainer-advice');
 
-						// 파일명
-						$('<span>').text(file.name).addClass('flex-grow-1').appendTo(fileItem);
+					const $preview = $('<div>')
+						.addClass('file-preview d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded')
+						.attr('data-filename', fileInfo.originalFileName);
 
-						// 삭제 버튼
-						$('<button>')
-							.addClass('btn btn-sm btn-outline-danger ms-2')
-							.html('<i class="bi bi-x"></i>')
-							.on('click', function () {
-								adviceFiles.splice(index, 1);
-								updateAdviceFilePreview();
+					// 파일 정보 표시
+					const $fileInfo = $('<div>').addClass('d-flex align-items-center');
+
+					// 파일 아이콘
+					const $icon = $('<i>').addClass('bi bi-file-earmark me-2');
+
+					// 파일명과 크기
+					const $details = $('<div>');
+					$details.append($('<div>').text(fileInfo.originalFileName).css('word-break', 'break-all'));
+					$details.append($('<small>').addClass('text-muted').text(formatFileSize(fileInfo.size)));
+
+					$fileInfo.append($icon).append($details);
+
+					let $deleteBtn = null;
+					let $downloadBtn = null;
+
+					if (${!isSameUser}) {
+						$deleteBtn = $('<button>')
+							.addClass('btn btn-sm btn-danger ms-2')
+							.attr('type', 'button')
+							.html('<i class="bi bi-trash"></i>')
+							.on('click', function (e) {
+								e.preventDefault();
+								e.stopPropagation();
+								deleteAdviceFile(fileInfo.originalFileName, $preview);
+							});
+					}
+
+					// a태그로 정적으로 서버 하드에 저장된 파일 다운로드 버튼
+					if (${isSameUser}) {
+						$downloadBtn = $('<a>')
+							.addClass('btn btn-sm btn-primary ms-2')
+							.attr({
+								'href': '/resources/resumeUpfiles/' + fileInfo.newFileName,
+								'download': fileInfo.originalFileName
 							})
-							.appendTo(fileItem);
+							.html('<i class="bi bi-download"></i>');
+					}
 
-						container.append(fileItem);
+					$preview.append($fileInfo).append($deleteBtn).append($downloadBtn);
+					$previewContainer.append($preview);
+				}
+
+				// 첨삭 파일 삭제 함수
+				function deleteAdviceFile(fileName, $preview) {
+					const uploadedFile = uploadedAdviceFiles.find(function (f) {
+						return f.originalFileName === fileName;
+					});
+					const pendingFile = pendingAdviceFiles.find(function (f) {
+						return f.originalFileName === fileName;
 					});
 
-					// 파일이 없을 경우 안내 메시지 표시
-					$('.advice-file-text').toggle(adviceFiles.length === 0);
-				}
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// 첨삭 모드 첨삭 의견 글자 수
-				$('#adviceTextarea').on('input', function () {
-					const currentLength = $(this).val().length;
-					const maxLength = 3000;
-					const remainingLength = maxLength - currentLength;
-					$('#adviceCharCount').text(currentLength + ' / ' + maxLength);
-				});
+					if (uploadedFile) {
+						// 업로드된 파일인 경우
+						uploadedAdviceFiles = uploadedAdviceFiles.filter(function (f) {
+							return f.originalFileName !== fileName;
+						});
+						$preview.remove();
+						updateAdviceFileText();
 
-				//---------------------------------------------------------------------------------------------------------------------------------
+						// 삭제된 파일 목록에 추가
+						if (!deletedAdviceFiles.includes(uploadedFile.newFileName)) {
+							deletedAdviceFiles.push(uploadedFile.newFileName);
+						}
+					} else if (pendingFile) {
+						// 대기 중인 파일인 경우
+						pendingAdviceFiles = pendingAdviceFiles.filter(f => f.originalFileName !== fileName);
+						$preview.remove();
+						updateAdviceFileText();
+					}
+				}
+
+				// 첨삭 파일 텍스트 업데이트
+				function updateAdviceFileText() {
+					const $fileText = $('.advice-file-text');
+					if (uploadedAdviceFiles.length + pendingAdviceFiles.length > 0) {
+						$fileText.hide();
+					} else {
+						$fileText.show();
+					}
+				}
+
 				// 첨삭 모드 저장 버튼
 				$('#adviceSaveBtn').on('click', async function () {
 					const adviceContent = $('#adviceTextarea').val();
-					const files = adviceFiles;
 
 					// 첨삭 의견 유효성
 					if (adviceContent.trim() === '') {
-						alert('첨삭 의견을 입력해주세요.');
+						showValidationModal('첨삭 의견을 입력해주세요.');
 						return;
 					}
 
 					try {
-						// 첨부파일 업로드
-						const uploadPromises = files.map(file => {
-							const formData = new FormData();
-							formData.append("file", file);
-
-							return $.ajax({
-								url: '/resume/uploadFile',
-								type: 'POST',
-								data: formData,
-								processData: false,
-								contentType: false
+						// 삭제된 첨삭 파일이 있으면 서버에 삭제 요청
+						if (deletedAdviceFiles.length > 0) {
+							let deletePromises = deletedAdviceFiles.map(function (fileName) {
+								return new Promise(function (resolve, reject) {
+									$.ajax({
+										url: "/resume/deleteFile",
+										type: "POST",
+										data: JSON.stringify({
+											originalFileName: fileName,
+											newFileName: fileName,
+											ext: fileName.split('.').pop(),
+											size: 0,
+											fileType: 'advice'
+										}),
+										contentType: "application/json",
+										success: function (result) {
+											if (result.success) {
+												resolve();
+											} else {
+												reject(result.message || "파일 삭제에 실패했습니다.");
+											}
+										},
+										error: function () {
+											reject("파일 삭제 중 오류가 발생했습니다.");
+										}
+									});
+								});
 							});
-						});
 
-						const uploadResults = await Promise.all(uploadPromises);
+							await Promise.all(deletePromises);
+							console.log("모든 첨삭 파일 삭제 성공");
+						}
+
+						// 대기 중인 첨삭 파일들을 서버에 업로드
+						if (pendingAdviceFiles.length > 0) {
+							const uploadPromises = pendingAdviceFiles.map(fileInfo => uploadAdviceFile(fileInfo));
+							const uploadResults = await Promise.all(uploadPromises);
+							console.log("모든 첨삭 파일 업로드 성공");
+							pendingAdviceFiles = [];
+						}
 
 						// 첨삭 내용과 파일 정보 저장
 						const adviceData = {
 							mentorUid: $('#userUid').val(),
-							resumeNo: ${ resumeDetail.resume.resumeNo },
+							resumeNo: ${resumeDetail.resume.resumeNo},
 							adviceContent: adviceContent,
-							files: uploadResults.map(result => ({
-								adviceFileName: result.newFileName,
-								originalFileName: result.originalFileName
-							}))
-					};
+							files: uploadedAdviceFiles.map(function(file) {
+								return {
+									newFileName: file.newFileName,
+									originalFileName: file.originalFileName,
+									ext: file.ext,
+									size: file.size,
+									base64Image: file.base64Image,
+									status: file.status
+								};
+							})
+						};
 
-					console.log(adviceData);
-
-					// 첨삭 저장 요청
-					$.ajax({
-						url: '/resume/advice/save',
-						type: 'POST',
-						contentType: 'application/json',
-						data: JSON.stringify(adviceData),
-						success: function (response) {
-							if (response.success) {
-								alert('첨삭이 저장되었습니다.');
-								window.location.href = '/resume/list';
-							} else {
-								alert('첨삭 저장에 실패했습니다.');
+						// 첨삭 저장 요청
+						$.ajax({
+							url: '/resume/advice/save',
+							type: 'POST',
+							contentType: 'application/json',
+							data: JSON.stringify(adviceData),
+							success: function (response) {
+								if (response.success) {
+									showValidationModal('첨삭이 저장되었습니다.');
+									setTimeout(() => {
+										window.location.href = '/resume/list';
+									}, 1500);
+								} else {
+									showValidationModal('첨삭 저장에 실패했습니다.');
+								}
+							},
+							error: function (error) {
+								console.error('첨삭 저장 중 오류 발생:', error);
+								showValidationModal('첨삭 저장 중 오류가 발생했습니다.');
 							}
-						},
-						error: function (error) {
-							console.error('첨삭 저장 중 오류 발생:', error);
-							alert('첨삭 저장 중 오류가 발생했습니다.');
-						}
-					});
-				} catch (error) {
-					console.error('파일 업로드 중 오류 발생:', error);
-					alert('파일 업로드 중 오류가 발생했습니다.');
-				}
+						});
+					} catch (error) {
+						console.error('파일 처리 중 오류 발생:', error);
+						showValidationModal('파일 처리 중 오류가 발생했습니다.');
+					}
+				});
+
+				// 첨삭 파일 삭제 기능
+				$(document).on('click', '.delete-advice-file', function() {
+					const adviceFileNo = $(this).data('advice-file-no');
+					const adviceFileName = $(this).data('advice-file-name');
+					const originalFileName = $(this).data('original-file-name');
+					const $fileItem = $(this).closest('.d-flex');
+					
+					if (confirm('이 첨삭 파일을 삭제하시겠습니까?')) {
+						// 서버에서 파일 삭제 요청
+						$.ajax({
+							url: '/resume/deleteFile',
+							type: 'POST',
+							data: {
+								fileNo: adviceFileNo,
+								fileName: adviceFileName,
+								originalFileName: originalFileName,
+								fileType: 'advice'
+							},
+							success: function(response) {
+								if (response.success) {
+									// UI에서 파일 항목 제거
+									$fileItem.remove();
+									
+									// 파일이 없을 경우 안내 메시지 표시
+									if ($('#previewContainer-advice .d-flex').length === 0) {
+										$('.advice-file-text').show();
+									}
+									
+									alert('첨삭 파일이 삭제되었습니다.');
+								} else {
+									alert('첨삭 파일 삭제에 실패했습니다: ' + response.message);
+								}
+							},
+							error: function() {
+								alert('첨삭 파일 삭제 중 오류가 발생했습니다.');
+							}
+						});
+					}
 				});
 
 		});
