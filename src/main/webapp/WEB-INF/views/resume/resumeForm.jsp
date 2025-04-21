@@ -16,7 +16,12 @@
 			<jsp:include page="/WEB-INF/views/header.jsp" />
 
 			<div class="container my-5">
-				<h2 class="mb-4">이력서 작성</h2>
+				<c:if test="${mode == 'advice'}">
+					<h2 class="mb-4">[${resumeDetail.resume.title}] 이력서 첨삭</h2>
+				</c:if>
+				<c:if test="${mode != 'advice'}">
+					<h2 class="mb-4">이력서 작성</h2>
+				</c:if>
 
 				<form id="resumeForm" method="post" enctype="multipart/form-data">
 
@@ -28,8 +33,16 @@
 						<div class="card-body">
 							<div class="input-group">
 								<span class="input-group-text bg-light"> <i class="bi bi-pencil-square"></i>
-								</span> <input type="text" class="form-control form-control-lg" id="title" name="title"
-									placeholder="예: 자바 개발자 지원" maxlength="30" value="${resumeDetail.resume.title}">
+								</span>
+								<c:if test="${mode == 'advice'}">
+									<input type="text" class="form-control form-control-lg" id="title" name="title"
+										placeholder="예: 자바 개발자 지원" maxlength="30" value="${resumeDetail.resume.title}"
+										readonly>
+								</c:if>
+								<c:if test="${mode != 'advice'}">
+									<input type="text" class="form-control form-control-lg" id="title" name="title"
+										placeholder="예: 자바 개발자 지원" maxlength="30" value="${resumeDetail.resume.title}">
+								</c:if>
 							</div>
 							<div class="d-flex justify-content-between mt-2">
 								<small class="text-muted">* 이력서의 제목을 입력해 주세요.</small> <small class="text-muted"><span
@@ -51,17 +64,22 @@
 										style="height: 200px; background-color: #f8f9fa;">
 										<input type="file" id="photoUpload" style="display: none;" accept="image/*">
 										<label for="photoUpload" class="text-center" style="cursor: pointer;">
-											<i class="bi bi-plus-circle"
-												style="font-size: 2rem; color: #6c757d;"></i><br>
-											증명 사진 등록<span class="essentialPoint">*</span>
+											<c:if test="${mode != 'advice'}">
+												<i class="bi bi-plus-circle"
+													style="font-size: 2rem; color: #6c757d;"></i><br>
+												증명 사진 등록<span class="essentialPoint">*</span>
+											</c:if>
 										</label>
+
 										<img id="photoPreview" src="#" alt="사진 미리보기"
 											style="display: none; max-height: 100%; max-width: 100%;" />
-										<button type="button"
-											class="btn-close position-absolute top-0 end-0 m-2 pCloseBtn"
-											id="removePhoto"
-											style="display: none; background-color: #47B2E4; border-radius: 50%; padding: 8px; border: 1px solid #37517E; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-										</button>
+										<c:if test="${mode != 'advice'}">
+											<button type="button"
+												class="btn-close position-absolute top-0 end-0 m-2 pCloseBtn"
+												id="removePhoto"
+												style="display: none; background-color: #47B2E4; border-radius: 50%; padding: 8px; border: 1px solid #37517E; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+											</button>
+										</c:if>
 									</div>
 								</div>
 								<input type="hidden" id="profileBase64" name="profileBase64" />
@@ -120,9 +138,12 @@
 														<c:set var="isChecked" value="true" />
 													</c:if>
 												</c:forEach>
+												<!-- 조건: mode가 'advice'이면 disabled 속성 추가 -->
 												<input class="form-check-input" type="checkbox" name="jobForm"
 													value="${jobForm.name()}" id="${jobForm.name()}" ${isChecked
-													? 'checked' : '' }> <label class="form-check-label"
+													? 'checked' : '' } <c:if test="${mode == 'advice'}">disabled</c:if>
+												/>
+												<label class="form-check-label"
 													for="${jobForm.name()}">${jobForm.displayName}</label>
 											</div>
 										</c:forEach>
@@ -144,28 +165,32 @@
 										<label class="form-label me-3">급여 방식</label>
 										<div class="form-check form-check-inline">
 											<input class="form-check-input" type="radio" name="payType" value="시급"
-												id="hourly" ${resumeDetail.resume.payType=='시급' ? 'checked' : '' }>
+												id="hourly" ${resumeDetail.resume.payType=='시급' ? 'checked' : '' } <c:if
+												test="${mode == 'advice'}">disabled</c:if> />
 											<label class="form-check-label" for="hourly">시급</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<input class="form-check-input" type="radio" name="payType" value="일급"
-												id="daily" ${resumeDetail.resume.payType=='일급' ? 'checked' : '' }>
+												id="daily" ${resumeDetail.resume.payType=='일급' ? 'checked' : '' } <c:if
+												test="${mode == 'advice'}">disabled</c:if> />
 											<label class="form-check-label" for="daily">일급</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<input class="form-check-input" type="radio" name="payType" value="월급"
-												id="monthly" ${resumeDetail.resume.payType=='월급' ? 'checked' : '' }>
+												id="monthly" ${resumeDetail.resume.payType=='월급' ? 'checked' : '' }
+												<c:if test="${mode == 'advice'}">disabled</c:if> />
 											<label class="form-check-label" for="monthly">월급</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<input class="form-check-input" type="radio" name="payType" value="연봉"
-												id="yearly" ${resumeDetail.resume.payType=='연봉' ? 'checked' : '' }>
+												id="yearly" ${resumeDetail.resume.payType=='연봉' ? 'checked' : '' } <c:if
+												test="${mode == 'advice'}">disabled</c:if> />
 											<label class="form-check-label" for="yearly">연봉</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<input class="form-check-input" type="radio" name="payType" value="협의 후 결정"
 												id="negotiable" ${resumeDetail.resume.payType=='협의 후 결정' ? 'checked'
-												: '' }>
+												: '' } <c:if test="${mode == 'advice'}">disabled</c:if> />
 											<label class="form-check-label" for="negotiable">협의 후
 												결정</label>
 										</div>
@@ -175,7 +200,7 @@
 									<input type="text" class="form-control text-end" id="payAmount" name="pay"
 										placeholder="금액 입력(숫자만 입력 가능해요)" maxlength="11"
 										value="${resumeDetail.resume.pay}" ${resumeDetail.resume.payType=='협의 후 결정'
-										? 'disabled' : '' }>
+										? 'disabled' : '' } <c:if test="${mode == 'advice'}">disabled</c:if> />
 									<span class="ms-2">원</span>
 								</div>
 							</div>
@@ -191,37 +216,44 @@
 						<div class="card-body">
 							<div class="row">
 								<!-- 시/도 목록 -->
-								<div class="col-md-4">
-									<div class="region-list-container"
-										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-										<ul class="list-group" id="regionList">
-											<c:forEach var="region" items="${regionList}">
-												<li class="list-group-item region-item"
-													data-region="${region.regionNo}">${region.name}▶</li>
-											</c:forEach>
-										</ul>
+								<c:if test="${mode != 'advice'}">
+									<div class="col-md-4">
+										<div class="region-list-container"
+											style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+											<ul class="list-group" id="regionList">
+												<c:forEach var="region" items="${regionList}">
+													<li class="list-group-item region-item"
+														data-region="${region.regionNo}">${region.name}▶</li>
+												</c:forEach>
+											</ul>
+										</div>
 									</div>
-								</div>
-
+								</c:if>
 								<!-- 시/군/구 목록 -->
-								<div class="col-md-4">
-									<div class="sigungu-list-container"
-										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-										<ul class="list-group" id="sigunguList">
-											<li class="list-group-item text-muted">시/도를 선택하세요</li>
-										</ul>
+								<c:if test="${mode != 'advice'}">
+									<div class="col-md-4">
+										<div class="sigungu-list-container"
+											style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+											<ul class="list-group" id="sigunguList">
+												<li class="list-group-item text-muted">시/도를 선택하세요</li>
+											</ul>
+										</div>
 									</div>
-								</div>
+								</c:if>
 
 								<!-- 선택한 지역 표시 영역 -->
 								<div class="col-md-4">
-									<label class="form-label">선택한 지역</label>
+									<c:if test="${mode != 'advice'}">
+										<label class="form-label">선택한 지역</label>
+									</c:if>
 									<div id="selectedRegions" class="mt-2">
 										<c:forEach var="selectedRegion" items="${selectedSigungu}">
 											<span class="badge bg-primary me-2" data-region="${selectedRegion.regionNo}"
 												data-sigungu="${selectedRegion.sigunguNo}">
 												${selectedRegion.regionName} ${selectedRegion.name}
-												<button class="btn-close ms-2" aria-label="삭제"></button>
+												<c:if test="${mode != 'advice'}">
+													<button class="btn-close ms-2" aria-label="삭제"></button>
+												</c:if>
 											</span>
 										</c:forEach>
 									</div>
@@ -238,31 +270,37 @@
 						<div class="card-body">
 							<div class="row">
 								<!-- 대분류 목록 -->
-								<div class="col-md-4">
-									<div class="major-list-container"
-										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-										<ul class="list-group" id="majorCategoryList">
-											<c:forEach var="major" items="${majorList}">
-												<li class="list-group-item major-item"
-													data-major="${major.majorcategoryNo}">${major.jobName}▶</li>
-											</c:forEach>
-										</ul>
+								<c:if test="${mode != 'advice'}">
+									<div class="col-md-4">
+										<div class="major-list-container"
+											style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+											<ul class="list-group" id="majorCategoryList">
+												<c:forEach var="major" items="${majorList}">
+													<li class="list-group-item major-item"
+														data-major="${major.majorcategoryNo}">${major.jobName}▶</li>
+												</c:forEach>
+											</ul>
+										</div>
 									</div>
-								</div>
+								</c:if>
 
 								<!-- 소분류 목록 -->
-								<div class="col-md-4">
-									<div class="sub-list-container"
-										style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
-										<ul class="list-group" id="subCategoryList">
-											<li class="list-group-item text-muted">대분류를 선택하세요</li>
-										</ul>
+								<c:if test="${mode != 'advice'}">
+									<div class="col-md-4">
+										<div class="sub-list-container"
+											style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+											<ul class="list-group" id="subCategoryList">
+												<li class="list-group-item text-muted">대분류를 선택하세요</li>
+											</ul>
+										</div>
 									</div>
-								</div>
+								</c:if>
 
 								<!-- 선택한 업직종 표시 영역 -->
 								<div class="col-md-4">
-									<label class="form-label">선택한 업직종</label>
+									<c:if test="${mode != 'advice'}">
+										<label class="form-label">선택한 업직종</label>
+									</c:if>
 									<div id="selectedJobTypes" class="mt-2">
 										<!-- 디버깅 -->
 										<!-- <c:if test="${empty selectedSubCategory}">
@@ -275,7 +313,9 @@
 												data-major="${selectedJob.majorCategoryNo}"
 												data-sub="${selectedJob.subcategoryNo}">
 												${selectedJob.jobName}
-												<button class="btn-close ms-2" aria-label="삭제"></button>
+												<c:if test="${mode != 'advice'}">
+													<button class="btn-close ms-2" aria-label="삭제"></button>
+												</c:if>
 											</span>
 										</c:forEach>
 									</div>
@@ -288,15 +328,19 @@
 					<div class="card mb-4">
 						<div class="card-header d-flex justify-content-between align-items-center">
 							<span id=myMerits>성격 및 강점<span class="essentialPoint">*</span></span>
-							<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-								data-bs-target="#meritModal">추가하기</button>
+							<c:if test="${mode != 'advice'}">
+								<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+									data-bs-target="#meritModal">추가하기</button>
+							</c:if>
 						</div>
 						<div class="card-body">
 							<div id="selectedMerits" class="mt-2">
 								<c:forEach var="merit" items="${resumeDetail.merits}">
 									<span class="badge bg-primary me-2 mb-2" data-merit="${merit.meritContent}">
 										${merit.meritContent}
-										<button class="btn-close ms-2" aria-label="삭제"></button>
+										<c:if test="${mode != 'advice'}">
+											<button class="btn-close ms-2" aria-label="삭제"></button>
+										</c:if>
 									</span>
 								</c:forEach>
 							</div>
@@ -405,7 +449,9 @@
 					<div class="card mb-4">
 						<div class="card-header d-flex justify-content-between align-items-center" id="myEducationBox">
 							<span>학력사항</span>
-							<button type="button" class="btn btn-primary btn-sm" id="addEducationBtn">추가하기</button>
+							<c:if test="${mode != 'advice'}">
+								<button type="button" class="btn btn-primary btn-sm" id="addEducationBtn">추가하기</button>
+							</c:if>
 						</div>
 						<div class="card-body">
 							<div id="educationContainer">
@@ -419,8 +465,11 @@
 					<template id="educationTemplate">
 						<div class="education-item border rounded p-3 mb-3 position-relative">
 							<!-- 삭제 버튼 (X) -->
-							<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-education"
-								aria-label="삭제"></button>
+							<c:if test="${mode != 'advice'}">
+								<button type="button"
+									class="btn-close position-absolute top-0 end-0 m-3 remove-education"
+									aria-label="삭제"></button>
+							</c:if>
 							<div class="row g-3">
 								<!-- 학력 레벨 선택 -->
 								<div class="col-md-4">
@@ -469,7 +518,9 @@
 					<div class="card mb-4">
 						<div class="card-header d-flex justify-content-between align-items-center" id="myHistoryBox">
 							<span>경력사항</span>
-							<button type="button" class="btn btn-primary btn-sm" id="addHistoryBtn">추가하기</button>
+							<c:if test="${mode != 'advice'}">
+								<button type="button" class="btn btn-primary btn-sm" id="addHistoryBtn">추가하기</button>
+							</c:if>
 						</div>
 						<div class="card-body">
 							<div id="historyContainer">
@@ -488,8 +539,10 @@
 					<template id="historyTemplate">
 						<div class="history-item border rounded p-3 mb-3 position-relative">
 							<!-- 삭제 버튼 (X) -->
-							<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-history"
-								aria-label="삭제"></button>
+							<c:if test="${mode != 'advice'}">
+								<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-history"
+									aria-label="삭제"></button>
+							</c:if>
 							<div class="row g-3">
 								<!-- 회사명 입력 -->
 								<div class="col-md-6">
@@ -546,7 +599,9 @@
 					<div class="card mb-4">
 						<div class="card-header d-flex justify-content-between align-items-center" id="myLicenseBox">
 							<span>자격증</span>
-							<button type="button" class="btn btn-primary btn-sm" id="addLicenseBtn">추가하기</button>
+							<c:if test="${mode != 'advice'}">
+								<button type="button" class="btn btn-primary btn-sm" id="addLicenseBtn">추가하기</button>
+							</c:if>
 						</div>
 						<div class="card-body">
 							<div id="licenseContainer">
@@ -560,8 +615,10 @@
 					<template id="licenseTemplate">
 						<div class="license-item border rounded p-3 mb-3 position-relative">
 							<!-- 삭제 버튼 (X) -->
-							<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-license"
-								aria-label="삭제"></button>
+							<c:if test="${mode != 'advice'}">
+								<button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-license"
+									aria-label="삭제"></button>
+							</c:if>
 							<div class="row g-3">
 								<!-- 자격증명 입력 -->
 								<div class="col-md-6">
@@ -597,7 +654,8 @@
 						</div>
 						<div class="card-body">
 							<textarea class="form-control" id="selfIntroTextarea" rows="8"
-								placeholder="자기소개를 입력하세요(최대 1000자)" maxlength="1000"></textarea>
+								placeholder="자기소개를 입력하세요(최대 1000자)" maxlength="1000" <c:if
+								test="${mode == 'advice'}">readonly</c:if>></textarea>
 							<div class="text-end">
 								<span id="charCount" class="text-muted">0 / 1000</span>
 							</div>
@@ -608,14 +666,25 @@
 					<!-- 파일 첨부 -->
 					<div class="card mb-4">
 						<div class="card-header d-flex justify-content-between align-items-center">
-							<span>첨부파일</span> <label for="fileInput" class="btn btn-primary btn-sm mb-0">파일 선택</label>
-							<input type="file" id="fileInput" style="display: none;" multiple>
+							<span>첨부파일</span>
+							<c:if test="${mode != 'advice'}">
+								<label for="fileInput" class="btn btn-primary btn-sm mb-0">파일
+									선택</label>
+								<input type="file" id="fileInput" style="display: none;" multiple>
+							</c:if>
 						</div>
 						<div class="card-body">
 							<div id="fileContainer" class="border rounded p-3">
-								<div class="text-center text-muted fileText">
-									여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br> (최대 10MB)
-								</div>
+								<c:if test="${mode != 'advice'}">
+									<div class="text-center text-muted fileText">
+										여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br> (최대 10MB)
+									</div>
+								</c:if>
+								<c:if test="${mode == 'advice'}">
+									<div class="text-center text-muted fileText">
+										첨부 된 파일이 없습니다.
+									</div>
+								</c:if>
 								<div id="previewContainer" class="mt-3"></div>
 							</div>
 							<small class="text-muted">* 자격증명서, 졸업증명서 등 첨부 가능합니다.</small><br>
@@ -623,6 +692,45 @@
 							<small class="text-muted">* 이미지 파일은 2.5MB 이하로 압축 후 업로드 해주세요.</small>
 						</div>
 					</div>
+
+					<!-- 첨삭 의견 입력란 -->
+					<c:if test="${mode == 'advice'}">
+						<div class="card mb-4">
+							<div class="card-header-advice d-flex justify-content-between align-items-center">
+								<span>첨삭 의견</span>
+							</div>
+							<div class="card-body">
+								<textarea class="form-control" id="adviceTextarea" rows="15"
+									placeholder="이력서에 대한 첨삭 의견을 입력하세요(최대 3000자)" maxlength="3000"></textarea>
+								<div class="text-end">
+									<span id="adviceCharCount" class="text-muted">0 / 3000</span>
+								</div>
+							</div>
+						</div>
+					</c:if>
+
+					<!-- 첨삭 전용 파일 첨부 -->
+					<c:if test="${mode == 'advice'}">
+						<div class="card mb-4">
+							<div class="card-header-advice d-flex justify-content-between align-items-center">
+								<span>첨삭 전용 파일 첨부</span>
+								<label for="fileInput-advice" class="btn btn-sm mb-0 advice-file-input">파일
+									선택</label>
+								<input type="file" id="fileInput-advice" style="display: none;" multiple>
+							</div>
+							<div class="card-body">
+								<div id="fileContainer-advice" class="border rounded p-3">
+									<div class="text-center text-muted advice-file-text">
+										여기에 파일을 드래그하거나 '파일 선택' 버튼을 클릭하세요.<br> (최대 10MB)
+									</div>
+									<div id="previewContainer-advice" class="mt-3"></div>
+								</div>
+								<small class="text-muted">* 이미지 외 파일은 10MB 까지 업로드 가능합니다.</small><br>
+								<small class="text-muted">* 이미지 파일은 2.5MB 이하로 압축 후 업로드 해주세요.</small>
+							</div>
+						</div>
+					</c:if>
+
 
 					<!-- 저장 버튼 -->
 					<button type="button" class="btn btn-primary" id="finalSaveBtn"><span class="btn-text">저장하기</span>
@@ -726,6 +834,18 @@
 				justify-content: space-between;
 			}
 
+			.card-header-advice {
+				background: #47B2E4;
+				color: white;
+				font-weight: 600;
+				padding: 0.75rem 1rem;
+				border-radius: 8px 8px 0 0 !important;
+				min-height: 45px;
+				display: inline-block;
+				align-items: center;
+				justify-content: space-between;
+			}
+
 			.card-body {
 				padding: 1.5rem;
 			}
@@ -766,6 +886,16 @@
 
 			.btn-primary:hover {
 				background: color-mix(in srgb, var(--accent-color), transparent 15%);
+				transform: translateY(-2px);
+			}
+
+			.advice-file-input {
+				background: #37517E;
+				color: white;
+			}
+
+			.advice-file-input:hover {
+				background: color-mix(in srgb, #37517E, transparent 15%);
 				transform: translateY(-2px);
 			}
 
@@ -2157,113 +2287,115 @@
 					e.preventDefault();
 					e.stopPropagation();
 					$(this).removeClass('border-primary');
-
+					if (${ mode != 'advice' }) {
 					const files = e.originalEvent.dataTransfer.files;
 					handleFiles(files);
-				});
+				}
+			});
+			// 파일 처리 함수
+			function handleFiles(files) {
+				if (uploadedFiles.length + pendingFiles.length + files.length > MAX_FILES) {
+					showValidationModal("최대 10개의 파일만 업로드할 수 있습니다.");
+					return;
+				}
 
-				// 파일 처리 함수
-				function handleFiles(files) {
-					if (uploadedFiles.length + pendingFiles.length + files.length > MAX_FILES) {
-						showValidationModal("최대 10개의 파일만 업로드할 수 있습니다.");
+				Array.from(files).forEach(file => {
+					// 👉 이미지 파일이면 2.5MB 제한
+					if (file.type.startsWith("image/") && file.size > 2.5 * 1024 * 1024) {
+						showValidationModal('이미지의 크기가 2.5MB를 초과합니다.');
 						return;
 					}
 
-					Array.from(files).forEach(file => {
-						// 👉 이미지 파일이면 2.5MB 제한
-						if (file.type.startsWith("image/") && file.size > 2.5 * 1024 * 1024) {
-							showValidationModal('이미지의 크기가 2.5MB를 초과합니다.');
-							return;
-						}
+					// 파일 크기 체크
+					if (file.size > MAX_FILE_SIZE) {
+						showValidationModal(`파일의 크기가 10MB를 초과합니다.`);
+						return;
+					}
 
-						// 파일 크기 체크
-						if (file.size > MAX_FILE_SIZE) {
-							showValidationModal(`파일의 크기가 10MB를 초과합니다.`);
-							return;
-						}
-
-						// 중복 체크 (업로드된 파일과 대기 중인 파일 모두 확인 some() -> 배열에 조건에 맞는 요소가 있는지 확인)
-						if (uploadedFiles.some(f => f.originalFileName === file.name) ||
-							pendingFiles.some(f => f.originalFileName === file.name)) {
-							showValidationModal(`이미 업로드된 파일입니다.`);
-							return;
-						}
+					// 중복 체크 (업로드된 파일과 대기 중인 파일 모두 확인 some() -> 배열에 조건에 맞는 요소가 있는지 확인)
+					if (uploadedFiles.some(f => f.originalFileName === file.name) ||
+						pendingFiles.some(f => f.originalFileName === file.name)) {
+						showValidationModal(`이미 업로드된 파일입니다.`);
+						return;
+					}
 
 
-						// 파일 정보 생성
-						const fileInfo = {
-							file: file,
-							originalFileName: file.name,
-							ext: file.name.split('.').pop(),
-							size: file.size
-						};
+					// 파일 정보 생성
+					const fileInfo = {
+						file: file,
+						originalFileName: file.name,
+						ext: file.name.split('.').pop(),
+						size: file.size
+					};
 
-						// 대기 중인 파일 목록에 추가
-						pendingFiles.push(fileInfo);
-						// 미리보기 표시
-						showFilePreview(fileInfo);
-						updateFileText();
-					});
-				}
+					// 대기 중인 파일 목록에 추가
+					pendingFiles.push(fileInfo);
+					// 미리보기 표시
+					showFilePreview(fileInfo);
+					updateFileText();
+				});
+			}
 
-				// 파일 업로드 함수 (Promise 기반)
-				function uploadFile(fileInfo) {
-					return new Promise((resolve, reject) => {
-						const formData = new FormData();
-						formData.append("file", fileInfo.file);
+			// 파일 업로드 함수 (Promise 기반)
+			function uploadFile(fileInfo) {
+				return new Promise((resolve, reject) => {
+					const formData = new FormData();
+					formData.append("file", fileInfo.file);
 
-						$.ajax({
-							url: "/resume/uploadFile",
-							type: "POST",
-							data: formData,
-							processData: false,
-							contentType: false,
-							success: function (result) {
-								if (result.success) {
-									// 업로드된 파일 정보 저장
-									const uploadedFile = {
-										originalFileName: result.originalFileName,
-										newFileName: result.newFileName,
-										ext: result.ext,
-										size: result.size,
-										base64Image: result.base64Image
-									};
-									uploadedFiles.push(uploadedFile);
-									resolve(uploadedFile);
-								} else {
-									reject(result.message || "파일 업로드에 실패했습니다.");
-								}
-							},
-							error: function () {
-								reject("파일 업로드 중 오류가 발생했습니다.");
+					$.ajax({
+						url: "/resume/uploadFile",
+						type: "POST",
+						data: formData,
+						processData: false,
+						contentType: false,
+						success: function (result) {
+							if (result.success) {
+								// 업로드된 파일 정보 저장
+								const uploadedFile = {
+									originalFileName: result.originalFileName,
+									newFileName: result.newFileName,
+									ext: result.ext,
+									size: result.size,
+									base64Image: result.base64Image
+								};
+								uploadedFiles.push(uploadedFile);
+								resolve(uploadedFile);
+							} else {
+								reject(result.message || "파일 업로드에 실패했습니다.");
 							}
-						});
+						},
+						error: function () {
+							reject("파일 업로드 중 오류가 발생했습니다.");
+						}
 					});
-				}
+				});
+			}
 
-				// 파일 미리보기 표시
-				function showFilePreview(fileInfo) {
-					const $previewContainer = $('#previewContainer');
+			// 파일 미리보기 표시
+			function showFilePreview(fileInfo) {
+				const $previewContainer = $('#previewContainer');
 
-					const $preview = $('<div>')
-						.addClass('file-preview d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded')
-						.attr('data-filename', fileInfo.originalFileName);
+				const $preview = $('<div>')
+					.addClass('file-preview d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded')
+					.attr('data-filename', fileInfo.originalFileName);
 
-					// 파일 정보 표시
-					const $fileInfo = $('<div>').addClass('d-flex align-items-center');
+				// 파일 정보 표시
+				const $fileInfo = $('<div>').addClass('d-flex align-items-center');
 
-					// 파일 아이콘 (확장자에 따라 다르게 표시 가능)
-					const $icon = $('<i>').addClass('bi bi-file-earmark me-2');
+				// 파일 아이콘 (확장자에 따라 다르게 표시 가능)
+				const $icon = $('<i>').addClass('bi bi-file-earmark me-2');
 
-					// 파일명과 크기
-					const $details = $('<div>');
-					$details.append($('<div>').text(fileInfo.originalFileName).css('word-break', 'break-all'));
-					$details.append($('<small>').addClass('text-muted').text(formatFileSize(fileInfo.size)));
+				// 파일명과 크기
+				const $details = $('<div>');
+				$details.append($('<div>').text(fileInfo.originalFileName).css('word-break', 'break-all'));
+				$details.append($('<small>').addClass('text-muted').text(formatFileSize(fileInfo.size)));
 
-					$fileInfo.append($icon).append($details);
+				$fileInfo.append($icon).append($details);
 
-					// 삭제 버튼
-					const $deleteBtn = $('<button>')
+				let $deleteBtn = null;
+				let $downloadBtn = null;
+				if (${ mode != 'advice' }) {
+					$deleteBtn = $('<button>')
 						.addClass('btn btn-sm btn-danger ms-2')
 						.attr('type', 'button')
 						.html('<i class="bi bi-trash"></i>')
@@ -2272,252 +2404,351 @@
 							e.stopPropagation();
 							deleteFile(fileInfo.originalFileName, $preview);
 						});
-
-					$preview.append($fileInfo).append($deleteBtn);
-					$previewContainer.append($preview);
 				}
 
-				// 파일 삭제 함수
-				function deleteFile(fileName, $preview) {
-					const uploadedFile = uploadedFiles.find(function (f) {
-						return f.originalFileName === fileName;
-					});
-					const pendingFile = pendingFiles.find(function (f) {
-						return f.originalFileName === fileName;
-					});
-
-					if (uploadedFile) {
-						// 업로드된 파일인 경우
-						uploadedFiles = uploadedFiles.filter(function (f) {
-							return f.originalFileName !== fileName;
-						});
-						$preview.remove();
-						updateFileText();
-
-						// 삭제된 파일 목록에 추가
-						if (!deletedFiles.includes(uploadedFile.newFileName)) {
-							deletedFiles.push(uploadedFile.newFileName);
-						}
-					} else if (pendingFile) {
-						// 대기 중인 파일인 경우
-						pendingFiles = pendingFiles.filter(f => f.originalFileName !== fileName);
-						$preview.remove();
-						updateFileText();
-					}
+				// a태그로 정적으로 서버 하드에 저장된 파일 다운로드 버튼
+				if (${ mode == 'advice' }) {
+					$downloadBtn = $('<a>')
+						.addClass('btn btn-sm btn-primary ms-2')
+						.attr({
+							'href': '/resources/resumeUpfiles/' + fileInfo.newFileName,
+							'download': fileInfo.originalFileName
+						})
+						.html('<i class="bi bi-download"></i>');
 				}
+				$preview.append($fileInfo).append($deleteBtn).append($downloadBtn);
+				$previewContainer.append($preview);
+			}
 
-				// 파일 크기 포맷팅
-				function formatFileSize(bytes) {
-					if (bytes === 0) return '0 Bytes';
-					const k = 1024;
-					const sizes = ['Bytes', 'KB', 'MB'];
-					const i = Math.floor(Math.log(bytes) / Math.log(k));
-					return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-				}
-
-				// 파일 텍스트 업데이트
-				function updateFileText() {
-					const $fileText = $('.fileText');
-					if (uploadedFiles.length + pendingFiles.length > 0) {
-						$fileText.hide();
-					} else {
-						$fileText.show();
-					}
-				}
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// 제목 입력 글자수 카운트
-				$('#title').on('input', function () {
-					const currentLength = $(this).val().length;
-					$('#titleLength').text(currentLength);
+			// 파일 삭제 함수
+			function deleteFile(fileName, $preview) {
+				const uploadedFile = uploadedFiles.find(function (f) {
+					return f.originalFileName === fileName;
 				});
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// -todoList-
-				// 로컬스토리지에 임시저장 기능 추가
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// 페이지 로드 시 지역 선택 실행
-				initializeSelectedRegions();
-
-				// 페이지 로드 시 선택된 지역에 대한 체크박스 처리
-				function initializeSelectedRegions() {
-					const $badges = $('#selectedRegions .badge');
-
-					// 이미 선택된 지역이 없으면 중단
-					if ($badges.length === 0) return;
-
-					// 선택된 지역들의 데이터 수집
-					const selectedRegions = new Map();
-					$badges.each(function () {
-						const regionNo = $(this).data('region');
-						const sigunguNo = $(this).data('sigungu');
-						if (!selectedRegions.has(regionNo)) {
-							selectedRegions.set(regionNo, []);
-						}
-						selectedRegions.get(regionNo).push(sigunguNo);
-					});
-
-					// 각 시/도에 대해 한 번만 클릭 이벤트 발생
-					selectedRegions.forEach(function (sigunguNos, regionNo) {
-						const $regionItem = $(`.region-item[data-region="${regionNo}"]`);
-						$regionItem.trigger('click');
-
-						// Ajax 완료 후 해당 시군구들 체크
-						$.ajax({
-							url: "/resume/getSigungu",
-							type: "GET",
-							data: { regionNo: regionNo },
-							success: function () {
-								for (let i = 0; i < sigunguNos.length; i++) {
-									$(`#sigungu_${sigunguNos[i]}`).prop('checked', true);
-								}
-							}
-						});
-					});
-
-					// 삭제 버튼 이벤트 처리
-					$('#selectedRegions').on('click', '.btn-close', function (e) {
-						e.preventDefault();
-						e.stopPropagation();
-
-						const $badge = $(this).parent();
-						const sigunguNo = $badge.data('sigungu');
-						const regionName = $badge.text().trim().split(' ')[1]; // 띄어쓰기로 분리 (시/군/구 이름)
-
-						$badge.remove();
-						$(`#sigungu_${sigunguNo}`).prop('checked', false);
-
-						// 해당 텍스트와 일치하는 체크박스 찾아서 해제
-						$('.sigungu-item input[type="checkbox"]').each(function () {
-							if ($(this).data('name') === regionName) {
-								$(this).prop('checked', false);
-							}
-						});
-					});
-				}
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// 페이지 로드 시 업직종 선택 실행
-				initializeSelectedJobTypes();
-
-				// 페이지 로드 시 선택된 업직종에 대한 체크박스 처리
-				function initializeSelectedJobTypes() {
-					const $badges = $('#selectedJobTypes .badge');
-
-					// 이미 선택된 업직종이 중단
-					if ($badges.length === 0) return;
-
-					// 선택된 업직종들의 데이터 수집
-					const selectedJobTypes = new Map();
-					$badges.each(function () {
-						const majorNo = $(this).data('major');
-						const subNo = $(this).data('sub');
-						if (!selectedJobTypes.has(majorNo)) {
-							selectedJobTypes.set(majorNo, []);
-						}
-						selectedJobTypes.get(majorNo).push(subNo);
-					});
-
-					// 각 대분류에 대해 한 번만 클릭 이벤트 발생
-					selectedJobTypes.forEach(function (subNos, majorNo) {
-						const $majorItem = $(`.major-item[data-major="${majorNo}"]`);
-						$majorItem.trigger('click');
-
-						// Ajax 완료 후 해당 소분류들 체크
-						$.ajax({
-							url: "/resume/getSubCategory",
-							type: "GET",
-							data: { majorNo: majorNo },
-
-							success: function () {
-								for (let i = 0; i < subNos.length; i++) {
-									$(`#sub_${subNos[i]}`).prop('checked', true);
-								}
-							}
-						});
-					});
-
-					// 삭제 버튼 이벤트 처리
-					$('#selectedJobTypes').on('click', '.btn-close', function (e) {
-						e.preventDefault();
-						e.stopPropagation();
-
-						const $badge = $(this).parent();
-						const subNo = $badge.data('sub');
-						const jobName = $badge.text().trim(); // 배지의 텍스트 가져오기
-
-						$badge.remove();
-
-						// 해당 텍스트와 일치하는 체크박스 찾아서 해제
-						$('.sub-item input[type="checkbox"]').each(function () {
-							if ($(this).data('name') === jobName) {
-								$(this).prop('checked', false);
-							}
-						});
-					});
-				}
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// 사진 업로드 이벤트
-				$('#photoUpload').on('change', function (event) {
-					const file = event.target.files[0];
-					if (file) {
-						if (!file.type.startsWith('image/')) {
-							showValidationModal('이미지 파일만 등록 가능합니다.');
-							return;
-						}
-						if (file.size > 2.5 * 1024 * 1024) {
-							showValidationModal('이미지의 크기가 2.5MB를 초과합니다.');
-							return;
-						}
-						const reader = new FileReader();
-						reader.onload = function (e) {
-							$('#photoPreview').attr('src', e.target.result).show();
-							$('#profileBase64').val(e.target.result);
-							// 사진 등록 텍스트와 아이콘 숨기기
-							$('label[for="photoUpload"]').hide();
-							// X 버튼 보이기
-							$('#removePhoto').show();
-						}
-						reader.readAsDataURL(file);
-					}
+				const pendingFile = pendingFiles.find(function (f) {
+					return f.originalFileName === fileName;
 				});
 
-				// X 버튼 클릭 이벤트
-				$('#removePhoto').on('click', function () {
-					// 미리보기 이미지 숨기기
-					$('#photoPreview').hide();
-					// base64 값 초기화
-					$('#profileBase64').val('');
-					// 사진 등록 텍스트와 아이콘 다시 보이기
-					$('label[for="photoUpload"]').show();
-					// X 버튼 숨기기
-					$(this).hide();
-					// 파일 입력 초기화
-					$('#photoUpload').val('');
-				});
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// 유효성 검사 실패 시 스피너 중지 및 버튼 복원 함수
-				function resetSubmitButton() {
-					isSubmitting = false; // 중복 방지 플래그 해제
-					$('#finalSaveBtn').prop('disabled', false); // 버튼 복원
-					$('#finalSaveBtn .btn-text').removeClass('d-none');
-					$('#finalSaveBtn .spinner-border').addClass('d-none');
-				}
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// 페이지 로드 시 프로필 이미지 초기화
-				<c:if test="${not empty resumeDetail.resume.profileBase64}">
-					$('#photoPreview').attr('src', '${resumeDetail.resume.profileBase64}').show();
-					$('#profileBase64').val('${resumeDetail.resume.profileBase64}');
-					$('label[for="photoUpload"]').hide();
-					$('#removePhoto').show();
-				</c:if>
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// 돌아가기 버튼
-				$('#returnBtn').on('click', function () {
-					const urlParams = new URLSearchParams(window.location.search);
-					const uid = urlParams.get('uid');
-					if (uid) {
-						window.location.href = '/submission/check?uid=' + uid;
-					} else {
-						window.location.href = '/resume/list';
+				if (uploadedFile) {
+					// 업로드된 파일인 경우
+					uploadedFiles = uploadedFiles.filter(function (f) {
+						return f.originalFileName !== fileName;
+					});
+					$preview.remove();
+					updateFileText();
+
+					// 삭제된 파일 목록에 추가
+					if (!deletedFiles.includes(uploadedFile.newFileName)) {
+						deletedFiles.push(uploadedFile.newFileName);
 					}
-				});
+				} else if (pendingFile) {
+					// 대기 중인 파일인 경우
+					pendingFiles = pendingFiles.filter(f => f.originalFileName !== fileName);
+					$preview.remove();
+					updateFileText();
+				}
+			}
+
+			// 파일 크기 포맷팅
+			function formatFileSize(bytes) {
+				if (bytes === 0) return '0 Bytes';
+				const k = 1024;
+				const sizes = ['Bytes', 'KB', 'MB'];
+				const i = Math.floor(Math.log(bytes) / Math.log(k));
+				return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+			}
+
+			// 파일 텍스트 업데이트
+			function updateFileText() {
+				const $fileText = $('.fileText');
+				if (uploadedFiles.length + pendingFiles.length > 0) {
+					$fileText.hide();
+				} else {
+					$fileText.show();
+				}
+			}
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 제목 입력 글자수 카운트
+			$('#title').on('input', function () {
+				const currentLength = $(this).val().length;
+				$('#titleLength').text(currentLength);
 			});
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// -todoList-
+			// 로컬스토리지에 임시저장 기능 추가
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 페이지 로드 시 지역 선택 실행
+			initializeSelectedRegions();
+
+			// 페이지 로드 시 선택된 지역에 대한 체크박스 처리
+			function initializeSelectedRegions() {
+				const $badges = $('#selectedRegions .badge');
+
+				// 이미 선택된 지역이 없으면 중단
+				if ($badges.length === 0) return;
+
+				// 선택된 지역들의 데이터 수집
+				const selectedRegions = new Map();
+				$badges.each(function () {
+					const regionNo = $(this).data('region');
+					const sigunguNo = $(this).data('sigungu');
+					if (!selectedRegions.has(regionNo)) {
+						selectedRegions.set(regionNo, []);
+					}
+					selectedRegions.get(regionNo).push(sigunguNo);
+				});
+
+				// 각 시/도에 대해 한 번만 클릭 이벤트 발생
+				selectedRegions.forEach(function (sigunguNos, regionNo) {
+					const $regionItem = $(`.region-item[data-region="${regionNo}"]`);
+					$regionItem.trigger('click');
+
+					// Ajax 완료 후 해당 시군구들 체크
+					$.ajax({
+						url: "/resume/getSigungu",
+						type: "GET",
+						data: { regionNo: regionNo },
+						success: function () {
+							for (let i = 0; i < sigunguNos.length; i++) {
+								$(`#sigungu_${sigunguNos[i]}`).prop('checked', true);
+							}
+						}
+					});
+				});
+
+				// 삭제 버튼 이벤트 처리
+				$('#selectedRegions').on('click', '.btn-close', function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					const $badge = $(this).parent();
+					const sigunguNo = $badge.data('sigungu');
+					const regionName = $badge.text().trim().split(' ')[1]; // 띄어쓰기로 분리 (시/군/구 이름)
+
+					$badge.remove();
+					$(`#sigungu_${sigunguNo}`).prop('checked', false);
+
+					// 해당 텍스트와 일치하는 체크박스 찾아서 해제
+					$('.sigungu-item input[type="checkbox"]').each(function () {
+						if ($(this).data('name') === regionName) {
+							$(this).prop('checked', false);
+						}
+					});
+				});
+			}
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 페이지 로드 시 업직종 선택 실행
+			initializeSelectedJobTypes();
+
+			// 페이지 로드 시 선택된 업직종에 대한 체크박스 처리
+			function initializeSelectedJobTypes() {
+				const $badges = $('#selectedJobTypes .badge');
+
+				// 이미 선택된 업직종이 중단
+				if ($badges.length === 0) return;
+
+				// 선택된 업직종들의 데이터 수집
+				const selectedJobTypes = new Map();
+				$badges.each(function () {
+					const majorNo = $(this).data('major');
+					const subNo = $(this).data('sub');
+					if (!selectedJobTypes.has(majorNo)) {
+						selectedJobTypes.set(majorNo, []);
+					}
+					selectedJobTypes.get(majorNo).push(subNo);
+				});
+
+				// 각 대분류에 대해 한 번만 클릭 이벤트 발생
+				selectedJobTypes.forEach(function (subNos, majorNo) {
+					const $majorItem = $(`.major-item[data-major="${majorNo}"]`);
+					$majorItem.trigger('click');
+
+					// Ajax 완료 후 해당 소분류들 체크
+					$.ajax({
+						url: "/resume/getSubCategory",
+						type: "GET",
+						data: { majorNo: majorNo },
+
+						success: function () {
+							for (let i = 0; i < subNos.length; i++) {
+								$(`#sub_${subNos[i]}`).prop('checked', true);
+							}
+						}
+					});
+				});
+
+				// 삭제 버튼 이벤트 처리
+				$('#selectedJobTypes').on('click', '.btn-close', function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					const $badge = $(this).parent();
+					const subNo = $badge.data('sub');
+					const jobName = $badge.text().trim(); // 배지의 텍스트 가져오기
+
+					$badge.remove();
+
+					// 해당 텍스트와 일치하는 체크박스 찾아서 해제
+					$('.sub-item input[type="checkbox"]').each(function () {
+						if ($(this).data('name') === jobName) {
+							$(this).prop('checked', false);
+						}
+					});
+				});
+			}
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 사진 업로드 이벤트
+			$('#photoUpload').on('change', function (event) {
+				const file = event.target.files[0];
+				if (file) {
+					if (!file.type.startsWith('image/')) {
+						showValidationModal('이미지 파일만 등록 가능합니다.');
+						return;
+					}
+					if (file.size > 2.5 * 1024 * 1024) {
+						showValidationModal('이미지의 크기가 2.5MB를 초과합니다.');
+						return;
+					}
+					const reader = new FileReader();
+					reader.onload = function (e) {
+						$('#photoPreview').attr('src', e.target.result).show();
+						$('#profileBase64').val(e.target.result);
+						// 사진 등록 텍스트와 아이콘 숨기기
+						$('label[for="photoUpload"]').hide();
+						// X 버튼 보이기
+						$('#removePhoto').show();
+					}
+					reader.readAsDataURL(file);
+				}
+			});
+
+			// X 버튼 클릭 이벤트
+			$('#removePhoto').on('click', function () {
+				// 미리보기 이미지 숨기기
+				$('#photoPreview').hide();
+				// base64 값 초기화
+				$('#profileBase64').val('');
+				// 사진 등록 텍스트와 아이콘 다시 보이기
+				$('label[for="photoUpload"]').show();
+				// X 버튼 숨기기
+				$(this).hide();
+				// 파일 입력 초기화
+				$('#photoUpload').val('');
+			});
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 유효성 검사 실패 시 스피너 중지 및 버튼 복원 함수
+			function resetSubmitButton() {
+				isSubmitting = false; // 중복 방지 플래그 해제
+				$('#finalSaveBtn').prop('disabled', false); // 버튼 복원
+				$('#finalSaveBtn .btn-text').removeClass('d-none');
+				$('#finalSaveBtn .spinner-border').addClass('d-none');
+			}
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 페이지 로드 시 프로필 이미지 초기화
+			<c:if test="${not empty resumeDetail.resume.profileBase64}">
+				$('#photoPreview').attr('src', '${resumeDetail.resume.profileBase64}').show();
+				$('#profileBase64').val('${resumeDetail.resume.profileBase64}');
+				$('label[for="photoUpload"]').hide();
+				$('#removePhoto').show();
+			</c:if>
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 돌아가기 버튼
+			$('#returnBtn').on('click', function () {
+				const urlParams = new URLSearchParams(window.location.search);
+				const uid = urlParams.get('uid');
+				if (uid) {
+					window.location.href = '/submission/check?uid=' + uid;
+				} else {
+					window.location.href = '/resume/list';
+				}
+			});
+
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 첨삭 모드 첨부파일 기능
+			// 첨삭 모드 파일 업로드 관련 변수
+			let adviceFiles = [];
+			const maxFileSize = 10 * 1024 * 1024; // 10MB
+			const maxImageSize = 2.5 * 1024 * 1024; // 2.5MB
+
+			// 파일 선택 버튼 클릭 이벤트
+			$('#fileInput-advice').on('change', function (e) {
+				handleAdviceFiles(e.target.files);
+			});
+
+			// 드래그 앤 드롭 이벤트
+			$('#fileContainer-advice').on('dragover', function (e) {
+				e.preventDefault();
+				$(this).addClass('border-primary');
+			}).on('dragleave', function (e) {
+				e.preventDefault();
+				$(this).removeClass('border-primary');
+			}).on('drop', function (e) {
+				e.preventDefault();
+				$(this).removeClass('border-primary');
+				handleAdviceFiles(e.originalEvent.dataTransfer.files);
+			});
+
+			// 파일 처리 함수
+			function handleAdviceFiles(files) {
+				Array.from(files).forEach(file => {
+					// 파일 크기 체크
+					if (file.size > maxFileSize) {
+						alert('파일 크기는 10MB를 초과할 수 없습니다.');
+						return;
+					}
+
+					// 이미지 파일인 경우 2.5MB 제한
+					if (file.type.startsWith('image/') && file.size > maxImageSize) {
+						alert('이미지 파일은 2.5MB를 초과할 수 없습니다.');
+						return;
+					}
+
+					// 파일 추가
+					adviceFiles.push(file);
+					updateAdviceFilePreview();
+				});
+			}
+
+			// 파일 미리보기 업데이트
+			function updateAdviceFilePreview() {
+				const container = $('#previewContainer-advice');
+				container.empty();
+
+				adviceFiles.forEach((file, index) => {
+					const fileItem = $('<div>').addClass('d-flex align-items-center mb-2 p-2 border rounded');
+
+					// 파일 아이콘 또는 이미지 미리보기
+					$('<i>').addClass('bi bi-file-earmark me-2').appendTo(fileItem);
+
+					// 파일명
+					$('<span>').text(file.name).addClass('flex-grow-1').appendTo(fileItem);
+
+					// 삭제 버튼
+					$('<button>')
+						.addClass('btn btn-sm btn-outline-danger ms-2')
+						.html('<i class="bi bi-x"></i>')
+						.on('click', function () {
+							adviceFiles.splice(index, 1);
+							updateAdviceFilePreview();
+						})
+						.appendTo(fileItem);
+
+					container.append(fileItem);
+				});
+
+				// 파일이 없을 경우 안내 메시지 표시
+				$('.advice-file-text').toggle(adviceFiles.length === 0);
+			}
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 첨삭 모드 첨삭 의견 글자 수
+			$('#adviceTextarea').on('input', function () {
+				const currentLength = $(this).val().length;
+				const maxLength = 3000;
+				const remainingLength = maxLength - currentLength;
+				$('#adviceCharCount').text(currentLength + ' / ' + maxLength);
+			});
+			//---------------------------------------------------------------------------------------------------------------------------------
+			
+
+		});
 		</script>

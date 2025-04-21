@@ -312,9 +312,8 @@ public class ResumeController {
 	 * @param session  사용자 세션
 	 * @return 이력서 수정 폼 JSP 경로 또는 오류 페이지
 	 */
-	// 이력서 수정 페이지 -> /form과 합침 작업 예정
-	@GetMapping("/edit/{resumeNo}")
-	public String editResumeForm(@PathVariable int resumeNo, Model model, HttpSession session) {
+	@GetMapping({"/edit/{resumeNo}", "/advice/{resumeNo}"})
+	public String editResumeForm(@PathVariable int resumeNo, Model model, HttpSession session, HttpServletRequest request) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		int userUid = account.getUid();
 		try {
@@ -360,6 +359,11 @@ public class ResumeController {
 			// 유저정보를 가져옴
 			UserVO user = resumeService.getUserInfo(userUid);
 			model.addAttribute("user", user);
+			
+			String uri = request.getRequestURI();
+			if (uri.contains("advice")) {
+				model.addAttribute("mode", "advice");
+			}
 
 			return "resume/resumeForm";
 		} catch (Exception e) {
@@ -399,5 +403,6 @@ public class ResumeController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
+
 
 }
