@@ -110,12 +110,15 @@ public class ReviewBoardController {
 
 			ReviewDetailViewDTO detail = service.getReviewDetail(boardNo);
 			System.out.println("조회가 없네요:  " + detail);
-
+				
 			if (detail == null) {
 				logger.warn("조회 결과 없음!");
 				model.addAttribute("errorMessage", "해당 게시글이 존재하지 않습니다.");
 			} else {
 				logger.info("조회 성공: {}", detail);
+				if (detail.getLikes() == null) {
+			        detail.setLikes(0);
+			    }
 			}
 			boolean isLiked = false;
 			if (account != null) {
