@@ -87,6 +87,13 @@
 #reportCategory option {
 	color: #000 !important;
 }
+
+.list-group-item {
+  color: black !important;
+  font-size: 16px !important;
+  background-color: #fdfdfd !important;
+  display: block !important;
+}
 </style>
 
 
@@ -230,7 +237,8 @@
 
 	<!-- 댓글 목록 출력 영역 -->
 	<ul id="replyList" class="list-group">
-		<!-- 여기에 기존 댓글들이 자동으로 추가됨 (JS로) -->
+		<li class="list-group-item"><strong>작성자</strong> (날짜)<br>
+			<div>댓글 내용</div></li>
 	</ul>
 
 	<!-- 댓글 작성 영역 (사용자가 댓글 쓰는 부분) -->
@@ -272,7 +280,7 @@
 				</div>
 
 				<div class="modal-body">
-					<input type="hidden" id="boardNo" value="${detail.boardNo}">
+
 					<input type="hidden" id="loginUserUid" value="${loginUser.uid}">
 
 					<label for="reportCategory" class="form-label">신고 사유</label> <select
@@ -300,7 +308,7 @@
 			</div>
 		</div>
 	</div>
-	<input type="hidden" id="boardNo" value="${detail.boardNo}">
+
 
 	<script>
 	
@@ -336,7 +344,10 @@
 		  });
 		});
  */
-
+//공통 변수
+ const boardNo = $('#boardNo').val();
+ const userId = $('#userId').val();
+ const likeModal = new bootstrap.Modal(document.getElementById('likeModal'));
 	$(document).ready(function () {
 		  const isLiked = $('#isLiked').val() === 'true';
 
@@ -348,12 +359,7 @@
 		    $('#unlikeBtn').hide();
 		  }
 		});
-
 	
-	// 공통 변수
-	const userId = $('#userId').val();
-	const boardNo = $('#boardNo').val();
-	const likeModal = new bootstrap.Modal(document.getElementById('likeModal'));
 
 	// 좋아요 등록
 	$('#likeBtn').click(function () {
@@ -405,13 +411,10 @@
 	  });
 	});
 
-
-	
-
-
+		//게시물삭제 
 	  $(document).ready(function () {
 		  $(".delete-btn").click(function () {
-		    const boardNo = $(this).data("boardno");
+		   let boardNo = $(this).data("boardno");
 
 		    if (confirm("정말 삭제하시겠습니까?")) {
 		      $.ajax({
@@ -433,10 +436,10 @@
 		  });
 		});
 		
-	  
+	//게시물 신고	  
 	  $(document).ready(function () {
 		  $('#submitReportBtn').on('click', function () {
-		    const boardNo = $('#boardNo').val();
+		   
 		    const reporterAccountUid = $('#loginUserUid').val();
 		    const reportCategory = $('#reportCategory').val();
 		    const reportMessage = $('#reportMessage').val();
@@ -455,7 +458,7 @@
 		      reportTargetURL: `/reviewBoard/detail?boardNo=${boardNo}`
 		    };
 		    
-
+			 
 		    $.ajax({
 		      type: 'POST',
 		      url: '/report/board',
@@ -472,40 +475,12 @@
 		  });
 		});
 		
-	
+	  
+
 	  $(document).ready(function () {
-	    const boardNo = $('#boardNo').val();  // 게시글 번호 (hidden input 필요)
-	    
-	    // 댓글 목록 불러오기
-	    function loadReplies() {
-	      $.ajax({
-	        url: '/reply/' + boardNo,
-	        type: 'GET',
-	        success: function (data) {
-	          const $replyList = $('#replyList');
-	          $replyList.empty();
+	   
+	    loadReplies();
 
-	          if (data.length === 0) {
-	            $replyList.append('<li class="list-group-item text-muted">등록된 댓글이 없습니다.</li>');
-	          } else {
-	            data.forEach(reply => {
-	              const date = reply.postDate?.substring(0, 10) || '';
-	              const html = `
-	                <li class="list-group-item">
-	                  <strong>${reply.userId}</strong> (${date})<br>
-	                  ${reply.content}
-	                </li>`;
-	              $replyList.append(html);
-	            });
-	          }
-	        },
-	        error: function () {
-	          alert('댓글을 불러오는 중 오류가 발생했습니다.');
-	        }
-	      });
-	    }
-
-	    // 댓글 등록
 	    $('#submitReplyBtn').click(function () {
 	      const content = $('#replyContent').val().trim();
 	      if (!content) {
@@ -523,17 +498,57 @@
 	        }),
 	        success: function () {
 	          $('#replyContent').val('');
-	          loadReplies();
+	          loadReplies();  // 등록 후 새로고침
 	        },
 	        error: function () {
 	          alert('댓글 등록 중 오류가 발생했습니다.');
 	        }
 	      });
 	    });
-
-	    // 페이지 로드 시 댓글 불러오기
-	    loadReplies();
 	  });
+
+	  function loadReplies() {
+		  $.ajax({
+		    url: '/reply/' + boardNo,
+		    type: 'GET',
+		    success: function (data) {
+		    	console.log("댓글 데이터:", data); 
+		    	const $replyList = $('#replyList');
+		      $replyList.empty();
+
+		      if (!Array.isArray(data) || data.length === 0) {
+		        $replyList.append('<li class="list-group-item text-muted">등록된 댓글이 없습니다.</li>');
+		        return;
+		      }
+		      data.forEach(reply => {
+		        const date = typeof reply.postDate === 'string' && reply.postDate.length >= 10
+		          ? reply.postDate.substring(0, 10)
+		          : '날짜 없음';
+
+		        const writer = reply.writerId && typeof reply.writerId === 'string' && reply.writerId.trim().length > 0
+		          ? reply.writerId
+		          : (reply.userId ? '사용자 ' + reply.userId : '익명');
+
+		        const content = reply.content ? reply.content : '(내용 없음)';
+
+		        const html = '<li class="list-group-item">' +
+	             '<strong>' + writer + '</strong> (' + date + ')<br>' +
+	             '<div>' + reply.content + '</div>' +
+	             '</li>';
+		        $replyList.append(html);
+		      });
+		    },
+		    error: function () {
+		      alert('댓글을 불러오는 중 오류가 발생했습니다.');
+		    }
+		  });
+		}
+
+
+
+
+	   
+	  
 	  
 
 	</script>
