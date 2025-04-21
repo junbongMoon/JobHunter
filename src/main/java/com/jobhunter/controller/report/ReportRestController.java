@@ -4,12 +4,15 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.customenum.ReportCategory;
 import com.jobhunter.model.report.AccountReportDTO;
 import com.jobhunter.model.report.BoardReportDTO;
 import com.jobhunter.service.report.ReportService;
@@ -43,22 +46,32 @@ public class ReportRestController {
 	}
 
 	@PostMapping("/board")
-	public ResponseEntity<Void> reportBoard(@RequestBody BoardReportDTO boardReportDTO , HttpSession session) {
-		 AccountVO account = (AccountVO) session.getAttribute("account");
-		 if (account == null) {
-		        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		    }
-		 
-		 try {
+	public ResponseEntity<Void> reportBoard(@RequestBody BoardReportDTO boardReportDTO, HttpSession session, Model model) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+
+		if (account == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+
+		try {
+			// 신고자 UID 설정
 			boardReportDTO.setReporterAccountUid(account.getUid());
+
+			// Enum, URL 등 자동값 설정
 			boardReportDTO.applyDefaultValues();
-		
+
+			// 서비스로 위임
 			reportService.saveBoardReport(boardReportDTO);
+			model.addAttribute("reportCategories", ReportCategory.values());
 			return ResponseEntity.ok().build();
+
 		} catch (Exception e) {
-			e.printStackTrace(); // 로그 찍기
-			return ResponseEntity.status(500).build();
+			e.printStackTrace(); // 콘솔 로그
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
+
+	
+	
 
 }
