@@ -46,4 +46,14 @@
 		LIMIT #{startRowIndex}, #{rowCntPerPage}
 	</select>
 
+	<select id="getPRBoardDetail" parameterType="int"
+		resultType="com.jobhunter.model.prboard.PRBoardVO">
+		SELECT
+		prBoardNo, useruid, title, writer, userId, introduce, postDate
+		FROM
+		prBoard
+		WHERE
+		prBoardNo = #{prBoardNo}
+	</select>
+
 </mapper>

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
@@ -44,9 +45,17 @@ public class PRBoardController {
         return "prBoard/list"; 
     }
 
-    // 상세 보기 페이지
     @GetMapping("/detail")
-    public String showPrBoardDetailPage() {
+    public String showPrBoardDetailPage(@RequestParam("prBoardNo") int prBoardNo, Model model) {
+        try {
+            PRBoardVO boardDetail = prBoardService.getPRBoardDetail(prBoardNo);
+            model.addAttribute("prBoard", boardDetail);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 에러 페이지로 리다이렉트하거나 예외처리
+            return "error/500";
+        }
+
         return "prBoard/detail"; // /WEB-INF/views/prBoard/detail.jsp
     }
     

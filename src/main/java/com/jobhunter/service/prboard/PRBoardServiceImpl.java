@@ -71,4 +71,9 @@ public class PRBoardServiceImpl implements PRBoardService {
 	    return pageResponseDTO;
 	}
 
+	
+	@Override
+	public PRBoardVO getPRBoardDetail(int prBoardNo) throws Exception {
+	    return prBoardDAO.selectPRBoardDetail(prBoardNo);
+	}
 }

@@ -35,5 +35,10 @@ public class PRBoardDAOImpl implements PRBoardDAO {
 		
 		return ses.selectList(NS + ".getPRBoardListByPaging", pageResponseDTO);
 	}
+	
+	@Override
+	public PRBoardVO selectPRBoardDetail(int prBoardNo) throws Exception {
+	    return ses.selectOne(NS + ".getPRBoardDetail", prBoardNo);
+	}
 
 }

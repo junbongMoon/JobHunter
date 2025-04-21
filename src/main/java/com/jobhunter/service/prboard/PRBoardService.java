@@ -21,4 +21,6 @@ public interface PRBoardService {
 	public boolean savePRBoard(PRBoardDTO prBoardDTO) throws Exception;
 
 	public PageResponseDTO<PRBoardVO> getprBoardByPagination(PageRequestDTO pageRequestDTO) throws Exception;
+
+	public PRBoardVO getPRBoardDetail(int prBoardNo) throws Exception;
 }

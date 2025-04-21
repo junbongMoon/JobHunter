@@ -37,14 +37,14 @@
 			
 			        <!-- 중간: 제목 -->
 					<h3 class="entry-title text-center my-2">
-					  <a href="/prBoard/detail?prBoardNo=${pr.prBoardNo}" style="color: #37517e;" class="fw-bold fs-4">
+					  <a href="/prboard/detail?prBoardNo=${pr.prBoardNo}" style="color: #37517e;" class="fw-bold fs-4">
 					    ${pr.title}
 					  </a>
 					</h3>
 			
 			        <!-- 하단: 자세히 보기 -->
 			        <div class="d-flex justify-content-end mt-auto">
-			          <a href="/prBoard/detail?prBoardNo=${pr.prBoardNo}" class="btn btn-outline-primary btn-sm">
+			          <a href="/prboard/detail?prBoardNo=${pr.prBoardNo}" class="btn btn-outline-primary btn-sm">
 			            자세히 보기
 			          </a>
 			        </div>
