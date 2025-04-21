@@ -36,7 +36,7 @@
           <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
         </div>
         <div style="cursor: pointer; border:1px solid var(--bs-gray-300); width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; text-align: center;" onclick="cropImgModalOpen()" id="profileImgContainer"><span id="profileImg">이미지 로딩중...</span></div>
-        <i style="margin:10px; color:var(--accent-color); cursor: pointer;" onclick="deleteImgModal()">이미지 삭제</i><hr>
+        <i style="margin:10px; color:var(--accent-color); cursor: pointer; max-width:90px;" onclick="deleteImgModal()">이미지 삭제</i><hr>
         <div class="info-grid" id="basicInfo">
           <div>회사명</div><div><strong id="companyName">로딩중...</strong></div>
           <div>대표자</div><div id="representative">로딩중...</div>
