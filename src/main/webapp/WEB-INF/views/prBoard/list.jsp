@@ -52,6 +52,12 @@
 			      </article>
 			    </c:forEach>
 
+
+                <div class="d-flex justify-content-end mb-3">
+                    <a href="/prboard/write" class="btn btn-primary">
+                      <i class="fas fa-pen"></i> 글 작성
+                    </a>
+                  </div>
             <!-- Pagination -->
 			<div class="blog-pagination">
 			        <ul class="pagination justify-content-center mt-4">
