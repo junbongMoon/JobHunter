@@ -112,4 +112,11 @@ public interface ResumeDAO {
 	void insertAdvice(ResumeAdviceDTO adviceDTO);
 
 	void insertAdviceFile(ResumeAdviceUpfileDTO fileDTO); 
+
+	ResumeAdviceDTO selectAdvice(int resumeNo);
+	
+	List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo);
+
+	ResumeAdviceDTO getAdvice(int resumeNo);
+	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);
 }

@@ -29,6 +29,7 @@ import com.jobhunter.model.resume.EducationStatus;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
+import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
@@ -313,13 +314,13 @@ public class ResumeController {
 	 * @param session  사용자 세션
 	 * @return 이력서 수정 폼 JSP 경로 또는 오류 페이지
 	 */
-	@GetMapping({"/edit/{resumeNo}", "/advice/{resumeNo}"})
+	@GetMapping({"/edit/{resumeNo}", "/advice/{resumeNo}", "/checkAdvice/{resumeNo}"})
 	public String editResumeForm(@PathVariable int resumeNo, Model model, HttpSession session, HttpServletRequest request) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		int userUid = account.getUid();
 		try {
-			// 이력서 상태 확인
-			if (resumeService.isResumeChecked(resumeNo)) {
+			// 수정으로 접근했을 때만 이력서 상태 확인
+			if (request.getRequestURI().contains("/edit/") && resumeService.isResumeChecked(resumeNo)) {
 				model.addAttribute("error", "기업에서 확인중인 이력서는 수정할 수 없습니다.");
 				return "error";
 			}
@@ -364,6 +365,17 @@ public class ResumeController {
 			String uri = request.getRequestURI();
 			if (uri.contains("advice")) {
 				model.addAttribute("mode", "advice");
+
+			} else if (uri.contains("checkAdvice")) {
+				// 첨삭 내용 조회
+				ResumeAdviceDTO advice = resumeService.getAdvice(resumeNo);
+				if (advice != null) {
+					model.addAttribute("advice", advice);
+					// 첨삭 파일 조회
+					List<ResumeAdviceUpfileDTO> adviceFiles = resumeService.getAdviceFiles(advice.getAdviceNo());
+					model.addAttribute("adviceFiles", adviceFiles);
+				}
+				model.addAttribute("mode", "checkAdvice");
 			}
 
 			return "resume/resumeForm";
@@ -405,8 +417,6 @@ public class ResumeController {
 		}
 	}
 
-
-
 	/**
 	 * 이력서 첨삭 내용을 저장합니다.
 	 * <p>
@@ -420,7 +430,7 @@ public class ResumeController {
 	@ResponseBody
 	public Map<String, Object> saveAdvice(@RequestBody ResumeAdviceDTO adviceDTO) {
 		Map<String, Object> response = new HashMap<>();
-		
+
 		try {
 			resumeService.saveAdvice(adviceDTO);
 			response.put("success", true);
@@ -429,7 +439,9 @@ public class ResumeController {
 			response.put("success", false);
 			response.put("message", "첨삭 저장에 실패했습니다: " + e.getMessage());
 		}
-		
+
 		return response;
 	}
+	
+		
 }

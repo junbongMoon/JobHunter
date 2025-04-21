@@ -14,6 +14,7 @@ import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
+import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
@@ -264,5 +265,15 @@ public class ResumeServiceImpl implements ResumeService {
 				rdao.insertAdviceFile(fileDTO);
 			}
 		}
+	}
+
+	@Override
+	public ResumeAdviceDTO getAdvice(int resumeNo) {
+		return rdao.getAdvice(resumeNo);
+	}
+
+	@Override
+	public List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) {
+		return rdao.getAdviceFiles(adviceNo);
 	}
 }

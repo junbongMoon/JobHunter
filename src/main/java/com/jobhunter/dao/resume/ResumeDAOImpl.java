@@ -259,4 +259,24 @@ public class ResumeDAOImpl implements ResumeDAO {
 		ses.insert(NS + ".insertAdviceFile", fileDTO);
 	}
 
+	@Override
+	public ResumeAdviceDTO selectAdvice(int resumeNo) {
+		return ses.selectOne(NS + ".selectAdvice", resumeNo);
+	}
+
+	@Override
+	public List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo) {
+		return ses.selectList(NS + ".selectAdviceFiles", adviceNo);
+	}
+
+	@Override
+	public ResumeAdviceDTO getAdvice(int resumeNo) {
+		return ses.selectOne(NS + ".getAdvice", resumeNo);
+	}
+
+	@Override
+	public List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) {
+		return ses.selectList(NS + ".getAdviceFiles", adviceNo);
+	}
+
 }

@@ -22,4 +22,5 @@ public class ResumeAdviceDTO {
     private String adviceContent;
     private LocalDateTime regDate;
     private List<ResumeAdviceUpfileDTO> files;
+    private int mentorUid;
 } 
