@@ -53,7 +53,7 @@ public class PRBoardController {
         } catch (Exception e) {
             e.printStackTrace();
             // 에러 페이지로 리다이렉트하거나 예외처리
-            return "error/500";
+            return "prBoard/list";
         }
 
         return "prBoard/detail"; // /WEB-INF/views/prBoard/detail.jsp
@@ -75,6 +75,44 @@ public class PRBoardController {
 		}
         
 
+        return "redirect:/prboard/list";
+    }
+    
+ // --- Controller ---
+    @GetMapping("/modify")
+    public String showModifyPage(@RequestParam("prBoardNo") int prBoardNo, Model model) {
+        try {
+            PRBoardVO board = prBoardService.getPRBoardDetail(prBoardNo);
+            model.addAttribute("prBoard", board);
+            return "prBoard/modify";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "prBoard/list";
+        }
+    }
+
+    @PostMapping("/modify")
+    public String handleModify(@ModelAttribute PRBoardDTO prBoardDTO) {
+    	int boardNo = prBoardDTO.getPrBoardNo();
+    	System.out.println(boardNo);
+        try {
+            prBoardService.updatePRBoard(prBoardDTO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error/500";
+        }
+        return "redirect:/prboard/detail?prBoardNo=" + prBoardDTO.getPrBoardNo();
+    }
+
+    @GetMapping("/remove")
+    public String handleRemove(@RequestParam("prBoardNo") int prBoardNo) {
+        try {
+            prBoardService.deletePRBoard(prBoardNo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error/500";
+        }
         return "redirect:/prboard/list";
     }
 

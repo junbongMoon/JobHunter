@@ -49,11 +49,25 @@
 	<select id="getPRBoardDetail" parameterType="int"
 		resultType="com.jobhunter.model.prboard.PRBoardVO">
 		SELECT
-		prBoardNo, useruid, title, writer, userId, introduce, postDate
+		prBoardNo, useruid, title, writer, userId, introduce,
+		postDate
 		FROM
 		prBoard
 		WHERE
 		prBoardNo = #{prBoardNo}
 	</select>
+
+	<update id="updatePRBoard">
+		UPDATE prBoard
+		SET title = #{title},
+		writer = #{writer},
+		introduce = #{introduce}
+		WHERE prBoardNo = #{prBoardNo}
+	</update>
+
+	<delete id="deletePRBoard">
+		DELETE FROM prBoard
+		WHERE prBoardNo = #{prBoardNo}
+	</delete>
 
 </mapper>

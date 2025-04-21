@@ -11,10 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class PRBoardDTO {
+	private int prBoardNo;
 	private int useruid;
 	private String title;
 	private String writer;
 	private String userId;
 	private String introduce;
+
 
 }

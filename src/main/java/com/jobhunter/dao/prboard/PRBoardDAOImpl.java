@@ -41,4 +41,14 @@ public class PRBoardDAOImpl implements PRBoardDAO {
 	    return ses.selectOne(NS + ".getPRBoardDetail", prBoardNo);
 	}
 
+	@Override
+	public int updatePRBoard(PRBoardDTO prBoardDTO) throws Exception {
+	    return ses.update(NS + ".updatePRBoard", prBoardDTO);
+	}
+
+	@Override
+	public int deletePRBoard(int prBoardNo) throws Exception {
+	    return ses.delete(NS + ".deletePRBoard", prBoardNo);
+	}
+
 }

@@ -76,4 +76,22 @@ public class PRBoardServiceImpl implements PRBoardService {
 	public PRBoardVO getPRBoardDetail(int prBoardNo) throws Exception {
 	    return prBoardDAO.selectPRBoardDetail(prBoardNo);
 	}
+
+	@Override
+	public boolean updatePRBoard(PRBoardDTO prBoardDTO) throws Exception {
+		boolean result = false;
+		if(prBoardDAO.updatePRBoard(prBoardDTO) > 0) {
+			result = true;
+		}
+	    return result;
+	}
+
+	@Override
+	public boolean deletePRBoard(int prBoardNo) throws Exception {
+		boolean result = false;
+		if(prBoardDAO.deletePRBoard(prBoardNo) > 0) {
+			result = true;
+		}
+	    return result;
+	}
 }

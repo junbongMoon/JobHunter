@@ -23,4 +23,8 @@ public interface PRBoardService {
 	public PageResponseDTO<PRBoardVO> getprBoardByPagination(PageRequestDTO pageRequestDTO) throws Exception;
 
 	public PRBoardVO getPRBoardDetail(int prBoardNo) throws Exception;
+
+	public boolean updatePRBoard(PRBoardDTO prBoardDTO) throws Exception;
+
+	public boolean deletePRBoard(int prBoardNo) throws Exception;
 }

@@ -28,6 +28,10 @@ public interface PRBoardDAO {
 	List<PRBoardVO> selectPRBoardListByPaging(PageResponseDTO<PRBoardVO> pageResponseDTO) throws Exception;
 	
 	PRBoardVO selectPRBoardDetail(int prBoardNo) throws Exception;
+
+	int deletePRBoard(int prBoardNo) throws Exception;
+
+	int updatePRBoard(PRBoardDTO prBoardDTO) throws Exception;
 	
 
 }
