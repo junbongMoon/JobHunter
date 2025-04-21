@@ -289,10 +289,16 @@
 		VALUES (#{resumeNo}, #{adviceContent}, #{mentorUid})
 	</insert>
 
+	<!-- 기존 첨삭 내용 삭제 -->
+	<delete id="deleteExistingAdvice" parameterType="map">
+		DELETE FROM resume_advice 
+		WHERE resumeNo = #{resumeNo} AND mentorUid = #{mentorUid}
+	</delete>
+
 	<!-- 이력서 첨삭 파일 정보 저장 -->
 	<insert id="insertAdviceFile" parameterType="com.jobhunter.model.resume.ResumeAdviceUpfileDTO">
-		INSERT INTO resume_advice_upfiles (adviceNo, adviceFileName, originalFileName)
-		VALUES (#{adviceNo}, #{adviceFileName}, #{originalFileName})
+		INSERT INTO resume_advice_upfiles (adviceNo, originalFileName, newFileName, ext, size, base64Image, status)
+		VALUES (#{adviceNo}, #{originalFileName}, #{newFileName}, #{ext}, #{size}, #{base64Image}, #{status})
 	</insert> 
 
     <!-- 첨삭 내용 조회 -->
@@ -313,10 +319,13 @@
     <select id="getAdviceFiles" parameterType="int" resultType="com.jobhunter.model.resume.ResumeAdviceUpfileDTO">
         SELECT 
             adviceUpfileNo,
-            adviceNo,
-            adviceFileName,
             originalFileName,
-            regDate
+            newFileName,
+            ext,
+            size,
+            base64Image,
+            status,
+            adviceNo
         FROM resume_advice_upfiles
         WHERE adviceNo = #{adviceNo}
     </select>

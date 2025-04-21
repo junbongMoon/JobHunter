@@ -113,6 +113,8 @@ public interface ResumeDAO {
 
 	void insertAdviceFile(ResumeAdviceUpfileDTO fileDTO); 
 
+	void deleteExistingAdvice(int resumeNo, int mentorUid);
+
 	ResumeAdviceDTO selectAdvice(int resumeNo);
 	
 	List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo);

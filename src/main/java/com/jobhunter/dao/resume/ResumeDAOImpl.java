@@ -279,4 +279,12 @@ public class ResumeDAOImpl implements ResumeDAO {
 		return ses.selectList(NS + ".getAdviceFiles", adviceNo);
 	}
 
+	@Override
+	public void deleteExistingAdvice(int resumeNo, int mentorUid) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("resumeNo", resumeNo);
+		params.put("mentorUid", mentorUid);
+		ses.delete(NS + ".deleteExistingAdvice", params);
+	}
+
 }

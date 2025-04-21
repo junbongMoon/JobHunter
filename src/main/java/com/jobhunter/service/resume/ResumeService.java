@@ -61,6 +61,8 @@ public interface ResumeService {
 
 	void saveAdvice(ResumeAdviceDTO adviceDTO);
 
+	void deleteExistingAdvice(int resumeNo, int mentorUid);
+
 	ResumeAdviceDTO getAdvice(int resumeNo);
 
 	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);

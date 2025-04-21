@@ -255,6 +255,9 @@ public class ResumeServiceImpl implements ResumeService {
 
 	@Override
 	public void saveAdvice(ResumeAdviceDTO adviceDTO) {
+		// 기존 첨삭 내용 삭제
+		rdao.deleteExistingAdvice(adviceDTO.getResumeNo(), adviceDTO.getMentorUid());
+		
 		// 첨삭 내용 저장
 		rdao.insertAdvice(adviceDTO);
 		
@@ -265,6 +268,11 @@ public class ResumeServiceImpl implements ResumeService {
 				rdao.insertAdviceFile(fileDTO);
 			}
 		}
+	}
+
+	@Override
+	public void deleteExistingAdvice(int resumeNo, int mentorUid) {
+		rdao.deleteExistingAdvice(resumeNo, mentorUid);
 	}
 
 	@Override
