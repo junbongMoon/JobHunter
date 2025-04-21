@@ -756,7 +756,7 @@
 											<c:forEach var="file" items="${adviceFiles}">
 												<div class="d-flex align-items-center mb-2 p-2 border rounded">
 													<i class="bi bi-file-earmark me-2"></i>
-													<span class="flex-grow-1">${file.adviceFileName}</span>
+													<span class="flex-grow-1">${file.originalFileName}</span>
 													<a href="/resources/resumeUpfiles/${file.adviceFileName}" download
 														class="btn btn-sm btn-primary ms-2">
 														<i class="bi bi-download"></i>
@@ -2831,7 +2831,8 @@
 							resumeNo: ${ resumeDetail.resume.resumeNo },
 							adviceContent: adviceContent,
 							files: uploadResults.map(result => ({
-								adviceFileName: result.newFileName
+								adviceFileName: result.newFileName,
+								originalFileName: result.originalFileName
 							}))
 					};
 

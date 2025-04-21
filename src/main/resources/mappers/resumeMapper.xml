@@ -291,8 +291,8 @@
 
 	<!-- 이력서 첨삭 파일 정보 저장 -->
 	<insert id="insertAdviceFile" parameterType="com.jobhunter.model.resume.ResumeAdviceUpfileDTO">
-		INSERT INTO resume_advice_upfiles (adviceNo, adviceFileName)
-		VALUES (#{adviceNo}, #{adviceFileName})
+		INSERT INTO resume_advice_upfiles (adviceNo, adviceFileName, originalFileName)
+		VALUES (#{adviceNo}, #{adviceFileName}, #{originalFileName})
 	</insert> 
 
     <!-- 첨삭 내용 조회 -->
@@ -315,6 +315,7 @@
             adviceUpfileNo,
             adviceNo,
             adviceFileName,
+            originalFileName,
             regDate
         FROM resume_advice_upfiles
         WHERE adviceNo = #{adviceNo}

@@ -19,5 +19,6 @@ public class ResumeAdviceUpfileDTO {
     private int adviceUpfileNo;
     private int adviceNo;
     private String adviceFileName;
+    private String originalFileName;
     private LocalDateTime regDate;
 } 
