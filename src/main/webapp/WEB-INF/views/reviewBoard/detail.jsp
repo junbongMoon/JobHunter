@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -78,6 +79,14 @@
 	visibility: visible !important;
 	color: inherit !important;
 }
+
+#reportCategory {
+	color: #000 !important;
+}
+
+#reportCategory option {
+	color: #000 !important;
+}
 </style>
 
 
@@ -154,6 +163,9 @@
 							<c:otherwise>미선택</c:otherwise>
 						</c:choose></td>
 				</tr>
+
+
+
 				<tr>
 					<th>면접 난이도</th>
 					<td><c:forEach begin="1" end="${detail.reviewLevel}">⭐</c:forEach>
@@ -216,6 +228,18 @@
 	<input type="hidden" id="isLiked" value="${isLiked}" />
 
 
+	<!-- 댓글 목록 출력 영역 -->
+	<ul id="replyList" class="list-group">
+		<!-- 여기에 기존 댓글들이 자동으로 추가됨 (JS로) -->
+	</ul>
+
+	<!-- 댓글 작성 영역 (사용자가 댓글 쓰는 부분) -->
+	<div class="mt-3">
+		<textarea id="replyContent" class="form-control" rows="3"
+			placeholder="댓글을 입력해주세요"></textarea>
+		<button id="submitReplyBtn" class="btn btn-primary mt-2">등록</button>
+	</div>
+
 
 
 
@@ -236,42 +260,51 @@
 	</div>
 
 
-	<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-    
-      <div class="modal-header">
-        <h5 class="modal-title" id="reportModalLabel">신고하기</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-      </div>
-      
-      <div class="modal-body">
-        <input type="hidden" id="boardNo" value="${detail.boardNo}">
-        <input type="hidden" id="loginUserUid" value="${loginUser.uid}">
-        
-        <label for="reportCategory" class="form-label">신고 사유</label>
-        <select class="form-select" id="reportCategory">
-          <option value="INAPPROPRIATE">부적절한 내용</option>
-          <option value="SPAM">스팸</option>
-          <option value="FALSE_INFO">허위 정보</option>
-        </select>
+	<div class="modal fade" id="reportModal" tabindex="-1"
+		aria-labelledby="reportModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
 
-        <label for="reportMessage" class="form-label mt-3">신고 내용</label>
-        <textarea class="form-control" id="reportMessage" rows="4" placeholder="자세한 내용을 입력해주세요"></textarea>
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-        <button type="button" id="submitReportBtn" class="btn btn-danger">제출</button>
-      </div>
-      
-    </div>
-  </div>
-</div>
+				<div class="modal-header">
+					<h5 class="modal-title" id="reportModalLabel">신고하기</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="닫기"></button>
+				</div>
+
+				<div class="modal-body">
+					<input type="hidden" id="boardNo" value="${detail.boardNo}">
+					<input type="hidden" id="loginUserUid" value="${loginUser.uid}">
+
+					<label for="reportCategory" class="form-label">신고 사유</label> <select
+						name="reportCategory" id="reportCategory" class="form-select"
+						required>
+						<option value="" disabled selected>-- 신고 사유 선택 --</option>
+						<option value="SPAM">스팸/광고성 메시지</option>
+						<option value="HARASSMENT">욕설/괴롭힘</option>
+						<option value="FALSE_INFO">허위 정보</option>
+						<option value="ILLEGAL_ACTIVITY">불법 행위</option>
+						<option value="INAPPROPRIATE_CONTENT">부적절한 프로필/사진</option>
+						<option value="MISCONDUCT">부적절한 행동/요구</option>
+						<option value="ETC">기타 사유</option>
+					</select> <label for="reportMessage" class="form-label mt-3">신고 내용</label>
+					<textarea class="form-control" id="reportMessage" rows="4"
+						placeholder="자세한 내용을 입력해주세요"></textarea>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">닫기</button>
+					<button type="button" id="submitReportBtn" class="btn btn-danger">제출</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<input type="hidden" id="boardNo" value="${detail.boardNo}">
 
 	<script>
 	
-	document.addEventListener("formData", () => {
+/* 	document.addEventListener("formData", () => {
 		  const form = document.getElementById("reviewForm");
 
 		  if (form === null) {
@@ -302,7 +335,7 @@
 		    }
 		  });
 		});
-
+ */
 
 	$(document).ready(function () {
 		  const isLiked = $('#isLiked').val() === 'true';
@@ -407,6 +440,11 @@
 		    const reporterAccountUid = $('#loginUserUid').val();
 		    const reportCategory = $('#reportCategory').val();
 		    const reportMessage = $('#reportMessage').val();
+		    
+		    	  if (!reportCategory) {
+		    	    alert("신고 사유를 선택해주세요.");
+		    	    return;
+		    	  }
 
 		    const reportData = {
 		      boardNo: parseInt(boardNo),
@@ -416,6 +454,7 @@
 		      reportType: "BOARD",
 		      reportTargetURL: `/reviewBoard/detail?boardNo=${boardNo}`
 		    };
+		    
 
 		    $.ajax({
 		      type: 'POST',
@@ -432,7 +471,74 @@
 		    });
 		  });
 		});
+		
+	
+	  $(document).ready(function () {
+	    const boardNo = $('#boardNo').val();  // 게시글 번호 (hidden input 필요)
+	    
+	    // 댓글 목록 불러오기
+	    function loadReplies() {
+	      $.ajax({
+	        url: '/reply/' + boardNo,
+	        type: 'GET',
+	        success: function (data) {
+	          const $replyList = $('#replyList');
+	          $replyList.empty();
+
+	          if (data.length === 0) {
+	            $replyList.append('<li class="list-group-item text-muted">등록된 댓글이 없습니다.</li>');
+	          } else {
+	            data.forEach(reply => {
+	              const date = reply.postDate?.substring(0, 10) || '';
+	              const html = `
+	                <li class="list-group-item">
+	                  <strong>${reply.userId}</strong> (${date})<br>
+	                  ${reply.content}
+	                </li>`;
+	              $replyList.append(html);
+	            });
+	          }
+	        },
+	        error: function () {
+	          alert('댓글을 불러오는 중 오류가 발생했습니다.');
+	        }
+	      });
+	    }
+
+	    // 댓글 등록
+	    $('#submitReplyBtn').click(function () {
+	      const content = $('#replyContent').val().trim();
+	      if (!content) {
+	        alert('댓글 내용을 입력해주세요.');
+	        return;
+	      }
+
+	      $.ajax({
+	        url: '/reply/add',
+	        type: 'POST',
+	        contentType: 'application/json',
+	        data: JSON.stringify({
+	          boardNo: parseInt(boardNo),
+	          content: content
+	        }),
+	        success: function () {
+	          $('#replyContent').val('');
+	          loadReplies();
+	        },
+	        error: function () {
+	          alert('댓글 등록 중 오류가 발생했습니다.');
+	        }
+	      });
+	    });
+
+	    // 페이지 로드 시 댓글 불러오기
+	    loadReplies();
+	  });
+	  
 
 	</script>
+
+
+
 </body>
 </html>
