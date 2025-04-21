@@ -490,6 +490,11 @@
 											${resume.regDate.substring(8,10)}일</small>
 									</div>
 									<div class="action-buttons">
+									<!-- 첨삭 테스트용 버튼 -->
+									<a href="/resume/advice/${resume.resumeNo}"
+													class="btn-custom btn-edit"> <i class="fas fa-edit"></i>
+													test하기
+												</a>
 										<c:choose>
 											<c:when test="${resume.checked}">
 												<button type="button" class="btn-custom btn-edit"
