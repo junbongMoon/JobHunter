@@ -28,6 +28,7 @@ import com.jobhunter.model.resume.EducationLevel;
 import com.jobhunter.model.resume.EducationStatus;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
@@ -405,4 +406,30 @@ public class ResumeController {
 	}
 
 
+
+	/**
+	 * 이력서 첨삭 내용을 저장합니다.
+	 * <p>
+	 * 첨삭 내용과 첨부파일 정보를 저장합니다.
+	 * </p>
+	 * 
+	 * @param adviceDTO 첨삭 정보
+	 * @return 저장 결과
+	 */
+	@PostMapping("/advice/save")
+	@ResponseBody
+	public Map<String, Object> saveAdvice(@RequestBody ResumeAdviceDTO adviceDTO) {
+		Map<String, Object> response = new HashMap<>();
+		
+		try {
+			resumeService.saveAdvice(adviceDTO);
+			response.put("success", true);
+			response.put("message", "첨삭이 저장되었습니다.");
+		} catch (Exception e) {
+			response.put("success", false);
+			response.put("message", "첨삭 저장에 실패했습니다: " + e.getMessage());
+		}
+		
+		return response;
+	}
 }

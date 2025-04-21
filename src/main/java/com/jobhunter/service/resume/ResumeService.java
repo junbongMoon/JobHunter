@@ -13,6 +13,7 @@ import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.resume.ResumeAdviceDTO;
 
 public interface ResumeService {
 
@@ -56,4 +57,6 @@ public interface ResumeService {
 
 	// 이력서 상태 확인
 	boolean isResumeChecked(int resumeNo) throws Exception;
+
+	void saveAdvice(ResumeAdviceDTO adviceDTO);
 }

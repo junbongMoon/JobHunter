@@ -14,6 +14,8 @@ import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.ResumeAdviceDTO;
+import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.ResumeVO;
@@ -246,4 +248,15 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public int checkResumeStatus(int resumeNo) throws Exception {
 		return ses.selectOne(NS + ".checkResumeStatus", resumeNo);
 	}
+
+	@Override
+	public void insertAdvice(ResumeAdviceDTO adviceDTO) {
+		ses.insert(NS + ".insertAdvice", adviceDTO);
+	}
+
+	@Override
+	public void insertAdviceFile(ResumeAdviceUpfileDTO fileDTO) {
+		ses.insert(NS + ".insertAdviceFile", fileDTO);
+	}
+
 }

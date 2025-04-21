@@ -282,5 +282,17 @@
         WHERE resumePk = #{resumeNo}
         AND status = 'CHECKED'
     </select>
+
+    <!-- 이력서 첨삭 내용 저장 -->
+	<insert id="insertAdvice" parameterType="com.jobhunter.model.resume.ResumeAdviceDTO" useGeneratedKeys="true" keyProperty="adviceNo">
+		INSERT INTO resume_advice (resumeNo, adviceContent)
+		VALUES (#{resumeNo}, #{adviceContent})
+	</insert>
+
+	<!-- 이력서 첨삭 파일 정보 저장 -->
+	<insert id="insertAdviceFile" parameterType="com.jobhunter.model.resume.ResumeAdviceUpfileDTO">
+		INSERT INTO resume_advice_upfiles (adviceNo, adviceFileName)
+		VALUES (#{adviceNo}, #{adviceFileName})
+	</insert> 
     
 </mapper>

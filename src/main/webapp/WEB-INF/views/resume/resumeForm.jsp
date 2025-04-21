@@ -733,10 +733,18 @@
 
 
 					<!-- 저장 버튼 -->
-					<button type="button" class="btn btn-primary" id="finalSaveBtn"><span class="btn-text">저장하기</span>
-						<span class="spinner-border spinner-border-sm text-light d-none" role="status"
-							aria-hidden="true"></span></button>
-
+					<c:if test="${mode != 'advice'}">
+						<button type="button" class="btn btn-primary" id="finalSaveBtn"><span
+								class="btn-text">저장하기</span>
+							<span class="spinner-border spinner-border-sm text-light d-none" role="status"
+								aria-hidden="true"></span></button>
+					</c:if>
+					<c:if test="${mode == 'advice'}">
+						<button type="button" class="btn btn-primary" id="adviceSaveBtn"><span class="btn-text">첨삭
+								저장하기</span>
+							<span class="spinner-border spinner-border-sm text-light d-none" role="status"
+								aria-hidden="true"></span></button>
+					</c:if>
 					<!-- <button type="button" class="btn btn-secondary" id="testBtn">코드
 						테스트용 버튼</button> -->
 					<button type="button" class="btn btn-secondary" id="returnBtn">목록으로</button>
@@ -2747,8 +2755,63 @@
 				const remainingLength = maxLength - currentLength;
 				$('#adviceCharCount').text(currentLength + ' / ' + maxLength);
 			});
+
 			//---------------------------------------------------------------------------------------------------------------------------------
-			
+			// 첨삭 모드 저장 버튼
+			$('#adviceSaveBtn').on('click', async function () {
+				const adviceContent = $('#adviceTextarea').val();
+				const files = adviceFiles;
+
+				try {
+					// 첨부파일 업로드
+					const uploadPromises = files.map(file => {
+						const formData = new FormData();
+						formData.append("file", file);
+
+						return $.ajax({
+							url: '/resume/uploadFile',
+							type: 'POST',
+							data: formData,
+							processData: false,
+							contentType: false
+						});
+					});
+
+					const uploadResults = await Promise.all(uploadPromises);
+
+					// 첨삭 내용과 파일 정보 저장
+					const adviceData = {
+						resumeNo: ${ resumeDetail.resume.resumeNo },
+						adviceContent: adviceContent,
+						files: uploadResults.map(result => ({
+							adviceFileName: result.newFileName
+						}))
+				};
+
+				// 첨삭 저장 요청
+				$.ajax({
+					url: '/resume/advice/save',
+					type: 'POST',
+					contentType: 'application/json',
+					data: JSON.stringify(adviceData),
+					success: function (response) {
+						if (response.success) {
+							alert('첨삭이 저장되었습니다.');
+							window.location.href = '/resume/list';
+						} else {
+							alert('첨삭 저장에 실패했습니다.');
+						}
+					},
+					error: function (error) {
+						console.error('첨삭 저장 중 오류 발생:', error);
+						alert('첨삭 저장 중 오류가 발생했습니다.');
+					}
+				});
+			} catch (error) {
+				console.error('파일 업로드 중 오류 발생:', error);
+				alert('파일 업로드 중 오류가 발생했습니다.');
+			}
+			});
 
 		});
 		</script>

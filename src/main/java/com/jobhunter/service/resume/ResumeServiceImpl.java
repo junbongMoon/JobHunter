@@ -13,6 +13,7 @@ import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
@@ -249,5 +250,19 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	public boolean isResumeChecked(int resumeNo) throws Exception {
 		return rdao.checkResumeStatus(resumeNo) > 0;
+	}
+
+	@Override
+	public void saveAdvice(ResumeAdviceDTO adviceDTO) {
+		// 첨삭 내용 저장
+		rdao.insertAdvice(adviceDTO);
+		
+		// 첨부파일 정보가 있는 경우 저장
+		if (adviceDTO.getFiles() != null && !adviceDTO.getFiles().isEmpty()) {
+			for (com.jobhunter.model.resume.ResumeAdviceUpfileDTO fileDTO : adviceDTO.getFiles()) {
+				fileDTO.setAdviceNo(adviceDTO.getAdviceNo());
+				rdao.insertAdviceFile(fileDTO);
+			}
+		}
 	}
 }
