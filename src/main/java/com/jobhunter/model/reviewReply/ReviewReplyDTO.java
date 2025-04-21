@@ -27,6 +27,7 @@ public class ReviewReplyDTO {
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 		private LocalDateTime postDate;
 		private Timestamp updatedAt;
+		private String isDeleted;
 	
 
 }
