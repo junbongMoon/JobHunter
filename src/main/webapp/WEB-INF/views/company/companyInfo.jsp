@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css">
 <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
 
-<link href="/resources/css/mypage.css" rel="stylesheet">
+<link href="/resources/css/companyInfo.css" rel="stylesheet">
 
 <main class="main" data-aos="fade-up">
   <h1 class="page-title">회사 정보</h1>
@@ -65,11 +65,20 @@
             <div>상세주소</div><div>로딩중...</div>
             <div>회사규모</div><div>로딩중...</div>
             <div>회사 홈페이지</div><div>로딩중...</div>
-            <div class="introduce-section"><div class="introduce-title">회사소개</div><div class="introduce-content">로딩중...</div></div>
             <div class="edit-buttons">
             <button class="btn-edit" onclick="modyfiInfoTapOpen(this)"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
             <button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
             </div>
+        </div>
+      </section>
+
+      <!-- 공고 영역 -->
+      <section data-aos="fade-up" data-aos-delay="300">
+        <div class="section-title">
+          <h2><i class="bi bi-file-earmark-text section-icon"></i>회사 소개</h2>
+        </div>
+        <div class="empty-state">
+          <div class="introduce-section"><div id="introduce-content">로딩중...</div></div>
         </div>
       </section>
       
@@ -117,28 +126,17 @@
               <div>회사 홈페이지</div>
               <div><input type="text" class="form-control" id="homePage" placeholder="홈페이지 링크를 입력하세요" maxlength="190"></div>
               
+              <h3 class="section-subtitle">회사소개</h3>
+              <div class="introduce-section">
+                <textarea id="introduce" placeholder="회사소개를 입력해주세요"></textarea>
+              </div>
             </div>
           </div>
 
-          <div class="introduce-section">
-            <textarea id="introduce" placeholder="회사소개를 입력해주세요"></textarea>
-          </div>
-          
           <div class="edit-buttons">
             <button onclick="cancleModify()" class="btn-cancel">취소</button>
             <button onclick="confirmModify(this)" class="btn-confirm">변경 확인</button>
           </div>
-        </div>
-      </section>
-
-      <!-- 공고 영역 -->
-      <section data-aos="fade-up" data-aos-delay="300">
-        <div class="section-title">
-          <h2><i class="bi bi-file-earmark-text section-icon"></i>내 공고</h2>
-        </div>
-        <div class="empty-state">
-          <i class="bi bi-file-earmark-text"></i>
-          <p>등록된 이력서가 없습니다.</p>
         </div>
       </section>
 
@@ -320,8 +318,7 @@ function updateCompanyDetailInfo(companyInfo) {
   }
 
   // 자기소개
-  const introduceDiv = companyDetailInfo.querySelector('.introduce-content');
-  introduceDiv.innerHTML = companyInfo.introduce || '회사소개가 아직 없습니다.';
+  $('#introduce-content').html(companyInfo.introduce || '회사소개가 아직 없습니다.');
 }
 
 // 수정창 내용 초기화
@@ -351,8 +348,8 @@ function updateCompanyModifyInfo(result) {
     $('#addressDetail').show()
   }
   if (result.detailAddr) {
-    $('detailAddressBackup').val(result.detailAddr);
-    $('addressDetail').val(result.detailAddr || '');
+    $('#detailAddressBackup').val(result.detailAddr);
+    $('#addressDetail').val(result.detailAddr || '');
   }
 
   // 기업규모
