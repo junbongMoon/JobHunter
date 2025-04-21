@@ -81,6 +81,10 @@
 			<mapping path="/account/testLoginAjax" />
 			<mapping path="/account/testGetLogin" />
 			<mapping path="/resume/**" />
+			<mapping path="/recruitmentnotice/save"/>
+			<mapping path="/recruitmentnotice/modify"/>
+			<mapping path="/recruitmentnotice/remove"/>
+			<mapping path="/submit/**"/>
 			<mapping path="/submission/**" />
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
