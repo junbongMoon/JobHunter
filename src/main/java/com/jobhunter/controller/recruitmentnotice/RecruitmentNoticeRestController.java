@@ -116,7 +116,31 @@ public class RecruitmentNoticeRestController {
 			return result;
 		}
 	
-	   
+		/**
+		 *  @author 육근우
+		 *
+		 * <p>
+		 * 내 공고 리스트 + 해당 공고에 붙은 신청서 갯수를 가져오는 메서드
+		 * </p>
+		 * 
+		 * @param int companyUid
+		 * @param PageRequestDTO pageRequestDTO
+		 * @param Model model
+		 * @return  공고리스트를 담은 페이징에 정보를 객체를 담은 ResponseEntity
+		 *
+		 */
+		@GetMapping("/list/{companyUid}/{page}")
+		public ResponseEntity<PageResponseDTO<RecruitmentNotice>> showRecruitmentWithResumeByUid(@PathVariable("companyUid") int companyUid,
+				@PathVariable("page") int page){
+			ResponseEntity<PageResponseDTO<RecruitmentNotice>> result = null;		
+			
+			PageResponseDTO<RecruitmentNotice> pageResponseDTO = recService.getRecruitmentByCompanyUid(companyUid, pageRequestDTO);
+			
+			result = ResponseEntity.ok().body(pageResponseDTO);
+			
+			return result;
+			
+		}
 	
 	
 }

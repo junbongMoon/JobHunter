@@ -42,4 +42,6 @@ public interface UserDAO {
 
 	void updateProfileImg(Integer uid, String base64) throws Exception;
 
+	void updateName(Integer uid, String newName) throws Exception;
+
 }

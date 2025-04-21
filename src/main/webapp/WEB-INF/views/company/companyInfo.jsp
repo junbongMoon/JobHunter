@@ -35,8 +35,8 @@
         <div class="section-title">
           <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
         </div>
-        <div style="border:1px solid var(--bs-gray-300); width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; text-align: center;" onclick="cropImgModalOpen()" id="profileImgContainer"><span id="profileImg">이미지 로딩중...</span></div>
-        <i style="margin:10px; color:var(--accent-color)">이미지 삭제</i><hr>
+        <div style="cursor: pointer; border:1px solid var(--bs-gray-300); width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; text-align: center;" onclick="cropImgModalOpen()" id="profileImgContainer"><span id="profileImg">이미지 로딩중...</span></div>
+        <i style="margin:10px; color:var(--accent-color); cursor: pointer;" onclick="deleteImgModal()">이미지 삭제</i><hr>
         <div class="info-grid" id="basicInfo">
           <div>회사명</div><div><strong id="companyName">로딩중...</strong></div>
           <div>대표자</div><div id="representative">로딩중...</div>
@@ -56,7 +56,7 @@
       </section>
 
       <!-- CompanyVO 상세 정보 섹션 -->
-      <section data-aos="fade-up" data-aos-delay="150">
+      <section data-aos="fade-up" data-aos-delay="150" class="spacerContainer">
         <div class="section-title">
           <h2><i class="bi bi-person-vcard section-icon"></i>상세 정보</h2>
         </div>
@@ -65,11 +65,13 @@
             <div>상세주소</div><div>로딩중...</div>
             <div>회사규모</div><div>로딩중...</div>
             <div>회사 홈페이지</div><div>로딩중...</div>
+        </div>
+            <div class="spacer">
+        	</div>
             <div class="edit-buttons">
             <button class="btn-edit" onclick="modyfiInfoTapOpen(this)"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
             <button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
             </div>
-        </div>
       </section>
 
       <!-- 공고 영역 -->
@@ -1273,7 +1275,27 @@ function copperConfirm() {
 
 // #endregion 
 
+// #region 프로필 이미지삭제
+function deleteImgModal() {
+    window.publicModals.show(`정말로 삭제하시겠습니까?`,{
+      confirmText:'예', cancleText:'아니오', onConfirm:deleteImg
+    })
+  }
 
+function deleteImg() {
+  $.ajax({
+      url: "/company/profileImg",
+      type: "DELETE",
+      success: function (response) {
+        window.publicModals.show("변경 완료!");
+        document.getElementById('profileImg').innerHTML = `<img src="\${response}" style="width:100%; height:100%; object-fit:cover;">`;
+      },
+      error: function (xhr, status, error) {
+        window.publicModals.show("변경에 실패하였습니다. 잠시 후 다시 시도해주세요.");
+      }
+    });
+}
+// #endregion 
 </script>
 <!-- 풋터 -->
 <jsp:include page="/WEB-INF/views/footer.jsp"></jsp:include>

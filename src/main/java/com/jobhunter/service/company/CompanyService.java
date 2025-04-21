@@ -30,4 +30,6 @@ public interface CompanyService {
 
 	void updateProfileImg(Integer uid, String base64) throws Exception;
 
+	void deleteProfileImg(Integer uid) throws Exception;
+
 }

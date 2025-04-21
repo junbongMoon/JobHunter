@@ -32,10 +32,10 @@
         <div class="section-title">
           <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
         </div>
-        <div style="border:1px solid var(--bs-gray-300); width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; text-align: center;" onclick="cropImgModalOpen()" id="profileImgContainer"><span id="profileImg">이미지 로딩중...</span></div>
-        <i style="margin:10px; color:var(--accent-color)">이미지 삭제</i><hr>
+        <div style="cursor: pointer; border:1px solid var(--bs-gray-300); width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; text-align: center;" onclick="cropImgModalOpen()" id="profileImgContainer"><span id="profileImg">이미지 로딩중...</span></div>
+        <i style="margin:10px; color:var(--accent-color); cursor: pointer;" onclick="deleteImgModal()">이미지 삭제</i><hr>
         <div class="info-grid" id="basicInfo">
-          <div>이름</div><div><span id="userName">로딩중...</span><i class="nameChangeBtn">변경</i></div>
+          <div>이름</div><div><span id="userName">로딩중...</span><i class="nameChangeBtn" onclick="changeNameModal()">변경</i></div>
           <div>전화번호</div><div id="nowMobile">로딩중...</div>
           <div>이메일</div><div id="nowEmail">로딩중...</div>
           <div>가입일</div><div id="regDate">로딩중...</div>
@@ -79,7 +79,6 @@
             <div class="edit-buttons">
             <button class="btn-edit" onclick="modyfiInfoTapOpen()"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
 
-            <div>장애여부</div>
             <button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
             </div>
         </div>
@@ -1076,14 +1075,14 @@ async function verifiToNewMobile() {
     showCodeModal(()=>{changeMobile(formattedNumber)});
   } catch (error) {
     window.publicModals.show("인증번호 전송중 오류가 발생했습니다. fireBase 사용횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.", {
-      onConfirm: backdoor,
+      onConfirm: ()=>{backdoor(formattedNumber); return false;},
       confirmText: "백도어",
       cancelText: "닫기"
     });
   }
 }
 
-function backdoor() {
+function backdoor(formattedNumber) {
   const dto = {
       type: "mobile",
       value: formattedNumber,
@@ -1546,7 +1545,64 @@ function copperConfirm() {
 
 // #endregion 
 
+// #region 프로필 이미지삭제
+function deleteImgModal() {
+    window.publicModals.show(`정말로 삭제하시겠습니까?`,{
+      confirmText:'예', cancleText:'아니오', onConfirm:deleteImg
+    })
+  }
 
+function deleteImg() {
+  $.ajax({
+      url: "/user/profileImg",
+      type: "DELETE",
+      success: function (response) {
+        window.publicModals.show("변경 완료!");
+        document.getElementById('profileImg').innerHTML = `<img src="\${response}" style="width:100%; height:100%; object-fit:cover;">`;
+      },
+      error: function (xhr, status, error) {
+        window.publicModals.show("변경에 실패하였습니다. 잠시 후 다시 시도해주세요.");
+      }
+    });
+}
+// #endregion 
+
+function changeNameModal() {
+  const changeNameText = `
+  <h4>이름 변경</h4>
+  <input type="text" id="changeNameModal" placeholder="변경할 이름을 입력해 주세요."></input>
+  <div style="font-size:0.7em">해당 성함은 이력서에도 입력될 내용이니 되도록 실명을 추천드립니다.</div>
+  `
+
+  window.publicModals.show(changeNameText,{
+    confirmText:'변경', cancleText:'취소', onConfirm:changeName
+  })
+}
+
+function changeName() {
+  const newName = $('#changeNameModal').val();
+
+  console.log(newName);
+
+  if (!newName || newName.trim() === '') {
+    window.publicModals.show("이름은 비워둘 수 없습니다.");
+    return;
+  }
+
+  $.ajax({
+    url: '/user/name',
+    method: 'PATCH',
+    contentType: 'application/json',
+    data: JSON.stringify({ name: newName.trim() }),
+    success: function (res) {
+      window.publicModals.show("이름이 성공적으로 변경되었습니다.");
+      $('#userName').text(res.message); // 화면에 이름 반영
+    },
+    error: function (xhr) {
+      window.publicModals.show("이름 변경 중 오류 발생");
+    }
+  });
+}
 
 </script>
 <!-- 풋터 -->

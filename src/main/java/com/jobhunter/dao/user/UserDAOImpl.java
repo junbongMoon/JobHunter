@@ -142,4 +142,13 @@ public class UserDAOImpl implements UserDAO {
 	    
 		ses.update(NS + ".updateProfileImg", paramMap);
 	}
+
+	@Override
+	public void updateName(Integer uid, String newName) throws Exception {
+		Map<String, Object> paramMap = new HashMap<>();
+	    paramMap.put("uid", uid);
+	    paramMap.put("name", newName);
+	    
+		ses.update(NS + ".updateName", paramMap);
+	}
 }

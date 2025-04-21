@@ -43,4 +43,8 @@ public interface UserService {
 
 	void updateProfileImg(Integer uid, String base64) throws Exception;
 
+	void deleteProfileImg(Integer uid) throws Exception;
+
+	void updateName(Integer uid, String newName) throws Exception;
+
 }

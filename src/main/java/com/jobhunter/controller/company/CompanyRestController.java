@@ -32,6 +32,7 @@ import com.jobhunter.model.user.PasswordDTO;
 import com.jobhunter.service.company.CompanyService;
 import com.jobhunter.util.AccountUtil;
 import com.jobhunter.util.CompressImgUtil;
+import com.jobhunter.util.PropertiesTask;
 
 import lombok.RequiredArgsConstructor;
 
@@ -351,6 +352,22 @@ public class CompanyRestController {
 
             // 클라이언트에 전달
             return ResponseEntity.ok(base64);
+
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+        	e.printStackTrace();
+        	return ResponseEntity.status(500).body("이미지 처리 중 오류 발생");
+		}
+    }
+	
+	@DeleteMapping("/profileImg")
+    public ResponseEntity<String> deleteProfileImg(@SessionAttribute("account") AccountVO account) {
+        try {
+            // DB 저장
+            service.deleteProfileImg(account.getUid());
+
+            // 클라이언트에 전달
+            return ResponseEntity.ok(PropertiesTask.getPropertiesValue("config/profileImg.properties", "defaltImg"));
 
         } catch (Exception e) {
 			// TODO Auto-generated catch block

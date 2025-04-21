@@ -1,6 +1,7 @@
 let controller = new AbortController(); // 전역 컨트롤러
 
 function summerNoteImgSizeCheck(files, maxSize) {
+
   let RequiredCompress = false;
 
   for (const file of files) {
@@ -12,11 +13,21 @@ function summerNoteImgSizeCheck(files, maxSize) {
   if (RequiredCompress) {
     imgCompressModal(files, '#introduce', maxSize); // 모달로 압축 물어봄
   } else {
-    for (const file of files) {
-      if (file.size > maxSize) {
-        insertSmartImageToSummernote(file, '#introduce'); // 바로 삽입
-      }
-    }
+    insertNowSummernote(files, '#introduce'); // 바로 삽입
+  }
+}
+
+// 압축 없이 이미지 바로 삽입
+function insertNowSummernote(files, targetEditorSelector) {
+  for (const file of files) {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const base64Image = reader.result;
+      $(targetEditorSelector).summernote('insertImage', base64Image);
+    };
+
+    reader.readAsDataURL(file);
   }
 }
 
@@ -37,6 +48,7 @@ function imgCompressModal(files, targetEditorSelector, maxSize) {
 
 // 썸머노트 이미지 강제압축 함수
 function insertSmartImageToSummernote(files, targetEditorSelector, maxSize) {
+
   controller = new AbortController();
   let completed = 0; // 완료된 파일 수
   const total = files.length;

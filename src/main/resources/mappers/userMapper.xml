@@ -231,5 +231,11 @@
 		(#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N',
 		#{nationality});
 	</insert>
+	
+	<update id="updateName">
+		UPDATE users
+		SET userName = #{name}
+		WHERE uid = #{uid}
+	</update>
 
 </mapper>
