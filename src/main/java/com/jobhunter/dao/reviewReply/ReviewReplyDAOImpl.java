@@ -1,6 +1,8 @@
 package com.jobhunter.dao.reviewReply;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -32,5 +34,18 @@ public class ReviewReplyDAOImpl implements ReviewReplyDAO {
     public int insertReply(ReviewReplyDTO dto) throws Exception {
     	return ses.insert(NS+".insertReply", dto);
     }
+
+	@Override
+	public int updateReplyDao(ReviewReplyDTO dto) throws Exception {
+	    return ses.update(NS+".updateReplyDate", dto);
+	}
+
+	@Override
+	public int deleteReplyDao(int replyNo, int userId) throws Exception {
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("replyNo", replyNo);
+	    param.put("userId", userId);
+	    return ses.update(NS+".deleteReplyDate", param);
+	}
 }
 

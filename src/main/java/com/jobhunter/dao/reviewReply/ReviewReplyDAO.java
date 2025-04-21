@@ -9,4 +9,8 @@ public interface ReviewReplyDAO {
     
     
     int insertReply(ReviewReplyDTO dto) throws Exception;
+    
+    int updateReplyDao(ReviewReplyDTO dto) throws Exception;
+    
+    int deleteReplyDao(int replyNo, int userId) throws Exception;
 }

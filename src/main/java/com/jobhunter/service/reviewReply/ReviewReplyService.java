@@ -8,4 +8,8 @@ public interface ReviewReplyService {
 	List<ReviewReplyDTO> getRepliesByBoardNo(int boardNo) throws Exception;
 
 	boolean insertReply(ReviewReplyDTO dto) throws Exception;
+	
+	boolean updateReply(ReviewReplyDTO dto) throws Exception;
+	
+	boolean deleteReply(int replyNo, int userId) throws Exception;
 }

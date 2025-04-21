@@ -5,43 +5,57 @@
 
 <mapper namespace="com.jobhunter.mapper.reviewreplymapper">
 
-  <!-- 댓글 목록 조회 -->
-  <select id="selectRepliesByBoardNo" parameterType="int" resultType="com.jobhunter.model.reviewReply.ReviewReplyDTO">
-    SELECT
-      rr.replyNo,
-      rr.boardNo,
-      rr.userId,
-      u.userId AS writerId,
-      rr.content,
-      rr.likes,
-      rr.postDate,
-      rr.updatedAt,
-      rr.isDeleted
-    FROM reviewReply rr
-    JOIN users u ON rr.userId = u.uid
-    WHERE rr.boardNo = #{boardNo}
-      AND rr.isDeleted = 'N'
-    ORDER BY rr.postDate ASC
-  </select>
+	<!-- 댓글 목록 조회 -->
+	<select id="selectRepliesByBoardNo" parameterType="int"
+		resultType="com.jobhunter.model.reviewReply.ReviewReplyDTO">
+		SELECT
+		rr.replyNo,
+		rr.boardNo,
+		rr.userId,
+		u.userId AS writerId,
+		rr.content,
+		rr.likes,
+		rr.postDate,
+		rr.updatedAt,
+		rr.isDeleted
+		FROM reviewReply rr
+		JOIN users u ON rr.userId = u.uid
+		WHERE rr.boardNo = #{boardNo}
+		AND rr.isDeleted = 'N'
+		ORDER BY rr.postDate ASC
+	</select>
 
-  <!-- 댓글 작성 -->
-  <insert id="insertReply" parameterType="com.jobhunter.model.reviewReply.ReviewReplyDTO" useGeneratedKeys="true" keyProperty="replyNo">
-    INSERT INTO reviewReply (
-      boardNo,
-      userId,
-      content,
-      likes,
-      postDate,
-      isDeleted
-    )
-    VALUES (
-      #{boardNo},
-      #{userId},
-      #{content},
-      #{likes},
-      NOW(),
-      'N'
-    )
-  </insert>
+	<!-- 댓글 작성 -->
+	<insert id="insertReply"
+		parameterType="com.jobhunter.model.reviewReply.ReviewReplyDTO"
+		useGeneratedKeys="true" keyProperty="replyNo">
+		INSERT INTO reviewReply (
+		boardNo,
+		userId,
+		content,
+		likes,
+		postDate,
+		isDeleted
+		)
+		VALUES (
+		#{boardNo},
+		#{userId},
+		#{content},
+		#{likes},
+		NOW(),
+		'N'
+		)
+	</insert>
 
+	<update id="updateReplyDate" parameterType="com.jobhunter.model.reviewReply.ReviewReplyDTO">
+		UPDATE reviewReply
+		SET content = #{content}, updatedAt = NOW()
+		WHERE replyNo = #{replyNo} AND userId = #{userId}
+	</update>
+
+	<update id="deleteReplyDate" parameterType="map">
+		UPDATE reviewReply
+		SET isDeleted = 'Y'
+		WHERE replyNo = #{replyNo} AND userId = #{userId}
+	</update>
 </mapper>

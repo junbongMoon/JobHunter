@@ -30,5 +30,24 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
 			return false;
 		}
 	}
+	
+	@Override
+	public boolean updateReply(ReviewReplyDTO dto) throws Exception {
+		int result = replyDAO.updateReplyDao(dto);
+	    if (result == 1) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
 
+	@Override
+	public boolean deleteReply(int replyNo, int userId) throws Exception {
+		int result = replyDAO.deleteReplyDao(replyNo, userId);
+	    if (result == 1) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
 }
