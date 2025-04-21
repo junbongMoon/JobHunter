@@ -29,7 +29,7 @@ public class ReviewDetailViewDTO {
 	private String reviewType; // 면접 유형
 	private int reviewLevel; // 난이도
 	private String content; // 후기 본문
-	private int likes; // 좋아요 수
+	private Integer likes; // 좋아요 수
 	private int views; // 조회수
 	
 	private String typeOtherText; // 기타 상세 유
