@@ -312,9 +312,6 @@
 
 		<script>
 
-			window.publicSessionUid = "${sessionScope.account.uid}";
-			window.publicSessionAccType = "${sessionScope.account.accountType}";
-
 			function openNotifications(uid, accountType) {
 				const width = 800;
 				const height = 600;
