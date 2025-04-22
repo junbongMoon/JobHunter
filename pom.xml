@@ -15,14 +15,6 @@
 		<org.slf4j-version>1.6.6</org.slf4j-version>
 	</properties>
 
-	<!-- 아임포트 Maven Repository -->
-	<repositories>
-		<repository>
-			<id>iamport</id>
-			<url>https://jitpack.io</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<!-- Spring -->
 		<dependency>
@@ -249,14 +241,7 @@
 			<artifactId>junit</artifactId>
 			<version>4.7</version>
 			<scope>test</scope>
-		</dependency>
-		
-		<!-- 아임포트 Java SDK 의존성 -->
-		<dependency>
-			<groupId>com.github.iamport</groupId>
-			<artifactId>iamport-rest-client-java</artifactId>
-			<version>0.2.21</version>
-		</dependency>
+		</dependency>		
 
 
 
