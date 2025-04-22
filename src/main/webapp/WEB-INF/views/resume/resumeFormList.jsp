@@ -497,6 +497,12 @@
 													<i class="fas fa-edit"></i>
 													첨삭 조회 하기 (멘티&멘토) + 수정까지
 												</a>
+												<!-- 첨삭 제출 페이지 -->
+												<a href="/submission/adCheck/?uid=1"
+													class="btn-custom btn-edit">
+													<i class="fas fa-edit"></i>
+													첨삭 제출
+												</a>
 												<c:choose>
 													<c:when test="${resume.checked}">
 														<button type="button" class="btn-custom btn-edit"
