@@ -89,10 +89,10 @@
 }
 
 .list-group-item {
-  color: black !important;
-  font-size: 16px !important;
-  background-color: #fdfdfd !important;
-  display: block !important;
+	color: black !important;
+	font-size: 16px !important;
+	background-color: #fdfdfd !important;
+	display: block !important;
 }
 </style>
 
@@ -309,7 +309,7 @@
 		</div>
 	</div>
 
-
+  		<input type="hidden" id="loginUserUid" value="${sessionScope.account.uid}">
 	<script>
 	
 /* 	document.addEventListener("formData", () => {
@@ -346,9 +346,11 @@
  */
 //공통 변수
  const boardNo = $('#boardNo').val();
+ const ReplyNo = $('#ReplyNo').val();
  const userId = $('#userId').val();
  const likeModal = new bootstrap.Modal(document.getElementById('likeModal'));
-	$(document).ready(function () {
+ const loginUserUid = $('#userId').val();
+ $(document).ready(function () {
 		  const isLiked = $('#isLiked').val() === 'true';
 
 		  if (isLiked) {
@@ -476,7 +478,7 @@
 		});
 		
 	  
-
+		//댓글 등록 
 	  $(document).ready(function () {
 	   
 	    loadReplies();
@@ -506,10 +508,10 @@
 	      });
 	    });
 	  });
-
+		//댓글들 목록 
 	  function loadReplies() {
 		  $.ajax({
-		    url: '/reply/' + boardNo,
+		    url: '/reply/list/' + boardNo,
 		    type: 'GET',
 		    success: function (data) {
 		    	console.log("댓글 데이터:", data); 
@@ -521,20 +523,35 @@
 		        return;
 		      }
 		      data.forEach(reply => {
-		        const date = typeof reply.postDate === 'string' && reply.postDate.length >= 10
+		    	  const date = typeof reply.postDate === 'string' && reply.postDate.length >= 10
 		          ? reply.postDate.substring(0, 10)
 		          : '날짜 없음';
-
+		         
 		        const writer = reply.writerId && typeof reply.writerId === 'string' && reply.writerId.trim().length > 0
 		          ? reply.writerId
 		          : (reply.userId ? '사용자 ' + reply.userId : '익명');
 
 		        const content = reply.content ? reply.content : '(내용 없음)';
+		        console.log("reply.replyNo:", reply.replyNo);
+		        console.log("reply.userId:", reply.userId);
+		        console.log("reply.content:", reply.content);
 
-		        const html = '<li class="list-group-item">' +
-	             '<strong>' + writer + '</strong> (' + date + ')<br>' +
-	             '<div>' + reply.content + '</div>' +
-	             '</li>';
+		        const buttonsHtml = (reply.userId === parseInt(loginUserUid)) ? `
+		        		<button 
+		        	    class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn"
+		        	    data-replyno="${reply.replyNo}"
+		        	    data-content="${reply.replyContent}">
+		        	    수정
+		        	  </button>
+		        	  <button class="btn btn-sm btn-outline-danger delete-reply-btn"
+		        	    data-replyno="${reply.replyNo}">삭제</button>` : '';
+		        	      
+		        
+		        const html = '<li class="list-group-item" data-replyno="' + reply.replyNo + '">' +
+		        '<strong>' + writer + '</strong> (' + date + ')<br>' +
+		        '<div class="reply-content">' + content + '</div>' +
+		        buttonsHtml +
+		      '</li>';
 		        $replyList.append(html);
 		      });
 		    },
@@ -545,11 +562,62 @@
 		}
 
 
+				// 수정 클릭 → 입력창으로 전환
+			$(document).on('click', '.delete-reply-btn', function () {
+			  const replyNo = $(this).data('replyno');
+			
+			  if (confirm('댓글을 삭제하시겠습니까?')) {
+			    $.ajax({
+			      url: '/reply/delete',
+			      type: 'POST',
+			      success: function () {
+			        alert('댓글이 삭제되었습니다.');
+			        loadReplies(); // 댓글 목록 갱신
+			      },
+			      error: function () {
+			        alert('댓글 삭제 중 오류가 발생했습니다.');
+			      }
+			    });
+			  }
+});
 
+		// 댓글 수정
+		$(document).on('click', '.edit-reply-btn', function () {
+			  const replyNo = $(this).data('replyno');
+			  const currentContent = $(this).data('content');
+			  const $btn = $(this);
+			  console.log("버튼 전체 HTML:", $btn[0].outerHTML);
+			  console.log("data-replyno:", $btn.data("replyno"));
+			  console.log("data-content:", $btn.data("content"));
+			 
+			  
+			  if (isNaN(replyNo)) {
+			    alert("댓글 번호가 유효하지 않습니다.");
+			    return;
+			  }
 
-	   
-	  
-	  
+	  const newContent = prompt('댓글을 수정하세요:', currentContent);
+	  if (newContent !== null) {
+	    $.ajax({
+	      url: '/reply/update',
+	      type: 'POST',
+	      contentType: 'application/json',
+	      data: JSON.stringify({ 
+	    	replyNo: parseInt(replyNo),
+	        userId: parseInt($('#userId').val()),
+	        content: newContent.trim()
+	      }),
+	      success: function () {
+	        alert('댓글이 수정되었습니다.');
+	        loadReplies();
+	      },
+	      error: function () {
+	        alert('댓글 수정 중 오류가 발생했습니다.');
+	      }
+	    });
+	  }
+	});
+
 
 	</script>
 

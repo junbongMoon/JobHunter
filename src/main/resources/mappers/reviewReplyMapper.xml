@@ -6,13 +6,14 @@
 <mapper namespace="com.jobhunter.mapper.reviewreplymapper">
 
 	<!-- 댓글 목록 조회 -->
-	<select id="selectRepliesByBoardNo" parameterType="int"
-		resultType="com.jobhunter.model.reviewReply.ReviewReplyDTO">
+	<select id="selectRepliesByBoardNo" resultMap="ReplyResultMap"
+		parameterType="int">
 		SELECT
 		rr.replyNo,
 		rr.boardNo,
 		rr.userId,
-		u.userId AS writerId,
+		u.userId AS
+		writerId,
 		rr.content,
 		rr.likes,
 		rr.postDate,
@@ -20,10 +21,24 @@
 		rr.isDeleted
 		FROM reviewReply rr
 		JOIN users u ON rr.userId = u.uid
-		WHERE rr.boardNo = #{boardNo}
+		WHERE rr.boardNo =
+		#{boardNo}
 		AND rr.isDeleted = 'N'
 		ORDER BY rr.postDate ASC
 	</select>
+
+	<resultMap id="ReplyResultMap"
+		type="com.jobhunter.model.reviewReply.ReviewReplyDTO">
+		<id property="replyNo" column="replyNo" />
+		<result property="boardNo" column="boardNo" />
+		<result property="userId" column="userId" />
+		<result property="writerId" column="writerId" />
+		<result property="content" column="content" />
+		<result property="likes" column="likes" />
+		<result property="postDate" column="postDate" />
+		<result property="updatedAt" column="updatedAt" />
+		<result property="isDeleted" column="isDeleted" />
+	</resultMap>
 
 	<!-- 댓글 작성 -->
 	<insert id="insertReply"
@@ -47,9 +62,12 @@
 		)
 	</insert>
 
-	<update id="updateReplyDate" parameterType="com.jobhunter.model.reviewReply.ReviewReplyDTO">
+
+	<update id="updateReplyDate"
+		parameterType="com.jobhunter.model.reviewReply.ReviewReplyDTO">
 		UPDATE reviewReply
-		SET content = #{content}, updatedAt = NOW()
+		SET content = #{content}, updatedAt =
+		NOW()
 		WHERE replyNo = #{replyNo} AND userId = #{userId}
 	</update>
 
