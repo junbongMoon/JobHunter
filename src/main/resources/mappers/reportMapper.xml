@@ -31,6 +31,35 @@
 	</insert>
 <!-- 계정 신고 관련 매퍼 -->
 
+
+
+<!-- 게시글  신고 관련 매퍼 -->
+<insert id="insertBoardReport" parameterType="com.jobhunter.model.report.BoardReportDTO">
+  INSERT INTO reportMessage (
+    reportType,
+    targetAccountUid,
+    targetAccountType,
+    reporterAccountUid,
+    reporterAccountType,
+    reportCategory,
+    reportMessage,
+    reportTargetURL
+
+  ) VALUES (
+    #{reportType},
+    #{targetAccountUid},
+    #{targetAccountType},
+    #{reporterAccountUid},
+    #{reporterAccountType},
+    #{reportCategory},
+    #{reportMessage},
+    #{reportTargetURL}
+    
+  )
+</insert>
+
+<!-- 게시글  신고 관련 매퍼 -->
+
 <!-- reporterAccountType이 USER인 신고 데이터 조회 -->
 	<select id="getReportsByUserReporter" resultType="com.jobhunter.model.report.ReportMessageVO">
 		SELECT *
@@ -42,4 +71,5 @@
 			regDate DESC
 	</select>
 <!-- reporterAccountType이 USER인 신고 데이터 조회 -->
+
 </mapper>

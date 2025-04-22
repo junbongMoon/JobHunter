@@ -53,11 +53,11 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 		return ses.selectOne(NS + ".detailAll", boardNo);
 	}
 
-	@Override
-	public LocalDateTime selectLike(Likes like) throws Exception {
-
-		return ses.selectOne(NS + ".selectLastLikeTime", like);
-	}
+//	@Override
+//	public LocalDateTime selectLike(Likes like) throws Exception {
+//
+//		return ses.selectOne(NS + ".selectLastLikeTime", like);
+//	}
 
 	@Override
 	public int insertLike(Likes like) {
@@ -145,7 +145,6 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 
 	@Override
 	public int countReviewBoard(RPageRequestDTO pageRequestDTO) throws Exception {
-
 		return ses.selectOne(NS + ".countReviewBoard", pageRequestDTO);
 	}
 
@@ -167,6 +166,17 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 			ses.insert(NS + ".logInsertDelete", param);
 		}
 
+	}
+
+	@Override
+	public List<String> ListCompany() throws Exception {
+			return ses.selectList(NS +".getCompanyList");
+	}
+
+	@Override
+	public Integer findWriterUidByBoardNo(int boardNo) {
+		
+		return ses.selectOne(NS +".findWriterUidByBoardNo",boardNo);
 	}
 
 }

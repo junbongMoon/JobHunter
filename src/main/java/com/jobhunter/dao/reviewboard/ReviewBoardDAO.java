@@ -21,7 +21,7 @@ public interface ReviewBoardDAO {
 
 	ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception;
 
-	LocalDateTime selectLike(Likes like) throws Exception;
+//	boolean selectLike(Likes like) throws Exception;
 
 	int insertLike(Likes like) throws Exception;
 
@@ -37,9 +37,8 @@ public interface ReviewBoardDAO {
 
 	int deletBoardNo(int boardNo) throws Exception;
 
-	int checkViewedWithHours(int userId, int boardNo) throws Exception;	
+	int checkViewedWithHours(int userId, int boardNo) throws Exception;
 
-	
 	int incrementViews(int boardNo) throws Exception;
 
 	int countAllBoards() throws Exception;
@@ -56,11 +55,8 @@ public interface ReviewBoardDAO {
 
 	int hasUserLikeit(Likes like) throws Exception;
 
-	
-
-	
-
-
-
+	List<String> ListCompany() throws Exception;
+	//신고 아이디 조
+	Integer findWriterUidByBoardNo(int boardNo);
 
 }

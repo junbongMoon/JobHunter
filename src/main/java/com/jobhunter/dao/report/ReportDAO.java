@@ -3,7 +3,11 @@ package com.jobhunter.dao.report;
 import java.util.List;
 
 import com.jobhunter.model.report.AccountReportDTO;
+
+import com.jobhunter.model.report.BoardReportDTO;
+
 import com.jobhunter.model.report.ReportMessageVO;
+
 
 public interface ReportDAO {
 
@@ -16,5 +20,7 @@ public interface ReportDAO {
 	 * @throws Exception
 	 */
 	List<ReportMessageVO> getReportsByUserReporter() throws Exception;
+
+	void insertBoardReport(BoardReportDTO dro) throws Exception;
 
 }

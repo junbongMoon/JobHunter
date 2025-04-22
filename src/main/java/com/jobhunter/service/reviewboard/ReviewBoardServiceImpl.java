@@ -80,35 +80,40 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean addlikes(int userId, int boardNo) throws Exception {
-		Likes like = Likes.builder().userId(userId).boardNo(boardNo).likeType("REBOARD").build();
+	    Likes like = Likes.builder()
+	            .userId(userId)
+	            .boardNo(boardNo)
+	            .likeType("REBOARD")
+	            .build();
 
-		// 1. 마지막 좋아요 시간 조회-> 유저가(userId) 어떤 게시글(boardNo)에 마지막으로 좋아요를 누른 시간이 언제인지
-		LocalDateTime lastLikeTime = Rdao.selectLike(like);
+	    // [유지] 좋아요 시간 조회 (현재는 사용 안함)
+//	   boolean lastLikeTime = Rdao.selectLike(like);
+//	   	
+//	   if (lastLikeTime) {
+//	        // 여기 안은 실행 안 됨 (추후 다시 사용할 여지를 둠)
+//	        throw new IllegalArgumentException("제한된 추천입니다.");
+//	    }
+	    // [비활성화] 24시간 제한 체크 (나중을 위해 주석만 남겨둠)
+	    /*
+	    if (lastLikeTime != null) {
+	        LocalDateTime now = LocalDateTime.now();
+	        long hours = ChronoUnit.HOURS.between(lastLikeTime, now);
+	        if (hours < 24) {
+	            // 24시간 제한으로 인해 좋아요 불가
+	            throw new IllegalArgumentException("24시간 이내에는 다시 추천할 수 없습니다.");
+	        }
+	    }
+	    */
 
-		// 2. 24시간 제한 체크
-		// if문으로 마지막으로 좋아요 누른 시간이 있다면
-		if (lastLikeTime != null) {
-			// 현재 날짜와 시간을 now에 저장
-			LocalDateTime now = LocalDateTime.now();
-			// 마지막 좋아요 시간(lastLikeTime)과 지금 시간(now) 사이의 시간 차이를 계산
-			// ChronoUnit: 날짜나 시간 사이의 차이를 계산할 때,사용할 단위를 지정해주는 도구
-			// HOURS는 시간을 기준으로 할때 between은 (A변수,B변수) 의 차이를 시간알려준다
-			long hours = ChronoUnit.HOURS.between(lastLikeTime, now);
-			// 마지막 좋아요 이후 24시간이 지나지 않았다면
-			if (hours < 24) {
+	    // 3. 좋아요 추가
+	    Rdao.insertLike(like);
 
-			}
-		}
+	    // 4. 게시글 좋아요 수 증가
+	    Rdao.updateBoardLikes(boardNo);
 
-		// 3. 좋아요 추가
-
-		Rdao.insertLike(like);
-
-		// 4. 게시글 좋아요 수 증가
-		Rdao.updateBoardLikes(boardNo);
-
-		return true;
+	    return true;
 	}
+
 
 	@Override
 
@@ -177,12 +182,19 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 		// 1. 전체 게시글 수 (검색 조건 포함)
 		int totalCount = Rdao.countReviewBoard(pageRequestDTO);
-
+		
+		System.out.println("조회된 게시글 수: " + totalCount);
 		// 2. 현재 페이지에 해당하는 게시글 목록
 		List<ReviewBoardDTO> boardList = Rdao.selectPagedReviewBoard(pageRequestDTO);
 
 		// 3. 응답 DTO 생성 및 반환
 		return new RPageResponseDTO<ReviewBoardDTO>(boardList, totalCount, pageRequestDTO);
+	}
+
+	@Override
+	public List<String> getCompanyList() throws Exception {
+	
+		return Rdao.ListCompany();
 	}
 
 }

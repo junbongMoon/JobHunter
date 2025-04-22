@@ -5,30 +5,11 @@
 <mapper namespace="com.jobhunter.mapper.reviewboardmapper">
 
 	<!-- 게시글 목록 조회 -->
-
-	<select id="allList"
-		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
-		SELECT
-		r.boardNo,
-		u.userId AS writer,
-		c.companyName,
-		r.reviewResult,
-		r.likes,
-		r.views,
-		r.postDate
-		FROM
-		reviewBoard r
-		JOIN
-		users u
-		ON r.writer = u.uid
-		JOIN
-		recruitmentnotice rn ON r.gonggoUid = rn.uid
-		JOIN
-		company c ON
-		rn.refCompany = c.uid
-		ORDER BY
-		r.boardNo DESC;
-	</select>
+	<!-- <select id="allList" resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO"> 
+		SELECT r.boardNo, u.userId AS writer, c.companyName, r.reviewResult, r.likes, 
+		r.views, r.postDate FROM reviewBoard r JOIN users u ON r.writer = u.uid JOIN 
+		recruitmentnotice rn ON r.gonggoUid = rn.uid JOIN company c ON rn.refCompany 
+		= c.uid ORDER BY r.boardNo DESC; </select> -->
 	<!-- 작성페이지 조회 -->
 	<select id="gonggoAll"
 		resultType="com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO">
@@ -125,19 +106,9 @@
 	</resultMap>
 
 
-	<!-- 1. 최근 24시간 내 좋아요 시간 -->
-	<select id="selectLastLikeTime"
-		resultType="java.time.LocalDateTime">
-		SELECT createdAt
-		FROM LikesLog
-		WHERE userId = #{userId}
-		AND
-		boardNo = #{boardNo}
-		AND LikeType = #{likeType}
-		ORDER BY createdAt DESC
-		LIMIT 1
-	</select>
-
+	<!-- <select id="selectLastLikeTime" resultType="java.time.LocalDateTime"> 
+		SELECT createdAt FROM LikesLog WHERE userId = #{userId} AND boardNo = #{boardNo} 
+		AND LikeType = #{likeType} ORDER BY createdAt DESC LIMIT 1 </select> -->
 	<!-- 2. 좋아요 등록 -->
 	<insert id="insertLike">
 		INSERT INTO LikesLog (userId, boardNo,LikeType)
@@ -175,7 +146,8 @@
 		SELECT COUNT(*)
 		FROM LikesLog
 		WHERE userId = #{userId}
-		AND boardNo = #{boardNo}
+		AND boardNo =
+		#{boardNo}
 		AND LikeType = #{likeType}
 	</select>
 
@@ -246,42 +218,42 @@
 		reviewBoard
 	</select>
 
-	<select id="selectPagedBoards"
-		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
-		SELECT * FROM reviewBoard
-		ORDER BY boardNo DESC
-		LIMIT #{size}
-		OFFSET #{offset}
-	</select>
 
 	<!--검색 기능 쿼리 -->
-	<select id="selectPagedReviewBoard"
+	<select id="selectPagedBoards"
 		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
-		SELECT
-		r.*,
-		c.companyName
-		FROM
-		reviewBoard r
-		JOIN recruitmentnotice rn ON
-		r.gonggoUid = rn.uid
-		JOIN company c ON
-		rn.refCompany = c.uid
-		<where>
-			<if
-				test="searchType != null and searchType != '' and keyword != null and keyword != ''">
-				<choose>
-					<when test="searchType eq 'companyName'">
-						c.companyName LIKE CONCAT('%', #{keyword}, '%')
-					</when>
-					<when test="searchType eq 'reviewResult'">
-						r.reviewResult = #{keyword}
-					</when>
-				</choose>
-			</if>
-		</where>
-		ORDER BY r.boardNo DESC
+		SELECT r.*, u.userId AS writer, c.companyName
+		FROM reviewBoard r
+		JOIN
+		users u ON r.writer = u.uid
+		JOIN recruitmentnotice rn ON r.gonggoUid =
+		rn.uid
+		JOIN company c ON rn.refCompany = c.uid
+		WHERE 1 = 1
+
+		<if test="resultFilter != null and resultFilter.trim() != ''">
+			AND r.reviewResult = #{resultFilter}
+		</if>
+
+		<if test="companyFilter != null and companyFilter.trim() != ''">
+			AND c.companyName = #{companyFilter}
+		</if>
+
+		<choose>
+			<when test="'likes'.equals(sortType)">
+				ORDER BY r.likes DESC, r.boardNo DESC
+			</when>
+			<when test="'views'.equals(sortType)">
+				ORDER BY r.views DESC, r.boardNo DESC
+			</when>
+			<otherwise>
+				ORDER BY r.boardNo DESC
+			</otherwise>
+		</choose>
+
 		LIMIT #{offset}, #{size}
 	</select>
+
 
 
 	<select id="countReviewBoard" resultType="int">
@@ -290,20 +262,29 @@
 		JOIN recruitmentnotice rn ON
 		r.gonggoUid = rn.uid
 		JOIN company c ON rn.refCompany = c.uid
-		<where>
-			<if
-				test="searchType != null and searchType != '' and keyword != null and keyword != ''">
-				<choose>
-					<when test="searchType eq 'companyName'">
-						c.companyName LIKE CONCAT('%', #{keyword}, '%')
-					</when>
-					<when test="searchType eq 'reviewResult'">
-						r.reviewResult = #{keyword}
-					</when>
-				</choose>
-			</if>
-		</where>
+		WHERE 1 = 1
+
+		<if test="resultFilter != null and resultFilter.trim() != ''">
+			AND r.reviewResult = #{resultFilter}
+		</if>
+
+		<if test="companyFilter != null and companyFilter.trim() != ''">
+			AND c.companyName = #{companyFilter}
+		</if>
 	</select>
+
+	<!-- 회사 목록 -->
+	<select id="getCompanyList" resultType="string">
+		SELECT DISTINCT
+		c.companyName
+		FROM recruitmentnotice rn
+		JOIN company c ON rn.refCompany
+		= c.uid
+		ORDER BY c.companyName
+	</select>
+
+
+
 
 	<!--CDLog에 띄우는 매퍼 -->
 	<select id="selectUserIdByBoardNo" parameterType="int"
@@ -320,5 +301,10 @@
 		insert into CDLog (targetId, targetType, logType)
 		values (#{uid}, 'REVIEW', 'DELETE')
 	</insert>
+
+
+	<select id="findWriterUidByBoardNo" resultType="int">
+		SELECT writer FROM reviewBoard WHERE boardNo = #{boardNo}
+	</select>
 
 </mapper>
