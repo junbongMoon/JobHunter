@@ -308,250 +308,198 @@
 			</div>
 		</div>
 	</div>
+	<input type="hidden" id="loginUserUid"
+		value="${sessionScope.account.uid}">
+</body>
+<script>
 
-  		<input type="hidden" id="loginUserUid" value="${sessionScope.account.uid}">
-	<script>
-	
-/* 	document.addEventListener("formData", () => {
-		  const form = document.getElementById("reviewForm");
+	$(document).ready(function() {
+		const isLiked = $('#isLiked').val() === 'true';
 
-		  if (form === null) {
-		    console.warn("리뷰 폼이 존재하지 않아 유효성 검사를 생략합니다.");
-		    return;
-		  }
-
-		  const reviewTypeSelect = document.getElementById("reviewType");
-		  const typeOtherTextInput = document.getElementById("typeOtherText");
-
-		  form.addEventListener("submit", (e) => {
-		    const selectedType = reviewTypeSelect?.value;
-		    const otherText = typeOtherTextInput?.value?.trim();
-
-		    if (selectedType === "OTHER") {
-		      if (!otherText) {
-		        alert("기타 사유를 입력해주세요.");
-		        typeOtherTextInput?.focus();
-		        e.preventDefault();
-		        return;
-		      }
-
-		      if (otherText.length > 100) {
-		        alert("기타 사유는 100자 이내로 입력해주세요.");
-		        e.preventDefault();
-		        return;
-		      }
-		    }
-		  });
-		});
- */
-//공통 변수
- const boardNo = $('#boardNo').val();
- const ReplyNo = $('#ReplyNo').val();
- const userId = $('#userId').val();
- const likeModal = new bootstrap.Modal(document.getElementById('likeModal'));
- const loginUserUid = $('#userId').val();
- $(document).ready(function () {
-		  const isLiked = $('#isLiked').val() === 'true';
-
-		  if (isLiked) {
-		    $('#likeBtn').hide();
-		    $('#unlikeBtn').show();
-		  } else {
-		    $('#likeBtn').show();
-		    $('#unlikeBtn').hide();
-		  }
-		});
-	
+		if (isLiked) {
+			$('#likeBtn').hide();
+			$('#unlikeBtn').show();
+		} else {
+			$('#likeBtn').show();
+			$('#unlikeBtn').hide();
+		}
+	});
 
 	// 좋아요 등록
-	$('#likeBtn').click(function () {
-	  let currentLikes = parseInt($('#likeCountNum').text()) || 0;
-	  $('#likeCountNum').text(currentLikes + 1);
-	  $('#likeBtn').hide();
-	  $('#unlikeBtn').show();
+	$('#likeBtn').click(function() {
+		let currentLikes = parseInt($('#likeCountNum').text()) || 0;
+		$('#likeCountNum').text(currentLikes + 1);
+		$('#likeBtn').hide();
+		$('#unlikeBtn').show();
 
-	  $('#likeModalMessage').text("좋아요가 등록되었습니다!");
-	  likeModal.show();
+		$('#likeModalMessage').text("좋아요가 등록되었습니다!");
+		likeModal.show();
 
-	  $.ajax({
-	    url: '/reviewBoard/like',
-	    type: 'POST',
-	    contentType: 'application/json',
-	    data: JSON.stringify({ userId: userId, boardNo: boardNo }),
-	    error: function () {
-	      $('#likeCountNum').text(currentLikes);
-	      $('#likeBtn').show();
-	      $('#unlikeBtn').hide();
-	      $('#likeModalMessage').text("좋아요 등록 중 오류가 발생했습니다.");
-	      likeModal.show();
-	    }
-	  });
+		$.ajax({
+			url : '/reviewBoard/like',
+			type : 'POST',
+			contentType : 'application/json',
+			data : JSON.stringify({
+				userId : userId,
+				boardNo : boardNo
+			}),
+			error : function() {
+				$('#likeCountNum').text(currentLikes);
+				$('#likeBtn').show();
+				$('#unlikeBtn').hide();
+				$('#likeModalMessage').text("좋아요 등록 중 오류가 발생했습니다.");
+				likeModal.show();
+			}
+		});
 	});
 
 	// 좋아요 취소
-	$('#unlikeBtn').click(function () {
-	  let currentLikes = parseInt($('#likeCountNum').text()) || 0;
-	  $('#likeCountNum').text(currentLikes - 1);
-	  $('#unlikeBtn').hide();
-	  $('#likeBtn').show();
+	$('#unlikeBtn').click(function() {
+		let currentLikes = parseInt($('#likeCountNum').text()) || 0;
+		$('#likeCountNum').text(currentLikes - 1);
+		$('#unlikeBtn').hide();
+		$('#likeBtn').show();
 
-	  $('#likeModalMessage').text("좋아요가 취소되었습니다.");
-	  likeModal.show();
+		$('#likeModalMessage').text("좋아요가 취소되었습니다.");
+		likeModal.show();
 
-	  $.ajax({
-	    url: '/reviewBoard/unlike',
-	    type: 'POST',
-	    contentType: 'application/json',
-	    data: JSON.stringify({ userId: userId, boardNo: boardNo }),
-	    error: function () {
-	      $('#likeCountNum').text(currentLikes);
-	      $('#unlikeBtn').show();
-	      $('#likeBtn').hide();
-	      $('#likeModalMessage').text("좋아요 취소 중 오류가 발생했습니다.");
-	      likeModal.show();
-	    }
-	  });
+		$.ajax({
+			url : '/reviewBoard/unlike',
+			type : 'POST',
+			contentType : 'application/json',
+			data : JSON.stringify({
+				userId : userId,
+				boardNo : boardNo
+			}),
+			error : function() {
+				$('#likeCountNum').text(currentLikes);
+				$('#unlikeBtn').show();
+				$('#likeBtn').hide();
+				$('#likeModalMessage').text("좋아요 취소 중 오류가 발생했습니다.");
+				likeModal.show();
+			}
+		});
 	});
 
-		//게시물삭제 
-	  $(document).ready(function () {
-		  $(".delete-btn").click(function () {
-		   let boardNo = $(this).data("boardno");
+	//게시물삭제 
+	$(document)
+			.ready(
+					function() {
+						$(".delete-btn")
+								.click(
+										function() {
+											let boardNo = $(this).data(
+													"boardno");
 
-		    if (confirm("정말 삭제하시겠습니까?")) {
-		      $.ajax({
-		        url: "${pageContext.request.contextPath}/reviewBoard/delete",
-		        type: "POST",
-		        data: { boardNo: boardNo },
-		        success: function (res) {
-		          alert(res.message);
-		          if (res.success) {
-		            window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
-		          }
-		        },
-		        error: function (xhr, status, error) {
-		          console.error("삭제 실패:", error);
-		          alert("삭제 중 오류가 발생했습니다.");
-		        }
-		      });
-		    }
-		  });
-		});
-		
+											if (confirm("정말 삭제하시겠습니까?")) {
+												$
+														.ajax({
+															url : "${pageContext.request.contextPath}/reviewBoard/delete",
+															type : "POST",
+															data : {
+																boardNo : boardNo
+															},
+															success : function(
+																	res) {
+																alert(res.message);
+																if (res.success) {
+																	window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
+																}
+															},
+															error : function(
+																	xhr,
+																	status,
+																	error) {
+																console
+																		.error(
+																				"삭제 실패:",
+																				error);
+																alert("삭제 중 오류가 발생했습니다.");
+															}
+														});
+											}
+										});
+					});
+
 	//게시물 신고	  
-	  $(document).ready(function () {
-		  $('#submitReportBtn').on('click', function () {
-		   
-		    const reporterAccountUid = $('#loginUserUid').val();
-		    const reportCategory = $('#reportCategory').val();
-		    const reportMessage = $('#reportMessage').val();
-		    
-		    	  if (!reportCategory) {
-		    	    alert("신고 사유를 선택해주세요.");
-		    	    return;
-		    	  }
+	$(document).ready(function() {
+		$('#submitReportBtn').on('click', function() {
 
-		    const reportData = {
-		      boardNo: parseInt(boardNo),
-		      reporterAccountUid: parseInt(reporterAccountUid),
-		      reportCategory: reportCategory,
-		      reportMessage: reportMessage,
-		      reportType: "BOARD",
-		      reportTargetURL: `/reviewBoard/detail?boardNo=${boardNo}`
-		    };
-		    
-			 
-		    $.ajax({
-		      type: 'POST',
-		      url: '/report/board',
-		      contentType: 'application/json',
-		      data: JSON.stringify(reportData),
-		      success: function () {
-		        alert('신고가 접수되었습니다.');
-		        $('#reportModal').modal('hide'); // 모달 닫기
-		      },
-		      error: function (xhr) {
-		        alert('신고 처리 중 오류가 발생했습니다: ' + xhr.responseText);
-		      }
-		    });
-		  });
+			const reporterAccountUid = $('#loginUserUid').val();
+			const reportCategory = $('#reportCategory').val();
+			const reportMessage = $('#reportMessage').val();
+
+			if (!reportCategory) {
+				alert("신고 사유를 선택해주세요.");
+				return;
+			}
+
+			const reportData = {
+				boardNo : parseInt(boardNo),
+				reporterAccountUid : parseInt(reporterAccountUid),
+				reportCategory : reportCategory,
+				reportMessage : reportMessage,
+				reportType : "BOARD",
+				reportTargetURL : `/reviewBoard/detail?boardNo=${boardNo}`
+			};
+			$.ajax({
+				type : 'POST',
+				url : '/report/board',
+				contentType : 'application/json',
+				data : JSON.stringify(reportData),
+				success : function() {
+					alert('신고가 접수되었습니다.');
+					$('#reportModal').modal('hide'); // 모달 닫기
+				},
+				error : function(xhr) {
+					alert('신고 처리 중 오류가 발생했습니다: ' + xhr.responseText);
+				}
+			});
 		});
-		
-	  
-		//댓글 등록 
-	  $(document).ready(function () {
-	   
-	    loadReplies();
+	});
 
-	    $('#submitReplyBtn').click(function () {
-	      const content = $('#replyContent').val().trim();
-	      if (!content) {
-	        alert('댓글 내용을 입력해주세요.');
-	        return;
-	      }
+	//댓글 등록 
 
-	      $.ajax({
-	        url: '/reply/add',
-	        type: 'POST',
-	        contentType: 'application/json',
-	        data: JSON.stringify({
-	          boardNo: parseInt(boardNo),
-	          content: content
-	        }),
-	        success: function () {
-	          $('#replyContent').val('');
-	          loadReplies();  // 등록 후 새로고침
-	        },
-	        error: function () {
-	          alert('댓글 등록 중 오류가 발생했습니다.');
-	        }
-	      });
-	    });
-	  });
-		//댓글들 목록 
-	  function loadReplies() {
+	const boardNo = parseInt($('#boardNo').val());
+	const loginUserUid = $('#userId').val();
+	function loadReplies() {
 		  $.ajax({
 		    url: '/reply/list/' + boardNo,
 		    type: 'GET',
 		    success: function (data) {
-		    	console.log("댓글 데이터:", data); 
-		    	const $replyList = $('#replyList');
+		      const $replyList = $('#replyList');
 		      $replyList.empty();
 
 		      if (!Array.isArray(data) || data.length === 0) {
 		        $replyList.append('<li class="list-group-item text-muted">등록된 댓글이 없습니다.</li>');
 		        return;
 		      }
+
 		      data.forEach(reply => {
-		    	  const date = typeof reply.postDate === 'string' && reply.postDate.length >= 10
+		        const replyNo = reply.replyNo;
+		        const replyContent = (reply.content ?? '').replace(/"/g, '&quot;');
+		        const date = (typeof reply.postDate === 'string' && reply.postDate.length >= 10)
 		          ? reply.postDate.substring(0, 10)
 		          : '날짜 없음';
-		         
-		        const writer = reply.writerId && typeof reply.writerId === 'string' && reply.writerId.trim().length > 0
+
+		        const writer = reply.writerId && reply.writerId.trim().length > 0
 		          ? reply.writerId
 		          : (reply.userId ? '사용자 ' + reply.userId : '익명');
 
-		        const content = reply.content ? reply.content : '(내용 없음)';
-		        console.log("reply.replyNo:", reply.replyNo);
-		        console.log("reply.userId:", reply.userId);
-		        console.log("reply.content:", reply.content);
+		        const content = $('<div>').text(reply.content ?? '(내용 없음)').html();
 
-		        const buttonsHtml = (reply.userId === parseInt(loginUserUid)) ? `
-		        		<button 
-		        	    class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn"
-		        	    data-replyno="${reply.replyNo}"
-		        	    data-content="${reply.replyContent}">
-		        	    수정
-		        	  </button>
-		        	  <button class="btn btn-sm btn-outline-danger delete-reply-btn"
-		        	    data-replyno="${reply.replyNo}">삭제</button>` : '';
-		        	      
-		        
-		        const html = '<li class="list-group-item" data-replyno="' + reply.replyNo + '">' +
+		        const html = '<li class="list-group-item" data-replyno="' + replyNo + '">' +
 		        '<strong>' + writer + '</strong> (' + date + ')<br>' +
 		        '<div class="reply-content">' + content + '</div>' +
-		        buttonsHtml +
-		      '</li>';
+		        (reply.userId?.toString() === loginUserUid.toString()
+		          ? '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" ' +
+		              'data-replyno="' + replyNo + '" ' +
+		              'data-content="' + replyContent + '">수정</button>' +
+		            '<button class="btn btn-sm btn-outline-danger delete-reply-btn" ' +
+		              'data-replyno="' + replyNo + '">삭제</button>'
+		          : '') +
+		        '</li>';
+
 		        $replyList.append(html);
 		      });
 		    },
@@ -561,67 +509,94 @@
 		  });
 		}
 
+		// ✅ 문서 로드 후 이벤트 등록
+		$(document).ready(function () {
 
-				// 수정 클릭 → 입력창으로 전환
-			$(document).on('click', '.delete-reply-btn', function () {
-			  const replyNo = $(this).data('replyno');
-			
-			  if (confirm('댓글을 삭제하시겠습니까?')) {
-			    $.ajax({
-			      url: '/reply/delete',
-			      type: 'POST',
-			      success: function () {
-			        alert('댓글이 삭제되었습니다.');
-			        loadReplies(); // 댓글 목록 갱신
-			      },
-			      error: function () {
-			        alert('댓글 삭제 중 오류가 발생했습니다.');
-			      }
-			    });
-			  }
-});
+		  // 🔃 댓글 초기 로딩
+		  loadReplies();
 
-		// 댓글 수정
-		$(document).on('click', '.edit-reply-btn', function () {
-			  const replyNo = $(this).data('replyno');
-			  const currentContent = $(this).data('content');
-			  const $btn = $(this);
-			  console.log("버튼 전체 HTML:", $btn[0].outerHTML);
-			  console.log("data-replyno:", $btn.data("replyno"));
-			  console.log("data-content:", $btn.data("content"));
-			 
-			  
-			  if (isNaN(replyNo)) {
-			    alert("댓글 번호가 유효하지 않습니다.");
-			    return;
-			  }
+		  // ✅ 댓글 등록 이벤트
+		  $('#submitReplyBtn').click(function () {
+		    const content = $('#replyContent').val().trim();
+		    if (!content) {
+		      alert('댓글 내용을 입력해주세요.');
+		      return;
+		    }
 
-	  const newContent = prompt('댓글을 수정하세요:', currentContent);
-	  if (newContent !== null) {
-	    $.ajax({
-	      url: '/reply/update',
-	      type: 'POST',
-	      contentType: 'application/json',
-	      data: JSON.stringify({ 
-	    	replyNo: parseInt(replyNo),
-	        userId: parseInt($('#userId').val()),
-	        content: newContent.trim()
-	      }),
-	      success: function () {
-	        alert('댓글이 수정되었습니다.');
-	        loadReplies();
-	      },
-	      error: function () {
-	        alert('댓글 수정 중 오류가 발생했습니다.');
-	      }
-	    });
-	  }
-	});
+		    $.ajax({
+		      url: '/reply/add',
+		      type: 'POST',
+		      contentType: 'application/json',
+		      data: JSON.stringify({
+		        boardNo: boardNo,
+		        content: content
+		      }),
+		      success: function () {
+		        $('#replyContent').val('');
+		        loadReplies();
+		      },
+		      error: function () {
+		        alert('댓글 등록 중 오류가 발생했습니다.');
+		      }
+		    });
+		  });
 
+		  // ✅ 댓글 삭제 이벤트
+		  $(document).on('click', '.delete-reply-btn', function () {
+		    const replyNo = $(this).data('replyno');
+		    if (isNaN(replyNo)) {
+		      alert("댓글 번호가 유효하지 않습니다.");
+		      return;
+		    }
 
-	</script>
+		    if (confirm('댓글을 삭제하시겠습니까?')) {
+		      $.ajax({
+		        url: '/reply/delete',
+		        type: 'POST',
+		        contentType: 'application/json',
+		        data: JSON.stringify({ replyNo: replyNo }),
+		        success: function () {
+		          alert('댓글이 삭제되었습니다.');
+		          loadReplies();
+		        },
+		        error: function () {
+		          alert('댓글 삭제 중 오류가 발생했습니다.');
+		        }
+		      });
+		    }
+		  });
 
+		  // ✅ 댓글 수정 이벤트
+		  $(document).on('click', '.edit-reply-btn', function () {
+		    const replyNo = $(this).data('replyno');
+		    const currentContent = $(this).data('content');
 
+		    if (isNaN(replyNo)) {
+		      alert("댓글 번호가 유효하지 않습니다.");
+		      return;
+		    }
 
-</body>
+		    const newContent = prompt('댓글을 수정하세요:', currentContent);
+		    if (newContent !== null && newContent.trim() !== '') {
+		      $.ajax({
+		        url: '/reply/update',
+		        type: 'POST',
+		        contentType: 'application/json',
+		        data: JSON.stringify({
+		          replyNo: parseInt(replyNo),
+		          userId: parseInt(loginUserUid),
+		          content: newContent.trim()
+		        }),
+		        success: function () {
+		          alert('댓글이 수정되었습니다.');
+		          loadReplies();
+		        },
+		        error: function () {
+		          alert('댓글 수정 중 오류가 발생했습니다.');
+		        }
+		      });
+		    }
+		  });
+		});
+</script>
 </html>
