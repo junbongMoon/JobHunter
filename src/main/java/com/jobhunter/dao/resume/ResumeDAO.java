@@ -121,4 +121,32 @@ public interface ResumeDAO {
 
 	ResumeAdviceDTO getAdvice(int resumeNo);
 	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 신청을 저장하는 메서드
+	 * </p>
+	 * 
+	 * @param int mentorUid 첨삭자 UID
+	 * @param int resumeNo 이력서 번호
+	 * @return 성공하면 1, 실패하면 0
+	 *
+	 */
+	int insertRegistrationAdvice(int mentorUid, int resumeNo) throws Exception;
+	
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 신청 중복 여부를 확인하는 메서드
+	 * </p>
+	 * 
+	 * @param int mentorUid 첨삭자 UID
+	 * @param int resumeNo 이력서 번호
+	 * @return 중복이면 1 이상, 중복이 아니면 0
+	 *
+	 */
+	int checkDuplicateAdvice(int mentorUid, int resumeNo) throws Exception;
 }

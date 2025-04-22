@@ -3,6 +3,8 @@ package com.jobhunter.service.resume;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.resume.ResumeDAO;
@@ -283,5 +285,31 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	public List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) {
 		return rdao.getAdviceFiles(adviceNo);
+	}
+
+/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 신청을 처리하는 메서드
+	 * </p>
+	 * 
+	 * @param int mentorUid 첨삭자 UID
+	 * @param int resumeNo 이력서 번호
+	 * @return 성공 여부
+	 *
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public boolean submitAdvice(int mentorUid, int resumeNo) throws Exception {
+		// 중복 신청 확인
+		int duplicateCount = rdao.checkDuplicateAdvice(mentorUid, resumeNo);
+		if (duplicateCount > 0) {
+			return false; // 중복 신청이 있으면 실패
+		}
+		
+		// 첨삭 신청 저장
+		int result = rdao.insertRegistrationAdvice(mentorUid, resumeNo);
+		return result > 0; // 성공하면 true, 실패하면 false
 	}
 }

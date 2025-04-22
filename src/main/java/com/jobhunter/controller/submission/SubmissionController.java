@@ -169,4 +169,36 @@ public class SubmissionController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
+	
+	/**
+	 * 이력서 첨삭 신청을 처리합니다.
+	 * <p>
+	 * 선택한 이력서를 첨삭자에게 첨삭 신청합니다.
+	 * 중복 신청을 방지하기 위해 이미 신청한 이력서인지 확인합니다.
+	 * </p>
+	 *
+	 * @param resumeNo 이력서 번호
+	 * @param mentorUid 첨삭자 UID
+	 * @return 첨삭 신청 결과
+	 */
+	@PostMapping("/submitAdvice")
+	public ResponseEntity<Map<String, String>> submitAdvice(@RequestParam("resumeNo") int resumeNo, @RequestParam("mentorUid") int mentorUid) {
+		try {
+			// 이력서 첨삭 신청
+			boolean result = resumeService.submitAdvice(mentorUid, resumeNo);
+			
+			Map<String, String> response = new HashMap<>();
+			if (result) {
+				response.put("success", "이력서 첨삭 신청이 완료되었습니다.");
+				return ResponseEntity.ok(response);
+			} else {
+				response.put("fail", "이미 첨삭 신청한 이력서입니다.");
+				return ResponseEntity.ok(response);
+			}
+		} catch (Exception e) {
+			Map<String, String> response = new HashMap<>();
+			response.put("error", "이력서 첨삭 신청 중 오류가 발생했습니다: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+	}
 }

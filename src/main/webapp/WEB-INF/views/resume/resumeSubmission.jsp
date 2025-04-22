@@ -22,6 +22,8 @@
 				<div class="container">
 					<c:if test="${mode == 'adCheck'}">
 						<h1 class="page-title">이력서 첨삭 제출</h1>
+						<input type="hidden" id="mentorUid" value="${prBoard.useruid}">
+						<input type="hidden" id="prBoardNo" value="${prBoard.prBoardNo}">
 					</c:if>
 					<c:if test="${mode != 'adCheck'}">
 						<h1 class="page-title">이력서 제출</h1>
@@ -76,6 +78,24 @@
 											id="dueDate">${recruitmentNotice.dueDate}</span>
 									</div>
 								</div>
+							</div>
+						</c:if>
+					</c:if>
+
+					<c:if test="${mode == 'adCheck'}">
+						<c:if test="${not empty prBoard}">
+							<div class="notice-info">
+								<div class="notice-title">
+									<a
+										href="/prboard/detail?prBoardNo=${prBoard.prBoardNo}">${prBoard.title}</a>
+								</div>
+								<div class="notice-company">
+									<i class="fas fa-solid fa-user"></i>&nbsp;${prBoard.userId}
+								</div>
+								<div class="notice-detail-item">
+										<i class="fas fa-calendar-alt"></i> <span
+											id="dueDate">${prBoard.postDate}</span>
+									</div>
 							</div>
 						</c:if>
 					</c:if>
@@ -178,12 +198,21 @@
 															<i class="fas fa-edit"></i> 수정 및 상세보기
 														</button>
 													</c:when>
+													<c:when test="${mode == 'adCheck'}">
+														<a href="/resume/edit/${resume.resumeNo}?uid=${prBoard.prBoardNo}&mode=adCheck"
+															class="btn btn-outline-primary edit-resume"> <i
+																class="fas fa-edit"></i> 수정 및 상세보기
+														</a>
+													</c:when>
 													<c:otherwise>
+														<c:if test="${mode != 'adCheck'}">
 														<a href="/resume/edit/${resume.resumeNo}?uid=${recruitmentNotice.uid}"
 															class="btn btn-outline-primary edit-resume"> <i
 																class="fas fa-edit"></i> 수정 및 상세보기
 														</a>
+														</c:if>
 													</c:otherwise>
+
 												</c:choose>
 											</div>
 										</div>
@@ -198,10 +227,12 @@
 						</div>
 					</div>
 
-					<c:if test="${totalResumes > 0}">
-						<!-- 개인정보 제3자 제공 동의 -->
-						<div class="privacy-consent card">
-							<div class="card-header d-flex justify-content-between align-items-center">
+					
+					<c:if test="${totalResumes > 0 }">
+						<c:if test="${mode != 'adCheck'}">
+							<!-- 개인정보 제3자 제공 동의 -->
+							<div class="privacy-consent card">
+								<div class="card-header d-flex justify-content-between align-items-center">
 								<div>
 									<input type="checkbox" id="privacyConsentCheckbox"> <label
 										for="privacyConsentCheckbox">[필수] 개인정보 제3자 제공 동의</label>
@@ -221,66 +252,117 @@
 											보유 자격증, 자기소개서)</li>
 									</ol>
 								</div>
+								</div>
 							</div>
-						</div>
+						</c:if>
 						<!-- 페이징 처리 -->
-						<div class="submit-button-container text-center mb-4">
-							<button type="button" id="submitResumeBtn" class="btn btn-primary btn-lg" disabled>
+						<c:if test="${mode != 'adCheck'}">
+							<div class="submit-button-container text-center mb-4">
+								<button type="button" id="submitResumeBtn" class="btn btn-primary btn-lg" disabled>
 								<i class="fas fa-paper-plane"></i> 이력서 제출하기
 							</button>
 						</div>
+						</c:if>
+						<c:if test="${mode == 'adCheck'}">
+							<div class="submit-button-container text-center mb-4">
+								<button type="button" id="submitAdviceResumeBtn" class="btn btn-primary btn-lg" disabled>
+								<i class="fas fa-paper-plane"></i> 첨삭 신청 (-1000 P)
+							</button>
+						</div>
+						</c:if>
 						<div class="pagination-container">
 							<nav aria-label="Page navigation">
 								<ul class="pagination justify-content-center">
 									<!-- 이전 블록으로 이동 -->
 									<c:if test="${currentBlock > 1}">
 										<li class="page-item">
-											<a class="page-link"
-												href="/submission/check?uid=${recruitmentNotice.uid}&page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
-												aria-label="Previous Block">
-												<i class="fas fa-angle-double-left"></i>
-											</a>
+											<c:if test="${mode != 'adCheck'}">
+												<a class="page-link"
+													href="/submission/check?uid=${recruitmentNotice.uid}&page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													aria-label="Previous Block">
+													<i class="fas fa-angle-double-left"></i>
+												</a>
+											</c:if>
+											<c:if test="${mode == 'adCheck'}">
+												<a class="page-link"
+													href="/submission/adCheck?uid=${prBoard.prBoardNo}&page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													aria-label="Previous Block">
+													<i class="fas fa-angle-double-left"></i>
+												</a>
+											</c:if>
 										</li>
 									</c:if>
 
 									<!-- 이전 페이지로 이동 -->
 									<c:if test="${currentPage > 1}">
 										<li class="page-item">
-											<a class="page-link"
-												href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
-												aria-label="Previous">
-												<i class="fas fa-chevron-left"></i>
-											</a>
+											<c:if test="${mode != 'adCheck'}">
+												<a class="page-link"
+													href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													aria-label="Previous">
+													<i class="fas fa-chevron-left"></i>
+												</a>
+											</c:if>
+											<c:if test="${mode == 'adCheck'}">
+												<a class="page-link"
+														href="/submission/adCheck?uid=${prBoard.prBoardNo}&page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													aria-label="Previous">
+													<i class="fas fa-chevron-left"></i>
+												</a>
+											</c:if>
 										</li>
 									</c:if>
-
 									<!-- 페이지 번호 -->
 									<c:forEach begin="${startPage}" end="${endPage}" var="i">
 										<li class="page-item ${currentPage == i ? 'active' : ''}">
-											<a class="page-link"
+											<c:if test="${mode != 'adCheck'}">
+												<a class="page-link"
 												href="/submission/check?uid=${recruitmentNotice.uid}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
+											</c:if>
+											<c:if test="${mode == 'adCheck'}">
+												<a class="page-link"
+												href="/submission/adCheck?uid=${prBoard.prBoardNo}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
+											</c:if>
 										</li>
 									</c:forEach>
 
 									<!-- 다음 페이지로 이동 -->
 									<c:if test="${currentPage < totalPages}">
 										<li class="page-item">
-											<a class="page-link"
+											<c:if test="${mode != 'adCheck'}">
+												<a class="page-link"
 												href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 												aria-label="Next">
 												<i class="fas fa-chevron-right"></i>
+												</a>
+											</c:if>
+											<c:if test="${mode == 'adCheck'}">
+												<a class="page-link"
+												href="/submission/adCheck?uid=${prBoard.prBoardNo}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+												aria-label="Next">
+												<i class="fas fa-chevron-right"></i>
 											</a>
+											</c:if>
 										</li>
 									</c:if>
 
 									<!-- 다음 블록으로 이동 -->
 									<c:if test="${currentBlock < totalBlocks}">
 										<li class="page-item">
-											<a class="page-link"
+											<c:if test="${mode != 'adCheck'}">
+												<a class="page-link"
 												href="/submission/check?uid=${recruitmentNotice.uid}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 												aria-label="Next Block">
 												<i class="fas fa-angle-double-right"></i>
 											</a>
+											</c:if>
+											<c:if test="${mode == 'adCheck'}">
+												<a class="page-link"
+												href="/submission/adCheck?uid=${prBoard.prBoardNo}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+												aria-label="Next Block">
+												<i class="fas fa-angle-double-right"></i>
+											</a>
+											</c:if>
 										</li>
 									</c:if>
 								</ul>
@@ -586,7 +668,7 @@
 				margin-top: 30px;
 			}
 
-			#submitResumeBtn {
+			#submitResumeBtn, #submitAdviceResumeBtn {
 				background-color: #47b2e4;
 				border: none;
 				padding: 12px 30px;
@@ -594,12 +676,12 @@
 				transition: all 0.3s ease;
 			}
 
-			#submitResumeBtn:disabled {
+			#submitResumeBtn:disabled, #submitAdviceResumeBtn:disabled {
 				background-color: #adb5bd;
 				cursor: not-allowed;
 			}
 
-			#submitResumeBtn:not(:disabled):hover {
+			#submitResumeBtn:not(:disabled):hover, #submitAdviceResumeBtn:not(:disabled):hover {
 				background-color: #3592c4;
 				transform: translateY(-2px);
 			}
@@ -698,8 +780,7 @@
 					$('#dueDate').text(formattedDate);
 				}
 
-				let selectedResumeId = null;
-
+				
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 이력서 항목 클릭 이벤트
 				$('.resume-item').click(function () {
@@ -708,12 +789,16 @@
 
 					// 현재 항목 선택
 					$(this).addClass('selected');
-					selectedResumeId = $(this).data('resume-id');
+					window.selectedResumeId = $(this).data('resume-id');
 
-					console.log(selectedResumeId);
-
+					console.log(window.selectedResumeId);
+					if ('${mode}' != 'adCheck') {
 					// 제출 버튼 활성화 여부 확인
 					toggleSubmitButton();
+				} else if ('${mode}' == 'adCheck') {
+					// 첨삭 버튼 활성화 여부 확인
+					toggleSubmitAdviceButton();
+				}
 				});
 
 				//---------------------------------------------------------------------------------------------------------------------------------
@@ -725,17 +810,25 @@
 
 				// 제출 버튼 활성화 여부 확인 함수
 				function toggleSubmitButton() {
-					if (selectedResumeId && $('#privacyConsentCheckbox').is(':checked')) {
+					if (window.selectedResumeId && $('#privacyConsentCheckbox').is(':checked')) {
 						$('#submitResumeBtn').prop('disabled', false);
 					} else {
 						$('#submitResumeBtn').prop('disabled', true);
 					}
 				}
 
+				// 첨삭 버튼 활성화 여부 확인 함수
+				function toggleSubmitAdviceButton() {
+					if (window.selectedResumeId) {
+						$('#submitAdviceResumeBtn').prop('disabled', false);
+					} else {
+						$('#submitAdviceResumeBtn').prop('disabled', true);
+					}
+				}
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 제출하기 버튼 클릭 이벤트
 				$('#submitResumeBtn').click(function () {
-					if (!selectedResumeId) {
+					if (!window.selectedResumeId) {
 						alert('이력서를 선택해주세요.');
 						return;
 					}
@@ -775,7 +868,7 @@
 							url: '/submission/submit',
 							type: 'POST',
 							data: {
-								resumeNo: selectedResumeId,
+								resumeNo: window.selectedResumeId,
 								recruitmentNo: recruitmentId
 							},
 							success: function (response) {
@@ -835,4 +928,66 @@
 				// 검색 결과 초기화를 위해 폼 제출
 				$('#searchForm').submit();
 			}
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 이력서 첨삭 신청 버튼 클릭 이벤트
+			$('#submitAdviceResumeBtn').click(function () {
+				if (!window.selectedResumeId) {
+					alert('이력서를 선택해주세요.');
+					return;
+				}
+				
+				// 선택된 이력서의 제목 가져오기
+				const selectedResumeTitle = $('.resume-item.selected .resume-title').text().trim();
+				// 첨삭자 이름
+				const adWriter = $('.notice-company').text().trim();
+				console.log("선택된 이력서 제목:", selectedResumeTitle);
+				console.log("첨삭자 이름:", adWriter);
+				// 모달 메시지 설정
+				$('#validationMessage').html(
+					'<strong style="color: #37517e;">[' + adWriter + ']</strong> 님에게<br>' +
+					'<strong style="color: #37517e;">[' + selectedResumeTitle + ']</strong> 이력서를<br>' +
+					'첨삭 신청하시겠습니까?<br><br>' +
+					'<small style="color: #37517e;">* 첨삭 신청 후 첨삭중인 이력서는 <br> 수정 및 삭제가 불가능합니다.</small><br>' +
+					'<small style="color: #37517e;">* 첨삭 신청 시 <strong style="color: red;">1000 P</strong> 차감됩니다.</small>'
+				);
+				// 모달 표시
+				$('#validationModal').modal('show');
+
+				// 확인 버튼 클릭 이벤트
+				$('#validationCheckBtn').off('click').on('click', function () {
+					// 첨삭 신청
+					$.ajax({
+						url: '/submission/submitAdvice',
+						type: 'POST',
+						data: {
+							resumeNo: window.selectedResumeId,
+							mentorUid: $('#mentorUid').val()
+						},
+						success: function (response) {
+							if (response.success) {
+								// 성공 모달 표시
+								$('#modalMessage').html('<strong style="color: #37517e;">' + response.success + '</strong>');
+								$('#modal').modal('show');
+								// 제출 후 해당 공고 페이지로 이동
+								$('#modalCheckBtn').off('click').on('click', function () {
+									window.location.href = '/prboard/detail?prBoardNo=' + $('#prBoardNo').val();
+								});
+							} else if (response.fail) {
+								// 중복 지원 모달 표시
+								$('#modalMessage').html('<strong style="color: #37517e;">' + response.fail + '</strong>');
+								$('#modal').modal('show');
+								// 이후 해당 공고 페이지로 이동
+								$('#modalCheckBtn').off('click').on('click', function () {
+									window.location.href = '/prboard/detail?prBoardNo=' + $('#prBoardNo').val();
+								});
+							}
+						},
+						error: function (xhr, status, error) {
+							// 오류 모달 표시
+							$('#modalMessage').html('<strong style="color: #37517e;">이력서 첨삭 신청 중 오류가 발생했습니다.</strong>');
+							$('#modal').modal('show');
+						}
+					});
+				});
+			});
 		</script>

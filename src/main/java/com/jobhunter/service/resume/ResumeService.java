@@ -66,4 +66,18 @@ public interface ResumeService {
 	ResumeAdviceDTO getAdvice(int resumeNo);
 
 	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);
+	
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 신청을 처리하는 메서드
+	 * </p>
+	 * 
+	 * @param int mentorUid 첨삭자 UID
+	 * @param int resumeNo 이력서 번호
+	 * @return 성공 여부
+	 *
+	 */
+	boolean submitAdvice(int mentorUid, int resumeNo) throws Exception;
 }
