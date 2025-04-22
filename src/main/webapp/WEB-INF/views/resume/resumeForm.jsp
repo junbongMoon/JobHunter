@@ -2706,9 +2706,14 @@
 				$('#returnBtn').on('click', function () {
 					const urlParams = new URLSearchParams(window.location.search);
 					const uid = urlParams.get('uid');
+					const mode = urlParams.get('mode');
 					if (uid) {
-						window.location.href = '/submission/check?uid=' + uid;
+						if (mode == 'adCheck') {
+							window.location.href = '/submission/adCheck?uid=' + uid;
 						} else {
+							window.location.href = '/submission/check?uid=' + uid;
+						}
+					} else {
 						window.location.href = '/resume/list';
 					}
 				});
