@@ -514,6 +514,16 @@
 															<i class="fas fa-trash"></i> 삭제하기
 														</button>
 													</c:when>
+													<c:when test="${resume.advice}">
+														<button type="button" class="btn-custom btn-edit"
+															onclick="showAdviceResumeModal('수정')">
+															<i class="fas fa-edit"></i> 수정하기
+														</button>
+														<button type="button" class="btn-custom btn-delete"
+															onclick="showAdviceResumeModal('삭제')">
+															<i class="fas fa-trash"></i> 삭제하기
+														</button>
+													</c:when>
 													<c:otherwise>
 														<a href="/resume/edit/${resume.resumeNo}"
 															class="btn-custom btn-edit"> <i class="fas fa-edit"></i>
@@ -641,6 +651,7 @@
 					$('#validationModal').modal('show');
 				}
 
+
 				function showCheckedResumeModal(action) {
 					const message = action === '수정'
 						? '기업에서 확인중인 이력서는 수정할 수 없습니다.'
@@ -650,6 +661,15 @@
 					$('#resultModal').modal('show');
 				}
 
+				function showAdviceResumeModal(action) {
+					const message = action === '수정'
+						? '이력서 첨삭 중인 이력서는 수정할 수 없습니다.'
+						: '이력서 첨삭 중인 이력서는 삭제할 수 없습니다.';
+
+					$('#resultMessage').text(message);
+					$('#resultModal').modal('show');
+				}
+				
 				$(document).ready(function () {
 					// 검색 영역 토글
 					$('#searchToggleBtn').click(function () {
