@@ -374,21 +374,13 @@
 						<ul>
 							<li><a href="/" class="active">Home</a></li>
 							<li class="dropdown"><a href="/recruitmentnotice/listAll"><span>채용정보</span> <i
-										class="bi bi-chevron-down toggle-dropdown"></i></a>
-								<ul>
-									<li><a href="#">이력서 ADVICE</a></li>
-									<li><a href="/prboard/list">멘토 PR 리스트</a></li>
-									<li><a href="/prboard/list">멘토 PR 리스트</a></li>
-									<li><a href="/prboard/list">멘토 PR 리스트</a></li>
-								</ul>
-							</li>
-							<li class="dropdown"><a href="/recruitmentnotice/listAll"><span></span> <i
-										class="bi bi-chevron-down toggle-dropdown"></i></a>
+								class="bi bi-chevron-down toggle-dropdown"></i></a>
 								<ul>
 									<li><a href="/recruitmentnotice/listAll">전체 채용정보</a></li>
 									<li><a href="#">공공기관 제공 채용정보</a></li>
 								</ul>
 							</li>
+							<li><a href="/prboard/list">취업 도우미</a></li>
 							<li><a href="/reviewBoard/allBoard">면접후기</a></li>
 							<li>
 								<c:if test="${not empty sessionScope.account}">

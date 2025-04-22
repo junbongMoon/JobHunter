@@ -17,12 +17,15 @@
 				<!-- 헤더 -->
 				<jsp:include page="/WEB-INF/views/header.jsp" />
 
+				<!-- resumeNo 남기기 -->
+				<input type="hidden" id="resumeNo" value="${resumeDetail.resume.resumeNo}">
 				<!-- resume.userUid 남기기 -->
 				<input type="hidden" id="userUid" value="${ resumeDetail.resume.userUid }">
 				<!-- session.userUid 남기기 -->
 				<input type="hidden" id="sessionUserUid" value="${ sessionScope.account.uid }">
 				<!-- session.userUid와 resume.userUid가 같은지 확인 -->
 				<c:set var="isSameUser" value="${sessionScope.account.uid == resumeDetail.resume.userUid}" />
+				<input type="hidden" id="isSameUser" value="${isSameUser}">
 
 				<div class="container my-5">
 					<c:if test="${mode == 'advice'}">
@@ -43,15 +46,15 @@
 								<div class="input-group">
 									<span class="input-group-text bg-light"> <i class="bi bi-pencil-square"></i>
 									</span>
-									<c:if test="${!isSameUser}">
-										<input type="text" class="form-control form-control-lg" id="title" name="title"
-											placeholder="예: 자바 개발자 지원" maxlength="30"
-											value="${resumeDetail.resume.title}" readonly>
-									</c:if>
 									<c:if test="${isSameUser}">
 										<input type="text" class="form-control form-control-lg" id="title" name="title"
 											placeholder="예: 자바 개발자 지원" maxlength="30"
 											value="${resumeDetail.resume.title}">
+									</c:if>
+									<c:if test="${!isSameUser}">
+										<input type="text" class="form-control form-control-lg" id="title" name="title"
+											placeholder="예: 자바 개발자 지원" maxlength="30"
+											value="${resumeDetail.resume.title}" readonly>
 									</c:if>
 								</div>
 								<div class="d-flex justify-content-between mt-2">
@@ -3005,7 +3008,7 @@
 						// 첨삭 내용과 파일 정보 저장
 						const adviceData = {
 							mentorUid: $('#userUid').val(),
-							resumeNo: ${resumeDetail.resume.resumeNo},
+							resumeNo: $('#resumeNo').val(),
 							adviceContent: adviceContent,
 							files: uploadedAdviceFiles.map(function(file) {
 								return {
