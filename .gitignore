@@ -170,4 +170,5 @@ address.properties
 business.properties
 kakao.properties
 mobile.properties
+employment.properties
 # End of https://www.gitignore.io/api/git,java,maven,windows,eclipse
