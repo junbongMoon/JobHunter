@@ -237,6 +237,7 @@
 		UPDATE users
 		SET userName = #{name}
 		WHERE uid = #{uid}
+	</update>
 
 	<update id="modifyUserPoint">
 		update users

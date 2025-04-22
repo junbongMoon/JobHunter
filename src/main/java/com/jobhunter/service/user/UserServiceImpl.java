@@ -204,6 +204,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void updateName(Integer uid, String newName) throws Exception {
 		dao.updateName(uid, newName);
+	}
 
 	/**
 	 *  @author 문준봉
