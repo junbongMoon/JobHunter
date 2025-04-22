@@ -241,7 +241,7 @@
 								<!-- 마우스 호버 시 뜨는 프로필 카드 -->
 								<div class="mypage-profile-card">
 									<div class="profile-img-container">
-										<div class="profile-img"><img src="${sessionScope.account.profileImg}" style="width:100%; height:100%; object-fit:cover;"></div>
+										<div class="profile-img"><img src="${sessionScope.account.profileImg}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div>
 										<div class="speech-bubble"
 											onclick="openNotifications('${sessionScope.account.uid}', '${sessionScope.account.accountType}')">
 											<!-- 메시지 카운트 들어오게 -->

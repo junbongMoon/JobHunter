@@ -68,5 +68,8 @@ public class ResumeDetailInfoBySubmit {
     
     // 직업군
     private List<SubCategory> subcategoryList;
+    
+    // 프로필 사진 (Base64 문자열)
+    private String profileBase64;
 
 }

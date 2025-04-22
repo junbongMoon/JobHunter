@@ -311,14 +311,33 @@ function renderRecruitList(items) {
           <div class="resume-dropdown" id="dropdown-\${item.uid}" style="
             display: none;
             background: #f8f9fa;
-            padding: 15px 20px;
-            border-radius: 8px;
+            padding: 20px 25px;
+            border-radius: 12px;
             border: 1px solid #e9ecef;
-            margin-top: 5px;
-            font-size: 13px;
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
           ">
-            <em>이력서 불러오는 중...</em>
+            <div style="margin-bottom: 15px;">
+              <label style="font-size: 14px; color: #555;">
+                <input type="checkbox" onchange="fetchResumes(\${item.uid}, this.checked)">
+                <span style="margin-left: 6px;">읽지 않은 신청서만 보기</span>
+              </label>
+            </div>
+
+            <div id="resumeList-\${item.uid}" style="margin-bottom: 15px;">
+              <em>이력서 불러오는 중...</em>
+            </div>
+
+            <div id="resumePagination-\${item.uid}" style="
+              display: flex;
+              justify-content: center;
+              flex-wrap: wrap;
+              gap: 8px;
+            "></div>
           </div>
+
         </div>
       `;
 
@@ -333,43 +352,114 @@ function viewRecruitDetail(uid) {
   location.href = `/recruitmentnotice/detail?uid=\${uid}`;
 }
 
-function toggleResumeDropdown(uid) {
-	  // 모든 드롭다운 닫기
-	  $('.resume-dropdown').slideUp();
+const submitDto = {
+  recruitmentUid:0,
+  page:1,
+  onlyUnread:false,
+  prioritizeUnread:true
+}
 
-	  // 이미 열려있는 경우면 닫기
+function toggleResumeDropdown(uid) {
+	  $('.resume-dropdown').slideUp(); // 모든 드롭다운 닫기
 	  const $target = $(`#dropdown-\${uid}`);
+
 	  if ($target.is(':visible')) {
 	    $target.slideUp();
 	    return;
 	  }
 
-	  // 열기 + AJAX 불러오기
-	  $target.slideDown().html('<em>이력서 불러오는 중...</em>');
+	  $target.slideDown();
+	  fetchResumes(uid, false); // 기본은 전체 보기
+}
 
-	  // 이력서 리스트 불러오기 (예시)
-	  // $.ajax({
-	  //   url: `/recruitmentnotice/${uid}/resumes`,
-	  //   method: 'GET',
-	  //   success: function(res) {
-	  //     if (!res || res.length === 0) {
-	  //       $target.html('<p style="color:#888;">등록된 이력서가 없습니다.</p>');
-	  //       return;
-	  //     }
+function fetchResumes(uid, onlyUnread, page = 1) {
+	  const listContainer = $(`#resumeList-\${uid}`);
+	  const pageContainer = $(`#resumePagination-\${uid}`);
 
-	  //     let resumeHtml = '<ul style="margin:0; padding-left: 16px;">';
-	  //     res.forEach(r => {
-	  //       resumeHtml += `<li>${r.applicantName} / ${r.title}</li>`;
-	  //     });
-	  //     resumeHtml += '</ul>';
+	  const loader = $('<div class="resume-loading-spinner">불러오는 중...</div>');
+	  listContainer.append(loader);
+	  pageContainer.empty();
 
-	  //     $target.html(resumeHtml);
-	  //   },
-	  //   error: function() {
-	  //     $target.html('<p style="color:red;">이력서를 불러오는 데 실패했습니다.</p>');
-	  //   }
-	  // });
+	  $.ajax({
+	    url: '/submit/withResume',
+	    method: 'POST',
+	    contentType: 'application/json',
+	    data: JSON.stringify({
+	      recruitmentUid: uid,
+	      page: page,
+	      onlyUnread: onlyUnread,
+	      prioritizeUnread: true
+	    }),
+	    success: function(res) {
+	      if (!res || res.items.length === 0) {
+	    	listContainer.empty();
+	        listContainer.html('<p style="color:#888;">표시할 이력서가 없습니다.</p>');
+	        return;
+	      }
+
+	      // 이력서 렌더링
+	      let html = '<ul style="padding-left: 0; list-style: none;">';
+	        res.items.forEach(r => {
+	          const statusLabel = r.status === 'WAITING' ? '미확인' : '';
+	          html += `
+	            <li onclick="viewSubmitDetail(\${r.registrationNo})" style="
+	              background: #fff;
+	              border: 1px solid #ddd;
+	              border-radius: 10px;
+	              padding: 12px 40px;
+	              margin-bottom: 8px;
+	        	  margin-left: 30px;
+	              box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+	        	  cursor: pointer;
+	            ">
+	              <div><strong>\${r.userName}</strong> - \${r.title} <span style="color:var(--bs-red); font-size:0.7em; margin-left: 15px;">\${statusLabel}</span></div>
+	              <div style="font-size: 13px; color: #666;">\${formatDate(r.regDate)}</div>
+	            </li>
+	          `;
+	        });
+	        html += '</ul>';
+          listContainer.empty();
+	      listContainer.html(html);
+
+	      // 페이지 버튼 렌더링
+	      renderResumePagination(uid, onlyUnread, res);
+	    },
+	    error: function() {
+	      listContainer.empty();
+	      listContainer.html('<p style="color:red;">이력서 로딩 실패</p>');
+	    }
+	  });
 	}
+	
+function viewSubmitDetail(registrationNo) {
+	  location.href = `/submit/detail/\${registrationNo}`;
+	}
+	
+function renderResumePagination(uid, onlyUnread, res) {
+	  const container = $(`#resumePagination-\${uid}`);
+	  const { currentPage, pageList, hasPrevBlock, hasNextBlock, startPage, endPage } = res;
+
+	  let html = `<div style="margin-top: 10px; display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;">`;
+
+	  if (hasPrevBlock) {
+	    html += `<button class="btn-edit" onclick="fetchResumes(\${uid}, \${onlyUnread}, \${startPage - 1})">«</button>`;
+	  }
+
+	  pageList.forEach(p => {
+	    html += `<button class="btn-edit \${p === currentPage ? 'active' : ''}" 
+	      style="\${p === currentPage ? 'background:#3a8fb8;color:white;' : ''}" 
+	      onclick="fetchResumes(\${uid}, \${onlyUnread}, \${p})">\${p}</button>`;
+	  });
+
+	  if (hasNextBlock) {
+	    html += `<button class="btn-edit" onclick="fetchResumes(\${uid}, \${onlyUnread}, \${endPage + 1})">»</button>`;
+	  }
+
+	  html += '</div>';
+	  container.html(html);
+	}
+
+
 
 
 

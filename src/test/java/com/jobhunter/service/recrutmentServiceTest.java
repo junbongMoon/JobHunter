@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
-import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageVO;
+import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -35,7 +35,7 @@ public class recrutmentServiceTest {
         dto.setNotClosing(false);
         dto.setApplyViaSite(false);
 
-        RecruitmentWithResumePageVO result = recruitmentService.searchRecruitments(dto);
+        TenToFivePageVO result = recruitmentService.searchRecruitments(dto);
 
         System.out.println("▶ 총 공고 수: " + result.getTotalItems());
         System.out.println("▶ 현재 페이지: " + result.getCurrentPage());

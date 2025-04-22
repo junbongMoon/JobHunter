@@ -13,15 +13,22 @@ import org.springframework.util.StringUtils;
 
 import com.jobhunter.dao.message.MessageDAO;
 import com.jobhunter.dao.submit.SubmitDAO;
+import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.message.MessageDTO;
 import com.jobhunter.model.message.MessageTargetInfoDTO;
 import com.jobhunter.model.message.USERTYPE;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
+import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.RegistrationVO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 import com.jobhunter.model.submit.Status;
+import com.jobhunter.model.submit.SubmitFromRecruitVO;
+import com.jobhunter.model.submit.SubmitSearchDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -289,5 +296,50 @@ public class SubmitServiceImpl implements SubmitService {
 			submitDAO.updateExpiredByRecUid(uid);
 		}
 
+	}
+	
+	/**
+	 *  @author 육근우
+	 *
+	 * <p>
+	 * 공고uid를 기반으로 검색조건에 맞는 신청서를 페이징해서 가져오는 메서드 
+	 * </p>
+	 * 
+	 * @param RecruitmentWithResumePageDTO 검색조건과 기업uid등이 담긴 객체
+	 * @return 조건에 맞는 공고들
+	 * @throws Exception 
+	 *
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public TenToFivePageVO<SubmitFromRecruitVO> selectResumesByRecruitmentUid(SubmitSearchDTO dto) throws Exception {
+	    int totalItems = submitDAO.countResumesByRecruitmentUid(dto);
+	    List<SubmitFromRecruitVO> list = submitDAO.selectResumesByRecruitmentUid(dto);
+
+	    TenToFivePageVO<SubmitFromRecruitVO> vo = new TenToFivePageVO<SubmitFromRecruitVO>(list, dto.getPage(), totalItems);
+
+	    return vo;
+	}
+	
+	/**
+	 *  @author 육근우
+	 *
+	 * <p>
+	 * 신청서의 대상 기업이 본인이거나 관리자가 접근했을 경우에만 신청서 하나만 이력서포함해서 가져오는 메서드
+	 * </p>
+	 * 
+	 * @param int registrationNo 신청서 pk
+	 * @return 신청서 상세정보
+	 *
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public ResumeDetailInfoBySubmit selectSubmitAndResumeDetailInfo(int registrationNo, AccountVO account) throws Exception {
+		
+		int companyUid = submitDAO.getCompanyUidByRegistrationNo(registrationNo);
+		if((companyUid == account.getUid() && account.getAccountType() == AccountType.COMPANY) || account.getIsAdmin() == "Y") {
+			return submitDAO.selectSubmitAndResumeDetailInfo(registrationNo);
+		}
+	    return null;
 	}
 }

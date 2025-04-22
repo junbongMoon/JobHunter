@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import lombok.Data;
 
 @Data
-public class RecruitmentWithResumePageVO {
+public class TenToFivePageVO<T> {
 
     // 현재 페이지 번호
     private int currentPage;
@@ -32,10 +32,10 @@ public class RecruitmentWithResumePageVO {
     private List<Integer> pageList;
 
     // 현재 페이지 항목들
-    private List<RecruitmentWithResume> items;
+    private List<T> items;
 
     // 생성자에서 페이징 계산까지 수행
-    public RecruitmentWithResumePageVO(List<RecruitmentWithResume> items, int currentPage, int totalItems) {
+    public TenToFivePageVO(List<T> items, int currentPage, int totalItems) {
         this.items = items;
         this.currentPage = currentPage;
         this.totalItems = totalItems;

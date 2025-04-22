@@ -266,12 +266,33 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	    return ses.update(NS + ".increaseRecruitmentViewCnt", boardNo);
 	}
 
-	
+	/**
+	 *  @author 육근우
+	 *
+	 * <p>
+	 * 검색조건에 맞는 공고의 갯수를 검색하는 메서드
+	 * </p>
+	 * 
+	 * @param RecruitmentWithResumePageDTO dto
+	 * @return int 공고총갯수
+	 *
+	 */
 	@Override
 	public int countRecruitments(RecruitmentWithResumePageDTO dto) {
 		return ses.selectOne(NS + ".countRecruitments", dto);
 	}
 	
+	/**
+	 *  @author 육근우
+	 *
+	 * <p>
+	 * 검색조건에 맞는 요약된 공고 리스트를 가져오는 메서드
+	 * </p>
+	 * 
+	 * @param RecruitmentWithResumePageDTO dto
+	 * @return 조건에 맞는 공고의 필요한 내용들과 공고에 달린 신청서 갯수, 안읽은신청서가 있는지 여부가 포함된 객체의 리스트
+	 *
+	 */
 	@Override
 	public List<RecruitmentWithResume> searchRecruitments(RecruitmentWithResumePageDTO dto) {
 		List<RecruitmentWithResume> list = ses.selectList(NS + ".searchRecruitments", dto);
