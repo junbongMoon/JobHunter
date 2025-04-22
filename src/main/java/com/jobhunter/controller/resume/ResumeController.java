@@ -317,7 +317,7 @@ public class ResumeController {
 	 * @return 이력서 수정 폼 JSP 경로 또는 오류 페이지
 	 */
 	@GetMapping({"/edit/{resumeNo}", "/advice/{resumeNo}", "/checkAdvice/{resumeNo}"})
-	public String editResumeForm(@PathVariable int resumeNo, Model model, HttpSession session, HttpServletRequest request) {
+	public String editResumeForm(@PathVariable int resumeNo, @RequestParam int uid, Model model, HttpSession session, HttpServletRequest request) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		int userUid = account.getUid();
 		try {
@@ -332,7 +332,6 @@ public class ResumeController {
 				model.addAttribute("error", "첨삭 중인 이력서는 수정할 수 없습니다.");
 				return "error";
 			}
-
 			// 기존 이력서 정보 조회
 			ResumeDetailDTO resumeDetail = resumeService.getResumeDetailWithAll(resumeNo);
 			model.addAttribute("resumeDetail", resumeDetail);
@@ -366,8 +365,8 @@ public class ResumeController {
 			String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			model.addAttribute("today", today);
 
-			// 유저정보를 가져옴
-			UserVO user = resumeService.getUserInfo(userUid);
+			// 이력서의 유저정보를 가져옴
+			UserVO user = resumeService.getUserInfo(uid);
 			model.addAttribute("user", user);
 			
 			String uri = request.getRequestURI();
