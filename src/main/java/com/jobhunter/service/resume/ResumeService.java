@@ -59,6 +59,9 @@ public interface ResumeService {
 	// 이력서 상태 확인
 	boolean isResumeChecked(int resumeNo) throws Exception;
 
+	// 이력서 첨삭 상태 확인
+	boolean isResumeAdvice(int resumeNo) throws Exception;
+
 	void saveAdvice(ResumeAdviceDTO adviceDTO);
 
 	void deleteExistingAdvice(int resumeNo, int mentorUid);

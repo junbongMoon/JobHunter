@@ -330,4 +330,10 @@ public class ResumeDAOImpl implements ResumeDAO {
         return ses.selectOne(NS + ".checkDuplicateAdvice", params);
     }
 
+	// 이력서 첨삭 상태 확인
+	@Override
+	public int checkResumeAdvice(int resumeNo) throws Exception {
+		return ses.selectOne(NS + ".checkResumeAdvice", resumeNo);
+	}
+
 }

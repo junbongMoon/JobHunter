@@ -185,6 +185,8 @@ public class ResumeServiceImpl implements ResumeService {
 
 			// 이력서 상태 확인
 			resume.setChecked(rdao.checkResumeStatus(resume.getResumeNo()) > 0);
+			// 이력서 첨삭 상태 확인
+			resume.setAdvice(rdao.checkResumeAdvice(resume.getResumeNo()) > 0);
 		}
 
 		return resumeList;
@@ -253,6 +255,12 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	public boolean isResumeChecked(int resumeNo) throws Exception {
 		return rdao.checkResumeStatus(resumeNo) > 0;
+	}
+
+	// 이력서 첨삭 상태 확인
+	@Override
+	public boolean isResumeAdvice(int resumeNo) throws Exception {
+		return rdao.checkResumeAdvice(resumeNo) > 0;
 	}
 
 	@Override

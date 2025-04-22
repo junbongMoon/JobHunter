@@ -13,4 +13,5 @@ public class ResumeVO {
     private List<SigunguVO> sigunguList;
     private List<SubCategoryVO> subcategoryList;
     private boolean checked;  // 이력서가 기업에서 확인되었는지 여부
+    private boolean advice;  // 이력서가 첨삭 중인지 여부
 } 

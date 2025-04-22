@@ -341,5 +341,11 @@
 		SELECT COUNT(*) FROM registration_advice 
 		WHERE mentorUid = #{mentorUid} AND resumeNo = #{resumeNo}
 	</select>
+
+	<!-- 이력서 첨삭 상태 확인 -->
+	<select id="checkResumeAdvice" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM registration_advice
+		WHERE resumeNo = #{resumeNo} AND status = 'CHECKING'
+	</select>
     
 </mapper>

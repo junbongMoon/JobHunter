@@ -149,4 +149,7 @@ public interface ResumeDAO {
 	 *
 	 */
 	int checkDuplicateAdvice(int mentorUid, int resumeNo) throws Exception;
+
+	// 이력서 첨삭 상태 확인
+	int checkResumeAdvice(int resumeNo) throws Exception;
 }
