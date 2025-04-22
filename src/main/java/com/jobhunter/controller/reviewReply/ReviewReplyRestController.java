@@ -79,21 +79,28 @@ public class ReviewReplyRestController {
 		}
 
 		try {
-			boolean result = service.updateReply(dto);
-		} catch (Exception e) {
-			
-			e.printStackTrace();
-		}
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	        boolean result = service.updateReply(dto);
+	        if (result) {
+	            return ResponseEntity.ok().build();
+	        } else {
+	            System.out.println("❌ 업데이트 실패: 조건 불일치");
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace(); // 콘솔 로그 확인 필수!
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
 	}
-
 	@PostMapping("/delete")
 	public ResponseEntity<Boolean> deleteReply(@RequestBody ReviewReplyDTO dto, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		if (account == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
 		}
-
+		if (dto.getReplyNo() <= 0) {
+		    System.out.println(dto.getReplyNo());
+		    return ResponseEntity.badRequest().build();
+		}
 		boolean result = false;
 		try {
 			result = service.deleteReply(dto.getReplyNo(), account.getUid());
