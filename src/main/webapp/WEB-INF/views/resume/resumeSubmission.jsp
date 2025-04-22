@@ -198,15 +198,22 @@
 															<i class="fas fa-edit"></i> 수정 및 상세보기
 														</button>
 													</c:when>
+													<c:when test="${resume.advice}">
+														<button type="button"
+															class="btn btn-outline-secondary edit-resume"
+															onclick="showAdviceResumeModal()">
+															<i class="fas fa-edit"></i> 수정 및 상세보기
+														</button>
+													</c:when>
 													<c:when test="${mode == 'adCheck'}">
-														<a href="/resume/edit/${resume.resumeNo}?uid=${prBoard.prBoardNo}&mode=adCheck"
+														<a href="/resume/edit/${resume.resumeNo}?uid=${resume.userUid}&mode=adCheck&boardNo=${prBoard.prBoardNo}"
 															class="btn btn-outline-primary edit-resume"> <i
 																class="fas fa-edit"></i> 수정 및 상세보기
 														</a>
 													</c:when>
 													<c:otherwise>
 														<c:if test="${mode != 'adCheck'}">
-														<a href="/resume/edit/${resume.resumeNo}?uid=${recruitmentNotice.uid}"
+														<a href="/resume/edit/${resume.resumeNo}?uid=${resume.userUid}&boardNo=${recruitmentNotice.uid}"
 															class="btn btn-outline-primary edit-resume"> <i
 																class="fas fa-edit"></i> 수정 및 상세보기
 														</a>
@@ -278,14 +285,14 @@
 										<li class="page-item">
 											<c:if test="${mode != 'adCheck'}">
 												<a class="page-link"
-													href="/submission/check?uid=${recruitmentNotice.uid}&page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													href="/submission/check?boardNo=${recruitmentNotice.uid}&page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 													aria-label="Previous Block">
 													<i class="fas fa-angle-double-left"></i>
 												</a>
 											</c:if>
 											<c:if test="${mode == 'adCheck'}">
 												<a class="page-link"
-													href="/submission/adCheck?uid=${prBoard.prBoardNo}&page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													href="/submission/adCheck?boardNo=${prBoard.prBoardNo}&page=${startPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 													aria-label="Previous Block">
 													<i class="fas fa-angle-double-left"></i>
 												</a>
@@ -298,14 +305,14 @@
 										<li class="page-item">
 											<c:if test="${mode != 'adCheck'}">
 												<a class="page-link"
-													href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													href="/submission/check?boardNo=${recruitmentNotice.uid}&page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 													aria-label="Previous">
 													<i class="fas fa-chevron-left"></i>
 												</a>
 											</c:if>
 											<c:if test="${mode == 'adCheck'}">
 												<a class="page-link"
-														href="/submission/adCheck?uid=${prBoard.prBoardNo}&page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													href="/submission/adCheck?boardNo=${prBoard.prBoardNo}&page=${currentPage - 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 													aria-label="Previous">
 													<i class="fas fa-chevron-left"></i>
 												</a>
@@ -317,11 +324,11 @@
 										<li class="page-item ${currentPage == i ? 'active' : ''}">
 											<c:if test="${mode != 'adCheck'}">
 												<a class="page-link"
-												href="/submission/check?uid=${recruitmentNotice.uid}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
+												href="/submission/check?boardNo=${recruitmentNotice.uid}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
 											</c:if>
 											<c:if test="${mode == 'adCheck'}">
 												<a class="page-link"
-												href="/submission/adCheck?uid=${prBoard.prBoardNo}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
+												href="/submission/adCheck?boardNo=${prBoard.prBoardNo}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
 											</c:if>
 										</li>
 									</c:forEach>
@@ -331,14 +338,14 @@
 										<li class="page-item">
 											<c:if test="${mode != 'adCheck'}">
 												<a class="page-link"
-												href="/submission/check?uid=${recruitmentNotice.uid}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+												href="/submission/check?boardNo=${recruitmentNotice.uid}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 												aria-label="Next">
 												<i class="fas fa-chevron-right"></i>
 												</a>
 											</c:if>
 											<c:if test="${mode == 'adCheck'}">
 												<a class="page-link"
-												href="/submission/adCheck?uid=${prBoard.prBoardNo}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+												href="/submission/adCheck?boardNo=${prBoard.prBoardNo}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 												aria-label="Next">
 												<i class="fas fa-chevron-right"></i>
 											</a>
@@ -351,14 +358,14 @@
 										<li class="page-item">
 											<c:if test="${mode != 'adCheck'}">
 												<a class="page-link"
-												href="/submission/check?uid=${recruitmentNotice.uid}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+												href="/submission/check?boardNo=${recruitmentNotice.uid}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 												aria-label="Next Block">
 												<i class="fas fa-angle-double-right"></i>
 											</a>
 											</c:if>
 											<c:if test="${mode == 'adCheck'}">
 												<a class="page-link"
-												href="/submission/adCheck?uid=${prBoard.prBoardNo}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+												href="/submission/adCheck?boardNo=${prBoard.prBoardNo}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
 												aria-label="Next Block">
 												<i class="fas fa-angle-double-right"></i>
 											</a>
@@ -904,6 +911,13 @@
 			// 확인된 이력서 모달 표시 함수
 			function showCheckedResumeModal() {
 				$('#modalMessage').text('기업에서 확인중인 이력서는 수정할 수 없습니다.');
+				$('#modal').modal('show');
+			}
+
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 첨삭 모달 표시 함수
+			function showAdviceResumeModal() {
+				$('#modalMessage').text('첨삭 중인 이력서는 수정할 수 없습니다.');
 				$('#modal').modal('show');
 			}
 			//---------------------------------------------------------------------------------------------------------------------------------

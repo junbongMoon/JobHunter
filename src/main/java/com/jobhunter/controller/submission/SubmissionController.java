@@ -60,10 +60,11 @@ public class SubmissionController {
 	 */
 	// 이력서 제출 페이지 (쿼리 파라미터 방식)
 	@GetMapping({"/check", "/adCheck"})
-	public String submitResumeForm(@RequestParam("uid") int uid,
+	public String submitResumeForm(
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
 			@RequestParam(value = "searchTitle", required = false) String searchTitle,
+			@RequestParam(value = "boardNo", required = false) int boardNo,
 			Model model, HttpSession session, HttpServletRequest request) {
 
 		// 세션에서 사용자 정보 가져오기
@@ -74,7 +75,7 @@ public class SubmissionController {
 		try {
 			// 공고 정보 조회
 			if (uri.contains("check")) {
-				RecruitmentDetailInfo recruitmentNotice = recruitmentNoticeService.getRecruitmentByUid(uid);
+				RecruitmentDetailInfo recruitmentNotice = recruitmentNoticeService.getRecruitmentByUid(boardNo);
 
 				if (recruitmentNotice == null) {
 					model.addAttribute("errorMessage", "존재하지 않는 공고입니다.");
@@ -84,7 +85,7 @@ public class SubmissionController {
 				// 모델에 공고 정보 추가
 				model.addAttribute("recruitmentNotice", recruitmentNotice);
 			} else if (uri.contains("adCheck")) { // 첨삭 PR 페이지에서 접근
-				PRBoardVO prBoard = prBoardService.getPRBoardDetail(uid);
+				PRBoardVO prBoard = prBoardService.getPRBoardDetail(boardNo);
 				// 첨삭 PR 페이지에서 접근 시 모드 설정
 				model.addAttribute("mode", "adCheck");
 				model.addAttribute("prBoard", prBoard);

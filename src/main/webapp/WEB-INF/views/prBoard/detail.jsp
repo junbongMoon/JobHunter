@@ -141,7 +141,7 @@
       <i class="fas fa-list"></i> 목록으로
     </a>
     <!-- 첨삭 제출 페이지 -->
-    <a href="/submission/adCheck/?uid=${prBoard.prBoardNo}" class="btn btn-edit" style="background-color: #47b2e4; color: white;">
+    <a href="/submission/adCheck/?boardNo=${prBoard.prBoardNo}" class="btn btn-edit" style="background-color: #47b2e4; color: white;">
     <i class="fas fa-edit"></i>
     첨삭 제출
     </a>

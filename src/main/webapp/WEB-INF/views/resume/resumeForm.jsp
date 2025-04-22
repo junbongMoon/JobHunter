@@ -2515,13 +2515,13 @@
 				// 돌아가기 버튼
 				$('#returnBtn').on('click', function () {
 					const urlParams = new URLSearchParams(window.location.search);
-					const uid = urlParams.get('uid');
+					const boardNo = urlParams.get('boardNo');
 					const mode = urlParams.get('mode');
-					if (uid) {
+					if (boardNo) {
 						if (mode == 'adCheck') {
-							window.location.href = '/submission/adCheck?uid=' + uid;
+							window.location.href = '/submission/adCheck?boardNo=' + boardNo;
 						} else {
-							window.location.href = '/submission/check?uid=' + uid;
+							window.location.href = '/submission/check?boardNo=' + boardNo;
 						}
 					} else {
 						window.location.href = '/resume/list';

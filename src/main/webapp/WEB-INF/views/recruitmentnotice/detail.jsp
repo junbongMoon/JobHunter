@@ -690,7 +690,7 @@ button.btn-resume {
 													</c:when>
 													<c:when test="${sessionScope.account.accountType == 'USER'}">
 														<button type="button" class="btn-resume" id="submitResumeBtn"
-														onclick="location.href='/submission/check?uid=${RecruitmentDetailInfo.uid}'">
+														onclick="location.href='/submission/check?boardNo=${RecruitmentDetailInfo.uid}'">
 														이력서 제출
 													</button>
 												</c:when>
