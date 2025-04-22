@@ -20,57 +20,64 @@
 
 			<div class="main">
 				<div class="container">
-					<h1 class="page-title">이력서 제출</h1>
+					<c:if test="${mode == 'adCheck'}">
+						<h1 class="page-title">이력서 첨삭 제출</h1>
+					</c:if>
+					<c:if test="${mode != 'adCheck'}">
+						<h1 class="page-title">이력서 제출</h1>
+					</c:if>
 
-					<!-- 공고 정보 표시 -->
-					<c:if test="${not empty recruitmentNotice}">
-						<div class="notice-info">
-							<div class="notice-title">
-								<a
-									href="/recruitmentnotice/detail?uid=${recruitmentNotice.uid}">${recruitmentNotice.title}</a>
+					<c:if test="${mode != 'adCheck'}">
+						<!-- 공고 정보 표시 -->
+						<c:if test="${not empty recruitmentNotice}">
+							<div class="notice-info">
+								<div class="notice-title">
+									<a
+										href="/recruitmentnotice/detail?uid=${recruitmentNotice.uid}">${recruitmentNotice.title}</a>
+								</div>
+								<div class="notice-company">
+									<i class="fas fa-solid fa-building "></i>&nbsp;${recruitmentNotice.companyName}
+								</div>
+								<div class="notice-details">
+									<div class="notice-detail-item" data-bs-toggle="tooltip" data-bs-placement="top"
+										title="근무 지역">
+										<i class="fas fa-map-marker-alt"></i> <span>
+											<c:if test="${not empty recruitmentNotice.region}">
+												${recruitmentNotice.region.name}</c:if>
+											<c:if test="${not empty recruitmentNotice.sigungu}">
+												${recruitmentNotice.sigungu.name}</c:if>
+										</span>
+									</div>
+									<div class="notice-detail-item" data-bs-toggle="tooltip" data-bs-placement="top"
+										title="근무 형태">
+										<i class="fas fa-briefcase"></i> <span>${recruitmentNotice.workType}</span>
+									</div>
+									<div class="notice-detail-item" data-bs-toggle="tooltip" data-bs-placement="top"
+										title="조건 사항">
+										<i class="fas fa-solid fa-list-check"></i>
+										<span>${recruitmentNotice.personalHistory}</span>
+									</div>
+									<div class="notice-detail-item" data-bs-toggle="tooltip" data-bs-placement="top"
+										title="급여 정보">
+										<i class="fas fa-money-bill-wave"></i> <span>
+											<c:choose>
+												<c:when test="${recruitmentNotice.payType eq 'HOUR'}">시급</c:when>
+												<c:when test="${recruitmentNotice.payType eq 'DATE'}">일급</c:when>
+												<c:when test="${recruitmentNotice.payType eq 'WEEK'}">주급</c:when>
+												<c:when test="${recruitmentNotice.payType eq 'MONTH'}">월급</c:when>
+												<c:when test="${recruitmentNotice.payType eq 'YEAR'}">연봉</c:when>
+												<c:otherwise>기타</c:otherwise>
+											</c:choose> <span id="payAmount">${recruitmentNotice.pay}</span>원
+										</span>
+									</div>
+									<div class="notice-detail-item" data-bs-toggle="tooltip" data-bs-placement="top"
+										title="공고 마감일">
+										<i class="fas fa-calendar-alt"></i> <span
+											id="dueDate">${recruitmentNotice.dueDate}</span>
+									</div>
+								</div>
 							</div>
-							<div class="notice-company">
-								<i class="fas fa-solid fa-building "></i>&nbsp;${recruitmentNotice.companyName}
-							</div>
-							<div class="notice-details">
-								<div class="notice-detail-item" data-bs-toggle="tooltip" data-bs-placement="top"
-									title="근무 지역">
-									<i class="fas fa-map-marker-alt"></i> <span>
-										<c:if test="${not empty recruitmentNotice.region}">
-											${recruitmentNotice.region.name}</c:if>
-										<c:if test="${not empty recruitmentNotice.sigungu}">
-											${recruitmentNotice.sigungu.name}</c:if>
-									</span>
-								</div>
-								<div class="notice-detail-item" data-bs-toggle="tooltip" data-bs-placement="top"
-									title="근무 형태">
-									<i class="fas fa-briefcase"></i> <span>${recruitmentNotice.workType}</span>
-								</div>
-								<div class="notice-detail-item" data-bs-toggle="tooltip" data-bs-placement="top"
-									title="조건 사항">
-									<i class="fas fa-solid fa-list-check"></i>
-									<span>${recruitmentNotice.personalHistory}</span>
-								</div>
-								<div class="notice-detail-item" data-bs-toggle="tooltip" data-bs-placement="top"
-									title="급여 정보">
-									<i class="fas fa-money-bill-wave"></i> <span>
-										<c:choose>
-											<c:when test="${recruitmentNotice.payType eq 'HOUR'}">시급</c:when>
-											<c:when test="${recruitmentNotice.payType eq 'DATE'}">일급</c:when>
-											<c:when test="${recruitmentNotice.payType eq 'WEEK'}">주급</c:when>
-											<c:when test="${recruitmentNotice.payType eq 'MONTH'}">월급</c:when>
-											<c:when test="${recruitmentNotice.payType eq 'YEAR'}">연봉</c:when>
-											<c:otherwise>기타</c:otherwise>
-										</c:choose> <span id="payAmount">${recruitmentNotice.pay}</span>원
-									</span>
-								</div>
-								<div class="notice-detail-item" data-bs-toggle="tooltip" data-bs-placement="top"
-									title="공고 마감일">
-									<i class="fas fa-calendar-alt"></i> <span
-										id="dueDate">${recruitmentNotice.dueDate}</span>
-								</div>
-							</div>
-						</div>
+						</c:if>
 					</c:if>
 
 					<!-- 이력서 선택 섹션 -->

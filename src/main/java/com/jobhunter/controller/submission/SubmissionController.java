@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.prboard.PRBoardVO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.resume.ResumeVO;
+import com.jobhunter.service.prboard.PRBoardService;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 import com.jobhunter.service.resume.ResumeService;
 
@@ -40,6 +42,7 @@ public class SubmissionController {
 
 	private final ResumeService resumeService;
 	private final RecruitmentNoticeService recruitmentNoticeService;
+	private final PRBoardService prBoardService;
 
 	/**
 	 * 이력서 제출 페이지를 출력합니다.
@@ -81,7 +84,10 @@ public class SubmissionController {
 				// 모델에 공고 정보 추가
 				model.addAttribute("recruitmentNotice", recruitmentNotice);
 			} else if (uri.contains("adCheck")) { // 첨삭 PR 페이지에서 접근
-				// 
+				PRBoardVO prBoard = prBoardService.getPRBoardDetail(uid);
+				// 첨삭 PR 페이지에서 접근 시 모드 설정
+				model.addAttribute("mode", "adCheck");
+				model.addAttribute("prBoard", prBoard);
 			}
 
 			// 사용자의 이력서 목록 조회 (페이징 처리)
