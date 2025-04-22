@@ -373,7 +373,16 @@
 					<nav id="navmenu" class="navmenu">
 						<ul>
 							<li><a href="/" class="active">Home</a></li>
-							<li class="dropdown"><a href="#"><span>채용정보</span> <i
+							<li class="dropdown"><a href="/recruitmentnotice/listAll"><span>채용정보</span> <i
+										class="bi bi-chevron-down toggle-dropdown"></i></a>
+								<ul>
+									<li><a href="#">이력서 ADVICE</a></li>
+									<li><a href="/prboard/list">멘토 PR 리스트</a></li>
+									<li><a href="/prboard/list">멘토 PR 리스트</a></li>
+									<li><a href="/prboard/list">멘토 PR 리스트</a></li>
+								</ul>
+							</li>
+							<li class="dropdown"><a href="/recruitmentnotice/listAll"><span></span> <i
 										class="bi bi-chevron-down toggle-dropdown"></i></a>
 								<ul>
 									<li><a href="/recruitmentnotice/listAll">전체 채용정보</a></li>
@@ -414,7 +423,9 @@
 								<!-- 마우스 호버 시 뜨는 프로필 카드 -->
 								<div class="mypage-profile-card">
 									<div class="profile-img-container">
-										<div class="profile-img"><img src="${sessionScope.account.profileImg}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div>
+										<div class="profile-img"><img src="${sessionScope.account.profileImg}"
+												style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+										</div>
 										<div class="speech-bubble"
 											onclick="openNotifications('${sessionScope.account.uid}', '${sessionScope.account.accountType}')">
 											<!-- 메시지 카운트 들어오게 -->
@@ -493,7 +504,7 @@
 			function openNotifications(uid, accountType) {
 				// 모달 표시
 				document.getElementById('notificationModal').style.display = 'block';
-				
+
 				// 알림 목록 가져오기
 				fetchNotifications(uid, accountType);
 			}
@@ -505,18 +516,18 @@
 					.then(html => {
 						// 알림 목록 컨테이너 가져오기
 						const notificationList = document.getElementById('notificationList');
-						
+
 						// 임시 DOM 요소 생성
 						const tempDiv = document.createElement('div');
 						tempDiv.innerHTML = html;
-						
+
 						// 알림 목록 추출
 						const listGroup = tempDiv.querySelector('.list-group');
-						
+
 						if (listGroup) {
 							// 알림 목록이 있는 경우
 							notificationList.innerHTML = listGroup.innerHTML;
-							
+
 							// 이벤트 리스너 추가
 							addNotificationEventListeners(uid, accountType);
 						} else {
@@ -545,7 +556,7 @@
 				// 알림 항목 클릭 이벤트
 				const notificationItems = document.querySelectorAll('.notification-item');
 				notificationItems.forEach(item => {
-					item.addEventListener('click', function() {
+					item.addEventListener('click', function () {
 						const messageNo = this.getAttribute('data-message-no');
 						markAsRead(messageNo, accountType, uid);
 					});
@@ -554,7 +565,7 @@
 				// 삭제 아이콘 클릭 이벤트
 				const deleteIcons = document.querySelectorAll('.delete-icon');
 				deleteIcons.forEach(icon => {
-					icon.addEventListener('click', function(event) {
+					icon.addEventListener('click', function (event) {
 						event.stopPropagation();
 						const messageNo = this.closest('.notification-item').getAttribute('data-message-no');
 						deleteNotification(messageNo);
@@ -562,7 +573,7 @@
 				});
 
 				// 모두 읽음 버튼 클릭 이벤트
-				document.getElementById('markAllReadBtn').addEventListener('click', function() {
+				document.getElementById('markAllReadBtn').addEventListener('click', function () {
 					markAllAsRead(accountType, uid);
 				});
 			}
@@ -576,25 +587,25 @@
 					},
 					body: 'messageNo=' + messageNo + '&accountType=' + accountType + '&uid=' + uid
 				})
-				.then(response => {
-					if (response.ok) {
-						// 알림 항목의 클래스 변경
-						const notificationItem = document.querySelector('[data-message-no="' + messageNo + '"]');
-						if (notificationItem) {
-							notificationItem.classList.remove('unread');
-							notificationItem.classList.add('read');
-							
-							// 배지 제거
-							const badge = notificationItem.querySelector('.notification-badge');
-							if (badge) {
-								badge.remove();
+					.then(response => {
+						if (response.ok) {
+							// 알림 항목의 클래스 변경
+							const notificationItem = document.querySelector('[data-message-no="' + messageNo + '"]');
+							if (notificationItem) {
+								notificationItem.classList.remove('unread');
+								notificationItem.classList.add('read');
+
+								// 배지 제거
+								const badge = notificationItem.querySelector('.notification-badge');
+								if (badge) {
+									badge.remove();
+								}
 							}
 						}
-					}
-				})
-				.catch(error => {
-					console.error('Error:', error);
-				});
+					})
+					.catch(error => {
+						console.error('Error:', error);
+					});
 			}
 
 			// 모든 알림을 읽음 상태로 변경하는 함수
@@ -606,25 +617,25 @@
 					},
 					body: 'accountType=' + accountType + '&uid=' + uid
 				})
-				.then(response => {
-					if (response.ok) {
-						// 모든 알림 항목의 클래스 변경
-						const unreadItems = document.querySelectorAll('.notification-item.unread');
-						unreadItems.forEach(item => {
-							item.classList.remove('unread');
-							item.classList.add('read');
-						});
-						
-						// 모든 배지 제거
-						const badges = document.querySelectorAll('.notification-badge');
-						badges.forEach(badge => {
-							badge.remove();
-						});
-					}
-				})
-				.catch(error => {
-					console.error('Error:', error);
-				});
+					.then(response => {
+						if (response.ok) {
+							// 모든 알림 항목의 클래스 변경
+							const unreadItems = document.querySelectorAll('.notification-item.unread');
+							unreadItems.forEach(item => {
+								item.classList.remove('unread');
+								item.classList.add('read');
+							});
+
+							// 모든 배지 제거
+							const badges = document.querySelectorAll('.notification-badge');
+							badges.forEach(badge => {
+								badge.remove();
+							});
+						}
+					})
+					.catch(error => {
+						console.error('Error:', error);
+					});
 			}
 
 			// 알림 삭제 함수
@@ -636,39 +647,39 @@
 					},
 					body: JSON.stringify({ messageNo: messageNo })
 				})
-				.then(response => {
-					if (response.ok) {
-						// 알림 항목 제거
-						const notificationItem = document.querySelector('[data-message-no="' + messageNo + '"]');
-						if (notificationItem) {
-							notificationItem.remove();
-							
-							// 모든 알림이 삭제되었는지 확인
-							const remainingItems = document.querySelectorAll('.notification-item');
-							if (remainingItems.length === 0) {
-								// 알림이 없으면 빈 메시지 표시
-								document.getElementById('notificationList').innerHTML = `
+					.then(response => {
+						if (response.ok) {
+							// 알림 항목 제거
+							const notificationItem = document.querySelector('[data-message-no="' + messageNo + '"]');
+							if (notificationItem) {
+								notificationItem.remove();
+
+								// 모든 알림이 삭제되었는지 확인
+								const remainingItems = document.querySelectorAll('.notification-item');
+								if (remainingItems.length === 0) {
+									// 알림이 없으면 빈 메시지 표시
+									document.getElementById('notificationList').innerHTML = `
 									<div class="empty-notification">
 										<i class="fas fa-bell-slash fa-3x mb-3"></i>
 										<p>새로운 알림이 없습니다.</p>
 									</div>
 								`;
+								}
 							}
 						}
-					}
-				})
-				.catch(error => {
-					console.error('Error:', error);
-				});
+					})
+					.catch(error => {
+						console.error('Error:', error);
+					});
 			}
 
 			// 모달 닫기 이벤트 리스너
-			document.getElementById('closeNotificationModal').addEventListener('click', function() {
+			document.getElementById('closeNotificationModal').addEventListener('click', function () {
 				document.getElementById('notificationModal').style.display = 'none';
 			});
 
 			// 모달 외부 클릭 시 닫기
-			window.addEventListener('click', function(event) {
+			window.addEventListener('click', function (event) {
 				const modal = document.getElementById('notificationModal');
 				if (event.target === modal) {
 					modal.style.display = 'none';
