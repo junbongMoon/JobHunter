@@ -282,5 +282,52 @@
         WHERE resumePk = #{resumeNo}
         AND status = 'CHECKED'
     </select>
+
+    <!-- 이력서 첨삭 내용 저장 -->
+	<insert id="insertAdvice" parameterType="com.jobhunter.model.resume.ResumeAdviceDTO" useGeneratedKeys="true" keyProperty="adviceNo">
+		INSERT INTO resume_advice (resumeNo, adviceContent, mentorUid)
+		VALUES (#{resumeNo}, #{adviceContent}, #{mentorUid})
+	</insert>
+
+	<!-- 기존 첨삭 내용 삭제 -->
+	<delete id="deleteExistingAdvice" parameterType="map">
+		DELETE FROM resume_advice 
+		WHERE resumeNo = #{resumeNo} AND mentorUid = #{mentorUid}
+	</delete>
+
+	<!-- 이력서 첨삭 파일 정보 저장 -->
+	<insert id="insertAdviceFile" parameterType="com.jobhunter.model.resume.ResumeAdviceUpfileDTO">
+		INSERT INTO resume_advice_upfiles (adviceNo, originalFileName, newFileName, ext, size, base64Image, status)
+		VALUES (#{adviceNo}, #{originalFileName}, #{newFileName}, #{ext}, #{size}, #{base64Image}, #{status})
+	</insert> 
+
+    <!-- 첨삭 내용 조회 -->
+    <select id="getAdvice" parameterType="int" resultType="com.jobhunter.model.resume.ResumeAdviceDTO">
+        SELECT 
+            adviceNo,
+            resumeNo,
+            adviceContent,
+            regDate,
+            mentorUid
+        FROM resume_advice
+        WHERE resumeNo = #{resumeNo}
+        ORDER BY regDate DESC
+        LIMIT 1
+    </select>
+
+    <!-- 첨삭 파일 조회 -->
+    <select id="getAdviceFiles" parameterType="int" resultType="com.jobhunter.model.resume.ResumeAdviceUpfileDTO">
+        SELECT 
+            adviceUpfileNo,
+            originalFileName,
+            newFileName,
+            ext,
+            size,
+            base64Image,
+            status,
+            adviceNo
+        FROM resume_advice_upfiles
+        WHERE adviceNo = #{adviceNo}
+    </select>
     
 </mapper>

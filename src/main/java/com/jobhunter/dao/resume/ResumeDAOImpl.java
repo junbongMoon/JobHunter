@@ -14,6 +14,8 @@ import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.ResumeAdviceDTO;
+import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.ResumeVO;
@@ -246,4 +248,43 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public int checkResumeStatus(int resumeNo) throws Exception {
 		return ses.selectOne(NS + ".checkResumeStatus", resumeNo);
 	}
+
+	@Override
+	public void insertAdvice(ResumeAdviceDTO adviceDTO) {
+		ses.insert(NS + ".insertAdvice", adviceDTO);
+	}
+
+	@Override
+	public void insertAdviceFile(ResumeAdviceUpfileDTO fileDTO) {
+		ses.insert(NS + ".insertAdviceFile", fileDTO);
+	}
+
+	@Override
+	public ResumeAdviceDTO selectAdvice(int resumeNo) {
+		return ses.selectOne(NS + ".selectAdvice", resumeNo);
+	}
+
+	@Override
+	public List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo) {
+		return ses.selectList(NS + ".selectAdviceFiles", adviceNo);
+	}
+
+	@Override
+	public ResumeAdviceDTO getAdvice(int resumeNo) {
+		return ses.selectOne(NS + ".getAdvice", resumeNo);
+	}
+
+	@Override
+	public List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) {
+		return ses.selectList(NS + ".getAdviceFiles", adviceNo);
+	}
+
+	@Override
+	public void deleteExistingAdvice(int resumeNo, int mentorUid) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("resumeNo", resumeNo);
+		params.put("mentorUid", mentorUid);
+		ses.delete(NS + ".deleteExistingAdvice", params);
+	}
+
 }

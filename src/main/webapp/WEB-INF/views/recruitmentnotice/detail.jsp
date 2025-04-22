@@ -5,10 +5,47 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4230440978d7fc8b259ff34d707166f2&autoload=false&libraries=services"></script>
 <script>
 	$(function() {
 
 		showDetailInfo();
+
+		kakao.maps.load(function () {
+			const addr = '${RecruitmentDetailInfo.companyAddr}';
+
+			if (!addr || addr.trim() === "") {
+			console.warn("주소 정보가 없습니다.");
+			return;
+		}
+		
+			const mapContainer = document.getElementById('map');
+			const mapOption = {
+			center: new kakao.maps.LatLng(37.566826, 126.9786567),
+			level: 3
+			};
+			const map = new kakao.maps.Map(mapContainer, mapOption);
+			const geocoder = new kakao.maps.services.Geocoder();
+
+			geocoder.addressSearch(addr, function (result, status) {
+			if (status === kakao.maps.services.Status.OK) {
+				const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+				const marker = new kakao.maps.Marker({
+				map: map,
+				position: coords
+				});
+
+				const infowindow = new kakao.maps.InfoWindow({
+				content: `<div style="padding:5px;font-size:14px;">회사 위치</div>`
+				});
+				infowindow.open(map, marker);
+				map.setCenter(coords);
+			} else {
+				console.warn("주소로 좌표를 찾을 수 없습니다.");
+			}
+			});
+		});
 
 	});
 	
@@ -543,6 +580,17 @@ button.btn-resume {
 												<div id="detail" class="detail-box"></div>
 											</div>
 										</div>
+
+										<div class="categories-widget widget-item card">
+											<h2 class="widget-title">오시는 길</h2>
+											<div class="highlight-box">
+												<div id="map" style="width:100%;height:400px;border-radius:12px;"></div>
+											
+											</div>
+										</div>
+										
+
+
 										<h3>첨부 파일</h3>
 										<p id="fileList">
 										  <c:if test="${not empty RecruitmentDetailInfo.fileList}">

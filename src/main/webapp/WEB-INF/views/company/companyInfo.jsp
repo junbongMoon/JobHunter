@@ -6,12 +6,23 @@
 <!-- 헤더 -->
 <jsp:include page="/WEB-INF/views/header.jsp"></jsp:include>
 
+<script src="/resources/js/imgCompress.js"></script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Firebase UMD 방식 -->
 <script src="https://www.gstatic.com/firebasejs/11.5.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.5.0/firebase-auth-compat.js"></script>
 
-<link href="/resources/css/mypage.css" rel="stylesheet">
+<!-- Summernote CSS/JS (Bootstrap 4 기준) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-ko-KR.min.js"></script>
+
+<!-- 이미지자르기 Cropper.js -->
+<link rel="stylesheet" href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css">
+<script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+
+<link href="/resources/css/companyInfo.css" rel="stylesheet">
 
 <main class="main" data-aos="fade-up">
   <h1 class="page-title">회사 정보</h1>
@@ -24,6 +35,8 @@
         <div class="section-title">
           <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
         </div>
+        <div style="cursor: pointer; border:1px solid var(--bs-gray-300); width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; text-align: center;" onclick="cropImgModalOpen()" id="profileImgContainer"><span id="profileImg">이미지 로딩중...</span></div>
+        <i style="margin:10px; color:var(--accent-color); cursor: pointer; max-width:90px;" onclick="deleteImgModal()">이미지 삭제</i><hr>
         <div class="info-grid" id="basicInfo">
           <div>회사명</div><div><strong id="companyName">로딩중...</strong></div>
           <div>대표자</div><div id="representative">로딩중...</div>
@@ -43,7 +56,7 @@
       </section>
 
       <!-- CompanyVO 상세 정보 섹션 -->
-      <section data-aos="fade-up" data-aos-delay="150">
+      <section data-aos="fade-up" data-aos-delay="150" class="spacerContainer">
         <div class="section-title">
           <h2><i class="bi bi-person-vcard section-icon"></i>상세 정보</h2>
         </div>
@@ -52,11 +65,22 @@
             <div>상세주소</div><div>로딩중...</div>
             <div>회사규모</div><div>로딩중...</div>
             <div>회사 홈페이지</div><div>로딩중...</div>
-            <div class="introduce-section"><div class="introduce-title">회사소개</div><div class="introduce-content">로딩중...</div></div>
+        </div>
+            <div class="spacer">
+        	</div>
             <div class="edit-buttons">
             <button class="btn-edit" onclick="modyfiInfoTapOpen(this)"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
             <button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
             </div>
+      </section>
+
+      <!-- 공고 영역 -->
+      <section data-aos="fade-up" data-aos-delay="300">
+        <div class="section-title">
+          <h2><i class="bi bi-file-earmark-text section-icon"></i>회사 소개</h2>
+        </div>
+        <div class="empty-state">
+          <div class="introduce-section"><div id="introduce-content">로딩중...</div></div>
         </div>
       </section>
       
@@ -104,13 +128,13 @@
               <div>회사 홈페이지</div>
               <div><input type="text" class="form-control" id="homePage" placeholder="홈페이지 링크를 입력하세요" maxlength="190"></div>
               
+              <h3 class="section-subtitle">회사소개</h3>
+              <div class="introduce-section">
+                <textarea id="introduce" placeholder="회사소개를 입력해주세요"></textarea>
+              </div>
             </div>
           </div>
 
-          <div class="introduce-section">
-            <textarea id="introduce" placeholder="회사소개를 입력해주세요"></textarea>
-          </div>
-          
           <div class="edit-buttons">
             <button onclick="cancleModify()" class="btn-cancel">취소</button>
             <button onclick="confirmModify(this)" class="btn-confirm">변경 확인</button>
@@ -118,26 +142,13 @@
         </div>
       </section>
 
-      <!-- 공고 영역 -->
-      <section data-aos="fade-up" data-aos-delay="300">
-        <div class="section-title">
-          <h2><i class="bi bi-file-earmark-text section-icon"></i>내 공고</h2>
-        </div>
-        <div class="empty-state">
-          <i class="bi bi-file-earmark-text"></i>
-          <p>등록된 이력서가 없습니다.</p>
-        </div>
-      </section>
-
       <!-- 아무튼 카드 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
-          <h2><i class="bi bi-heart section-icon"></i>카드 예제</h2>
+          <h2><i class="bi bi-heart section-icon"></i>작성한 공고</h2>
+          <button class="btn-edit" onclick="recruitSearchModal()">공고 검색 옵션</button>
         </div>
-        <div class="empty-state">
-          <i class="bi bi-heart"></i>
-          <p>나중에 필요한거 담을 공간.</p>
-        </div>
+        <div id="recruitSection"></div>
       </section>
 
     </div>
@@ -150,11 +161,354 @@
 <script>
 $(()=>{
   getInfo();
+  getMyRecruit();
 })
+
+function recruitSearchModal() {
+	const text = `
+	<div id="recruitSearchBox">
+	    <h2>공고 검색</h2>
+		<div>
+	      <label style="width:150px"><input type="checkbox" id="noRead"> 신규 신청</label>
+		  <label style="width:150px"><input type="checkbox" id="notClosing"> 모집중</label>
+		  <label style="width:150px"><input type="checkbox" id="applyViaSite"> 사이트 신청</label>
+	  	</div>
+	  	<hr>
+	  	<div>
+	  	<span>
+	  	<label style="width:200px">검색조건 : 
+		  <select id="searchKeywordType">
+		    <option value="title">제목검색</option>
+		    <option value="manager">담당자</option>
+		  </select>
+		</label>
+		</span><span>
+		<label style="width:200px">정렬 : 
+		  <select id="sortBy">
+		    <option value="DUE_SOON">마감임박</option>
+		    <option value="LATEST">최신순</option>
+		    <option value="REG_COUNT">신청서수</option>
+		  </select>
+		</label>
+		</span>
+		</div>
+		
+		<div>
+		  <input type="text" id="searchKeyword" placeholder="검색어를 입력하세요" style="width:450px"/>
+		</div>
+	</div>
+	`
+	
+	// 모달 열고 나서 input 값 채워넣기
+  window.publicModals.show(text, {
+    cancelText: "취소",
+    onConfirm: () => {
+      // 모달 값 → 전역 변수에 반영
+      noRead = $('#noRead').is(':checked');
+      notClosing = $('#notClosing').is(':checked');
+      applyViaSite = $('#applyViaSite').is(':checked');
+      searchKeyword = $('#searchKeyword').val();
+      searchKeywordType = $('#searchKeywordType').val();
+      sortBy = $('#sortBy').val();
+
+      page = 1; // 검색 새로 할 때는 1페이지부터 시작
+
+      getMyRecruit(); // 검색 실행
+    },
+    size_x: "600px"
+  });
+
+  $('#noRead').prop('checked', noRead);
+  $('#notClosing').prop('checked', notClosing);
+  $('#applyViaSite').prop('checked', applyViaSite);
+  $('#searchKeyword').val(searchKeyword);
+  $('#searchKeywordType').val(searchKeywordType);
+  $('#sortBy').val(sortBy);
+
+}
+
+function getMyRecruit() {
+  const data = {
+    uid: uid,
+    page: page,
+    searchKeyword: searchKeyword,
+    searchKeywordType: searchKeywordType,
+    sortBy: sortBy,
+    noRead: noRead,
+    notClosing: notClosing,
+    applyViaSite: applyViaSite
+  };
+
+  $.ajax({
+    url: '/recruitmentnotice/rest/withResume',
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(data),
+    success: function(res) {
+      console.log("공고 결과:", res);
+      renderRecruitList(res.items)
+      renderPagination(res)
+    },
+    error: function(xhr) {
+      console.log("에러 발생", xhr);
+    }
+  });
+}
+
+function goToPage(pageNum) {
+	  page = pageNum;
+	  getMyRecruit();
+	}
+
+function renderRecruitList(items) {
+	  const container = $('#recruitSection');
+	  container.empty();
+
+	  if (!items || items.length === 0) {
+	    container.html(`
+	      <div class="empty-state">
+	        <i class="fas fa-folder-open"></i><br>
+	        검색된 공고가 없습니다.
+	      </div>
+	    `);
+	    return;
+	  }
+
+	  let html = '<div class="recruit-card-list" style="display: flex; flex-direction: column; gap: 12px;">';
+
+	  items.forEach(item => {
+	    html += `
+        <div class="recruit-card-wrapper" data-uid="\${item.uid}">
+          <div class="recruit-card" style="
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2c3e50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+          " onclick="toggleResumeDropdown(\${item.uid})">
+            
+            <div style="flex: 1;">
+              <div><strong>\${item.title}</strong> <span style="color: #888;">(\${item.manager})</span></div>
+              <div style="font-size: 13px; color: #666;">
+                \${formatDate(item.dueDate)} 마감 · 신청서 \${item.registrationCount}건
+                \${item.hasUnreadApplications ? '<span style="color: #e74c3c;"> · 🔔 미확인 있음</span>' : ''}
+                \${item.applyViaSite ? '<span style="color: #47b2e4;"> · 📥 사이트신청</span>' : ''}
+              </div>
+            </div>
+
+            <button class="btn-edit" onclick="event.stopPropagation(); viewRecruitDetail(\${item.uid})">
+              상세조회
+            </button>
+          </div>
+
+          <div class="resume-dropdown" id="dropdown-\${item.uid}" style="
+            display: none;
+            background: #f8f9fa;
+            padding: 20px 25px;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+          ">
+            <div style="margin-bottom: 15px;">
+              <label style="font-size: 14px; color: #555;">
+                <input type="checkbox" onchange="fetchResumes(\${item.uid}, this.checked)">
+                <span style="margin-left: 6px;">읽지 않은 신청서만 보기</span>
+              </label>
+            </div>
+
+            <div id="resumeList-\${item.uid}" style="margin-bottom: 15px;">
+              <em>이력서 불러오는 중...</em>
+            </div>
+
+            <div id="resumePagination-\${item.uid}" style="
+              display: flex;
+              justify-content: center;
+              flex-wrap: wrap;
+              gap: 8px;
+            "></div>
+          </div>
+
+        </div>
+      `;
+
+	  });
+
+	  html += '</div>';
+	  container.html(html);
+}
+
+function viewRecruitDetail(uid) {
+  // 예시: 상세 페이지 이동
+  location.href = `/recruitmentnotice/detail?uid=\${uid}`;
+}
+
+const submitDto = {
+  recruitmentUid:0,
+  page:1,
+  onlyUnread:false,
+  prioritizeUnread:true
+}
+
+function toggleResumeDropdown(uid) {
+	  $('.resume-dropdown').slideUp(); // 모든 드롭다운 닫기
+	  const $target = $(`#dropdown-\${uid}`);
+
+	  if ($target.is(':visible')) {
+	    $target.slideUp();
+	    return;
+	  }
+
+	  $target.slideDown();
+	  fetchResumes(uid, false); // 기본은 전체 보기
+}
+
+function fetchResumes(uid, onlyUnread, page = 1) {
+	  const listContainer = $(`#resumeList-\${uid}`);
+	  const pageContainer = $(`#resumePagination-\${uid}`);
+
+	  const loader = $('<div class="resume-loading-spinner">불러오는 중...</div>');
+	  listContainer.append(loader);
+	  pageContainer.empty();
+
+	  $.ajax({
+	    url: '/submit/withResume',
+	    method: 'POST',
+	    contentType: 'application/json',
+	    data: JSON.stringify({
+	      recruitmentUid: uid,
+	      page: page,
+	      onlyUnread: onlyUnread,
+	      prioritizeUnread: true
+	    }),
+	    success: function(res) {
+	      if (!res || res.items.length === 0) {
+	    	listContainer.empty();
+	        listContainer.html('<p style="color:#888;">표시할 이력서가 없습니다.</p>');
+	        return;
+	      }
+
+	      // 이력서 렌더링
+	      let html = '<ul style="padding-left: 0; list-style: none;">';
+	        res.items.forEach(r => {
+	          const statusLabel = r.status === 'WAITING' ? '미확인' : '';
+	          html += `
+	            <li onclick="viewSubmitDetail(\${r.registrationNo})" style="
+	              background: #fff;
+	              border: 1px solid #ddd;
+	              border-radius: 10px;
+	              padding: 12px 40px;
+	              margin-bottom: 8px;
+	        	  margin-left: 30px;
+	              box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+	        	  cursor: pointer;
+	            ">
+	              <div><strong>\${r.userName}</strong> - \${r.title} <span style="color:var(--bs-red); font-size:0.7em; margin-left: 15px;">\${statusLabel}</span></div>
+	              <div style="font-size: 13px; color: #666;">\${formatDate(r.regDate)}</div>
+	            </li>
+	          `;
+	        });
+	        html += '</ul>';
+          listContainer.empty();
+	      listContainer.html(html);
+
+	      // 페이지 버튼 렌더링
+	      renderResumePagination(uid, onlyUnread, res);
+	    },
+	    error: function() {
+	      listContainer.empty();
+	      listContainer.html('<p style="color:red;">이력서 로딩 실패</p>');
+	    }
+	  });
+	}
+	
+function viewSubmitDetail(registrationNo) {
+	  location.href = `/submit/detail/\${registrationNo}`;
+	}
+	
+function renderResumePagination(uid, onlyUnread, res) {
+	  const container = $(`#resumePagination-\${uid}`);
+	  const { currentPage, pageList, hasPrevBlock, hasNextBlock, startPage, endPage } = res;
+
+	  let html = `<div style="margin-top: 10px; display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;">`;
+
+	  if (hasPrevBlock) {
+	    html += `<button class="btn-edit" onclick="fetchResumes(\${uid}, \${onlyUnread}, \${startPage - 1})">«</button>`;
+	  }
+
+	  pageList.forEach(p => {
+	    html += `<button class="btn-edit \${p === currentPage ? 'active' : ''}" 
+	      style="\${p === currentPage ? 'background:#3a8fb8;color:white;' : ''}" 
+	      onclick="fetchResumes(\${uid}, \${onlyUnread}, \${p})">\${p}</button>`;
+	  });
+
+	  if (hasNextBlock) {
+	    html += `<button class="btn-edit" onclick="fetchResumes(\${uid}, \${onlyUnread}, \${endPage + 1})">»</button>`;
+	  }
+
+	  html += '</div>';
+	  container.html(html);
+	}
+
+
+
+
+
+  function renderPagination(res) {
+  const { pageList, currentPage, hasPrevBlock, hasNextBlock, startPage, endPage } = res;
+  const container = $('#recruitSection');
+
+  let html = `
+    <div class="pagination" style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    ">
+  `;
+
+  if (hasPrevBlock) {
+    html += `<button class="btn-edit" onclick="goToPage(\${startPage - 1})">« 이전</button>`;
+  }
+
+  pageList.forEach(p => {
+    html += `<button class="btn-edit \${p === currentPage ? 'active' : ''}" onclick="goToPage(\${p})" style="\${p === currentPage ? 'background:#3a8fb8;' : ''}">\${p}</button>`;
+  });
+
+  if (hasNextBlock) {
+    html += `<button class="btn-edit" onclick="goToPage(\${endPage + 1})">다음 »</button>`;
+  }
+
+  html += '</div>';
+  container.append(html);
+}
+
+
+
+
 // #region 전역 변수 및 초기화
 const uid = "${sessionScope.account.uid}"
 let sessionMobile = "${sessionScope.account.mobile}";
 let sessionEmail = "${sessionScope.account.email}";
+
+let page = 1;
+let searchKeyword = '';
+let searchKeywordType = "title";
+let sortBy = "DUE_SOON";
+let noRead = false;
+let notClosing = false;
+let applyViaSite = false;
 
 const METHOD = {
   EMAIL: "email",
@@ -277,6 +631,7 @@ function getInfo() {
 
 // 기본정보 로딩
 function updateBasicInfo(companyInfo) {
+  $('#profileImg').html(`<img src="\${companyInfo.companyImg}" style="width:100%; height:100%; object-fit:cover;">`);
   $('#companyName').text( companyInfo.companyName || '미입력')
   $('#representative').text( companyInfo.representative || '대표자명 미등록')
   $('#nowMobile').text( companyInfo.mobile || '등록된 전화번호 없음')
@@ -306,8 +661,7 @@ function updateCompanyDetailInfo(companyInfo) {
   }
 
   // 자기소개
-  const introduceDiv = companyDetailInfo.querySelector('.introduce-content');
-  introduceDiv.textContent = companyInfo.introduce || '회사소개가 아직 없습니다.';
+  $('#introduce-content').html(companyInfo.introduce || '회사소개가 아직 없습니다.');
 }
 
 // 수정창 내용 초기화
@@ -337,8 +691,8 @@ function updateCompanyModifyInfo(result) {
     $('#addressDetail').show()
   }
   if (result.detailAddr) {
-    $('detailAddressBackup').val(result.detailAddr);
-    $('addressDetail').val(result.detailAddr || '');
+    $('#detailAddressBackup').val(result.detailAddr);
+    $('#addressDetail').val(result.detailAddr || '');
   }
 
   // 기업규모
@@ -353,7 +707,9 @@ function updateCompanyModifyInfo(result) {
 
   // 자기소개
   if (result.introduce) {
-    $('#introduce').val(result.introduce);
+    $('#introduce').summernote('code', result.introduce);
+  } else {
+    $('#introduce').summernote('code', '');
   }
 }
 
@@ -417,6 +773,8 @@ function confirmModify(btn) {
     error: function (xhr) {
       if (xhr.status == 404) {
         window.publicModals.show("장시간 대기로 로그인이 해제되었습니다.<br>새로고침 후 다시 시도해주세요.",{size_x:"350px"})
+      } else if (xhr.status == 507) {
+    	window.publicModals.show("cafe24 요금제 제한등으로 인하여<br>업로드에 실패했습니다.<br>파일갯수등을 줄이고<br>다시 시도해주세요.(6개이하 추천)",{size_x:"350px"})
       }
       window.publicModals.show("서버와의 연결이 불안정하여<br>정보 로딩에 실패하였습니다.<br>잠시 후 다시 시도해주세요.")
     }
@@ -1157,6 +1515,128 @@ function enableAddressScroll() {
 }
 // #endregion
 
+// #region 썸머노트
+$('#introduce').summernote({
+  height: 300,
+  placeholder: '회사소개를 입력해주세요',
+  callbacks: {
+    onImageUpload: function(files) {
+      const maxSize = 1024 * 300; // 300kB (압축대상 크기)
+      summerNoteImgSizeCheck(files, maxSize)
+    }
+  }
+});
+
+// #endregion
+
+// #region 프로필 이미지 자르기
+function cropImgModalOpen() {
+	const copperTap=`
+    <h2>프로필 이미지 수정</h2>
+		<input type="file" id="imageInput" accept="image/*">
+		<div>
+		  <img id="cropTarget" style="max-width:100%; display:none;">
+		</div>
+	`
+	
+	window.publicModals.show(copperTap,{
+    onConfirm:copperConfirm,
+    confirmText: "자르기",
+    cancelText: "취소"
+  });
+}
+
+let cropper;
+
+$(document).on('change', '#imageInput', (e) => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const img = document.getElementById('cropTarget');
+    img.src = reader.result;
+    img.style.display = 'block';
+
+    if (cropper) cropper.destroy(); // 이전 인스턴스 제거
+    cropper = new Cropper(img, {
+      aspectRatio: 1,
+      viewMode: 1,
+      movable: true,
+      zoomable: true,
+      scalable: true,
+      cropBoxResizable: true
+    });
+  };
+
+	reader.readAsDataURL(file);
+});
+	
+function copperConfirm() {
+  const profileImg = document.getElementById('profileImgContainer');
+
+  // 클릭 비활성화
+  profileImg.onclick = null;
+  profileImg.style.pointerEvents = 'none'; // 추가로 마우스 차단
+  profileImg.style.opacity = '0.6';        // 시각적으로도 비활성 느낌
+
+  const croppedCanvas = cropper.getCroppedCanvas({
+    width: 400,   // 원하는 사이즈 지정 가능
+    height: 400,
+    imageSmoothingQuality: 'row'
+  });
+
+  const croppedDataUrl = croppedCanvas.toDataURL('image/jpeg');
+  
+  croppedCanvas.toBlob(blob => {
+    const formData = new FormData();
+    formData.append('file', blob, 'cropped.jpg');
+    
+    $.ajax({
+      url: "/company/profileImg",
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function (response) {
+        window.publicModals.show("변경 완료!");
+        document.getElementById('profileImg').innerHTML = `<img src="\${response}" style="width:100%; height:100%; object-fit:cover;">`;
+      },
+      error: function (xhr, status, error) {
+        window.publicModals.show("변경에 실패하였습니다. 서버 혹은 업로드한 이미지를 확인 후 다시 시도해주세요.");
+      },
+      complete: () => {
+        // 다시 클릭 가능하게 복원
+        profileImg.onclick = cropImgModalOpen;
+        profileImg.style.pointerEvents = 'auto';
+        profileImg.style.opacity = '1';
+      }
+    });
+  }, 'image/jpeg');
+}
+
+// #endregion 
+
+// #region 프로필 이미지삭제
+function deleteImgModal() {
+    window.publicModals.show(`정말로 삭제하시겠습니까?`,{
+      confirmText:'예', cancleText:'아니오', onConfirm:deleteImg
+    })
+  }
+
+function deleteImg() {
+  $.ajax({
+      url: "/company/profileImg",
+      type: "DELETE",
+      success: function (response) {
+        window.publicModals.show("변경 완료!");
+        document.getElementById('profileImg').innerHTML = `<img src="\${response}" style="width:100%; height:100%; object-fit:cover;">`;
+      },
+      error: function (xhr, status, error) {
+        window.publicModals.show("변경에 실패하였습니다. 잠시 후 다시 시도해주세요.");
+      }
+    });
+}
+// #endregion 
 </script>
 <!-- 풋터 -->
 <jsp:include page="/WEB-INF/views/footer.jsp"></jsp:include>

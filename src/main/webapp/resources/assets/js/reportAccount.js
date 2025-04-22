@@ -1,6 +1,5 @@
 let reporterAccountUid;
 let reporterAccountType;
-
 const reportCategory = {
   SPAM: "스팸/광고성 메시지",                     // 무차별 메시지, 홍보
   HARASSMENT: "욕설/괴롭힘",                      // 협박, 불쾌한 메시지
@@ -16,14 +15,14 @@ const reportCategoryList = Object.entries(reportCategory).map(([key, value]) => 
   label: value
 }));
 
-window.onload = () => {
-  reporterAccountUid = window.publicSessionUid;
-  reporterAccountType = window.publicSessionAccType;
+window.addEventListener('load', () => {
+  reporterAccountUid = document.getElementById('loginStatus')?.getAttribute('data-uid');
+  reporterAccountType = document.getElementById('accountType')?.getAttribute('data-accountType');
 
   if (reporterAccountUid) {
-    setReportBtn()
+    setReportBtn();
   }
-}
+});
 
 function setReportBtn() {
   let selectHtml = `<select id="reportReason" style="padding: 5px; flex-shrink: 0; max-width: 200px; margin-bottom:12px;">`;
@@ -37,6 +36,11 @@ function setReportBtn() {
 
 
   document.querySelectorAll('.flagAccBtn').forEach(e => {
+
+    if (e.dataset.uid == reporterAccountUid && e.dataset.type.toUpperCase() == reporterAccountType) {
+      return;
+    }
+
     e.innerHTML = `<i class="bi bi-exclamation-circle" style="color:red; margin:0px 0.3em"></i>`;
     
     e.setAttribute('title', '해당 사용자를 신고하시겠습니까?');
@@ -121,21 +125,21 @@ function sendReport(targetAccountUid, targetAccountType) {
 
   console.log("신고 데이터 DTO:", dto);
 
-  // fetch("/report/account", {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json"
-  //   },
-  //   body: JSON.stringify(dto)
-  // })
-  //   .then(response => {
-  //     if (response.ok) {
-  //       window.publicModals.show("신고가 접수되었습니다.");
-  //     } else {
-  //       window.publicModals.show("신고 접수 중 오류가 발생했습니다.");
-  //     }
-  //   })
-  //   .catch(err => {
-  //     window.publicModals.show("신고 요청에 실패했습니다.");
-  //   });
+  fetch("/report/account", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(dto)
+  })
+    .then(response => {
+      if (response.ok) {
+        window.publicModals.show("신고가 접수되었습니다.");
+      } else {
+        window.publicModals.show("신고 접수 중 오류가 발생했습니다.");
+      }
+    })
+    .catch(err => {
+      window.publicModals.show("신고 요청에 실패했습니다.");
+    });
 }

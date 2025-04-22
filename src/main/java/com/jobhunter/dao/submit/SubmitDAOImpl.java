@@ -14,6 +14,8 @@ import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.RegistrationVO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 import com.jobhunter.model.submit.Status;
+import com.jobhunter.model.submit.SubmitFromRecruitVO;
+import com.jobhunter.model.submit.SubmitSearchDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -201,11 +203,70 @@ public class SubmitDAOImpl implements SubmitDAO {
 		
 		return ses.selectList(NS + ".getRegistrationVOLisByUidAndStatus", param);
 	}
-
-
-
-	
-	
 	
 
+	/**
+	 *  @author 육근우
+	 *
+	 * <p>
+	 * 공고에 제출된 신청서를 검색조건에 따라 가져오는 메서드
+	 * </p>
+	 * 
+	 * @param SubmitSearchDTO dto 검색조건과 공고uid를 담은 DTO
+	 * @return 검색 조건에 맞는 SubmitFromRecruitVO 리스트
+	 *
+	 */
+	@Override
+	public List<SubmitFromRecruitVO> selectResumesByRecruitmentUid(SubmitSearchDTO dto) {
+		return ses.selectList(NS + ".selectResumesByRecruitmentUid", dto);
+	}
+	
+	/**
+	 *  @author 육근우
+	 *
+	 * <p>
+	 * 공고에 제출된 검색조건에 맞는 신청서의 총 갯수를 가져오는 메서드
+	 * </p>
+	 * 
+	 * @param SubmitSearchDTO dto 검색조건과 공고uid를 담은 DTO
+	 * @return int 검색 조건에 맞는 신청서 갯수
+	 *
+	 */
+	@Override
+	public int countResumesByRecruitmentUid(SubmitSearchDTO dto) {
+		return ses.selectOne(NS + ".countResumesByRecruitmentUid", dto);
+	}
+	
+	/**
+	 *  @author 육근우
+	 *
+	 * <p>
+	 * 신청서 하나만 이력서포함해서 가져오는 메서드
+	 * </p>
+	 * 
+	 * @param int registrationNo 신청서 pk
+	 * @return 신청서 상세정보
+	 *
+	 */
+    @Override
+    public ResumeDetailInfoBySubmit selectSubmitAndResumeDetailInfo(int registrationNo) throws Exception {
+        return ses.selectOne(NS + ".selectOneResumeByRegistrationNo", registrationNo);
+    }
+    
+    /**
+	 *  @author 육근우
+	 *
+	 * <p>
+	 * 신청서가 제출된 공고의 작성기업 uid 가져오는 메서드
+	 * </p>
+	 * 
+	 * @param int registrationNo 신청서 pk
+	 * @return 신청서가 제출된 공고의 작성기업 uid
+	 *
+	 */
+    @Override
+    public int getCompanyUidByRegistrationNo(int registrationNo) throws Exception {
+        return ses.selectOne(NS + ".getCompanyUidByRegistrationNo", registrationNo);
+    }
+	
 }

@@ -1,6 +1,9 @@
 package com.jobhunter.controller.company;
 
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.sql.SQLException;
+import java.util.Base64;
 import java.util.NoSuchElementException;
 
 import javax.servlet.http.HttpSession;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.company.BusinessRequestDTO;
@@ -26,6 +31,8 @@ import com.jobhunter.model.user.ContactUpdateDTO;
 import com.jobhunter.model.user.PasswordDTO;
 import com.jobhunter.service.company.CompanyService;
 import com.jobhunter.util.AccountUtil;
+import com.jobhunter.util.CompressImgUtil;
+import com.jobhunter.util.PropertiesTask;
 
 import lombok.RequiredArgsConstructor;
 
@@ -71,6 +78,8 @@ public class CompanyRestController {
 			}
 
 			CompanyVO companyVO = service.showCompanyHome(uid);
+			
+			System.out.println("컴퍼니 컨트롤러 VO : " + companyVO);
 
 			if (companyVO == null) {
 				throw new NoSuchElementException();
@@ -109,7 +118,7 @@ public class CompanyRestController {
 			@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
 
-			if (uid != null) {
+			if (uid == null) {
 				throw new NoSuchElementException();
 			}
 
@@ -117,6 +126,9 @@ public class CompanyRestController {
 
 			service.updateCompanyInfo(companyInfo);
 			return ResponseEntity.ok().body(ResponseJsonMsg.success());
+		}	catch (SQLException e) {
+		    e.printStackTrace();
+		    return ResponseEntity.status(HttpStatus.INSUFFICIENT_STORAGE).body(ResponseJsonMsg.error("cafe24 요금제 제한등으로 인하여 업로드에 실패했습니다."));
 		} catch (NoSuchElementException e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseJsonMsg.notFound());
@@ -323,4 +335,44 @@ public class CompanyRestController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseJsonMsg.error());
 		}
 	}
+	
+	private final CompressImgUtil compressImgUtil;
+	@PostMapping("/profileImg")
+    public ResponseEntity<String> uploadProfileImg(@RequestParam("file") MultipartFile file,
+                                                   @SessionAttribute("account") AccountVO account) {
+        try {
+            // 압축 (300KB 제한)
+        	byte[] compressedImg = compressImgUtil.compressToJpg(file, 300 * 1024);
+
+            // Base64 인코딩
+            String base64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(compressedImg);
+
+            // DB 저장
+            service.updateProfileImg(account.getUid(), base64);
+
+            // 클라이언트에 전달
+            return ResponseEntity.ok(base64);
+
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+        	e.printStackTrace();
+        	return ResponseEntity.status(500).body("이미지 처리 중 오류 발생");
+		}
+    }
+	
+	@DeleteMapping("/profileImg")
+    public ResponseEntity<String> deleteProfileImg(@SessionAttribute("account") AccountVO account) {
+        try {
+            // DB 저장
+            service.deleteProfileImg(account.getUid());
+
+            // 클라이언트에 전달
+            return ResponseEntity.ok(PropertiesTask.getPropertiesValue("config/profileImg.properties", "defaltImg"));
+
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+        	e.printStackTrace();
+        	return ResponseEntity.status(500).body("이미지 처리 중 오류 발생");
+		}
+    }
 }

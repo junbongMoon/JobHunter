@@ -35,7 +35,7 @@ public class RoleCheckInterceptor implements HandlerInterceptor {
 
         HttpSession session = request.getSession();
 
-AccountVO account = (AccountVO) session.getAttribute("account");
+        AccountVO account = (AccountVO) session.getAttribute("account");
         
         // 로그인 안 했거나 인증이 필요할 때
         if (account == null || "Y".equals(account.getRequiresVerification())) {

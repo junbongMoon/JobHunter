@@ -302,6 +302,11 @@ function getMonth() {
       chart.draw(data, options);
     }
   </script>
+<style>
+    .selectMonth {
+      margin-bottom: 20px;
+    }
+</style>
 <body>
 <!-- 차트 콘텐츠 -->
 <div class="container-fluid">

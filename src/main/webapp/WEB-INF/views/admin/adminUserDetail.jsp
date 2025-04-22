@@ -21,9 +21,18 @@
 
 		<!-- 뒤로가기 버튼 -->
 		<div class="mb-4">
-			<a href="/admin/userList" class="btn btn-secondary"> <i
-				class="fas fa-arrow-left"></i> 목록으로 돌아가기
-			</a>
+			<c:choose>
+				<c:when test="${not empty param.reportNo}">
+					<a href="/admin/reportUserList" class="btn btn-secondary"> <i
+						class="fas fa-arrow-left"></i> 목록으로 돌아가기
+					</a>
+				</c:when>
+				<c:otherwise>
+					<a href="/admin/userList" class="btn btn-secondary"> <i
+						class="fas fa-arrow-left"></i> 목록으로 돌아가기
+					</a>
+				</c:otherwise>
+			</c:choose>
 		</div>
 
 		<!-- 유저 상세 정보 카드 -->

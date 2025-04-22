@@ -45,6 +45,9 @@
 			<!-- Swiper -->
 			<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 
+			<!-- Font Awesome -->
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 			<style>
 				.mypage-profile-card {
 					display: none;
@@ -166,6 +169,155 @@
 				.mypage-profile-card a:last-child {
 					margin-bottom: 0;
 				}
+
+				/* 알림 모달 스타일 */
+				.notification-modal {
+					display: none;
+					position: fixed;
+					z-index: 1050;
+					left: 0;
+					top: 0;
+					width: 100%;
+					height: 100%;
+					overflow: auto;
+					background-color: rgba(0, 0, 0, 0.4);
+				}
+
+				.notification-modal-content {
+					background-color: #fefefe;
+					margin: 5% auto;
+					padding: 0;
+					border-radius: 8px;
+					width: 80%;
+					max-width: 600px;
+					max-height: 80vh;
+					overflow-y: auto;
+					box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+				}
+
+				.notification-header {
+					background-color: #4a6bdf;
+					color: white;
+					padding: 15px;
+					border-radius: 8px 8px 0 0;
+					margin-bottom: 0;
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+				}
+
+				.notification-item {
+					border-bottom: 1px solid #e9ecef;
+					padding: 15px;
+					transition: background-color 0.2s;
+					position: relative;
+					cursor: pointer;
+				}
+
+				.notification-item:hover {
+					background-color: #f1f3f9;
+				}
+
+				.notification-item.unread {
+					background-color: #e8f0fe;
+				}
+
+				.notification-item.read {
+					background-color: #ffffff;
+				}
+
+				.notification-title {
+					font-weight: 600;
+					margin-bottom: 5px;
+				}
+
+				.notification-content {
+					color: #6c757d;
+					font-size: 0.9rem;
+				}
+
+				.notification-time {
+					font-size: 0.8rem;
+					color: #adb5bd;
+				}
+
+				.notification-badge {
+					background-color: #dc3545;
+					color: white;
+					border-radius: 50%;
+					padding: 2px 6px;
+					font-size: 0.7rem;
+					position: absolute;
+					top: 5px;
+					right: 5px;
+				}
+
+				.empty-notification {
+					text-align: center;
+					padding: 30px;
+					color: #6c757d;
+				}
+
+				.notification-icon {
+					width: 40px;
+					height: 40px;
+					border-radius: 50%;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					margin-right: 15px;
+				}
+
+				.user-icon {
+					background-color: #4a6bdf;
+					color: white;
+				}
+
+				.company-icon {
+					background-color: #28a745;
+					color: white;
+				}
+
+				.admin-icon {
+					background-color: #dc3545;
+					color: white;
+				}
+
+				.delete-icon {
+					position: absolute;
+					bottom: 10px;
+					right: 10px;
+					color: #dc3545;
+					cursor: pointer;
+					opacity: 0.7;
+					transition: opacity 0.2s;
+				}
+
+				.delete-icon:hover {
+					opacity: 1;
+				}
+
+				.mark-all-read-btn {
+					background-color: transparent;
+					border: 1px solid white;
+					color: white;
+					padding: 5px 10px;
+					border-radius: 4px;
+					font-size: 0.8rem;
+					cursor: pointer;
+					transition: all 0.2s;
+				}
+
+				.mark-all-read-btn:hover {
+					background-color: rgba(255, 255, 255, 0.2);
+				}
+
+				.close-notification {
+					color: white;
+					font-size: 1.5rem;
+					cursor: pointer;
+					margin-left: 10px;
+				}
 			</style>
 
 			<!-- =======================================================
@@ -185,6 +337,27 @@
 			</div>
 		</div>
 		<!-- 알럿 모달 -->
+
+		<!-- 알림 모달 -->
+		<div id="notificationModal" class="notification-modal">
+			<div class="notification-modal-content">
+				<div class="notification-header">
+					<div>
+						<i class="fas fa-bell me-2"></i>알림 목록
+					</div>
+					<div>
+						<button id="markAllReadBtn" class="mark-all-read-btn">
+							<i class="fas fa-check-double me-1"></i>모두 읽음
+						</button>
+						<span class="close-notification" id="closeNotificationModal">&times;</span>
+					</div>
+				</div>
+				<div id="notificationList" class="list-group">
+					<!-- 알림 목록이 여기에 동적으로 추가됩니다 -->
+				</div>
+			</div>
+		</div>
+		<!-- 알림 모달 -->
 
 		<div class="index-page">
 			<header id="header" class="header d-flex align-items-center">
@@ -220,7 +393,7 @@
 									</c:when>
 									<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 										<a class="nav-link dropdown-toggle"
-											href="/company/companyHome?uid=${sessionScope.account.uid}&accountType=company"
+											href="/company/companyInfo?uid=${sessionScope.account.uid}&accountType=company"
 											id="mypageDropdown" role="button">
 											My Page
 										</a>
@@ -241,7 +414,7 @@
 								<!-- 마우스 호버 시 뜨는 프로필 카드 -->
 								<div class="mypage-profile-card">
 									<div class="profile-img-container">
-										<div class="profile-img"></div>
+										<div class="profile-img"><img src="${sessionScope.account.profileImg}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div>
 										<div class="speech-bubble"
 											onclick="openNotifications('${sessionScope.account.uid}', '${sessionScope.account.accountType}')">
 											<!-- 메시지 카운트 들어오게 -->
@@ -312,22 +485,195 @@
 
 		<script>
 
+
 			window.publicSessionUid = "${sessionScope.account.uid}";
 			window.publicSessionAccType = "${sessionScope.account.accountType}";
 
+			// 알림 모달 열기 함수
 			function openNotifications(uid, accountType) {
-				const width = 800;
-				const height = 600;
-				const top = (window.screen.height - height) / 2;
-				const left = (window.screen.width - width) / 2;
-
-				const popup = window.open('/notification/list?uid=' + uid + '&accountType=' + accountType, 'notifications',
-
-					`width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);
-
-				if (popup) popup.focus();
-				else alert("팝업 차단됨. 브라우저 설정 확인해주세요.");
+				// 모달 표시
+				document.getElementById('notificationModal').style.display = 'block';
+				
+				// 알림 목록 가져오기
+				fetchNotifications(uid, accountType);
 			}
+
+			// 알림 목록 가져오기 함수
+			function fetchNotifications(uid, accountType) {
+				fetch('/notification/list?uid=' + uid + '&accountType=' + accountType)
+					.then(response => response.text())
+					.then(html => {
+						// 알림 목록 컨테이너 가져오기
+						const notificationList = document.getElementById('notificationList');
+						
+						// 임시 DOM 요소 생성
+						const tempDiv = document.createElement('div');
+						tempDiv.innerHTML = html;
+						
+						// 알림 목록 추출
+						const listGroup = tempDiv.querySelector('.list-group');
+						
+						if (listGroup) {
+							// 알림 목록이 있는 경우
+							notificationList.innerHTML = listGroup.innerHTML;
+							
+							// 이벤트 리스너 추가
+							addNotificationEventListeners(uid, accountType);
+						} else {
+							// 알림이 없는 경우
+							notificationList.innerHTML = `
+								<div class="empty-notification">
+									<i class="fas fa-bell-slash fa-3x mb-3"></i>
+									<p>새로운 알림이 없습니다.</p>
+								</div>
+							`;
+						}
+					})
+					.catch(error => {
+						console.error('알림 목록 가져오기 실패:', error);
+						document.getElementById('notificationList').innerHTML = `
+							<div class="empty-notification">
+								<i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+								<p>알림을 불러오는 중 오류가 발생했습니다.</p>
+							</div>
+						`;
+					});
+			}
+
+			// 알림 이벤트 리스너 추가 함수
+			function addNotificationEventListeners(uid, accountType) {
+				// 알림 항목 클릭 이벤트
+				const notificationItems = document.querySelectorAll('.notification-item');
+				notificationItems.forEach(item => {
+					item.addEventListener('click', function() {
+						const messageNo = this.getAttribute('data-message-no');
+						markAsRead(messageNo, accountType, uid);
+					});
+				});
+
+				// 삭제 아이콘 클릭 이벤트
+				const deleteIcons = document.querySelectorAll('.delete-icon');
+				deleteIcons.forEach(icon => {
+					icon.addEventListener('click', function(event) {
+						event.stopPropagation();
+						const messageNo = this.closest('.notification-item').getAttribute('data-message-no');
+						deleteNotification(messageNo);
+					});
+				});
+
+				// 모두 읽음 버튼 클릭 이벤트
+				document.getElementById('markAllReadBtn').addEventListener('click', function() {
+					markAllAsRead(accountType, uid);
+				});
+			}
+
+			// 알림을 읽음 상태로 변경하는 함수
+			function markAsRead(messageNo, accountType, uid) {
+				fetch('/notification/markAsRead', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body: 'messageNo=' + messageNo + '&accountType=' + accountType + '&uid=' + uid
+				})
+				.then(response => {
+					if (response.ok) {
+						// 알림 항목의 클래스 변경
+						const notificationItem = document.querySelector('[data-message-no="' + messageNo + '"]');
+						if (notificationItem) {
+							notificationItem.classList.remove('unread');
+							notificationItem.classList.add('read');
+							
+							// 배지 제거
+							const badge = notificationItem.querySelector('.notification-badge');
+							if (badge) {
+								badge.remove();
+							}
+						}
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+				});
+			}
+
+			// 모든 알림을 읽음 상태로 변경하는 함수
+			function markAllAsRead(accountType, uid) {
+				fetch('/notification/markAllAsRead', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body: 'accountType=' + accountType + '&uid=' + uid
+				})
+				.then(response => {
+					if (response.ok) {
+						// 모든 알림 항목의 클래스 변경
+						const unreadItems = document.querySelectorAll('.notification-item.unread');
+						unreadItems.forEach(item => {
+							item.classList.remove('unread');
+							item.classList.add('read');
+						});
+						
+						// 모든 배지 제거
+						const badges = document.querySelectorAll('.notification-badge');
+						badges.forEach(badge => {
+							badge.remove();
+						});
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+				});
+			}
+
+			// 알림 삭제 함수
+			function deleteNotification(messageNo) {
+				fetch('/notification/delete', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ messageNo: messageNo })
+				})
+				.then(response => {
+					if (response.ok) {
+						// 알림 항목 제거
+						const notificationItem = document.querySelector('[data-message-no="' + messageNo + '"]');
+						if (notificationItem) {
+							notificationItem.remove();
+							
+							// 모든 알림이 삭제되었는지 확인
+							const remainingItems = document.querySelectorAll('.notification-item');
+							if (remainingItems.length === 0) {
+								// 알림이 없으면 빈 메시지 표시
+								document.getElementById('notificationList').innerHTML = `
+									<div class="empty-notification">
+										<i class="fas fa-bell-slash fa-3x mb-3"></i>
+										<p>새로운 알림이 없습니다.</p>
+									</div>
+								`;
+							}
+						}
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+				});
+			}
+
+			// 모달 닫기 이벤트 리스너
+			document.getElementById('closeNotificationModal').addEventListener('click', function() {
+				document.getElementById('notificationModal').style.display = 'none';
+			});
+
+			// 모달 외부 클릭 시 닫기
+			window.addEventListener('click', function(event) {
+				const modal = document.getElementById('notificationModal');
+				if (event.target === modal) {
+					modal.style.display = 'none';
+				}
+			});
 
 			// 알림 개수 업데이트 함수
 			function updateNotificationCount(count) {

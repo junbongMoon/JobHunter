@@ -35,7 +35,14 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 	@Override
 	public AccountVO loginAccount(LoginDTO logindto) throws Exception {
 		// 로그인 처리(아이디랑 비밀번호로 유저 찾아오기)
-		return ses.selectOne(NS+".loginAccount", logindto);
+		AccountVO account = ses.selectOne(NS+".loginAccount", logindto);
+
+		// 후처리: 프로필 이미지가 없으면 기본값 설정
+		if (account != null && (account.getProfileImg() == null || account.getProfileImg().isEmpty())) {
+			account.setProfileImg(null); // 기본 이미지 세터가 작동하도록 null 전달
+		}
+
+		return account;
 	}
 	
 	@Override
@@ -70,7 +77,14 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 
 	@Override
 	public AccountVO getAccountByUid(int uid) throws Exception {
-		return ses.selectOne(NS + ".getAccountByUid", uid);
+		AccountVO account = ses.selectOne(NS + ".getAccountByUid", uid);
+
+		// 후처리: 프로필 이미지가 없으면 기본값 설정
+		if (account != null && (account.getProfileImg() == null || account.getProfileImg().isEmpty())) {
+			account.setProfileImg(null); // 기본 이미지 세터가 작동하도록 null 전달
+		}
+
+		return account;
 	}
 	
 	@Override
@@ -85,7 +99,14 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 
 	@Override
 	public AccountVO getAccountByAutoLogin(String sessionId) throws Exception {
-		return ses.selectOne(NS + ".getAccountByAutoLogin", sessionId);
+		AccountVO account = ses.selectOne(NS + ".getAccountByAutoLogin", sessionId);
+
+		// 후처리: 프로필 이미지가 없으면 기본값 설정
+		if (account != null && (account.getProfileImg() == null || account.getProfileImg().isEmpty())) {
+			account.setProfileImg(null); // 기본 이미지 세터가 작동하도록 null 전달
+		}
+
+		return account;
 	}
 	
 	@Override
@@ -93,13 +114,26 @@ public class CompanyLoginDAOImpl implements AccountLoginDAO {
 		Map<String, Object> param = new HashMap<>();
 		param.put("targetType", targetType);
 		param.put("targetValue", target);
-		AccountVO result = ses.selectOne(NS + ".findByContact", param);
-		return result;
+		AccountVO account = ses.selectOne(NS + ".findByContact", param);
+
+		// 후처리: 프로필 이미지가 없으면 기본값 설정
+		if (account != null && (account.getProfileImg() == null || account.getProfileImg().isEmpty())) {
+			account.setProfileImg(null); // 기본 이미지 세터가 작동하도록 null 전달
+		}
+
+		return account;
 	}
 
 	@Override
 	public AccountVO getIdByContect(findIdDTO dto) throws Exception {
-		return ses.selectOne(NS + ".findByContact", dto);
+		AccountVO account = ses.selectOne(NS + ".findByContact", dto);
+
+		// 후처리: 프로필 이미지가 없으면 기본값 설정
+		if (account != null && (account.getProfileImg() == null || account.getProfileImg().isEmpty())) {
+			account.setProfileImg(null); // 기본 이미지 세터가 작동하도록 null 전달
+		}
+
+		return account;
 	}
 
 }

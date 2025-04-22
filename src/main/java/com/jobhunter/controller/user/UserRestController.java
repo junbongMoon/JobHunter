@@ -1,7 +1,10 @@
 package com.jobhunter.controller.user;
 
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.util.Base64;
 import java.util.Collections;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.jobhunter.customexception.NeedLoginException;
 import com.jobhunter.model.account.AccountVO;
@@ -26,6 +31,8 @@ import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.service.user.UserService;
 import com.jobhunter.util.AccountUtil;
+import com.jobhunter.util.CompressImgUtil;
+import com.jobhunter.util.PropertiesTask;
 
 import lombok.RequiredArgsConstructor;
 
@@ -149,6 +156,73 @@ public class UserRestController {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseJsonMsg.error());
 		}
+	}
+	
+	private final CompressImgUtil compressImgUtil;
+	@PostMapping("/profileImg")
+    public ResponseEntity<String> uploadProfileImg(@RequestParam("file") MultipartFile file,
+                                                   @SessionAttribute("account") AccountVO account) {
+        try {
+            // 압축 (300KB 제한)
+        	byte[] compressedImg = compressImgUtil.compressToJpg(file, 300 * 1024);
+
+            // Base64 인코딩
+            String base64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(compressedImg);
+
+            // DB 저장
+            service.updateProfileImg(account.getUid(), base64);
+
+            // 클라이언트에 전달
+            return ResponseEntity.ok(base64);
+
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+        	e.printStackTrace();
+        	return ResponseEntity.status(500).body("이미지 처리 중 오류 발생");
+		}
+    }
+	
+	@DeleteMapping("/profileImg")
+    public ResponseEntity<String> deleteProfileImg(@SessionAttribute("account") AccountVO account) {
+        try {
+            // DB 저장
+            service.deleteProfileImg(account.getUid());
+
+            // 클라이언트에 전달
+            return ResponseEntity.ok(PropertiesTask.getPropertiesValue("config/profileImg.properties", "defaltImg"));
+
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+        	e.printStackTrace();
+        	return ResponseEntity.status(500).body("이미지 처리 중 오류 발생");
+		}
+    }
+	
+	@PatchMapping(value = "/name", consumes = "application/json")
+	public ResponseEntity<ResponseJsonMsg> updateUserName(@RequestBody Map<String, String> payload,
+	                                        @SessionAttribute("account") AccountVO account,
+	                                        HttpSession session) {
+	    try {
+	        String newName = payload.get("name");
+	        
+	        System.out.println(newName);
+	        if (newName == null || newName.trim().isEmpty()) {
+	        	return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseJsonMsg.notFound());
+	        }
+
+	        // 서비스 호출
+	        service.updateName(account.getUid(), newName.trim());
+
+	        // 세션 정보 갱신
+	        account.setAccountName(newName.trim());
+	        session.setAttribute("account", account);
+
+	        // 응답
+	        return ResponseEntity.ok().body(ResponseJsonMsg.success(newName.trim()));
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseJsonMsg.error());
+	    }
 	}
 
 }

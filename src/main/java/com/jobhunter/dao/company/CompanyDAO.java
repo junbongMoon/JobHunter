@@ -1,6 +1,5 @@
 package com.jobhunter.dao.company;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
@@ -32,5 +31,6 @@ public interface CompanyDAO {
 	
 	void setDeleteAccount(Integer uid) throws Exception;
 
+	void updateProfileImg(Integer uid, String base64) throws Exception;
 
 }
