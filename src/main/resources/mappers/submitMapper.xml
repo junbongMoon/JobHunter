@@ -303,7 +303,95 @@
 		</if>
 	</select>
 	<!-- 육근우_단일 신청서 하나만 상세조회 -->
-	<select id="selectOneResumeByRegistrationNo" resultMap="ResumeDetailInfoBySubmitMap">
+	<!-- resultMap -->
+	<resultMap id="ResumeDetailInfoBySubmitAndUserMap"
+		type="com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser">
+		<id property="resumeNo" column="resumeNo" />
+		<id property="registrationNo" column="registrationNo" />
+		<result property="title" column="title" />
+		<result property="payType" column="payType" />
+		<result property="pay" column="pay" />
+		<result property="introduce" column="introduce" />
+		<result property="saveType" column="saveType" />
+		<result property="userUid" column="userUid" />
+		<result property="profileBase64" column="profileBase64" />
+	
+		<result property="userName" column="userName" />
+		<result property="mobile" column="mobile" />
+		<result property="email" column="email" />
+		<result property="gender" column="gender" />
+		<result property="age" column="age" />
+		<result property="militaryService" column="militaryService" />
+		<result property="nationality" column="nationality" />
+		<result property="disability" column="disability" />
+	
+		<association property="registrationVO"
+			javaType="com.jobhunter.model.submit.RegistrationVO">
+			<id property="registrationNo" column="registrationNo" />
+			<result property="status" column="status" />
+			<result property="recruitmentNoticePk"
+				column="regRecruitmentNoticePk" />
+			<result property="regDate" column="regDate" />
+			<result property="resumePk" column="regResumePk" />
+		</association>
+	
+		<collection property="jobForms"
+			ofType="com.jobhunter.model.resume.JobFormDTO">
+			<id property="jobFormNo" column="jobFormNo" />
+			<result property="form" column="jobForm" />
+		</collection>
+	
+		<collection property="merits"
+			ofType="com.jobhunter.model.resume.MeritDTO">
+			<id property="meritNo" column="meritNo" />
+			<result property="meritContent" column="meritContent" />
+		</collection>
+	
+		<collection property="educations"
+			ofType="com.jobhunter.model.resume.EducationDTO">
+			<id property="educationNo" column="educationNo" />
+			<result property="educationLevel" column="educationLevel" />
+			<result property="educationStatus" column="educationStatus" />
+			<result property="graduationDate" column="graduationDate" />
+			<result property="customInput" column="customInput" />
+		</collection>
+	
+		<collection property="histories"
+			ofType="com.jobhunter.model.resume.PersonalHistoryDTO">
+			<id property="historyNo" column="historyNo" />
+			<result property="companyName" column="companyName" />
+			<result property="position" column="position" />
+			<result property="jobDescription" column="jobDescription" />
+			<result property="startDate" column="startDate" />
+			<result property="endDate" column="endDate" />
+		</collection>
+	
+		<collection property="licenses"
+			ofType="com.jobhunter.model.resume.LicenseDTO">
+			<id property="licenseNo" column="licenseNo" />
+			<result property="licenseName" column="licenseName" />
+			<result property="acquisitionDate" column="acquisitionDate" />
+			<result property="institution" column="institution" />
+		</collection>
+	
+		<collection property="sigunguList"
+			ofType="com.jobhunter.model.region.Sigungu">
+			<id property="sigunguNo" column="sigunguNo" />
+			<result property="name" column="sigunguName" />
+			<result property="regionNo" column="regionNo" />
+		</collection>
+	
+		<collection property="subcategoryList"
+			ofType="com.jobhunter.model.category.SubCategory">
+			<id property="subcategoryNo" column="subcategoryNo" />
+			<result property="jobName" column="jobName" />
+			<result property="refMajorcategoryNo"
+				column="refMajorcategoryNo" />
+		</collection>
+	</resultMap>
+	
+	<!-- 육근우_단일 신청서 하나만 상세조회 -->
+	<select id="selectOneResumeByRegistrationNo" resultMap="ResumeDetailInfoBySubmitAndUserMap">
 		SELECT
 			r.resumeNo, r.title, r.payType, r.pay, r.introduce,
 			r.saveType, r.userUid, r.profileBase64,
@@ -319,10 +407,13 @@
 			h.historyNo, h.companyName, h.position, h.jobDescription, h.startDate, h.endDate,
 			l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
 			s.sigunguNo, s.name AS sigunguName, s.regionNo,
-			sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo
+			sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo,
+	
+			u.userName, u.mobile, u.email, u.gender, u.age, u.militaryService, u.nationality, u.disability
 	
 		FROM registration reg
 		JOIN resume r ON reg.resumePk = r.resumeNo
+		LEFT JOIN users u ON r.userUid = u.uid
 		LEFT JOIN jobform jf ON r.resumeNo = jf.resumeNo
 		LEFT JOIN merit m ON r.resumeNo = m.resumeNo
 		LEFT JOIN education e ON r.resumeNo = e.resumeNo
@@ -335,6 +426,7 @@
 	
 		WHERE reg.registrationNo = #{registrationNo}
 	</select>
+
 
 	<select id="getCompanyUidByRegistrationNo" resultType="int">
 		SELECT rn.refCompany
