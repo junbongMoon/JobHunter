@@ -13,6 +13,8 @@ import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.resume.ResumeAdviceDTO;
+import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 
 public interface ResumeService {
 
@@ -56,4 +58,12 @@ public interface ResumeService {
 
 	// 이력서 상태 확인
 	boolean isResumeChecked(int resumeNo) throws Exception;
+
+	void saveAdvice(ResumeAdviceDTO adviceDTO);
+
+	void deleteExistingAdvice(int resumeNo, int mentorUid);
+
+	ResumeAdviceDTO getAdvice(int resumeNo);
+
+	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);
 }

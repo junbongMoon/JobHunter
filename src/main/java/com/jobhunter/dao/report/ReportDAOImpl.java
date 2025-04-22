@@ -1,9 +1,12 @@
 package com.jobhunter.dao.report;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.report.AccountReportDTO;
+import com.jobhunter.model.report.ReportMessageVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +19,11 @@ public class ReportDAOImpl implements ReportDAO {
 	@Override
 	public void insertAccountReport(AccountReportDTO dto) throws Exception {
 		ses.insert(NS + ".insertAccountReport", dto);
+	}
+	
+	@Override
+	public List<ReportMessageVO> getReportsByUserReporter() throws Exception {
+		return ses.selectList(NS + ".getReportsByUserReporter");
 	}
 	
 }

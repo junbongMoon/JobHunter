@@ -218,4 +218,78 @@
 			blockReason = NULL
 		WHERE uid = #{uid}
 	</update>
+	
+	<!-- 신고 목록 조회 (필터링 및 페이징) -->
+	<select id="getReportsByUserReporterWithFilter" parameterType="map" resultType="com.jobhunter.model.report.ReportMessageVO">
+		SELECT 
+			rm.*,
+			u1.userName as reporterUserName,
+			u2.userName as targetUserName
+		FROM reportMessage rm
+		LEFT JOIN users u1 ON rm.reporterAccountUid = u1.uid
+		LEFT JOIN users u2 ON rm.targetAccountUid = u2.uid
+		<where>
+			<if test="reportType != null and reportType != 'all'">
+				AND rm.reportType = #{reportType}
+			</if>
+			<if test="readStatus != null and readStatus != 'all'">
+				AND rm.isRead = #{readStatus}
+			</if>
+			<if test="category != null and category != 'all'">
+				AND rm.reportCategory = #{category}
+			</if>
+			<if test="dateFilter != null and dateFilter != 'all'">
+				<choose>
+					<when test="dateFilter == 'today'">
+						AND DATE(rm.regDate) = CURDATE()
+					</when>
+					<when test="dateFilter == 'week'">
+						AND rm.regDate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+					</when>
+					<when test="dateFilter == 'month'">
+						AND rm.regDate >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+					</when>
+				</choose>
+			</if>
+		</where>
+		ORDER BY rm.regDate DESC
+		LIMIT #{offset}, #{pageSize}
+	</select>
+	
+	<!-- 신고 목록 총 개수 조회 (필터링) -->
+	<select id="getTotalReportCount" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM reportMessage rm
+		<where>
+			<if test="reportType != null and reportType != 'all'">
+				AND rm.reportType = #{reportType}
+			</if>
+			<if test="readStatus != null and readStatus != 'all'">
+				AND rm.isRead = #{readStatus}
+			</if>
+			<if test="category != null and category != 'all'">
+				AND rm.reportCategory = #{category}
+			</if>
+			<if test="dateFilter != null and dateFilter != 'all'">
+				<choose>
+					<when test="dateFilter == 'today'">
+						AND DATE(rm.regDate) = CURDATE()
+					</when>
+					<when test="dateFilter == 'week'">
+						AND rm.regDate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+					</when>
+					<when test="dateFilter == 'month'">
+						AND rm.regDate >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+					</when>
+				</choose>
+			</if>
+		</where>
+	</select>
+
+	<!-- 신고 상태 업데이트 -->
+	<update id="updateReportReadStatus" parameterType="map">
+		UPDATE reportMessage
+		SET isRead = #{isRead}
+		WHERE reportNo = #{reportNo}
+	</update>
 </mapper>

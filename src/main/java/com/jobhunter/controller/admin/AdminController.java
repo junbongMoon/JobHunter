@@ -31,6 +31,7 @@ import com.jobhunter.model.company.CompanyVO;
 import com.jobhunter.model.status.StatusVODTO;
 import com.jobhunter.model.status.TotalStatusVODTO;
 import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.report.ReportMessageVO;
 import com.jobhunter.service.admin.AdminService;
 import com.jobhunter.service.status.StatusService;
 
@@ -395,5 +396,96 @@ public class AdminController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
 	    }
 
+	}
+
+	/**
+	 * 사용자 신고 목록을 조회합니다.
+	 *
+	 * @param model 뷰에 전달할 데이터
+	 * @param page 현재 페이지 번호
+	 * @param reportType 신고 유형 필터
+	 * @param readStatus 읽음 상태 필터
+	 * @param category 신고 카테고리 필터
+	 * @param dateFilter 날짜 필터
+	 * @return 사용자 신고 목록 JSP 페이지 경로
+	 * 
+	 * @author 유지원
+	 */
+	@GetMapping("/admin/reportUserList")
+	public String adminReportUserList(
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "reportType", defaultValue = "all") String reportType,
+			@RequestParam(value = "readStatus", defaultValue = "all") String readStatus,
+			@RequestParam(value = "category", defaultValue = "all") String category,
+			@RequestParam(value = "dateFilter", defaultValue = "all") String dateFilter,
+			Model model) {
+		try {
+			// 페이지 번호가 1보다 작으면 1로 설정
+			page = Math.max(1, page);
+			
+			int pageSize = 10; // 페이지당 표시할 게시물 수
+			
+			Map<String, String> filterParams = new HashMap<>();
+			filterParams.put("reportType", reportType);
+			filterParams.put("readStatus", readStatus);
+			filterParams.put("category", category);
+			filterParams.put("dateFilter", dateFilter);
+			
+			// 전체 게시물 수 조회
+			int totalCount = adminService.getTotalReportCount(filterParams);
+			
+			// 페이징 객체 생성
+			Pagination pagination = new Pagination(totalCount, page, pageSize);
+			
+			// 게시물 목록 조회
+			List<ReportMessageVO> reportList = adminService.getReportsByUserReporterWithFilter(filterParams, page, pageSize);
+			
+			model.addAttribute("reportList", reportList);
+			model.addAttribute("pagination", pagination);
+			model.addAttribute("reportType", reportType);
+			model.addAttribute("readStatus", readStatus);
+			model.addAttribute("category", category);
+			model.addAttribute("dateFilter", dateFilter);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "admin/adminReportUserList";
+	}
+
+	/**
+	 * 신고 상태를 읽음/미읽음으로 변경합니다.
+	 *
+	 * @param reportNo 신고 번호
+	 * @param isRead 읽음 상태 (Y/N)
+	 * @return 처리 결과를 담은 JSON 응답
+	 * 
+	 * @author 유지원
+	 */
+	@PostMapping("/admin/updateReportReadStatus")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> updateReportReadStatus(
+			@RequestParam("reportNo") int reportNo,
+			@RequestParam("isRead") String isRead) {
+		
+		Map<String, Object> response = new HashMap<>();
+		
+		try {
+			boolean result = adminService.updateReportReadStatus(reportNo, isRead);
+			
+			if (result) {
+				response.put("success", true);
+				response.put("message", "신고 상태가 성공적으로 업데이트되었습니다.");
+			} else {
+				response.put("success", false);
+				response.put("message", "신고 상태 업데이트에 실패했습니다.");
+			}
+			
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("success", false);
+			response.put("message", "서버 오류가 발생했습니다: " + e.getMessage());
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

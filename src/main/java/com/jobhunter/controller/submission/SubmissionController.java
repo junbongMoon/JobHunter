@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
@@ -55,27 +56,33 @@ public class SubmissionController {
 	 * @return 이력서 제출 JSP 뷰 경로
 	 */
 	// 이력서 제출 페이지 (쿼리 파라미터 방식)
-	@GetMapping("/check")
+	@GetMapping({"/check", "/adCheck"})
 	public String submitResumeForm(@RequestParam("uid") int uid,
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
 			@RequestParam(value = "searchTitle", required = false) String searchTitle,
-			Model model, HttpSession session) {
+			Model model, HttpSession session, HttpServletRequest request) {
 
 		// 세션에서 사용자 정보 가져오기
 		AccountVO account = (AccountVO) session.getAttribute("account");
+		String uri = request.getRequestURI();
 
-		// 공고 정보 조회
+		
 		try {
-			RecruitmentDetailInfo recruitmentNotice = recruitmentNoticeService.getRecruitmentByUid(uid);
+			// 공고 정보 조회
+			if (uri.contains("check")) {
+				RecruitmentDetailInfo recruitmentNotice = recruitmentNoticeService.getRecruitmentByUid(uid);
 
-			if (recruitmentNotice == null) {
-				model.addAttribute("errorMessage", "존재하지 않는 공고입니다.");
-				return "resume/resumeSubmission";
+				if (recruitmentNotice == null) {
+					model.addAttribute("errorMessage", "존재하지 않는 공고입니다.");
+					return "resume/resumeSubmission";
+				}
+
+				// 모델에 공고 정보 추가
+				model.addAttribute("recruitmentNotice", recruitmentNotice);
+			} else if (uri.contains("adCheck")) { // 첨삭 PR 페이지에서 접근
+				// 
 			}
-
-			// 모델에 공고 정보 추가
-			model.addAttribute("recruitmentNotice", recruitmentNotice);
 
 			// 사용자의 이력서 목록 조회 (페이징 처리)
 			if (account != null) {

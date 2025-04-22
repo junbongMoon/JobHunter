@@ -9,6 +9,8 @@ import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.ResumeAdviceDTO;
+import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.ResumeVO;
@@ -106,4 +108,17 @@ public interface ResumeDAO {
 	
 	// 이력서 상태 확인
 	int checkResumeStatus(int resumeNo) throws Exception;
+
+	void insertAdvice(ResumeAdviceDTO adviceDTO);
+
+	void insertAdviceFile(ResumeAdviceUpfileDTO fileDTO); 
+
+	void deleteExistingAdvice(int resumeNo, int mentorUid);
+
+	ResumeAdviceDTO selectAdvice(int resumeNo);
+	
+	List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo);
+
+	ResumeAdviceDTO getAdvice(int resumeNo);
+	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);
 }

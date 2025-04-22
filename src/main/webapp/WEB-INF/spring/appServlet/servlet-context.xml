@@ -82,6 +82,8 @@
 			<mapping path="/account/testGetLogin" />
 			<mapping path="/resume/**" />
 			<mapping path="/submission/**" />
+			<mapping path="/admin/**" />
+			<mapping path="/notification/**" />
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
 		
