@@ -40,4 +40,9 @@ public interface UserDAO {
 
 	void setDeleteAccount(Integer uid) throws Exception;
 
+	int updateUserPoint(int userUid, int point) throws Exception; 
+
+		
+	
+
 }

@@ -311,4 +311,8 @@ public interface RecruitmentNoticeDAO {
      * @return 증가된 조회수
      */
     int increaseRecruitmentViewCnt(int boardNo);
+
+	int increaseRecruitmentLikeCnt(int uid) throws Exception;
+
+	int decreaseRecruitmentLikeCnt(int uid) throws Exception;
 }

@@ -226,5 +226,11 @@
 		(#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N',
 		#{nationality});
 	</insert>
+	
+	<update id="modifyUserPoint">
+		update users
+		set point = point + #{point}
+		where uid = #{userUid}
+	</update>
 
 </mapper>

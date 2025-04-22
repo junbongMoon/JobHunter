@@ -172,6 +172,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	 * @throws Exception
 	 *
 	 */
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public PageResponseDTO<RecruitmentDetailInfo> getEntireRecruitment(PageRequestDTO pageRequestDTO) throws Exception {
 

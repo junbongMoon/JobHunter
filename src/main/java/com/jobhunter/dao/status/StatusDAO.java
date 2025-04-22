@@ -36,7 +36,7 @@ public interface StatusDAO {
 	public StatusVODTO selectStatusByYesterDay(LocalDate yesterday);
 	
     
-    public TotalStatusVODTO selectTotalStatusByYesterDay(LocalDate yesterday, LocalDateTime start, LocalDateTime end);
+	public TotalStatusVODTO selectTotalStatusByYesterDay(LocalDate yesterday);
 
     
     public void insertTotalStatus(TotalStatusVODTO status);

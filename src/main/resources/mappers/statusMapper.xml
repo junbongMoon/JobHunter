@@ -35,8 +35,7 @@
 		resultMap="TotalStatusVODTOMap">
 		SELECT *
 		FROM total_status
-		WHERE statusDate BETWEEN #{start}
-		AND #{end}
+		WHERE DATE(statusDate) = #{yesterday}
 	</select>
 
 	<insert id="insertTotalStatus"
@@ -115,7 +114,8 @@
 	</resultMap>
 
 	<select id="getYearAndMonthStatus" resultType="string">
-		SELECT DISTINCT DATE_FORMAT(statusDate, '%Y-%m') AS `ym`
+		SELECT DISTINCT
+		DATE_FORMAT(statusDate, '%Y-%m') AS `ym`
 		FROM status
 		ORDER BY `ym` DESC
 	</select>

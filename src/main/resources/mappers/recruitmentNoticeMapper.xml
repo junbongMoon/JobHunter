@@ -87,7 +87,7 @@
 	<select id="selectRecruitmentWithPaging"
 		resultMap="RecruitmentDetailMap">
 		SELECT
-		r.*, c.companyName,
+		r.*, c.companyName, c.addr AS companyAddr,
 		rg.regionNo, rg.name AS regionName, rg.code,
 		sg.sigunguNo, sg.name AS sigunguName, sg.regionNo,
 		mj.majorcategoryNo
@@ -113,7 +113,7 @@
 		ON c.uid = r.refCompany
 
 		<where>
-			r.status = 'Y'
+			r.status = 'Y' AND r.dueDate > now()
 
 			<!-- 검색 조건은 그대로 유지 -->
 			<if test="searchType != null and searchType != ''">
@@ -211,6 +211,7 @@
 		<result property="regDate" column="regDate" />
 		<result property="refCompany" column="refCompany" />
 		<result property="companyName" column="companyName" />
+		<result property="companyAddr" column="companyAddr" />
 
 		<!-- Region (도시) -->
 		<association property="region"
@@ -252,7 +253,7 @@
 	<select id="getTotalCountRow" resultType="int">
 		select count(*) from
 		recruitmentnotice
-		where status = 'Y'
+		where status = 'Y' AND dueDate > now()
 	</select>
 
 	<select id="getSearchResultCountRow" resultType="int">
@@ -276,7 +277,7 @@
 		r.uid
 
 		<where>
-			r.status = 'Y'
+			r.status = 'Y' AND r.dueDate > now()
 
 			<if
 				test="searchType != null and searchWord != null and searchWord != ''">
@@ -325,7 +326,7 @@
 	<select id="getBoardDetailInfoByUid"
 		resultMap="RecruitmentDetailMap">
 		SELECT
-		r.*, c.companyName,
+		r.*, c.companyName, c.addr AS companyAddr,
 
 		rg.regionNo,
 		rg.name AS regionName,
@@ -507,9 +508,27 @@
 	</select>
 
 	<update id="increaseRecruitmentViewCnt" parameterType="int">
-		UPDATE recruitmentnotice
+		UPDATE
+		recruitmentnotice
 		SET count = count + 1
 		WHERE uid = #{boardNo}
+	</update>
+
+	<!-- 좋아요 증가 -->
+	<update id="increaseRecruitmentLikeCnt" parameterType="int">
+		UPDATE recruitmentnotice
+		SET likeCnt = likeCnt + 1
+		WHERE uid = #{uid}
+	</update>
+
+	<!-- 좋아요 감소 -->
+	<update id="decreaseRecruitmentLikeCnt" parameterType="int">
+		UPDATE recruitmentnotice
+		SET likeCnt = CASE
+		WHEN likeCnt > 0 THEN likeCnt - 1
+		ELSE 0
+		END
+		WHERE uid = #{uid}
 	</update>
 
 </mapper>
