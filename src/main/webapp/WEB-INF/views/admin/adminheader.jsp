@@ -97,6 +97,28 @@
                 </div>
             </div>
         </li>
+        
+        <!-- 🔹 유틸리티 섹션 -->
+        <div class="sidebar-heading">차트</div>
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+                aria-expanded="true" aria-controls="collapseUtilities">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>차트 상세</span>
+            </a>
+            <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
+                data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">CHART</h6>
+                    <a class="collapse-item" href="">유저</a>
+                    <a class="collapse-item" href="">기업</a>
+                    <a class="collapse-item" href="">공고</a>
+                    <a class="collapse-item" href="">리뷰</a>
+                    <a class="collapse-item" href="">제출</a>
+                    
+                </div>
+            </div>
+        </li>
 
         <!-- 🔹 사이드바 토글 버튼 -->
         <div class="text-center d-none d-md-inline">
