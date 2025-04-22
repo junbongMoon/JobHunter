@@ -8,7 +8,53 @@
 <meta charset="UTF-8">
 <title>멘토PR 게시판</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<style>
+	a.btn-detail {
+	background-color: #3d4d6a !important;
+	color: white !important;
+	border: 2px solid #3d4d6a !important;
+	border-radius: 6px !important;
+	padding: 5px 12px !important;
+	transition: all 0.3s ease !important;
+	}
+
+	a.btn-detail:hover {
+	background-color: #2a344a !important;
+	border-color: #2a344a !important;
+	transform: translateY(-2px) !important;
+	color: white !important;
+	}
+
+	a.btn-write {
+	background-color: #3d4d6a !important;
+	color: white !important;
+	border: 2px solid #3d4d6a !important;
+	border-radius: 6px !important;
+	padding: 6px 14px !important;
+	transition: all 0.3s ease !important;
+	}
+
+	a.btn-write:hover {
+	background-color: #2a344a !important;
+	border-color: #2a344a !important;
+	transform: translateY(-2px) !important;
+	color: white !important;
+	}
+
+  article.entry {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  article.entry:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+</style>
 </head>
+
 <body>
 <jsp:include page="../header.jsp"></jsp:include>
 
@@ -44,9 +90,9 @@
 			
 			        <!-- 하단: 자세히 보기 -->
 			        <div class="d-flex justify-content-end mt-auto">
-			          <a href="/prboard/detail?prBoardNo=${pr.prBoardNo}" class="btn btn-outline-primary btn-sm">
-			            자세히 보기
-			          </a>
+						<a href="/prboard/detail?prBoardNo=${pr.prBoardNo}" class="btn btn-detail btn-sm">
+							자세히 보기
+						  </a>
 			        </div>
 			
 			      </article>
@@ -54,9 +100,9 @@
 
 
                 <div class="d-flex justify-content-end mb-3">
-                    <a href="/prboard/write" class="btn btn-primary">
-                      <i class="fas fa-pen"></i> 글 작성
-                    </a>
+					<a href="/prboard/write" class="btn btn-write">
+						<i class="fas fa-pen"></i> 글 작성
+					  </a>
                   </div>
             <!-- Pagination -->
 			<div class="blog-pagination">
