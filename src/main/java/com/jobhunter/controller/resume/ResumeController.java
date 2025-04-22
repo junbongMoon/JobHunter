@@ -110,7 +110,9 @@ public class ResumeController {
 		String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		model.addAttribute("today", today);
 
-		return "resume/resumeForm";
+
+
+		return "resume/resumeFormNew";
 	}
 
 	/**
@@ -322,6 +324,12 @@ public class ResumeController {
 			// 수정으로 접근했을 때만 이력서 상태 확인
 			if (request.getRequestURI().contains("/edit/") && resumeService.isResumeChecked(resumeNo)) {
 				model.addAttribute("error", "기업에서 확인중인 이력서는 수정할 수 없습니다.");
+				return "error";
+			}
+
+			// 첨삭 상태 확인
+			if (request.getRequestURI().contains("/edit/") && resumeService.isResumeAdvice(resumeNo)) {
+				model.addAttribute("error", "첨삭 중인 이력서는 수정할 수 없습니다.");
 				return "error";
 			}
 
