@@ -94,6 +94,75 @@
 	background-color: #fdfdfd !important;
 	display: block !important;
 }
+
+ #replyList {
+    padding-left: 0;
+  }
+
+  #replyList .list-group-item {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    padding: 15px 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    position: relative;
+  }
+
+  #replyList .list-group-item strong {
+    font-weight: 600;
+    color: #0056b3;
+  }
+
+  #replyList .list-group-item small {
+    color: #999;
+    font-size: 13px;
+    margin-left: 5px;
+  }
+
+  #replyList .reply-content {
+    margin-top: 8px;
+    margin-bottom: 10px;
+    white-space: pre-line;
+    line-height: 1.5;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-left: 4px solid #47b2e4;
+    border-radius: 6px;
+  }
+
+  #replyList .edit-reply-btn,
+  #replyList .delete-reply-btn {
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-right: 6px;
+  }
+
+  #replyList .edit-reply-btn {
+    background-color: #e8f4fc;
+    color: #007bff;
+    border: 1px solid #cce5ff;
+  }
+
+  #replyList .delete-reply-btn {
+    background-color: #fce8e8;
+    color: #dc3545;
+    border: 1px solid #f5c6cb;
+  }
+
+  @media screen and (max-width: 576px) {
+    #replyList .reply-content {
+      font-size: 14px;
+    }
+
+    #replyList .edit-reply-btn,
+    #replyList .delete-reply-btn {
+      font-size: 12px;
+      padding: 3px 8px;
+    }
+  }
+
 </style>
 
 
@@ -236,19 +305,12 @@
 
 
 	<!-- 댓글 목록 출력 영역 -->
-	<ul id="replyList" class="list-group">
-		<li class="list-group-item"><strong>작성자</strong> (날짜)<br>
-			<div>댓글 내용</div></li>
-	</ul>
+	<ul id="replyList" class="list-group"></ul> <!-- 여기에는 목록만 append -->
 
-	<!-- 댓글 작성 영역 (사용자가 댓글 쓰는 부분) -->
-	<div class="mt-3">
-		<textarea id="replyContent" class="form-control" rows="3"
-			placeholder="댓글을 입력해주세요"></textarea>
-		<button id="submitReplyBtn" class="btn btn-primary mt-2">등록</button>
-	</div>
-
-
+		<!-- 댓글 페이징 부분 -->
+		<nav>
+		  <ul class="pagination justify-content-center mt-3" id="replyPagination"></ul>
+		</nav> <!--  여기에만 페이징 append -->
 
 
 	<!-- 좋아요 알림 모달 -->
@@ -382,44 +444,32 @@
 	});
 
 	//게시물삭제 
-	$(document)
-			.ready(
-					function() {
-						$(".delete-btn")
-								.click(
-										function() {
-											let boardNo = $(this).data(
-													"boardno");
+	$(document).ready(function () {
+  		$(".delete-btn").click(function () {
+    		let boardNo = $(this).data("boardno");
 
-											if (confirm("정말 삭제하시겠습니까?")) {
-												$
-														.ajax({
-															url : "${pageContext.request.contextPath}/reviewBoard/delete",
-															type : "POST",
-															data : {
-																boardNo : boardNo
-															},
-															success : function(
-																	res) {
-																alert(res.message);
-																if (res.success) {
-																	window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
-																}
-															},
-															error : function(
-																	xhr,
-																	status,
-																	error) {
-																console
-																		.error(
-																				"삭제 실패:",
-																				error);
-																alert("삭제 중 오류가 발생했습니다.");
-															}
-														});
-											}
-										});
-					});
+			    if (confirm("정말 삭제하시겠습니까?")) {
+			      $.ajax({
+			        url: "${pageContext.request.contextPath}/reviewBoard/delete",
+			        type: "POST",
+			        data: {
+			          boardNo: boardNo
+			        },
+			        success: function (res) {
+			          alert(res.message);
+			          if (res.success) {
+			            window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
+			          }
+			        },
+			        error: function (xhr, status, error) {
+			          console.error("삭제 실패:", error);
+			          alert("삭제 중 오류가 발생했습니다.");
+			        }
+			      });
+			    }
+			  });
+			});
+
 
 	//게시물 신고	  
 	$(document).ready(function() {
@@ -460,143 +510,185 @@
 
 	//댓글 등록 
 
-	const boardNo = parseInt($('#boardNo').val());
-	const loginUserUid = $('#userId').val();
-	function loadReplies() {
-		  $.ajax({
-		    url: '/reply/list/' + boardNo,
-		    type: 'GET',
-		    success: function (data) {
-		      const $replyList = $('#replyList');
-		      $replyList.empty();
+const boardNo = parseInt($('#boardNo').val());
+const loginUserUid = $('#userId').val();
 
-		      if (!Array.isArray(data) || data.length === 0) {
-		        $replyList.append('<li class="list-group-item text-muted">등록된 댓글이 없습니다.</li>');
-		        return;
-		      }
+function loadReplies(page = 1) {
+  $.ajax({
+    url: '/reply/page',
+    type: 'GET',
+    data: {
+      boardNo: boardNo,
+      page: page,
+      size: 5
+    },
+    success: function (response) {
+      console.log("👀 서버 응답:", response);
 
-		      data.forEach(reply => {
-		        const replyNo = reply.replyNo;
-		        const replyContent = (reply.content ?? '').replace(/"/g, '&quot;');
-		        const date = (typeof reply.postDate === 'string' && reply.postDate.length >= 10)
-		          ? reply.postDate.substring(0, 10)
-		          : '날짜 없음';
+      const replies = response.boardList;
+      const totalPages = response.totalPage ?? Math.ceil(response.totalCount / response.size);
+      const currentPage = response.page;
 
-		        const writer = reply.writerId && reply.writerId.trim().length > 0
-		          ? reply.writerId
-		          : (reply.userId ? '사용자 ' + reply.userId : '익명');
+      const $replyList = $('#replyList');
+      const $pagination = $('#replyPagination');
+      $replyList.empty();
+      $pagination.empty();
 
-		        const content = $('<div>').text(reply.content ?? '(내용 없음)').html();
+      // 댓글 출력
+      if (!replies || replies.length === 0) {
+        $replyList.append('<li class="list-group-item text-muted">등록된 댓글이 없습니다.</li>');
+      } else {
+        replies.forEach(reply => {
+          const replyNo = reply.replyNo;
+          const replyContent = (reply.content ?? '').replace(/"/g, '&quot;');
+          const date = (reply.postDate ?? '').substring(0, 10);
+          const writer = reply.writerId ?? '익명';
 
-		        const html = '<li class="list-group-item" data-replyno="' + replyNo + '">' +
-		        '<strong>' + writer + '</strong> (' + date + ')<br>' +
-		        '<div class="reply-content">' + content + '</div>' +
-		        (reply.userId?.toString() === loginUserUid.toString()
-		          ? '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" ' +
-		              'data-replyno="' + replyNo + '" ' +
-		              'data-content="' + replyContent + '">수정</button>' +
-		            '<button class="btn btn-sm btn-outline-danger delete-reply-btn" ' +
-		              'data-replyno="' + replyNo + '">삭제</button>'
-		          : '') +
-		        '</li>';
+          const html = '<li class="list-group-item">' +
+            '<strong>' + writer + '</strong> (' + date + ')<br>' +
+            '<div class="reply-content">' + reply.content + '</div>' +
+            (reply.userId.toString() === loginUserUid.toString()
+              ? '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" data-replyno="' + replyNo + '" data-content="' + replyContent + '">수정</button>' +
+                '<button class="btn btn-sm btn-outline-danger delete-reply-btn" data-replyno="' + replyNo + '">삭제</button>'
+              : '') +
+            '</li>';
+          $replyList.append(html);
+        });
+      }
 
-		        $replyList.append(html);
-		      });
-		    },
-		    error: function () {
-		      alert('댓글을 불러오는 중 오류가 발생했습니다.');
-		    }
-		  });
-		}
+      // 페이징 출력
+      if (response.totalPage > 1) {
+        // 이전
+        if (response.hasPrev) {
+          $pagination.append(`
+            <li class="page-item">
+              <a class="page-link" href="#" data-page="${response.startPage - 1}">&laquo;</a>
+            </li>
+          `);
+        }
 
-		// ✅ 문서 로드 후 이벤트 등록
-		$(document).ready(function () {
+        // 숫자 버튼
+        for (let i = response.startPage; i <= response.endPage; i++) {
+          const isActive = (i === response.page) ? 'active' : '';
+          console.log("📌 페이지 생성 i =", i); 
+          $pagination.append('<li class="page-item ' + isActive + '"><a class="page-link" href="#" data-page="' + i + '">' + i + '</a></li>');
+        }
 
-		  // 🔃 댓글 초기 로딩
-		  loadReplies();
+        // 다음
+        if (response.hasNext) {
+          $pagination.append(`
+            <li class="page-item">
+              <a class="page-link" href="#" data-page="${response.endPage + 1}">&raquo;</a>
+            </li>
+          `);
+        }
+      }
+    },
+    error: function () {
+      alert('댓글 로딩 중 오류 발생');
+    }
+  });
+}
 
-		  // ✅ 댓글 등록 이벤트
-		  $('#submitReplyBtn').click(function () {
-		    const content = $('#replyContent').val().trim();
-		    if (!content) {
-		      alert('댓글 내용을 입력해주세요.');
-		      return;
-		    }
+$(document).ready(function () {
+  // 초기 로딩
+  loadReplies(1);
 
-		    $.ajax({
-		      url: '/reply/add',
-		      type: 'POST',
-		      contentType: 'application/json',
-		      data: JSON.stringify({
-		        boardNo: boardNo,
-		        content: content
-		      }),
-		      success: function () {
-		        $('#replyContent').val('');
-		        loadReplies();
-		      },
-		      error: function () {
-		        alert('댓글 등록 중 오류가 발생했습니다.');
-		      }
-		    });
-		  });
+  // 댓글 등록
+  $('#submitReplyBtn').click(function () {
+    const content = $('#replyContent').val().trim();
+    if (!content) {
+      alert('댓글 내용을 입력해주세요.');
+      return;
+    }
 
-		  // ✅ 댓글 삭제 이벤트
-		  $(document).on('click', '.delete-reply-btn', function () {
-		    const replyNo = $(this).data('replyno');
-		    if (isNaN(replyNo)) {
-		      alert("댓글 번호가 유효하지 않습니다.");
-		      return;
-		    }
+    $.ajax({
+      url: '/reply/add',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        boardNo: boardNo,
+        content: content
+      }),
+      success: function () {
+        $('#replyContent').val('');
+        loadReplies(1); // 첫 페이지로 갱신
+      },
+      error: function () {
+        alert('댓글 등록 중 오류가 발생했습니다.');
+      }
+    });
+  });
 
-		    if (confirm('댓글을 삭제하시겠습니까?')) {
-		      $.ajax({
-		        url: '/reply/delete',
-		        type: 'POST',
-		        contentType: 'application/json',
-		        data: JSON.stringify({ replyNo: replyNo }),
-		        success: function () {
-		          alert('댓글이 삭제되었습니다.');
-		          loadReplies();
-		        },
-		        error: function () {
-		          alert('댓글 삭제 중 오류가 발생했습니다.');
-		        }
-		      });
-		    }
-		  });
+  // 댓글 삭제
+  $(document).on('click', '.delete-reply-btn', function () {
+    const replyNo = $(this).data('replyno');
+    if (isNaN(replyNo)) {
+      alert("댓글 번호가 유효하지 않습니다.");
+      return;
+    }
 
-		  // ✅ 댓글 수정 이벤트
-		  $(document).on('click', '.edit-reply-btn', function () {
-		    const replyNo = $(this).data('replyno');
-		    const currentContent = $(this).data('content');
+    if (confirm('댓글을 삭제하시겠습니까?')) {
+      $.ajax({
+        url: '/reply/delete',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ replyNo: replyNo }),
+        success: function () {
+          alert('댓글이 삭제되었습니다.');
+          loadReplies(); // 현재 페이지 유지
+        },
+        error: function () {
+          alert('댓글 삭제 중 오류가 발생했습니다.');
+        }
+      });
+    }
+  });
 
-		    if (isNaN(replyNo)) {
-		      alert("댓글 번호가 유효하지 않습니다.");
-		      return;
-		    }
+  // 댓글 수정
+  $(document).on('click', '.edit-reply-btn', function () {
+    const replyNo = $(this).data('replyno');
+    const currentContent = $(this).data('content');
 
-		    const newContent = prompt('댓글을 수정하세요:', currentContent);
-		    if (newContent !== null && newContent.trim() !== '') {
-		      $.ajax({
-		        url: '/reply/update',
-		        type: 'POST',
-		        contentType: 'application/json',
-		        data: JSON.stringify({
-		          replyNo: parseInt(replyNo),
-		          userId: parseInt(loginUserUid),
-		          content: newContent.trim()
-		        }),
-		        success: function () {
-		          alert('댓글이 수정되었습니다.');
-		          loadReplies();
-		        },
-		        error: function () {
-		          alert('댓글 수정 중 오류가 발생했습니다.');
-		        }
-		      });
-		    }
-		  });
-		});
+    if (isNaN(replyNo)) {
+      alert("댓글 번호가 유효하지 않습니다.");
+      return;
+    }
+
+    const newContent = prompt('댓글을 수정하세요:', currentContent);
+    if (newContent !== null && newContent.trim() !== '') {
+      $.ajax({
+        url: '/reply/update',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          replyNo: parseInt(replyNo),
+          userId: parseInt(loginUserUid),
+          content: newContent.trim()
+        }),
+        success: function () {
+          alert('댓글이 수정되었습니다.');
+          loadReplies(); // 현재 페이지 유지
+        },
+        error: function () {
+          alert('댓글 수정 중 오류가 발생했습니다.');
+        }
+      });
+    }
+  });
+
+  // 페이지 클릭 이벤트 위임 (중복 방지)
+  $(document).on('click', '#replyPagination a', function (e) {
+    e.preventDefault();
+    const selectedPage = $(this).data('page');
+    console.log("👉 선택된 페이지:", selectedPage);
+    if (!selectedPage || isNaN(selectedPage)) {
+      alert("유효하지 않은 페이지입니다.");
+      return;
+    }
+    loadReplies(parseInt(selectedPage));
+  });
+});
+
 </script>
 </html>

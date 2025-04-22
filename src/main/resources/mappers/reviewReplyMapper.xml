@@ -27,18 +27,6 @@
 		ORDER BY rr.postDate ASC
 	</select>
 
-	<resultMap id="ReplyResultMap"
-		type="com.jobhunter.model.reviewReply.ReviewReplyDTO">
-		<id property="replyNo" column="replyNo" />
-		<result property="boardNo" column="boardNo" />
-		<result property="userId" column="userId" />
-		<result property="writerId" column="writerId" />
-		<result property="content" column="content" />
-		<result property="likes" column="likes" />
-		<result property="postDate" column="postDate" />
-		<result property="updatedAt" column="updatedAt" />
-		<result property="isDeleted" column="isDeleted" />
-	</resultMap>
 
 	<!-- 댓글 작성 -->
 	<insert id="insertReply"
@@ -76,4 +64,46 @@
 		SET isDeleted = 'Y'
 		WHERE replyNo = #{replyNo} AND userId = #{userId}
 	</update>
+	
+	
+	<!-- ✅ 댓글 페이징 조회 -->
+  <select id="selectRepliesWithPaging" resultMap="ReplyResultMap">
+    SELECT
+      rr.replyNo,
+      rr.boardNo,
+      rr.userId,
+      u.userId AS writerId,
+      rr.content,
+      rr.likes,
+      rr.postDate,
+      rr.updatedAt,
+      rr.isDeleted
+    FROM reviewReply rr
+    JOIN users u ON rr.userId = u.uid
+    WHERE rr.boardNo = #{boardNo}
+      AND rr.isDeleted = 'N'
+    ORDER BY rr.postDate ASC
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
+  <!-- 댓글 총 개수 조회 (페이징용) -->
+  <select id="countRepliesByBoardNo" resultType="int">
+    SELECT COUNT(*)
+    FROM reviewReply
+    WHERE boardNo = #{boardNo}
+      AND isDeleted = 'N'
+  </select>
+
+  <!-- 결과 매핑 -->
+  <resultMap id="ReplyResultMap" type="com.jobhunter.model.reviewReply.ReviewReplyDTO">
+    <id property="replyNo" column="replyNo"/>
+    <result property="boardNo" column="boardNo"/>
+    <result property="userId" column="userId"/>
+    <result property="writerId" column="writerId"/>
+    <result property="content" column="content"/>
+    <result property="likes" column="likes"/>
+    <result property="postDate" column="postDate"/>
+    <result property="updatedAt" column="updatedAt"/>
+    <result property="isDeleted" column="isDeleted"/>
+  </resultMap>
 </mapper>

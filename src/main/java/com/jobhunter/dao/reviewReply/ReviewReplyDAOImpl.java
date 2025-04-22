@@ -47,5 +47,19 @@ public class ReviewReplyDAOImpl implements ReviewReplyDAO {
 	    param.put("userId", userId);
 	    return ses.update(NS+".deleteReplyDate", param);
 	}
+
+	@Override
+	public List<ReviewReplyDTO> selectRepliesWithPaging(int boardNo, int offset, int size) throws Exception {
+	    Map<String, Object> param = new HashMap<>();
+        param.put("boardNo", boardNo);
+        param.put("offset", offset);
+        param.put("size", size);
+        return ses.selectList(NS + ".selectRepliesWithPaging", param);
+    }
+
+    @Override
+    public int countRepliesByBoardNo(int boardNo) throws Exception {
+        return ses.selectOne(NS + ".countRepliesByBoardNo", boardNo);
+    }
 }
 

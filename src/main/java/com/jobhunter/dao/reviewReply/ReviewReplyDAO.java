@@ -13,4 +13,10 @@ public interface ReviewReplyDAO {
     int updateReplyDao(ReviewReplyDTO dto) throws Exception;
     
     int deleteReplyDao(int replyNo, int userId) throws Exception;
+
+
+	List<ReviewReplyDTO> selectRepliesWithPaging(int boardNo, int offset, int size) throws Exception;
+
+
+	int countRepliesByBoardNo(int boardNo) throws Exception;
 }
