@@ -40,9 +40,14 @@
 				</choose>
 			</if>
 		</where>
-		<if test="sortOption != null">
+	<choose>
+		<when test="sortOption != null">
 			ORDER BY ${sortOption}
-		</if>
+		</when>
+		<otherwise>
+			ORDER BY prBoardNo DESC
+		</otherwise>
+	</choose>
 		LIMIT #{startRowIndex}, #{rowCntPerPage}
 	</select>
 
