@@ -232,10 +232,16 @@
 		#{nationality});
 	</insert>
 	
+
 	<update id="updateName">
 		UPDATE users
 		SET userName = #{name}
 		WHERE uid = #{uid}
+
+	<update id="modifyUserPoint">
+		update users
+		set point = point + #{point}
+		where uid = #{userUid}
 	</update>
 
 </mapper>

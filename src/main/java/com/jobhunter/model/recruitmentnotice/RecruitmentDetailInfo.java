@@ -130,6 +130,15 @@ public class RecruitmentDetailInfo {
 	private String companyName;
 	
 	
+	private String companyAddr;
+	
+	/**
+	 * <p> 
+	 * 좋아요 수
+	 * </p>
+	 */
+	private int likeCnt;
+	
 	
 	/**
 	 * <p> 

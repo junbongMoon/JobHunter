@@ -312,7 +312,13 @@ public interface RecruitmentNoticeDAO {
      */
     int increaseRecruitmentViewCnt(int boardNo);
 
+
 	List<RecruitmentWithResume> searchRecruitments(RecruitmentWithResumePageDTO dto);
 
 	int countRecruitments(RecruitmentWithResumePageDTO dto);
+
+	int increaseRecruitmentLikeCnt(int uid) throws Exception;
+
+	int decreaseRecruitmentLikeCnt(int uid) throws Exception;
+
 }

@@ -35,12 +35,8 @@ public class StatusDAOImpl implements StatusDAO {
 	}
 
 	@Override
-	public TotalStatusVODTO selectTotalStatusByYesterDay(LocalDate yesterday, LocalDateTime start, LocalDateTime end) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("start", start);
-		params.put("end", end);
-		System.out.println(params);
-		return ses.selectOne(NS + ".getTotalStatusByYesterDay", params);
+	public TotalStatusVODTO selectTotalStatusByYesterDay(LocalDate yesterday) {
+	    return ses.selectOne(NS + ".getTotalStatusByYesterDay", yesterday);
 	}
 
 	@Override

@@ -266,6 +266,7 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	    return ses.update(NS + ".increaseRecruitmentViewCnt", boardNo);
 	}
 
+
 	/**
 	 *  @author 육근우
 	 *
@@ -281,6 +282,22 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 	public int countRecruitments(RecruitmentWithResumePageDTO dto) {
 		return ses.selectOne(NS + ".countRecruitments", dto);
 	}
+
+
+	@Override
+	public int increaseRecruitmentLikeCnt(int uid) throws Exception {
+		
+		return ses.update(NS + ".increaseRecruitmentLikeCnt",uid);
+	}
+
+
+	@Override
+	public int decreaseRecruitmentLikeCnt(int uid) throws Exception {
+		
+		return ses.update(NS + ".decreaseRecruitmentLikeCnt",uid);
+	}
+
+
 	
 	/**
 	 *  @author 육근우

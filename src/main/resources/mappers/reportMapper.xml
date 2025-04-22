@@ -30,4 +30,16 @@
 		)
 	</insert>
 <!-- 계정 신고 관련 매퍼 -->
+
+<!-- reporterAccountType이 USER인 신고 데이터 조회 -->
+	<select id="getReportsByUserReporter" resultType="com.jobhunter.model.report.ReportMessageVO">
+		SELECT *
+		FROM 
+			reportMessage
+		WHERE 
+			reporterAccountType = 'USER'
+		ORDER BY 
+			regDate DESC
+	</select>
+<!-- reporterAccountType이 USER인 신고 데이터 조회 -->
 </mapper>

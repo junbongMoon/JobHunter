@@ -133,6 +133,19 @@ public class UserDAOImpl implements UserDAO {
 		ses.update(NS + ".setDeleteAccount", uid);
 
 	}
+
+
+	@Override
+	public int updateUserPoint(int userUid, int point) throws Exception {
+		Map<String, Object> param = new HashMap<>();
+		param.put("userUid", userUid);
+		param.put("point", point);
+		
+		
+		return ses.update(NS + ".modifyUserPoint", param);
+	}
+
+
 	
 	@Override
 	public void updateProfileImg(Integer uid, String base64) throws Exception {

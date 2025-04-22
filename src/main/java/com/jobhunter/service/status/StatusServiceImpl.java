@@ -56,17 +56,13 @@ public class StatusServiceImpl implements StatusService {
 	 * 어제 작성된 누적 통계를 조회하는 메서드
 	 * </p>
 	 * 
-	 * @return TotalStatusVODTO 어제의 누적 통계
+	 * @return TotalStatusVODTO 그제의 누적 통계
 	 *
 	 */
 	@Override
 	public TotalStatusVODTO getTotalStatusUntilYesterday() {
-		LocalDate yesterday = LocalDate.now().minusDays(1);
-		LocalDateTime start = yesterday.atStartOfDay();
-		LocalDateTime end = yesterday.plusDays(1).atStartOfDay().minusSeconds(1);
-
-		TotalStatusVODTO result = statusDAO.selectTotalStatusByYesterDay(yesterday, start, end);
-		return result;
+	    LocalDate yesterday = LocalDate.now().minusDays(2);
+	    return statusDAO.selectTotalStatusByYesterDay(yesterday);
 	}
 
 	/**
@@ -81,9 +77,9 @@ public class StatusServiceImpl implements StatusService {
 	 */
 	@Override
 	public StatusVODTO getTodayIncrement() {
-		LocalDate today = LocalDate.now().minusDays(1);
-		LocalDateTime start = today.atStartOfDay();
-		LocalDateTime end = today.plusDays(1).atStartOfDay().minusSeconds(1);
+		LocalDate target = LocalDate.now().minusDays(1);
+		LocalDateTime start = target.atStartOfDay();
+		LocalDateTime end = target.plusDays(1).atStartOfDay().minusSeconds(1);
 
 		int todayCreateUsers = statusDAO.selectLogCntBetweenAndRole(start, end, "USER", "CREATE");
 		int todayDeleteUsers = statusDAO.selectLogCntBetweenAndRole(start, end, "USER", "DELETE");
@@ -105,7 +101,7 @@ public class StatusServiceImpl implements StatusService {
 		int newRegistration = submitDAO.countBySubmittedDateBetween(start, end);
 		int newReviewBoard = todayCreateReviews - todayDeleteReviews;
 
-		return StatusVODTO.builder().statusDate(LocalDateTime.now()).newUsers(newUsers).newCompanies(newCompanies)
+		return StatusVODTO.builder().statusDate(start).newUsers(newUsers).newCompanies(newCompanies)
 				.newRecruitmentNoticeCnt(newRecruitmentNoticeCnt).newRegistration(newRegistration)
 				.newReviewBoard(newReviewBoard).build();
 	}
