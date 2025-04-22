@@ -139,14 +139,21 @@
       <i class="fas fa-list"></i> 목록으로
     </a>
     
-      <a href="/prboard/modify?prBoardNo=${prBoard.prBoardNo}" class="btn btn-modify">
-        <i class="fas fa-edit"></i> 수정
-      </a>
-		<button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
-		  <i class="fas fa-trash"></i> 삭제
-		</button>
+    <c:choose>
+      <c:when test="${sessionScope.account.uid == prBoard.useruid}">
+        <a href="/prboard/modify?prBoardNo=${prBoard.prBoardNo}" class="btn btn-modify">
+          <i class="fas fa-edit"></i> 수정
+        </a>
+  
+        <button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
+          <i class="fas fa-trash"></i> 삭제
+        </button>
+      </c:when>
+    </c:choose>
     
   </div>
+
+  <c:if test="${sessionScope.account.uid == prBoard.useruid}">
   <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -170,6 +177,7 @@
     </div>
   </div>
 </div>
+</c:if>
 </div>
 
 <script>
