@@ -34,10 +34,17 @@
 		const urlParams = new URLSearchParams(window.location.search);
 	  	const kakao = urlParams.get('kakao');
 	  	if (kakao == "emailDuplicate") {
-	  		window.publicModals.show("이미 등록된 이메일입니다. 로그인 후 카카오톡 연동을 진행해주세요. 계정찾기로 이동하시겠습니까?", {onConfirm: redirectSearchAccountPage,cancelText:"취소"})
+	  		window.publicModals.show("이미 등록된 이메일입니다.<br>로그인 후 카카오톡 연동을 진행해주세요.<br>계정찾기로 이동하시겠습니까?", {onConfirm: redirectSearchAccountPage,cancelText:"취소"})
 	  	}
 	  	function redirectSearchAccountPage() {
 			location.href = "/account/find/id";
+	  	}
+		const firstLogin = urlParams.get('firstLogin');
+		if (firstLogin == "company") {
+	  		window.publicModals.show("회원가입을 환영합니다.<br>상세정보의 입력을 위하여<br>기업정보 페이지로 이동하시겠습니까?", {onConfirm: redirectcompanyInfoPage,cancelText:"취소"})
+	  	}
+	  	function redirectcompanyInfoPage() {
+			location.href = "company/companyInfo?uid=${sessionScope.account.uid}&accountType=company";
 	  	}
 	</script>
 		<!-- 풋터 -->

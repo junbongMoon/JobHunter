@@ -28,4 +28,8 @@ public interface CompanyService {
 
 	void setDeleteAccount(Integer uid) throws Exception;
 
+	void updateProfileImg(Integer uid, String base64) throws Exception;
+
+	void deleteProfileImg(Integer uid) throws Exception;
+
 }

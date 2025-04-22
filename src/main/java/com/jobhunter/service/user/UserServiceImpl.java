@@ -191,6 +191,20 @@ public class UserServiceImpl implements UserService {
 		dao.setDeleteAccount(uid);
 	}
 
+	@Override
+	public void updateProfileImg(Integer uid, String base64) throws Exception {
+		dao.updateProfileImg(uid, base64);
+	}
+	
+	@Override
+	public void deleteProfileImg(Integer uid) throws Exception {
+		dao.updateProfileImg(uid, null);
+	}
+
+	@Override
+	public void updateName(Integer uid, String newName) throws Exception {
+		dao.updateName(uid, newName);
+
 	/**
 	 *  @author 문준봉
 	 *
@@ -217,6 +231,7 @@ public class UserServiceImpl implements UserService {
 		
 		return result;
 		
+
 	}
 
 

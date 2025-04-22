@@ -1,9 +1,7 @@
 package com.jobhunter.service.recruitmentnotice;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -23,7 +21,10 @@ import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
+import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
 import com.jobhunter.model.util.FileStatus;
 
 import lombok.RequiredArgsConstructor;
@@ -504,7 +505,26 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	    return getRecruitmentByUid(uid);
 	}
 
+	/**
+	 *  @author 육근우
+	 *
+	 * <p>
+	 * 기업uid를 기반으로 검색조건에 맞는 공고를 페이징해서 가져오는 메서드 
+	 * </p>
+	 * 
+	 * @param RecruitmentWithResumePageDTO 검색조건과 기업uid등이 담긴 객체
+	 * @return 조건에 맞는 공고들
+	 *
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public TenToFivePageVO<RecruitmentWithResume> searchRecruitments(RecruitmentWithResumePageDTO dto) {
+	    int totalItems = recdao.countRecruitments(dto);
+	    List<RecruitmentWithResume> list = recdao.searchRecruitments(dto);
 
+	    TenToFivePageVO<RecruitmentWithResume> vo = new TenToFivePageVO<RecruitmentWithResume>(list, dto.getPage(), totalItems);
 
+	    return vo;
+	}
 
 }

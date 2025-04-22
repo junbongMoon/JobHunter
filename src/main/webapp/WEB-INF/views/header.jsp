@@ -393,7 +393,7 @@
 									</c:when>
 									<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 										<a class="nav-link dropdown-toggle"
-											href="/company/companyHome?uid=${sessionScope.account.uid}&accountType=company"
+											href="/company/companyInfo?uid=${sessionScope.account.uid}&accountType=company"
 											id="mypageDropdown" role="button">
 											My Page
 										</a>
@@ -414,7 +414,7 @@
 								<!-- 마우스 호버 시 뜨는 프로필 카드 -->
 								<div class="mypage-profile-card">
 									<div class="profile-img-container">
-										<div class="profile-img"></div>
+										<div class="profile-img"><img src="${sessionScope.account.profileImg}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div>
 										<div class="speech-bubble"
 											onclick="openNotifications('${sessionScope.account.uid}', '${sessionScope.account.accountType}')">
 											<!-- 메시지 카운트 들어오게 -->
@@ -484,6 +484,7 @@
 		<div id="accountType" style="display: none;" data-accountType="${sessionScope.account.accountType}"></div>
 
 		<script>
+
 
 			window.publicSessionUid = "${sessionScope.account.uid}";
 			window.publicSessionAccType = "${sessionScope.account.accountType}";

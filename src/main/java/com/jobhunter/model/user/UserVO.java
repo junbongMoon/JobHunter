@@ -1,5 +1,6 @@
 package com.jobhunter.model.user;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.customenum.Gender;
 import com.jobhunter.model.customenum.MilitaryServe;
 import com.jobhunter.model.customenum.Nationality;
+import com.jobhunter.util.PropertiesTask;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,4 +49,16 @@ public class UserVO {
     private MilitaryServe militaryService; // 병역 사항 (NOT_COMPLETED: 미필, COMPLETED: 군필, EXEMPTED: 면제)
     private Nationality nationality; // 국적 (KOREAN: 한국인, FOREIGNER: 외국인)
     private String disability; // 장애 여부
+    
+    public void setUserImg(String userImg) {
+    	if (userImg == null || userImg.equals("")) {
+    		try {
+				this.userImg = PropertiesTask.getPropertiesValue("config/profileImg.properties", "defaltImg");
+			} catch (IOException e) {
+				this.userImg = null;
+			}
+    	} else {
+    		this.userImg = userImg;
+    	}
+	}
 }

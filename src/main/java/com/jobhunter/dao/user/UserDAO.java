@@ -40,6 +40,11 @@ public interface UserDAO {
 
 	void setDeleteAccount(Integer uid) throws Exception;
 
+
+	void updateProfileImg(Integer uid, String base64) throws Exception;
+
+	void updateName(Integer uid, String newName) throws Exception;
+
 	int updateUserPoint(int userUid, int point) throws Exception; 
 
 		

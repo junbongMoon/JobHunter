@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +16,9 @@ import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
+import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 
 import lombok.RequiredArgsConstructor;
@@ -116,7 +121,28 @@ public class RecruitmentNoticeRestController {
 			return result;
 		}
 	
-	   
+		/**
+		 *  @author 육근우
+		 *
+		 * <p>
+		 * 내 공고 리스트 + 해당 공고에 붙은 신청서 갯수를 가져오는 메서드
+		 * </p>
+		 * 
+		 * @param int companyUid
+		 * @param PageRequestDTO pageRequestDTO
+		 * @param Model model
+		 * @return  공고리스트를 담은 페이징에 정보를 객체를 담은 ResponseEntity
+		 *
+		 */
+		@PostMapping("/withResume")
+	    public TenToFivePageVO<RecruitmentWithResume> showRecruitmentWithResumeByUid(@RequestBody RecruitmentWithResumePageDTO dto) {
+	        try {
+				return recService.searchRecruitments(dto);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	        return null;
+	    }
 	
 	
 }

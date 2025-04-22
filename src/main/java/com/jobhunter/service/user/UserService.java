@@ -42,6 +42,13 @@ public interface UserService {
 
 	void setDeleteAccount(Integer uid) throws Exception;
 
+	void updateProfileImg(Integer uid, String base64) throws Exception;
+
+	void deleteProfileImg(Integer uid) throws Exception;
+
+	void updateName(Integer uid, String newName) throws Exception;
+
 	boolean addPoint(String userId, int point, PaymentLogDTO paymentLog) throws Exception;
+
 
 }

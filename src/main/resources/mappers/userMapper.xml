@@ -8,7 +8,7 @@
 		type="com.jobhunter.model.account.AccountVO">
 		<result column="userId" property="accountId" />
 		<result column="userName" property="accountName" />
-		<result column="accountType" property="accountType" />
+		<result column="userImg" property="profileImg" />
 		<!-- 나머지는 동일 컬럼이므로 자동 매핑 -->
 	</resultMap>
 
@@ -215,8 +215,13 @@
 		WHERE uid = #{uid}
 	</update>
 	
-
-<insert id="registUser"
+	<update id="updateProfileImg">
+		UPDATE users
+		SET userImg = #{img}
+		WHERE uid = #{uid}
+	</update>
+	
+	<insert id="registUser"
 		parameterType="com.jobhunter.model.user.UserRegisterDTO"
 		useGeneratedKeys="true" keyProperty="uid">
 		INSERT INTO `users`
@@ -227,6 +232,12 @@
 		#{nationality});
 	</insert>
 	
+
+	<update id="updateName">
+		UPDATE users
+		SET userName = #{name}
+		WHERE uid = #{uid}
+
 	<update id="modifyUserPoint">
 		update users
 		set point = point + #{point}

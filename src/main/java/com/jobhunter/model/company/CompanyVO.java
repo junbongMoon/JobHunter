@@ -1,26 +1,14 @@
 package com.jobhunter.model.company;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 
 import com.jobhunter.model.customenum.AccountType;
-import com.jobhunter.model.customenum.Gender;
-import com.jobhunter.model.customenum.MilitaryServe;
-import com.jobhunter.model.customenum.Nationality;
+import com.jobhunter.util.PropertiesTask;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-@Getter
-@Setter
-@ToString
+@Data
 public class CompanyVO {
 
     private Integer uid;
@@ -49,6 +37,21 @@ public class CompanyVO {
     private String introduce; // 회사소개
     private String scale; // 회사규모
     private String homePage; // 회사 홈페이지
+    
+    private String companyImg; // 회사 프로필 이미지
+    
+    public void setCompanyImg(String companyImg) {
+    	if (companyImg == null || companyImg.equals("")) {
+    		try {
+    			String defaltImg = PropertiesTask.getPropertiesValue("config/profileImg.properties", "defaltImg");
+				this.companyImg = defaltImg;
+			} catch (IOException e) {
+				this.companyImg = null;
+			}
+    	} else {
+    		this.companyImg = companyImg;
+    	}
+	}
 }
 
 //private String detailAddr; // 상세주소
