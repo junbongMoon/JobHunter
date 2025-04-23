@@ -2,6 +2,8 @@ package com.jobhunter.service.recruitmentnotice;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -354,12 +356,25 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 		// 새로운 면접 방식이면 추가
 		for (ApplicationDTO newApp : newAppList) {
-			boolean existsInOld = oldAppList.stream().anyMatch(old -> old.getMethod() == newApp.getMethod());
+		    Optional<Application> matchedOldOpt = oldAppList.stream()
+		        .filter(old -> old.getMethod() == newApp.getMethod())
+		        .findFirst();
 
-			if (!existsInOld) {
-				newApp.setRecruitmentNoticeUid(uid);
-				recdao.insertApplicationWithRecruitmentNotice(newApp);
-			}
+		    if (matchedOldOpt.isPresent()) {
+		        Application oldApp = matchedOldOpt.get();
+		        if (!Objects.equals(oldApp.getDetail(), newApp.getDetail())) {
+		            // detail이 다르면 기존 것을 삭제 후 insert
+		            recdao.deleteApplication(uid, newApp.getMethod());
+
+		            newApp.setRecruitmentNoticeUid(uid);
+		            recdao.insertApplicationWithRecruitmentNotice(newApp);
+		        }
+		        // detail이 같다면 아무 작업 안 함
+		    } else {
+		        // 기존에 없던 방식이면 insert
+		        newApp.setRecruitmentNoticeUid(uid);
+		        recdao.insertApplicationWithRecruitmentNotice(newApp);
+		    }
 		}
 
 		// Step 4: 파일 비교 후 변경
