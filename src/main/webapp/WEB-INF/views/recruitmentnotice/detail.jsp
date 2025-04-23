@@ -237,6 +237,16 @@ function drawRecruitmentStats() {
 		fiftiesOrAbove: parseInt('${RecruitmentDetailInfo.stats.fiftiesOrAbove}', 10) || 0
 	};
 
+	const total =
+		stats.maleCount + stats.femaleCount +
+		stats.teens + stats.twenties + stats.thirties + stats.forties + stats.fiftiesOrAbove;
+
+	if (total === 0) {
+		document.getElementById("recruitmentnoticeStat").style.display = "none";
+		$('.recStat').html("지원된 공고가 없습니다.");
+		return;
+	}
+
 	// 성별 비율
 	const genderData = google.visualization.arrayToDataTable([
 		['성별', '인원수'],
@@ -596,14 +606,15 @@ button.btn-resume {
 
 									<div class="content">
 
-										<div class="categories-widget widget-item card">
-											<h3 class="widget-title">공고 지원 비율</h3>
-											<div id="recruitmentnoticeStat" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+										<c:if test="${not empty RecruitmentDetailInfo.stats}">
+											<div class="categories-widget widget-item card">
+												<h3 class="widget-title recStat">공고 지원 비율</h3>
+												<div id="recruitmentnoticeStat" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
 												<div id="genderChart"></div>
 												<div id="ageChart"></div>
+												</div>
 											</div>
-
-										</div>
+										</c:if>
 
 										<div class="categories-widget widget-item card">
 											<h3 class="widget-title">지역</h3>
