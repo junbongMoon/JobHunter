@@ -137,7 +137,7 @@ function drawDynamicChart(dataList) {
     
 
     dataList.forEach(item => {
-        const dateStr = item.formattedDate || formatDateLabel(item.statusDate);  // ✅ formattedDate 우선 사용
+        const dateStr = item.formattedDate || formatDateLabel(item.statusDate);  // formattedDate 우선 사용
         const row = [dateStr];
 
         if (selected.includes('user')) row.push(item.newUsers || 0);
@@ -153,7 +153,7 @@ function drawDynamicChart(dataList) {
         title: '선택된 항목 통계',
         legend: { position: 'bottom' },
         width: '100%',
-        height: 400,
+        height: 320,
         bar: { groupWidth: "60%" }
     };
 
@@ -177,7 +177,7 @@ function formatDateLabel(rawDate) {
         var y = rawDate.year;
         var m = String(rawDate.month).padStart(2, '0');
         var d = String(rawDate.day).padStart(2, '0');
-        return y + '-' + m + '-' + d;  // ✅ 문자열 덧셈 방식 사용
+        return y + '-' + m + '-' + d;  // 
     }
 
     // Date 타입일 경우
@@ -187,7 +187,7 @@ function formatDateLabel(rawDate) {
         var y = parsed.getFullYear();
         var m = String(parsed.getMonth() + 1).padStart(2, '0');
         var d = String(parsed.getDate()).padStart(2, '0');
-        return y + '-' + m + '-' + d;  // ✅ 문자열 덧셈 방식 사용
+        return y + '-' + m + '-' + d;  // 
     } catch (e) {
         return '날짜 오류';
     }
@@ -239,11 +239,20 @@ function getDailyStatusByymd() {
     .selectMonth {
       margin-bottom: 20px;
     }
+    
+  .form-control {
+    min-width: 120px;
+  }
+  .gap-2 {
+    gap: 0.5rem !important;
+  }
+
 </style>
 <body>
 <!-- 차트 콘텐츠 -->
 <div class="container-fluid">
     <div class="row">
+        <div class="col-12 d-flex flex-wrap align-items-end gap-2">
     <div class="selectStartDatetime">
         <select id="startYear" class="form-control">
             <option value="-1">시작 연도를 선택 하세요</option>
@@ -278,12 +287,13 @@ function getDailyStatusByymd() {
     
       <button type="button" id="getDailyStatusBtn" onclick="getDailyStatusByymd()">조회</button>
     </div>
+    </div>
 
     <!-- ===== 차트가 포함될 콘텐츠 영역 ===== -->
     <div class="row">
 
         <!-- 📌 영역 차트 (Area Chart) -->
-        <div class="col-xl-8 col-lg-7">
+        <div class="col-12">
             <div class="card shadow mb-4">
                 <!-- 차트 제목 -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
