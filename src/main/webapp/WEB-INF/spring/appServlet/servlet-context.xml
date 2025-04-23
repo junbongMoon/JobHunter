@@ -75,6 +75,7 @@
 	<interceptors>
 
 		<interceptor>
+			<mapping path="/reviewBoard/modify"/>
 			<mapping path="/user/mypage" />
 			<mapping path="/reviewBoard/write"/>
 			<mapping path="/company/companyInfo" />
