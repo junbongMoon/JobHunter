@@ -12,11 +12,15 @@
 
 <style>
 .card.custom-job-card {
-	border: 1px solid #47b2e4; /* 얇은 테두리 추가 */
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between; /* 하단 정렬에 도움 */
+	border: 1px solid #47b2e4;
 	border-radius: 12px;
 	overflow: hidden;
 	transition: transform 0.2s ease;
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+	height: 100%;
 }
 
 .card.custom-job-card:hover {
@@ -25,13 +29,16 @@
 
 .card.custom-job-card img {
 	width: 100%;
-	height: 120px; /* 기존보다 작게 줄임 */
-	object-fit: contain; /* 비율 유지하며 꽉 채우지 않음 */
+	height: 120px;
+	object-fit: contain;
 	background-color: #fff;
 	padding: 1rem;
 }
 
 .card.custom-job-card .card-body {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
 	padding: 1rem;
 }
 
@@ -46,20 +53,23 @@
 	font-size: 0.85rem;
 	color: #555;
 	line-height: 1.5;
-	margin-bottom: 0.75rem;
+	flex-grow: 1; /* 내용이 짧아도 빈 공간 확보 */
 }
 
 .card.custom-job-card .btn {
-	background-color: #007bff;
+	background-color: #47b2e4;
 	border: none;
 	font-size: 0.9rem;
 	padding: 0.4rem 0.8rem;
 	border-radius: 6px;
+	align-self: flex-start; /* 좌측 정렬 */
+	margin-top: 10px;
 }
 
 .card.custom-job-card .btn:hover {
-	background-color: #0056b3;
+	background-color: #3399cc;
 }
+
 
 /* employment 검색바 및 버튼 스타일 */
 .search-bar-container {
@@ -184,7 +194,7 @@
 						<div class="card-body">
 							<h5 class="card-title">${list.empWantedTitle}</h5>
 							<p class="card-text">
-								<strong>기관:</strong> ${list.empBusiNm} (${list.coClcdNm})<br />
+								<strong>기관:</strong> ${list.empBusiNm} (${empty list.coClcdNm ? '사기업' : list.coClcdNm})<br />
 								<strong>고용형태:</strong> ${list.empWantedTypeNm}<br /> <strong>기간:</strong>
 								${list.empWantedStdt} ~ ${list.empWantedEndt}
 							</p>
