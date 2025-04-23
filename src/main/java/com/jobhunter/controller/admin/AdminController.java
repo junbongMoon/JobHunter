@@ -492,7 +492,7 @@ public class AdminController {
 	@GetMapping("/admin/adminChartDetail")
 	public String showUserCompanyChartDetail(Model model) {
 		
-		return "/admin/adminChartDetail";
+		return "admin/adminChartDetail";
 	}
 	
 }
