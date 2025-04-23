@@ -1,5 +1,6 @@
 package com.jobhunter.controller.status;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobhunter.model.status.FullStatus;
+import com.jobhunter.model.status.StatusVODTO;
 import com.jobhunter.service.status.StatusService;
 
 import lombok.RequiredArgsConstructor;
@@ -67,6 +69,23 @@ public class StatusRestController {
 	    }
 	    
 	    
+	}
+	
+	@PostMapping("/range")
+	public ResponseEntity<List<StatusVODTO>> getStatusBetweenDates(
+	        @RequestParam String start,
+	        @RequestParam String end) {
+		System.out.println("startDate : " + start + "endDate : " + end);
+		
+	    try {
+	        LocalDateTime startDt = LocalDateTime.parse(start);
+	        LocalDateTime endDt = LocalDateTime.parse(end);
+	        List<StatusVODTO> list = statusService.getDailyChartByPaging(startDt, endDt);
+	        return ResponseEntity.ok(list);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().build();
+	    }
 	}
 	
 }
