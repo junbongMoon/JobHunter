@@ -8,6 +8,7 @@ import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser;
 import com.jobhunter.model.submit.Status;
 import com.jobhunter.model.submit.SubmitFromRecruitVO;
 import com.jobhunter.model.submit.SubmitSearchDTO;
@@ -106,5 +107,5 @@ public interface SubmitService {
 	 * @return 신청서 상세정보
 	 *
 	 */
-	ResumeDetailInfoBySubmit selectSubmitAndResumeDetailInfo(int registrationNo, AccountVO account) throws Exception;
+	ResumeDetailInfoBySubmitAndUser selectSubmitAndResumeDetailInfo(int registrationNo, AccountVO account) throws Exception;
 }

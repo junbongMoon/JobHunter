@@ -79,6 +79,7 @@ public class ResumeDetailInfoBySubmitAndUser {
     private String userName; // 사용자 이름
     private String mobile; // 전화번호
     private String email; // 이메일
+    private String addr; // 이메일
     private Gender gender; // 성별 (MALE: 남성, FEMALE: 여성)
     private Integer age; // 나이
     

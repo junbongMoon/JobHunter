@@ -14,6 +14,7 @@ import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser;
 import com.jobhunter.model.submit.Status;
 import com.jobhunter.service.submit.SubmitService;
 
@@ -94,7 +95,7 @@ public class SubmitController {
 		// 신청서 대상 기업 혹은 admin만 열람 가능
 
 		// ResumeDetailInfoBySubmit 가져와야함
-		ResumeDetailInfoBySubmit result = null;
+		ResumeDetailInfoBySubmitAndUser result = null;
 		try {
 			result = submitService.selectSubmitAndResumeDetailInfo(registrationNo, account);
 		} catch (Exception e) {

@@ -26,6 +26,7 @@ import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.RegistrationVO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser;
 import com.jobhunter.model.submit.Status;
 import com.jobhunter.model.submit.SubmitFromRecruitVO;
 import com.jobhunter.model.submit.SubmitSearchDTO;
@@ -334,7 +335,7 @@ public class SubmitServiceImpl implements SubmitService {
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-	public ResumeDetailInfoBySubmit selectSubmitAndResumeDetailInfo(int registrationNo, AccountVO account) throws Exception {
+	public ResumeDetailInfoBySubmitAndUser selectSubmitAndResumeDetailInfo(int registrationNo, AccountVO account) throws Exception {
 		
 		int companyUid = submitDAO.getCompanyUidByRegistrationNo(registrationNo);
 		if((companyUid == account.getUid() && account.getAccountType() == AccountType.COMPANY) || account.getIsAdmin() == "Y") {

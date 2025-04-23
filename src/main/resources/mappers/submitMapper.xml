@@ -321,6 +321,7 @@
 		<result property="email" column="email" />
 		<result property="gender" column="gender" />
 		<result property="age" column="age" />
+		<result property="addr" column="addr" />
 		<result property="militaryService" column="militaryService" />
 		<result property="nationality" column="nationality" />
 		<result property="disability" column="disability" />
@@ -388,6 +389,17 @@
 			<result property="refMajorcategoryNo"
 				column="refMajorcategoryNo" />
 		</collection>
+		
+		<collection property="files"
+			ofType="com.jobhunter.model.resume.ResumeUpfileDTO">
+			<id property="boardUpFileNo" column="boardUpFileNo" />
+			<result property="originalFileName" column="originalFileName" />
+			<result property="newFileName" column="newFileName" />
+			<result property="ext" column="ext" />
+			<result property="size" column="size" />
+			<result property="base64Image" column="base64Image" />
+			<result property="resumeNo" column="resumeNo" />
+		</collection>
 	</resultMap>
 	
 	<!-- 육근우_단일 신청서 하나만 상세조회 -->
@@ -395,6 +407,14 @@
 		SELECT
 			r.resumeNo, r.title, r.payType, r.pay, r.introduce,
 			r.saveType, r.userUid, r.profileBase64,
+			
+			ruf.boardUpFileNo,
+			ruf.originalFileName,
+			ruf.newFileName,
+			ruf.ext,
+			ruf.size,
+			ruf.base64Image,
+			ruf.resumeNo,
 	
 			reg.registrationNo, reg.status,
 			reg.recruitmentNoticePk AS regRecruitmentNoticePk,
@@ -409,11 +429,12 @@
 			s.sigunguNo, s.name AS sigunguName, s.regionNo,
 			sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo,
 	
-			u.userName, u.mobile, u.email, u.gender, u.age, u.militaryService, u.nationality, u.disability
+			u.userName, u.mobile, u.email, u.gender, u.age, u.militaryService, u.nationality, u.disability, u.addr
 	
 		FROM registration reg
 		JOIN resume r ON reg.resumePk = r.resumeNo
 		LEFT JOIN users u ON r.userUid = u.uid
+		LEFT JOIN resumeupfiles ruf ON r.resumeNo = ruf.resumeNo
 		LEFT JOIN jobform jf ON r.resumeNo = jf.resumeNo
 		LEFT JOIN merit m ON r.resumeNo = m.resumeNo
 		LEFT JOIN education e ON r.resumeNo = e.resumeNo
