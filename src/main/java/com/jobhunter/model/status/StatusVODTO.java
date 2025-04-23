@@ -1,6 +1,7 @@
 package com.jobhunter.model.status;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -64,5 +65,9 @@ public class StatusVODTO {
 	 * </p>
 	 */
 	private int newReviewBoard;
+	
+    public String getFormattedDate() {
+        return statusDate != null ? statusDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "날짜 없음";
+    }
 
 }

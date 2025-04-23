@@ -121,44 +121,76 @@ function loadDayOptions(year, month, targetSelector) {
     });
 }
 
-function drawUserChart(dataList) {
+
+function drawDynamicChart(dataList) {
+    const selected = $('.stat-check:checked').map(function () {
+        return this.value;
+    }).get();
+
     const data = new google.visualization.DataTable();
     data.addColumn('string', '날짜');
-    data.addColumn('number', '신규 유저');
-    data.addColumn('number', '신규 기업');
+
+    if (selected.includes('user')) data.addColumn('number', '신규 유저');
+    if (selected.includes('company')) data.addColumn('number', '신규 기업');
+    if (selected.includes('recruit')) data.addColumn('number', '공고 등록 수');
+    if (selected.includes('submit')) data.addColumn('number', '이력서 제출 수');
+    if (selected.includes('review')) data.addColumn('number', '리뷰 수');
 
     dataList.forEach(item => {
-    // 날짜 문자열로 안전하게 변환
-    const rawDate = item.statusDate;
-    let dateStr = '';
+        const dateStr = item.formattedDate || formatDateLabel(item.statusDate);  // ✅ formattedDate 우선 사용
+        const row = [dateStr];
 
-        if (typeof rawDate === 'string') {
-            // 이미 문자열인 경우
-            dateStr = rawDate.split("T")[0];
-        } else if (rawDate instanceof Object && rawDate.year) {
-            // 예: { year: 2025, month: 3, day: 10, hour: 0, minute: 0, second: 0 } 형태
-            const y = rawDate.year;
-            const m = String(rawDate.month).padStart(2, '0');
-            const d = String(rawDate.day).padStart(2, '0');
-            dateStr = `${y}-${m}-${d}`;
-        } else {
-            // 마지막 수단: 그냥 문자열로 변환해서 처리
-            dateStr = String(rawDate).split("T")[0];
-        }
+        if (selected.includes('user')) row.push(item.newUsers || 0);
+        if (selected.includes('company')) row.push(item.newCompanies || 0);
+        if (selected.includes('recruit')) row.push(item.newRecruitmentNoticeCnt || 0);
+        if (selected.includes('submit')) row.push(item.newRegistration || 0);
+        if (selected.includes('review')) row.push(item.newReviewBoard || 0);
 
-        data.addRow([dateStr, item.newUsers, item.newCompanies]);
+        data.addRow(row);
     });
 
     const options = {
-        title: '유저/기업 일일 통계',
+        title: '선택된 항목 통계',
         legend: { position: 'bottom' },
         width: '100%',
-        height: 320,
+        height: 400,
         bar: { groupWidth: "60%" }
     };
 
-    const chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_top'));
+    const chart = new google.visualization.ColumnChart(document.getElementById('chart_container'));
     chart.draw(data, options);
+}
+
+
+
+function formatDateLabel(rawDate) {
+    if (!rawDate) return '날짜 없음';
+
+    // 문자열로 들어오는 경우 (ex: "2025-04-01T00:00:00")
+    if (typeof rawDate === 'string') {
+        if (rawDate.includes("T")) return rawDate.split("T")[0];
+        return rawDate;
+    }
+
+    // 객체로 들어오는 경우 (ex: { year: 2025, month: 4, day: 1 })
+    if (typeof rawDate === 'object' && rawDate.year !== undefined) {
+        var y = rawDate.year;
+        var m = String(rawDate.month).padStart(2, '0');
+        var d = String(rawDate.day).padStart(2, '0');
+        return y + '-' + m + '-' + d;  // ✅ 문자열 덧셈 방식 사용
+    }
+
+    // Date 타입일 경우
+    try {
+        var parsed = new Date(rawDate);
+        if (isNaN(parsed)) return '날짜 오류';
+        var y = parsed.getFullYear();
+        var m = String(parsed.getMonth() + 1).padStart(2, '0');
+        var d = String(parsed.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + d;  // ✅ 문자열 덧셈 방식 사용
+    } catch (e) {
+        return '날짜 오류';
+    }
 }
 
 function getDailyStatusByymd() {
@@ -179,8 +211,8 @@ function getDailyStatusByymd() {
     }
 
     // 날짜 문자열 조합
-    const start = `\${startYear}-\${String(startMonth).padStart(2, '0')}-\${String(startDate).padStart(2, '0')}T00:00:00`;
-    const end = `\${endYear}-\${String(endMonth).padStart(2, '0')}-\${String(endDate).padStart(2, '0')}T23:59:59`;
+    const start = startYear + '-' + String(startMonth).padStart(2, '0') + '-' + String(startDate).padStart(2, '0') + 'T00:00:00';
+    const end = endYear + '-' + String(endMonth).padStart(2, '0') + '-' + String(endDate).padStart(2, '0') + 'T23:59:59';
 
     // Ajax 요청
     $.ajax({
@@ -192,7 +224,8 @@ function getDailyStatusByymd() {
             end: end
         },
         success: function (data) {
-            drawUserChart(data);  // 유저/기업 차트 함수 호출
+            console.log(data);
+            drawDynamicChart(data);
         },
         error: function () {
             alert("데이터를 불러오지 못했습니다.");
@@ -234,6 +267,15 @@ function getDailyStatusByymd() {
             <option value="-1">끝 일을 선택 하세요</option>
         </select>
       </div>
+
+      <div class="form-group mb-3">
+        <label>표시할 통계 항목 선택:</label><br>
+        <input type="checkbox" class="stat-check" value="user" checked> 유저
+        <input type="checkbox" class="stat-check" value="company" checked> 기업
+        <input type="checkbox" class="stat-check" value="recruit"> 공고
+        <input type="checkbox" class="stat-check" value="submit"> 제출
+        <input type="checkbox" class="stat-check" value="review"> 리뷰
+    </div>
       <button type="button" id="getDailyStatusBtn" onclick="getDailyStatusByymd()">조회</button>
     </div>
 
@@ -245,7 +287,7 @@ function getDailyStatusByymd() {
             <div class="card shadow mb-4">
                 <!-- 차트 제목 -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">유저 일일 통계</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">일일 통계</h6>
                     <div class="dropdown no-arrow">
                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
@@ -262,7 +304,7 @@ function getDailyStatusByymd() {
                 <!-- 차트 본문 -->
                 <div class="card-body">
                     <div class="chart-area">
-                        <div id="curve_chart_top" style="width: 100%; height: 320px"></div>
+                        <div id="chart_container" style="width: 100%; height: 400px;"></div>
                       </div>
                 </div>
             </div>
@@ -270,35 +312,6 @@ function getDailyStatusByymd() {
 
     </div>
 
-    <div class="row">
-    <div class="col-xl-8 col-lg-7">
-        <div class="card shadow mb-4">
-            <!-- 차트 제목 -->
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">기업 일일 통계</h6>
-                <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                        <div class="dropdown-header">옵션 선택</div>
-                        <a class="dropdown-item" href="#">액션 1</a>
-                        <a class="dropdown-item" href="#">액션 2</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">기타 옵션</a>
-                    </div>
-                </div>
-            </div>
-            <!-- 차트 본문 -->
-            <div class="card-body">
-                <div class="chart-area">
-                    <div id="curve_chart_bottom" style="width: 100%; height: 320px"></div>
-                  </div>
-            </div>
-        </div>
-    </div>
-
-</div>
 
     <!-- ===== 차트 관련 JavaScript ===== -->
     <script src="${pageContext.request.contextPath}/resources/adminpagematerials/vendor/chart.js/Chart.min.js"></script>
