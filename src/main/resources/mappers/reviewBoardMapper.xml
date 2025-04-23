@@ -69,7 +69,8 @@
 		r.reviewLevel,
 		r.content,
 		r.likes,
-		r.views
+		r.views,
+		r.writer AS writerUid
 		FROM
 		reviewBoard r
 		JOIN recruitmentnotice rec ON r.gonggoUid = rec.uid
@@ -103,6 +104,7 @@
 		<result column="content" property="content" />
 		<result column="likes" property="likes" />
 		<result column="views" property="views" />
+		<result column="writerUid" property="writerUid" />
 	</resultMap>
 
 
@@ -155,7 +157,7 @@
 		resultType="com.jobhunter.model.reviewboard.WriteBoardDTO">
 		SELECT boardNo, gonggoUid, writer, companyName,
 		reviewResult, reviewType,
-		reviewLevel, content
+		reviewLevel, content, typeOtherText 
 		FROM reviewBoard
 		WHERE
 		boardNo = #{boardNo}

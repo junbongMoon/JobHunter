@@ -295,18 +295,22 @@
 
 
 		<!-- 수정 버튼 -->
-		<a
-			href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
-			class="btn-getstarted btn-sm btn-common-shape">✏️ 수정</a>
+		<c:if test="${sessionScope.account.uid eq detail.writerUid}">
+			<!-- 수정 버튼 -->
+			<a
+				href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
+				class="btn-getstarted btn-sm btn-common-shape">✏️ 수정</a>
 
-		<!-- 삭제 버튼 -->
-		<form action="${pageContext.request.contextPath}/reviewBoard/delete"
-			method="post" style="display: inline;">
-			<input type="hidden" name="boardNo" value="${detail.boardNo}" />
-			<button type="button"
-				class="btn-getstarted btn-sm delete-btn btn-common-shape"
-				data-boardno="${detail.boardNo}">🗑 삭제</button>
-		</form>
+			<!-- 삭제 버튼 -->
+			<form action="${pageContext.request.contextPath}/reviewBoard/delete"
+				method="post" style="display: inline;">
+				<input type="hidden" name="boardNo" value="${detail.boardNo}" />
+				<button type="button"
+					class="btn-getstarted btn-sm delete-btn btn-common-shape"
+					data-boardno="${detail.boardNo}">🗑 삭제</button>
+					
+			</form>
+		</c:if>
 
 		<!-- 목록으로 -->
 		<a
@@ -320,7 +324,8 @@
 		</c:if>
 	</div>
 
-
+		<p>writerUid: ${detail.writerUid}</p>
+<p>session UID: ${sessionScope.account.uid}</p>
 
 	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
 	<input type="hidden" id="isLiked" value="${isLiked}" />

@@ -24,7 +24,7 @@
 		WHERE rr.boardNo =
 		#{boardNo}
 		AND rr.isDeleted = 'N'
-		ORDER BY rr.postDate ASC
+		ORDER BY rr.postDate DESC
 	</select>
 
 
