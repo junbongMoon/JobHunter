@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import com.jobhunter.dao.jobtype.JobDAO;
 import com.jobhunter.dao.recruitmentnotice.RecruitmentNoticeDAO;
 import com.jobhunter.dao.region.RegionDAO;
+import com.jobhunter.dao.submit.SubmitDAO;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.Advantage;
@@ -21,10 +22,12 @@ import com.jobhunter.model.recruitmentnotice.ApplicationDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentStats;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
+import com.jobhunter.model.user.UserVO;
 import com.jobhunter.model.util.FileStatus;
 
 import lombok.RequiredArgsConstructor;
@@ -52,6 +55,8 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	 * </p>
 	 */
 	private final JobDAO jobdao;
+	
+	private final SubmitDAO submitdao;
 	
 	 
 	/**
@@ -125,6 +130,8 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 		
 		recdao.insertCDLogForRecruitment(recNo);
 
+		
+
 		return result;
 	}
 
@@ -154,8 +161,16 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 			detailInfo.setApplication(applications != null ? applications : Collections.emptyList());
 			detailInfo.setAdvantage(advantages != null ? advantages : Collections.emptyList());
 			detailInfo.setFileList(fileList != null ? fileList : Collections.emptyList());
+			
+			// 여기서 제출한 이력List select
+			
+			List<UserVO> applicants = submitdao.selectUsersWhoApplied(uid); // 신청한 유저 리스트 select
+			RecruitmentStats stats = calculateStats(applicants);
+			detailInfo.setStats(stats);
+			System.out.println("지원한 유저의 통계 : " + detailInfo.getStats());
+			
 		}
-		System.out.println(detailInfo);
+		
 
 		return detailInfo;
 	}
@@ -525,6 +540,46 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	    TenToFivePageVO<RecruitmentWithResume> vo = new TenToFivePageVO<RecruitmentWithResume>(list, dto.getPage(), totalItems);
 
 	    return vo;
+	}
+	
+	public RecruitmentStats calculateStats(List<UserVO> applicants) {
+	    RecruitmentStats stats = new RecruitmentStats();
+
+	    int ageSum = 0;
+	    int ageCount = 0;
+
+	    for (UserVO user : applicants) {
+	    	
+	    	 if (user.getGender() != null) {
+	             if ("MALE".equalsIgnoreCase(user.getGender().toString())) {
+	                 stats.setMaleCount(stats.getMaleCount() + 1);
+	             } else if ("FEMALE".equalsIgnoreCase(user.getGender().toString())) {
+	                 stats.setFemaleCount(stats.getFemaleCount() + 1);
+	             }
+	         }
+
+
+	        if (user.getAge() != null) {
+	            int age = user.getAge();
+	            ageSum += age;
+	            ageCount++;
+
+	            if (age < 20) stats.setTeens(stats.getTeens() + 1);
+	            else if (age < 30) stats.setTwenties(stats.getTwenties() + 1);
+	            else if (age < 40) stats.setThirties(stats.getThirties() + 1);
+	            else if (age < 50) stats.setForties(stats.getForties() + 1);
+	            else stats.setFiftiesOrAbove(stats.getFiftiesOrAbove() + 1);
+	        } else {
+	            stats.setUnknownAgeCount(stats.getUnknownAgeCount() + 1);
+	        }
+	    }
+
+	    stats.setTotalApplicants(applicants.size());
+	    if (ageCount > 0) {
+	        stats.setAverageAge(ageSum / (double) ageCount);
+	    }
+
+	    return stats;
 	}
 
 }

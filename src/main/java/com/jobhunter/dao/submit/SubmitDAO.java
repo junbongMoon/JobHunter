@@ -12,6 +12,7 @@ import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 import com.jobhunter.model.submit.Status;
 import com.jobhunter.model.submit.SubmitFromRecruitVO;
 import com.jobhunter.model.submit.SubmitSearchDTO;
+import com.jobhunter.model.user.UserVO;
 
 public interface SubmitDAO {
 	
@@ -162,6 +163,9 @@ public interface SubmitDAO {
 	 *
 	 */
 	int getCompanyUidByRegistrationNo(int registrationNo) throws Exception;
+
+
+	List<UserVO> selectUsersWhoApplied(int Recruitmentuid) throws Exception;
 	
 	
 }

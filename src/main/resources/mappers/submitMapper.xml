@@ -13,38 +13,53 @@
 
 		reg.registrationNo, reg.status,
 		reg.recruitmentNoticePk AS regRecruitmentNoticePk,
-		reg.regDate, reg.resumePk AS regResumePk,
+		reg.regDate,
+		reg.resumePk AS regResumePk,
 
 		jf.jobFormNo, jf.form AS jobForm,
 		m.meritNo, m.meritContent,
 		e.educationNo, e.educationLevel,
 		e.educationStatus, e.graduationDate, e.customInput,
-		h.historyNo, h.companyName, h.position, h.jobDescription, h.startDate, h.endDate,
+		h.historyNo,
+		h.companyName, h.position, h.jobDescription, h.startDate, h.endDate,
 		l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
 		s.sigunguNo, s.name AS sigunguName, s.regionNo,
-		sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo
+		sc.subcategoryNo,
+		sc.jobName, sc.refMajorcategoryNo
 
 		FROM (
 		SELECT r.resumeNo
-		FROM registration reg
+		FROM
+		registration reg
 		JOIN resume r ON reg.resumePk = r.resumeNo
-		WHERE reg.recruitmentNoticePk = #{recruitmentUid}
+		WHERE
+		reg.recruitmentNoticePk = #{recruitmentUid}
 		ORDER BY r.resumeNo DESC
 		LIMIT #{startRowIndex}, #{rowCntPerPage}
 		) AS pageResume
 
-		JOIN resume r ON pageResume.resumeNo = r.resumeNo
-		JOIN registration reg ON reg.resumePk = r.resumeNo AND
-		reg.recruitmentNoticePk = #{recruitmentUid}
+		JOIN resume r
+		ON pageResume.resumeNo = r.resumeNo
+		JOIN registration reg ON
+		reg.resumePk = r.resumeNo AND
+		reg.recruitmentNoticePk =
+		#{recruitmentUid}
 		LEFT JOIN jobform jf ON r.resumeNo = jf.resumeNo
-		LEFT JOIN merit m ON r.resumeNo = m.resumeNo
-		LEFT JOIN education e ON r.resumeNo = e.resumeNo
-		LEFT JOIN personalhistory h ON r.resumeNo = h.resumeNo
+		LEFT
+		JOIN merit m ON r.resumeNo = m.resumeNo
+		LEFT JOIN education e ON
+		r.resumeNo = e.resumeNo
+		LEFT JOIN personalhistory h ON r.resumeNo =
+		h.resumeNo
 		LEFT JOIN license l ON r.resumeNo = l.resumeNo
-		LEFT JOIN where_resume_sigungu sr ON r.resumeNo = sr.refResumeNo
-		LEFT JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
-		LEFT JOIN jobtype_resume_sub jrs ON r.resumeNo = jrs.refResumeNo
-		LEFT JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
+		LEFT JOIN
+		where_resume_sigungu sr ON r.resumeNo = sr.refResumeNo
+		LEFT JOIN
+		sigungu s ON sr.refSigunguNo = s.sigunguNo
+		LEFT JOIN jobtype_resume_sub
+		jrs ON r.resumeNo = jrs.refResumeNo
+		LEFT JOIN subcategory sc ON
+		jrs.refSubNo = sc.subcategoryNo
 
 		ORDER BY r.resumeNo DESC
 	</select>
@@ -247,28 +262,30 @@
 		AND status
 		= #{status}
 	</select>
-	
+
 	<!-- 육근우_검색조건달린 리스트 가져오려고 만듬 -->
 	<!-- 육근우_신청서 리스트 조회 (공고에 제출된 (if)읽지않은 신청서 조회) -->
-	<select id="selectResumesByRecruitmentUid" resultMap="ResumeListMap">
+	<select id="selectResumesByRecruitmentUid"
+		resultMap="ResumeListMap">
 		SELECT
-			reg.registrationNo,
-			reg.status,
-			reg.regDate,
-			r.resumeNo,
-			r.title,
-			u.userName
-		
+		reg.registrationNo,
+		reg.status,
+		reg.regDate,
+		r.resumeNo,
+		r.title,
+		u.userName
+
 		FROM registration reg
 		JOIN resume r ON reg.resumePk = r.resumeNo
-		JOIN users u ON r.userUid = u.uid
-	
+		JOIN users
+		u ON r.userUid = u.uid
+
 		WHERE reg.recruitmentNoticePk = #{recruitmentUid}
-	
+
 		<if test="onlyUnread">
 			AND reg.status = 'WAITING'
 		</if>
-	
+
 		ORDER BY
 		<choose>
 			<when test="prioritizeUnread">
@@ -279,68 +296,90 @@
 				reg.registrationNo DESC
 			</otherwise>
 		</choose>
-	
+
 		LIMIT #{offset}, 5
 	</select>
 	<!-- 육근우_신청서 리스트 조회(공고에 제출된 (if)읽지않은 신청서 조회)용 매퍼 -->
-	<resultMap id="ResumeListMap" type="com.jobhunter.model.submit.SubmitFromRecruitVO">
-	    <result property="registrationNo" column="registrationNo" />
-	    <result property="status" column="status" />
-	    <result property="regDate" column="regDate" />
-	    
-	    <result property="resumeNo" column="resumeNo" />
-	    <result property="title" column="title" />
-	    
-	    <result property="userName" column="userName" />
+	<resultMap id="ResumeListMap"
+		type="com.jobhunter.model.submit.SubmitFromRecruitVO">
+		<result property="registrationNo" column="registrationNo" />
+		<result property="status" column="status" />
+		<result property="regDate" column="regDate" />
+
+		<result property="resumeNo" column="resumeNo" />
+		<result property="title" column="title" />
+
+		<result property="userName" column="userName" />
 	</resultMap>
 	<!-- 육근우_공고에 제출된 (if)읽지않은 신청서 총 갯수 -->
 	<select id="countResumesByRecruitmentUid" resultType="int">
 		SELECT COUNT(*)
 		FROM registration reg
-		WHERE reg.recruitmentNoticePk = #{recruitmentUid}
+		WHERE reg.recruitmentNoticePk =
+		#{recruitmentUid}
 		<if test="onlyUnread">
 			AND reg.status = 'WAITING'
 		</if>
 	</select>
 	<!-- 육근우_단일 신청서 하나만 상세조회 -->
-	<select id="selectOneResumeByRegistrationNo" resultMap="ResumeDetailInfoBySubmitMap">
+	<select id="selectOneResumeByRegistrationNo"
+		resultMap="ResumeDetailInfoBySubmitMap">
 		SELECT
-			r.resumeNo, r.title, r.payType, r.pay, r.introduce,
-			r.saveType, r.userUid, r.profileBase64,
-	
-			reg.registrationNo, reg.status,
-			reg.recruitmentNoticePk AS regRecruitmentNoticePk,
-			reg.regDate, reg.resumePk AS regResumePk,
-	
-			jf.jobFormNo, jf.form AS jobForm,
-			m.meritNo, m.meritContent,
-			e.educationNo, e.educationLevel,
-			e.educationStatus, e.graduationDate, e.customInput,
-			h.historyNo, h.companyName, h.position, h.jobDescription, h.startDate, h.endDate,
-			l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
-			s.sigunguNo, s.name AS sigunguName, s.regionNo,
-			sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo
-	
+		r.resumeNo, r.title, r.payType, r.pay, r.introduce,
+		r.saveType, r.userUid, r.profileBase64,
+
+		reg.registrationNo, reg.status,
+		reg.recruitmentNoticePk AS regRecruitmentNoticePk,
+		reg.regDate, reg.resumePk AS regResumePk,
+
+		jf.jobFormNo, jf.form AS jobForm,
+		m.meritNo, m.meritContent,
+		e.educationNo, e.educationLevel,
+		e.educationStatus, e.graduationDate, e.customInput,
+		h.historyNo, h.companyName, h.position, h.jobDescription, h.startDate, h.endDate,
+		l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
+		s.sigunguNo, s.name AS sigunguName, s.regionNo,
+		sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo
+
 		FROM registration reg
 		JOIN resume r ON reg.resumePk = r.resumeNo
-		LEFT JOIN jobform jf ON r.resumeNo = jf.resumeNo
-		LEFT JOIN merit m ON r.resumeNo = m.resumeNo
+		LEFT JOIN
+		jobform jf ON r.resumeNo = jf.resumeNo
+		LEFT JOIN merit m ON r.resumeNo
+		= m.resumeNo
 		LEFT JOIN education e ON r.resumeNo = e.resumeNo
-		LEFT JOIN personalhistory h ON r.resumeNo = h.resumeNo
-		LEFT JOIN license l ON r.resumeNo = l.resumeNo
-		LEFT JOIN where_resume_sigungu sr ON r.resumeNo = sr.refResumeNo
+		LEFT JOIN
+		personalhistory h ON r.resumeNo = h.resumeNo
+		LEFT JOIN license l ON
+		r.resumeNo = l.resumeNo
+		LEFT JOIN where_resume_sigungu sr ON r.resumeNo
+		= sr.refResumeNo
 		LEFT JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
 		LEFT JOIN jobtype_resume_sub jrs ON r.resumeNo = jrs.refResumeNo
-		LEFT JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
-	
+		LEFT
+		JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
+
 		WHERE reg.registrationNo = #{registrationNo}
 	</select>
 
 	<select id="getCompanyUidByRegistrationNo" resultType="int">
-		SELECT rn.refCompany
+		SELECT
+		rn.refCompany
 		FROM registration reg
-		JOIN recruitmentnotice rn ON reg.recruitmentNoticePk = rn.uid
-		WHERE reg.registrationNo = #{registrationNo}
+		JOIN recruitmentnotice rn ON
+		reg.recruitmentNoticePk = rn.uid
+		WHERE reg.registrationNo =
+		#{registrationNo}
+	</select>
+
+	<select id="selectUsersWhoApplied"
+		resultType="com.jobhunter.model.user.UserVO" parameterType="int">
+		SELECT u.*
+		FROM registration r
+		JOIN resume res ON r.resumePk = res.resumeNo
+		JOIN users u ON res.userUid = u.uid
+		WHERE r.recruitmentNoticePk = #{recruitmentUid}
+		AND r.status != 'EXPIRED'
 	</select>
 
 </mapper>
