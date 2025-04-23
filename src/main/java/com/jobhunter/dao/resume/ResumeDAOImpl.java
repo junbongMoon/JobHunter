@@ -336,4 +336,12 @@ public class ResumeDAOImpl implements ResumeDAO {
 		return ses.selectOne(NS + ".checkResumeAdvice", resumeNo);
 	}
 
+	@Override
+	public int getRegistrationAdviceNo(int mentorUid, int resumeNo) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("mentorUid", mentorUid);
+		params.put("resumeNo", resumeNo);
+		return ses.selectOne(NS + ".getRegistrationAdviceNo", params);
+	}
+
 }

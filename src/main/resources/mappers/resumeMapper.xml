@@ -347,5 +347,15 @@
 		SELECT COUNT(*) FROM registration_advice
 		WHERE resumeNo = #{resumeNo} AND status = 'CHECKING'
 	</select>
+
+    <!-- 첨삭 신청 번호 조회 -->
+    <select id="getRegistrationAdviceNo" parameterType="map" resultType="int">
+        SELECT rgAdviceNo
+        FROM registration_advice
+        WHERE mentorUid = #{mentorUid}
+        AND resumeNo = #{resumeNo}
+        ORDER BY regDate DESC
+        LIMIT 1
+    </select>
     
 </mapper>

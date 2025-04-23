@@ -83,4 +83,6 @@ public interface ResumeService {
 	 *
 	 */
 	boolean submitAdvice(int mentorUid, int resumeNo) throws Exception;
+
+	int getRegistrationAdviceNo(int mentorUid, int resumeNo);
 }

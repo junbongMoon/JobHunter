@@ -18,6 +18,9 @@
 			<!-- 헤더 -->
 			<jsp:include page="/WEB-INF/views/header.jsp" />
 
+			<!-- session.account.uid 남기기 -->
+			<input type="hidden" id="sessionUid" value="${sessionScope.account.uid}">
+
 			<div class="main">
 				<div class="container">
 					<c:if test="${mode == 'adCheck'}">
@@ -86,16 +89,14 @@
 						<c:if test="${not empty prBoard}">
 							<div class="notice-info">
 								<div class="notice-title">
-									<a
-										href="/prboard/detail?prBoardNo=${prBoard.prBoardNo}">${prBoard.title}</a>
+									<a href="/prboard/detail?prBoardNo=${prBoard.prBoardNo}">${prBoard.title}</a>
 								</div>
 								<div class="notice-company">
 									<i class="fas fa-solid fa-user"></i>&nbsp;${prBoard.userId}
 								</div>
 								<div class="notice-detail-item">
-										<i class="fas fa-calendar-alt"></i> <span
-											id="dueDate">${prBoard.postDate}</span>
-									</div>
+									<i class="fas fa-calendar-alt"></i> <span id="dueDate">${prBoard.postDate}</span>
+								</div>
 							</div>
 						</c:if>
 					</c:if>
@@ -213,10 +214,10 @@
 													</c:when>
 													<c:otherwise>
 														<c:if test="${mode != 'adCheck'}">
-														<a href="/resume/edit/${resume.resumeNo}?uid=${resume.userUid}&boardNo=${recruitmentNotice.uid}"
-															class="btn btn-outline-primary edit-resume"> <i
-																class="fas fa-edit"></i> 수정 및 상세보기
-														</a>
+															<a href="/resume/edit/${resume.resumeNo}?uid=${resume.userUid}&boardNo=${recruitmentNotice.uid}"
+																class="btn btn-outline-primary edit-resume"> <i
+																	class="fas fa-edit"></i> 수정 및 상세보기
+															</a>
 														</c:if>
 													</c:otherwise>
 
@@ -234,31 +235,32 @@
 						</div>
 					</div>
 
-					
+
 					<c:if test="${totalResumes > 0 }">
 						<c:if test="${mode != 'adCheck'}">
 							<!-- 개인정보 제3자 제공 동의 -->
 							<div class="privacy-consent card">
 								<div class="card-header d-flex justify-content-between align-items-center">
-								<div>
-									<input type="checkbox" id="privacyConsentCheckbox"> <label
-										for="privacyConsentCheckbox">[필수] 개인정보 제3자 제공 동의</label>
+									<div>
+										<input type="checkbox" id="privacyConsentCheckbox"> <label
+											for="privacyConsentCheckbox">[필수] 개인정보 제3자 제공 동의</label>
+									</div>
+									<button class="btn btn-link" data-bs-toggle="collapse"
+										data-bs-target="#consentDetails" aria-expanded="false"
+										aria-controls="consentDetails" id="toggleButton">
+										<span id="toggleText">자세히..</span> <i class="fas fa-chevron-down"></i>
+									</button>
 								</div>
-								<button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#consentDetails"
-									aria-expanded="false" aria-controls="consentDetails" id="toggleButton">
-									<span id="toggleText">자세히..</span> <i class="fas fa-chevron-down"></i>
-								</button>
-							</div>
-							<div id="consentDetails" class="collapse">
-								<div class="card-body">
-									<ol>
-										<li>개인정보를 제공받는 자: ${recruitmentNotice.companyName}</li>
-										<li>개인정보를 제공받는 자의 개인정보 이용 목적: 입사지원 및 채용절차 진행</li>
-										<li>제공하는 개인정보 항목: 입사지원 시 작성한 이력서 정보(이름, 생년월일, 성별, 휴대폰 번호,
-											이메일, 거주지역, 희망 근무지, 희망 업직종, 희망 근무형태, 희망급여, 성격 및 강점, 학력사항, 경력사항,
-											보유 자격증, 자기소개서)</li>
-									</ol>
-								</div>
+								<div id="consentDetails" class="collapse">
+									<div class="card-body">
+										<ol>
+											<li>개인정보를 제공받는 자: ${recruitmentNotice.companyName}</li>
+											<li>개인정보를 제공받는 자의 개인정보 이용 목적: 입사지원 및 채용절차 진행</li>
+											<li>제공하는 개인정보 항목: 입사지원 시 작성한 이력서 정보(이름, 생년월일, 성별, 휴대폰 번호,
+												이메일, 거주지역, 희망 근무지, 희망 업직종, 희망 근무형태, 희망급여, 성격 및 강점, 학력사항, 경력사항,
+												보유 자격증, 자기소개서)</li>
+										</ol>
+									</div>
 								</div>
 							</div>
 						</c:if>
@@ -266,16 +268,17 @@
 						<c:if test="${mode != 'adCheck'}">
 							<div class="submit-button-container text-center mb-4">
 								<button type="button" id="submitResumeBtn" class="btn btn-primary btn-lg" disabled>
-								<i class="fas fa-paper-plane"></i> 이력서 제출하기
-							</button>
-						</div>
+									<i class="fas fa-paper-plane"></i> 이력서 제출하기
+								</button>
+							</div>
 						</c:if>
 						<c:if test="${mode == 'adCheck'}">
 							<div class="submit-button-container text-center mb-4">
-								<button type="button" id="submitAdviceResumeBtn" class="btn btn-primary btn-lg" disabled>
-								<i class="fas fa-paper-plane"></i> 첨삭 신청 (-1000 P)
-							</button>
-						</div>
+								<button type="button" id="submitAdviceResumeBtn" class="btn btn-primary btn-lg"
+									disabled>
+									<i class="fas fa-paper-plane"></i> 첨삭 신청 (-1000 P)
+								</button>
+							</div>
 						</c:if>
 						<div class="pagination-container">
 							<nav aria-label="Page navigation">
@@ -324,11 +327,11 @@
 										<li class="page-item ${currentPage == i ? 'active' : ''}">
 											<c:if test="${mode != 'adCheck'}">
 												<a class="page-link"
-												href="/submission/check?boardNo=${recruitmentNotice.uid}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
+													href="/submission/check?boardNo=${recruitmentNotice.uid}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
 											</c:if>
 											<c:if test="${mode == 'adCheck'}">
 												<a class="page-link"
-												href="/submission/adCheck?boardNo=${prBoard.prBoardNo}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
+													href="/submission/adCheck?boardNo=${prBoard.prBoardNo}&page=${i}&pageSize=${pageSize}&searchTitle=${param.searchTitle}">${i}</a>
 											</c:if>
 										</li>
 									</c:forEach>
@@ -338,17 +341,17 @@
 										<li class="page-item">
 											<c:if test="${mode != 'adCheck'}">
 												<a class="page-link"
-												href="/submission/check?boardNo=${recruitmentNotice.uid}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
-												aria-label="Next">
-												<i class="fas fa-chevron-right"></i>
+													href="/submission/check?boardNo=${recruitmentNotice.uid}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													aria-label="Next">
+													<i class="fas fa-chevron-right"></i>
 												</a>
 											</c:if>
 											<c:if test="${mode == 'adCheck'}">
 												<a class="page-link"
-												href="/submission/adCheck?boardNo=${prBoard.prBoardNo}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
-												aria-label="Next">
-												<i class="fas fa-chevron-right"></i>
-											</a>
+													href="/submission/adCheck?boardNo=${prBoard.prBoardNo}&page=${currentPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													aria-label="Next">
+													<i class="fas fa-chevron-right"></i>
+												</a>
 											</c:if>
 										</li>
 									</c:if>
@@ -358,17 +361,17 @@
 										<li class="page-item">
 											<c:if test="${mode != 'adCheck'}">
 												<a class="page-link"
-												href="/submission/check?boardNo=${recruitmentNotice.uid}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
-												aria-label="Next Block">
-												<i class="fas fa-angle-double-right"></i>
-											</a>
+													href="/submission/check?boardNo=${recruitmentNotice.uid}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													aria-label="Next Block">
+													<i class="fas fa-angle-double-right"></i>
+												</a>
 											</c:if>
 											<c:if test="${mode == 'adCheck'}">
 												<a class="page-link"
-												href="/submission/adCheck?boardNo=${prBoard.prBoardNo}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
-												aria-label="Next Block">
-												<i class="fas fa-angle-double-right"></i>
-											</a>
+													href="/submission/adCheck?boardNo=${prBoard.prBoardNo}&page=${endPage + 1}&pageSize=${pageSize}&searchTitle=${param.searchTitle}"
+													aria-label="Next Block">
+													<i class="fas fa-angle-double-right"></i>
+												</a>
 											</c:if>
 										</li>
 									</c:if>
@@ -675,7 +678,8 @@
 				margin-top: 30px;
 			}
 
-			#submitResumeBtn, #submitAdviceResumeBtn {
+			#submitResumeBtn,
+			#submitAdviceResumeBtn {
 				background-color: #47b2e4;
 				border: none;
 				padding: 12px 30px;
@@ -683,12 +687,14 @@
 				transition: all 0.3s ease;
 			}
 
-			#submitResumeBtn:disabled, #submitAdviceResumeBtn:disabled {
+			#submitResumeBtn:disabled,
+			#submitAdviceResumeBtn:disabled {
 				background-color: #adb5bd;
 				cursor: not-allowed;
 			}
 
-			#submitResumeBtn:not(:disabled):hover, #submitAdviceResumeBtn:not(:disabled):hover {
+			#submitResumeBtn:not(:disabled):hover,
+			#submitAdviceResumeBtn:not(:disabled):hover {
 				background-color: #3592c4;
 				transform: translateY(-2px);
 			}
@@ -787,7 +793,7 @@
 					$('#dueDate').text(formattedDate);
 				}
 
-				
+
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 이력서 항목 클릭 이벤트
 				$('.resume-item').click(function () {
@@ -800,12 +806,12 @@
 
 					console.log(window.selectedResumeId);
 					if ('${mode}' != 'adCheck') {
-					// 제출 버튼 활성화 여부 확인
-					toggleSubmitButton();
-				} else if ('${mode}' == 'adCheck') {
-					// 첨삭 버튼 활성화 여부 확인
-					toggleSubmitAdviceButton();
-				}
+						// 제출 버튼 활성화 여부 확인
+						toggleSubmitButton();
+					} else if ('${mode}' == 'adCheck') {
+						// 첨삭 버튼 활성화 여부 확인
+						toggleSubmitAdviceButton();
+					}
 				});
 
 				//---------------------------------------------------------------------------------------------------------------------------------
@@ -949,7 +955,7 @@
 					alert('이력서를 선택해주세요.');
 					return;
 				}
-				
+
 				// 선택된 이력서의 제목 가져오기
 				const selectedResumeTitle = $('.resume-item.selected .resume-title').text().trim();
 				// 첨삭자 이름
@@ -975,7 +981,8 @@
 						type: 'POST',
 						data: {
 							resumeNo: window.selectedResumeId,
-							mentorUid: $('#mentorUid').val()
+							mentorUid: $('#mentorUid').val(),
+							sessionUid: $('#sessionUid').val()
 						},
 						success: function (response) {
 							if (response.success) {

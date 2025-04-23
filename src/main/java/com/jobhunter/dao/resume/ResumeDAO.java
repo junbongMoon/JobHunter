@@ -152,4 +152,6 @@ public interface ResumeDAO {
 
 	// 이력서 첨삭 상태 확인
 	int checkResumeAdvice(int resumeNo) throws Exception;
+
+	int getRegistrationAdviceNo(int mentorUid, int resumeNo);
 }

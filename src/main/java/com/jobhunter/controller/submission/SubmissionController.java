@@ -20,6 +20,8 @@ import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.prboard.PRBoardVO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.resume.ResumeVO;
+import com.jobhunter.model.user.UserVO;
+import com.jobhunter.service.point.PointService;
 import com.jobhunter.service.prboard.PRBoardService;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 import com.jobhunter.service.resume.ResumeService;
@@ -43,6 +45,7 @@ public class SubmissionController {
 	private final ResumeService resumeService;
 	private final RecruitmentNoticeService recruitmentNoticeService;
 	private final PRBoardService prBoardService;
+	private final PointService pointService;
 
 	/**
 	 * 이력서 제출 페이지를 출력합니다.
@@ -183,12 +186,25 @@ public class SubmissionController {
 	 * @return 첨삭 신청 결과
 	 */
 	@PostMapping("/submitAdvice")
-	public ResponseEntity<Map<String, String>> submitAdvice(@RequestParam("resumeNo") int resumeNo, @RequestParam("mentorUid") int mentorUid) {
+	public ResponseEntity<Map<String, String>> submitAdvice(@RequestParam("resumeNo") int resumeNo, @RequestParam("mentorUid") int mentorUid, @RequestParam("sessionUid") int sessionUid) {
 		try {
 			// 이력서 첨삭 신청
 			boolean result = resumeService.submitAdvice(mentorUid, resumeNo);
 			
 			Map<String, String> response = new HashMap<>();
+
+			// 해당 유저가 1000P 이상인지 확인
+			UserVO user = resumeService.getUserInfo(sessionUid);
+			if (user.getPoint() < 1000) {
+				response.put("fail", "포인트가 부족합니다.");
+				return ResponseEntity.ok(response);
+			} else if (user.getPoint() > 1000) {
+				// 첨삭 신청 번호 가져오기
+				int rgAdviceNo = resumeService.getRegistrationAdviceNo(mentorUid, resumeNo);
+				// 포인트 로그 테이블에 포인트 차감 기록
+				pointService.submitAdvicePointLog(mentorUid, sessionUid, -1000, rgAdviceNo);
+			}
+
 			if (result) {
 				response.put("success", "이력서 첨삭 신청이 완료되었습니다.");
 				return ResponseEntity.ok(response);

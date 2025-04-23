@@ -320,4 +320,9 @@ public class ResumeServiceImpl implements ResumeService {
 		int result = rdao.insertRegistrationAdvice(mentorUid, resumeNo);
 		return result > 0; // 성공하면 true, 실패하면 false
 	}
+
+	@Override
+	public int getRegistrationAdviceNo(int mentorUid, int resumeNo) {
+		return rdao.getRegistrationAdviceNo(mentorUid, resumeNo);
+	}
 }
