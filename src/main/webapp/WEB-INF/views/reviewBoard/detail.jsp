@@ -160,6 +160,40 @@
 	}
 }
 
+
+/* 댓글 전체 영역을 감싸는 컨테이너 */
+#replySection {
+  width: 1300px;
+  margin: 40px auto; 
+}
+
+#replyContent {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 20px;
+  resize: vertical;
+}
+
+#submitReplyBtn {
+  background-color: #47b2e4;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 6px;
+  margin-top: 8px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#submitReplyBtn:hover {
+  background-color: #339fd0;
+  transform: translateY(-1px);
+}
+
+#replyPagination {
+  justify-content: center;
+}
 .btn-common-shape {
 	border: none;
 	padding: 8px 16px;
@@ -180,6 +214,13 @@
 	outline: none;
 	box-shadow: 0 0 0 3px rgba(71, 178, 228, 0.4);
 }
+
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
 </style>
 
 
@@ -324,13 +365,12 @@
 		</c:if>
 	</div>
 
-		<p>writerUid: ${detail.writerUid}</p>
-<p>session UID: ${sessionScope.account.uid}</p>
+		
 
 	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
 	<input type="hidden" id="isLiked" value="${isLiked}" />
 
-
+	<div id="replySection">
 	<!-- 댓글 목록 출력 영역 -->
 	<ul id="replyList" class="list-group"></ul>
 
@@ -346,7 +386,7 @@
 		<ul class="pagination justify-content-center mt-3"
 			id="replyPagination"></ul>
 	</nav>
-
+	</div>
 	<!-- 좋아요 알림 모달 -->
 	<div class="modal fade" id="likeModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
