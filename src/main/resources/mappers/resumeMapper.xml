@@ -339,7 +339,7 @@
 	<!-- 이력서 첨삭 신청 중복 확인 -->
 	<select id="checkDuplicateAdvice" parameterType="map" resultType="int">
 		SELECT COUNT(*) FROM registration_advice 
-		WHERE mentorUid = #{mentorUid} AND resumeNo = #{resumeNo}
+		WHERE resumeNo = #{resumeNo}
 	</select>
 
 	<!-- 이력서 첨삭 상태 확인 -->

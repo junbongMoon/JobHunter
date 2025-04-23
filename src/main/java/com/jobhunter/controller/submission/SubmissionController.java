@@ -197,11 +197,11 @@ public class SubmissionController {
 				return ResponseEntity.ok(response);
 			} else {
 				// 이력서 첨삭 신청
-				boolean result = resumeService.submitAdvice(mentorUid, resumeNo);
-				// 첨삭 신청 번호 가져오기
-				int rgAdviceNo = resumeService.getRegistrationAdviceNo(mentorUid, resumeNo);
-				// 포인트 로그 테이블에 포인트 차감 기록
-				pointService.submitAdvicePointLog(mentorUid, sessionUid, -1000, rgAdviceNo);
+				boolean result = resumeService.submitAdvice(mentorUid, resumeNo, sessionUid);
+				// // 첨삭 신청 번호 가져오기
+				// int rgAdviceNo = resumeService.getRegistrationAdviceNo(mentorUid, resumeNo);
+				// // 포인트 로그 테이블에 포인트 차감 기록
+				// pointService.submitAdvicePointLog(mentorUid, sessionUid, -1000, rgAdviceNo);
 				
 				if (result) {
 					response.put("success", "이력서 첨삭 신청이 완료되었습니다.");

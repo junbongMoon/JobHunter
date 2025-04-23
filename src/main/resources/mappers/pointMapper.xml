@@ -34,14 +34,7 @@
         SET status = #{status},
             finalDate = NOW()
         WHERE rgAdviceNo = #{rgAdviceNo}
-        <choose>
-        <when test="type == 'reject'">
-            AND status = 'WAITING'
-        </when>
-        <when test="type == 'end'">
-            AND status = 'CHECKING'
-        </when>
-        </choose>
+        AND status = 'WAITING'
     </update>
 
 
