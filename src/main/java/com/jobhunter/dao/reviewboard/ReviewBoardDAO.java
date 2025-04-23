@@ -8,6 +8,7 @@ import com.jobhunter.model.reviewboard.RPageRequestDTO;
 import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
+import com.jobhunter.model.reviewboard.ReviewBoardWithReplyVO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
 import com.jobhunter.model.reviewboard.WriteBoardDTO;
 
@@ -58,5 +59,9 @@ public interface ReviewBoardDAO {
 	List<String> ListCompany() throws Exception;
 	//신고 아이디 조
 	Integer findWriterUidByBoardNo(int boardNo);
+
+	List<ReviewBoardWithReplyVO> findMyReviewWithReply(RPageRequestDTO dto) throws Exception;
+
+	int findMyReviewWithReplyCnt(RPageRequestDTO dto) throws Exception;
 
 }

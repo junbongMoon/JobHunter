@@ -14,7 +14,7 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentNoticeDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
-import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
+import com.jobhunter.model.util.TenToFivePageVO;
 
 public interface RecruitmentNoticeService {
 	

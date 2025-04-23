@@ -7,8 +7,10 @@ import com.jobhunter.model.reviewboard.RPageRequestDTO;
 import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
+import com.jobhunter.model.reviewboard.ReviewBoardWithReplyVO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
 import com.jobhunter.model.reviewboard.WriteBoardDTO;
+import com.jobhunter.model.util.TenToFivePageVO;
 
 public interface ReviewBoardService {
 
@@ -50,6 +52,8 @@ public interface ReviewBoardService {
 	RPageResponseDTO<ReviewBoardDTO> getPagedBoardList(RPageRequestDTO pageRequestDTO) throws Exception;
 
 	List<String> getCompanyList() throws Exception;
+
+	TenToFivePageVO<ReviewBoardWithReplyVO> getMyReview(RPageRequestDTO dto) throws Exception;
 
 
 	

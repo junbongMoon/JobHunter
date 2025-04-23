@@ -96,6 +96,7 @@ public class SubmitController {
 
 		// ResumeDetailInfoBySubmit 가져와야함
 		ResumeDetailInfoBySubmitAndUser result = null;
+		// TODO 들어가면 읽음처리하고 페이지 내에서 상태변경도 필요...
 		try {
 			result = submitService.selectSubmitAndResumeDetailInfo(registrationNo, account);
 		} catch (Exception e) {

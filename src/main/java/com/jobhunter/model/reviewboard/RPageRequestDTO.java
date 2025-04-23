@@ -1,6 +1,5 @@
 package com.jobhunter.model.reviewboard;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,6 +18,8 @@ public class RPageRequestDTO {
     private String sortType;     // 정렬 기준: likes, views 등
     private String resultFilter; // 합격 여부 필터: PASSED, FAILED, PENDING
     private String companyFilter; 
+    
+    private int writer;
     
     public RPageRequestDTO() {
         this.page = 1;

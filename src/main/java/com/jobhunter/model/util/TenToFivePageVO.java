@@ -1,4 +1,4 @@
-package com.jobhunter.model.recruitmentnotice;
+package com.jobhunter.model.util;
 
 import java.util.List;
 import java.util.ArrayList;

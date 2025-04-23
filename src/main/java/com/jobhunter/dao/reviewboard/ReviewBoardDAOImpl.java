@@ -16,6 +16,7 @@ import com.jobhunter.model.reviewboard.RPageRequestDTO;
 import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
+import com.jobhunter.model.reviewboard.ReviewBoardWithReplyVO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
 import com.jobhunter.model.reviewboard.WriteBoardDTO;
 
@@ -177,6 +178,16 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 	public Integer findWriterUidByBoardNo(int boardNo) {
 		
 		return ses.selectOne(NS +".findWriterUidByBoardNo",boardNo);
+	}
+	
+	@Override
+	public List<ReviewBoardWithReplyVO> findMyReviewWithReply(RPageRequestDTO dto) throws Exception {
+		return ses.selectList(NS +".selectReviewBoardWithReplies", dto);
+	}
+	
+	@Override
+	public int findMyReviewWithReplyCnt(RPageRequestDTO dto) throws Exception {
+		return ses.selectOne(NS +".countReviewBoardWithReplies", dto);
 	}
 
 }

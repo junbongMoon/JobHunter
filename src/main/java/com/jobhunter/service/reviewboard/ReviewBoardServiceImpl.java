@@ -1,26 +1,25 @@
 package com.jobhunter.service.reviewboard;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.reviewboard.ReviewBoardDAO;
-import com.jobhunter.model.page.PageResponseDTO;
+import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
 import com.jobhunter.model.reviewboard.Likes;
 import com.jobhunter.model.reviewboard.RPageRequestDTO;
 import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardDTO;
+import com.jobhunter.model.reviewboard.ReviewBoardWithReplyVO;
 import com.jobhunter.model.reviewboard.ReviewDetailViewDTO;
 import com.jobhunter.model.reviewboard.WriteBoardDTO;
+import com.jobhunter.model.util.TenToFivePageVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -195,6 +194,15 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	public List<String> getCompanyList() throws Exception {
 	
 		return Rdao.ListCompany();
+	}
+
+	@Override
+	public TenToFivePageVO<ReviewBoardWithReplyVO> getMyReview(RPageRequestDTO dto) throws Exception {
+		List<ReviewBoardWithReplyVO> list = Rdao.findMyReviewWithReply(dto);
+		int totalItems = Rdao.findMyReviewWithReplyCnt(dto);
+		
+		TenToFivePageVO<ReviewBoardWithReplyVO> vo = new TenToFivePageVO<ReviewBoardWithReplyVO>(list, dto.getPage(), totalItems);
+		return vo;
 	}
 
 }

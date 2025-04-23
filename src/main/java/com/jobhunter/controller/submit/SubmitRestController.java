@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
 import com.jobhunter.model.submit.SubmitFromRecruitVO;
 import com.jobhunter.model.submit.SubmitSearchDTO;
+import com.jobhunter.model.util.TenToFivePageVO;
 import com.jobhunter.service.submit.SubmitService;
 
 import lombok.RequiredArgsConstructor;
