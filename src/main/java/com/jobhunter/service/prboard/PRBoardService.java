@@ -1,9 +1,12 @@
 package com.jobhunter.service.prboard;
 
+import java.util.List;
+
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.prboard.PRBoardDTO;
 import com.jobhunter.model.prboard.PRBoardVO;
+import com.jobhunter.model.util.TenToFivePageVO;
 
 public interface PRBoardService {
 	/**
@@ -27,4 +30,6 @@ public interface PRBoardService {
 	public boolean updatePRBoard(PRBoardDTO prBoardDTO) throws Exception;
 
 	public boolean deletePRBoard(int prBoardNo) throws Exception;
+
+	TenToFivePageVO<PRBoardVO> selectMyPRBoard(int uid, int page) throws Exception;
 }

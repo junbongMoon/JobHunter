@@ -267,6 +267,54 @@ Kakao.isInitialized();
 		});
 	}
 // #endregion 카톡
+const registrationAdviceStatus = {
+  NONE: null,
+  COMPLETE: 'COMPLETE',
+  CANCEL: 'CANCEL',
+  WAITING: 'WAITING',
+  CHECKING: 'CHECKING'
+};
+const registrationAdviceData = {
+  page: 1,
+  status: registrationAdviceStatus.NONE
+};
+function getMyResumes() {
+  const listContainer = $('#resumeSection')
+
+  $.ajax({
+    url: '/myRegistrationAdvice',
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
+      uid: uid,
+      page: registrationAdviceData.page,
+      status: registrationAdviceData.status
+    }),
+    success: function(res) {
+      console.log(res);
+    },
+    error: function(xhr) {
+      console.log("error : " + xhr);
+    }
+  });
+}
+
+let prboardPage = 1
+function getMyPrboard() {
+  // const listContainer = $('#prboardSection')
+  $.ajax({
+    url: '/myPr/\${uid}/\${prboardPage}',
+    method: 'POST',
+    contentType: 'application/json',
+    success: function(res) {
+      console.log(res);
+    },
+    error: function(xhr) {
+      console.log("error : " + xhr);
+    }
+  });
+}
+
 
 $(()=>{
   getInfo();

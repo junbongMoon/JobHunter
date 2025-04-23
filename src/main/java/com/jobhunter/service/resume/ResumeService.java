@@ -3,7 +3,9 @@ package com.jobhunter.service.resume;
 import java.util.List;
 
 import com.jobhunter.model.resume.MajorCategoryDTO;
+import com.jobhunter.model.resume.MyRegistrationAdviceSearchDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.RegistrationAdviceVO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
@@ -13,6 +15,7 @@ import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.util.TenToFivePageVO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 
@@ -66,4 +69,6 @@ public interface ResumeService {
 	ResumeAdviceDTO getAdvice(int resumeNo);
 
 	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);
+
+	TenToFivePageVO<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto);
 }

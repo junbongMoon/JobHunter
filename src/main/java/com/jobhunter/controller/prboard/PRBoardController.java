@@ -4,14 +4,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.prboard.PRBoardDTO;
 import com.jobhunter.model.prboard.PRBoardVO;
+import com.jobhunter.model.util.TenToFivePageVO;
 import com.jobhunter.service.prboard.PRBoardService;
 
 import lombok.RequiredArgsConstructor;
@@ -114,6 +118,17 @@ public class PRBoardController {
             return "error/500";
         }
         return "redirect:/prboard/list";
+    }
+    
+    @PostMapping("/myPr/{uid}/{page}")
+    @ResponseBody
+    public TenToFivePageVO<PRBoardVO> selectMyPRBoard(@PathVariable("uid") int uid, @PathVariable("page") int page) {
+        try {
+        	return prBoardService.selectMyPRBoard(uid, page);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

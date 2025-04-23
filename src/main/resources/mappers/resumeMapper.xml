@@ -330,4 +330,28 @@
         WHERE adviceNo = #{adviceNo}
     </select>
     
+    <select id="selectRegistrationAdviceByMentorWithPaging" resultType="com.jobhunter.model.advice.RegistrationAdviceVO">
+	  SELECT 
+	    rgAdviceNo,
+	    regDate,
+	    status,
+	    mentorUid,
+	    resumeNo
+	  FROM registration_advice
+	  WHERE mentorUid = #{uid}
+	  <if test="status != null and status != ''">
+	    AND status = #{status}
+	  </if>
+	  ORDER BY regDate DESC
+	  LIMIT 5 OFFSET #{offset}
+	</select>
+	
+	<select id="countRegistrationAdviceByMentor" resultType="int">
+	  SELECT COUNT(*) FROM registration_advice
+	  WHERE mentorUid = #{uid}
+	  <if test="status != null and status != ''">
+	    AND status = #{status}
+	  </if>
+	</select>
+    
 </mapper>

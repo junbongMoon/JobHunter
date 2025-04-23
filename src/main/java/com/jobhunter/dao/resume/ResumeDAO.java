@@ -7,8 +7,10 @@ import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.LicenseDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
+import com.jobhunter.model.resume.MyRegistrationAdviceSearchDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.RegistrationAdviceVO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 import com.jobhunter.model.resume.ResumeDTO;
@@ -121,4 +123,8 @@ public interface ResumeDAO {
 
 	ResumeAdviceDTO getAdvice(int resumeNo);
 	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);
+
+	List<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto);
+
+	int countRegistrationAdviceByMentor(MyRegistrationAdviceSearchDTO dto);
 }

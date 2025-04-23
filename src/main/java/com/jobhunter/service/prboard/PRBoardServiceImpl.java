@@ -10,6 +10,7 @@ import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.prboard.PRBoardDTO;
 import com.jobhunter.model.prboard.PRBoardVO;
+import com.jobhunter.model.util.TenToFivePageVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -92,6 +93,15 @@ public class PRBoardServiceImpl implements PRBoardService {
 		if(prBoardDAO.deletePRBoard(prBoardNo) > 0) {
 			result = true;
 		}
+	    return result;
+	}
+	
+	@Override
+	public TenToFivePageVO<PRBoardVO> selectMyPRBoard (int uid, int page) throws Exception {
+		int offset = (page - 1) * 5;
+		List<PRBoardVO> vo = prBoardDAO.selectMyPRBoard(uid, offset);
+		int totalCnt = prBoardDAO.selectMyPRBoardCnt(uid);
+		TenToFivePageVO<PRBoardVO> result = new TenToFivePageVO<PRBoardVO>(vo, page, totalCnt);
 	    return result;
 	}
 }

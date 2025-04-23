@@ -74,5 +74,26 @@
 		DELETE FROM prBoard
 		WHERE prBoardNo = #{prBoardNo}
 	</delete>
+	
+	<select id="selectPRBoardsByUserUidWithPaging" resultType="com.jobhunter.model.prboard.PRBoardVO">
+	  SELECT 
+	    prBoardNo,
+	    useruid,
+	    title,
+	    writer,
+	    userId,
+	    introduce,
+	    postDate
+	  FROM prBoard
+	  WHERE useruid = #{uid}
+	  ORDER BY postDate DESC
+	  LIMIT 5 OFFSET #{offset}
+	</select>
+	
+	<select id="countPRBoardsByUserUid" resultType="int">
+	  SELECT COUNT(*) FROM prBoard
+	  WHERE useruid = #{uid}
+	</select>
+	
 
 </mapper>

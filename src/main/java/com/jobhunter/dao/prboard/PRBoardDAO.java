@@ -32,6 +32,9 @@ public interface PRBoardDAO {
 	int deletePRBoard(int prBoardNo) throws Exception;
 
 	int updatePRBoard(PRBoardDTO prBoardDTO) throws Exception;
-	
 
+	List<PRBoardVO> selectMyPRBoard(int uid, int offset) throws Exception;
+
+	int selectMyPRBoardCnt(int uid) throws Exception;
+	
 }

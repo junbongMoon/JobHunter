@@ -1,5 +1,6 @@
 package com.jobhunter.service.resume;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -11,8 +12,10 @@ import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.LicenseDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
+import com.jobhunter.model.resume.MyRegistrationAdviceSearchDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.RegistrationAdviceVO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 import com.jobhunter.model.resume.ResumeDTO;
@@ -24,6 +27,7 @@ import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.util.TenToFivePageVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -283,5 +287,19 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	public List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) {
 		return rdao.getAdviceFiles(adviceNo);
+	}
+	
+	@Override
+	public TenToFivePageVO<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto) {
+		List<String> validStatuses = Arrays.asList("PASS", "FAILURE", "EXPIRED", "CHECKED", "WAITING");
+
+		if (!validStatuses.contains(dto.getStatus())) {
+		    dto.setStatus(null);
+		}
+		
+		List<RegistrationAdviceVO> vo = rdao.selectRegistrationAdviceByMentorWithPaging(dto);
+		int totalCnt = rdao.countRegistrationAdviceByMentor(dto);
+		TenToFivePageVO<RegistrationAdviceVO> result = new TenToFivePageVO<RegistrationAdviceVO>(vo, dto.getPage(), totalCnt);
+		return result;
 	}
 }
