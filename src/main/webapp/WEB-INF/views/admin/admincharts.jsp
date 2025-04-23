@@ -112,7 +112,7 @@ function drawRecruitSubmitReviewChart() {
 <div class="container-fluid">
     
     <div class="row">
-        <div class="col-xl-8 col-lg-7">
+        <div class="col-xl-8 col-lg-7" style="cursor: pointer;" onclick="location.href='/admin/adminChartDetail'">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">유저/기업 통계</h6>
@@ -123,7 +123,7 @@ function drawRecruitSubmitReviewChart() {
             </div>
         </div>
 
-        <!-- 유저/기업 도넛 -->
+        <!-- 유저/기업 파이 -->
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
@@ -138,7 +138,7 @@ function drawRecruitSubmitReviewChart() {
 
     <!-- ✅ 공고/제출/리뷰 통계 -->
     <div class="row">
-        <div class="col-xl-8 col-lg-7">
+        <div class="col-xl-8 col-lg-7" style="cursor: pointer;" onclick="location.href='/admin/adminChartDetail'">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">공고/제출/리뷰 통계</h6>
@@ -149,7 +149,7 @@ function drawRecruitSubmitReviewChart() {
             </div>
         </div>
 
-        <!-- 공고/제출/리뷰 도넛 -->
+        <!-- 공고/제출/리뷰 파이 -->
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">

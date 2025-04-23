@@ -489,16 +489,10 @@ public class AdminController {
 		}
 	}
 	
-	@GetMapping("/admin/postChartDetail")
-	public String showPostChartDetail(Model model) {
-		
-		return "/admin/postChartDetail";
-	}
-	
-	@GetMapping("/admin/userCompanyChartDetail")
+	@GetMapping("/admin/adminChartDetail")
 	public String showUserCompanyChartDetail(Model model) {
 		
-		return "/admin/userCompanyChartDetail";
+		return "/admin/adminChartDetail";
 	}
 	
 }

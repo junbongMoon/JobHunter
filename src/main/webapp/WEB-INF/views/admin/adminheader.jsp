@@ -98,24 +98,12 @@
             </div>
         </li>
         
-        <!-- 🔹 유틸리티 섹션 -->
-        <div class="sidebar-heading">차트</div>
+        <!-- 🔹 차트 페이지 -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                aria-expanded="true" aria-controls="collapseUtilities">
+            <a class="nav-link" href="/admin/adminChartDetail">
                 <i class="fas fa-fw fa-chart-area"></i>
                 <span>차트 상세</span>
             </a>
-            <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
-                data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">CHART</h6>
-                    <a class="collapse-item" href="/admin/userCompanyChartDetail">유저/기업</a>
-                    <a class="collapse-item" href="/admin/postChartDetail">공고/제출/리뷰</a>
-
-                    
-                </div>
-            </div>
         </li>
 
         <!-- 🔹 사이드바 토글 버튼 -->
