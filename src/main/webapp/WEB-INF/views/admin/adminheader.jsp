@@ -110,11 +110,9 @@
                 data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">CHART</h6>
-                    <a class="collapse-item" href="">유저</a>
-                    <a class="collapse-item" href="">기업</a>
-                    <a class="collapse-item" href="">공고</a>
-                    <a class="collapse-item" href="">리뷰</a>
-                    <a class="collapse-item" href="">제출</a>
+                    <a class="collapse-item" href="/admin/userCompanyChartDetail">유저/기업</a>
+                    <a class="collapse-item" href="/admin/postChartDetail">공고/제출/리뷰</a>
+
                     
                 </div>
             </div>
