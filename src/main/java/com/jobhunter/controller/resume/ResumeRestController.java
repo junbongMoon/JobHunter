@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jobhunter.model.resume.MyRegistrationAdviceSearchDTO;
 import com.jobhunter.model.resume.RegistrationAdviceVO;
+import com.jobhunter.model.resume.ResumeAdviceVO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.util.TenToFivePageVO;
 import com.jobhunter.service.resume.ResumeService;
@@ -81,7 +82,17 @@ public class ResumeRestController {
 	@PostMapping(value = "/myRegistrationAdvice")
 	public TenToFivePageVO<RegistrationAdviceVO> getMyRegistrationAdvice(@RequestBody MyRegistrationAdviceSearchDTO dto) {
 		try {
-			resumeService.selectRegistrationAdviceByMentorWithPaging(dto);
+			return resumeService.selectRegistrationAdviceByMentorWithPaging(dto);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+	
+	@PostMapping(value = "/myResumeAdvice/{uid}/{page}")
+	public TenToFivePageVO<ResumeAdviceVO> getMyResumeAdviceByUserUid(@PathVariable("uid") int uid, @PathVariable("page")int page) {
+		try {
+			return resumeService.selectResumeAdviceByUserUid(uid, page);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}

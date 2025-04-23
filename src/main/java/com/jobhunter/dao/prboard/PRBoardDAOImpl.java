@@ -58,11 +58,12 @@ public class PRBoardDAOImpl implements PRBoardDAO {
 		Map<String, Integer> param = new HashMap<String, Integer>();
 		param.put("uid", uid);
 		param.put("offset", offset);
-	    return ses.selectList(NS + ".selectPRBoardsByUserUid", param);
+	    return ses.selectList(NS + ".selectPRBoardsByUserUidWithPaging", param);
 	}
 	
 	@Override
 	public int selectMyPRBoardCnt(int uid) throws Exception {
+		System.out.println(uid);
 	    return ses.selectOne(NS + ".countPRBoardsByUserUid", uid);
 	}
 

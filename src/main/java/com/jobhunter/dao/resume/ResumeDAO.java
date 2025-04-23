@@ -13,6 +13,7 @@ import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.RegistrationAdviceVO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
+import com.jobhunter.model.resume.ResumeAdviceVO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.ResumeVO;
@@ -127,4 +128,8 @@ public interface ResumeDAO {
 	List<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto);
 
 	int countRegistrationAdviceByMentor(MyRegistrationAdviceSearchDTO dto);
+
+	List<ResumeAdviceVO> selectResumeAdviceByUserUid(int uid, int offset);
+
+	int countResumeAdviceByUserUid(int uid);
 }

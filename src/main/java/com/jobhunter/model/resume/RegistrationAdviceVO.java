@@ -9,6 +9,7 @@ public class RegistrationAdviceVO {
 	private int rgAdviceNo;
     private Timestamp regDate;
     private String status;
+    private String title;
     private int mentorUid;
     private int resumeNo;
 }

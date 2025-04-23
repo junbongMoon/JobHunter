@@ -1,7 +1,6 @@
 package com.jobhunter.model.resume;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +18,8 @@ import lombok.ToString;
 public class ResumeAdviceVO {
     private int adviceNo;
     private int resumeNo;
-    private String adviceContent;
     private LocalDateTime regDate;
     private int mentorUid;
+    private String mentorName;
+    private String title;
 } 

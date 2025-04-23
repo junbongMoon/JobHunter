@@ -18,6 +18,7 @@ import com.jobhunter.model.user.UserVO;
 import com.jobhunter.model.util.TenToFivePageVO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
+import com.jobhunter.model.resume.ResumeAdviceVO;
 
 public interface ResumeService {
 
@@ -71,4 +72,6 @@ public interface ResumeService {
 	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);
 
 	TenToFivePageVO<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto);
+
+	TenToFivePageVO<ResumeAdviceVO> selectResumeAdviceByUserUid(int uid, int page);
 }

@@ -18,6 +18,7 @@ import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.RegistrationAdviceVO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
+import com.jobhunter.model.resume.ResumeAdviceVO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.ResumeVO;
@@ -297,6 +298,19 @@ public class ResumeDAOImpl implements ResumeDAO {
 	@Override
 	public int countRegistrationAdviceByMentor(MyRegistrationAdviceSearchDTO dto) {
 		return ses.selectOne(NS + ".countRegistrationAdviceByMentor", dto);
+	}
+	
+	@Override
+	public List<ResumeAdviceVO> selectResumeAdviceByUserUid(int uid, int offset) {
+		Map<String, Integer> param = new HashMap<String, Integer>();
+		param.put("userUid", uid);
+		param.put("offset", offset);
+		return ses.selectList(NS + ".selectResumeAdviceByUserUid", param);
+	}
+	
+	@Override
+	public int countResumeAdviceByUserUid(int uid) {
+		return ses.selectOne(NS + ".countResumeAdviceByUserUid", uid);
 	}
 
 }

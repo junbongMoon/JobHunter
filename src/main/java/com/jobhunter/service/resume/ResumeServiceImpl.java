@@ -18,6 +18,7 @@ import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.RegistrationAdviceVO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
+import com.jobhunter.model.resume.ResumeAdviceVO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
@@ -300,6 +301,15 @@ public class ResumeServiceImpl implements ResumeService {
 		List<RegistrationAdviceVO> vo = rdao.selectRegistrationAdviceByMentorWithPaging(dto);
 		int totalCnt = rdao.countRegistrationAdviceByMentor(dto);
 		TenToFivePageVO<RegistrationAdviceVO> result = new TenToFivePageVO<RegistrationAdviceVO>(vo, dto.getPage(), totalCnt);
+		return result;
+	}
+	
+	@Override
+	public TenToFivePageVO<ResumeAdviceVO> selectResumeAdviceByUserUid(int uid, int page) {
+		int offset = (page - 1) * 5;
+		List<ResumeAdviceVO> vo = rdao.selectResumeAdviceByUserUid(uid, offset);
+		int totalCnt = rdao.countResumeAdviceByUserUid(uid);
+		TenToFivePageVO<ResumeAdviceVO> result = new TenToFivePageVO<ResumeAdviceVO>(vo, page, totalCnt);
 		return result;
 	}
 }

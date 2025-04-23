@@ -330,14 +330,16 @@
         WHERE adviceNo = #{adviceNo}
     </select>
     
-    <select id="selectRegistrationAdviceByMentorWithPaging" resultType="com.jobhunter.model.advice.RegistrationAdviceVO">
+    <select id="selectRegistrationAdviceByMentorWithPaging" resultType="com.jobhunter.model.resume.RegistrationAdviceVO">
 	  SELECT 
-	    rgAdviceNo,
-	    regDate,
-	    status,
-	    mentorUid,
-	    resumeNo
-	  FROM registration_advice
+	    ra.rgAdviceNo,
+	    ra.regDate,
+	    ra.status,
+	    ra.mentorUid,
+	    ra.resumeNo,
+	    r.title AS title
+	  FROM registration_advice ra
+	  JOIN resume r ON ra.resumeNo = r.resumeNo
 	  WHERE mentorUid = #{uid}
 	  <if test="status != null and status != ''">
 	    AND status = #{status}
@@ -352,6 +354,29 @@
 	  <if test="status != null and status != ''">
 	    AND status = #{status}
 	  </if>
+	</select>
+	
+	<select id="selectResumeAdviceByUserUid" resultType="com.jobhunter.model.resume.ResumeAdviceVO">
+	  SELECT
+	    ra.adviceNo,
+	    ra.resumeNo,
+	    ra.regDate,
+	    ra.mentorUid,
+	    r.title AS title,
+	    u.userName AS mentorName
+	  FROM resume_advice ra
+	  JOIN resume r ON ra.resumeNo = r.resumeNo
+	  JOIN users u ON ra.mentorUid = u.uid
+	  WHERE r.userUid = #{userUid}
+	  ORDER BY ra.regDate DESC
+	  LIMIT 5 OFFSET #{offset}
+	</select>
+	
+	<select id="countResumeAdviceByUserUid" resultType="int">
+	  SELECT COUNT(*)
+	  FROM resume_advice ra
+	  JOIN resume r ON ra.resumeNo = r.resumeNo
+	  WHERE r.userUid = #{userUid}
 	</select>
     
 </mapper>

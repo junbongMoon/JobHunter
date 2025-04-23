@@ -203,15 +203,37 @@
         <div id="reviewSection"></div>
       </section>
 
-      <!-- 관심 공고 -->
-      <section data-aos="fade-up" data-aos-delay="500">
+      <!-- 멘토등록글 -->
+      <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
-          <h2><i class="bi bi-heart section-icon"></i>관심 공고 목록</h2>
+          <h2><i class="bi bi-heart section-icon"></i>등록한 멘토pr글</h2>
         </div>
-        <div class="empty-state">
-          <i class="bi bi-heart"></i>
-          <p>관심 등록된 공고가 없습니다.</p>
+        <div id="prboardSection"></div>
+      </section>
+
+      <!-- 리뷰 영역 -->
+      <section data-aos="fade-up" data-aos-delay="400">
+        <div class="section-title">
+          <h2><i class="bi bi-heart section-icon"></i>내가 받은 첨삭 신청서</h2>
+          <div>
+	          <select id="statusSelect" class="form-select" onchange="handleStatusChange()">
+				  <option value="">-- 전체 상태 --</option>
+				  <option value="COMPLETE">완료</option>
+				  <option value="CANCEL">취소</option>
+				  <option value="WAITING">대기</option>
+				  <option value="CHECKING">검토 중</option>
+			  </select>
+		  </div>
         </div>
+        <div id="registrationAdviceSection"></div>
+      </section>
+
+      <!-- 리뷰 영역 -->
+      <section data-aos="fade-up" data-aos-delay="400">
+        <div class="section-title">
+          <h2><i class="bi bi-heart section-icon"></i>답변받은 이력서 첨삭</h2>
+        </div>
+        <div id="resumeAdviceSection"></div>
       </section>
     </div>
   </div>
@@ -267,6 +289,181 @@ Kakao.isInitialized();
 		});
 	}
 // #endregion 카톡
+function renderPagination(res, pageFunc, container) {
+  const { pageList, currentPage, hasPrevBlock, hasNextBlock, startPage, endPage } = res;
+
+  let html = `
+    <div class="pagination" style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    ">
+  `;
+
+  if (hasPrevBlock) {
+    html += `<button class="btn-edit" onclick="\${pageFunc}(\${startPage - 1})">« 이전</button>`;
+  }
+
+  pageList.forEach(p => {
+    html += `<button class="btn-edit \${p === currentPage ? 'active' : ''}" onclick="\${pageFunc}(\${p})" style="\${p === currentPage ? 'background:#3a8fb8;' : ''}">\${p}</button>`;
+  });
+
+  if (hasNextBlock) {
+    html += `<button class="btn-edit" onclick="\${pageFunc}(\${endPage + 1})">다음 »</button>`;
+  }
+
+  html += '</div>';
+  container.append(html);
+}
+
+
+function renderPrboard(res) {
+  const items = res.items;
+	  const container = $('#resumeAdviceSection');
+	  container.empty();
+
+	  if (!items || items.length === 0) {
+	    container.html(`
+	      <div class="empty-state">
+	        <i class="fas fa-folder-open"></i><br>
+	        검색된 신청글이 없습니다.
+	      </div>
+	    `);
+	    return;
+	  }
+
+	  let html = '<div class="recruit-card-list" style="display: flex; flex-direction: column; gap: 12px;">';
+
+	  items.forEach(item => {
+	    html += `
+        <div class="recruit-card-wrapper">
+          <div class="recruit-card" style="
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2c3e50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;"
+            onclick="viewResumeAdvice(\${item.resumeNo}, \${item.adviceNo})">
+            
+            <div style="flex: 1;">
+              <div><strong>\${item.title}</strong></div>
+              <div style="font-size: 13px; color: #666;">
+                <div>\${item.mentorName}</div>
+                \${formatDate(item.regDate)}작성
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `;
+	  });
+
+	  html += '</div>';
+	  container.html(html);
+
+    renderPagination(res, "goToResumeAdvice", container)
+}
+function viewResumeAdvice(resumeNo, adviceNo) {
+  // pr보드 글 상세조회 페이지로 보내기
+  console.log(resumeNo, adviceNo);
+}
+function goToResumeAdvice(pageNum) {
+  resumeAdvicePage = pageNum;
+	getMyResumeAdvice();
+}
+
+
+let resumeAdvicePage = 1
+function getMyResumeAdvice() {
+  $.ajax({
+    url: `/resume/myResumeAdvice/\${uid}/\${resumeAdvicePage}`,
+    method: 'POST',
+    contentType: 'application/json',
+    success: function(res) {
+      console.log(res);
+    },
+    error: function(xhr) {
+      console.log("error : " + xhr);
+    }
+  });
+}
+
+function renderPrboard(res) {
+  const items = res.items;
+	  const container = $('#registrationAdviceSection');
+	  container.empty();
+
+	  if (!items || items.length === 0) {
+	    container.html(`
+	      <div class="empty-state">
+	        <i class="fas fa-folder-open"></i><br>
+	        검색된 신청글이 없습니다.
+	      </div>
+	    `);
+	    return;
+	  }
+
+	  let html = '<div class="recruit-card-list" style="display: flex; flex-direction: column; gap: 12px;">';
+
+	  items.forEach(item => {
+	    html += `
+        <div class="recruit-card-wrapper">
+          <div class="recruit-card" style="
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2c3e50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;"
+            onclick="viewRegistrationAdvice(\${item.rgAdviceNo})">
+            
+            <div style="flex: 1;">
+              <div><strong>\${item.title}</strong></div>
+              <div style="font-size: 13px; color: #666;">
+                \${formatDate(item.regDate)} 신청
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+	  });
+
+	  html += '</div>';
+	  container.html(html);
+
+    renderPagination(res, "goToRegistrationAdvice", container)
+}
+function viewRegistrationAdvice(No) {
+  // pr보드 글 상세조회 페이지로 보내기
+  console.log(No);
+}
+function goToRegistrationAdvice(pageNum) {
+  registrationAdviceData.page = pageNum;
+	getMyRegistrationAdvice();
+}
+
+function handleStatusChange() {
+  const selected = document.getElementById('statusSelect').value;
+  registrationAdviceData.status = selected || registrationAdviceStatus.NONE;
+
+  getMyRegistrationAdvice();
+}
 const registrationAdviceStatus = {
   NONE: null,
   COMPLETE: 'COMPLETE',
@@ -278,11 +475,9 @@ const registrationAdviceData = {
   page: 1,
   status: registrationAdviceStatus.NONE
 };
-function getMyResumes() {
-  const listContainer = $('#resumeSection')
-
+function getMyRegistrationAdvice() {
   $.ajax({
-    url: '/myRegistrationAdvice',
+    url: `/resume/myRegistrationAdvice`,
     method: 'POST',
     contentType: 'application/json',
     data: JSON.stringify({
@@ -292,6 +487,7 @@ function getMyResumes() {
     }),
     success: function(res) {
       console.log(res);
+      renderPrboard(res)
     },
     error: function(xhr) {
       console.log("error : " + xhr);
@@ -301,13 +497,13 @@ function getMyResumes() {
 
 let prboardPage = 1
 function getMyPrboard() {
-  // const listContainer = $('#prboardSection')
+  const url = `/prboard/myPr/\${uid}/\${prboardPage}`
   $.ajax({
-    url: '/myPr/\${uid}/\${prboardPage}',
+    url: url,
     method: 'POST',
     contentType: 'application/json',
     success: function(res) {
-      console.log(res);
+      renderPrboard(res)
     },
     error: function(xhr) {
       console.log("error : " + xhr);
@@ -315,11 +511,75 @@ function getMyPrboard() {
   });
 }
 
+function renderPrboard(res) {
+  const items = res.items;
+	  const container = $('#prboardSection');
+	  container.empty();
+
+	  if (!items || items.length === 0) {
+	    container.html(`
+	      <div class="empty-state">
+	        <i class="fas fa-folder-open"></i><br>
+	        검색된 신청글이 없습니다.
+	      </div>
+	    `);
+	    return;
+	  }
+
+	  let html = '<div class="recruit-card-list" style="display: flex; flex-direction: column; gap: 12px;">';
+
+	  items.forEach(item => {
+	    html += `
+        <div class="recruit-card-wrapper">
+          <div class="recruit-card" style="
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2c3e50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;"
+            onclick="viewPrboard(\${item.prBoardNo})">
+            
+            <div style="flex: 1;">
+              <div><strong>\${item.title}</strong></div>
+              <div style="font-size: 13px; color: #666;">
+                \${formatDate(item.postDate)} 신청
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+	  });
+
+	  html += '</div>';
+	  container.html(html);
+
+    renderPagination(res, "goToPrboardPage", container)
+}
+function viewPrboard(prBoardNo) {
+  // pr보드 글 상세조회 페이지로 보내기
+  console.log(prBoardNo);
+}
+function goToPrboardPage(pageNum) {
+  prboardPage = pageNum;
+	getMyPrboard();
+}
+
 
 $(()=>{
   getInfo();
+  getMyResumes();
   getMyReview();
-  getMyResumes()
+
+  getMyRegistrationAdvice();
+  getMyPrboard();
+  getMyResumeAdvice();
 })
 
 function viewRecruitDetail(uid) {
@@ -364,7 +624,7 @@ function getMyResumes() {
     }),
     success: function(res) {
       renderResumeList(res.items)
-      renderPaginationResume(res)
+      renderPagination(res, "goToResumePage", $('#resumeSection'))
     },
     error: function(xhr) {
       console.log("error : " + xhr);
@@ -426,45 +686,10 @@ function renderResumeList(items) {
 	  container.html(html);
 }
 
-function renderPaginationResume(res) {
-  const { pageList, currentPage, hasPrevBlock, hasNextBlock, startPage, endPage } = res;
-  const container = $('#resumeSection');
-
-  let html = `
-    <div class="pagination" style="
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      margin-top: 25px;
-      flex-wrap: wrap;
-    ">
-  `;
-
-  if (hasPrevBlock) {
-    html += `<button class="btn-edit" onclick="goToResumePage(\${startPage - 1})">« 이전</button>`;
-  }
-
-  pageList.forEach(p => {
-    html += `<button class="btn-edit \${p === currentPage ? 'active' : ''}" onclick="goToResumePage(\${p})" style="\${p === currentPage ? 'background:#3a8fb8;' : ''}">\${p}</button>`;
-  });
-
-  if (hasNextBlock) {
-    html += `<button class="btn-edit" onclick="goToResumePage(\${endPage + 1})">다음 »</button>`;
-  }
-
-  html += '</div>';
-  container.append(html);
-}
-
 function goToResumePage(pageNum) {
   requestResumeData.page = pageNum;
 	getMyResumes();
 }
-
-
-
-
 
 const reviewSortType = {
   LIKES: "likes",
@@ -499,7 +724,7 @@ function getMyReview() {
     data: JSON.stringify(data),
     success: function(res) {
       renderReviewList(res.items)
-      renderPaginationReview(res)
+      renderPagination(res, "goToReviewPage", $('#reviewSection'))
     },
     error: function(xhr) {
       console.log("에러 발생", xhr);
