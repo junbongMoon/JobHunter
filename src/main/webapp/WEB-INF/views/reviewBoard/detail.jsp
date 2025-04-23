@@ -95,74 +95,91 @@
 	display: block !important;
 }
 
- #replyList {
-    padding-left: 0;
-  }
+#replyList {
+	padding-left: 0;
+}
 
-  #replyList .list-group-item {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    padding: 15px 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    position: relative;
-  }
+#replyList .list-group-item {
+	background-color: #ffffff;
+	border: 1px solid #ddd;
+	border-radius: 10px;
+	margin-bottom: 15px;
+	padding: 15px 20px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+	position: relative;
+}
 
-  #replyList .list-group-item strong {
-    font-weight: 600;
-    color: #0056b3;
-  }
+#replyList .list-group-item strong {
+	font-weight: 600;
+	color: #0056b3;
+}
 
-  #replyList .list-group-item small {
-    color: #999;
-    font-size: 13px;
-    margin-left: 5px;
-  }
+#replyList .list-group-item small {
+	color: #999;
+	font-size: 13px;
+	margin-left: 5px;
+}
 
-  #replyList .reply-content {
-    margin-top: 8px;
-    margin-bottom: 10px;
-    white-space: pre-line;
-    line-height: 1.5;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-left: 4px solid #47b2e4;
-    border-radius: 6px;
-  }
+#replyList .reply-content {
+	margin-top: 8px;
+	margin-bottom: 10px;
+	white-space: pre-line;
+	line-height: 1.5;
+	padding: 10px;
+	background-color: #f9f9f9;
+	border-left: 4px solid #47b2e4;
+	border-radius: 6px;
+}
 
-  #replyList .edit-reply-btn,
-  #replyList .delete-reply-btn {
-    font-size: 13px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    margin-right: 6px;
-  }
+#replyList .edit-reply-btn, #replyList .delete-reply-btn {
+	font-size: 13px;
+	padding: 4px 10px;
+	border-radius: 20px;
+	margin-right: 6px;
+}
 
-  #replyList .edit-reply-btn {
-    background-color: #e8f4fc;
-    color: #007bff;
-    border: 1px solid #cce5ff;
-  }
+#replyList .edit-reply-btn {
+	background-color: #e8f4fc;
+	color: #007bff;
+	border: 1px solid #cce5ff;
+}
 
-  #replyList .delete-reply-btn {
-    background-color: #fce8e8;
-    color: #dc3545;
-    border: 1px solid #f5c6cb;
-  }
+#replyList .delete-reply-btn {
+	background-color: #fce8e8;
+	color: #dc3545;
+	border: 1px solid #f5c6cb;
+}
 
-  @media screen and (max-width: 576px) {
-    #replyList .reply-content {
-      font-size: 14px;
-    }
+@media screen and (max-width: 576px) {
+	#replyList .reply-content {
+		font-size: 14px;
+	}
+	#replyList .edit-reply-btn, #replyList .delete-reply-btn {
+		font-size: 12px;
+		padding: 3px 8px;
+	}
+}
 
-    #replyList .edit-reply-btn,
-    #replyList .delete-reply-btn {
-      font-size: 12px;
-      padding: 3px 8px;
-    }
-  }
+.btn-common-shape {
+	border: none;
+	padding: 8px 16px;
+	font-size: 0.9rem;
+	font-weight: 500;
+	border-radius: 6px;
+	text-decoration: none;
+	display: inline-block;
+	transition: background-color 0.2s ease, transform 0.2s ease;
+}
 
+.btn-common-shape:hover {
+	transform: translateY(-1px);
+	text-decoration: none;
+}
+
+.btn-common-shape:focus {
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(71, 178, 228, 0.4);
+}
 </style>
 
 
@@ -271,21 +288,23 @@
 
 		<!-- 좋아요 버튼 -->
 
-		<button id="likeBtn" class="btn btn-outline-primary">👍 좋아요</button>
-		<button id="unlikeBtn" class="btn btn-outline-danger"
+		<button id="likeBtn" class="btn btn-outline-primary btn-common-shape">👍
+			좋아요</button>
+		<button id="unlikeBtn" class="btn btn-outline-danger btn-common-shape"
 			style="display: none;">❌ 취소</button>
 
 
 		<!-- 수정 버튼 -->
 		<a
 			href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
-			class="btn-getstarted btn-sm">✏️ 수정</a>
+			class="btn-getstarted btn-sm btn-common-shape">✏️ 수정</a>
 
 		<!-- 삭제 버튼 -->
 		<form action="${pageContext.request.contextPath}/reviewBoard/delete"
 			method="post" style="display: inline;">
 			<input type="hidden" name="boardNo" value="${detail.boardNo}" />
-			<button type="button" class="btn-getstarted btn-sm delete-btn"
+			<button type="button"
+				class="btn-getstarted btn-sm delete-btn btn-common-shape"
 				data-boardno="${detail.boardNo}">🗑 삭제</button>
 		</form>
 
@@ -294,24 +313,34 @@
 			href="/reviewBoard/allBoard?page=${pageRequestDTO.page}&searchType=${pageRequestDTO.searchType}&keyword=${pageRequestDTO.keyword}"
 			class="btn btn-secondary btn-sm btn-rounded">목록으로 돌아가기</a>
 
-		<button type="button" class="btn btn-danger btn-sm"
-			data-bs-toggle="modal" data-bs-target="#reportModal">🚨 신고하기
-		</button>
+		<c:if test="${loginUserId ne detail.userId}">
+			<!-- 본인 게시물이 아닌 경우만 신고 버튼 출력 -->
+			<button type="button" class="btn btn-sm btn-danger"
+				data-bs-toggle="modal" data-bs-target="#reportModal">🚨 신고</button>
+		</c:if>
 	</div>
 
-	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
+
+
 	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
 	<input type="hidden" id="isLiked" value="${isLiked}" />
 
 
 	<!-- 댓글 목록 출력 영역 -->
-	<ul id="replyList" class="list-group"></ul> <!-- 여기에는 목록만 append -->
+	<ul id="replyList" class="list-group"></ul>
 
-		<!-- 댓글 페이징 부분 -->
-		<nav>
-		  <ul class="pagination justify-content-center mt-3" id="replyPagination"></ul>
-		</nav> <!--  여기에만 페이징 append -->
+	<!--  댓글 작성 영역 추가 -->
+	<div class="mt-4">
+		<textarea id="replyContent" class="form-control" rows="3"
+			placeholder="댓글을 입력해주세요"></textarea>
+		<button id="submitReplyBtn" class="btn btn-primary mt-2">등록</button>
+	</div>
 
+	<!-- 댓글 페이징 부분 -->
+	<nav>
+		<ul class="pagination justify-content-center mt-3"
+			id="replyPagination"></ul>
+	</nav>
 
 	<!-- 좋아요 알림 모달 -->
 	<div class="modal fade" id="likeModal" tabindex="-1" aria-hidden="true">
@@ -329,7 +358,7 @@
 		</div>
 	</div>
 
-
+	<!-- 신고 버튼 모달  -->
 	<div class="modal fade" id="reportModal" tabindex="-1"
 		aria-labelledby="reportModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
@@ -372,6 +401,9 @@
 	</div>
 	<input type="hidden" id="loginUserUid"
 		value="${sessionScope.account.uid}">
+	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
+	<input type="hidden" id="postWriterUid" value="${detail.userId}">
+	<input type="hidden" id="loginUserId" value="${loginUser.userId}" />
 </body>
 <script>
 
@@ -472,41 +504,47 @@
 
 
 	//게시물 신고	  
-	$(document).ready(function() {
-		$('#submitReportBtn').on('click', function() {
+		$(document).ready(function() {
+			$('#submitReportBtn').on('click', function() {
+				const loginUserUid = parseInt($('#loginUserUid').val());    // 로그인한 사용자 UID
+			    const writerId = parseInt($('#postWriterUid').val());      // 게시글 작성자 UID
+			    const reportCategory = $('#reportCategory').val();
+			    const reportMessage = $('#reportMessage').val();
+			    const boardNo = parseInt($('#boardNo').val());
 
-			const reporterAccountUid = $('#loginUserUid').val();
-			const reportCategory = $('#reportCategory').val();
-			const reportMessage = $('#reportMessage').val();
-
-			if (!reportCategory) {
-				alert("신고 사유를 선택해주세요.");
-				return;
+					// 본인 게시글 신고 방지
+					if (loginUserId === writerId) {
+					    alert("본인의 게시물은 신고할 수 없습니다.");
+					    return;
+					}
+					if (!reportCategory) {
+						alert("신고 사유를 선택해주세요.");
+						return;
+					}
+		const reportData = {
+				boardNo: parseInt(boardNo),
+	            reporterAccountUid: parseInt(reporterAccountUid),
+	            reportCategory: reportCategory,
+	            reportMessage: reportMessage,
+	            reportType: "BOARD",
+	            reportTargetURL: `/reviewBoard/detail?boardNo=${boardNo}`
+		};
+		$.ajax({
+			type: 'POST',
+			url: '/report/board',
+			contentType: 'application/json',
+			data: JSON.stringify(reportData),
+			success: function() {
+				alert('신고가 접수되었습니다.');
+				$('#reportModal').modal('hide');
+			},
+			error: function(xhr) {
+				alert('신고 처리 중 오류가 발생했습니다: ' + xhr.responseText);
 			}
-
-			const reportData = {
-				boardNo : parseInt(boardNo),
-				reporterAccountUid : parseInt(reporterAccountUid),
-				reportCategory : reportCategory,
-				reportMessage : reportMessage,
-				reportType : "BOARD",
-				reportTargetURL : `/reviewBoard/detail?boardNo=${boardNo}`
-			};
-			$.ajax({
-				type : 'POST',
-				url : '/report/board',
-				contentType : 'application/json',
-				data : JSON.stringify(reportData),
-				success : function() {
-					alert('신고가 접수되었습니다.');
-					$('#reportModal').modal('hide'); // 모달 닫기
-				},
-				error : function(xhr) {
-					alert('신고 처리 중 오류가 발생했습니다: ' + xhr.responseText);
-				}
-			});
 		});
 	});
+});
+
 
 	//댓글 등록 
 
@@ -677,18 +715,18 @@ $(document).ready(function () {
     }
   });
 
-  // 페이지 클릭 이벤트 위임 (중복 방지)
-  $(document).on('click', '#replyPagination a', function (e) {
-    e.preventDefault();
-    const selectedPage = $(this).data('page');
-    console.log("👉 선택된 페이지:", selectedPage);
-    if (!selectedPage || isNaN(selectedPage)) {
-      alert("유효하지 않은 페이지입니다.");
-      return;
-    }
-    loadReplies(parseInt(selectedPage));
-  });
-});
+		  // 페이지 클릭 이벤트 위임 (중복 방지)
+		  $(document).on('click', '#replyPagination a', function (e) {
+		    e.preventDefault();
+		    const selectedPage = $(this).data('page');
+		    console.log("👉 선택된 페이지:", selectedPage);
+		    if (!selectedPage || isNaN(selectedPage)) {
+		      alert("유효하지 않은 페이지입니다.");
+		      return;
+		    }
+		    loadReplies(parseInt(selectedPage));
+		  });
+		});
 
 </script>
 </html>
