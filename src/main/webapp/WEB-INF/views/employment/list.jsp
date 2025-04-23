@@ -157,13 +157,24 @@
     color: white;
     border: 1px solid #47b2e4;
 }
+
+
+.recruit-title {
+    color: #3d4d6a;
+    font-weight: bold;
+    font-size: 50px; 
+    text-align: center;
+    margin-bottom: 20px;
+}
 </style>
 </head>
 <body>
 	<jsp:include page="../header.jsp"></jsp:include>
 
 	<div class="container mt-4">
-
+	
+	<h2 class="recruit-title">공공기관 제공 채용정보</h2>
+	
 		<!-- 검색바 영역 -->
 		<div class="row mb-3">
 			<div class="col-12">
