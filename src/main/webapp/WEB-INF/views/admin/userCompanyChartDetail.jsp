@@ -134,7 +134,7 @@ function drawDynamicChart(dataList) {
     if (selected.includes('company')) data.addColumn('number', '신규 기업');
     if (selected.includes('recruit')) data.addColumn('number', '공고 등록 수');
     if (selected.includes('submit')) data.addColumn('number', '이력서 제출 수');
-    if (selected.includes('review')) data.addColumn('number', '리뷰 수');
+    
 
     dataList.forEach(item => {
         const dateStr = item.formattedDate || formatDateLabel(item.statusDate);  // ✅ formattedDate 우선 사용
@@ -144,7 +144,7 @@ function drawDynamicChart(dataList) {
         if (selected.includes('company')) row.push(item.newCompanies || 0);
         if (selected.includes('recruit')) row.push(item.newRecruitmentNoticeCnt || 0);
         if (selected.includes('submit')) row.push(item.newRegistration || 0);
-        if (selected.includes('review')) row.push(item.newReviewBoard || 0);
+        
 
         data.addRow(row);
     });
@@ -274,8 +274,8 @@ function getDailyStatusByymd() {
         <input type="checkbox" class="stat-check" value="company" checked> 기업
         <input type="checkbox" class="stat-check" value="recruit"> 공고
         <input type="checkbox" class="stat-check" value="submit"> 제출
-        <input type="checkbox" class="stat-check" value="review"> 리뷰
     </div>
+    
       <button type="button" id="getDailyStatusBtn" onclick="getDailyStatusByymd()">조회</button>
     </div>
 
