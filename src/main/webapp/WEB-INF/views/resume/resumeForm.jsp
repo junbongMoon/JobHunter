@@ -67,74 +67,77 @@
 
 						<!-- 기본 정보 (users 테이블에서 가져올 예정) -->
 						<c:if test="${userUidOwner == queryUid}">
-						<div class="card mb-4">
-							<div class="card-header">
-								기본 정보<span class="essentialPoint">*</span>
-							</div>
-							<div class="card-body">
-								<div class="row g-3">
-									<!-- 증명사진 업로드 -->
-									<div class="col-md-2">
-										<div class="d-flex justify-content-center align-items-center border rounded position-relative photoUploadBox"
-											style="height: 200px; background-color: #f8f9fa;">
-											<input type="file" id="photoUpload" style="display: none;" accept="image/*">
-											<label for="photoUpload" class="text-center" style="cursor: pointer;">
+							<div class="card mb-4">
+								<div class="card-header">
+									기본 정보<span class="essentialPoint">*</span>
+								</div>
+								<div class="card-body">
+									<div class="row g-3">
+										<!-- 증명사진 업로드 -->
+										<div class="col-md-2">
+											<div class="d-flex justify-content-center align-items-center border rounded position-relative photoUploadBox"
+												style="height: 200px; background-color: #f8f9fa;">
 												<c:if test="${isSameUser}">
-													<i class="bi bi-plus-circle"
-														style="font-size: 2rem; color: #6c757d;"></i><br>
-													증명 사진 등록<span class="essentialPoint">*</span>
+													<input type="file" id="photoUpload" style="display: none;"
+														accept="image/*" />
+													<label for="photoUpload" class="text-center"
+														style="cursor: pointer;">
+														<i class="bi bi-plus-circle"
+															style="font-size: 2rem; color: #6c757d;"></i><br>
+														증명 사진 등록<span class="essentialPoint">*</span>
+													</label>
+													<img id="photoPreview" src="#" alt="사진 미리보기"
+														style="display: none; max-height: 100%; max-width: 100%;" />
+													<button type="button"
+														class="btn-close position-absolute top-0 end-0 m-2 pCloseBtn"
+														id="removePhoto"
+														style="display: none; background-color: #47B2E4; border-radius: 50%; padding: 8px; border: 1px solid #37517E; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+													</button>
 												</c:if>
-											</label>
-
-											<img id="photoPreview" src="#" alt="사진 미리보기"
-												style="display: none; max-height: 100%; max-width: 100%;" />
-											<c:if test="${isSameUser}">
-												<button type="button"
-													class="btn-close position-absolute top-0 end-0 m-2 pCloseBtn"
-													id="removePhoto"
-													style="display: none; background-color: #47B2E4; border-radius: 50%; padding: 8px; border: 1px solid #37517E; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-												</button>
-											</c:if>
+											</div>
 										</div>
-									</div>
-									<input type="hidden" id="profileBase64" name="profileBase64" />
-									<div class="col-md-9 pContent">
-										<div class="row g-3">
-											<div class="col-md-4">
-												<label class="form-label">이름</label>
-												<input type="text" class="form-control" value="${user.userName}"
-													readonly />
+										<input type="hidden" id="profileBase64" name="profileBase64" />
+										<div class="col-md-9 pContent">
+											<div class="row g-3">
+												<div class="col-md-4">
+													<label class="form-label">이름</label>
+													<input type="text" class="form-control" value="${user.userName}"
+														readonly />
+												</div>
+												<div class="col-md-4">
+													<label class="form-label">나이</label>
+													<input type="text" class="form-control" value="${user.age}"
+														readonly />
+												</div>
+												<div class="col-md-4">
+													<label class="form-label">성별</label>
+													<input type="text" class="form-control"
+														value="${user.gender == 'MALE' ? '남성' : '여성'}" readonly />
+												</div>
+												<c:if test="${isSameUser}">
+													<div class="col-md-4">
+														<label class="form-label">이메일</label>
+														<input type="email" class="form-control" value="${user.email}"
+															readonly />
+													</div>
+													<div class="col-md-4">
+														<label class="form-label">연락처</label>
+														<input type="tel" class="form-control" value="${user.mobile}"
+															readonly />
+													</div>
+													<div class="col-md-4">
+														<label class="form-label">거주지</label>
+														<input type="text" class="form-control" value="${user.addr}"
+															readonly />
+													</div>
+												</c:if>
 											</div>
-											<div class="col-md-4">
-												<label class="form-label">나이</label>
-												<input type="text" class="form-control" value="${user.age}" readonly />
-											</div>
-											<div class="col-md-4">
-												<label class="form-label">성별</label>
-												<input type="text" class="form-control"
-													value="${user.gender == 'MALE' ? '남성' : '여성'}" readonly />
-											</div>
-											<c:if test="${isSameUser}">
-											<div class="col-md-4">
-												<label class="form-label">이메일</label>
-												<input type="email" class="form-control" value="${user.email}"
-													readonly />
-											</div>
-											<div class="col-md-4">
-												<label class="form-label">연락처</label>
-												<input type="tel" class="form-control" value="${user.mobile}"
-													readonly />
-											</div>
-											<div class="col-md-4">
-												<label class="form-label">거주지</label>
-												<input type="text" class="form-control" value="${user.addr}" readonly />
-											</div>
-											</c:if>
 										</div>
-									</div>
-									<small class="text-muted">* 2.5MB 이하의 이미지 파일만 등록 가능합니다.</small>
-									<!-- userUid -->
-									<input type="hidden" id="userUid" name="userUid" value="${account.uid}" />
+										<c:if test="${isSameUser}">
+											<small class="text-muted">* 2.5MB 이하의 이미지 파일만 등록 가능합니다.</small>
+										</c:if>
+										<!-- userUid -->
+										<input type="hidden" id="userUid" name="userUid" value="${account.uid}" />
 									</div>
 								</div>
 							</div>
@@ -2105,17 +2108,17 @@
 							<c:forEach var="file" items="${resumeDetail.files}">
 								uploadedFiles.push({
 									"originalFileName": "${file.originalFileName}",
-									"newFileName": "${file.newFileName}",
-									"ext": "${file.ext}",
-									"size": Number("${file.size}"),
-									"base64Image": "${file.base64Image}"
+								"newFileName": "${file.newFileName}",
+								"ext": "${file.ext}",
+								"size": Number("${file.size}"),
+								"base64Image": "${file.base64Image}"
 								});
 								showFilePreview({
 									"originalFileName": "${file.originalFileName}",
-									"newFileName": "${file.newFileName}",
-									"ext": "${file.ext}",
-									"size": Number("${file.size}"),
-									"base64Image": "${file.base64Image}"
+								"newFileName": "${file.newFileName}",
+								"ext": "${file.ext}",
+								"size": Number("${file.size}"),
+								"base64Image": "${file.base64Image}"
 								});
 							</c:forEach>
 							updateFileText();
@@ -2147,17 +2150,17 @@
 						e.preventDefault();
 						e.stopPropagation();
 						$(this).removeClass('border-primary');
-						if (${isSameUser}) {
-							const files = e.originalEvent.dataTransfer.files;
-							handleFiles(files);
-						}
-					});
+						if (${ isSameUser }) {
+						const files = e.originalEvent.dataTransfer.files;
+						handleFiles(files);
+					}
+				});
 				// 파일 처리 함수
 				function handleFiles(files) {
 					if (uploadedFiles.length + pendingFiles.length + files.length > MAX_FILES) {
 						showValidationModal("최대 10개의 파일만 업로드할 수 있습니다.");
-							return;
-						}
+						return;
+					}
 
 					Array.from(files).forEach(file => {
 						// 👉 이미지 파일이면 2.5MB 제한
@@ -2254,7 +2257,7 @@
 
 					let $deleteBtn = null;
 					let $downloadBtn = null;
-					if (${isSameUser}) {
+					if (${ isSameUser }) {
 						$deleteBtn = $('<button>')
 							.addClass('btn btn-sm btn-danger ms-2')
 							.attr('type', 'button')
@@ -2267,7 +2270,7 @@
 					}
 
 					// a태그로 정적으로 서버 하드에 저장된 파일 다운로드 버튼
-					if (${!isSameUser}) {
+					if (${ !isSameUser }) {
 						$downloadBtn = $('<a>')
 							.addClass('btn btn-sm btn-primary ms-2')
 							.attr({
@@ -2424,7 +2427,7 @@
 						$majorItem.trigger('click');
 
 						// Ajax 완료 후 해당 소분류들 체크
-									$.ajax({
+						$.ajax({
 							url: "/resume/getSubCategory",
 							type: "GET",
 							data: { majorNo: majorNo },
@@ -2433,9 +2436,9 @@
 								for (let i = 0; i < subNos.length; i++) {
 									$(`#sub_${subNos[i]}`).prop('checked', true);
 								}
-										}
-									});
-								});
+							}
+						});
+					});
 
 					// 삭제 버튼 이벤트 처리
 					$('#selectedJobTypes').on('click', '.btn-close', function (e) {
@@ -2545,19 +2548,19 @@
 						<c:forEach var="file" items="${adviceFiles}">
 							uploadedAdviceFiles.push({
 								"originalFileName": "${file.originalFileName}",
-								"newFileName": "${file.newFileName}",
-								"ext": "${file.ext}",
-								"size": Number("${file.size}"),
-								"base64Image": "${file.base64Image}",
-								"adviceFileNo": Number("${file.adviceUpfileNo}")
+							"newFileName": "${file.newFileName}",
+							"ext": "${file.ext}",
+							"size": Number("${file.size}"),
+							"base64Image": "${file.base64Image}",
+							"adviceFileNo": Number("${file.adviceUpfileNo}")
 							});
 							showAdviceFilePreview({
 								"originalFileName": "${file.originalFileName}",
-								"newFileName": "${file.newFileName}",
-								"ext": "${file.ext}",
-								"size": Number("${file.size}"),
-								"base64Image": "${file.base64Image}",
-								"adviceFileNo": Number("${file.adviceUpfileNo}")
+							"newFileName": "${file.newFileName}",
+							"ext": "${file.ext}",
+							"size": Number("${file.size}"),
+							"base64Image": "${file.base64Image}",
+							"adviceFileNo": Number("${file.adviceUpfileNo}")
 							});
 						</c:forEach>
 						updateAdviceFileText();
@@ -2585,10 +2588,10 @@
 					e.preventDefault();
 					e.stopPropagation();
 					$(this).removeClass('border-primary');
-					if (${!isSameUser}) {
-						const files = e.originalEvent.dataTransfer.files;
-						handleAdviceFiles(files);
-					}
+					if (${ !isSameUser }) {
+					const files = e.originalEvent.dataTransfer.files;
+					handleAdviceFiles(files);
+				}
 				});
 
 				// 첨삭 파일 처리 함수
@@ -2694,7 +2697,7 @@
 					let $deleteBtn = null;
 					let $downloadBtn = null;
 
-					if (${!isSameUser}) {
+					if (${ !isSameUser }) {
 						$deleteBtn = $('<button>')
 							.addClass('btn btn-sm btn-danger ms-2')
 							.attr('type', 'button')
@@ -2707,7 +2710,7 @@
 					}
 
 					// a태그로 정적으로 서버 하드에 저장된 파일 다운로드 버튼
-					if (${isSameUser}) {
+					if (${ isSameUser }) {
 						$downloadBtn = $('<a>')
 							.addClass('btn btn-sm btn-primary ms-2')
 							.attr({
@@ -2811,13 +2814,13 @@
 							console.log("모든 첨삭 파일 업로드 성공");
 							pendingAdviceFiles = [];
 						}
-						
+
 						// 첨삭 내용과 파일 정보 저장
 						const adviceData = {
 							mentorUid: $('#userUid').val(),
 							resumeNo: $('#resumeNo').val(),
 							adviceContent: adviceContent,
-							files: uploadedAdviceFiles.map(function(file) {
+							files: uploadedAdviceFiles.map(function (file) {
 								return {
 									newFileName: file.newFileName,
 									originalFileName: file.originalFileName,
@@ -2857,12 +2860,12 @@
 				});
 
 				// 첨삭 파일 삭제 기능
-				$(document).on('click', '.delete-advice-file', function() {
+				$(document).on('click', '.delete-advice-file', function () {
 					const adviceFileNo = $(this).data('advice-file-no');
 					const adviceFileName = $(this).data('advice-file-name');
 					const originalFileName = $(this).data('original-file-name');
 					const $fileItem = $(this).closest('.d-flex');
-					
+
 					if (confirm('이 첨삭 파일을 삭제하시겠습니까?')) {
 						// 서버에서 파일 삭제 요청
 						$.ajax({
@@ -2874,22 +2877,22 @@
 								originalFileName: originalFileName,
 								fileType: 'advice'
 							},
-							success: function(response) {
+							success: function (response) {
 								if (response.success) {
 									// UI에서 파일 항목 제거
 									$fileItem.remove();
-									
+
 									// 파일이 없을 경우 안내 메시지 표시
 									if ($('#previewContainer-advice .d-flex').length === 0) {
 										$('.advice-file-text').show();
 									}
-									
+
 									alert('첨삭 파일이 삭제되었습니다.');
 								} else {
 									alert('첨삭 파일 삭제에 실패했습니다: ' + response.message);
 								}
 							},
-							error: function() {
+							error: function () {
 								alert('첨삭 파일 삭제 중 오류가 발생했습니다.');
 							}
 						});
