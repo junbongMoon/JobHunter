@@ -20,24 +20,35 @@ import lombok.RequiredArgsConstructor;
 public class StatusRestController {
 	private final StatusService statusService;
 
-	@GetMapping(value = "/ym/", produces = "application/json")
-	public ResponseEntity<List<String>> getMonthListByStatus(){
-		
-		ResponseEntity<List<String>> result = null;
-		
-		try {
-			List<String> resultMonth = statusService.getYearAndMonth();
-			result = ResponseEntity.ok().body(resultMonth);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			result = ResponseEntity.badRequest().body(null);
-			
-		}
-		
-		
-		
-		return result;
+	
+	@GetMapping("/years")
+	public ResponseEntity<List<Integer>> getYears() {
+	    try {
+	        return ResponseEntity.ok(statusService.getYears());
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().build();
+	    }
+	}
+
+	@GetMapping("/months")
+	public ResponseEntity<List<Integer>> getMonths(@RequestParam int year) {
+	    try {
+	        return ResponseEntity.ok(statusService.getMonthsByYear(year));
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().build();
+	    }
+	}
+
+	@GetMapping("/days")
+	public ResponseEntity<List<Integer>> getDays(@RequestParam int year, @RequestParam int month) {
+	    try {
+	        return ResponseEntity.ok(statusService.getDaysByYearAndMonth(year, month));
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().build();
+	    }
 	}
 	
 	@PostMapping(value = "/ym/data", produces = "application/json")

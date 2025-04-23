@@ -97,4 +97,22 @@ public class StatusDAOImpl implements StatusDAO {
 		return ses.selectList(NS + ".getYearAndMonthStatus");
 	}
 
+	@Override
+	public List<Integer> selectYears() {
+	    return ses.selectList(NS + ".selectYears");
+	}
+
+	@Override
+	public List<Integer> selectMonthsByYear(int year) {
+	    return ses.selectList(NS + ".selectMonthsByYear", year);
+	}
+
+	@Override
+	public List<Integer> selectDaysByYearAndMonth(int year, int month) {
+	    Map<String, Integer> param = new HashMap<>();
+	    param.put("year", year);
+	    param.put("month", month);
+	    return ses.selectList(NS + ".selectDaysByYearAndMonth", param);
+	}
+
 }
