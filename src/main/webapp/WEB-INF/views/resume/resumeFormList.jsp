@@ -672,8 +672,8 @@
 
 				function showAdviceResumeModal(action) {
 					const message = action === '수정'
-						? '이력서 첨삭 중인 이력서는 수정할 수 없습니다.'
-						: '이력서 첨삭 중인 이력서는 삭제할 수 없습니다.';
+						? '첨삭 중인 이력서는 수정할 수 없습니다.'
+						: '첨삭 중인 이력서는 삭제할 수 없습니다.';
 
 					$('#resultMessage').text(message);
 					$('#resultModal').modal('show');

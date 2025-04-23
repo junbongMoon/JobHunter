@@ -450,5 +450,44 @@ public class ResumeController {
 		return response;
 	}
 	
+	/**
+	 * 첨삭 종료 처리
+	 * <p>
+	 * 첨삭 종료 버튼을 눌렀을 때 첨삭 종료 처리를 합니다.
+	 * </p>
+	 * 
+	 * @param resumeNo 첨삭 종료할 이력서의 번호
+	 * @param model    View에 전달할 데이터
+	 * @param session  사용자 세션
+	 * @return 첨삭 종료 결과 메시지를 포함한 HTTP 응답 객체
+	 */
+	@PostMapping("/endAdvice")
+	public ResponseEntity<Map<String, Object>> endAdvice(@RequestBody ResumeAdviceDTO adviceDTO, HttpSession session) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+		int userUid = account.getUid();
 		
+		int resumeNo = adviceDTO.getResumeNo();
+		int ownerUid = adviceDTO.getOwnerUid();
+		
+		Map<String, Object> response = new HashMap<>();
+		try {
+			resumeService.saveAdvice(adviceDTO);
+			// 이력서 첨삭 종료 처리
+			boolean result = resumeService.endAdvice(resumeNo, userUid, ownerUid);
+			if (result) {
+				response.put("message", "첨삭이 종료되었습니다.");
+				response.put("url", "/");
+				response.put("success", true);
+				return ResponseEntity.ok().body(response);
+			} else {
+				response.put("message", "이미 첨삭 종료를 하였습니다.");
+				response.put("success", false);
+				return ResponseEntity.ok().body(response);
+			}
+		} catch (Exception e) {
+			response.put("message", "첨삭 종료 처리 중 오류가 발생했습니다.");
+			response.put("success", false);
+			return ResponseEntity.ok().body(response);
+		}
+	}
 }

@@ -785,14 +785,14 @@
 						<!-- 저장 버튼 -->
 						<!-- 테스트 종료 후 isSameUser 달기 -->
 						<!-- <c:if test="${isSameUser}"></c:if> -->
-						<c:if test="${mode != 'advice' && mode == 'checkAdvice' && isSameUser}">
+						<c:if test="${isSameUser}">
 							<button type="button" class="btn btn-primary" id="finalSaveBtn"><span
 									class="btn-text">저장하기</span>
 								<span class="spinner-border spinner-border-sm text-light d-none" role="status"
 									aria-hidden="true"></span></button>
 						</c:if>
 						<!-- <c:if test="${!isSameUser}"></c:if> -->
-						<c:if test="${mode == 'advice' || !isSameUser}">
+						<c:if test="${!isSameUser}">
 							<button type="button" class="btn btn-primary" id="adviceSaveBtn"><span class="btn-text">첨삭
 									저장하기</span>
 								<span class="spinner-border spinner-border-sm text-light d-none" role="status"
@@ -1223,27 +1223,6 @@
 						},
 						error: function () {
 							alert("첨삭 거절 처리 중 오류가 발생했습니다.");
-							location.reload();
-						}
-					});
-				});
-
-				// 첨삭 종료 버튼 클릭 이벤트
-				$("#endAdviceBtn").on("click", function () {
-					// 첨삭 종료 확인 컨펌
-					if (!confirm("첨삭을 종료하시겠습니까?")) return;
-					// 💥💥💥 from : 근우 -> url 해당 resumeNo랑 ownerUid=이력서 주인 uid로 수정해야해요~~~
-					const mentorUrl = "/resume/endAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}";
-					// const mentiUrl = "/resume/endAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}&userUid=";
-					$.ajax({
-						url: mentorUrl,
-						type: "GET",
-						success: function (response) {
-							alert(response.message);
-							location.reload();
-						},
-						error: function () {
-							alert("첨삭 종료 처리 중 오류가 발생했습니다.");
 							location.reload();
 						}
 					});
@@ -1816,12 +1795,7 @@
 							contentType: 'application/json',
 							success: function (response) {
 								if (response.success) {
-									if (uid) {
-										// uid가 있으면 이력서 제출 페이지로 이동
-										window.location.href = `/submission/check?uid=` + uid;
-									} else {
-										window.location.href = response.redirectUrl;
-									}
+									window.location.href = response.redirectUrl;
 								} else {
 									showValidationModal(response.message || "저장 중 오류가 발생했습니다.");
 								}
@@ -2847,7 +2821,7 @@
 				}
 
 				// 첨삭 모드 저장 버튼
-				$('#adviceSaveBtn').on('click', async function () {
+				$('#adviceSaveBtn, #endAdviceBtn').on('click', async function () {
 					const adviceContent = $('#adviceTextarea').val();
 
 					// 첨삭 의견 유효성
@@ -2912,9 +2886,12 @@
 									base64Image: file.base64Image,
 									status: file.status
 								};
-							})
+							}),
+							ownerUid: $('#userUidOwner').val()
 						};
+						
 
+						if ($(this).attr('id') === 'adviceSaveBtn') {
 						// 첨삭 저장 요청
 						$.ajax({
 							url: '/resume/advice/save',
@@ -2936,49 +2913,31 @@
 								showValidationModal('첨삭 저장 중 오류가 발생했습니다.');
 							}
 						});
+					} else if ($(this).attr('id') === 'endAdviceBtn') {
+						if (!confirm("첨삭을 종료하시겠습니까?")) return;
+						// 첨삭 종료 요청
+						$.ajax({
+							url: '/resume/endAdvice',
+							type: 'POST',
+							contentType: 'application/json',
+							data: JSON.stringify(adviceData),
+							success: function (response) {
+								if (response.success) {
+									showValidationModal('첨삭이 종료되었습니다.');
+									window.location.href = response.url;
+								} else {
+									showValidationModal('첨삭 종료에 실패했습니다.');
+								}
+							},
+							error: function (error) {
+								console.error('첨삭 종료 중 오류 발생:', error);
+								showValidationModal('첨삭 종료 중 오류가 발생했습니다.');
+							}
+						});
+					}
 					} catch (error) {
 						console.error('파일 처리 중 오류 발생:', error);
 						showValidationModal('파일 처리 중 오류가 발생했습니다.');
-					}
-				});
-
-				// 첨삭 파일 삭제 기능
-				$(document).on('click', '.delete-advice-file', function () {
-					const adviceFileNo = $(this).data('advice-file-no');
-					const adviceFileName = $(this).data('advice-file-name');
-					const originalFileName = $(this).data('original-file-name');
-					const $fileItem = $(this).closest('.d-flex');
-
-					if (confirm('이 첨삭 파일을 삭제하시겠습니까?')) {
-						// 서버에서 파일 삭제 요청
-						$.ajax({
-							url: '/resume/deleteFile',
-							type: 'POST',
-							data: {
-								fileNo: adviceFileNo,
-								fileName: adviceFileName,
-								originalFileName: originalFileName,
-								fileType: 'advice'
-							},
-							success: function (response) {
-								if (response.success) {
-									// UI에서 파일 항목 제거
-									$fileItem.remove();
-
-									// 파일이 없을 경우 안내 메시지 표시
-									if ($('#previewContainer-advice .d-flex').length === 0) {
-										$('.advice-file-text').show();
-									}
-
-									alert('첨삭 파일이 삭제되었습니다.');
-								} else {
-									alert('첨삭 파일 삭제에 실패했습니다: ' + response.message);
-								}
-							},
-							error: function () {
-								alert('첨삭 파일 삭제 중 오류가 발생했습니다.');
-							}
-						});
 					}
 				});
 
