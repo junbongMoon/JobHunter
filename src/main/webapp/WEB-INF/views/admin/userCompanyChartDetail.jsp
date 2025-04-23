@@ -7,6 +7,11 @@
 <jsp:include page="adminheader.jsp"></jsp:include>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
+    google.charts.load('current', { packages: ['corechart'] });
+    let googleChartsReady = false;
+    google.charts.setOnLoadCallback(function () {
+        googleChartsReady = true;
+    });
 
 $(function() {
     loadYearOptions();
@@ -112,6 +117,85 @@ function loadDayOptions(year, month, targetSelector) {
         },
         error: function () {
             alert("일 정보를 불러오는 데 실패했습니다.");
+        }
+    });
+}
+
+function drawUserChart(dataList) {
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', '날짜');
+    data.addColumn('number', '신규 유저');
+    data.addColumn('number', '신규 기업');
+
+    dataList.forEach(item => {
+    // 날짜 문자열로 안전하게 변환
+    const rawDate = item.statusDate;
+    let dateStr = '';
+
+        if (typeof rawDate === 'string') {
+            // 이미 문자열인 경우
+            dateStr = rawDate.split("T")[0];
+        } else if (rawDate instanceof Object && rawDate.year) {
+            // 예: { year: 2025, month: 3, day: 10, hour: 0, minute: 0, second: 0 } 형태
+            const y = rawDate.year;
+            const m = String(rawDate.month).padStart(2, '0');
+            const d = String(rawDate.day).padStart(2, '0');
+            dateStr = `${y}-${m}-${d}`;
+        } else {
+            // 마지막 수단: 그냥 문자열로 변환해서 처리
+            dateStr = String(rawDate).split("T")[0];
+        }
+
+        data.addRow([dateStr, item.newUsers, item.newCompanies]);
+    });
+
+    const options = {
+        title: '유저/기업 일일 통계',
+        legend: { position: 'bottom' },
+        width: '100%',
+        height: 320,
+        bar: { groupWidth: "60%" }
+    };
+
+    const chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_top'));
+    chart.draw(data, options);
+}
+
+function getDailyStatusByymd() {
+    const startYear = $("#startYear").val();
+    const startMonth = $("#startMonth").val();
+    const startDate = $("#startDate").val();
+    const endYear = $("#endYear").val();
+    const endMonth = $("#endMonth").val();
+    const endDate = $("#endDate").val();
+
+    // 유효성 검사
+    if (
+        !startYear || !startMonth || !startDate ||
+        !endYear || !endMonth || !endDate
+    ) {
+        alert("시작과 끝 날짜를 모두 선택해주세요.");
+        return;
+    }
+
+    // 날짜 문자열 조합
+    const start = `\${startYear}-\${String(startMonth).padStart(2, '0')}-\${String(startDate).padStart(2, '0')}T00:00:00`;
+    const end = `\${endYear}-\${String(endMonth).padStart(2, '0')}-\${String(endDate).padStart(2, '0')}T23:59:59`;
+
+    // Ajax 요청
+    $.ajax({
+        url: "/status/rest/range",
+        method: "POST",
+        contentType: "application/x-www-form-urlencoded",
+        data: {
+            start: start,
+            end: end
+        },
+        success: function (data) {
+            drawUserChart(data);  // 유저/기업 차트 함수 호출
+        },
+        error: function () {
+            alert("데이터를 불러오지 못했습니다.");
         }
     });
 }
