@@ -188,30 +188,30 @@ public class SubmissionController {
 	@PostMapping("/submitAdvice")
 	public ResponseEntity<Map<String, String>> submitAdvice(@RequestParam("resumeNo") int resumeNo, @RequestParam("mentorUid") int mentorUid, @RequestParam("sessionUid") int sessionUid) {
 		try {
-			// 이력서 첨삭 신청
-			boolean result = resumeService.submitAdvice(mentorUid, resumeNo);
-			
 			Map<String, String> response = new HashMap<>();
-
+			
 			// 해당 유저가 1000P 이상인지 확인
 			UserVO user = resumeService.getUserInfo(sessionUid);
 			if (user.getPoint() < 1000) {
 				response.put("fail", "포인트가 부족합니다.");
 				return ResponseEntity.ok(response);
-			} else if (user.getPoint() > 1000) {
+			} else {
+				// 이력서 첨삭 신청
+				boolean result = resumeService.submitAdvice(mentorUid, resumeNo);
 				// 첨삭 신청 번호 가져오기
 				int rgAdviceNo = resumeService.getRegistrationAdviceNo(mentorUid, resumeNo);
 				// 포인트 로그 테이블에 포인트 차감 기록
 				pointService.submitAdvicePointLog(mentorUid, sessionUid, -1000, rgAdviceNo);
+				
+				if (result) {
+					response.put("success", "이력서 첨삭 신청이 완료되었습니다.");
+					return ResponseEntity.ok(response);
+				} else {
+					response.put("fail", "이미 첨삭 신청한 이력서입니다.");
+					return ResponseEntity.ok(response);
+				}
 			}
 
-			if (result) {
-				response.put("success", "이력서 첨삭 신청이 완료되었습니다.");
-				return ResponseEntity.ok(response);
-			} else {
-				response.put("fail", "이미 첨삭 신청한 이력서입니다.");
-				return ResponseEntity.ok(response);
-			}
 		} catch (Exception e) {
 			Map<String, String> response = new HashMap<>();
 			response.put("error", "이력서 첨삭 신청 중 오류가 발생했습니다: " + e.getMessage());

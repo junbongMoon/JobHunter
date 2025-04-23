@@ -870,7 +870,7 @@
 
 					// 확인 버튼 클릭 이벤트
 					$('#validationCheckBtn').off('click').on('click', function () {
-						const recruitmentId = new URLSearchParams(window.location.search).get('uid');
+						const recruitmentId = new URLSearchParams(window.location.search).get('boardNo');
 						if (!recruitmentId) {
 							alert('공고 정보가 없습니다.');
 							return;

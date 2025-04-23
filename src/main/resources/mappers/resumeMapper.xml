@@ -357,5 +357,13 @@
         ORDER BY regDate DESC
         LIMIT 1
     </select>
+
+    <!-- 첨삭 상태 변경 -->
+    <update id="changeAdviceStatus" parameterType="map">
+        UPDATE registration_advice
+        SET status = #{status}
+        WHERE resumeNo = #{resumeNo}
+        AND mentorUid = #{userUid}
+    </update>
     
 </mapper>

@@ -28,4 +28,21 @@
         )
     </insert>
 
+    <!-- 포인트 로그 업데이트 -->
+    <update id="updatePointLog" parameterType="map">
+        UPDATE pointLog
+        SET status = #{status},
+            finalDate = NOW()
+        WHERE rgAdviceNo = #{rgAdviceNo}
+        <choose>
+        <when test="type == 'reject'">
+            AND status = 'WAITING'
+        </when>
+        <when test="type == 'end'">
+            AND status = 'CHECKING'
+        </when>
+        </choose>
+    </update>
+
+
 </mapper>

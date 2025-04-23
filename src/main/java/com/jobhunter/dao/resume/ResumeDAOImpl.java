@@ -35,7 +35,6 @@ public class ResumeDAOImpl implements ResumeDAO {
 
 	private static final String NS = "com.jobhunter.mapper.resumemapper";
 
-
 	@Override
 	public void insertResumeFinal(ResumeDTO resumeDTO) {
 		ses.insert(NS + ".insertResumeFinal", resumeDTO);
@@ -53,7 +52,6 @@ public class ResumeDAOImpl implements ResumeDAO {
 		map.put("sigunguNo", sigunguNo);
 		ses.insert(NS + ".insertSigungu", map);
 	}
-
 
 	@Override
 	public void insertSubCategory(int resumeNo, int subcategoryNo) {
@@ -102,7 +100,7 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public void insertLicense(LicenseDTO licenseDTO) throws Exception {
 		ses.insert(NS + ".insertLicense", licenseDTO);
 	}
-	
+
 	@Override
 	public void insertResumeUpfile(ResumeUpfileDTO resumeUpfileDTO) throws Exception {
 		ses.insert(NS + ".insertResumeUpfile", resumeUpfileDTO);
@@ -135,7 +133,7 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public List<SubCategoryVO> selectResumeSubCategory(int resumeNo) throws Exception {
 		return ses.selectList(NS + ".selectResumeSubCategory", resumeNo);
 	}
-	
+
 	// 이력서 삭제
 	@Override
 	public List<ResumeUpfileDTO> selectResumeUpfile(int resumeNo) throws Exception {
@@ -146,7 +144,7 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public void deleteResume(int resumeNo) throws Exception {
 		ses.delete(NS + ".deleteResume", resumeNo);
 	}
-	
+
 	// 이력서 상세 조회
 	@Override
 	public ResumeDTO selectResumeDetail(int resumeNo) throws Exception {
@@ -227,7 +225,7 @@ public class ResumeDAOImpl implements ResumeDAO {
 	public UserVO selectUserInfo(int userUid) throws Exception {
 		return ses.selectOne(NS + ".selectUserInfo", userUid);
 	}
-	
+
 	@Override
 	public void insertRegistration(int resumeNo, int recruitmentNo) throws Exception {
 		Map<String, Object> map = new HashMap<>();
@@ -235,7 +233,7 @@ public class ResumeDAOImpl implements ResumeDAO {
 		map.put("recruitmentNo", recruitmentNo);
 		ses.insert(NS + ".insertRegistration", map);
 	}
-	
+
 	@Override
 	public int checkExistingRegistration(int userUid, int recruitmentNo) throws Exception {
 		Map<String, Object> map = new HashMap<>();
@@ -250,85 +248,84 @@ public class ResumeDAOImpl implements ResumeDAO {
 	}
 
 	@Override
-	public void insertAdvice(ResumeAdviceDTO adviceDTO) {
+	public void insertAdvice(ResumeAdviceDTO adviceDTO) throws Exception {
 		ses.insert(NS + ".insertAdvice", adviceDTO);
 	}
 
 	@Override
-	public void insertAdviceFile(ResumeAdviceUpfileDTO fileDTO) {
+	public void insertAdviceFile(ResumeAdviceUpfileDTO fileDTO) throws Exception {
 		ses.insert(NS + ".insertAdviceFile", fileDTO);
 	}
 
 	@Override
-	public ResumeAdviceDTO selectAdvice(int resumeNo) {
+	public ResumeAdviceDTO selectAdvice(int resumeNo) throws Exception {
 		return ses.selectOne(NS + ".selectAdvice", resumeNo);
 	}
 
 	@Override
-	public List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo) {
+	public List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo) throws Exception {
 		return ses.selectList(NS + ".selectAdviceFiles", adviceNo);
 	}
 
 	@Override
-	public ResumeAdviceDTO getAdvice(int resumeNo) {
+	public ResumeAdviceDTO getAdvice(int resumeNo) throws Exception {
 		return ses.selectOne(NS + ".getAdvice", resumeNo);
 	}
 
 	@Override
-	public List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) {
+	public List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) throws Exception {
 		return ses.selectList(NS + ".getAdviceFiles", adviceNo);
 	}
 
 	@Override
-	public void deleteExistingAdvice(int resumeNo, int mentorUid) {
+	public void deleteExistingAdvice(int resumeNo, int mentorUid) throws Exception {
 		Map<String, Object> params = new HashMap<>();
 		params.put("resumeNo", resumeNo);
 		params.put("mentorUid", mentorUid);
 		ses.delete(NS + ".deleteExistingAdvice", params);
 	}
 
-	
-    /**
-     *  @author 유지원
-     *
-     * <p>
-     * 이력서 첨삭 신청을 저장하는 메서드
-     * </p>
-     * 
-     * @param int mentorUid 첨삭자 UID
-     * @param int resumeNo 이력서 번호
-     * @return 성공하면 1, 실패하면 0
-     *
-     */
-    @Override
-    public int insertRegistrationAdvice(int mentorUid, int resumeNo) throws Exception {
-        Map<String, Object> params = new HashMap<>();
-        params.put("mentorUid", mentorUid);
-        params.put("resumeNo", resumeNo);
-        
-        return ses.insert(NS + ".insertRegistrationAdvice", params);
-    }
-    
-    /**
-     *  @author 유지원
-     *
-     * <p>
-     * 이력서 첨삭 신청 중복 여부를 확인하는 메서드
-     * </p>
-     * 
-     * @param int mentorUid 첨삭자 UID
-     * @param int resumeNo 이력서 번호
-     * @return 중복이면 1 이상, 중복이 아니면 0
-     *
-     */
-    @Override
-    public int checkDuplicateAdvice(int mentorUid, int resumeNo) throws Exception {
-        Map<String, Object> params = new HashMap<>();
-        params.put("mentorUid", mentorUid);
-        params.put("resumeNo", resumeNo);
-        
-        return ses.selectOne(NS + ".checkDuplicateAdvice", params);
-    }
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 신청을 저장하는 메서드
+	 * </p>
+	 * 
+	 * @param int mentorUid 첨삭자 UID
+	 * @param int resumeNo 이력서 번호
+	 * @return 성공하면 1, 실패하면 0
+	 *
+	 */
+	@Override
+	public int insertRegistrationAdvice(int mentorUid, int resumeNo) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("mentorUid", mentorUid);
+		params.put("resumeNo", resumeNo);
+
+		return ses.insert(NS + ".insertRegistrationAdvice", params);
+	}
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 신청 중복 여부를 확인하는 메서드
+	 * </p>
+	 * 
+	 * @param int mentorUid 첨삭자 UID
+	 * @param int resumeNo 이력서 번호
+	 * @return 중복이면 1 이상, 중복이 아니면 0
+	 *
+	 */
+	@Override
+	public int checkDuplicateAdvice(int mentorUid, int resumeNo) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("mentorUid", mentorUid);
+		params.put("resumeNo", resumeNo);
+
+		return ses.selectOne(NS + ".checkDuplicateAdvice", params);
+	}
 
 	// 이력서 첨삭 상태 확인
 	@Override
@@ -337,11 +334,35 @@ public class ResumeDAOImpl implements ResumeDAO {
 	}
 
 	@Override
-	public int getRegistrationAdviceNo(int mentorUid, int resumeNo) {
+	public int getRegistrationAdviceNo(int mentorUid, int resumeNo) throws Exception {
 		Map<String, Object> params = new HashMap<>();
 		params.put("mentorUid", mentorUid);
 		params.put("resumeNo", resumeNo);
 		return ses.selectOne(NS + ".getRegistrationAdviceNo", params);
 	}
 
+	// @Override
+	// public void acceptAdvice(int resumeNo, int userUid) throws Exception {
+	// 	Map<String, Object> params = new HashMap<>();
+	// 	params.put("resumeNo", resumeNo);
+	// 	params.put("userUid", userUid);
+	// 	ses.update(NS + ".acceptAdvice", params);
+	// }
+
+	// @Override
+	// public void rejectAdvice(int resumeNo, int userUid) throws Exception {
+	// 	Map<String, Object> params = new HashMap<>();
+	// 	params.put("resumeNo", resumeNo);
+	// 	params.put("userUid", userUid);
+	// 	ses.update(NS + ".rejectAdvice", params);
+	// }
+
+	@Override
+	public int changeAdviceStatus(int resumeNo, int userUid, String status) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("resumeNo", resumeNo);
+		params.put("userUid", userUid);
+		params.put("status", status);
+		return ses.update(NS + ".changeAdviceStatus", params);
+	}
 }

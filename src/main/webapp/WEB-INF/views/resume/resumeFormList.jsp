@@ -486,7 +486,8 @@
 											<div class="action-buttons">
 												<!-- 첨삭 테스트용 버튼 -->
 												<!-- 멘토 첨삭 기능 하는데 로그인 uid랑 resume.userUid가 다르면 readonly 붙음 -->
-												<a href="/resume/advice/${resume.resumeNo}?uid=${resume.userUid}" class="btn-custom btn-edit">
+												<a href="/resume/advice/${resume.resumeNo}?uid=${resume.userUid}"
+													class="btn-custom btn-edit">
 													<i class="fas fa-edit"></i>
 													첨삭 작성 하기 (멘토)
 												</a>
@@ -504,6 +505,12 @@
 													class="btn-custom btn-edit">
 													<i class="fas fa-edit"></i>
 													첨삭 제출
+												</a> -->
+												<!-- 첨삭 승인 버튼 체크모양 -->
+												<!-- <a href="/resume/acceptAdvice/${resume.resumeNo}"
+													class="btn-custom btn-edit">
+													<i class="fas fa-check"></i>
+													첨삭 승인
 												</a> -->
 												<c:choose>
 													<c:when test="${resume.checked}">

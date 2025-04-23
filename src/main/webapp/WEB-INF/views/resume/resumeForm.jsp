@@ -801,6 +801,29 @@
 						<!-- <button type="button" class="btn btn-secondary" id="testBtn">코드
 						테스트용 버튼</button> -->
 						<button type="button" class="btn btn-secondary" id="returnBtn">목록으로</button>
+
+
+						<!-- 첨삭 승인 버튼 체크모양 
+						스크립트도 줘야함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<button type="button" class="btn btn-primary" id="acceptAdviceBtn">
+							<i class="fas fa-check"></i>
+							첨삭 승인
+						</button>
+
+						<!-- 첨삭 거절 버튼 엑스모양 
+						스크립트도 줘야함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<button type="button" class="btn btn-primary" id="rejectAdviceBtn">
+							<i class="fas fa-times"></i>
+							첨삭 거절
+						</button>
+
+						<!-- 첨삭 종료 
+						스크립트도 줘야함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<button type="button" class="btn btn-primary" id="endAdviceBtn">
+							<i class="fas fa-check"></i>
+							첨삭 종료
+						</button>
+
 					</form>
 					<div>
 						<!-- 재사용 공용 경고 모달창 -->
@@ -1166,6 +1189,66 @@
 			</style>
 
 			<script>
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 첨삭 승인 버튼 클릭 이벤트
+				$("#acceptAdviceBtn").on("click", function () {
+					// 첨삭 승인 확인 컨펌
+					if (!confirm("첨삭을 승인하시겠습니까?")) return;
+					$.ajax({ // 💥💥💥 from : 근우 -> url 해당 resumeNo로 수정해야해요~~~
+						url: "/resume/acceptAdvice/${resumeDetail.resume.resumeNo}",
+						type: "GET",
+						success: function (response) {
+							alert(response.message);
+							location.reload();
+						},
+						error: function () {
+							alert("첨삭 승인 처리 중 오류가 발생했습니다.");
+							location.reload();
+						}
+					});
+				});
+				// 첨삭 거절 버튼 클릭 이벤트
+				$("#rejectAdviceBtn").on("click", function () {
+					// 첨삭 거절 확인 컨펌
+					if (!confirm("첨삭을 거절하시겠습니까?")) return;
+					// 💥💥💥 from : 근우 -> url 해당 resumeNo랑 ownerUid=이력서 주인 uid로 수정해야해요~~~
+					const mentorUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}";
+					// const mentiUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}&userUid=";
+					$.ajax({
+						url: mentorUrl,
+						type: "GET",
+						success: function (response) {
+							alert(response.message);
+							location.reload();
+						},
+						error: function () {
+							alert("첨삭 거절 처리 중 오류가 발생했습니다.");
+							location.reload();
+						}
+					});
+				});
+
+				// 첨삭 종료 버튼 클릭 이벤트
+				$("#endAdviceBtn").on("click", function () {
+					// 첨삭 종료 확인 컨펌
+					if (!confirm("첨삭을 종료하시겠습니까?")) return;
+					// 💥💥💥 from : 근우 -> url 해당 resumeNo랑 ownerUid=이력서 주인 uid로 수정해야해요~~~
+					const mentorUrl = "/resume/endAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}";
+					// const mentiUrl = "/resume/endAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}&userUid=";
+					$.ajax({
+						url: mentorUrl,
+						type: "GET",
+						success: function (response) {
+							alert(response.message);
+							location.reload();
+						},
+						error: function () {
+							alert("첨삭 종료 처리 중 오류가 발생했습니다.");
+							location.reload();
+						}
+					});
+				});
+
 				//---------------------------------------------------------------------------------------------------------------------------------
 				$(document).ready(function () {
 					// 이력서 주인 uid와 쿼리스트링 uid가 다르면 튕기게하기

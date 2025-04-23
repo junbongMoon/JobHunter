@@ -22,4 +22,13 @@ public class PointDAOImpl implements PointDAO {
 		params.put("rgAdviceNo", rgAdviceNo);
 		ses.insert(NS + ".submitAdvicePointLog", params);
 	}
+
+	@Override
+	public int updatePointLog(int rgAdviceNo, String status, String type) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("rgAdviceNo", rgAdviceNo);
+		params.put("status", status);
+		params.put("type", type);
+		return ses.update(NS + ".updatePointLog", params);
+	}
 }
