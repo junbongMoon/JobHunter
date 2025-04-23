@@ -156,7 +156,7 @@
             title: '선택된 항목 통계',
             legend: { position: 'bottom' },
             width: '100%',
-            height: 320,
+            height: 550,
             bar: { groupWidth: "60%" }
         };
 
@@ -265,13 +265,33 @@
     gap: 0.5rem !important;
   }
 
+  #getDailyStatusBtn {
+    background-color: #3d4d6a !important;
+	color: white !important;
+	border: 2px solid #3d4d6a !important;
+	border-radius: 6px !important;
+	padding: 5px 12px !important;
+	transition: all 0.3s ease !important;
+  }
+
+  #getDailyStatusBtn:hover{
+    background-color: #2a344a !important;
+	border-color: #2a344a !important;
+	transform: translateY(-2px) !important;
+	color: white !important;
+  }
+  
+  .chartArea {
+	  margin-top: 20px;
+	}
+
 </style>
 <body>
 <!-- 차트 콘텐츠 -->
 <div class="container-fluid">
     <div class="row">
         <div class="col-12 d-flex flex-wrap align-items-end gap-2">
-    <div class="selectStartDatetime">
+    <div class="selectStartDatetime d-flex flex-column flex-grow-1">
         <select id="startYear" class="form-control">
             <option value="-1">시작 연도를 선택 하세요</option>
         </select>
@@ -283,7 +303,7 @@
         </select>
       </div>
       
-        <div class="selectEndDatetime">
+        <div class="selectEndDatetime d-flex flex-column flex-grow-1">
         <select id="endYear" class="form-control">
             <option value="-1">끝 연도를 선택 하세요</option>
         </select>
@@ -295,20 +315,21 @@
         </select>
       </div>
 
-      <div class="form-group mb-3">
+      <div class="form-group flex-grow-1">
         <label>표시할 통계 항목 선택:</label><br>
         <input type="checkbox" class="stat-check" value="user" checked> 유저
         <input type="checkbox" class="stat-check" value="company" checked> 기업
         <input type="checkbox" class="stat-check" value="recruit"> 공고
         <input type="checkbox" class="stat-check" value="submit"> 제출
     </div>
-    
-      <button type="button" id="getDailyStatusBtn" onclick="getDailyStatusByymd()">조회</button>
+        <div>
+        <button type="button" id="getDailyStatusBtn" onclick="getDailyStatusByymd()">조회</button>
+        </div>
     </div>
     </div>
 
     <!-- ===== 차트가 포함될 콘텐츠 영역 ===== -->
-    <div class="row">
+    <div class="row chartArea">
 
         <!-- 📌 영역 차트 (Area Chart) -->
         <div class="col-12">
@@ -330,9 +351,9 @@
                     </div>
                 </div>
                 <!-- 차트 본문 -->
-                <div class="card-body">
+                <div class="card-body" style="height: 620px;">
                     <div class="chart-area">
-                        <div id="chart_container" style="width: 100%; height: 400px;"></div>
+                        <div id="chart_container" style="width: 100%; height: 580px;"></div>
                       </div>
                 </div>
             </div>
