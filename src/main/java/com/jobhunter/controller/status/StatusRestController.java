@@ -24,7 +24,10 @@ public class StatusRestController {
 	@GetMapping("/years")
 	public ResponseEntity<List<Integer>> getYears() {
 	    try {
-	        return ResponseEntity.ok(statusService.getYears());
+	    	
+	    	List<Integer> yearList = statusService.getYears();
+	    	System.out.println(yearList);
+	        return ResponseEntity.ok(yearList);
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        return ResponseEntity.badRequest().build();
