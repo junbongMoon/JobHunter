@@ -1,9 +1,9 @@
 package com.jobhunter.controller.reviewboard;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.jobhunter.model.reviewboard.RPageRequestDTO;
 import com.jobhunter.model.reviewboard.ReviewBoardWithReplyVO;
@@ -12,7 +12,7 @@ import com.jobhunter.service.reviewboard.ReviewBoardService;
 
 import lombok.RequiredArgsConstructor;
 
-@Controller
+@RestController
 @RequestMapping("/reviewBoard")
 @RequiredArgsConstructor
 public class ReviewBoardRestController {
@@ -21,8 +21,11 @@ public class ReviewBoardRestController {
 
 	@PostMapping("/myReview")
 	public TenToFivePageVO<ReviewBoardWithReplyVO> getMyReview(@RequestBody RPageRequestDTO dto) {
+		System.out.println(dto);
 		try {
-			return service.getMyReview(dto);
+			TenToFivePageVO<ReviewBoardWithReplyVO> vo = service.getMyReview(dto);
+			System.out.println(vo);
+			return vo;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

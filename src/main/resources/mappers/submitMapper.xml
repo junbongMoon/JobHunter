@@ -447,13 +447,60 @@
 	
 		WHERE reg.registrationNo = #{registrationNo}
 	</select>
-
-
 	<select id="getCompanyUidByRegistrationNo" resultType="int">
 		SELECT rn.refCompany
 		FROM registration reg
 		JOIN recruitmentnotice rn ON reg.recruitmentNoticePk = rn.uid
 		WHERE reg.registrationNo = #{registrationNo}
 	</select>
+	
+	
+	<select id="selectSubmitFromUser" resultType="com.jobhunter.model.submit.SubmitFromUserVO">
+	  SELECT 
+	    reg.registrationNo,
+	    reg.status,
+	    reg.regDate,
+	    res.resumeNo,
+	    res.title AS resumeTitle,
+	    rec.uid AS recruitNo,
+	    rec.title AS recruitTitle
+	  FROM registration reg
+	  JOIN resume res ON reg.resumePk = res.resumeNo
+	  JOIN users u ON res.userUid = u.uid
+	  JOIN recruitmentnotice rec ON reg.recruitmentNoticePk = rec.uid
+	  <where>
+	    u.uid = #{uid}
+	    <if test="onlyUnread">
+	      AND reg.status NOT IN ('WAITING', 'EXPIRED')
+	    </if>
+	  </where>
+	  <choose>
+	    <when test="prioritizeUnread">
+	      ORDER BY 
+	        FIELD(reg.status, 'PASS', 'FAILURE', 'CHECKED', 'WAITING', 'EXPIRED'),
+	        reg.regDate DESC
+	    </when>
+	    <otherwise>
+	      ORDER BY reg.regDate DESC
+	    </otherwise>
+	  </choose>
+	  LIMIT 5 OFFSET #{offset}
+	</select>
+	
+	<select id="countSubmitFromUser" resultType="int">
+	  SELECT COUNT(*)
+	  FROM registration reg
+	  JOIN resume res ON reg.resumePk = res.resumeNo
+	  JOIN users u ON res.userUid = u.uid
+	  JOIN recruitmentnotice rec ON reg.recruitmentNoticePk = rec.uid
+	  <where>
+	    u.uid = #{uid}
+	    <if test="onlyUnread">
+	      AND reg.status NOT IN ('WAITING', 'EXPIRED')
+	    </if>
+	  </where>
+	</select>
+	
+	
 
 </mapper>

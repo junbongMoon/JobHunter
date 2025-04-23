@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class SubmitSearchDTO {
+	private int Uid;
 	private int recruitmentUid;
 	private int page;
 	private boolean onlyUnread;        // 읽지 않은 것만 보기

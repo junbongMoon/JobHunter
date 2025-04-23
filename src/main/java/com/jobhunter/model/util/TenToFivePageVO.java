@@ -4,6 +4,14 @@ import java.util.List;
 import java.util.ArrayList;
 import lombok.Data;
 
+/**
+ * 고정크기 페이징용 객체
+ * <p>
+ * 1페이지에 5개, 1블럭에 10페이지 고정
+ * </p>
+ * 
+ * @author 육근우
+ */
 @Data
 public class TenToFivePageVO<T> {
 

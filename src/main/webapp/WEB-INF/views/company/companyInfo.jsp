@@ -501,7 +501,6 @@ function renderResumePagination(uid, onlyUnread, res) {
 const uid = "${sessionScope.account.uid}"
 let sessionMobile = "${sessionScope.account.mobile}";
 let sessionEmail = "${sessionScope.account.email}";
-
 let page = 1;
 let searchKeyword = '';
 let searchKeywordType = "title";

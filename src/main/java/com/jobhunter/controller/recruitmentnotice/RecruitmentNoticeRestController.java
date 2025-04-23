@@ -137,12 +137,12 @@ public class RecruitmentNoticeRestController {
 		@PostMapping("/withResume")
 	    public TenToFivePageVO<RecruitmentWithResume> showRecruitmentWithResumeByUid(@RequestBody RecruitmentWithResumePageDTO dto) {
 	        try {
-				return recService.searchRecruitments(dto);
+	        	TenToFivePageVO<RecruitmentWithResume> result = recService.searchRecruitments(dto);
+				return result;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 	        return null;
 	    }
-	
 	
 }

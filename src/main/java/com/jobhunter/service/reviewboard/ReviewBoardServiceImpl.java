@@ -201,7 +201,9 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 		List<ReviewBoardWithReplyVO> list = Rdao.findMyReviewWithReply(dto);
 		int totalItems = Rdao.findMyReviewWithReplyCnt(dto);
 		
+		
 		TenToFivePageVO<ReviewBoardWithReplyVO> vo = new TenToFivePageVO<ReviewBoardWithReplyVO>(list, dto.getPage(), totalItems);
+		System.out.println(vo + "서비스");
 		return vo;
 	}
 

@@ -87,7 +87,7 @@ public class SubmitController {
 		return result;
 	}
 
-	// accept.jsp(승인 페이지)로 이동
+	// 신청서 상세조회 페이지로 이동
 	@GetMapping("/detail/{registrationNo}")
 	public String showAcceptDetail(@PathVariable("registrationNo") int registrationNo, HttpSession session,
 			Model model) {

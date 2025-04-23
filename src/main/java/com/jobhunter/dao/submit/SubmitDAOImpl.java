@@ -16,6 +16,7 @@ import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser;
 import com.jobhunter.model.submit.Status;
 import com.jobhunter.model.submit.SubmitFromRecruitVO;
+import com.jobhunter.model.submit.SubmitFromUserVO;
 import com.jobhunter.model.submit.SubmitSearchDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -268,6 +269,16 @@ public class SubmitDAOImpl implements SubmitDAO {
     @Override
     public int getCompanyUidByRegistrationNo(int registrationNo) throws Exception {
         return ses.selectOne(NS + ".getCompanyUidByRegistrationNo", registrationNo);
+    }
+    
+    @Override
+    public List<SubmitFromUserVO> selectSubmitFromUser(SubmitSearchDTO dto) throws Exception {
+        return ses.selectList(NS + ".selectSubmitFromUser", dto);
+    }
+    
+    @Override
+    public int countSubmitFromUser(SubmitSearchDTO dto) throws Exception {
+        return ses.selectOne(NS + ".countSubmitFromUser", dto);
     }
 	
 }

@@ -40,6 +40,7 @@
           <div>이메일</div><div id="nowEmail">로딩중...</div>
           <div>가입일</div><div id="regDate">로딩중...</div>
           <div>최근 로그인</div><div id="lastLoginDate">로딩중...</div>
+          <div>포인트</div><div><span id="userPoint">0</span>포인트 · <i class="nameChangeBtn" onclick="purchasePoints()">충전하기</i></div>
 
           <c:if test="${sessionScope.account.isSocial == 'N'}">
             <hr><hr>
@@ -185,23 +186,21 @@
       <!-- 이력서 영역 -->
       <section data-aos="fade-up" data-aos-delay="300">
         <div class="section-title">
-          <h2><i class="bi bi-file-earmark-text section-icon"></i>내 이력서</h2>
+          <h2><i class="bi bi-heart section-icon"></i>신청한 이력서</h2>
+          <span><button class="btn-edit" onclick="resumeReadOnly()" id="resumeReadOnlyBtn">조회된 신청서만 검색</button></span>
+          <span style="float:right"><button class="btn-edit" onclick="resumeSortOption()" id="resumeSortOptionBtn">최신순으로 정렬</button></span>
+          
         </div>
-        <div class="empty-state">
-          <i class="bi bi-file-earmark-text"></i>
-          <p>등록된 이력서가 없습니다.</p>
-        </div>
+        <div id="resumeSection"></div>
       </section>
 
       <!-- 리뷰 영역 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
-          <h2><i class="bi bi-star section-icon"></i>내가 작성한 리뷰</h2>
+          <h2><i class="bi bi-heart section-icon"></i>작성한 리뷰</h2>
+          <button class="btn-edit" onclick="openReviewSearchModal()">리뷰 검색 옵션</button>
         </div>
-        <div class="empty-state">
-          <i class="bi bi-star"></i>
-          <p>작성한 리뷰가 없습니다.</p>
-        </div>
+        <div id="reviewSection"></div>
       </section>
 
       <!-- 관심 공고 -->
@@ -223,6 +222,25 @@
 
 <script>
 // #region 카톡
+function purchasePoints() {
+	    fetch("/kakao/pay/ready", {
+	      method: "POST",
+	      headers: { "Content-Type": "application/json" },
+	      body: JSON.stringify({
+	        item_name: "5000포인트 충전",
+	        total_amount: 5000
+	      })
+	    })
+	    .then(res => res.json())
+	    .then(data => {
+	      if (data.next_redirect_pc_url) {
+	        window.location.href = data.next_redirect_pc_url;
+	      } else {
+	        alert("결제 URL 생성 실패");
+	      }
+	    });
+	}
+	
 function linkToKakaoBtn() {
   window.publicModals.show("<div>연동한 카카오 계정의 이메일로 고정되며,</div><br><div>동일한 이메일을 다른 계정이 사용중이면</div><div>카카오 계정 연동에 실패할 수 있습니다.</div><br><div>카카오 계정에 연동하시겠습니까?</div>", 
   {
@@ -252,7 +270,310 @@ Kakao.isInitialized();
 
 $(()=>{
   getInfo();
+  getMyReview();
+  getMyResumes()
 })
+
+function viewRecruitDetail(uid) {
+  location.href = `/recruitmentnotice/detail?uid=\${uid}`;
+}
+
+function resumeReadOnly() {
+  requestResumeData.onlyUnread = !requestResumeData.onlyUnread;
+  requestResumeData.page = 1;
+  const text = requestResumeData.onlyUnread? "모든 신청서 조회" : "조회된 신청서만 검색"
+  $('#resumeReadOnlyBtn').text(text);
+  getMyResumes()
+}
+
+function resumeSortOption() {
+  requestResumeData.prioritizeUnread = !requestResumeData.prioritizeUnread;
+  requestResumeData.page = 1;
+  const text = requestResumeData.prioritizeUnread? "최신순으로 정렬" : "조회된 신청서 우선검색";
+  $('#resumeSortOptionBtn').text(text);
+  getMyResumes()
+}
+
+const requestResumeData = {
+    page: 1,
+    onlyUnread: false,
+    prioritizeUnread: true
+  };
+
+
+function getMyResumes() {
+  const listContainer = $('#resumeSection')
+
+  $.ajax({
+    url: '/submit/withUser',
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
+      uid: uid,
+      page: requestResumeData.page,
+      onlyUnread: requestResumeData.onlyUnread,
+      prioritizeUnread: requestResumeData.prioritizeUnread
+    }),
+    success: function(res) {
+      renderResumeList(res.items)
+      renderPaginationResume(res)
+    },
+    error: function(xhr) {
+      console.log("error : " + xhr);
+    }
+  });
+}
+
+
+function renderResumeList(items) {
+	  const container = $('#resumeSection');
+	  container.empty();
+
+	  if (!items || items.length === 0) {
+	    container.html(`
+	      <div class="empty-state">
+	        <i class="fas fa-folder-open"></i><br>
+	        검색된 신청서가 없습니다.
+	      </div>
+	    `);
+	    return;
+	  }
+
+	  let html = '<div class="recruit-card-list" style="display: flex; flex-direction: column; gap: 12px;">';
+
+	  items.forEach(item => {
+	    html += `
+        <div class="recruit-card-wrapper">
+          <div class="recruit-card" style="
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2c3e50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;">
+            
+            <div style="flex: 1;">
+              <div><strong>\${item.recruitTitle}</strong></div>
+              <div style="font-size: 13px; color: #666;">
+                <div>\${item.resumeTitle}</div>
+                \${formatDate(item.regDate)} 신청 · 상태 : \${item.statusDisplayName}
+              </div>
+            </div>
+
+            <button class="btn-edit" onclick="event.stopPropagation(); viewRecruitDetail(\${item.recruitNo})">
+              대상 공고 보기
+            </button>
+          </div>
+        </div>
+      `;
+	  });
+
+	  html += '</div>';
+	  container.html(html);
+}
+
+function renderPaginationResume(res) {
+  const { pageList, currentPage, hasPrevBlock, hasNextBlock, startPage, endPage } = res;
+  const container = $('#resumeSection');
+
+  let html = `
+    <div class="pagination" style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    ">
+  `;
+
+  if (hasPrevBlock) {
+    html += `<button class="btn-edit" onclick="goToResumePage(\${startPage - 1})">« 이전</button>`;
+  }
+
+  pageList.forEach(p => {
+    html += `<button class="btn-edit \${p === currentPage ? 'active' : ''}" onclick="goToResumePage(\${p})" style="\${p === currentPage ? 'background:#3a8fb8;' : ''}">\${p}</button>`;
+  });
+
+  if (hasNextBlock) {
+    html += `<button class="btn-edit" onclick="goToResumePage(\${endPage + 1})">다음 »</button>`;
+  }
+
+  html += '</div>';
+  container.append(html);
+}
+
+function goToResumePage(pageNum) {
+  requestResumeData.page = pageNum;
+	getMyResumes();
+}
+
+
+
+
+
+const reviewSortType = {
+  LIKES: "likes",
+  VIEWS: "views",
+  POSTDATE: "postDate"
+}
+
+const reviewFilter = {
+  IS: "isReply",
+  NOT: "notReply"
+}
+
+const requestReviewData = {
+    page: 1,
+    sortType: reviewSortType.POSTDATE,
+    resultFilter: reviewFilter.NOT
+  };
+
+function getMyReview() {
+  const data = {
+    page: requestReviewData.page,
+    size: 5,
+    sortType: requestReviewData.sortType,
+    resultFilter: requestReviewData.resultFilter,
+    writer: uid
+  };
+
+  $.ajax({
+    url: '/reviewBoard/myReview',
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(data),
+    success: function(res) {
+      renderReviewList(res.items)
+      renderPaginationReview(res)
+    },
+    error: function(xhr) {
+      console.log("에러 발생", xhr);
+    }
+  });
+}
+
+function openReviewSearchModal() {
+  const text = `
+  <h2>검색 조건</h2>
+  <select id="sortTypeSelect">
+    <option value="postDate">최신순</option>
+    <option value="likes">좋아요순</option>
+    <option value="views">조회수순</option>
+  </select>
+
+  <select id="resultFilterSelect">
+    <option value="notReply">전체</option>
+    <option value="isReply">댓글 있는 것만</option>
+  </select>
+  `
+  window.publicModals.show(text, {cancelText:'취소', onConfirm:()=>{
+    requestReviewData.page = 1;
+    requestReviewData.resultFilter = $('#resultFilterSelect').val();
+    requestReviewData.sortType = $('#sortTypeSelect').val();
+    getMyReview();
+  }})
+}
+
+function goToReviewPage(pageNum) {
+  requestReviewData.page = pageNum;
+	getMyReview();
+}
+
+function renderReviewList(items) {
+	  const container = $('#reviewSection');
+	  container.empty();
+
+	  if (!items || items.length === 0) {
+	    container.html(`
+	      <div class="empty-state">
+	        <i class="fas fa-folder-open"></i><br>
+	        검색된 리뷰가 없습니다.
+	      </div>
+	    `);
+	    return;
+	  }
+
+	  let html = '<div class="recruit-card-list" style="display: flex; flex-direction: column; gap: 12px;">';
+
+	  items.forEach(item => {
+	    html += `
+        <div class="recruit-card-wrapper">
+          <div class="recruit-card" style="
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2c3e50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;"
+            onclick="viewReviewDetail(\${item.boardNo})">
+            
+            <div style="flex: 1;">
+              <div><strong>\${item.companyName}</strong></div>
+              <div style="font-size: 13px; color: #666;">
+                <div>\${item.content}</div>
+                \${formatDate(item.postDate)}작성 · 댓글 \${item.replyCnt}건 · 
+                <span style="color: #999;">\${item.views} <i class="bi bi-eye"></i> · \${item.likes} <i class="bi bi-hand-thumbs-up"></i></span>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      `;
+	  });
+
+	  html += '</div>';
+	  container.html(html);
+}
+
+function renderPaginationReview(res) {
+  const { pageList, currentPage, hasPrevBlock, hasNextBlock, startPage, endPage } = res;
+  const container = $('#reviewSection');
+
+  let html = `
+    <div class="pagination" style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    ">
+  `;
+
+  if (hasPrevBlock) {
+    html += `<button class="btn-edit" onclick="goToReviewPage(\${startPage - 1})">« 이전</button>`;
+  }
+
+  pageList.forEach(p => {
+    html += `<button class="btn-edit \${p === currentPage ? 'active' : ''}" onclick="goToReviewPage(\${p})" style="\${p === currentPage ? 'background:#3a8fb8;' : ''}">\${p}</button>`;
+  });
+
+  if (hasNextBlock) {
+    html += `<button class="btn-edit" onclick="goToReviewPage(\${endPage + 1})">다음 »</button>`;
+  }
+
+  html += '</div>';
+  container.append(html);
+}
+
+function viewReviewDetail(boardNo) {
+  // 상세 페이지 이동
+  location.href = `/reviewBoard/detail?boardNo=\${boardNo}&page=1`;
+}
+
 // #region 전역 변수 및 초기화
 const uid = "${sessionScope.account.uid}"
 let sessionMobile = "${sessionScope.account.mobile}";
@@ -381,6 +702,7 @@ function updateBasicInfo(userInfo) {
   $('#nowEmail').text( userInfo.email || '등록된 이메일 없음')
   $('#regDate').text( formatDate(userInfo.regDate))
   $('#lastLoginDate').text( formatDateTime(userInfo.lastLoginDate))
+  $('#userPoint').text( userInfo.point || 0)
 }
 
 // 상세정보 로딩
