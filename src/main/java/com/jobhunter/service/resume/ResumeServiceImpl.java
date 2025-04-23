@@ -314,16 +314,26 @@ public class ResumeServiceImpl implements ResumeService {
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-	public boolean submitAdvice(int mentorUid, int resumeNo) throws Exception {
+	public boolean submitAdvice(int mentorUid, int resumeNo, int sessionUid) throws Exception {
 		// 중복 신청 확인
 		int duplicateCount = rdao.checkDuplicateAdvice(mentorUid, resumeNo);
 		if (duplicateCount > 0) {
 			return false; // 중복 신청이 있으면 실패
+		} else {
+			// 첨삭 신청 저장
+			int result = rdao.insertRegistrationAdvice(mentorUid, resumeNo);
+			if (result > 0) {
+				// 첨삭 신청 번호 가져오기
+				int rgAdviceNo = rdao.getRegistrationAdviceNo(mentorUid, resumeNo);
+				// 포인트 로그 저장
+				pointDAO.submitAdvicePointLog(mentorUid, sessionUid, -1000, rgAdviceNo);
+				// 포인트 차감
+				userDAO.updateUserPoint(sessionUid, -1000);
+
+				return true;
+			} 
 		}
-		
-		// 첨삭 신청 저장
-		int result = rdao.insertRegistrationAdvice(mentorUid, resumeNo);
-		return result > 0; // 성공하면 true, 실패하면 false
+		return false;
 	}
 
 	@Override

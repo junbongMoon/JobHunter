@@ -82,7 +82,7 @@ public interface ResumeService {
 	 * @return 성공 여부
 	 *
 	 */
-	boolean submitAdvice(int mentorUid, int resumeNo) throws Exception;
+	boolean submitAdvice(int mentorUid, int resumeNo, int sessionUid) throws Exception;
 
 	int getRegistrationAdviceNo(int mentorUid, int resumeNo) throws Exception;
 
