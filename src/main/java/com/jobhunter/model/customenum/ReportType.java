@@ -1,5 +1,5 @@
 package com.jobhunter.model.customenum;
 
 public enum ReportType {
-	USER, COMPANY, BOARD, RECRUTMENT
+	USER, COMPANY, BOARD, RECRUITMENT
 }
