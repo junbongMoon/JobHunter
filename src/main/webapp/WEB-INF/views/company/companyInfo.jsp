@@ -44,6 +44,8 @@
           <div>이메일</div><div id="nowEmail">로딩중...</div>
           <div>가입일</div><div id="regDate">로딩중...</div>
           <div>최근 로그인</div><div id="lastLoginDate">로딩중...</div>
+          <div id="accountDeleteDateTitle" style="color: var(--bs-red); font-size: 0.8em;"></div>
+          <div id="accountDeleteDateBlock" style="color: var(--bs-red); font-size: 0.8em;"></div>
         </div>
 
         <div class="spacer">
@@ -70,7 +72,7 @@
         	</div>
             <div class="edit-buttons">
             <button class="btn-edit" onclick="modyfiInfoTapOpen(this)"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
-            <button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
+            <button id="accountDeleteBtn" class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
             </div>
       </section>
 
@@ -613,6 +615,7 @@ function getInfo() {
       success: (result) => {
         sessionMobile = result.mobile;
   		  sessionEmail = result.email;
+        updateDeleteAccountInfo(result.deleteDeadline, result.blockDeadline)
         resetUserModifyForm();
         updateBasicInfo(result);
         updateCompanyDetailInfo(result);
@@ -627,6 +630,66 @@ function getInfo() {
       }
   });
 }
+
+// #region 계정삭제 관련 (백엔드 미구현)
+function updateDeleteAccountInfo(deleteDeadline, blockDeadline) {
+  if (deleteDeadline) {
+    $('#accountDeleteDateTitle').text('삭제 대기중...')
+    if (deleteDeadline < blockDeadline) {
+      $('#accountDeleteDateBlock').text(formatDate(blockDeadline) + " 이후 삭제 예정 / 정지기간중에는 계정 삭제가 불가능합니다.")
+    } else {
+      $('#accountDeleteDateBlock').text(formatDate(deleteDeadline) + " 이후 삭제 예정")
+    }
+    $('#accountDeleteBtn').text("계정 삭제 취소")
+    $('#accountDeleteBtn').off('click').on('click', deleteCancleAccount);
+  } else {
+    $('#accountDeleteDateTitle').text('')
+    $('#accountDeleteDateBlock').text('')
+    $('#accountDeleteBtn').text("계정 삭제 신청")
+    $('#accountDeleteBtn').off('click').on('click', deleteAccount);
+  }
+}
+
+function deleteAccount() {
+	  window.publicModals.show("<div>정말로 삭제하시겠습니까?</div>", {
+      cancelText : '취소',
+      onConfirm : checkedDeleteAccount
+    })
+  }
+
+  function checkedDeleteAccount() {
+    $.ajax({
+      url: `/user/info/${sessionScope.account.uid}`,
+      method: "DELETE",
+      contentType: "application/json",
+      success: (res) => {
+        window.publicModals.show("계정은 3일 뒤 삭제됩니다.")
+        updateDeleteAccountInfo(res.message)
+      },
+      error: (xhr) => {window.publicModals.show("연결 실패! 새로고침 후 다시 시도해주세요")}
+    });
+  }
+
+  function deleteCancleAccount() {
+	    window.publicModals.show("<div>계정 삭제를 취소하시겠습니까?</div>", {
+      cancelText : '취소',
+      onConfirm : checkedDeleteCancleAccount
+    })
+  }
+
+  function checkedDeleteCancleAccount() {
+    $.ajax({
+      url: `/user/info/${sessionScope.account.uid}/cancelDelete`,
+      method: "DELETE",
+      contentType: "application/json",
+      success: (res) => {
+        window.publicModals.show("계정삭제가 취소되었습니다.")
+        updateDeleteAccountInfo(res.message)
+      },
+      error: (xhr) => {window.publicModals.show("연결 실패! 새로고침 후 다시 시도해주세요")}
+    });
+  }
+// #endregion
 
 // 기본정보 로딩
 function updateBasicInfo(companyInfo) {
@@ -779,25 +842,6 @@ function confirmModify(btn) {
     }
   });
 }
-// #endregion
-
-// #region 계정삭제 관련 (백엔드 미구현)
-  function deleteAccount() {
-	  window.publicModals.show("정말로 삭제하시겠습니까?", {
-      cancelText : '취소',
-      onConfirm : checkedDeleteAccount
-    })
-  }
-
-  function checkedDeleteAccount() {
-    $.ajax({
-      url: `/company/info/${sessionScope.account.uid}`,
-      method: "DELETE",
-      contentType: "application/json",
-      success: () => {window.publicModals.show("삭제 대기중...", {onConfirm : getInfo})},
-      error: (xhr) => {window.publicModals.show("연결 실패! 새로고침 후 다시 시도해주세요")}
-    });
-  }
 // #endregion
 
 function showCodeModal(confirmFunc, isfailed) {

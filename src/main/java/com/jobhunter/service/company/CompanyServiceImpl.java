@@ -1,5 +1,6 @@
 package com.jobhunter.service.company;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -146,8 +147,15 @@ public class CompanyServiceImpl implements CompanyService {
 	}
 
 	@Override
-	public void setDeleteAccount(Integer uid) throws Exception {
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public Timestamp setDeleteAccount(Integer uid) throws Exception {
 		dao.setDeleteAccount(uid);
+		return dao.getDeleteAccount(uid);
+	}
+	
+	@Override
+	public void cancelDeleteAccount(Integer uid) throws Exception {
+		dao.cancelDeleteAccount(uid);
 	}
 	
 	@Override
