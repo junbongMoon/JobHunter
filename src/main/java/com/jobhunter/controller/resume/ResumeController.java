@@ -76,6 +76,7 @@ public class ResumeController {
 	 * @param model JSP에 전달할 데이터
 	 * @param session 로그인한 사용자 세션 정보
 	 * @return 이력서 작성 JSP 경로
+	 * @author 유지원
 	 */
 	// 이력서 작성 폼 연결
 	@GetMapping("/form")
@@ -127,6 +128,7 @@ public class ResumeController {
 	 * @param pageSize     페이지당 표시할 이력서 수 (기본값 10)
 	 * @param searchTitle  제목 검색 키워드 (선택)
 	 * @return 이력서 목록 JSP 경로
+	 * @author 유지원
 	 */
 	// 이력서 목록 페이지
 	@GetMapping("/list")
@@ -177,6 +179,7 @@ public class ResumeController {
 	 * 
 	 * @param regionNo 선택된 지역 번호
 	 * @return 시/군/구 목록 (JSON)
+	 * @author 유지원
 	 */
 	// 희망 근무 지역: 시/군/구 가져오기
 	@GetMapping("/getSigungu")
@@ -200,6 +203,7 @@ public class ResumeController {
 	 * 
 	 * @param majorNo 선택된 대분류 번호
 	 * @return 소분류 목록 (JSON)
+	 * @author 유지원
 	 */
 	// 희망 업직종: 소분류 가져오기
 	@GetMapping("/getSubCategory")
@@ -223,6 +227,7 @@ public class ResumeController {
 	 * 
 	 * @param resumeDTO 저장할 이력서 정보(JSON)
 	 * @return 저장 성공/실패 여부를 담은 응답 (JSON)
+	 * @author 유지원
 	 */
 	// 저장
 	@PostMapping("/submit-final")
@@ -252,6 +257,7 @@ public class ResumeController {
 	 * @param file 업로드할 파일
 	 * @param request 요청 객체
 	 * @return 업로드 결과 (성공 여부, 파일 정보 포함 JSON)
+	 * @author 유지원
 	 */
 	// 이력서 첨부파일 업로드
 	@PostMapping(value = "/uploadFile", produces = "application/json; charset=UTF-8")
@@ -288,6 +294,7 @@ public class ResumeController {
 	 * @param fileDTO 삭제할 파일 정보
 	 * @param request 요청 객체
 	 * @return 삭제 결과 (JSON)
+	 * @author 유지원
 	 */
 	@PostMapping(value = "/deleteFile", produces = "application/json; charset=UTF-8")
 	@ResponseBody
@@ -315,6 +322,7 @@ public class ResumeController {
 	 * @param model    View에 전달할 데이터
 	 * @param session  사용자 세션
 	 * @return 이력서 수정 폼 JSP 경로 또는 오류 페이지
+	 * @author 유지원
 	 */
 	@GetMapping({"/edit/{resumeNo}", "/advice/{resumeNo}", "/checkAdvice/{resumeNo}"})
 	public String editResumeForm(@PathVariable int resumeNo, @RequestParam int uid, Model model, HttpSession session, HttpServletRequest request) {
@@ -402,6 +410,7 @@ public class ResumeController {
 	 * @param resumeNo   수정할 이력서의 번호
 	 * @param resumeDTO  클라이언트에서 보낸 이력서 데이터 (JSON 형식)
 	 * @return 수정 성공 여부와 메시지를 포함한 JSON 응답
+	 * @author 유지원
 	 */
 	// 이력서 수정 처리
 	@PostMapping("/update/{resumeNo}")
@@ -432,6 +441,7 @@ public class ResumeController {
 	 * 
 	 * @param adviceDTO 첨삭 정보
 	 * @return 저장 결과
+	 * @author 유지원
 	 */
 	@PostMapping("/advice/save")
 	@ResponseBody
@@ -460,6 +470,7 @@ public class ResumeController {
 	 * @param model    View에 전달할 데이터
 	 * @param session  사용자 세션
 	 * @return 첨삭 종료 결과 메시지를 포함한 HTTP 응답 객체
+	 * @author 유지원
 	 */
 	@PostMapping("/endAdvice")
 	public ResponseEntity<Map<String, Object>> endAdvice(@RequestBody ResumeAdviceDTO adviceDTO, HttpSession session) {
