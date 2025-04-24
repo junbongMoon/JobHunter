@@ -121,10 +121,7 @@ public interface ResumeDAO {
 	ResumeAdviceDTO selectAdvice(int resumeNo) throws Exception;
 	
 
-	List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo);
-
-	ResumeAdviceDTO getAdvice(int resumeNo);
-	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);
+	
 
 	List<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto);
 
