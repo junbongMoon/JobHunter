@@ -53,13 +53,13 @@ public class SubmissionController {
 	 * 해당 채용 공고의 상세 정보를 불러오고, 로그인한 사용자의 이력서 목록을 페이징 처리하여 함께 전달합니다.
 	 * </p>
 	 *
-	 * @param uid 채용 공고 UID
 	 * @param page 현재 페이지 번호 (기본값 1)
 	 * @param pageSize 페이지당 출력할 이력서 수 (기본값 5)
 	 * @param searchTitle 이력서 제목 검색 키워드 (선택)
 	 * @param model 뷰에 전달할 데이터
 	 * @param session 사용자 세션 (로그인 정보 포함)
 	 * @return 이력서 제출 JSP 뷰 경로
+	 * @author 유지원
 	 */
 	// 이력서 제출 페이지 (쿼리 파라미터 방식)
 	@GetMapping({"/check", "/adCheck"})
@@ -147,6 +147,7 @@ public class SubmissionController {
 	 * @param recruitmentNo 채용 공고 번호
 	 * @param session 사용자 세션
 	 * @return 제출 성공 또는 실패 메시지를 담은 JSON 응답
+	 * @author 유지원
 	 */
 	@PostMapping("/submit")
 	public ResponseEntity<Map<String, String>> submitResume(@RequestParam("resumeNo") int resumeNo, @RequestParam("recruitmentNo") int recruitmentNo, HttpSession session) {
@@ -183,7 +184,9 @@ public class SubmissionController {
 	 *
 	 * @param resumeNo 이력서 번호
 	 * @param mentorUid 첨삭자 UID
+	 * @param sessionUid 세션에 저장된 유저 UID
 	 * @return 첨삭 신청 결과
+	 * @author 유지원
 	 */
 	@PostMapping("/submitAdvice")
 	public ResponseEntity<Map<String, String>> submitAdvice(@RequestParam("resumeNo") int resumeNo, @RequestParam("mentorUid") int mentorUid, @RequestParam("sessionUid") int sessionUid) {

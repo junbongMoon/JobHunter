@@ -42,7 +42,7 @@
 		</where>
 	<choose>
 		<when test="sortOption != null">
-			ORDER BY ${sortOption}
+			ORDER BY #{sortOption}
 		</when>
 		<otherwise>
 			ORDER BY prBoardNo DESC
@@ -91,7 +91,7 @@
 	</select>
 	
 	<select id="countPRBoardsByUserUid" resultType="int">
-	  SELECT COUNT(*) FROM prBoard
+	  SELECT COUNT(prBoardNo) FROM prBoard
 	  WHERE useruid = #{uid}
 	</select>
 	

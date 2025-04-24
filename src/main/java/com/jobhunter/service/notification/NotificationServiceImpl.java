@@ -80,4 +80,32 @@ public class NotificationServiceImpl implements NotificationService {
 	public int getUnreadCount(String uid, String accountType) throws Exception {
 		return messageDAO.getUnreadCount(uid, accountType);
 	}
+	
+	/**
+	 * 페이지네이션을 지원하는 알림 목록 조회 메서드
+	 * 
+	 * @param uid 사용자 ID
+	 * @param accountType 계정 타입
+	 * @param page 페이지 번호
+	 * @param pageSize 페이지 크기
+	 * @return 알림 목록
+	 * @throws Exception 예외 발생 시
+	 */
+	@Override
+	public List<MessageDTO> getNotificationListWithPaging(String uid, String accountType, int page, int pageSize) throws Exception {
+		return messageDAO.getMessagesWithPaging(uid, accountType, page, pageSize);
+	}
+	
+	/**
+	 * 전체 알림 개수를 가져오는 메서드
+	 * 
+	 * @param uid 사용자 ID
+	 * @param accountType 계정 타입
+	 * @return 전체 알림 개수
+	 * @throws Exception 예외 발생 시
+	 */
+	@Override
+	public int getTotalNotificationCount(String uid, String accountType) throws Exception {
+		return messageDAO.getTotalMessageCount(uid, accountType);
+	}
 }

@@ -68,4 +68,23 @@
 		WHERE isRead = 'N' AND toWho = #{uid} AND toUserType = #{accountType}
 	</select>
 
+	<select id="getMessagesWithPaging" parameterType="map" resultType="com.jobhunter.model.message.MessageDTO">
+		SELECT 
+			messageNo, toWho, fromWho, toUserType, fromUserType, 
+			title, content, isRead, regDate
+		FROM 
+			message
+		WHERE
+			toWho = #{uid} AND toUserType = #{accountType}
+		ORDER BY 
+			regDate DESC
+		LIMIT #{offset}, #{pageSize}
+	</select>
+	
+	<select id="getTotalMessageCount" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM message
+		WHERE toWho = #{uid} AND toUserType = #{accountType}
+	</select>
+
 </mapper>

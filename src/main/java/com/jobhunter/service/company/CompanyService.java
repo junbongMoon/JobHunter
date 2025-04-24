@@ -1,5 +1,7 @@
 package com.jobhunter.service.company;
 
+import java.sql.Timestamp;
+
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.company.BusinessRequestDTO;
 import com.jobhunter.model.company.CompanyInfoDTO;
@@ -26,10 +28,12 @@ public interface CompanyService {
 
 	void deleteContact(String uid, String type) throws Exception;
 
-	void setDeleteAccount(Integer uid) throws Exception;
+	Timestamp setDeleteAccount(Integer uid) throws Exception;
 
 	void updateProfileImg(Integer uid, String base64) throws Exception;
 
 	void deleteProfileImg(Integer uid) throws Exception;
+
+	void cancelDeleteAccount(Integer uid) throws Exception;
 
 }

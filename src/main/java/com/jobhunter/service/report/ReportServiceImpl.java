@@ -31,16 +31,26 @@ public class ReportServiceImpl implements ReportService {
 
 	@Override
 	public void saveBoardReport(BoardReportDTO dro) throws Exception {
-		Integer writerId = Rdao.findWriterUidByBoardNo(dro.getBoardNo());
+    
+    if(dro.getTargetAccountUid() == null){
+      		Integer writerId = Rdao.findWriterUidByBoardNo(dro.getBoardNo());
+          dro.setTargetAccountUid(writerId);
+    }
 
+		
+		System.out.println("dro : " + dro);
+		
 		if (writerId == null) {
 			throw new IllegalArgumentException("해당 게시글의 작성자를 찾을 수 없습니다.");
 		}
 		
-		dro.setTargetAccountUid(writerId);
-		 if (dro.getReporterAccountUid().equals(dro.getTargetAccountUid())) {
-		        throw new IllegalArgumentException("본인이 작성한 게시글은 신고할 수 없습니다.");
-		    }
+
+
+
+		if (dro.getReporterAccountUid().equals(dro.getTargetAccountUid()) && dro.getReporterAccountType().equals(dro.getTargetAccountType())) {
+	        throw new IllegalArgumentException("본인이 작성한 게시글은 신고할 수 없습니다.");
+	    }
+
 		
 	
 		dao.insertBoardReport(dro);

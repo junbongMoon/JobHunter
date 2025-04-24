@@ -2,7 +2,7 @@ package com.jobhunter.service.user;
 
 
 import java.util.Map;
-
+import java.sql.Timestamp;
 import java.util.List;
 
 
@@ -40,7 +40,7 @@ public interface UserService {
 
 	void deleteContact(String uid, String type) throws Exception;
 
-	void setDeleteAccount(Integer uid) throws Exception;
+	Timestamp setDeleteAccount(Integer uid) throws Exception;
 
 	void updateProfileImg(Integer uid, String base64) throws Exception;
 
@@ -49,6 +49,8 @@ public interface UserService {
 	void updateName(Integer uid, String newName) throws Exception;
 
 	boolean addPoint(String userId, int point, PaymentLogDTO paymentLog) throws Exception;
+
+	void cancelDeleteAccount(Integer uid) throws Exception;
 
 
 }

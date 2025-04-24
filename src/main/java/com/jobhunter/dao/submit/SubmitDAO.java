@@ -175,6 +175,9 @@ public interface SubmitDAO {
 
 	List<UserVO> selectUsersWhoApplied(int Recruitmentuid) throws Exception;
 
+
+	List<UserVO> selectUsersWhoAppliedPaged(int uid, int pageIndex, int pageSize) throws Exception;
+
 	
 	
 }

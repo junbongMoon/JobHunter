@@ -119,9 +119,6 @@ public interface ResumeDAO {
 	void deleteExistingAdvice(int resumeNo, int mentorUid) throws Exception;
 
 	ResumeAdviceDTO selectAdvice(int resumeNo) throws Exception;
-	
-
-	
 
 	List<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto);
 

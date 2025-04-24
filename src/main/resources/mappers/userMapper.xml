@@ -214,6 +214,14 @@
 		SET deleteDeadline = NOW() + INTERVAL 3 DAY 
 		WHERE uid = #{uid}
 	</update>
+	<select id="getDeleteDeadline" resultType="java.sql.Timestamp">
+		SELECT deleteDeadline FROM users WHERE uid = #{uid}
+	</select>
+	<update id="cancelDeleteAccount">
+		UPDATE users
+		SET deleteDeadline = NULL 
+		WHERE uid = #{uid}
+	</update>
 	
 	<update id="updateProfileImg">
 		UPDATE users

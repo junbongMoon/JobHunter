@@ -1,5 +1,6 @@
 package com.jobhunter.service.user;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -187,8 +188,15 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public void setDeleteAccount(Integer uid) throws Exception {
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public Timestamp setDeleteAccount(Integer uid) throws Exception {
 		dao.setDeleteAccount(uid);
+		return dao.getDeleteAccount(uid);
+	}
+	
+	@Override
+	public void cancelDeleteAccount(Integer uid) throws Exception {
+		dao.cancelDeleteAccount(uid);
 	}
 
 	@Override

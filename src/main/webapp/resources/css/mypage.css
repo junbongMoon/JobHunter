@@ -846,4 +846,14 @@
   background-color: #fafafa;
 }
 
+.registrationAdviceSelectBox {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 
+.registrationAdviceSelectBox select {
+  font-weight: bolder;
+  font-size: 14px;
+  width: 47%;
+}
