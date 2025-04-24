@@ -42,7 +42,7 @@ public class AccountUtil {
 	
 	public boolean checkOwnershipOrAdmin(AccountVO acc, boolean isAdminAllowed, Object... conditions) {
 	    if (conditions.length % 2 != 0) {
-	        throw new IllegalArgumentException("조건은 uid와 AccountType의 쌍으로 입력되어야 합니다.");
+	         System.out.println("AccountUtil.checkOwnershipOrAdmin_조건은 uid와 AccountType의 쌍으로 입력되어야 합니다.");
 	    }
 
 	    // 관리자 우선 패스
