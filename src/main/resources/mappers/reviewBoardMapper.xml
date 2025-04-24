@@ -53,7 +53,9 @@
 
 	<!-- 상세페이지 조회 -->
 	<select id="detailAll" resultMap="ReviewDetailViewDTOMap">
-		SELECT
+		
+		 <![CDATA[
+		 SELECT
 		r.boardNo,
 		res.title,
 		u.userId,
@@ -70,7 +72,8 @@
 		r.content,
 		r.likes,
 		r.views,
-		r.writer AS writerUid
+		r.writer AS writerUid,
+		rec.dueDate < NOW() AS closed
 		FROM
 		reviewBoard r
 		JOIN recruitmentnotice rec ON r.gonggoUid = rec.uid
@@ -85,6 +88,7 @@
 		=#{r.boardNo}
 		ORDER BY reg.regDate DESC
 		LIMIT 1
+		  ]]>
 	</select>
 
 	<resultMap id="ReviewDetailViewDTOMap"
@@ -105,6 +109,7 @@
 		<result column="likes" property="likes" />
 		<result column="views" property="views" />
 		<result column="writerUid" property="writerUid" />
+		<result column="closed" property="closed" />
 	</resultMap>
 
 
@@ -157,7 +162,7 @@
 		resultType="com.jobhunter.model.reviewboard.WriteBoardDTO">
 		SELECT boardNo, gonggoUid, writer, companyName,
 		reviewResult, reviewType,
-		reviewLevel, content, typeOtherText 
+		reviewLevel, content, typeOtherText
 		FROM reviewBoard
 		WHERE
 		boardNo = #{boardNo}
@@ -214,18 +219,14 @@
 	</update>
 
 
-	<!-- reviewBoardMapper.xml -->
-	<select id="countAllBoards" resultType="int">
-		SELECT COUNT(*) FROM
-		reviewBoard
-	</select>
+	
 
 
 	<!--검색 기능 쿼리 -->
 	<select id="selectPagedBoards"
 		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
 		SELECT r.boardNo,
-		u.userId AS writer,  
+		u.userId AS writer,
 		c.companyName,
 		r.reviewResult,
 		r.likes,
@@ -233,7 +234,8 @@
 		r.postDate
 		FROM reviewBoard r
 		JOIN
-		users u ON r.writer = u.uid
+		users u
+		ON r.writer = u.uid
 		JOIN
 		recruitmentnotice rn ON r.gonggoUid =
 		rn.uid
@@ -317,70 +319,71 @@
 		SELECT writer
 		FROM reviewBoard WHERE boardNo = #{boardNo}
 	</select>
-	
+
 	<!-- 육근우_내가 작성한 리뷰 댓글수 포함 검색 -->
-	<select id="selectReviewBoardWithReplies" resultType="com.jobhunter.model.reviewboard.ReviewBoardWithReplyVO">
-	  SELECT 
-	    r.boardNo,
-	    r.companyName,
-	    CONCAT(LEFT(r.content, 20), IF(CHAR_LENGTH(r.content) > 20, '...', '')) AS content,
-	    r.postDate,
-	    r.likes,
-	    r.views,
-	    IFNULL(rr.replyCnt, 0) AS replyCnt
-	  FROM reviewBoard r
-	  LEFT JOIN (
-	    SELECT boardNo, COUNT(*) AS replyCnt
-	    FROM reviewReply
-	    WHERE isDeleted = 'N'
-	    GROUP BY boardNo
-	  ) rr ON r.boardNo = rr.boardNo
-	
-	  <where>
-	    <!-- 댓글 여부 필터 -->
-	    <if test="resultFilter == 'isReply'">
-	      rr.replyCnt &gt; 0
-	    </if>
-	
-	    <!-- 작성자 필터 -->
-	    AND r.writer = #{writer}
-	  </where>
-	
-	  <!-- 정렬 기준 -->
-	  <choose>
-	    <when test="sortType == 'likes'">
-	      ORDER BY r.likes DESC
-	    </when>
-	    <when test="sortType == 'views'">
-	      ORDER BY r.views DESC
-	    </when>
-	    <otherwise>
-	      ORDER BY r.postDate DESC
-	    </otherwise>
-	  </choose>
-	
-	  LIMIT 5 OFFSET #{offset}
+	<select id="selectReviewBoardWithReplies"
+		resultType="com.jobhunter.model.reviewboard.ReviewBoardWithReplyVO">
+		SELECT
+		r.boardNo,
+		r.companyName,
+		CONCAT(LEFT(r.content, 20), IF(CHAR_LENGTH(r.content) > 20, '...', '')) AS content,
+		r.postDate,
+		r.likes,
+		r.views,
+		IFNULL(rr.replyCnt, 0) AS replyCnt
+		FROM reviewBoard r
+		LEFT JOIN (
+		SELECT boardNo, COUNT(*) AS replyCnt
+		FROM reviewReply
+		WHERE isDeleted = 'N'
+		GROUP BY boardNo
+		) rr ON r.boardNo = rr.boardNo
+
+		<where>
+			<!-- 댓글 여부 필터 -->
+			<if test="resultFilter == 'isReply'">
+				rr.replyCnt &gt; 0
+			</if>
+
+			<!-- 작성자 필터 -->
+			AND r.writer = #{writer}
+		</where>
+
+		<!-- 정렬 기준 -->
+		<choose>
+			<when test="sortType == 'likes'">
+				ORDER BY r.likes DESC
+			</when>
+			<when test="sortType == 'views'">
+				ORDER BY r.views DESC
+			</when>
+			<otherwise>
+				ORDER BY r.postDate DESC
+			</otherwise>
+		</choose>
+
+		LIMIT 5 OFFSET #{offset}
 	</select>
-	
+
 	<select id="countReviewBoardWithReplies" resultType="int">
-	  SELECT COUNT(*)
-	  FROM reviewBoard r
-	  LEFT JOIN (
-	    SELECT boardNo, COUNT(*) AS replyCnt
-	    FROM reviewReply
-	    WHERE isDeleted = 'N'
-	    GROUP BY boardNo
-	  ) rr ON r.boardNo = rr.boardNo
-	
-	  <where>
-	    <!-- 댓글 여부 필터 -->
-	    <if test="resultFilter == 'isReply'">
-	      rr.replyCnt &gt; 0
-	    </if>
-	
-	    <!-- 작성자 필터 -->
-	    AND r.writer = #{writer}
-	  </where>
+		SELECT COUNT(*)
+		FROM reviewBoard r
+		LEFT JOIN (
+		SELECT boardNo, COUNT(*) AS replyCnt
+		FROM reviewReply
+		WHERE isDeleted = 'N'
+		GROUP BY boardNo
+		) rr ON r.boardNo = rr.boardNo
+
+		<where>
+			<!-- 댓글 여부 필터 -->
+			<if test="resultFilter == 'isReply'">
+				rr.replyCnt &gt; 0
+			</if>
+
+			<!-- 작성자 필터 -->
+			AND r.writer = #{writer}
+		</where>
 	</select>
 
 </mapper>

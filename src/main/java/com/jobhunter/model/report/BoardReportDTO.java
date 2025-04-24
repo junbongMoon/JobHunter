@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor  
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class BoardReportDTO {
@@ -25,15 +25,21 @@ public class BoardReportDTO {
 	private String reportMessage; // 상세 설명
 	private String reportTargetURL; // 해당 게시글 상세 URL
 
-
 	// 필요 시 값 자동 설정 메서드 추가
 	public void applyDefaultValues() {
-		this.reportType = ReportType.BOARD;
-	
-		if (this.targetAccountType == null) this.targetAccountType = AccountType.USER;
-		if (this.reporterAccountType == null) this.reporterAccountType = AccountType.USER;
-		if (this.reportTargetURL == null && targetAccountUid != null) {
-			this.reportTargetURL = "/reviewBoard/detail?boardNo=" + targetAccountUid;
+		
+
+		if (this.targetAccountType == null) {
+			this.targetAccountType = AccountType.USER;
+		}
+
+		if (this.reporterAccountType == null) {
+			this.reporterAccountType = AccountType.USER;
+		}
+
+		// URL은 boardNo 기준으로 생성
+		if (this.reportTargetURL == null && boardNo > 0) {
+			this.reportTargetURL = "/reviewBoard/detail?boardNo=" + boardNo;
 		}
 	}
 }

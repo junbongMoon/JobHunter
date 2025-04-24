@@ -42,7 +42,7 @@ public interface ReviewBoardDAO {
 
 	int incrementViews(int boardNo) throws Exception;
 
-	int countAllBoards() throws Exception;
+	
 
 	List<ReviewBoardDTO> selectPagedReviewBoard(RPageRequestDTO pageRequestDTO) throws Exception;
 

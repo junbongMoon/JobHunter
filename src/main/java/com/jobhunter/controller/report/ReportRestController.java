@@ -67,6 +67,7 @@ public class ReportRestController {
 				boardReportDTO.applyDefaultValues();
 			}		
 
+			
 			// 서비스로 위임
 			reportService.saveBoardReport(boardReportDTO);
 			model.addAttribute("reportCategories", ReportCategory.values());
