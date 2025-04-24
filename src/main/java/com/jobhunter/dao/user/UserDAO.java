@@ -1,5 +1,6 @@
 package com.jobhunter.dao.user;
 
+import java.sql.Timestamp;
 import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
@@ -45,7 +46,11 @@ public interface UserDAO {
 
 	void updateName(Integer uid, String newName) throws Exception;
 
-	int updateUserPoint(int userUid, int point) throws Exception; 
+	int updateUserPoint(int userUid, int point) throws Exception;
+
+	Timestamp getDeleteAccount(Integer uid) throws Exception;
+
+	void cancelDeleteAccount(Integer uid) throws Exception; 
 
 		
 	
