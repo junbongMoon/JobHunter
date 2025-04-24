@@ -486,23 +486,32 @@
 											<div class="action-buttons">
 												<!-- 첨삭 테스트용 버튼 -->
 												<!-- 멘토 첨삭 기능 하는데 로그인 uid랑 resume.userUid가 다르면 readonly 붙음 -->
-												<a href="/resume/advice/${resume.resumeNo}" class="btn-custom btn-edit">
+												<a href="/resume/advice/${resume.resumeNo}?uid=${resume.userUid}"
+													class="btn-custom btn-edit">
 													<i class="fas fa-edit"></i>
 													첨삭 작성 하기 (멘토)
 												</a>
 												<!-- 멘티 첨삭 기능 하는데 로그인 uid랑 resume.userUid가 같으면 수정까지 가능 
-												만약 다르다면 첨삭 부분만 수정 가능-->
-												<a href="/resume/checkAdvice/${resume.resumeNo}"
+												만약 다르다면 첨삭 부분만 수정 가능 -->
+												<!-- resume.userUid를 컨트롤러에 넣어줘야함 -->
+												<a href="/resume/checkAdvice/${resume.resumeNo}?uid=${resume.userUid}"
 													class="btn-custom btn-edit">
 													<i class="fas fa-edit"></i>
 													첨삭 조회 하기 (멘티&멘토) + 수정까지
 												</a>
 												<!-- 첨삭 제출 페이지 -->
-												<a href="/submission/adCheck/?uid=1"
+												<!-- 첨삭 제출 페이지 주소 수정 필요 ?uid=prBoardNo-->
+												<!-- <a href="/submission/adCheck/?uid=1"
 													class="btn-custom btn-edit">
 													<i class="fas fa-edit"></i>
 													첨삭 제출
-												</a>
+												</a> -->
+												<!-- 첨삭 승인 버튼 체크모양 -->
+												<!-- <a href="/resume/acceptAdvice/${resume.resumeNo}"
+													class="btn-custom btn-edit">
+													<i class="fas fa-check"></i>
+													첨삭 승인
+												</a> -->
 												<c:choose>
 													<c:when test="${resume.checked}">
 														<button type="button" class="btn-custom btn-edit"
@@ -514,8 +523,18 @@
 															<i class="fas fa-trash"></i> 삭제하기
 														</button>
 													</c:when>
+													<c:when test="${resume.advice}">
+														<button type="button" class="btn-custom btn-edit"
+															onclick="showAdviceResumeModal('수정')">
+															<i class="fas fa-edit"></i> 수정하기
+														</button>
+														<button type="button" class="btn-custom btn-delete"
+															onclick="showAdviceResumeModal('삭제')">
+															<i class="fas fa-trash"></i> 삭제하기
+														</button>
+													</c:when>
 													<c:otherwise>
-														<a href="/resume/edit/${resume.resumeNo}"
+														<a href="/resume/edit/${resume.resumeNo}?uid=${resume.userUid}"
 															class="btn-custom btn-edit"> <i class="fas fa-edit"></i>
 															수정하기
 														</a>
@@ -641,10 +660,20 @@
 					$('#validationModal').modal('show');
 				}
 
+
 				function showCheckedResumeModal(action) {
 					const message = action === '수정'
 						? '기업에서 확인중인 이력서는 수정할 수 없습니다.'
 						: '기업에서 확인중인 이력서는 삭제할 수 없습니다.';
+
+					$('#resultMessage').text(message);
+					$('#resultModal').modal('show');
+				}
+
+				function showAdviceResumeModal(action) {
+					const message = action === '수정'
+						? '첨삭 중인 이력서는 수정할 수 없습니다.'
+						: '첨삭 중인 이력서는 삭제할 수 없습니다.';
 
 					$('#resultMessage').text(message);
 					$('#resultModal').modal('show');

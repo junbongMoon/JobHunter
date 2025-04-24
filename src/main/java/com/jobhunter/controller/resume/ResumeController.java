@@ -110,7 +110,9 @@ public class ResumeController {
 		String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		model.addAttribute("today", today);
 
-		return "resume/resumeForm";
+
+
+		return "resume/resumeFormNew";
 	}
 
 	/**
@@ -315,7 +317,7 @@ public class ResumeController {
 	 * @return 이력서 수정 폼 JSP 경로 또는 오류 페이지
 	 */
 	@GetMapping({"/edit/{resumeNo}", "/advice/{resumeNo}", "/checkAdvice/{resumeNo}"})
-	public String editResumeForm(@PathVariable int resumeNo, Model model, HttpSession session, HttpServletRequest request) {
+	public String editResumeForm(@PathVariable int resumeNo, @RequestParam int uid, Model model, HttpSession session, HttpServletRequest request) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		int userUid = account.getUid();
 		try {
@@ -325,6 +327,11 @@ public class ResumeController {
 				return "error";
 			}
 
+			// 첨삭 상태 확인
+			if (request.getRequestURI().contains("/edit/") && resumeService.isResumeAdvice(resumeNo)) {
+				model.addAttribute("error", "첨삭 중인 이력서는 수정할 수 없습니다.");
+				return "error";
+			}
 			// 기존 이력서 정보 조회
 			ResumeDetailDTO resumeDetail = resumeService.getResumeDetailWithAll(resumeNo);
 			model.addAttribute("resumeDetail", resumeDetail);
@@ -358,8 +365,8 @@ public class ResumeController {
 			String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			model.addAttribute("today", today);
 
-			// 유저정보를 가져옴
-			UserVO user = resumeService.getUserInfo(userUid);
+			// 이력서의 유저정보를 가져옴
+			UserVO user = resumeService.getUserInfo(uid);
 			model.addAttribute("user", user);
 			
 			String uri = request.getRequestURI();
@@ -443,5 +450,44 @@ public class ResumeController {
 		return response;
 	}
 	
+	/**
+	 * 첨삭 종료 처리
+	 * <p>
+	 * 첨삭 종료 버튼을 눌렀을 때 첨삭 종료 처리를 합니다.
+	 * </p>
+	 * 
+	 * @param resumeNo 첨삭 종료할 이력서의 번호
+	 * @param model    View에 전달할 데이터
+	 * @param session  사용자 세션
+	 * @return 첨삭 종료 결과 메시지를 포함한 HTTP 응답 객체
+	 */
+	@PostMapping("/endAdvice")
+	public ResponseEntity<Map<String, Object>> endAdvice(@RequestBody ResumeAdviceDTO adviceDTO, HttpSession session) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+		int userUid = account.getUid();
 		
+		int resumeNo = adviceDTO.getResumeNo();
+		int ownerUid = adviceDTO.getOwnerUid();
+		
+		Map<String, Object> response = new HashMap<>();
+		try {
+			resumeService.saveAdvice(adviceDTO);
+			// 이력서 첨삭 종료 처리
+			boolean result = resumeService.endAdvice(resumeNo, userUid, ownerUid);
+			if (result) {
+				response.put("message", "첨삭이 종료되었습니다.");
+				response.put("url", "/");
+				response.put("success", true);
+				return ResponseEntity.ok().body(response);
+			} else {
+				response.put("message", "이미 첨삭 종료를 하였습니다.");
+				response.put("success", false);
+				return ResponseEntity.ok().body(response);
+			}
+		} catch (Exception e) {
+			response.put("message", "첨삭 종료 처리 중 오류가 발생했습니다.");
+			response.put("success", false);
+			return ResponseEntity.ok().body(response);
+		}
+	}
 }
