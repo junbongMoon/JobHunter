@@ -206,8 +206,11 @@ function submitReport() {
     reporterAccountUid: parseInt(userId),
     reportCategory: category,
     reportMessage: message,
-    reportType: "RECRUITMENT",
-    reportTargetURL: `/recruitmentnotice/detail?uid=${uid}`
+    reportType: "RECRUITMENT", // ✅ 서버 ENUM 값에 맞추기
+    targetAccountType: "COMPANY", // ✅ 서버 ENUM 값
+    reporterAccountType : "${sessionScope.account.accountType}", // 👈 대소문자 정확히
+    targetAccountUid : parseInt("${RecruitmentDetailInfo.refCompany}"), // 👈 UID 값 명확히
+    reportTargetURL: `/recruitmentnotice/detail?uid=\${uid}`
   };
 
   $.ajax({
