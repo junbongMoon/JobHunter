@@ -189,7 +189,7 @@ public class SubmissionController {
 	 * @author 유지원
 	 */
 	@PostMapping("/submitAdvice")
-	public ResponseEntity<Map<String, String>> submitAdvice(@RequestParam("resumeNo") int resumeNo, @RequestParam("mentorUid") int mentorUid, @RequestParam("sessionUid") int sessionUid) {
+	public ResponseEntity<Map<String, String>> submitAdvice(@RequestParam("resumeNo") int resumeNo, @RequestParam("mentorUid") int mentorUid, @RequestParam("sessionUid") int sessionUid, @RequestParam("dueDate") String dueDate) {
 		try {
 			Map<String, String> response = new HashMap<>();
 			
@@ -200,7 +200,7 @@ public class SubmissionController {
 				return ResponseEntity.ok(response);
 			} else {
 				// 이력서 첨삭 신청
-				boolean result = resumeService.submitAdvice(mentorUid, resumeNo, sessionUid);
+				boolean result = resumeService.submitAdvice(mentorUid, resumeNo, sessionUid, dueDate);
 				// // 첨삭 신청 번호 가져오기
 				// int rgAdviceNo = resumeService.getRegistrationAdviceNo(mentorUid, resumeNo);
 				// // 포인트 로그 테이블에 포인트 차감 기록

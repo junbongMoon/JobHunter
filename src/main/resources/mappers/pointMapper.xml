@@ -19,7 +19,7 @@
         VALUES (
             NOW(),
             NULL,
-            DATE_ADD(NOW(), INTERVAL 7 DAY),
+            #{dueDate},
             #{point},
             #{sessionUid},
             #{mentorUid},

@@ -324,10 +324,11 @@ public class ResumeDAOImpl implements ResumeDAO {
 	 *
 	 */
 	@Override
-	public int insertRegistrationAdvice(int mentorUid, int resumeNo) throws Exception {
+	public int insertRegistrationAdvice(int mentorUid, int resumeNo, String dueDate) throws Exception {
 		Map<String, Object> params = new HashMap<>();
 		params.put("mentorUid", mentorUid);
 		params.put("resumeNo", resumeNo);
+		params.put("dueDate", dueDate);
 
 		return ses.insert(NS + ".insertRegistrationAdvice", params);
 	}

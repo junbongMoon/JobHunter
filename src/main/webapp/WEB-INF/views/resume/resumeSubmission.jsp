@@ -384,13 +384,19 @@
 
 			<!-- 이력서 제출용 모달창 -->
 			<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel"
-				aria-hidden="true">
+				aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 				<div class="modal-dialog modal-dialog-centered">
 					<div class="modal-content text-center">
 						<div class="modal-body">
 							<p id="validationMessage" class="mb-3">알림 메시지</p>
-							<button type="button" class="btn btn-primary" id="validationCheckBtn"
-								data-bs-dismiss="modal">확인</button>
+							<!-- 첨삭 신청 시 마감기한 입력 필드 추가 -->
+							<div id="dueDateInputArea" style="display: none;" class="mb-3">
+								<label for="adviceDueDate" class="form-label">첨삭 마감기한</label>
+								<input type="date" class="form-control" id="adviceDueDate" required>
+								<small class="text-muted normal-text" style="display: block;">첨삭을 완료해야 하는 마감기한을 선택해주세요.</small>
+								<div class="text-muted warning-text" style="display: none; font-size: 16px;">마감기한은 필수 입력 사항입니다.</div>
+							</div>
+							<button type="button" class="btn btn-primary" id="validationCheckBtn">확인</button>
 							<button type="button" class="btn btn-secondary" id="validationOutBtn"
 								data-bs-dismiss="modal">취소</button>
 						</div>
@@ -962,6 +968,10 @@
 				const adWriter = $('.notice-company').text().trim();
 				console.log("선택된 이력서 제목:", selectedResumeTitle);
 				console.log("첨삭자 이름:", adWriter);
+				
+				// 마감기한 입력 필드 표시
+				$('#dueDateInputArea').show();
+				
 				// 모달 메시지 설정
 				$('#validationMessage').html(
 					'<strong style="color: #37517e;">[' + adWriter + ']</strong> 님에게<br>' +
@@ -970,11 +980,24 @@
 					'<small style="color: #37517e;">* 첨삭 신청 후 첨삭중인 이력서는 <br> 수정 및 삭제가 불가능합니다.</small><br>' +
 					'<small style="color: #37517e;">* 첨삭 신청 시 <strong style="color: red;">1000 P</strong> 차감됩니다.</small>'
 				);
+				
 				// 모달 표시
 				$('#validationModal').modal('show');
 
 				// 확인 버튼 클릭 이벤트
 				$('#validationCheckBtn').off('click').on('click', function () {
+					// 마감기한 확인
+					const dueDate = $('#adviceDueDate').val();
+					if (!dueDate) {
+						$('#adviceDueDate').css('border-color', 'red');
+						$('.normal-text').css('display', 'none');
+						$('.warning-text').css('display', 'block');
+						return;
+					}
+					
+					// 마감기한이 입력되었을 때만 모달 닫기
+					$('#validationModal').modal('hide');
+					
 					// 첨삭 신청
 					$.ajax({
 						url: '/submission/submitAdvice',
@@ -982,7 +1005,8 @@
 						data: {
 							resumeNo: window.selectedResumeId,
 							mentorUid: $('#mentorUid').val(),
-							sessionUid: $('#sessionUid').val()
+							sessionUid: $('#sessionUid').val(),
+							dueDate: dueDate
 						},
 						success: function (response) {
 							if (response.success) {
@@ -1010,5 +1034,14 @@
 						}
 					});
 				});
+			});
+
+			// 모달이 닫힐 때 마감기한 입력 필드 숨기기 및 초기화
+			$('#validationModal').on('hidden.bs.modal', function () {
+				$('#dueDateInputArea').hide();
+				$('#adviceDueDate').val('');
+				$('#adviceDueDate').css('border-color', '');
+				$('.normal-text').css('display', 'block');
+				$('.warning-text').css('display', 'none');
 			});
 		</script>
