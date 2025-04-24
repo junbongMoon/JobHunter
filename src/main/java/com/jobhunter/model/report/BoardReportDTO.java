@@ -27,7 +27,7 @@ public class BoardReportDTO {
 
 	// 필요 시 값 자동 설정 메서드 추가
 	public void applyDefaultValues() {
-		this.reportType = ReportType.BOARD;
+		
 
 		if (this.targetAccountType == null) {
 			this.targetAccountType = AccountType.USER;
