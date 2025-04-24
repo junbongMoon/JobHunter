@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
 
 <!DOCTYPE html>
 <html>
@@ -38,7 +40,7 @@ h2 {
 }
 
 .table-container th {
-	background-color: #2c3e50;
+	background-color: #3d4d6a;
 	color: white;
 	font-weight: bold;
 }
@@ -64,7 +66,7 @@ h2 {
 	display: block;
 	margin: 30px auto;
 	padding: 10px 30px;
-	background-color: #0d6efd;
+	background-color: #47b2e4;
 	color: white;
 	border: none;
 	border-radius: 6px;
@@ -74,7 +76,22 @@ h2 {
 }
 
 .btn-write:hover {
-	background-color: #0b5ed7;
+	background-color: #3aa8da;
+}
+.search-form-wrapper {
+  max-width: 900px;
+  margin: 0 auto 20px auto;
+}
+
+.btn-primary {
+	background-color: #47b2e4 !important;
+	border-color: #47b2e4 !important;
+	color: white !important;
+}
+
+.btn-primary:hover {
+	background-color: #3aa8da !important;
+	border-color: #3aa8da !important;
 }
 </style>
 </head>
@@ -84,13 +101,15 @@ h2 {
 
 	<h2>면접 후기 목록</h2>
 
+
+	<div class="search-form-wrapper">
 	<form method="get"
 		action="${pageContext.request.contextPath}/reviewBoard/allBoard"
-		class="row g-2 align-items-center mb-4">
+		class="row align-items-end gx-3 mb-4" style="max-width: 900px; margin: 0 auto;">
 
 		<!-- 정렬 기준 -->
-		<div class="col-auto">
-			<label class="form-label">정렬</label> <select name="sortType"
+		<div class="col-md-3">
+			<label class="form-label"></label> <select name="sortType"
 				class="form-select">
 				<option value="">-- 정렬 기준 --</option>
 				<option value="likes" ${param.sortType == 'likes' ? 'selected' : ''}>추천순</option>
@@ -99,8 +118,8 @@ h2 {
 		</div>
 
 		<!-- 합격 여부 -->
-		<div class="col-auto">
-			<label class="form-label">합격 여부</label> <select name="resultFilter"
+		<div class="col-md-3">
+			<label class="form-label"></label> <select name="resultFilter"
 				class="form-select">
 				<option value="">-- 합격 여부 --</option>
 				<option value="PASSED"
@@ -113,8 +132,8 @@ h2 {
 		</div>
 
 		<!-- 회사 필터 -->
-		<div class="col-auto">
-			<label class="form-label">회사명</label> <select name="companyFilter"
+		<div class="col-md-3">
+			<label class="form-label"></label> <select name="companyFilter"
 				class="form-select">
 				<option value="">-- 회사 선택 --</option>
 				<c:forEach var="com" items="${companyList}">
@@ -125,25 +144,18 @@ h2 {
 		</div>
 
 		<!-- 검색 버튼 -->
-		<div class="col-auto mt-4">
+		<div class="col-md-3 d-flex gap-2">
 			<button type="submit" class="btn btn-primary">검색</button>
-		</div>
+		
 
-		<div class="col-auto mt-4">
+		
 			<button type="button" class="btn btn-secondary"
 				onclick="window.location.href='${pageContext.request.contextPath}/reviewBoard/allBoard'">
 				초기화</button>
 		</div>
 	</form>
+	</div>
 
-
-
-	<c:forEach var="i" begin="${pageResult.startPage}"
-		end="${pageResult.endPage}">
-		<a
-			href="?page=${i}&sortType=${param.sortType}&resultFilter=${param.resultFilter}&companyFilter=${param.companyFilter}">
-			${i} </a>
-	</c:forEach>
 
 	<table class="table-container">
 		<tr>
@@ -173,12 +185,13 @@ h2 {
 				<td>${board.likes}</td>
 				<td class="views-cell" data-board-no="${board.boardNo}">${board.views}</td>
 
-				<td class="postDate()" data-created="${board.postDate}">${board.postDate}</td>
+				<td class="postDate()" data-created="${board.postDate}"><fmt:formatDate
+						value="${board.postDate}" pattern="yyyy년 MM월 dd일 HH:mm:ss" /></td>
 
 			</tr>
 		</c:forEach>
 	</table>
-
+	
 
 	<!-- 페이징 영역 -->
 	<c:set var="page" value="${pageResult.page}" />
@@ -234,23 +247,6 @@ h2 {
 		  }
 		});
 
-	function postDate(createdAt) {
-		  const now = new Date();
-		  const postTime = new Date(createdAt.split('.')[0]); 
-		  const milli = now - postTime;
-		  const sec = Math.floor(milli / 1000);
-
-		  if (sec < 60) return `${sec}초 전`;
-		  const min = Math.floor(sec / 60);
-		  if (min < 60) return `${min}분 전`;
-		  const hr = Math.floor(min / 60);
-		  if (hr < 24) return `${hr}시간 전`;
-		  const day = Math.floor(hr / 24);
-		  if (day < 7) return `${day}일 전`;
-
-		  // 오래된 글은 직접 포맷해서 반환
-		  return formatDateWithoutMillis(createdAt.split('.')[0]);
-		}
 	
 	document.addEventListener("detail", function () {
 		const rows = document.querySelectorAll(".clickDetail");

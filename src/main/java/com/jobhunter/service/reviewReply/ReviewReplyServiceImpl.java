@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.jobhunter.dao.reviewReply.ReviewReplyDAO;
 import com.jobhunter.model.reviewReply.ReviewReplyDTO;
+import com.jobhunter.model.reviewboard.RPageRequestDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,4 +51,14 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
 	        return false;
 	    }
 	}
+
+	@Override
+    public List<ReviewReplyDTO> getRepliesByBoardNoWithPaging(int boardNo, RPageRequestDTO dto) throws Exception {
+        return replyDAO.selectRepliesWithPaging(boardNo, dto.getOffset(), dto.getSize());
+    }
+
+    @Override
+    public int getReplyCount(int boardNo) throws Exception {
+        return replyDAO.countRepliesByBoardNo(boardNo);
+    }
 }

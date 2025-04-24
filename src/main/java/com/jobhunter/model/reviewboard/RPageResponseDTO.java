@@ -25,6 +25,10 @@ public class RPageResponseDTO<T> {
 	    private String searchType;  
 	    private String keyword;
 
+	    public int getTotalPage() {
+	        return (int) Math.ceil((double) totalCount / size);
+	    }
+	    
 	    public RPageResponseDTO(List<T> boardList, int totalCount, RPageRequestDTO requestDTO) {
 	        this.boardList = boardList;
 	        this.totalCount = totalCount;

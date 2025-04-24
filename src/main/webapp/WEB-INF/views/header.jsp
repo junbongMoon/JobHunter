@@ -377,7 +377,7 @@
 										class="bi bi-chevron-down toggle-dropdown"></i></a>
 								<ul>
 									<li><a href="/recruitmentnotice/listAll">전체 채용정보</a></li>
-									<li><a href="#">공공기관 제공 채용정보</a></li>
+									<li><a href="/employment/list">공공기관 제공 채용정보</a></li>
 								</ul>
 							</li>
 							<li><a href="/reviewBoard/allBoard">면접후기</a></li>
