@@ -242,6 +242,14 @@
 			<version>4.7</version>
 			<scope>test</scope>
 		</dependency>		
+		
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava 
+		최대갯수와 유효기간이 있는 캐시 맵 들어간 라이브러리-->
+		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		    <version>33.4.8-jre</version>
+		</dependency>
 
 
 

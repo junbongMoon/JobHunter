@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.jobhunter.customexception.AccountLockException;
 import com.jobhunter.customexception.LoginBlockedException;
 import com.jobhunter.dao.account.AccountLoginDAO;
@@ -28,7 +31,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
-	private Map<String, LoginFailedDTO> failedMap = new HashMap<>();
+	private final Cache<String, LoginFailedDTO> failedMap = CacheBuilder.newBuilder()
+	        .expireAfterWrite(30, TimeUnit.MINUTES) // 쓰고 나서 30분 지나면 자동 삭제
+	        .maximumSize(10000) // 최대 10,000명까지만 저장 (메모리 보호)
+	        .build();
 
 	// 인터페이스 통합으로 하려니까 빈객체 주입에 문제생겨서 이걸로 강제주입
 	@Autowired
@@ -70,8 +76,10 @@ public class AccountServiceImpl implements AccountService {
 		AccountType accountType = loginDto.getAccountType();
 		AccountLoginDAO dao = getDAO(accountType);
 
-		LoginFailedDTO loginFailedDTO = failedMap.getOrDefault(sessionId,
-				LoginFailedDTO.builder().loginFailCnt(0).build());
+		LoginFailedDTO loginFailedDTO = failedMap.getIfPresent(sessionId);
+		if (loginFailedDTO == null) {
+		    loginFailedDTO = LoginFailedDTO.builder().loginFailCnt(0).build();
+		}
 
 		if (loginFailedDTO.getLoginFailCnt() >= 5) {
 			Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -82,7 +90,7 @@ public class AccountServiceImpl implements AccountService {
 
 				throw new LoginBlockedException(remainingSeconds);
 			} else {
-				failedMap.remove(sessionId);
+				failedMap.invalidate(sessionId);
 				loginFailedDTO = LoginFailedDTO.builder().loginFailCnt(0).build();
 			}
 		}
@@ -119,9 +127,9 @@ public class AccountServiceImpl implements AccountService {
 				loginFailedDTO.setBlockTime(blockUntil);
 				failedMap.put(sessionId, loginFailedDTO);
 				throw new LoginBlockedException(blockSeconds);
+			} else {
+				failedMap.put(sessionId, loginFailedDTO);
 			}
-
-			failedMap.put(sessionId, loginFailedDTO);
 
 			throw new NoSuchElementException();
 		} else if ("Y".equals(account.getRequiresVerification())) {
@@ -136,7 +144,7 @@ public class AccountServiceImpl implements AccountService {
 			// 마지막 로그인일자 갱신
 			dao.resetFailCount(account.getAccountId());
 			dao.setLoginTime(account.getUid());
-			failedMap.remove(sessionId);
+			failedMap.invalidate(sessionId);
 
 			// 자동로그인
 			if (loginDto.isRemember()) {
@@ -168,12 +176,7 @@ public class AccountServiceImpl implements AccountService {
 	
 	@Override
 	public Boolean checkDuplicateContact(String target, AccountType type, String targetType) throws Exception {
-		AccountLoginDAO dao = getDAO(type);
-		AccountVO account = dao.findAccountByContact(target, targetType);
-		if (account != null) {
-			return true;
-		}
-		return false;
+		return getDAO(type).findAccountByContact(target, targetType) != null;
 	}
 
 	@Override
