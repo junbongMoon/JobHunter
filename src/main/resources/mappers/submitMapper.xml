@@ -66,7 +66,7 @@
 
 	<!-- 전체 개수 -->
 	<select id="getTotalCountRowOfRecruitmentByUid" resultType="int">
-		SELECT COUNT(*)
+		SELECT COUNT(registrationNo)
 		FROM registration
 		WHERE recruitmentNoticePk = #{uid}
 	</select>
@@ -180,7 +180,7 @@
 
 	<select id="countByCreatedDateBetweenAndRole"
 		parameterType="map" resultType="int">
-		SELECT COUNT(*)
+		SELECT COUNT(registrationNo)
 		FROM registration
 		WHERE
 		regDate BETWEEN #{start} AND #{end}
@@ -315,7 +315,7 @@
 	</resultMap>
 	<!-- 육근우_공고에 제출된 (if)읽지않은 신청서 총 갯수 -->
 	<select id="countResumesByRecruitmentUid" resultType="int">
-		SELECT COUNT(*)
+		SELECT COUNT(registrationNo)
 		FROM registration reg
 		WHERE reg.recruitmentNoticePk =
 		#{recruitmentUid}
@@ -557,7 +557,7 @@
 	</select>
 
 	<select id="countSubmitFromUser" resultType="int">
-		SELECT COUNT(*)
+		SELECT COUNT(registrationNo)
 		FROM registration reg
 		JOIN resume res ON reg.resumePk =
 		res.resumeNo
@@ -588,6 +588,7 @@
 		ORDER BY
 		reg.regDate DESC
 		LIMIT #{pageIndex}, #{pageSize}
+
 	</select>
 
 </mapper>

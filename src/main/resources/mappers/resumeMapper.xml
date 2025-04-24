@@ -374,16 +374,16 @@
 	    ra.mentorUid,
 	    ra.resumeNo,
 	    r.title AS title,
-	    menti.uid AS mentiUid
+	    mentee.uid AS menteeUid
 	  FROM registration_advice ra
 	  JOIN resume r ON ra.resumeNo = r.resumeNo
-	  JOIN users menti ON r.userUid = menti.uid
+	  JOIN users mentee ON r.userUid = mentee.uid
 	  <choose>
 	    <when test="type == 'mentor'">
 	      WHERE mentorUid = #{uid}
 	    </when>
-	    <when test="type == 'mentor'">
-	      WHERE mentiUid = #{uid}
+	    <when test="type == 'mentee'">
+	      WHERE mentee.uid = #{uid}
 	    </when>
 	  </choose>
 	  <choose>
@@ -399,7 +399,7 @@
 	</select>
 	
 	<select id="countRegistrationAdviceByMentor" resultType="int">
-	  SELECT COUNT(*) FROM registration_advice
+	  SELECT COUNT(rgAdviceNo) FROM registration_advice
 	  WHERE mentorUid = #{uid}
 	  <choose>
 	    <when test="status == 'LIVE'">
@@ -419,18 +419,18 @@
 	    ra.mentorUid,
 	    r.title AS title,
 	    u.userName AS mentorName,
-	    menti.uid AS mentiUid
+	    mentee.uid AS menteeUid
 	  FROM resume_advice ra
 	  JOIN resume r ON ra.resumeNo = r.resumeNo
 	  JOIN users u ON ra.mentorUid = u.uid
-	  JOIN users menti ON r.userUid = menti.uid
+	  JOIN users mentee ON r.userUid = mentee.uid
 	  WHERE r.userUid = #{userUid}
 	  ORDER BY ra.regDate DESC
 	  LIMIT 5 OFFSET #{offset}
 	</select>
 	
 	<select id="countResumeAdviceByUserUid" resultType="int">
-	  SELECT COUNT(*)
+	  SELECT COUNT(adviceNo)
 	  FROM resume_advice ra
 	  JOIN resume r ON ra.resumeNo = r.resumeNo
 	  WHERE r.userUid = #{userUid}

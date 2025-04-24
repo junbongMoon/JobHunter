@@ -1,5 +1,6 @@
 package com.jobhunter.dao.user;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -131,9 +132,15 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public void setDeleteAccount(Integer uid) throws Exception {
 		ses.update(NS + ".setDeleteAccount", uid);
-
 	}
-
+	@Override
+	public Timestamp getDeleteAccount(Integer uid) throws Exception {
+		return ses.selectOne(NS + ".getDeleteDeadline", uid);
+	}
+	@Override
+	public void cancelDeleteAccount(Integer uid) throws Exception {
+		ses.selectOne(NS + ".cancelDeleteAccount", uid);
+	}
 
 	@Override
 	public int updateUserPoint(int userUid, int point) throws Exception {
