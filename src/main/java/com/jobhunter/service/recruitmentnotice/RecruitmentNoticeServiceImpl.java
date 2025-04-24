@@ -1,5 +1,6 @@
 package com.jobhunter.service.recruitmentnotice;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -167,8 +168,22 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 			// 여기서 제출한 이력List select
 			
 			List<UserVO> applicants = submitdao.selectUsersWhoApplied(uid); // 신청한 유저 리스트 select
-			RecruitmentStats stats = calculateStats(applicants);
-			detailInfo.setStats(stats);
+			
+	        int pageSize = 10;
+	        int pageIndex = 0;
+	        List<UserVO> allApplicants = new ArrayList<>();
+
+	        while (true) {
+	            List<UserVO> pagedList = submitdao.selectUsersWhoAppliedPaged(uid, pageIndex, pageSize);
+	            if (pagedList == null || pagedList.isEmpty()) break;
+	            allApplicants.addAll(pagedList);
+	            pageIndex += pageSize;
+	        }
+
+	        // 통계 계산 및 설정
+	        RecruitmentStats stats = calculateStats(allApplicants);
+	        detailInfo.setStats(stats);
+
 			System.out.println("지원한 유저의 통계 : " + detailInfo.getStats());
 			
 		}

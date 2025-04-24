@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.customenum.ReportCategory;
+import com.jobhunter.model.customenum.ReportType;
 import com.jobhunter.model.report.AccountReportDTO;
 import com.jobhunter.model.report.BoardReportDTO;
 import com.jobhunter.service.report.ReportService;
@@ -48,6 +50,8 @@ public class ReportRestController {
 	@PostMapping("/board")
 	public ResponseEntity<Void> reportBoard(@RequestBody BoardReportDTO boardReportDTO, HttpSession session, Model model) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
+		
+		System.out.println("BoardReportDTO : " + boardReportDTO);
 
 		if (account == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -58,7 +62,10 @@ public class ReportRestController {
 			boardReportDTO.setReporterAccountUid(account.getUid());
 
 			// Enum, URL 등 자동값 설정
-			boardReportDTO.applyDefaultValues();
+			if(boardReportDTO.getReportType() == ReportType.BOARD) {
+				System.out.println("여기 들어옴");
+				boardReportDTO.applyDefaultValues();
+			}		
 
 			// 서비스로 위임
 			reportService.saveBoardReport(boardReportDTO);

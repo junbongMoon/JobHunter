@@ -290,5 +290,17 @@ public class SubmitDAOImpl implements SubmitDAO {
         return ses.selectList(NS + ".selectUsersWhoApplied", recruitmentUid);
 
     }
+
+
+	@Override
+	public List<UserVO> selectUsersWhoAppliedPaged(int uid, int pageIndex, int pageSize) throws Exception {
+		Map<String, Integer> param = new HashMap<>();
+		param.put("uid", uid);
+		param.put("pageIndex", pageIndex);
+		param.put("pageSize", pageSize);
+		
+		
+		return ses.selectList(NS + ".selectUsersWhoAppliedPaged", param);
+	}
 	
 }

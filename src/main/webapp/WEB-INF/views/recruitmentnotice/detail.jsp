@@ -206,8 +206,11 @@ function submitReport() {
     reporterAccountUid: parseInt(userId),
     reportCategory: category,
     reportMessage: message,
-    reportType: "RECRUITMENT",
-    reportTargetURL: `/recruitmentnotice/detail?uid=${uid}`
+    reportType: "RECRUITMENT", // ✅ 서버 ENUM 값에 맞추기
+    targetAccountType: "COMPANY", // ✅ 서버 ENUM 값
+    reporterAccountType : "${sessionScope.account.accountType}", // 👈 대소문자 정확히
+    targetAccountUid : parseInt("${RecruitmentDetailInfo.refCompany}"), // 👈 UID 값 명확히
+    reportTargetURL: `/recruitmentnotice/detail?uid=\${uid}`
   };
 
   $.ajax({
@@ -226,66 +229,97 @@ function submitReport() {
 }
 
 function drawRecruitmentStats() {
-		const stats = {
-		maleCount: parseInt('${RecruitmentDetailInfo.stats.maleCount}', 10) || 0,
-		femaleCount: parseInt('${RecruitmentDetailInfo.stats.femaleCount}', 10) || 0,
-		unknownAgeCount: parseInt('${RecruitmentDetailInfo.stats.unknownAgeCount}', 10) || 0,
-		teens: parseInt('${RecruitmentDetailInfo.stats.teens}', 10) || 0,
-		twenties: parseInt('${RecruitmentDetailInfo.stats.twenties}', 10) || 0,
-		thirties: parseInt('${RecruitmentDetailInfo.stats.thirties}', 10) || 0,
-		forties: parseInt('${RecruitmentDetailInfo.stats.forties}', 10) || 0,
-		fiftiesOrAbove: parseInt('${RecruitmentDetailInfo.stats.fiftiesOrAbove}', 10) || 0
-	};
+  const stats = {
+    maleCount: parseInt('${RecruitmentDetailInfo.stats.maleCount}', 10) || 0,
+    femaleCount: parseInt('${RecruitmentDetailInfo.stats.femaleCount}', 10) || 0,
+    unknownAgeCount: parseInt('${RecruitmentDetailInfo.stats.unknownAgeCount}', 10) || 0,
+    teens: parseInt('${RecruitmentDetailInfo.stats.teens}', 10) || 0,
+    twenties: parseInt('${RecruitmentDetailInfo.stats.twenties}', 10) || 0,
+    thirties: parseInt('${RecruitmentDetailInfo.stats.thirties}', 10) || 0,
+    forties: parseInt('${RecruitmentDetailInfo.stats.forties}', 10) || 0,
+    fiftiesOrAbove: parseInt('${RecruitmentDetailInfo.stats.fiftiesOrAbove}', 10) || 0
+  };
 
-	const total =
-		stats.maleCount + stats.femaleCount +
-		stats.teens + stats.twenties + stats.thirties + stats.forties + stats.fiftiesOrAbove;
+  const totalGender = stats.maleCount + stats.femaleCount;
+  const totalAge = stats.teens + stats.twenties + stats.thirties +
+    stats.forties + stats.fiftiesOrAbove + stats.unknownAgeCount;
 
-	if (total === 0) {
-		document.getElementById("recruitmentnoticeStat").style.display = "none";
-		$('.recStat').html("지원된 공고가 없습니다.");
-		return;
-	}
+  if (totalGender + totalAge === 0) {
+    document.getElementById("recruitmentnoticeStat").style.display = "none";
+    $('.recStat').html("지원된 공고가 없습니다.");
+    return;
+  }
 
-	// 성별 비율
-	const genderData = google.visualization.arrayToDataTable([
-		['성별', '인원수'],
-		['남성', stats.maleCount],
-		['여성', stats.femaleCount]
-	]);
+	const genderDataArray = [['성별', '비율', { role: 'annotation' }]];
+	if (stats.maleCount > 0 && stats.femaleCount === 0) {
+		genderDataArray.push(['남성', 100, '100%']);
+		genderDataArray.push(['여성', 0.0001, '']);  // 시각적 균형용
+		} else if (stats.femaleCount > 0 && stats.maleCount === 0) {
+		genderDataArray.push(['여성', 100, '100%']);
+		genderDataArray.push(['남성', 0.0001, '']);  // 시각적 균형용
+		} else {
+		genderDataArray.push(['남성', (stats.maleCount / totalGender) * 100, (stats.maleCount / totalGender * 100).toFixed(1) + '%']);
+		genderDataArray.push(['여성', (stats.femaleCount / totalGender) * 100, (stats.femaleCount / totalGender * 100).toFixed(1) + '%']);
+		}
+
+	const genderData = google.visualization.arrayToDataTable(genderDataArray);
 
 	const genderOptions = {
-		title: '성별 비율',
-		pieHole: 0.4,
-		width: 400,
-		height: 300
+	title: '성별 비율 (%)',
+	pieHole: 0.4,
+	width: 400,
+	height: 350,
+	pieSliceText: 'percentage', 
+	pieSliceTextStyle: { fontSize: 16, bold: true },
+	legend: { position: 'bottom' },
+	chartArea: { width: '90%', height: '80%' }
 	};
 
-	// 연령대 비율
-	const ageData = google.visualization.arrayToDataTable([
-		['연령대', '인원수'],
-		['10대 미만', stats.teens],
-		['20대', stats.twenties],
-		['30대', stats.thirties],
-		['40대', stats.forties],
-		['50대 이상', stats.fiftiesOrAbove],
-		['나이 정보 없음', stats.unknownAgeCount]
-	]);
+  const ageData = google.visualization.arrayToDataTable([
+    ['연령대', '비율', { role: 'annotation' }],
+    ['10대 미만', (stats.teens / totalAge) * 100, (stats.teens / totalAge * 100).toFixed(1) + '%'],
+    ['20대', (stats.twenties / totalAge) * 100, (stats.twenties / totalAge * 100).toFixed(1) + '%'],
+    ['30대', (stats.thirties / totalAge) * 100, (stats.thirties / totalAge * 100).toFixed(1) + '%'],
+    ['40대', (stats.forties / totalAge) * 100, (stats.forties / totalAge * 100).toFixed(1) + '%'],
+    ['50대 이상', (stats.fiftiesOrAbove / totalAge) * 100, (stats.fiftiesOrAbove / totalAge * 100).toFixed(1) + '%'],
+    ['나이 정보 없음', (stats.unknownAgeCount / totalAge) * 100, (stats.unknownAgeCount / totalAge * 100).toFixed(1) + '%']
+  ]);
 
-	const ageOptions = {
-		title: '연령대 비율',
-		pieHole: 0.4,
-		width: 400,
-		height: 300
-	};
+  const ageOptions = {
+    title: '연령대 비율 (%)',
+    width: 500,
+    height: 350,
+    legend: { position: 'none' },
+    colors: ['#3366cc'],
+    hAxis: { title: '연령대' },
+    vAxis: {
+      title: '비율 (%)',
+      minValue: 0,
+      maxValue: 100,
+      ticks: [0, 20, 40, 60, 80, 100]
+    },
+    bar: { groupWidth: '60%' },
+    annotations: {
+      alwaysOutside: true,
+      textStyle: {
+        fontSize: 14,
+        color: '#000'
+      }
+    },
+    chartArea: { width: '80%', height: '70%' }
+  };
 
-	// 그리기
-	const genderChart = new google.visualization.PieChart(document.getElementById('genderChart'));
-	const ageChart = new google.visualization.PieChart(document.getElementById('ageChart'));
+  const genderChart = new google.visualization.PieChart(document.getElementById('genderChart'));
+  const ageChart = new google.visualization.ColumnChart(document.getElementById('ageChart'));
 
-	genderChart.draw(genderData, genderOptions);
-	ageChart.draw(ageData, ageOptions);
+  genderChart.draw(genderData, genderOptions);
+  ageChart.draw(ageData, ageOptions);
 }
+
+
+google.charts.load('current', { packages: ['corechart'] });
+google.charts.setOnLoadCallback(drawRecruitmentStats);
+
 
 google.charts.load('current', { packages: ['corechart'] });
 google.charts.setOnLoadCallback(drawRecruitmentStats);
@@ -565,6 +599,14 @@ button.btn-resume {
   font-weight: 600;
   color: #3d4d6a;
 }
+.btn-report{
+	background-color: red !important;
+	color: white !important;
+	border: 2px solid red !important;
+	border-radius: 6px !important;
+	padding: 5px 12px !important;
+	transition: all 0.3s ease !important;
+}
 </style>
 <body>
 	<!-- 헤더 -->
@@ -809,9 +851,21 @@ button.btn-resume {
 														onclick="location.href='/submission/check?boardNo=${RecruitmentDetailInfo.uid}'">
 														이력서 제출
 													</button>
-														<button type="button" class="btn btn-report" id="reportBtn" onclick="reportBoard()">신고하기</button>
+													
 												</c:when>
+												
 												</c:choose>
+												<c:choose>
+													
+													<c:when test="${sessionScope.account.accountType == 'COMPANY' && sessionScope.account.uid ne RecruitmentDetailInfo.refCompany}">
+														<button type="button" class="btn btn-report" onclick="reportBoard()">신고하기</button>
+													</c:when>
+
+													
+													<c:when test="${sessionScope.account.accountType == 'USER'}">
+														<button type="button" class="btn btn-report" onclick="reportBoard()">신고하기</button>
+													</c:when>
+													</c:choose>
 												</div>
 											</div>
 										</div>
