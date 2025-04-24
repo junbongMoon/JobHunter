@@ -42,7 +42,7 @@
 		</where>
 	<choose>
 		<when test="sortOption != null">
-			ORDER BY ${sortOption}
+			ORDER BY #{sortOption}
 		</when>
 		<otherwise>
 			ORDER BY prBoardNo DESC
