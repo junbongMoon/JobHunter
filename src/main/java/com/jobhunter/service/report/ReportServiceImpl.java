@@ -32,15 +32,11 @@ public class ReportServiceImpl implements ReportService {
 	@Override
 	public void saveBoardReport(BoardReportDTO dro) throws Exception {
     
-    if(dro.getTargetAccountUid() == null){
-      		Integer writerId = Rdao.findWriterUidByBoardNo(dro.getBoardNo());
-          dro.setTargetAccountUid(writerId);
-    }
 
 		
 		System.out.println("dro : " + dro);
 		
-		if (writerId == null) {
+		if (dro.getTargetAccountUid() == null) {
 			throw new IllegalArgumentException("해당 게시글의 작성자를 찾을 수 없습니다.");
 		}
 		
