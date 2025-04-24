@@ -28,10 +28,7 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentStats;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
-
-import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
 import com.jobhunter.model.user.UserVO;
-
 import com.jobhunter.model.util.FileStatus;
 import com.jobhunter.model.util.TenToFivePageVO;
 
