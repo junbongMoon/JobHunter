@@ -28,6 +28,7 @@ public interface AdminService {
 	 * @param adminUid 정지한 관리자의 고유 번호
 	 * @return 정지 성공 여부
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	boolean blockUser(int uid, Timestamp blockDeadline, String reason, int adminUid) throws Exception;
 
@@ -37,6 +38,7 @@ public interface AdminService {
 	 * @param uid 일반유저 고유 번호
 	 * @return 정지 해제 성공 여부
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	boolean unblockUser(int uid) throws Exception;
 
@@ -49,6 +51,7 @@ public interface AdminService {
 	 * @param adminUid 정지한 관리자의 고유 번호
 	 * @return 정지 성공 여부
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	boolean blockCompany(int uid, Timestamp blockDeadline, String reason, int adminUid) throws Exception;
 
@@ -58,6 +61,7 @@ public interface AdminService {
 	 * @param uid 기업유저 고유 번호
 	 * @return 정지 해제 성공 여부
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	boolean unblockCompany(int uid) throws Exception;
 
@@ -71,6 +75,7 @@ public interface AdminService {
 	 * @param pageSize 페이지당 표시할 게시물 수
 	 * @return 일반유저 목록
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	List<UserVO> getUsersBySearch(String searchType, String searchKeyword, String statusFilter, int page, int pageSize) throws Exception;
 
@@ -82,6 +87,7 @@ public interface AdminService {
 	 * @param statusFilter 상태 필터 (예: all, normal, blocked 등)
 	 * @return 일반유저의 총 수
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	int getTotalUserCount(String searchType, String searchKeyword, String statusFilter) throws Exception;
 
@@ -95,6 +101,7 @@ public interface AdminService {
 	 * @param pageSize 페이지당 표시할 게시물 수
 	 * @return 기업유저 목록
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	List<CompanyVO> getCompaniesBySearch(String searchType, String searchKeyword, String statusFilter, int page, int pageSize) throws Exception;
 
@@ -106,6 +113,7 @@ public interface AdminService {
 	 * @param statusFilter 상태 필터 (예: all, blocked 등)
 	 * @return 기업유저의 총 수
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	int getTotalCompanyCount(String searchType, String searchKeyword, String statusFilter) throws Exception;
 
@@ -115,6 +123,7 @@ public interface AdminService {
 	 * @param uid 일반유저 고유 번호
 	 * @return 일반유저 정보
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	UserVO getUserById(int uid) throws Exception;
 
@@ -124,6 +133,7 @@ public interface AdminService {
 	 * @param uid 기업유저 고유 번호
 	 * @return 기업유저 정보
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	CompanyVO getCompanyById(int uid) throws Exception;
 
@@ -132,6 +142,7 @@ public interface AdminService {
 	 *
 	 * @return 모든 일반유저 목록
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	List<UserVO> getAllUsers() throws Exception;
 
@@ -140,6 +151,7 @@ public interface AdminService {
 	 *
 	 * @return 모든 기업유저 목록
 	 * @throws Exception 
+	 * @author 유지원
 	 */
 	List<CompanyVO> getAllCompanies() throws Exception;
 	
@@ -148,6 +160,7 @@ public interface AdminService {
 	 *
 	 * @return 신고 데이터 목록
 	 * @throws Exception
+	 * @author 유지원
 	 */
 	List<ReportMessageVO> getReportsByUserReporter() throws Exception;
 	
@@ -158,6 +171,7 @@ public interface AdminService {
 	 * @param isRead 읽음 상태 (Y/N)
 	 * @return 업데이트 성공 여부
 	 * @throws Exception
+	 * @author 유지원
 	 */
 	boolean updateReportReadStatus(int reportNo, String isRead) throws Exception;
 
@@ -169,6 +183,7 @@ public interface AdminService {
 	 * @param pageSize 페이지당 표시할 게시물 수
 	 * @return 필터링된 신고 목록
 	 * @throws Exception
+	 * @author 유지원
 	 */
 	List<ReportMessageVO> getReportsByUserReporterWithFilter(Map<String, String> filterParams, int page, int pageSize) throws Exception;
 
@@ -178,6 +193,7 @@ public interface AdminService {
 	 * @param filterParams 필터링 파라미터
 	 * @return 필터링된 신고 목록의 총 개수
 	 * @throws Exception
+	 * @author 유지원
 	 */
 	int getTotalReportCount(Map<String, String> filterParams) throws Exception;
 }

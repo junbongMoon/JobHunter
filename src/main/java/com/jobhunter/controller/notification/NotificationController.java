@@ -38,6 +38,7 @@ public class NotificationController {
      *
      * @param model 뷰로 데이터를 전달할 때 사용
      * @return 알림 목록 뷰 이름
+     * @author 유지원
      */
 	@GetMapping("/list")
 	public String openNotifications(Model model, @RequestParam String uid, @RequestParam String accountType) {
@@ -57,6 +58,7 @@ public class NotificationController {
      *
      * @param uid 사용자 ID
      * @return 안 읽은 알림 수를 포함한 JSON 응답
+     * @author 유지원
      */
 	@GetMapping("/unreadCount")
 	@ResponseBody
@@ -78,6 +80,7 @@ public class NotificationController {
      *
      * @param request 메시지 번호를 담고 있는 요청 객체
      * @return 처리 결과(JSON)
+     * @author 유지원
      */
 	@PostMapping("/markAsRead")
 	@ResponseBody
@@ -96,10 +99,13 @@ public class NotificationController {
 	}
 
 	/**
-     * 모든 알림을 읽음 상태로 변경합니다.
-     *
-     * @return 처리 결과(JSON)
-     */
+	 * 모든 알림을 읽음 상태로 변경합니다.
+	 *
+	 * @param accountType 계정 타입
+	 * @param uid 사용자 ID
+	 * @return 처리 결과(JSON)	
+	 * @author 유지원
+	 */
 	@PostMapping("/markAllAsRead")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> markAllAsRead(@RequestParam String accountType, @RequestParam String uid) {
@@ -117,11 +123,12 @@ public class NotificationController {
 	}
 
     /**
-     * 특정 알림을 삭제합니다.
-     *
-     * @param request 메시지 번호를 담고 있는 요청 객체
-     * @return 처리 결과(JSON)
-     */
+	 * 특정 알림을 삭제합니다.
+	 *
+	 * @param request 메시지 번호를 담고 있는 요청 객체
+	 * @return 처리 결과(JSON)
+	 * @author 유지원
+	 */
 	@PostMapping("/delete")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> deleteNotification(@RequestBody MessageRequest request) {
