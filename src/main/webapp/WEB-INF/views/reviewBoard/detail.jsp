@@ -9,7 +9,8 @@
 <title>면접 후기 상세보기</title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/assets/css/main.css">
-
+<script src="/resources/assets/js/publicModal.js"></script>
+<link href="/resources/assets/css/publicModal.css" rel="stylesheet">
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 	rel="stylesheet">
@@ -160,40 +161,40 @@
 	}
 }
 
-
 /* 댓글 전체 영역을 감싸는 컨테이너 */
 #replySection {
-  width: 1300px;
-  margin: 40px auto; 
+	width: 1300px;
+	margin: 40px auto;
 }
 
 #replyContent {
-  width: 100%;
-  max-width: 100%;
-  margin-top: 20px;
-  resize: vertical;
+	width: 100%;
+	max-width: 100%;
+	margin-top: 20px;
+	resize: vertical;
 }
 
 #submitReplyBtn {
-  background-color: #47b2e4;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  border-radius: 6px;
-  margin-top: 8px;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+	background-color: #47b2e4;
+	color: white;
+	border: none;
+	padding: 8px 16px;
+	font-size: 0.9rem;
+	font-weight: 500;
+	border-radius: 6px;
+	margin-top: 8px;
+	transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 #submitReplyBtn:hover {
-  background-color: #339fd0;
-  transform: translateY(-1px);
+	background-color: #339fd0;
+	transform: translateY(-1px);
 }
 
 #replyPagination {
-  justify-content: center;
+	justify-content: center;
 }
+
 .btn-common-shape {
 	border: none;
 	padding: 8px 16px;
@@ -215,11 +216,29 @@
 	box-shadow: 0 0 0 3px rgba(71, 178, 228, 0.4);
 }
 
+.container {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 0 20px;
+}
 
-  .container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 0 20px;
+  .report-modal-body select,
+  .report-modal-body textarea {
+    font-size: 15px;
+    padding: 10px;
+    width: 100%;
+    border-radius: 6px;
+  }
+
+  .report-modal-body textarea {
+    width:200px;
+    resize: none;
+    height: 300px;
+  }
+
+  .report-modal-body h2 {
+    font-size: 22px;
+    margin-bottom: 12px;
   }
 </style>
 
@@ -240,6 +259,9 @@
 					<th>회사명</th>
 					<td>${detail.companyName}</td>
 				</tr>
+				<c:if test="${detail.closed}">
+					<span class="badge bg-danger">[공고마감]</span>
+				</c:if>
 				<tr>
 					<th>공고 상세</th>
 					<td>${detail.detail}</td>
@@ -349,7 +371,7 @@
 				<button type="button"
 					class="btn-getstarted btn-sm delete-btn btn-common-shape"
 					data-boardno="${detail.boardNo}">🗑 삭제</button>
-					
+
 			</form>
 		</c:if>
 
@@ -360,32 +382,32 @@
 
 		<c:if test="${loginUserId ne detail.userId}">
 			<!-- 본인 게시물이 아닌 경우만 신고 버튼 출력 -->
-			<button type="button" class="btn btn-sm btn-danger"
+			<button id="reportBtn" type="button" class="btn btn-sm btn-danger"
 				data-bs-toggle="modal" data-bs-target="#reportModal">🚨 신고</button>
 		</c:if>
 	</div>
 
-		
+
 
 	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
 	<input type="hidden" id="isLiked" value="${isLiked}" />
 
 	<div id="replySection">
-	<!-- 댓글 목록 출력 영역 -->
-	<ul id="replyList" class="list-group"></ul>
+		<!-- 댓글 목록 출력 영역 -->
+		<ul id="replyList" class="list-group"></ul>
 
-	<!--  댓글 작성 영역 추가 -->
-	<div class="mt-4">
-		<textarea id="replyContent" class="form-control" rows="3"
-			placeholder="댓글을 입력해주세요"></textarea>
-		<button id="submitReplyBtn" class="btn btn-primary mt-2">등록</button>
-	</div>
+		<!--  댓글 작성 영역 추가 -->
+		<div class="mt-4">
+			<textarea id="replyContent" class="form-control" rows="3"
+				placeholder="댓글을 입력해주세요"></textarea>
+			<button id="submitReplyBtn" class="btn btn-primary mt-2">등록</button>
+		</div>
 
-	<!-- 댓글 페이징 부분 -->
-	<nav>
-		<ul class="pagination justify-content-center mt-3"
-			id="replyPagination"></ul>
-	</nav>
+		<!-- 댓글 페이징 부분 -->
+		<nav>
+			<ul class="pagination justify-content-center mt-3"
+				id="replyPagination"></ul>
+		</nav>
 	</div>
 	<!-- 좋아요 알림 모달 -->
 	<div class="modal fade" id="likeModal" tabindex="-1" aria-hidden="true">
@@ -404,7 +426,7 @@
 	</div>
 
 	<!-- 신고 버튼 모달  -->
-	<div class="modal fade" id="reportModal" tabindex="-1"
+	<%-- <div class="modal fade" id="reportModal" tabindex="-1"
 		aria-labelledby="reportModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -439,15 +461,15 @@
 					<button type="button" class="btn btn-secondary"
 						data-bs-dismiss="modal">닫기</button>
 					<button type="button" id="submitReportBtn" class="btn btn-danger">제출</button>
-				</div>
+				</div> --%>
 
-			</div>
+	<!-- 		</div>
 		</div>
-	</div>
+	</div> -->
 	<input type="hidden" id="loginUserUid"
 		value="${sessionScope.account.uid}">
 	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
-	<input type="hidden" id="postWriterUid" value="${detail.userId}">
+	<input type="hidden" id="postWriterUid" value="${detail.writerUid}">
 	<input type="hidden" id="loginUserId" value="${loginUser.userId}" />
 </body>
 <script>
@@ -519,7 +541,8 @@
 			}
 		});
 	});
-
+		
+	
 	//게시물삭제 
 	$(document).ready(function () {
   		$(".delete-btn").click(function () {
@@ -546,49 +569,86 @@
 			    }
 			  });
 			});
+		
+	$(document).ready(function () {
+		  const loginUserUid = parseInt($('#loginUserUid').val());    // 로그인한 사용자 UID
+		  const writerId = parseInt($('#postWriterUid').val());       // 게시글 작성자 UID
+		  const boardNo = parseInt($('#boardNo').val());
+
+		  // 신고 버튼 클릭
+		  $('#reportBtn').on('click', function () {
+
+		    // 본인 글은 신고 불가
+		    if (loginUserUid === writerId) {
+		      window.publicModals.show("본인의 게시물은 신고할 수 없습니다.");
+		      return;
+		    }
+
+		    // 커스텀 모달 내용 (신고 선택)
+		    const content = `
+		    	  <div class="report-modal-body">  
+		    <h5>신고하기</h5>
+		      <select id="reportReason" class="form-select mb-2">
+		        <option value="">-- 신고 사유 선택 --</option>
+		        <option value="SPAM">스팸/광고성 메시지</option>
+		        <option value="HARASSMENT">욕설/괴롭힘</option>
+		        <option value="FALSE_INFO">허위 정보</option>
+		        <option value="ILLEGAL_ACTIVITY">불법 행위</option>
+		        <option value="INAPPROPRIATE_CONTENT">부적절한 프로필/사진</option>
+		        <option value="MISCONDUCT">부적절한 행동/요구</option>
+		        <option value="ETC">기타 사유</option>
+		      </select>
+		      <textarea id="reportMessage" rows="4" placeholder="자세한 내용을 입력해주세요" class="form-control mb-2"></textarea>
+		      </div>
+		      `;
+
+		    // 모달 띄우기
+		    window.publicModals.show(content, {
+		      confirmText: "제출",
+		      cancelText: "취소",
+		      size_x: "700px",
+		      size_y: "550px",
+		      onConfirm: function () {
+		        const reportCategory = $('#reportReason').val();
+		        const reportMessage = $('#reportMessage').val();
+
+		        if (!reportCategory) {
+		          window.publicModals.show("신고 사유를 선택해주세요.");
+		          return;
+		        }
+
+		        const reportData = {
+		        		  boardNo: boardNo,
+		        		  targetAccountUid: writerId,                     
+		        		  targetAccountType: "USER",                       
+		        		  reporterAccountUid: loginUserUid,
+		        		  reportCategory: reportCategory,
+		        		  reportMessage: reportMessage,
+		        		  reportType: "BOARD",
+		        		  reportTargetURL: `/reviewBoard/detail?boardNo=${boardNo}`
+		        		};
+
+		        // 신고 전송
+		        $.ajax({
+		          type: 'POST',
+		          url: '/report/board',
+		          contentType: 'application/json',
+		          data: JSON.stringify(reportData),
+		          success: function () {
+		            window.publicModals.show("신고가 접수되었습니다.");
+		          },
+		          error: function (xhr) {
+		            window.publicModals.show("신고 처리 중 오류가 발생했습니다: " + xhr.responseText);
+		          }
+		        });
+		      }
+		    });
+		  });
+		});
 
 
 	//게시물 신고	  
-		$(document).ready(function() {
-			$('#submitReportBtn').on('click', function() {
-				const loginUserUid = parseInt($('#loginUserUid').val());    // 로그인한 사용자 UID
-			    const writerId = parseInt($('#postWriterUid').val());      // 게시글 작성자 UID
-			    const reportCategory = $('#reportCategory').val();
-			    const reportMessage = $('#reportMessage').val();
-			    const boardNo = parseInt($('#boardNo').val());
-
-					// 본인 게시글 신고 방지
-					if (loginUserId === writerId) {
-					    alert("본인의 게시물은 신고할 수 없습니다.");
-					    return;
-					}
-					if (!reportCategory) {
-						alert("신고 사유를 선택해주세요.");
-						return;
-					}
-		const reportData = {
-				boardNo: parseInt(boardNo),
-	            reporterAccountUid: parseInt(reporterAccountUid),
-	            reportCategory: reportCategory,
-	            reportMessage: reportMessage,
-	            reportType: "BOARD",
-	            reportTargetURL: `/reviewBoard/detail?boardNo=${boardNo}`
-		};
-		$.ajax({
-			type: 'POST',
-			url: '/report/board',
-			contentType: 'application/json',
-			data: JSON.stringify(reportData),
-			success: function() {
-				alert('신고가 접수되었습니다.');
-				$('#reportModal').modal('hide');
-			},
-			error: function(xhr) {
-				alert('신고 처리 중 오류가 발생했습니다: ' + xhr.responseText);
-			}
-		});
-	});
-});
+				
 
 
 	//댓글 등록 
