@@ -425,47 +425,8 @@
 		</div>
 	</div>
 
-	<!-- 신고 버튼 모달  -->
-	<%-- <div class="modal fade" id="reportModal" tabindex="-1"
-		aria-labelledby="reportModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
 
-				<div class="modal-header">
-					<h5 class="modal-title" id="reportModalLabel">신고하기</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="닫기"></button>
-				</div>
-
-				<div class="modal-body">
-
-					<input type="hidden" id="loginUserUid" value="${loginUser.uid}">
-
-					<label for="reportCategory" class="form-label">신고 사유</label> <select
-						name="reportCategory" id="reportCategory" class="form-select"
-						required>
-						<option value="" disabled selected>-- 신고 사유 선택 --</option>
-						<option value="SPAM">스팸/광고성 메시지</option>
-						<option value="HARASSMENT">욕설/괴롭힘</option>
-						<option value="FALSE_INFO">허위 정보</option>
-						<option value="ILLEGAL_ACTIVITY">불법 행위</option>
-						<option value="INAPPROPRIATE_CONTENT">부적절한 프로필/사진</option>
-						<option value="MISCONDUCT">부적절한 행동/요구</option>
-						<option value="ETC">기타 사유</option>
-					</select> <label for="reportMessage" class="form-label mt-3">신고 내용</label>
-					<textarea class="form-control" id="reportMessage" rows="4"
-						placeholder="자세한 내용을 입력해주세요"></textarea>
-				</div>
-
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary"
-						data-bs-dismiss="modal">닫기</button>
-					<button type="button" id="submitReportBtn" class="btn btn-danger">제출</button>
-				</div> --%>
-
-	<!-- 		</div>
-		</div>
-	</div> -->
+	
 	<input type="hidden" id="loginUserUid"
 		value="${sessionScope.account.uid}">
 	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
@@ -569,40 +530,49 @@
 			    }
 			  });
 			});
+	
+	//신고 js
 		
-	$(document).ready(function () {
+		$(document).ready(function () {
 		  const loginUserUid = parseInt($('#loginUserUid').val());    // 로그인한 사용자 UID
 		  const writerId = parseInt($('#postWriterUid').val());       // 게시글 작성자 UID
 		  const boardNo = parseInt($('#boardNo').val());
-
-		  // 신고 버튼 클릭
+		
+		  // 고유 키 생성: 신고자_uid_피신고자_uid_게시글번호
+		  const reportKey = `report_${loginUserUid}_${writerId}_${boardNo}`;
+		
 		  $('#reportBtn').on('click', function () {
-
-		    // 본인 글은 신고 불가
+		    // 본인 글 신고 방지
 		    if (loginUserUid === writerId) {
 		      window.publicModals.show("본인의 게시물은 신고할 수 없습니다.");
 		      return;
 		    }
-
-		    // 커스텀 모달 내용 (신고 선택)
+		
+		    // 중복 신고 방지
+		    if (localStorage.getItem(reportKey)) {
+		      window.publicModals.show("이미 신고한 게시물입니다.");
+		      return;
+		    }
+		
+		    // 모달 내용 구성
 		    const content = `
-		    	  <div class="report-modal-body">  
-		    <h5>신고하기</h5>
-		      <select id="reportReason" class="form-select mb-2">
-		        <option value="">-- 신고 사유 선택 --</option>
-		        <option value="SPAM">스팸/광고성 메시지</option>
-		        <option value="HARASSMENT">욕설/괴롭힘</option>
-		        <option value="FALSE_INFO">허위 정보</option>
-		        <option value="ILLEGAL_ACTIVITY">불법 행위</option>
-		        <option value="INAPPROPRIATE_CONTENT">부적절한 프로필/사진</option>
-		        <option value="MISCONDUCT">부적절한 행동/요구</option>
-		        <option value="ETC">기타 사유</option>
-		      </select>
-		      <textarea id="reportMessage" rows="4" placeholder="자세한 내용을 입력해주세요" class="form-control mb-2"></textarea>
+		      <div class="report-modal-body">  
+		        <h5>신고하기</h5>
+		        <select id="reportReason" class="form-select mb-2">
+		          <option value="">-- 신고 사유 선택 --</option>
+		          <option value="SPAM">스팸/광고성 메시지</option>
+		          <option value="HARASSMENT">욕설/괴롭힘</option>
+		          <option value="FALSE_INFO">허위 정보</option>
+		          <option value="ILLEGAL_ACTIVITY">불법 행위</option>
+		          <option value="INAPPROPRIATE_CONTENT">부적절한 프로필/사진</option>
+		          <option value="MISCONDUCT">부적절한 행동/요구</option>
+		          <option value="ETC">기타 사유</option>
+		        </select>
+		        <textarea id="reportMessage" rows="4" placeholder="자세한 내용을 입력해주세요" class="form-control mb-2"></textarea>
 		      </div>
-		      `;
-
-		    // 모달 띄우기
+		    `;
+		
+		    // 모달 출력
 		    window.publicModals.show(content, {
 		      confirmText: "제출",
 		      cancelText: "취소",
@@ -611,30 +581,32 @@
 		      onConfirm: function () {
 		        const reportCategory = $('#reportReason').val();
 		        const reportMessage = $('#reportMessage').val();
-
+		
 		        if (!reportCategory) {
 		          window.publicModals.show("신고 사유를 선택해주세요.");
-		          return;
+		          return false; // false → 모달 유지
 		        }
-
+		
 		        const reportData = {
-		        		  boardNo: boardNo,
-		        		  targetAccountUid: writerId,                     
-		        		  targetAccountType: "USER",                       
-		        		  reporterAccountUid: loginUserUid,
-		        		  reportCategory: reportCategory,
-		        		  reportMessage: reportMessage,
-		        		  reportType: "BOARD",
-		        		  reportTargetURL: `/reviewBoard/detail?boardNo=\${boardNo}`
-		        		};
-
-		        // 신고 전송
+		          boardNo: boardNo,
+		          targetAccountUid: writerId,
+		          targetAccountType: "USER",
+		          reporterAccountUid: loginUserUid,
+		          reportCategory: reportCategory,
+		          reportMessage: reportMessage,
+		          reportType: "BOARD",
+		          reportTargetURL: `/reviewBoard/detail?boardNo=${boardNo}`
+		        };
+		
+		        // AJAX로 신고 전송
 		        $.ajax({
 		          type: 'POST',
 		          url: '/report/board',
 		          contentType: 'application/json',
 		          data: JSON.stringify(reportData),
 		          success: function () {
+		            // 신고 성공 시 localStorage에 기록 저장
+		            localStorage.setItem(reportKey, 'true');
 		            window.publicModals.show("신고가 접수되었습니다.");
 		          },
 		          error: function (xhr) {
@@ -647,10 +619,9 @@
 		});
 
 
-	//게시물 신고	  
+
+
 				
-
-
 	//댓글 등록 
 
 const boardNo = parseInt($('#boardNo').val());
