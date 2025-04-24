@@ -32,7 +32,7 @@ public class ReviewDetailViewDTO {
 	private Integer likes; // 좋아요 수
 	private int views; // 조회수
 	
-	
+	private boolean closed;
 	private int writerUid; // 작성자 UID
 	private String typeOtherText; // 기타 상세 유
 	
