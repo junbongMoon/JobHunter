@@ -70,4 +70,22 @@ public class MessageDAOImpl implements MessageDAO {
 		params.put("accountType", accountType);
 		return ses.selectOne(NS + ".getUnreadCount", params);
 	}
+
+	@Override
+	public List<MessageDTO> getMessagesWithPaging(String uid, String accountType, int page, int pageSize) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uid", uid);
+		params.put("accountType", accountType);
+		params.put("offset", (page - 1) * pageSize);
+		params.put("pageSize", pageSize);
+		return ses.selectList(NS + ".getMessagesWithPaging", params);
+	}
+
+	@Override
+	public int getTotalMessageCount(String uid, String accountType) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("uid", uid);
+		params.put("accountType", accountType);
+		return ses.selectOne(NS + ".getTotalMessageCount", params);
+	}
 }
