@@ -264,27 +264,29 @@ function drawRecruitmentStats() {
 		height: 300
 	};
 
-	// 연령대 비율
-	const ageData = google.visualization.arrayToDataTable([
-		['연령대', '인원수'],
-		['10대 미만', stats.teens],
-		['20대', stats.twenties],
-		['30대', stats.thirties],
-		['40대', stats.forties],
-		['50대 이상', stats.fiftiesOrAbove],
-		['나이 정보 없음', stats.unknownAgeCount]
+		const ageData = google.visualization.arrayToDataTable([
+	['연령대', '인원수'],
+	['10대 미만', stats.teens],
+	['20대', stats.twenties],
+	['30대', stats.thirties],
+	['40대', stats.forties],
+	['50대 이상', stats.fiftiesOrAbove],
+	['나이 정보 없음', stats.unknownAgeCount]
 	]);
 
+	// 막대차트 
 	const ageOptions = {
-		title: '연령대 비율',
-		pieHole: 0.4,
-		width: 400,
-		height: 300
+	title: '연령대 비율',
+	width: 400,
+	height: 300,
+	legend: { position: 'none' },
+	hAxis: { title: '연령대' },
+	vAxis: { title: '인원수' },
+	bar: { groupWidth: '60%' }
 	};
 
-	// 그리기
 	const genderChart = new google.visualization.PieChart(document.getElementById('genderChart'));
-	const ageChart = new google.visualization.PieChart(document.getElementById('ageChart'));
+	const ageChart = new google.visualization.ColumnChart(document.getElementById('ageChart'));
 
 	genderChart.draw(genderData, genderOptions);
 	ageChart.draw(ageData, ageOptions);
