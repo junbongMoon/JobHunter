@@ -60,6 +60,7 @@ public class ReportRestController {
 			// Enum, URL 등 자동값 설정
 			boardReportDTO.applyDefaultValues();
 
+			
 			// 서비스로 위임
 			reportService.saveBoardReport(boardReportDTO);
 			model.addAttribute("reportCategories", ReportCategory.values());
