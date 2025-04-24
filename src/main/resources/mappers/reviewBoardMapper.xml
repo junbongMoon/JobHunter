@@ -219,11 +219,7 @@
 	</update>
 
 
-	<!-- reviewBoardMapper.xml -->
-	<select id="countAllBoards" resultType="int">
-		SELECT COUNT(*) FROM
-		reviewBoard
-	</select>
+	
 
 
 	<!--검색 기능 쿼리 -->

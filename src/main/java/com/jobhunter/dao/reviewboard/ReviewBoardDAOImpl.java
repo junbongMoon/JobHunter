@@ -133,10 +133,7 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 		return ses.update(NS + ".updateCountViews", boardNo);
 	}
 
-	@Override
-	public int countAllBoards() throws Exception {
-		return ses.selectOne(NS + ".countAllBoards");
-	}
+	
 
 	@Override
 	public List<ReviewBoardDTO> selectPagedReviewBoard(RPageRequestDTO pageRequestDTO) throws Exception {

@@ -117,11 +117,21 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	@Override
 
 	public boolean hasUserLiked(int userId, int boardNo) throws Exception {
-		Likes like = Likes.builder().userId(userId).boardNo(boardNo).likeType("REBOARD") // 좋아요 타입 지정
-				.build();
+		 try {
+		        Likes like = Likes.builder()
+		                .userId(userId)
+		                .boardNo(boardNo)
+		                .likeType("REBOARD")
+		                .build();
 
-		return Rdao.hasUserLikeit(like) > 0;
-	}
+		        return Rdao.hasUserLikeit(like) > 0;
+		    } catch (Exception e) {
+		        // 에러 로그 기록
+		        
+		        return false; 
+		    }
+		}
+	
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
