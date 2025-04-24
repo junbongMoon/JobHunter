@@ -91,7 +91,7 @@
 	</select>
 	
 	<select id="countPRBoardsByUserUid" resultType="int">
-	  SELECT COUNT(*) FROM prBoard
+	  SELECT COUNT(prBoardNo) FROM prBoard
 	  WHERE useruid = #{uid}
 	</select>
 	

@@ -2,6 +2,7 @@ package com.jobhunter.controller.user;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.sql.Timestamp;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Map;
@@ -140,21 +141,37 @@ public class UserRestController {
 	}
 	
 	@DeleteMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
-	public ResponseEntity<ResponseJsonMsg> deleteCompany(@PathVariable("uid") Integer uid, HttpSession session) {
+	public ResponseEntity<ResponseJsonMsg> deleteAccount(@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
 
 			if (!accUtil.checkUid(session, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 
-			service.setDeleteAccount(uid);
-			return ResponseEntity.ok().body(ResponseJsonMsg.success());
+			Timestamp deadline = service.setDeleteAccount(uid);
+			return ResponseEntity.ok().body(ResponseJsonMsg.success(deadline.toString()));
 		} catch (AccessDeniedException e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseJsonMsg.notFound());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseJsonMsg.error());
+		}
+	}
+	
+	@DeleteMapping(value = "/info/{uid}/cancelDelete", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<Void> deleteCancelAccount(@PathVariable("uid") Integer uid, HttpSession session) {
+		try {
+
+			if (!accUtil.checkUid(session, uid)) {
+				throw new AccessDeniedException("잘못된 사용자");
+			}
+
+			service.cancelDeleteAccount(uid);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().build();
 		}
 	}
 	

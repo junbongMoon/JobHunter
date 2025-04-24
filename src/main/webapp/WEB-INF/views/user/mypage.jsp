@@ -41,6 +41,8 @@
           <div>가입일</div><div id="regDate">로딩중...</div>
           <div>최근 로그인</div><div id="lastLoginDate">로딩중...</div>
           <div>포인트</div><div><span id="userPoint">0</span>포인트 · <i class="nameChangeBtn" onclick="purchasePoints()">충전하기</i></div>
+          <div id="accountDeleteDateTitle" style="color: var(--bs-red); font-size: 0.8em;"></div>
+          <div id="accountDeleteDateBlock" style="color: var(--bs-red); font-size: 0.8em;"></div>
 
           <c:if test="${sessionScope.account.isSocial == 'N'}">
             <hr><hr>
@@ -80,7 +82,7 @@
             <div class="edit-buttons">
             <button class="btn-edit" onclick="modyfiInfoTapOpen()"><i class="bi bi-pencil-square"></i> 상세정보 수정</button>
 
-            <button class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
+            <button id="accountDeleteBtn" class="btn-edit btn-delete" style="background-color:#dc3545; margin-left: auto;" onclick="deleteAccount()"> 계정 삭제 신청</button>
             </div>
         </div>
       </section>
@@ -214,17 +216,21 @@
       <!-- 리뷰 영역 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
-          <h2><i class="bi bi-heart section-icon"></i>내가 받은 첨삭 신청서</h2>
-          <div>
-	          <select id="statusSelect" class="form-select" onchange="handleStatusChange()">
+          <h2><i class="bi bi-heart section-icon"></i>첨삭 요청</h2>
+          <div class="registrationAdviceSelectBox">
+            <select id="typeSelect" class="form-select" onchange="handleTypeChange()">
+              <option value="mentee">내가 신청한 첨삭요청</option>
+              <option value="mentor">내가 받은 첨삭요청</option>
+            </select>
+            <select id="statusSelect" class="form-select" onchange="handleStatusChange()">
               <option value="LIVE">*확인 필요*</option>
               <option value="WAITING">대기 중</option>
               <option value="CHECKING">검토 중</option>
               <option value="COMPLETE" style="color: #8d8d8d;">완료한 신청 보기</option>
-              <option value="CANCEL" style="color: #8d8d8d;">만료된 신청 보기</option>
+              <option value="CANCEL" style="color: #8d8d8d;">취소된 신청 보기</option>
               <option value="">--전체 내역 보기--</option>
-			  </select>
-		  </div>
+            </select>
+          </div>
         </div>
         <div id="registrationAdviceSection"></div>
       </section>
@@ -320,7 +326,6 @@ function renderPagination(res, pageFunc, container) {
   container.append(html);
 }
 
-
 function renderResumeAdvice(res) {
   const items = res.items;
 	  const container = $('#resumeAdviceSection');
@@ -354,7 +359,7 @@ function renderResumeAdvice(res) {
             justify-content: space-between;
             align-items: center;
             cursor: pointer;"
-            onclick="viewResumeAdvice(\${item.resumeNo}, \${item.adviceNo})">
+            onclick="viewResumeAdvice(\${item.resumeNo}, \${item.mentiUid})">
             
             <div style="flex: 1;">
               <div><strong>\${item.title}\${item.mentiUid}</strong></div>
@@ -374,15 +379,14 @@ function renderResumeAdvice(res) {
 
     renderPagination(res, "goToResumeAdvice", container)
 }
-function viewResumeAdvice(resumeNo, adviceNo) {
-  // pr보드 글 상세조회 페이지로 보내기
-  console.log(resumeNo, adviceNo);
+function viewResumeAdvice(resumeNo, mentiUid) {
+  location.href=`/resume/checkAdvice/\${resumeNo}?uid=\${mentiUid}`
 }
+
 function goToResumeAdvice(pageNum) {
   resumeAdvicePage = pageNum;
 	getMyResumeAdvice();
 }
-
 
 let resumeAdvicePage = 1
 function getMyResumeAdvice() {
@@ -398,6 +402,64 @@ function getMyResumeAdvice() {
       console.log("error : " + xhr);
     }
   });
+}
+function renderSendRegistrationAdvice(res) {
+  const items = res.items;
+	  const container = $('#registrationAdviceSection');
+	  container.empty();
+
+	  if (!items || items.length === 0) {
+	    container.html(`
+	      <div class="empty-state">
+	        <i class="fas fa-folder-open"></i><br>
+	        검색된 신청글이 없습니다.
+	      </div>
+	    `);
+	    return;
+	  }
+
+	  let html = '<div class="recruit-card-list" style="display: flex; flex-direction: column; gap: 12px;">';
+
+	  items.forEach(item => {
+      const status = {
+        COMPLETE: "<span style='color:var(--bs-teal)'>첨삭완료</span>",
+        CANCEL: "<span style='color:var(--bs-red)'>거절됨</span>",
+        WAITING: "<span style='color:var(--bs-gray-400)'>대기중</span>",
+        CHECKING: "<span style='color:var(--accent-color)'>첨삭진행중</span>",
+      }
+
+      const statusText = status[item.status];
+
+	    html += `
+        <div class="recruit-card-wrapper">
+          <div class="recruit-card" style="
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2c3e50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;>
+            
+            <div style="flex: 1;">
+              <div><strong>\${item.title}</strong>\${statusText}</div>
+              <div style="font-size: 13px; color: #666;">
+                \${formatDate(item.regDate)} 신청
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+	  });
+
+	  html += '</div>';
+	  container.html(html);
+
+    renderPagination(res, "goToRegistrationAdvice", container)
 }
 
 function renderRegistrationAdvice(res) {
@@ -418,6 +480,20 @@ function renderRegistrationAdvice(res) {
 	  let html = '<div class="recruit-card-list" style="display: flex; flex-direction: column; gap: 12px;">';
 
 	  items.forEach(item => {
+
+      const confirmBtn = `
+        <button class='btn-edit' onclick="acceptAdviceModal(\${item.resumeNo}, \${item.mentiUid})">승인</button>
+        <button class='btn-edit' onclick="rejectAdviceModal(\${item.resumeNo}, \${item.mentiUid})" style='background:var(--bs-gray-300); color:var(--default-color)'>거절</button>`;
+
+      const status = {
+        COMPLETE: "<span style='color:var(--bs-teal);'>첨삭완료</span>",
+        CANCEL: "<span style='color:var(--bs-red)'>취소</span>",
+        WAITING: confirmBtn,
+        CHECKING: `<button class='btn-edit' onclick="location.href='/resume/checkAdvice/\${item.resumeNo}?uid=\${item.mentiUid}'">조회 및 수정</button>`,
+      }
+
+      const statusText = status[item.status];
+
 	    html += `
         <div class="recruit-card-wrapper">
           <div class="recruit-card" style="
@@ -431,16 +507,20 @@ function renderRegistrationAdvice(res) {
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            cursor: pointer;"
-            onclick="viewRegistrationAdvice(\${item.rgAdviceNo})">
+            align-items: center;>
             
-            <div style="flex: 1;">
-              <div><strong>\${item.title}\${item.mentiUid}</strong></div>
-              <div style="font-size: 13px; color: #666;">
-                \${formatDate(item.regDate)} 신청
+              <div style="flex: 1;">
+                <div>
+                <div><strong>\${item.title}\${item.mentiUid}</strong></div>
+                <div style="font-size: 13px; color: #666;">
+                  \${formatDate(item.regDate)} 신청
+                </div></div>
+
+                <div style='display: flex; align-items: center; gap: 8px'>
+                  \${statusText}
+                </div>
+
               </div>
-            </div>
           </div>
         </div>
       `;
@@ -451,10 +531,7 @@ function renderRegistrationAdvice(res) {
 
     renderPagination(res, "goToRegistrationAdvice", container)
 }
-function viewRegistrationAdvice(No) {
-  // pr보드 글 상세조회 페이지로 보내기
-  console.log(No);
-}
+
 function goToRegistrationAdvice(pageNum) {
   registrationAdviceData.page = pageNum;
 	getMyRegistrationAdvice();
@@ -464,8 +541,10 @@ function handleStatusChange() {
   const selected = document.getElementById('statusSelect').value;
   registrationAdviceData.status = selected || registrationAdviceStatus.NONE;
 
-  console.log(registrationAdviceData.status);
-
+  getMyRegistrationAdvice();
+}
+function handleTypeChange() {
+  registrationAdviceData.type = document.getElementById('typeSelect').value;
   getMyRegistrationAdvice();
 }
 const registrationAdviceStatus = {
@@ -479,9 +558,10 @@ const registrationAdviceStatus = {
 const registrationAdviceData = {
   page: 1,
   status: registrationAdviceStatus.LIVE,
-  type: "mentor"
+  type: "mentee"
 };
 function getMyRegistrationAdvice() {
+  const type = registrationAdviceData.type;
   $.ajax({
     url: `/resume/myRegistrationAdvice`,
     method: 'POST',
@@ -489,11 +569,16 @@ function getMyRegistrationAdvice() {
     data: JSON.stringify({
       uid: uid,
       page: registrationAdviceData.page,
-      status: registrationAdviceData.status
+      status: registrationAdviceData.status,
+      type: type
     }),
     success: function(res) {
       console.log(res);
-      renderRegistrationAdvice(res)
+      if (type == 'mentor') {
+        renderRegistrationAdvice(res)
+      } else {
+        renderSendRegistrationAdvice(res)
+      }
     },
     error: function(xhr) {
       console.log("error : " + xhr);
@@ -577,12 +662,10 @@ function goToPrboardPage(pageNum) {
 	getMyPrboard();
 }
 
-
 $(()=>{
   getInfo();
   getMyResumes();
   getMyReview();
-
   getMyRegistrationAdvice();
   getMyPrboard();
   getMyResumeAdvice();
@@ -964,6 +1047,9 @@ function getInfo() {
         isSocial = result.isSocial == 'Y';
         sessionMobile = result.mobile;
   		  sessionEmail = result.email;
+        console.log(result.blockDeadline);
+        console.log(result.deleteDeadline);
+        updateDeleteAccountInfo(result.deleteDeadline, result.blockDeadline)
         resetUserModifyForm();
         updateBasicInfo(result);
         updateUserDetailInfo(result);
@@ -972,6 +1058,66 @@ function getInfo() {
       error: (xhr) => window.publicModals.show("정보 로딩에 실패하였습니다. 잠시후 새로고침해 주세요.")
   });
 }
+
+// #region 계정삭제 관련 (백엔드 미구현)
+function updateDeleteAccountInfo(deleteDeadline, blockDeadline) {
+  if (deleteDeadline) {
+    $('#accountDeleteDateTitle').text('삭제 대기중...')
+    if (deleteDeadline < blockDeadline) {
+      $('#accountDeleteDateBlock').text(formatDate(blockDeadline) + " 이후 삭제 예정 / 정지기간중에는 계정 삭제가 불가능합니다.")
+    } else {
+      $('#accountDeleteDateBlock').text(formatDate(deleteDeadline) + " 이후 삭제 예정")
+    }
+    $('#accountDeleteBtn').text("계정 삭제 취소")
+    $('#accountDeleteBtn').off('click').on('click', deleteCancleAccount);
+  } else {
+    $('#accountDeleteDateTitle').text('')
+    $('#accountDeleteDateBlock').text('')
+    $('#accountDeleteBtn').text("계정 삭제 신청")
+    $('#accountDeleteBtn').off('click').on('click', deleteAccount);
+  }
+}
+
+function deleteAccount() {
+	  window.publicModals.show("<div>정말로 삭제하시겠습니까?</div><div style='font-size:0.7em; color:var(--bs-gray-600)'>계정은 3일 뒤 삭제되며 포인트가 소멸할 수 있습니다.</div>", {
+      cancelText : '취소',
+      onConfirm : checkedDeleteAccount
+    })
+  }
+
+  function checkedDeleteAccount() {
+    $.ajax({
+      url: `/user/info/${sessionScope.account.uid}`,
+      method: "DELETE",
+      contentType: "application/json",
+      success: (res) => {
+        window.publicModals.show("계정은 3일 뒤 삭제됩니다.")
+        updateDeleteAccountInfo(res.message)
+      },
+      error: (xhr) => {window.publicModals.show("연결 실패! 새로고침 후 다시 시도해주세요")}
+    });
+  }
+
+  function deleteCancleAccount() {
+	    window.publicModals.show("<div>계정 삭제를 취소하시겠습니까?</div>", {
+      cancelText : '취소',
+      onConfirm : checkedDeleteCancleAccount
+    })
+  }
+
+  function checkedDeleteCancleAccount() {
+    $.ajax({
+      url: `/user/info/${sessionScope.account.uid}/cancelDelete`,
+      method: "DELETE",
+      contentType: "application/json",
+      success: (res) => {
+        window.publicModals.show("계정삭제가 취소되었습니다.")
+        updateDeleteAccountInfo(res.message)
+      },
+      error: (xhr) => {window.publicModals.show("연결 실패! 새로고침 후 다시 시도해주세요")}
+    });
+  }
+// #endregion
 
 // 기본정보 로딩
 function updateBasicInfo(userInfo) {
@@ -1275,25 +1421,6 @@ function confirmModify() {
     }
   });
 }
-// #endregion
-
-// #region 계정삭제 관련 (백엔드 미구현)
-  function deleteAccount() {
-	  window.publicModals.show("정말로 삭제하시겠습니까?", {
-      cancelText : '취소',
-      onConfirm : checkedDeleteAccount
-    })
-  }
-
-  function checkedDeleteAccount() {
-    $.ajax({
-      url: `/user/info/${sessionScope.account.uid}`,
-      method: "DELETE",
-      contentType: "application/json",
-      success: () => {window.publicModals.show("계정은 3일 뒤 삭제됩니다.")},
-      error: (xhr) => {window.publicModals.show("연결 실패! 새로고침 후 다시 시도해주세요")}
-    });
-  }
 // #endregion
 
 function showCodeModal(confirmFunc, isfailed) {
@@ -2205,6 +2332,38 @@ function changeName() {
   });
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+function acceptAdviceModal(resumeNo, mentiUid) {
+  window.publicModals.show("첨삭을 승인하시겠습니까?", {cancelText:"취소", onConfirm:()=>{
+    $.ajax({
+      url: `/resume/acceptAdvice/\${resumeNo}`,
+      type: "GET",
+      success: function (response) {
+        location.href=`/resume/checkAdvice/\${resumeNo}?uid=\${mentiUid}`
+      },
+      error: function () {
+        window.publicModals.show("첨삭 승인 처리 중 오류가 발생했습니다.");
+      }
+    });
+  }});
+}
+function rejectAdviceModal(resumeNo, userUid) {
+  window.publicModals.show("첨삭을 거절하시겠습니까?", {cancelText:"취소", onConfirm:()=>{
+    $.ajax({
+      url: `/resume/rejectAdvice/\${resumeNo}?ownerUid=\${userUid}`,
+      type: "GET",
+      success: function (response) {
+        window.publicModals.show(response.message);
+        getMyRegistrationAdvice()
+      },
+      error: function () {
+        window.publicModals.show("첨삭 거절 처리 중 오류가 발생했습니다.");
+      }
+    });
+  }});
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------
 </script>
 <!-- 풋터 -->
 <jsp:include page="/WEB-INF/views/footer.jsp"></jsp:include>
