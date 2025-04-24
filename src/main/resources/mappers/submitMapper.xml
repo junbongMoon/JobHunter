@@ -276,11 +276,13 @@
 		u.userName
 
 		FROM registration reg
-		JOIN resume r ON reg.resumePk = r.resumeNo
+		JOIN resume r ON reg.resumePk =
+		r.resumeNo
 		JOIN users
 		u ON r.userUid = u.uid
 
-		WHERE reg.recruitmentNoticePk = #{recruitmentUid}
+		WHERE
+		reg.recruitmentNoticePk = #{recruitmentUid}
 
 		<if test="onlyUnread">
 			AND reg.status = 'WAITING'
@@ -334,7 +336,7 @@
 		<result property="saveType" column="saveType" />
 		<result property="userUid" column="userUid" />
 		<result property="profileBase64" column="profileBase64" />
-	
+
 		<result property="userName" column="userName" />
 		<result property="mobile" column="mobile" />
 		<result property="email" column="email" />
@@ -344,7 +346,7 @@
 		<result property="militaryService" column="militaryService" />
 		<result property="nationality" column="nationality" />
 		<result property="disability" column="disability" />
-	
+
 		<association property="registrationVO"
 			javaType="com.jobhunter.model.submit.RegistrationVO">
 			<id property="registrationNo" column="registrationNo" />
@@ -354,19 +356,19 @@
 			<result property="regDate" column="regDate" />
 			<result property="resumePk" column="regResumePk" />
 		</association>
-	
+
 		<collection property="jobForms"
 			ofType="com.jobhunter.model.resume.JobFormDTO">
 			<id property="jobFormNo" column="jobFormNo" />
 			<result property="form" column="jobForm" />
 		</collection>
-	
+
 		<collection property="merits"
 			ofType="com.jobhunter.model.resume.MeritDTO">
 			<id property="meritNo" column="meritNo" />
 			<result property="meritContent" column="meritContent" />
 		</collection>
-	
+
 		<collection property="educations"
 			ofType="com.jobhunter.model.resume.EducationDTO">
 			<id property="educationNo" column="educationNo" />
@@ -375,7 +377,7 @@
 			<result property="graduationDate" column="graduationDate" />
 			<result property="customInput" column="customInput" />
 		</collection>
-	
+
 		<collection property="histories"
 			ofType="com.jobhunter.model.resume.PersonalHistoryDTO">
 			<id property="historyNo" column="historyNo" />
@@ -385,7 +387,7 @@
 			<result property="startDate" column="startDate" />
 			<result property="endDate" column="endDate" />
 		</collection>
-	
+
 		<collection property="licenses"
 			ofType="com.jobhunter.model.resume.LicenseDTO">
 			<id property="licenseNo" column="licenseNo" />
@@ -393,14 +395,14 @@
 			<result property="acquisitionDate" column="acquisitionDate" />
 			<result property="institution" column="institution" />
 		</collection>
-	
+
 		<collection property="sigunguList"
 			ofType="com.jobhunter.model.region.Sigungu">
 			<id property="sigunguNo" column="sigunguNo" />
 			<result property="name" column="sigunguName" />
 			<result property="regionNo" column="regionNo" />
 		</collection>
-	
+
 		<collection property="subcategoryList"
 			ofType="com.jobhunter.model.category.SubCategory">
 			<id property="subcategoryNo" column="subcategoryNo" />
@@ -408,7 +410,7 @@
 			<result property="refMajorcategoryNo"
 				column="refMajorcategoryNo" />
 		</collection>
-		
+
 		<collection property="files"
 			ofType="com.jobhunter.model.resume.ResumeUpfileDTO">
 			<id property="boardUpFileNo" column="boardUpFileNo" />
@@ -420,55 +422,79 @@
 			<result property="resumeNo" column="resumeNo" />
 		</collection>
 	</resultMap>
-	
+
 	<!-- 육근우_단일 신청서 하나만 상세조회 -->
-	<select id="selectOneResumeByRegistrationNo" resultMap="ResumeDetailInfoBySubmitAndUserMap">
+	<select id="selectOneResumeByRegistrationNo"
+		resultMap="ResumeDetailInfoBySubmitAndUserMap">
 		SELECT
-			r.resumeNo, r.title, r.payType, r.pay, r.introduce,
-			r.saveType, r.userUid, r.profileBase64,
-			
-			ruf.boardUpFileNo,
-			ruf.originalFileName,
-			ruf.newFileName,
-			ruf.ext,
-			ruf.size,
-			ruf.base64Image,
-			ruf.resumeNo,
-	
-			reg.registrationNo, reg.status,
-			reg.recruitmentNoticePk AS regRecruitmentNoticePk,
-			reg.regDate, reg.resumePk AS regResumePk,
-	
-			jf.jobFormNo, jf.form AS jobForm,
-			m.meritNo, m.meritContent,
-			e.educationNo, e.educationLevel,
-			e.educationStatus, e.graduationDate, e.customInput,
-			h.historyNo, h.companyName, h.position, h.jobDescription, h.startDate, h.endDate,
-			l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
-			s.sigunguNo, s.name AS sigunguName, s.regionNo,
-			sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo,
-	
-			u.userName, u.mobile, u.email, u.gender, u.age, u.militaryService, u.nationality, u.disability, u.addr
-	
+		r.resumeNo, r.title, r.payType, r.pay, r.introduce,
+		r.saveType, r.userUid, r.profileBase64,
+
+		ruf.boardUpFileNo,
+		ruf.originalFileName,
+		ruf.newFileName,
+		ruf.ext,
+		ruf.size,
+		ruf.base64Image,
+		ruf.resumeNo,
+
+		reg.registrationNo, reg.status,
+		reg.recruitmentNoticePk AS regRecruitmentNoticePk,
+		reg.regDate,
+		reg.resumePk AS regResumePk,
+
+		jf.jobFormNo, jf.form AS jobForm,
+		m.meritNo, m.meritContent,
+		e.educationNo, e.educationLevel,
+		e.educationStatus, e.graduationDate, e.customInput,
+		h.historyNo,
+		h.companyName, h.position, h.jobDescription, h.startDate, h.endDate,
+		l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
+		s.sigunguNo, s.name AS sigunguName, s.regionNo,
+		sc.subcategoryNo,
+		sc.jobName, sc.refMajorcategoryNo,
+
+		u.userName, u.mobile, u.email,
+		u.gender, u.age, u.militaryService, u.nationality,
+		u.disability, u.addr
+
 		FROM registration reg
 		JOIN resume r ON reg.resumePk = r.resumeNo
-		LEFT JOIN users u ON r.userUid = u.uid
-		LEFT JOIN resumeupfiles ruf ON r.resumeNo = ruf.resumeNo
-		LEFT JOIN jobform jf ON r.resumeNo = jf.resumeNo
-		LEFT JOIN merit m ON r.resumeNo = m.resumeNo
-		LEFT JOIN education e ON r.resumeNo = e.resumeNo
+		LEFT
+		JOIN
+		users u ON r.userUid = u.uid
+		LEFT JOIN resumeupfiles ruf ON
+		r.resumeNo
+		= ruf.resumeNo
+		LEFT JOIN jobform jf ON r.resumeNo =
+		jf.resumeNo
+		LEFT
+		JOIN merit m ON r.resumeNo = m.resumeNo
 		LEFT JOIN
-		personalhistory h ON r.resumeNo = h.resumeNo
+		education e ON
+		r.resumeNo = e.resumeNo
+		LEFT JOIN
+		personalhistory h ON
+		r.resumeNo =
+		h.resumeNo
 		LEFT JOIN license l ON
 		r.resumeNo = l.resumeNo
-		LEFT JOIN where_resume_sigungu sr ON r.resumeNo
+		LEFT JOIN
+		where_resume_sigungu sr ON r.resumeNo
 		= sr.refResumeNo
-		LEFT JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
-		LEFT JOIN jobtype_resume_sub jrs ON r.resumeNo = jrs.refResumeNo
 		LEFT
-		JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
+		JOIN sigungu
+		s ON sr.refSigunguNo = s.sigunguNo
+		LEFT JOIN
+		jobtype_resume_sub jrs ON
+		r.resumeNo = jrs.refResumeNo
+		LEFT
+		JOIN
+		subcategory sc ON jrs.refSubNo =
+		sc.subcategoryNo
 
-		WHERE reg.registrationNo = #{registrationNo}
+		WHERE
+		reg.registrationNo = #{registrationNo}
 	</select>
 	<select id="getCompanyUidByRegistrationNo" resultType="int">
 		SELECT
@@ -485,58 +511,83 @@
 		SELECT u.*
 		FROM registration r
 		JOIN resume res ON r.resumePk = res.resumeNo
-		JOIN users u ON res.userUid = u.uid
-		WHERE r.recruitmentNoticePk = #{recruitmentUid}
+		JOIN
+		users u ON res.userUid = u.uid
+		WHERE r.recruitmentNoticePk =
+		#{recruitmentUid}
 		AND r.status != 'EXPIRED'
 	</select>
-	
-	
-	<select id="selectSubmitFromUser" resultType="com.jobhunter.model.submit.SubmitFromUserVO">
-	  SELECT 
-	    reg.registrationNo,
-	    reg.status,
-	    reg.regDate,
-	    res.resumeNo,
-	    res.title AS resumeTitle,
-	    rec.uid AS recruitNo,
-	    rec.title AS recruitTitle
-	  FROM registration reg
-	  JOIN resume res ON reg.resumePk = res.resumeNo
-	  JOIN users u ON res.userUid = u.uid
-	  JOIN recruitmentnotice rec ON reg.recruitmentNoticePk = rec.uid
-	  <where>
-	    u.uid = #{uid}
-	    <if test="onlyUnread">
-	      AND reg.status NOT IN ('WAITING', 'EXPIRED')
-	    </if>
-	  </where>
-	  <choose>
-	    <when test="prioritizeUnread">
-	      ORDER BY 
-	        FIELD(reg.status, 'PASS', 'FAILURE', 'CHECKED', 'WAITING', 'EXPIRED'),
-	        reg.regDate DESC
-	    </when>
-	    <otherwise>
-	      ORDER BY reg.regDate DESC
-	    </otherwise>
-	  </choose>
-	  LIMIT 5 OFFSET #{offset}
+
+
+	<select id="selectSubmitFromUser"
+		resultType="com.jobhunter.model.submit.SubmitFromUserVO">
+		SELECT
+		reg.registrationNo,
+		reg.status,
+		reg.regDate,
+		res.resumeNo,
+		res.title AS resumeTitle,
+		rec.uid AS recruitNo,
+		rec.title AS
+		recruitTitle
+		FROM registration reg
+		JOIN resume res ON reg.resumePk =
+		res.resumeNo
+		JOIN users u ON res.userUid = u.uid
+		JOIN recruitmentnotice
+		rec ON reg.recruitmentNoticePk = rec.uid
+		<where>
+			u.uid = #{uid}
+			<if test="onlyUnread">
+				AND reg.status NOT IN ('WAITING', 'EXPIRED')
+			</if>
+		</where>
+		<choose>
+			<when test="prioritizeUnread">
+				ORDER BY
+				FIELD(reg.status, 'PASS', 'FAILURE',
+				'CHECKED', 'WAITING', 'EXPIRED'),
+				reg.regDate DESC
+			</when>
+			<otherwise>
+				ORDER BY reg.regDate DESC
+			</otherwise>
+		</choose>
+		LIMIT 5 OFFSET #{offset}
 	</select>
-	
+
 	<select id="countSubmitFromUser" resultType="int">
-	  SELECT COUNT(*)
-	  FROM registration reg
-	  JOIN resume res ON reg.resumePk = res.resumeNo
-	  JOIN users u ON res.userUid = u.uid
-	  JOIN recruitmentnotice rec ON reg.recruitmentNoticePk = rec.uid
-	  <where>
-	    u.uid = #{uid}
-	    <if test="onlyUnread">
-	      AND reg.status NOT IN ('WAITING', 'EXPIRED')
-	    </if>
-	  </where>
+		SELECT COUNT(*)
+		FROM registration reg
+		JOIN resume res ON reg.resumePk =
+		res.resumeNo
+		JOIN users u ON res.userUid = u.uid
+		JOIN recruitmentnotice
+		rec ON reg.recruitmentNoticePk = rec.uid
+		<where>
+			u.uid = #{uid}
+			<if test="onlyUnread">
+				AND reg.status NOT IN ('WAITING', 'EXPIRED')
+			</if>
+		</where>
 	</select>
-	
-	
+
+	<!-- 지원자 페이징 조회 -->
+	<select id="selectUsersWhoAppliedPaged" parameterType="map"
+		resultType="com.jobhunter.model.user.UserVO">
+		SELECT
+		u.*
+		FROM
+		registration reg
+		JOIN
+		resume res ON reg.resumePk = res.resumeNo
+		JOIN
+		users u ON res.userUid = u.uid
+		WHERE
+		reg.recruitmentNoticePk = #{uid}
+		ORDER BY
+		reg.regDate DESC
+		LIMIT #{pageIndex}, #{pageSize}
+	</select>
 
 </mapper>
