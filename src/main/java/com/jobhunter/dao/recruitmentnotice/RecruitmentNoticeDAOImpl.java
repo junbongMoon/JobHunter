@@ -316,4 +316,7 @@ public class RecruitmentNoticeDAOImpl implements RecruitmentNoticeDAO {
 		return list;
 	}
 
+
+
+
 }

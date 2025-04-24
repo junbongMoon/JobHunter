@@ -35,7 +35,8 @@
 		resultMap="TotalStatusVODTOMap">
 		SELECT *
 		FROM total_status
-		WHERE DATE(statusDate) = #{yesterday}
+		WHERE DATE(statusDate) =
+		#{yesterday}
 	</select>
 
 	<insert id="insertTotalStatus"
@@ -76,6 +77,7 @@
 		WHERE statusDate BETWEEN
 		#{start} AND
 		#{end}
+		ORDER BY statusDate ASC
 	</select>
 
 	<resultMap id="StatusVODTOMap"
@@ -118,6 +120,31 @@
 		DATE_FORMAT(statusDate, '%Y-%m') AS `ym`
 		FROM status
 		ORDER BY `ym` DESC
+	</select>
+
+	<!-- 연도 리스트 조회 -->
+	<select id="selectYears" resultType="int">
+		SELECT DISTINCT YEAR(statusDate) AS year
+		FROM status
+		ORDER BY year DESC
+	</select>
+
+	<!-- 월 리스트 조회 (해당 연도 기준) -->
+	<select id="selectMonthsByYear" parameterType="int"
+		resultType="int">
+		SELECT DISTINCT MONTH(statusDate) AS month
+		FROM status
+		WHERE YEAR(statusDate) = #{year}
+		ORDER BY month ASC
+	</select>
+
+	<!-- 일 리스트 조회 (해당 연/월 기준) -->
+	<select id="selectDaysByYearAndMonth" parameterType="map"
+		resultType="int">
+		SELECT DISTINCT DAY(statusDate) AS day
+		FROM status
+		WHERE YEAR(statusDate) = #{year} AND MONTH(statusDate) = #{month}
+		ORDER BY day ASC
 	</select>
 
 </mapper>

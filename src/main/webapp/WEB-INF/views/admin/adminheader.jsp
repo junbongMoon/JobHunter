@@ -97,6 +97,14 @@
                 </div>
             </div>
         </li>
+        
+        <!-- 🔹 차트 페이지 -->
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/adminChartDetail">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>차트 상세</span>
+            </a>
+        </li>
 
         <!-- 🔹 사이드바 토글 버튼 -->
         <div class="text-center d-none d-md-inline">

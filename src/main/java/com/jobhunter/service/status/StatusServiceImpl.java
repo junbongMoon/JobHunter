@@ -210,11 +210,6 @@ public class StatusServiceImpl implements StatusService {
 		return result;
 	}
 
-	@Override
-	public List<String> getYearAndMonth() throws Exception {
-		
-		return statusDAO.selectYearAndMonthByStatus();
-	}
 	
 	@Override
 	public FullStatus getFullStatusByMonth(String ym) throws Exception {
@@ -238,6 +233,21 @@ public class StatusServiceImpl implements StatusService {
 	    LocalDate start = LocalDate.parse(ym + "-01");
 	    LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
 	    return end.atTime(23, 59, 59); // 예: 2025-04-30T23:59:59
+	}
+	
+	@Override
+	public List<Integer> getYears() throws Exception {
+	    return statusDAO.selectYears(); // 예: 2024, 2025, ...
+	}
+
+	@Override
+	public List<Integer> getMonthsByYear(int year) throws Exception {
+	    return statusDAO.selectMonthsByYear(year); // 예: 1~12
+	}
+
+	@Override
+	public List<Integer> getDaysByYearAndMonth(int year, int month) throws Exception {
+	    return statusDAO.selectDaysByYearAndMonth(year, month); // 예: 1~31
 	}
 
 

@@ -6,6 +6,7 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 	<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4230440978d7fc8b259ff34d707166f2&autoload=false&libraries=services"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
 	$(function() {
 
@@ -183,6 +184,111 @@ function deleteLike(userId, boardNo) {
         }
     });
 }
+
+function reportBoard() {
+  const modal = new bootstrap.Modal(document.getElementById('reportModal'));
+  modal.show();
+}
+
+function submitReport() {
+  const userId = document.getElementById('loginUserUid').value;
+  const uid = document.getElementById('reportUid').value;
+  const category = document.getElementById('reportCategory').value;
+  const message = document.getElementById('reportMessage').value;
+
+  if (!category) {
+    alert("신고 사유를 선택해주세요.");
+    return;
+  }
+
+  const reportData = {
+    boardNo: parseInt(uid),
+    reporterAccountUid: parseInt(userId),
+    reportCategory: category,
+    reportMessage: message,
+    reportType: "RECRUITMENT",
+    reportTargetURL: `/recruitmentnotice/detail?uid=${uid}`
+  };
+
+  $.ajax({
+    url: '/report/board',
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(reportData),
+    success: function () {
+      alert("신고가 접수되었습니다.");
+      bootstrap.Modal.getInstance(document.getElementById('reportModal')).hide();
+    },
+    error: function (xhr) {
+      alert("신고 처리 중 오류가 발생했습니다: " + xhr.responseText);
+    }
+  });
+}
+
+function drawRecruitmentStats() {
+		const stats = {
+		maleCount: parseInt('${RecruitmentDetailInfo.stats.maleCount}', 10) || 0,
+		femaleCount: parseInt('${RecruitmentDetailInfo.stats.femaleCount}', 10) || 0,
+		unknownAgeCount: parseInt('${RecruitmentDetailInfo.stats.unknownAgeCount}', 10) || 0,
+		teens: parseInt('${RecruitmentDetailInfo.stats.teens}', 10) || 0,
+		twenties: parseInt('${RecruitmentDetailInfo.stats.twenties}', 10) || 0,
+		thirties: parseInt('${RecruitmentDetailInfo.stats.thirties}', 10) || 0,
+		forties: parseInt('${RecruitmentDetailInfo.stats.forties}', 10) || 0,
+		fiftiesOrAbove: parseInt('${RecruitmentDetailInfo.stats.fiftiesOrAbove}', 10) || 0
+	};
+
+	const total =
+		stats.maleCount + stats.femaleCount +
+		stats.teens + stats.twenties + stats.thirties + stats.forties + stats.fiftiesOrAbove;
+
+	if (total === 0) {
+		document.getElementById("recruitmentnoticeStat").style.display = "none";
+		$('.recStat').html("지원된 공고가 없습니다.");
+		return;
+	}
+
+	// 성별 비율
+	const genderData = google.visualization.arrayToDataTable([
+		['성별', '인원수'],
+		['남성', stats.maleCount],
+		['여성', stats.femaleCount]
+	]);
+
+	const genderOptions = {
+		title: '성별 비율',
+		pieHole: 0.4,
+		width: 400,
+		height: 300
+	};
+
+	// 연령대 비율
+	const ageData = google.visualization.arrayToDataTable([
+		['연령대', '인원수'],
+		['10대 미만', stats.teens],
+		['20대', stats.twenties],
+		['30대', stats.thirties],
+		['40대', stats.forties],
+		['50대 이상', stats.fiftiesOrAbove],
+		['나이 정보 없음', stats.unknownAgeCount]
+	]);
+
+	const ageOptions = {
+		title: '연령대 비율',
+		pieHole: 0.4,
+		width: 400,
+		height: 300
+	};
+
+	// 그리기
+	const genderChart = new google.visualization.PieChart(document.getElementById('genderChart'));
+	const ageChart = new google.visualization.PieChart(document.getElementById('ageChart'));
+
+	genderChart.draw(genderData, genderOptions);
+	ageChart.draw(ageData, ageOptions);
+}
+
+google.charts.load('current', { packages: ['corechart'] });
+google.charts.setOnLoadCallback(drawRecruitmentStats);
 
 </script>
 <style>
@@ -500,6 +606,16 @@ button.btn-resume {
 
 									<div class="content">
 
+										<c:if test="${not empty RecruitmentDetailInfo.stats}">
+											<div class="categories-widget widget-item card">
+												<h3 class="widget-title recStat">공고 지원 비율</h3>
+												<div id="recruitmentnoticeStat" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+												<div id="genderChart"></div>
+												<div id="ageChart"></div>
+												</div>
+											</div>
+										</c:if>
+
 										<div class="categories-widget widget-item card">
 											<h3 class="widget-title">지역</h3>
 											<p id="region">
@@ -693,6 +809,7 @@ button.btn-resume {
 														onclick="location.href='/submission/check?boardNo=${RecruitmentDetailInfo.uid}'">
 														이력서 제출
 													</button>
+														<button type="button" class="btn btn-report" id="reportBtn" onclick="reportBoard()">신고하기</button>
 												</c:when>
 												</c:choose>
 												</div>
@@ -702,7 +819,41 @@ button.btn-resume {
 
 									
 
-
+									<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+										<div class="modal-dialog">
+										  <div class="modal-content">
+										  
+											<div class="modal-header">
+											  <h5 class="modal-title" id="reportModalLabel">공고 신고</h5>
+											  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+											</div>
+									  
+											<div class="modal-body">
+											  <input type="hidden" id="loginUserUid" value="${sessionScope.account.uid}" />
+											  <input type="hidden" id="reportUid" value="${RecruitmentDetailInfo.uid}" />
+									  
+											  <label for="reportCategory" class="form-label">신고 사유</label>
+											  <select id="reportCategory" class="form-select" required>
+												<option value="" disabled selected>-- 신고 사유 선택 --</option>
+												<option value="SPAM">스팸/광고</option>
+												<option value="FALSE_INFO">허위 정보</option>
+												<option value="ILLEGAL_ACTIVITY">불법 행위</option>
+												<option value="INAPPROPRIATE_CONTENT">부적절한 내용</option>
+												<option value="ETC">기타</option>
+											  </select>
+									  
+											  <label for="reportMessage" class="form-label mt-3">상세 내용</label>
+											  <textarea id="reportMessage" class="form-control" rows="4" placeholder="신고 내용을 입력해주세요."></textarea>
+											</div>
+									  
+											<div class="modal-footer">
+											  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+											  <button type="button" class="btn btn-danger" onclick="submitReport()">제출</button>
+											</div>
+									  
+										  </div>
+										</div>
+									  </div>
 
 
 								</div>

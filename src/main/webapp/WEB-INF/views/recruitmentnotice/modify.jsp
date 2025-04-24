@@ -130,14 +130,15 @@ if (workType === "PART_TIME") {
       $('#summernote').summernote('code', detail);
 
       // 라디오 세팅
-      $(`input[name="workType"][value="${workType}"]`).prop("checked", true).trigger("change");
-      $(`input[name="payType"][value="${payType}"]`).prop("checked", true);
-      $(`input[name="personalHistory"][value="${personalHistory}"]`).prop("checked", true);
-      $(`input[name="militaryService"][value="${militaryService}"]`).prop("checked", true);
+      $(`input[name="workType"][value="\${workType}"]`).prop("checked", true).trigger("change");
+      $(`input[name="payType"][value="\${payType}"]`).prop("checked", true);
+      $(`input[name="personalHistory"][value="\${personalHistory}"]`).prop("checked", true);
+      $(`input[name="militaryService"][value="\${militaryService}"]`).prop("checked", true);
 
 
 	  
 	  const jsonStr = '<c:out value="${applicationsJson}" escapeXml="false" />';
+	  console.log(jsonStr);
 	  
   try {
     
@@ -173,10 +174,8 @@ if (workType === "PART_TIME") {
  	 }, 200);
 	}, 300);
 
-
-
-      // 근무 시간 분해
-      const timeRegex = /^(\d{2}:\d{2})~(\d{2}:\d{2})(?: \((.+)\))?$/;
+	 // 근무 시간 분해
+	 const timeRegex = /^(\d{2}:\d{2})~(\d{2}:\d{2})(?: \((.+)\))?$/;
       const match = period.match(timeRegex);
       if (match) {
         const [, startTime, endTime, detailType] = match;
@@ -184,7 +183,11 @@ if (workType === "PART_TIME") {
         $('#endTime').val(endTime);
         if (detailType) $('#workDetailType').val(detailType);
       }
+
+     
     }, 300);
+
+
 
 	
 
@@ -364,27 +367,27 @@ $(document).on("click", "#goToListBtn", function () {
 		});
 		
 		// class = ".application-checkbox" 값이 바뀌면.. 
-		$(document).on("change", ".application-checkbox", function () {
-  let method = $(this).val();
-  let checked = $(this).is(":checked");
+		$(document).on("change", ".application-checkbox", function (e) {
+		let method = $(this).val();
+		let checked = $(this).is(":checked");
 
-  if (checked) {
-    $(`.method-detail[data-method='\${method}']`).show();
-    $(`.save-method-btn[data-method='\${method}']`).show();
-  } else {
-    $(`.method-detail[data-method='\${method}']`).hide().val('');
-    $(`.save-method-btn[data-method='\${method}']`).hide();
-    deleteApplication(method);
-  }
-});
-// 저장버튼을 누르면
-$(document).on("click", ".save-method-btn", function () {
-  const method = $(this).data("method");
-  const detail = $(`.method-detail[data-method='\${method}']`).val() || "";
+		if (checked) {
+			$(`.method-detail[data-method='\${method}']`).show();
+			$(`.save-method-btn[data-method='\${method}']`).show();
+		} else {
+			$(`.method-detail[data-method='\${method}']`).hide().val('');
+			$(`.save-method-btn[data-method='\${method}']`).hide();
+			deleteApplication(method);
+		}
+		});
+		// 저장버튼을 누르면
+		$(document).on("click", ".save-method-btn", function () {
+		const method = $(this).data("method");
+		const detail = $(`.method-detail[data-method='\${method}']`).val() || "";
 
-  // 상세 정보는 입력하지 않아도 된다.
+		// 상세 정보는 입력하지 않아도 된다.
 
-  saveApplication(method, detail);
+		saveApplication(method, detail);
   
  
 
@@ -460,7 +463,7 @@ $("#write").on("click", function () {
 
   $(".application-checkbox:checked").each(function () {
     const method = $(this).val();
-    const detail = $(`.method-detail[data-method='${method}']`).val();
+    const detail = $(`.method-detail[data-method='\${method}']`).val();
     apps.push({ method, detail });
   });
 
@@ -554,14 +557,14 @@ function showModifyFileThumbnail(fileInfo, status = "") {
         : "/resources/images_mjb/noimage.png";
 
     const html = `
-        <tr id="thumb_${safeId}" data-status="${status}">
+        <tr id="thumb_\${safeId}" data-status="\${status}">
             <td>
                 <img src="\${thumbnailUrl}" width="60" height="60" alt="썸네일 이미지"
                      onerror="this.src='/resources/images_mjb/noimage.png'" />
             </td>
             <td>\${fileInfo.originalFileName}</td>
             <td>
-                <button type="button" class="btn btn-sm btn-danger" onclick="markFileAsDeleted('${fileInfo.originalFileName}')">X</button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="markFileAsDeleted('\${fileInfo.originalFileName}')">X</button>
             </td>
         </tr>
     `;
@@ -671,10 +674,17 @@ function markUploadSuccess(fileName) {
         recruitmentNoticeUid: -1
       }),
       success: function (data) {
-        console.log(data)
+        console.log(data);
+		$(".modal-body").text(`\${method} 방식 저장 성공`);
+
+		
+		$("#MyModal").modal("show");
       },
-      error: function () {
-        alert(`${method} 방식 저장 실패`);
+      error: function (e) {
+		$(".modal-body").text(`\${method} 방식 저장 실패`);
+
+		
+		$("#MyModal").modal("show");
       }
     });
   }
@@ -955,11 +965,11 @@ if (workDetailType) {
 		focusElement = $("#endTime");
 	}
 	result = false;
-  } else if (!personalHistory) { // 완
-	errorMessage = "경력사항을 입력해주세요.";
-    focusElement = $("#personalHistory");
-	result = false;
-  } else if (!militaryService) { // 완
+  } else if (!$("input[name='personalHistory']:checked").length) {
+		errorMessage = "경력사항을 입력해주세요.";
+		focusElement = $("input[name='personalHistory']").first(); 
+		result = false;
+	} else if (!militaryService) { // 완
     errorMessage = "병역 사항을 선택해주세요.";
 	result = false;
   } else if (!dueDate) { // 알아서 된다...
@@ -1297,13 +1307,13 @@ label {
 										<div class="d-flex flex-wrap gap-3" id="militaryService">
 											<div class="form-check">
 												<input class="form-check-input" type="radio"
-													name="militaryService" id="military1" value="NOT_COMPLETED">
+													name="militaryService" id="military1" value="NOT_SERVED">
 												<label class="form-check-label mb-2" for="military1">미필
 													이상</label>
 											</div>
 											<div class="form-check">
 												<input class="form-check-input" type="radio"
-													name="militaryService" id="military2" value="COMPLETED">
+													name="militaryService" id="military2" value="SERVED">
 												<label class="form-check-label mb-2" for="military2">군필
 													이상</label>
 											</div>
