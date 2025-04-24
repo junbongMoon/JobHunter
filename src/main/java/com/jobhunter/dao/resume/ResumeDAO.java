@@ -7,10 +7,13 @@ import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.LicenseDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
+import com.jobhunter.model.resume.MyRegistrationAdviceSearchDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.RegistrationAdviceVO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
+import com.jobhunter.model.resume.ResumeAdviceVO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.ResumeVO;
@@ -117,6 +120,20 @@ public interface ResumeDAO {
 
 	ResumeAdviceDTO selectAdvice(int resumeNo) throws Exception;
 	
+
+	List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo);
+
+	ResumeAdviceDTO getAdvice(int resumeNo);
+	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);
+
+	List<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto);
+
+	int countRegistrationAdviceByMentor(MyRegistrationAdviceSearchDTO dto);
+
+	List<ResumeAdviceVO> selectResumeAdviceByUserUid(int uid, int offset);
+
+	int countResumeAdviceByUserUid(int uid);
+
 	List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo) throws Exception;
 
 	ResumeAdviceDTO getAdvice(int resumeNo) throws Exception;
@@ -214,4 +231,5 @@ public interface ResumeDAO {
 	 * @return 성공 여부
 	 */
 	int changeAdviceStatus(int resumeNo, int userUid, String status) throws Exception;
+
 }

@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
-import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
+import com.jobhunter.model.util.TenToFivePageVO;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 
 @RunWith(SpringJUnit4ClassRunner.class)

@@ -5,12 +5,14 @@ import java.time.LocalDateTime;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
-import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser;
 import com.jobhunter.model.submit.Status;
 import com.jobhunter.model.submit.SubmitFromRecruitVO;
+import com.jobhunter.model.submit.SubmitFromUserVO;
 import com.jobhunter.model.submit.SubmitSearchDTO;
+import com.jobhunter.model.util.TenToFivePageVO;
 
 /**
  * @author 문준봉
@@ -106,5 +108,8 @@ public interface SubmitService {
 	 * @return 신청서 상세정보
 	 *
 	 */
-	ResumeDetailInfoBySubmit selectSubmitAndResumeDetailInfo(int registrationNo, AccountVO account) throws Exception;
+	ResumeDetailInfoBySubmitAndUser selectSubmitAndResumeDetailInfo(int registrationNo, AccountVO account) throws Exception;
+
+
+	TenToFivePageVO<SubmitFromUserVO> selectSubmitFromUser(SubmitSearchDTO dto) throws Exception;
 }

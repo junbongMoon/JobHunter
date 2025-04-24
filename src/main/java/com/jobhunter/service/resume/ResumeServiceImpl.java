@@ -1,5 +1,6 @@
 package com.jobhunter.service.resume;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -15,10 +16,13 @@ import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.LicenseDTO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MeritDTO;
+import com.jobhunter.model.resume.MyRegistrationAdviceSearchDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.RegistrationAdviceVO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
+import com.jobhunter.model.resume.ResumeAdviceVO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
@@ -28,6 +32,7 @@ import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.util.TenToFivePageVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -300,6 +305,29 @@ public class ResumeServiceImpl implements ResumeService {
 		return rdao.getAdviceFiles(adviceNo);
 	}
 
+	
+	@Override
+	public TenToFivePageVO<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto) {
+		List<String> validStatuses = Arrays.asList("COMPLETE", "CANCEL", "WAITING", "CHECKING", "LIVE");
+
+		if (!validStatuses.contains(dto.getStatus())) {
+		    dto.setStatus(null);
+		}
+		List<RegistrationAdviceVO> vo = rdao.selectRegistrationAdviceByMentorWithPaging(dto);
+		int totalCnt = rdao.countRegistrationAdviceByMentor(dto);
+		TenToFivePageVO<RegistrationAdviceVO> result = new TenToFivePageVO<RegistrationAdviceVO>(vo, dto.getPage(), totalCnt);
+		return result;
+	}
+	
+	@Override
+	public TenToFivePageVO<ResumeAdviceVO> selectResumeAdviceByUserUid(int uid, int page) {
+		int offset = (page - 1) * 5;
+		List<ResumeAdviceVO> vo = rdao.selectResumeAdviceByUserUid(uid, offset);
+		int totalCnt = rdao.countResumeAdviceByUserUid(uid);
+		TenToFivePageVO<ResumeAdviceVO> result = new TenToFivePageVO<ResumeAdviceVO>(vo, page, totalCnt);
+		return result;
+  }
+
 /**
 	 *  @author 유지원
 	 *
@@ -421,5 +449,6 @@ public class ResumeServiceImpl implements ResumeService {
 			}
 		}
 		return false;
+
 	}
 }

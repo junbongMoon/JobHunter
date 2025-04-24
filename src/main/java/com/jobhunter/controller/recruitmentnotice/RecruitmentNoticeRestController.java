@@ -18,7 +18,7 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo;
 import com.jobhunter.model.recruitmentnotice.RecruitmentNotice;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
-import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
+import com.jobhunter.model.util.TenToFivePageVO;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
 
 import lombok.RequiredArgsConstructor;
@@ -137,12 +137,12 @@ public class RecruitmentNoticeRestController {
 		@PostMapping("/withResume")
 	    public TenToFivePageVO<RecruitmentWithResume> showRecruitmentWithResumeByUid(@RequestBody RecruitmentWithResumePageDTO dto) {
 	        try {
-				return recService.searchRecruitments(dto);
+	        	TenToFivePageVO<RecruitmentWithResume> result = recService.searchRecruitments(dto);
+				return result;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 	        return null;
 	    }
-	
 	
 }

@@ -13,8 +13,10 @@ import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.RegistrationVO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser;
 import com.jobhunter.model.submit.Status;
 import com.jobhunter.model.submit.SubmitFromRecruitVO;
+import com.jobhunter.model.submit.SubmitFromUserVO;
 import com.jobhunter.model.submit.SubmitSearchDTO;
 import com.jobhunter.model.user.UserVO;
 
@@ -250,7 +252,7 @@ public class SubmitDAOImpl implements SubmitDAO {
 	 *
 	 */
     @Override
-    public ResumeDetailInfoBySubmit selectSubmitAndResumeDetailInfo(int registrationNo) throws Exception {
+    public ResumeDetailInfoBySubmitAndUser selectSubmitAndResumeDetailInfo(int registrationNo) throws Exception {
         return ses.selectOne(NS + ".selectOneResumeByRegistrationNo", registrationNo);
     }
     
@@ -270,10 +272,23 @@ public class SubmitDAOImpl implements SubmitDAO {
         return ses.selectOne(NS + ".getCompanyUidByRegistrationNo", registrationNo);
     }
 
+    
+    @Override
+    public List<SubmitFromUserVO> selectSubmitFromUser(SubmitSearchDTO dto) throws Exception {
+        return ses.selectList(NS + ".selectSubmitFromUser", dto);
+    }
+    
+    @Override
+    public int countSubmitFromUser(SubmitSearchDTO dto) throws Exception {
+        return ses.selectOne(NS + ".countSubmitFromUser", dto);
+    }
+
+
 
     @Override
     public List<UserVO> selectUsersWhoApplied(int recruitmentUid) throws Exception {
         return ses.selectList(NS + ".selectUsersWhoApplied", recruitmentUid);
+
     }
 	
 }

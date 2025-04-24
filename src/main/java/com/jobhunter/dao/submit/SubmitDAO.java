@@ -9,8 +9,10 @@ import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.RegistrationVO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser;
 import com.jobhunter.model.submit.Status;
 import com.jobhunter.model.submit.SubmitFromRecruitVO;
+import com.jobhunter.model.submit.SubmitFromUserVO;
 import com.jobhunter.model.submit.SubmitSearchDTO;
 import com.jobhunter.model.user.UserVO;
 
@@ -148,7 +150,7 @@ public interface SubmitDAO {
 	 * @return 신청서 상세정보
 	 *
 	 */
-	ResumeDetailInfoBySubmit selectSubmitAndResumeDetailInfo(int registrationNo) throws Exception;
+	ResumeDetailInfoBySubmitAndUser selectSubmitAndResumeDetailInfo(int registrationNo) throws Exception;
 
 
 	/**
@@ -165,7 +167,14 @@ public interface SubmitDAO {
 	int getCompanyUidByRegistrationNo(int registrationNo) throws Exception;
 
 
+
+	List<SubmitFromUserVO> selectSubmitFromUser(SubmitSearchDTO dto) throws Exception;
+
+
+	int countSubmitFromUser(SubmitSearchDTO dto) throws Exception;
+
 	List<UserVO> selectUsersWhoApplied(int Recruitmentuid) throws Exception;
+
 	
 	
 }

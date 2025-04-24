@@ -10,13 +10,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+
+import com.jobhunter.model.resume.MyRegistrationAdviceSearchDTO;
+import com.jobhunter.model.resume.RegistrationAdviceVO;
+import com.jobhunter.model.resume.ResumeAdviceVO;
+
 import com.jobhunter.model.account.AccountVO;
+
 import com.jobhunter.model.resume.ResumeUpfileDTO;
+import com.jobhunter.model.util.TenToFivePageVO;
 import com.jobhunter.service.resume.ResumeService;
 import com.jobhunter.util.resume.FileProcessForResume;
 
@@ -86,6 +95,27 @@ public class ResumeRestController {
 		}
 	}
 	
+
+	@PostMapping(value = "/myRegistrationAdvice")
+	public TenToFivePageVO<RegistrationAdviceVO> getMyRegistrationAdvice(@RequestBody MyRegistrationAdviceSearchDTO dto) {
+		try {
+			return resumeService.selectRegistrationAdviceByMentorWithPaging(dto);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+	
+	@PostMapping(value = "/myResumeAdvice/{uid}/{page}")
+	public TenToFivePageVO<ResumeAdviceVO> getMyResumeAdviceByUserUid(@PathVariable("uid") int uid, @PathVariable("page")int page) {
+		try {
+			return resumeService.selectResumeAdviceByUserUid(uid, page);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+
 	/**
 	 * 첨삭 승인 처리
 	 * <p>
@@ -153,5 +183,5 @@ public class ResumeRestController {
 		}
 	}
 	
-	
+
 }

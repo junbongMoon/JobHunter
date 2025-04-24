@@ -22,13 +22,15 @@ import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
 import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
-import com.jobhunter.model.recruitmentnotice.TenToFivePageVO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.RegistrationVO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser;
 import com.jobhunter.model.submit.Status;
 import com.jobhunter.model.submit.SubmitFromRecruitVO;
+import com.jobhunter.model.submit.SubmitFromUserVO;
 import com.jobhunter.model.submit.SubmitSearchDTO;
+import com.jobhunter.model.util.TenToFivePageVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -334,12 +336,23 @@ public class SubmitServiceImpl implements SubmitService {
 	 */
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-	public ResumeDetailInfoBySubmit selectSubmitAndResumeDetailInfo(int registrationNo, AccountVO account) throws Exception {
+	public ResumeDetailInfoBySubmitAndUser selectSubmitAndResumeDetailInfo(int registrationNo, AccountVO account) throws Exception {
 		
 		int companyUid = submitDAO.getCompanyUidByRegistrationNo(registrationNo);
 		if((companyUid == account.getUid() && account.getAccountType() == AccountType.COMPANY) || account.getIsAdmin() == "Y") {
 			return submitDAO.selectSubmitAndResumeDetailInfo(registrationNo);
 		}
 	    return null;
+	}
+	
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public TenToFivePageVO<SubmitFromUserVO> selectSubmitFromUser(SubmitSearchDTO dto) throws Exception {
+	    int totalItems = submitDAO.countSubmitFromUser(dto);
+	    List<SubmitFromUserVO> list = submitDAO.selectSubmitFromUser(dto);
+
+	    TenToFivePageVO<SubmitFromUserVO> vo = new TenToFivePageVO<SubmitFromUserVO>(list, dto.getPage(), totalItems);
+
+	    return vo;
 	}
 }

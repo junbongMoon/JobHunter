@@ -1,6 +1,8 @@
 package com.jobhunter.model.resume;
 
-import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

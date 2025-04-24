@@ -3,7 +3,9 @@ package com.jobhunter.service.resume;
 import java.util.List;
 
 import com.jobhunter.model.resume.MajorCategoryDTO;
+import com.jobhunter.model.resume.MyRegistrationAdviceSearchDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.RegistrationAdviceVO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
@@ -13,8 +15,10 @@ import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.util.TenToFivePageVO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
+import com.jobhunter.model.resume.ResumeAdviceVO;
 
 public interface ResumeService {
 
@@ -58,6 +62,19 @@ public interface ResumeService {
 
 	// 이력서 상태 확인
 	boolean isResumeChecked(int resumeNo) throws Exception;
+
+
+	void saveAdvice(ResumeAdviceDTO adviceDTO);
+
+	void deleteExistingAdvice(int resumeNo, int mentorUid);
+
+	ResumeAdviceDTO getAdvice(int resumeNo);
+
+	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo);
+
+	TenToFivePageVO<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto);
+
+	TenToFivePageVO<ResumeAdviceVO> selectResumeAdviceByUserUid(int uid, int page);
 
 	// 이력서 첨삭 상태 확인
 	boolean isResumeAdvice(int resumeNo) throws Exception;
@@ -127,4 +144,5 @@ public interface ResumeService {
 	 * @return 성공 여부
 	 */
 	boolean endAdvice(int resumeNo, int userUid, int ownerUid) throws Exception;
+
 }

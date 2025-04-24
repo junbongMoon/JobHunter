@@ -1,6 +1,8 @@
 package com.jobhunter.dao.prboard;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
@@ -49,6 +51,20 @@ public class PRBoardDAOImpl implements PRBoardDAO {
 	@Override
 	public int deletePRBoard(int prBoardNo) throws Exception {
 	    return ses.delete(NS + ".deletePRBoard", prBoardNo);
+	}
+	
+	@Override
+	public List<PRBoardVO> selectMyPRBoard(int uid, int offset) throws Exception {
+		Map<String, Integer> param = new HashMap<String, Integer>();
+		param.put("uid", uid);
+		param.put("offset", offset);
+	    return ses.selectList(NS + ".selectPRBoardsByUserUidWithPaging", param);
+	}
+	
+	@Override
+	public int selectMyPRBoardCnt(int uid) throws Exception {
+		System.out.println(uid);
+	    return ses.selectOne(NS + ".countPRBoardsByUserUid", uid);
 	}
 
 }

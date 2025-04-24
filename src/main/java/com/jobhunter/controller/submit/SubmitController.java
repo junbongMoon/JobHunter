@@ -14,6 +14,7 @@ import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
+import com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser;
 import com.jobhunter.model.submit.Status;
 import com.jobhunter.service.submit.SubmitService;
 
@@ -86,7 +87,7 @@ public class SubmitController {
 		return result;
 	}
 
-	// accept.jsp(승인 페이지)로 이동
+	// 신청서 상세조회 페이지로 이동
 	@GetMapping("/detail/{registrationNo}")
 	public String showAcceptDetail(@PathVariable("registrationNo") int registrationNo, HttpSession session,
 			Model model) {
@@ -94,7 +95,8 @@ public class SubmitController {
 		// 신청서 대상 기업 혹은 admin만 열람 가능
 
 		// ResumeDetailInfoBySubmit 가져와야함
-		ResumeDetailInfoBySubmit result = null;
+		ResumeDetailInfoBySubmitAndUser result = null;
+		// TODO 들어가면 읽음처리하고 페이지 내에서 상태변경도 필요...
 		try {
 			result = submitService.selectSubmitAndResumeDetailInfo(registrationNo, account);
 		} catch (Exception e) {
