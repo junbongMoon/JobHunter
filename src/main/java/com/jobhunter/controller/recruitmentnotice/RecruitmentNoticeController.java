@@ -552,6 +552,9 @@ public class RecruitmentNoticeController {
 	        RecruitmentDetailInfo existing = recruitmentService.getRecruitmentByUid(uid);
 
 	        // 서비스로 수정 로직 위임
+	        System.out.println("DTO: " + dto);
+	        System.out.println("applicationJson: " + applicationJson);
+	        System.out.println("advantageJson: " + advantageJson);
 	        recruitmentService.modifyRecruitmentNotice(dto, advantages, applications, modifyFileList, existing, uid);
 
 	        result = true;

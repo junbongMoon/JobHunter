@@ -112,14 +112,15 @@ public interface ResumeDAO {
 	// 이력서 상태 확인
 	int checkResumeStatus(int resumeNo) throws Exception;
 
-	void insertAdvice(ResumeAdviceDTO adviceDTO);
+	void insertAdvice(ResumeAdviceDTO adviceDTO) throws Exception;
 
-	void insertAdviceFile(ResumeAdviceUpfileDTO fileDTO); 
+	void insertAdviceFile(ResumeAdviceUpfileDTO fileDTO) throws Exception; 
 
-	void deleteExistingAdvice(int resumeNo, int mentorUid);
+	void deleteExistingAdvice(int resumeNo, int mentorUid) throws Exception;
 
-	ResumeAdviceDTO selectAdvice(int resumeNo);
+	ResumeAdviceDTO selectAdvice(int resumeNo) throws Exception;
 	
+
 	List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo);
 
 	ResumeAdviceDTO getAdvice(int resumeNo);
@@ -132,4 +133,103 @@ public interface ResumeDAO {
 	List<ResumeAdviceVO> selectResumeAdviceByUserUid(int uid, int offset);
 
 	int countResumeAdviceByUserUid(int uid);
+
+	List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo) throws Exception;
+
+	ResumeAdviceDTO getAdvice(int resumeNo) throws Exception;
+	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) throws Exception;
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 신청을 저장하는 메서드
+	 * </p>
+	 * 
+	 * @param int mentorUid 첨삭자 UID
+	 * @param int resumeNo 이력서 번호
+	 * @return 성공하면 1, 실패하면 0
+	 *
+	 */
+	int insertRegistrationAdvice(int mentorUid, int resumeNo) throws Exception;
+	
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 신청 중복 여부를 확인하는 메서드
+	 * </p>
+	 * 
+	 * @param int mentorUid 첨삭자 UID
+	 * @param int resumeNo 이력서 번호
+	 * @return 중복이면 1 이상, 중복이 아니면 0
+	 *
+	 */
+	int checkDuplicateAdvice(int mentorUid, int resumeNo) throws Exception;
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 상태를 확인하는 메서드
+	 * </p>
+	 * 
+	 * @param int resumeNo 이력서 번호
+	 * @return 첨삭 상태
+	 */
+	int checkResumeAdvice(int resumeNo) throws Exception;
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 신청 번호를 가져오는 메서드
+	 * </p>
+	 * 
+	 * @param int mentorUid 첨삭자 UID
+	 * @param int resumeNo 이력서 번호
+	 * @return 첨삭 신청 번호
+	 */
+	int getRegistrationAdviceNo(int mentorUid, int resumeNo) throws Exception;
+
+	// /**
+	//  *  @author 유지원
+	//  *
+	//  * <p>
+	//  * 이력서 첨삭 승인을 처리하는 메서드
+	//  * </p>
+	//  * 
+	//  * @param int resumeNo 이력서 번호
+	//  * @param int userUid 유저 UID
+	//  * @return 성공 여부
+	//  */
+	// void acceptAdvice(int resumeNo, int userUid, String status) throws Exception;
+	
+	// /**
+	//  *  @author 유지원
+	//  *
+	//  * <p>
+	//  * 이력서 첨삭 거절을 처리하는 메서드
+	//  * </p>
+	//  * 
+	//  * @param int resumeNo 이력서 번호
+	//  * @param int userUid 유저 UID
+	//  * @return 성공 여부
+	//  */
+	// void rejectAdvice(int resumeNo, int userUid, String status) throws Exception;
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 상태를 변경하는 메서드
+	 * </p>
+	 * 
+	 * @param int resumeNo 이력서 번호
+	 * @param int userUid 유저 UID
+	 * @param String status 첨삭 상태
+	 * @return 성공 여부
+	 */
+	int changeAdviceStatus(int resumeNo, int userUid, String status) throws Exception;
+
 }

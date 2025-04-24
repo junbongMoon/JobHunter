@@ -63,6 +63,7 @@ public interface ResumeService {
 	// 이력서 상태 확인
 	boolean isResumeChecked(int resumeNo) throws Exception;
 
+
 	void saveAdvice(ResumeAdviceDTO adviceDTO);
 
 	void deleteExistingAdvice(int resumeNo, int mentorUid);
@@ -74,4 +75,74 @@ public interface ResumeService {
 	TenToFivePageVO<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto);
 
 	TenToFivePageVO<ResumeAdviceVO> selectResumeAdviceByUserUid(int uid, int page);
+
+	// 이력서 첨삭 상태 확인
+	boolean isResumeAdvice(int resumeNo) throws Exception;
+
+	void saveAdvice(ResumeAdviceDTO adviceDTO) throws Exception;
+
+	void deleteExistingAdvice(int resumeNo, int mentorUid) throws Exception;
+
+	ResumeAdviceDTO getAdvice(int resumeNo) throws Exception;
+
+	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) throws Exception;
+	
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 신청을 처리하는 메서드
+	 * </p>
+	 * 
+	 * @param int mentorUid 첨삭자 UID
+	 * @param int resumeNo 이력서 번호
+	 * @return 성공 여부
+	 *
+	 */
+	boolean submitAdvice(int mentorUid, int resumeNo, int sessionUid) throws Exception;
+
+	int getRegistrationAdviceNo(int mentorUid, int resumeNo) throws Exception;
+
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 승인을 처리하는 메서드
+	 * </p>
+	 * 
+	 * @param int resumeNo 이력서 번호
+	 * @param int userUid 첨삭자 UID
+	 * @return 성공 여부
+	 */
+	boolean acceptAdvice(int resumeNo, int userUid) throws Exception;
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 거절을 처리하는 메서드
+	 * </p>
+	 * 
+	 * @param int resumeNo 이력서 번호
+	 * @param int userUid 첨삭자 UID
+	 * @param int ownerUid 이력서 주인 UID
+	 * @return 성공 여부
+	 */
+	boolean rejectAdvice(int resumeNo, int userUid, int ownerUid) throws Exception;
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 종료를 처리하는 메서드
+	 * </p>
+	 * 
+	 * @param int resumeNo 이력서 번호
+	 * @param int userUid 첨삭자 UID
+	 * @param int ownerUid 이력서 주인 UID
+	 * @return 성공 여부
+	 */
+	boolean endAdvice(int resumeNo, int userUid, int ownerUid) throws Exception;
+
 }

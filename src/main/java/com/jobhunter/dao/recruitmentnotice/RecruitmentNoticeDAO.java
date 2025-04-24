@@ -321,4 +321,6 @@ public interface RecruitmentNoticeDAO {
 
 	int decreaseRecruitmentLikeCnt(int uid) throws Exception;
 
+	
+
 }

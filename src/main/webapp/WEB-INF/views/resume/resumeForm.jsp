@@ -17,19 +17,23 @@
 				<!-- 헤더 -->
 				<jsp:include page="/WEB-INF/views/header.jsp" />
 
+				<!-- resumeNo 남기기 -->
+				<input type="hidden" id="resumeNo" value="${resumeDetail.resume.resumeNo}">
 				<!-- resume.userUid 남기기 -->
-				<input type="hidden" id="userUid" value="${ resumeDetail.resume.userUid }">
+				<input type="hidden" id="userUidOwner" value="${ resumeDetail.resume.userUid }">
 				<!-- session.userUid 남기기 -->
 				<input type="hidden" id="sessionUserUid" value="${ sessionScope.account.uid }">
 				<!-- session.userUid와 resume.userUid가 같은지 확인 -->
 				<c:set var="isSameUser" value="${sessionScope.account.uid == resumeDetail.resume.userUid}" />
+				<input type="hidden" id="isSameUser" value="${isSameUser}">
+				<input type="hidden" id="queryUid" value="${param.uid}">
 
 				<div class="container my-5">
 					<c:if test="${mode == 'advice'}">
 						<h2 class="mb-4">[${resumeDetail.resume.title}] 이력서 첨삭</h2>
 					</c:if>
 					<c:if test="${mode != 'advice'}">
-						<h2 class="mb-4">이력서 작성</h2>
+						<h2 class="mb-4">이력서 수정</h2>
 					</c:if>
 
 					<form id="resumeForm" method="post" enctype="multipart/form-data">
@@ -43,15 +47,15 @@
 								<div class="input-group">
 									<span class="input-group-text bg-light"> <i class="bi bi-pencil-square"></i>
 									</span>
-									<c:if test="${!isSameUser}">
-										<input type="text" class="form-control form-control-lg" id="title" name="title"
-											placeholder="예: 자바 개발자 지원" maxlength="30"
-											value="${resumeDetail.resume.title}" readonly>
-									</c:if>
 									<c:if test="${isSameUser}">
 										<input type="text" class="form-control form-control-lg" id="title" name="title"
 											placeholder="예: 자바 개발자 지원" maxlength="30"
 											value="${resumeDetail.resume.title}">
+									</c:if>
+									<c:if test="${!isSameUser}">
+										<input type="text" class="form-control form-control-lg" id="title" name="title"
+											placeholder="예: 자바 개발자 지원" maxlength="30"
+											value="${resumeDetail.resume.title}" readonly>
 									</c:if>
 								</div>
 								<div class="d-flex justify-content-between mt-2">
@@ -62,75 +66,82 @@
 						</div>
 
 						<!-- 기본 정보 (users 테이블에서 가져올 예정) -->
-						<div class="card mb-4">
-							<div class="card-header">
-								기본 정보<span class="essentialPoint">*</span>
-							</div>
-							<div class="card-body">
-								<div class="row g-3">
-									<!-- 증명사진 업로드 -->
-									<div class="col-md-2">
-										<div class="d-flex justify-content-center align-items-center border rounded position-relative photoUploadBox"
-											style="height: 200px; background-color: #f8f9fa;">
-											<input type="file" id="photoUpload" style="display: none;" accept="image/*">
-											<label for="photoUpload" class="text-center" style="cursor: pointer;">
+						<c:if test="${userUidOwner == queryUid}">
+							<div class="card mb-4">
+								<div class="card-header">
+									기본 정보<span class="essentialPoint">*</span>
+								</div>
+								<div class="card-body">
+									<div class="row g-3">
+										<!-- 증명사진 업로드 -->
+										<div class="col-md-2">
+											<div class="d-flex justify-content-center align-items-center border rounded position-relative photoUploadBox"
+												style="height: 200px; background-color: #f8f9fa;">
 												<c:if test="${isSameUser}">
-													<i class="bi bi-plus-circle"
-														style="font-size: 2rem; color: #6c757d;"></i><br>
-													증명 사진 등록<span class="essentialPoint">*</span>
+													<input type="file" id="photoUpload" style="display: none;"
+														accept="image/*" />
+													<label for="photoUpload" class="text-center"
+														style="cursor: pointer;">
+														<i class="bi bi-plus-circle"
+															style="font-size: 2rem; color: #6c757d;"></i><br>
+														증명 사진 등록<span class="essentialPoint">*</span>
+													</label>
+													<img id="photoPreview" src="#" alt="사진 미리보기"
+														style="display: none; max-height: 100%; max-width: 100%;" />
+													<button type="button"
+														class="btn-close position-absolute top-0 end-0 m-2 pCloseBtn"
+														id="removePhoto"
+														style="display: none; background-color: #47B2E4; border-radius: 50%; padding: 8px; border: 1px solid #37517E; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+													</button>
 												</c:if>
-											</label>
-
-											<img id="photoPreview" src="#" alt="사진 미리보기"
-												style="display: none; max-height: 100%; max-width: 100%;" />
-											<c:if test="${isSameUser}">
-												<button type="button"
-													class="btn-close position-absolute top-0 end-0 m-2 pCloseBtn"
-													id="removePhoto"
-													style="display: none; background-color: #47B2E4; border-radius: 50%; padding: 8px; border: 1px solid #37517E; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-												</button>
-											</c:if>
-										</div>
-									</div>
-									<input type="hidden" id="profileBase64" name="profileBase64" />
-									<div class="col-md-9 pContent">
-										<div class="row g-3">
-											<div class="col-md-4">
-												<label class="form-label">이름</label>
-												<input type="text" class="form-control" value="${account.accountName}"
-													readonly />
-											</div>
-											<div class="col-md-4">
-												<label class="form-label">나이</label>
-												<input type="text" class="form-control" value="${user.age}" readonly />
-											</div>
-											<div class="col-md-4">
-												<label class="form-label">성별</label>
-												<input type="text" class="form-control"
-													value="${user.gender == 'MALE' ? '남성' : '여성'}" readonly />
-											</div>
-											<div class="col-md-4">
-												<label class="form-label">이메일</label>
-												<input type="email" class="form-control" value="${account.email}"
-													readonly />
-											</div>
-											<div class="col-md-4">
-												<label class="form-label">연락처</label>
-												<input type="tel" class="form-control" value="${account.mobile}"
-													readonly />
-											</div>
-											<div class="col-md-4">
-												<label class="form-label">거주지</label>
-												<input type="text" class="form-control" value="${user.addr}" readonly />
 											</div>
 										</div>
+										<input type="hidden" id="profileBase64" name="profileBase64" />
+										<div class="col-md-9 pContent">
+											<div class="row g-3">
+												<div class="col-md-4">
+													<label class="form-label">이름</label>
+													<input type="text" class="form-control" value="${user.userName}"
+														readonly />
+												</div>
+												<div class="col-md-4">
+													<label class="form-label">나이</label>
+													<input type="text" class="form-control" value="${user.age}"
+														readonly />
+												</div>
+												<div class="col-md-4">
+													<label class="form-label">성별</label>
+													<input type="text" class="form-control"
+														value="${user.gender == 'MALE' ? '남성' : '여성'}" readonly />
+												</div>
+												<c:if test="${isSameUser}">
+													<div class="col-md-4">
+														<label class="form-label">이메일</label>
+														<input type="email" class="form-control" value="${user.email}"
+															readonly />
+													</div>
+													<div class="col-md-4">
+														<label class="form-label">연락처</label>
+														<input type="tel" class="form-control" value="${user.mobile}"
+															readonly />
+													</div>
+													<div class="col-md-4">
+														<label class="form-label">거주지</label>
+														<input type="text" class="form-control" value="${user.addr}"
+															readonly />
+													</div>
+												</c:if>
+											</div>
+										</div>
+										<c:if test="${isSameUser}">
+											<small class="text-muted">* 2.5MB 이하의 이미지 파일만 등록 가능합니다.</small>
+										</c:if>
+										<!-- userUid -->
+										<input type="hidden" id="userUid" name="userUid" value="${account.uid}" />
 									</div>
-									<small class="text-muted">* 2.5MB 이하의 이미지 파일만 등록 가능합니다.</small>
-									<!-- userUid -->
-									<input type="hidden" id="userUid" name="userUid" value="${account.uid}" />
 								</div>
 							</div>
-						</div>
+						</c:if>
 
 						<!-- 고용 형태 -->
 						<div class="card mb-4">
@@ -774,14 +785,14 @@
 						<!-- 저장 버튼 -->
 						<!-- 테스트 종료 후 isSameUser 달기 -->
 						<!-- <c:if test="${isSameUser}"></c:if> -->
-						<c:if test="${mode != 'advice' && mode == 'checkAdvice' && isSameUser}">
+						<c:if test="${isSameUser}">
 							<button type="button" class="btn btn-primary" id="finalSaveBtn"><span
 									class="btn-text">저장하기</span>
 								<span class="spinner-border spinner-border-sm text-light d-none" role="status"
 									aria-hidden="true"></span></button>
 						</c:if>
 						<!-- <c:if test="${!isSameUser}"></c:if> -->
-						<c:if test="${mode == 'advice' || !isSameUser}">
+						<c:if test="${!isSameUser}">
 							<button type="button" class="btn btn-primary" id="adviceSaveBtn"><span class="btn-text">첨삭
 									저장하기</span>
 								<span class="spinner-border spinner-border-sm text-light d-none" role="status"
@@ -790,6 +801,29 @@
 						<!-- <button type="button" class="btn btn-secondary" id="testBtn">코드
 						테스트용 버튼</button> -->
 						<button type="button" class="btn btn-secondary" id="returnBtn">목록으로</button>
+
+
+						<!-- 첨삭 승인 버튼 체크모양 
+						스크립트도 줘야함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<button type="button" class="btn btn-primary" id="acceptAdviceBtn">
+							<i class="fas fa-check"></i>
+							첨삭 승인
+						</button>
+
+						<!-- 첨삭 거절 버튼 엑스모양 
+						스크립트도 줘야함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<button type="button" class="btn btn-primary" id="rejectAdviceBtn">
+							<i class="fas fa-times"></i>
+							첨삭 거절
+						</button>
+
+						<!-- 첨삭 종료 
+						스크립트도 줘야함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<button type="button" class="btn btn-primary" id="endAdviceBtn">
+							<i class="fas fa-check"></i>
+							첨삭 종료
+						</button>
+
 					</form>
 					<div>
 						<!-- 재사용 공용 경고 모달창 -->
@@ -1156,7 +1190,52 @@
 
 			<script>
 				//---------------------------------------------------------------------------------------------------------------------------------
+				// 첨삭 승인 버튼 클릭 이벤트
+				$("#acceptAdviceBtn").on("click", function () {
+					// 첨삭 승인 확인 컨펌
+					if (!confirm("첨삭을 승인하시겠습니까?")) return;
+					$.ajax({ // 💥💥💥 from : 근우 -> url 해당 resumeNo로 수정해야해요~~~
+						url: "/resume/acceptAdvice/${resumeDetail.resume.resumeNo}",
+						type: "GET",
+						success: function (response) {
+							alert(response.message);
+							location.reload();
+						},
+						error: function () {
+							alert("첨삭 승인 처리 중 오류가 발생했습니다.");
+							location.reload();
+						}
+					});
+				});
+				// 첨삭 거절 버튼 클릭 이벤트
+				$("#rejectAdviceBtn").on("click", function () {
+					// 첨삭 거절 확인 컨펌
+					if (!confirm("첨삭을 거절하시겠습니까?")) return;
+					// 💥💥💥 from : 근우 -> url 해당 resumeNo랑 ownerUid=이력서 주인 uid로 수정해야해요~~~
+					const mentorUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}";
+					// const mentiUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}&userUid=";
+					$.ajax({
+						url: mentorUrl,
+						type: "GET",
+						success: function (response) {
+							alert(response.message);
+							location.reload();
+						},
+						error: function () {
+							alert("첨삭 거절 처리 중 오류가 발생했습니다.");
+							location.reload();
+						}
+					});
+				});
+
+				//---------------------------------------------------------------------------------------------------------------------------------
 				$(document).ready(function () {
+					// 이력서 주인 uid와 쿼리스트링 uid가 다르면 튕기게하기
+					const userUidOwner = $("#userUidOwner").val();
+					const queryUid = "${param.uid}";
+					if (userUidOwner !== queryUid) {
+						window.location.href = "/";
+					}
 					// 시/도 클릭하면...
 					$(".region-item").on("click", function () {
 						// 기존에 누른 시/도 해제 및 현재 시/도 선택
@@ -1420,210 +1499,6 @@
 							}
 						});
 					});
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 코드 테스트용 버튼 클릭 이벤트
-					$('#testBtn').on('click', function () {
-						// 유효성 검사
-						const title = $('#title').val().trim();
-						const titleLength = $('#title').val().length;
-						if (!title) {
-							showValidationModal("이력서 제목을 입력해주세요.", "#title");
-							return;
-						}
-
-						if (titleLength > 30) {
-							showValidationModal("이력서 제목은 30자 이내로 작성해주세요.", "#title");
-							return;
-						}
-
-						if (!$('#profileBase64').val()) {
-							showValidationModal("사진을 등록해 주세요.");
-							$(".photoUploadBox").attr("tabindex", -1).focus();
-							return;
-						}
-
-						const jobFormCount = $('input[name="jobForm"]:checked').length;
-						if (jobFormCount === 0) {
-							showValidationModal("희망 고용형태를 하나 이상 선택해주세요.", "#fullTime");
-							return;
-						}
-
-						const payType = $('input[name="payType"]:checked').val();
-						const payAmount = $('#payAmount').val().trim();
-						if (payType !== '협의 후 결정' && (!payAmount || payAmount <= 0)) {
-							showValidationModal("희망 금액을 입력해주세요", "#payAmount");
-							return;
-						}
-
-						const regionCount = $('#selectedRegions .badge').length;
-						if (regionCount === 0) {
-							showValidationModal("희망 근무지를 선택해 주세요");
-							$("#wishRegion").attr("tabindex", -1).focus();
-							return;
-						}
-
-						const jobTypeCount = $('#selectedJobTypes .badge').length;
-						if (jobTypeCount === 0) {
-							showValidationModal("희망 업직종을 선택해 주세요");
-							$("#wishJobBox").attr("tabindex", -1).focus();
-							return;
-						}
-
-						const meritCount = $('#selectedMerits .badge').length;
-						if (meritCount === 0) {
-							showValidationModal("성격 및 강점을 선택해 주세요");
-							$("#myMerits").attr("tabindex", -1).focus();
-							return;
-						}
-
-						// 학력을 추가하였는가 확인하고 추가하였다면 값을 입력하지 않았을 시 학력사항에 입력사항이 누락되었음을 알리고 입력을 하도록 유도
-						const educationItems = $('.education-item'); // each -> 
-						if (educationItems.length > 0) {
-							let isValid = true;
-
-							educationItems.each(function () {
-								const educationLevel = $(this).find('.education-level').val();
-								const educationStatus = $(this).find('.education-status').val();
-								const graduationDate = $(this).find('.graduation-date').val();
-								const customInput = $(this).find('.custom-input').val().trim();
-
-								if (!educationLevel || !educationStatus || !graduationDate || !customInput) {
-									isValid = false;
-									return false; // each 중단
-								}
-							});
-
-							if (!isValid) {
-								showValidationModal("학력사항에 입력사항이 누락되었습니다.");
-								$("#myEducationBox").attr("tabindex", -1).focus();
-								return;
-							}
-						}
-
-						// 경력사항 유효성 검사 -> 학력과 유사한 형식
-						const historyItems = $('.history-item');
-						if (historyItems.length > 0) {
-							let isValid = true;
-
-							historyItems.each(function () {
-								const companyName = $(this).find('.company-name').val().trim();
-								const jobDescription = $(this).find('.job-description').val().trim();
-								const startDate = $(this).find('.start-date').val();
-								const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
-								const endDate = $(this).find('.end-date').val();
-
-								if (!companyName || !jobDescription || !startDate) {
-									isValid = false;
-									focusElement = $(this).find(':input[value=""]:first');
-									return false; // each 중단
-								}
-
-								// 재직중이 아닌 경우에만 종료일 체크
-								if (!isCurrentlyEmployed && !endDate) {
-									isValid = false;
-									return false;
-								}
-							});
-
-							if (!isValid) {
-								showValidationModal("경력사항에 입력사항이 누락되었습니다.");
-								$("#myHistoryBox").attr("tabindex", -1).focus();
-								return;
-							}
-						}
-
-						// 자격증 유효성 검사
-						const licenseItems = $('.license-item');
-						if (licenseItems.length > 0) {
-							let isValid = true;
-
-							licenseItems.each(function () {
-								const licenseName = $(this).find('.license-name').val().trim();
-								const acquisitionDate = $(this).find('.acquisition-date').val();
-								const institution = $(this).find('.institution').val();
-
-								if (!licenseName || !acquisitionDate || !institution) {
-									isValid = false;
-									return false; // each 중단
-								}
-
-								if (!isValid) {
-									showValidationModal("자격증 정보가 누락되었습니다.");
-									$("#myLicenseBox").attr("tabindex", -1).focus();
-									return;
-								}
-							});
-						}
-
-						console.log("유효성 검사 통과");
-
-						// 폼 데이터 수집
-						const formData = {
-							title: $('#title').val(),
-							payType: $('input[name="payType"]:checked').val(),
-							pay: $('#payAmount').val().replace(/,/g, ''),
-							jobForms: $('input[name="jobForm"]:checked').map(function () {
-								return {
-									form: $(this).val()
-								};
-							}).get(),
-							sigunguNos: $('#selectedRegions').find('.badge').map(function () {
-								return $(this).data("sigungu");
-							}).get(),
-							subcategoryNos: $('#selectedJobTypes').find('.badge').map(function () {
-								return $(this).data("sub");
-							}).get(),
-							merits: $('#selectedMerits').find('.badge').map(function () {
-								return {
-									meritContent: $(this).data('merit')
-								};
-							}).get(),
-							educations: $('.education-item').map(function () {
-								return {
-									educationLevel: $(this).find('.education-level').val(),
-									educationStatus: $(this).find('.education-status').val(),
-									graduationDate: $(this).find('.graduation-date').val(),
-									customInput: $(this).find('.custom-input').val()
-								};
-							}).get(),
-							histories: $('.history-item').map(function () {
-								const $endDate = $(this).find('.end-date');
-								const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
-								return {
-									companyName: $(this).find('.company-name').val(),
-									position: $(this).find('.position').val(),
-									jobDescription: $(this).find('.job-description').val(),
-									startDate: $(this).find('.start-date').val(),
-									endDate: isCurrentlyEmployed ? null : $endDate.val()
-								};
-							}).get(),
-							licenses: $('.license-item').map(function () {
-								return {
-									licenseName: $(this).find('.license-name').val(),
-									acquisitionDate: $(this).find('.acquisition-date').val(),
-									institution: $(this).find('.institution').val()
-								};
-							}).get(),
-							introduce: $('#selfIntroTextarea').val(),
-							files: uploadedFiles,
-							userUid: $('#userUid').val(),
-							profileBase64: $('#profileBase64').val()
-						};
-
-						// 이력서 번호가 있는 경우 추가
-						const resumeNo = '${resumeDetail.resume.resumeNo}';
-						if (resumeNo) {
-							formData.resumeNo = resumeNo;
-						}
-						// URL에서 uid 파라미터 가져오기
-						const urlParams = new URLSearchParams(window.location.search);
-						const uid = urlParams.get('uid');
-						console.log('uid:', uid);
-
-						console.log('저장할 데이터:', formData);
-
-					});
-					//---------------------------------------------------------------------------------------------------------------------------------
 					//---------------------------------------------------------------------------------------------------------------------------------
 					let isSubmitting = false; // 중복 제출 방지용
 					// 최종 저장 버튼 클릭 이벤트
@@ -1920,12 +1795,7 @@
 							contentType: 'application/json',
 							success: function (response) {
 								if (response.success) {
-									if (uid) {
-										// uid가 있으면 이력서 제출 페이지로 이동
-										window.location.href = `/submission/check?uid=` + uid;
-									} else {
-										window.location.href = response.redirectUrl;
-									}
+									window.location.href = response.redirectUrl;
 								} else {
 									showValidationModal(response.message || "저장 중 오류가 발생했습니다.");
 								}
@@ -2295,17 +2165,17 @@
 							<c:forEach var="file" items="${resumeDetail.files}">
 								uploadedFiles.push({
 									"originalFileName": "${file.originalFileName}",
-									"newFileName": "${file.newFileName}",
-									"ext": "${file.ext}",
-									"size": Number("${file.size}"),
-									"base64Image": "${file.base64Image}"
+								"newFileName": "${file.newFileName}",
+								"ext": "${file.ext}",
+								"size": Number("${file.size}"),
+								"base64Image": "${file.base64Image}"
 								});
 								showFilePreview({
 									"originalFileName": "${file.originalFileName}",
-									"newFileName": "${file.newFileName}",
-									"ext": "${file.ext}",
-									"size": Number("${file.size}"),
-									"base64Image": "${file.base64Image}"
+								"newFileName": "${file.newFileName}",
+								"ext": "${file.ext}",
+								"size": Number("${file.size}"),
+								"base64Image": "${file.base64Image}"
 								});
 							</c:forEach>
 							updateFileText();
@@ -2337,17 +2207,17 @@
 						e.preventDefault();
 						e.stopPropagation();
 						$(this).removeClass('border-primary');
-						if (${isSameUser}) {
-							const files = e.originalEvent.dataTransfer.files;
-							handleFiles(files);
-						}
-					});
+						if (${ isSameUser }) {
+						const files = e.originalEvent.dataTransfer.files;
+						handleFiles(files);
+					}
+				});
 				// 파일 처리 함수
 				function handleFiles(files) {
 					if (uploadedFiles.length + pendingFiles.length + files.length > MAX_FILES) {
 						showValidationModal("최대 10개의 파일만 업로드할 수 있습니다.");
-							return;
-						}
+						return;
+					}
 
 					Array.from(files).forEach(file => {
 						// 👉 이미지 파일이면 2.5MB 제한
@@ -2444,7 +2314,7 @@
 
 					let $deleteBtn = null;
 					let $downloadBtn = null;
-					if (${isSameUser}) {
+					if (${ isSameUser }) {
 						$deleteBtn = $('<button>')
 							.addClass('btn btn-sm btn-danger ms-2')
 							.attr('type', 'button')
@@ -2457,7 +2327,7 @@
 					}
 
 					// a태그로 정적으로 서버 하드에 저장된 파일 다운로드 버튼
-					if (${!isSameUser}) {
+					if (${ !isSameUser }) {
 						$downloadBtn = $('<a>')
 							.addClass('btn btn-sm btn-primary ms-2')
 							.attr({
@@ -2614,7 +2484,7 @@
 						$majorItem.trigger('click');
 
 						// Ajax 완료 후 해당 소분류들 체크
-									$.ajax({
+						$.ajax({
 							url: "/resume/getSubCategory",
 							type: "GET",
 							data: { majorNo: majorNo },
@@ -2623,9 +2493,9 @@
 								for (let i = 0; i < subNos.length; i++) {
 									$(`#sub_${subNos[i]}`).prop('checked', true);
 								}
-										}
-									});
-								});
+							}
+						});
+					});
 
 					// 삭제 버튼 이벤트 처리
 					$('#selectedJobTypes').on('click', '.btn-close', function (e) {
@@ -2705,10 +2575,15 @@
 				// 돌아가기 버튼
 				$('#returnBtn').on('click', function () {
 					const urlParams = new URLSearchParams(window.location.search);
-					const uid = urlParams.get('uid');
-					if (uid) {
-						window.location.href = '/submission/check?uid=' + uid;
+					const boardNo = urlParams.get('boardNo');
+					const mode = urlParams.get('mode');
+					if (boardNo) {
+						if (mode == 'adCheck') {
+							window.location.href = '/submission/adCheck?boardNo=' + boardNo;
 						} else {
+							window.location.href = '/submission/check?boardNo=' + boardNo;
+						}
+					} else {
 						window.location.href = '/resume/list';
 					}
 				});
@@ -2730,19 +2605,19 @@
 						<c:forEach var="file" items="${adviceFiles}">
 							uploadedAdviceFiles.push({
 								"originalFileName": "${file.originalFileName}",
-								"newFileName": "${file.newFileName}",
-								"ext": "${file.ext}",
-								"size": Number("${file.size}"),
-								"base64Image": "${file.base64Image}",
-								"adviceFileNo": Number("${file.adviceUpfileNo}")
+							"newFileName": "${file.newFileName}",
+							"ext": "${file.ext}",
+							"size": Number("${file.size}"),
+							"base64Image": "${file.base64Image}",
+							"adviceFileNo": Number("${file.adviceUpfileNo}")
 							});
 							showAdviceFilePreview({
 								"originalFileName": "${file.originalFileName}",
-								"newFileName": "${file.newFileName}",
-								"ext": "${file.ext}",
-								"size": Number("${file.size}"),
-								"base64Image": "${file.base64Image}",
-								"adviceFileNo": Number("${file.adviceUpfileNo}")
+							"newFileName": "${file.newFileName}",
+							"ext": "${file.ext}",
+							"size": Number("${file.size}"),
+							"base64Image": "${file.base64Image}",
+							"adviceFileNo": Number("${file.adviceUpfileNo}")
 							});
 						</c:forEach>
 						updateAdviceFileText();
@@ -2770,10 +2645,10 @@
 					e.preventDefault();
 					e.stopPropagation();
 					$(this).removeClass('border-primary');
-					if (${!isSameUser}) {
-						const files = e.originalEvent.dataTransfer.files;
-						handleAdviceFiles(files);
-					}
+					if (${ !isSameUser }) {
+					const files = e.originalEvent.dataTransfer.files;
+					handleAdviceFiles(files);
+				}
 				});
 
 				// 첨삭 파일 처리 함수
@@ -2879,7 +2754,7 @@
 					let $deleteBtn = null;
 					let $downloadBtn = null;
 
-					if (${!isSameUser}) {
+					if (${ !isSameUser }) {
 						$deleteBtn = $('<button>')
 							.addClass('btn btn-sm btn-danger ms-2')
 							.attr('type', 'button')
@@ -2892,7 +2767,7 @@
 					}
 
 					// a태그로 정적으로 서버 하드에 저장된 파일 다운로드 버튼
-					if (${isSameUser}) {
+					if (${ isSameUser }) {
 						$downloadBtn = $('<a>')
 							.addClass('btn btn-sm btn-primary ms-2')
 							.attr({
@@ -2946,7 +2821,7 @@
 				}
 
 				// 첨삭 모드 저장 버튼
-				$('#adviceSaveBtn').on('click', async function () {
+				$('#adviceSaveBtn, #endAdviceBtn').on('click', async function () {
 					const adviceContent = $('#adviceTextarea').val();
 
 					// 첨삭 의견 유효성
@@ -3000,9 +2875,9 @@
 						// 첨삭 내용과 파일 정보 저장
 						const adviceData = {
 							mentorUid: $('#userUid').val(),
-							resumeNo: ${resumeDetail.resume.resumeNo},
+							resumeNo: $('#resumeNo').val(),
 							adviceContent: adviceContent,
-							files: uploadedAdviceFiles.map(function(file) {
+							files: uploadedAdviceFiles.map(function (file) {
 								return {
 									newFileName: file.newFileName,
 									originalFileName: file.originalFileName,
@@ -3011,9 +2886,12 @@
 									base64Image: file.base64Image,
 									status: file.status
 								};
-							})
+							}),
+							ownerUid: $('#userUidOwner').val()
 						};
+						
 
+						if ($(this).attr('id') === 'adviceSaveBtn') {
 						// 첨삭 저장 요청
 						$.ajax({
 							url: '/resume/advice/save',
@@ -3035,49 +2913,31 @@
 								showValidationModal('첨삭 저장 중 오류가 발생했습니다.');
 							}
 						});
+					} else if ($(this).attr('id') === 'endAdviceBtn') {
+						if (!confirm("첨삭을 종료하시겠습니까?")) return;
+						// 첨삭 종료 요청
+						$.ajax({
+							url: '/resume/endAdvice',
+							type: 'POST',
+							contentType: 'application/json',
+							data: JSON.stringify(adviceData),
+							success: function (response) {
+								if (response.success) {
+									showValidationModal('첨삭이 종료되었습니다.');
+									window.location.href = response.url;
+								} else {
+									showValidationModal('첨삭 종료에 실패했습니다.');
+								}
+							},
+							error: function (error) {
+								console.error('첨삭 종료 중 오류 발생:', error);
+								showValidationModal('첨삭 종료 중 오류가 발생했습니다.');
+							}
+						});
+					}
 					} catch (error) {
 						console.error('파일 처리 중 오류 발생:', error);
 						showValidationModal('파일 처리 중 오류가 발생했습니다.');
-					}
-				});
-
-				// 첨삭 파일 삭제 기능
-				$(document).on('click', '.delete-advice-file', function() {
-					const adviceFileNo = $(this).data('advice-file-no');
-					const adviceFileName = $(this).data('advice-file-name');
-					const originalFileName = $(this).data('original-file-name');
-					const $fileItem = $(this).closest('.d-flex');
-					
-					if (confirm('이 첨삭 파일을 삭제하시겠습니까?')) {
-						// 서버에서 파일 삭제 요청
-						$.ajax({
-							url: '/resume/deleteFile',
-							type: 'POST',
-							data: {
-								fileNo: adviceFileNo,
-								fileName: adviceFileName,
-								originalFileName: originalFileName,
-								fileType: 'advice'
-							},
-							success: function(response) {
-								if (response.success) {
-									// UI에서 파일 항목 제거
-									$fileItem.remove();
-									
-									// 파일이 없을 경우 안내 메시지 표시
-									if ($('#previewContainer-advice .d-flex').length === 0) {
-										$('.advice-file-text').show();
-									}
-									
-									alert('첨삭 파일이 삭제되었습니다.');
-								} else {
-									alert('첨삭 파일 삭제에 실패했습니다: ' + response.message);
-								}
-							},
-							error: function() {
-								alert('첨삭 파일 삭제 중 오류가 발생했습니다.');
-							}
-						});
 					}
 				});
 

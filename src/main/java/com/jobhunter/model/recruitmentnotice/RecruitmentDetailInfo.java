@@ -139,6 +139,8 @@ public class RecruitmentDetailInfo {
 	 */
 	private int likeCnt;
 	
+	private RecruitmentStats stats;
+	
 	
 	/**
 	 * <p> 

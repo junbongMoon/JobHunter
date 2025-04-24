@@ -60,7 +60,7 @@ public class AdminController {
 	 */
   // 문준봉
 	@RequestMapping(value = "/admin", method = RequestMethod.GET)
-	public String showCharts(Locale locale, Model model) {
+	public String showCharts(Model model) {
 
 		LocalDate now = LocalDate.now();
 		LocalDateTime start = now.withDayOfMonth(1).atStartOfDay(); // 이번 달 1일 00:00:00
@@ -488,4 +488,11 @@ public class AdminController {
 			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@GetMapping("/admin/adminChartDetail")
+	public String showUserCompanyChartDetail(Model model) {
+		
+		return "admin/adminChartDetail";
+	}
+	
 }

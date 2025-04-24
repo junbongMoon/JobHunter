@@ -665,9 +665,9 @@ function showThumbnail(file) {
 			focusElement = $("#endTime");
 		}
 		result = false;
-	} else if (!personalHistory) { // 완
+	} else if (!$("input[name='personalHistory']:checked").length) {
 		errorMessage = "경력사항을 입력해주세요.";
-		focusElement = $("#personalHistory");
+		focusElement = $("input[name='personalHistory']").first(); // ✅ 첫 번째 input으로 지정
 		result = false;
 	} else if (!militaryService) { // 완
 		errorMessage = "병역 사항을 선택해주세요.";

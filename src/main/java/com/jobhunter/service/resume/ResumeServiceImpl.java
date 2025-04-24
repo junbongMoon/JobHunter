@@ -4,9 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jobhunter.dao.point.PointDAO;
 import com.jobhunter.dao.resume.ResumeDAO;
+import com.jobhunter.dao.user.UserDAO;
 import com.jobhunter.model.resume.EducationDTO;
 import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.LicenseDTO;
@@ -37,6 +41,8 @@ import lombok.RequiredArgsConstructor;
 public class ResumeServiceImpl implements ResumeService {
 
 	private final ResumeDAO rdao;
+	private final PointDAO pointDAO;
+	private final UserDAO userDAO;
 
 	@Override
 	@Transactional
@@ -188,6 +194,8 @@ public class ResumeServiceImpl implements ResumeService {
 
 			// 이력서 상태 확인
 			resume.setChecked(rdao.checkResumeStatus(resume.getResumeNo()) > 0);
+			// 이력서 첨삭 상태 확인
+			resume.setAdvice(rdao.checkResumeAdvice(resume.getResumeNo()) > 0);
 		}
 
 		return resumeList;
@@ -258,14 +266,21 @@ public class ResumeServiceImpl implements ResumeService {
 		return rdao.checkResumeStatus(resumeNo) > 0;
 	}
 
+	// 이력서 첨삭 상태 확인
 	@Override
-	public void saveAdvice(ResumeAdviceDTO adviceDTO) {
+	public boolean isResumeAdvice(int resumeNo) throws Exception {
+		return rdao.checkResumeAdvice(resumeNo) > 0;
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public void saveAdvice(ResumeAdviceDTO adviceDTO) throws Exception {
 		// 기존 첨삭 내용 삭제
 		rdao.deleteExistingAdvice(adviceDTO.getResumeNo(), adviceDTO.getMentorUid());
 		
 		// 첨삭 내용 저장
 		rdao.insertAdvice(adviceDTO);
-		
+
 		// 첨부파일 정보가 있는 경우 저장
 		if (adviceDTO.getFiles() != null && !adviceDTO.getFiles().isEmpty()) {
 			for (com.jobhunter.model.resume.ResumeAdviceUpfileDTO fileDTO : adviceDTO.getFiles()) {
@@ -276,19 +291,20 @@ public class ResumeServiceImpl implements ResumeService {
 	}
 
 	@Override
-	public void deleteExistingAdvice(int resumeNo, int mentorUid) {
+	public void deleteExistingAdvice(int resumeNo, int mentorUid) throws Exception {
 		rdao.deleteExistingAdvice(resumeNo, mentorUid);
 	}
 
 	@Override
-	public ResumeAdviceDTO getAdvice(int resumeNo) {
+	public ResumeAdviceDTO getAdvice(int resumeNo) throws Exception {
 		return rdao.getAdvice(resumeNo);
 	}
 
 	@Override
-	public List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) {
+	public List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) throws Exception {
 		return rdao.getAdviceFiles(adviceNo);
 	}
+
 	
 	@Override
 	public TenToFivePageVO<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto) {
@@ -310,5 +326,129 @@ public class ResumeServiceImpl implements ResumeService {
 		int totalCnt = rdao.countResumeAdviceByUserUid(uid);
 		TenToFivePageVO<ResumeAdviceVO> result = new TenToFivePageVO<ResumeAdviceVO>(vo, page, totalCnt);
 		return result;
+  }
+
+/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 신청을 처리하는 메서드
+	 * </p>
+	 * 
+	 * @param int mentorUid 첨삭자 UID
+	 * @param int resumeNo 이력서 번호
+	 * @return 성공 여부
+	 *
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public boolean submitAdvice(int mentorUid, int resumeNo, int sessionUid) throws Exception {
+		// 중복 신청 확인
+		int duplicateCount = rdao.checkDuplicateAdvice(mentorUid, resumeNo);
+		if (duplicateCount > 0) {
+			return false; // 중복 신청이 있으면 실패
+		} else {
+			// 첨삭 신청 저장
+			int result = rdao.insertRegistrationAdvice(mentorUid, resumeNo);
+			if (result > 0) {
+				// 첨삭 신청 번호 가져오기
+				int rgAdviceNo = rdao.getRegistrationAdviceNo(mentorUid, resumeNo);
+				// 포인트 로그 저장
+				pointDAO.submitAdvicePointLog(mentorUid, sessionUid, -1000, rgAdviceNo);
+				// 포인트 차감
+				userDAO.updateUserPoint(sessionUid, -1000);
+
+				return true;
+			} 
+		}
+		return false;
+	}
+
+	@Override
+	public int getRegistrationAdviceNo(int mentorUid, int resumeNo) throws Exception {
+		return rdao.getRegistrationAdviceNo(mentorUid, resumeNo);
+	}
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 승인을 처리하는 메서드
+	 * </p>
+	 * 
+	 * @param int resumeNo 이력서 번호
+	 * @return 성공 여부
+	 */
+	@Override
+	public boolean acceptAdvice(int resumeNo, int userUid) throws Exception {
+		int adviceResult = rdao.changeAdviceStatus(resumeNo, userUid, "CHECKING");
+		return adviceResult > 0;
+	}
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 거절을 처리하는 메서드
+	 * 거절을 하면 첨삭 상태가 첨삭 대기에서 첨삭 거절로 변경됩니다.
+	 * 포인트 로그에 포인트 차감 내역이 CANCEL로 업데이트 됩니다.
+	 * 포인트를 지불한 유저의 포인트를 돌려줍니다.
+	 * </p>
+	 * 
+	 * @param int resumeNo 이력서 번호
+	 * @param int userUid 첨삭자 UID
+	 * @param int ownerUid 이력서 주인 UID
+	 * @return 성공 여부
+	 */
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public boolean rejectAdvice(int resumeNo, int userUid, int ownerUid) throws Exception {
+		// 첨삭 거절 처리
+		int adviceResult = rdao.changeAdviceStatus(resumeNo, userUid, "CANCEL");
+		if (adviceResult > 0) {
+			// 첨삭 거절한 rgAdviceNo 가져오기
+			int rgAdviceNo = rdao.getRegistrationAdviceNo(userUid, resumeNo);
+			// 포인트 로그에 포인트 차감 내역이 CANCEL로 업데이트 됩니다.
+			int pointResult = pointDAO.updatePointLog(rgAdviceNo, "CANCEL", "reject");
+			if (pointResult > 0) {
+				// 포인트를 지불한 유저의 포인트를 돌려줍니다.
+				userDAO.updateUserPoint(ownerUid, 1000);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 종료를 처리하는 메서드
+	 * 종료를 하면 첨삭 상태가 CHECKING 에서 COMPLETE로 변경됩니다.
+	 * 포인트 로그에 포인트 차감 내역이 COMPLETE로 업데이트 됩니다.
+	 * 첨삭을 완료한 유저의 포인트를 증가시킵니다.
+	 * </p>
+	 * 
+	 * @param int resumeNo 이력서 번호
+	 * @param int userUid 첨삭자 UID
+	 * @param int ownerUid 이력서 주인 UID
+	 * @return 성공 여부
+	 */
+	@Override
+	public boolean endAdvice(int resumeNo, int userUid, int ownerUid) throws Exception {
+		int adviceResult = rdao.changeAdviceStatus(resumeNo, userUid, "COMPLETE");
+		if (adviceResult > 0) {
+			// 첨삭 종료한 rgAdviceNo 가져오기
+			int rgAdviceNo = rdao.getRegistrationAdviceNo(userUid, resumeNo);
+			// 포인트 로그에 포인트 차감 내역이 COMPLETE로 업데이트 됩니다.
+			int pointResult = pointDAO.updatePointLog(rgAdviceNo, "COMPLETE", "end");
+			if (pointResult > 0) {
+				// 첨삭을 완료한 유저의 포인트를 증가시킵니다.
+				userDAO.updateUserPoint(userUid, 1000);
+				return true;
+			}
+		}
+		return false;
+
 	}
 }

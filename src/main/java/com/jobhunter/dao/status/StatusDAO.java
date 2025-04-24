@@ -73,6 +73,12 @@ public interface StatusDAO {
 	List<TotalStatusVODTO> getTotalStatusBetweenAndRole(LocalDateTime start, LocalDateTime end) throws Exception;
 
 	List<String> selectYearAndMonthByStatus() throws Exception;
+	
+    List<Integer> selectYears();
+    
+    List<Integer> selectMonthsByYear(int year);
+    
+    List<Integer> selectDaysByYearAndMonth(int year, int month);
     
 
 }

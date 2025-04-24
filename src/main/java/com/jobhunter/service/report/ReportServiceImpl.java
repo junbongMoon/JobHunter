@@ -31,19 +31,21 @@ public class ReportServiceImpl implements ReportService {
 
 	@Override
 	public void saveBoardReport(BoardReportDTO dro) throws Exception {
-		Integer writerUid = Rdao.findWriterUidByBoardNo(dro.getBoardNo());
+		Integer writerId = Rdao.findWriterUidByBoardNo(dro.getBoardNo());
 
-		if (writerUid == null) {
+		if (writerId == null) {
 			throw new IllegalArgumentException("해당 게시글의 작성자를 찾을 수 없습니다.");
 		}
 
 		// 작성자 정보를 DTO에 세팅
-		dro.setTargetAccountUid(writerUid);
+		dro.setTargetAccountUid(writerId);
 		dro.setTargetAccountType(AccountType.USER);
 		dro.setReportType(ReportType.BOARD);        
 		dro.setReportTargetURL("/reviewBoard/detail?boardNo=" + dro.getBoardNo());
 	
-
+		if (dro.getReporterAccountUid().equals(dro.getTargetAccountUid())) {
+	        throw new IllegalArgumentException("본인이 작성한 게시글은 신고할 수 없습니다.");
+	    }
 		
 	
 		dao.insertBoardReport(dro);

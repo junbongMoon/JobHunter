@@ -329,6 +329,42 @@
         FROM resume_advice_upfiles
         WHERE adviceNo = #{adviceNo}
     </select>
+
+    <!-- 이력서 첨삭 신청 저장 -->
+	<insert id="insertRegistrationAdvice" parameterType="map">
+		INSERT INTO registration_advice (regDate, status, mentorUid, resumeNo)
+		VALUES (NOW(), 'WAITING', #{mentorUid}, #{resumeNo})
+	</insert>
+	
+	<!-- 이력서 첨삭 신청 중복 확인 -->
+	<select id="checkDuplicateAdvice" parameterType="map" resultType="int">
+		SELECT COUNT(*) FROM registration_advice 
+		WHERE resumeNo = #{resumeNo}
+	</select>
+
+	<!-- 이력서 첨삭 상태 확인 -->
+	<select id="checkResumeAdvice" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM registration_advice
+		WHERE resumeNo = #{resumeNo} AND status = 'CHECKING'
+	</select>
+
+    <!-- 첨삭 신청 번호 조회 -->
+    <select id="getRegistrationAdviceNo" parameterType="map" resultType="int">
+        SELECT rgAdviceNo
+        FROM registration_advice
+        WHERE mentorUid = #{mentorUid}
+        AND resumeNo = #{resumeNo}
+        ORDER BY regDate DESC
+        LIMIT 1
+    </select>
+
+    <!-- 첨삭 상태 변경 -->
+    <update id="changeAdviceStatus" parameterType="map">
+        UPDATE registration_advice
+        SET status = #{status}
+        WHERE resumeNo = #{resumeNo}
+        AND mentorUid = #{userUid}
+    </update>
     
     <select id="selectRegistrationAdviceByMentorWithPaging" resultType="com.jobhunter.model.resume.RegistrationAdviceVO">
 	  SELECT 

@@ -69,7 +69,8 @@
 		r.reviewLevel,
 		r.content,
 		r.likes,
-		r.views
+		r.views,
+		r.writer AS writerUid
 		FROM
 		reviewBoard r
 		JOIN recruitmentnotice rec ON r.gonggoUid = rec.uid
@@ -103,6 +104,7 @@
 		<result column="content" property="content" />
 		<result column="likes" property="likes" />
 		<result column="views" property="views" />
+		<result column="writerUid" property="writerUid" />
 	</resultMap>
 
 
@@ -155,7 +157,7 @@
 		resultType="com.jobhunter.model.reviewboard.WriteBoardDTO">
 		SELECT boardNo, gonggoUid, writer, companyName,
 		reviewResult, reviewType,
-		reviewLevel, content
+		reviewLevel, content, typeOtherText 
 		FROM reviewBoard
 		WHERE
 		boardNo = #{boardNo}
@@ -222,13 +224,21 @@
 	<!--검색 기능 쿼리 -->
 	<select id="selectPagedBoards"
 		resultType="com.jobhunter.model.reviewboard.ReviewBoardDTO">
-		SELECT r.*, u.userId AS writer, c.companyName
+		SELECT r.boardNo,
+		u.userId AS writer,  
+		c.companyName,
+		r.reviewResult,
+		r.likes,
+		r.views,
+		r.postDate
 		FROM reviewBoard r
 		JOIN
 		users u ON r.writer = u.uid
-		JOIN recruitmentnotice rn ON r.gonggoUid =
+		JOIN
+		recruitmentnotice rn ON r.gonggoUid =
 		rn.uid
-		JOIN company c ON rn.refCompany = c.uid
+		JOIN company c ON
+		rn.refCompany = c.uid
 		WHERE 1 = 1
 
 		<if test="resultFilter != null and resultFilter.trim() != ''">
@@ -304,7 +314,8 @@
 
 
 	<select id="findWriterUidByBoardNo" resultType="int">
-		SELECT writer FROM reviewBoard WHERE boardNo = #{boardNo}
+		SELECT writer
+		FROM reviewBoard WHERE boardNo = #{boardNo}
 	</select>
 	
 	<!-- 육근우_내가 작성한 리뷰 댓글수 포함 검색 -->

@@ -121,10 +121,13 @@ public class ReviewBoardController {
 			    }
 			}
 			boolean isLiked = false;
+			 
 			if (account != null) {
 				int userId = account.getUid();
 				service.insertViews(userId, boardNo, "REBOARD");
 				isLiked = service.hasUserLiked(userId, boardNo);
+				
+
 			}
 
 			model.addAttribute("detail", detail);
@@ -198,6 +201,9 @@ public class ReviewBoardController {
 			model.addAttribute("gonggoList", gonggoList);
 
 			WriteBoardDTO writeBoardDTO = service.getReviewBoardUpdate(boardNo);
+			if (writeBoardDTO.getWriter() != userUid) {
+	            throw new SecurityException("본인의 게시글만 수정할 수 있습니다.");
+	        }
 			model.addAttribute("writeBoardDTO", writeBoardDTO);
 
 		} catch (Exception e) {
@@ -228,15 +234,34 @@ public class ReviewBoardController {
 
 	@PostMapping(value = "/delete", produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<MessageCallDTO> deleteBoardNo(@RequestParam("boardNo") int boardNo) {
-		try {
-			service.deleteBoard(boardNo);
-			return ResponseEntity.ok(MessageCallDTO.builder().message("게시글이 삭제되었습니다.").success(true).build());
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(MessageCallDTO.builder().message("삭제 중 오류 발생").success(false).build());
-		}
+	public ResponseEntity<MessageCallDTO> deleteBoardNo(@RequestParam("boardNo") int boardNo, HttpSession session) {
+	    try {
+	        AccountVO account = (AccountVO) session.getAttribute("account");
+	        if (account == null) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                    .body(MessageCallDTO.builder().message("로그인이 필요합니다.").success(false).build());
+	        }
+
+	        int userUid = account.getUid();
+
+	        // 게시글 정보 조회
+	        WriteBoardDTO writeBoardDTO = service.getReviewBoardUpdate(boardNo);
+
+	        // 작성자 본인인지 확인
+	        if (writeBoardDTO.getWriter() != userUid) {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+	                    .body(MessageCallDTO.builder().message("본인의 게시글만 삭제할 수 있습니다.").success(false).build());
+	        }
+
+	        // 삭제 수행
+	        service.deleteBoard(boardNo);  
+	        return ResponseEntity.ok(MessageCallDTO.builder().message("게시글이 삭제되었습니다.").success(true).build());
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body(MessageCallDTO.builder().message("삭제 중 오류 발생").success(false).build());
+	    }
 	}
 
 	@GetMapping("/viewCount")

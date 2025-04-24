@@ -94,7 +94,11 @@ public interface StatusService {
 	public List<TotalStatusVODTO> getTotalStatusBetweenStartAndEnd(LocalDateTime start, LocalDateTime end) throws Exception;
 
 
-	public List<String> getYearAndMonth() throws Exception;
+    List<Integer> getYears() throws Exception;
+    
+    List<Integer> getMonthsByYear(int year) throws Exception;
+    
+    List<Integer> getDaysByYearAndMonth(int year, int month) throws Exception;
 
 
 	public FullStatus getFullStatusByMonth(String ym) throws Exception;
