@@ -67,6 +67,7 @@ public class ResumeRestController {
      *     <li>기업 열람 중일 경우: 403 FORBIDDEN</li>
      *     <li>오류 발생 시: 500 INTERNAL_SERVER_ERROR</li>
      * </ul>
+     * @author 유지원
      */
 	@DeleteMapping(value = "/delete/{resumeNo}")
 	public ResponseEntity<String> deleteResume(@PathVariable int resumeNo) {
@@ -126,6 +127,7 @@ public class ResumeRestController {
 	 * @param model    View에 전달할 데이터
 	 * @param session  사용자 세션
 	 * @return 첨삭 승인 결과 메시지를 포함한 HTTP 응답 객체
+	 * @author 유지원
 	 */
 	@GetMapping("/acceptAdvice/{resumeNo}")
 	public ResponseEntity<Map<String, String>> acceptAdvice(@PathVariable int resumeNo, Model model, HttpSession session) {
@@ -159,6 +161,7 @@ public class ResumeRestController {
 	 * @param model    View에 전달할 데이터
 	 * @param session  사용자 세션
 	 * @return 첨삭 거절 결과 메시지를 포함한 HTTP 응답 객체
+	 * @author 유지원
 	 */
 	@GetMapping("/rejectAdvice/{resumeNo}")
 	public ResponseEntity<Map<String, String>> rejectAdvice(@PathVariable int resumeNo, @RequestParam int ownerUid,

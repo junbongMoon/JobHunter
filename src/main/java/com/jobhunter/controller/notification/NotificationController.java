@@ -1,6 +1,7 @@
 package com.jobhunter.controller.notification;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.jobhunter.model.message.MessageDTO;
 import com.jobhunter.model.message.MessageRequest;
 import com.jobhunter.service.notification.NotificationService;
 
@@ -38,6 +40,7 @@ public class NotificationController {
      *
      * @param model 뷰로 데이터를 전달할 때 사용
      * @return 알림 목록 뷰 이름
+     * @author 유지원
      */
 	@GetMapping("/list")
 	public String openNotifications(Model model, @RequestParam String uid, @RequestParam String accountType) {
@@ -53,10 +56,46 @@ public class NotificationController {
 	}
 	
 	/**
+	 * 페이지네이션을 지원하는 알림 목록 API
+	 * 
+	 * @param uid 사용자 ID
+	 * @param accountType 계정 타입
+	 * @param page 페이지 번호
+	 * @param pageSize 페이지 크기
+	 * @return 알림 목록과 전체 개수를 포함한 JSON 응답
+	 * @author 유지원
+	 */
+	@GetMapping("/listWithPaging")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getNotificationsWithPaging(
+			@RequestParam String uid, 
+			@RequestParam String accountType,
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int pageSize) {
+		Map<String, Object> response = new HashMap<>();
+		try {
+			List<MessageDTO> messages = notificationService.getNotificationListWithPaging(uid, accountType, page, pageSize);
+			int totalCount = notificationService.getTotalNotificationCount(uid, accountType);
+			
+			response.put("messages", messages);
+			response.put("totalCount", totalCount);
+			response.put("currentPage", page);
+			response.put("hasMore", (page * pageSize) < totalCount);
+			
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("error", "알림 목록을 가져오는 중 오류가 발생했습니다.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+	}
+	
+	/**
      * 사용자의 안 읽은 알림 개수를 반환합니다.
      *
      * @param uid 사용자 ID
      * @return 안 읽은 알림 수를 포함한 JSON 응답
+     * @author 유지원
      */
 	@GetMapping("/unreadCount")
 	@ResponseBody
@@ -78,6 +117,7 @@ public class NotificationController {
      *
      * @param request 메시지 번호를 담고 있는 요청 객체
      * @return 처리 결과(JSON)
+     * @author 유지원
      */
 	@PostMapping("/markAsRead")
 	@ResponseBody
@@ -96,10 +136,13 @@ public class NotificationController {
 	}
 
 	/**
-     * 모든 알림을 읽음 상태로 변경합니다.
-     *
-     * @return 처리 결과(JSON)
-     */
+	 * 모든 알림을 읽음 상태로 변경합니다.
+	 *
+	 * @param accountType 계정 타입
+	 * @param uid 사용자 ID
+	 * @return 처리 결과(JSON)	
+	 * @author 유지원
+	 */
 	@PostMapping("/markAllAsRead")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> markAllAsRead(@RequestParam String accountType, @RequestParam String uid) {
@@ -117,11 +160,12 @@ public class NotificationController {
 	}
 
     /**
-     * 특정 알림을 삭제합니다.
-     *
-     * @param request 메시지 번호를 담고 있는 요청 객체
-     * @return 처리 결과(JSON)
-     */
+	 * 특정 알림을 삭제합니다.
+	 *
+	 * @param request 메시지 번호를 담고 있는 요청 객체
+	 * @return 처리 결과(JSON)
+	 * @author 유지원
+	 */
 	@PostMapping("/delete")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> deleteNotification(@RequestBody MessageRequest request) {

@@ -68,4 +68,24 @@ public interface MessageDAO {
 	 * @author 유지원
 	 */
 	public int getUnreadCount(String uid, String accountType) throws Exception;
+	
+	/**
+	 * 페이지네이션을 지원하는 메시지 조회 메서드
+	 * @param uid 사용자 ID
+	 * @param accountType 계정 타입
+	 * @param page 페이지 번호
+	 * @param pageSize 페이지 크기
+	 * @return 메시지 목록
+	 * @author 유지원
+	 */
+	public List<MessageDTO> getMessagesWithPaging(String uid, String accountType, int page, int pageSize) throws Exception;
+	
+	/**
+	 * 전체 메시지 개수를 가져오는 메서드
+	 * @param uid 사용자 ID
+	 * @param accountType 계정 타입
+	 * @return 전체 메시지 개수
+	 * @author 유지원
+	 */
+	public int getTotalMessageCount(String uid, String accountType) throws Exception;
 }

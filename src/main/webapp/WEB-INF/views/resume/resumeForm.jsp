@@ -804,25 +804,24 @@
 
 
 						<!-- 첨삭 승인 버튼 체크모양 
-						스크립트도 줘야함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						스크립트도 줘야함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 						<button type="button" class="btn btn-primary" id="acceptAdviceBtn">
 							<i class="fas fa-check"></i>
 							첨삭 승인
 						</button>
 
-						<!-- 첨삭 거절 버튼 엑스모양 
-						스크립트도 줘야함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						 첨삭 거절 버튼 엑스모양 
+						스크립트도 줘야함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 						<button type="button" class="btn btn-primary" id="rejectAdviceBtn">
 							<i class="fas fa-times"></i>
 							첨삭 거절
-						</button>
-
-						<!-- 첨삭 종료 
-						스크립트도 줘야함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
-						<button type="button" class="btn btn-primary" id="endAdviceBtn">
-							<i class="fas fa-check"></i>
-							첨삭 종료
-						</button>
+						</button> -->
+						<c:if test="${!isSameUser}">
+							<button type="button" class="btn btn-primary" id="endAdviceBtn">
+								<i class="fas fa-check"></i>
+								첨삭 종료
+							</button>
+						</c:if>
 
 					</form>
 					<div>
@@ -1190,43 +1189,43 @@
 
 			<script>
 				//---------------------------------------------------------------------------------------------------------------------------------
-				// 첨삭 승인 버튼 클릭 이벤트
-				$("#acceptAdviceBtn").on("click", function () {
-					// 첨삭 승인 확인 컨펌
-					if (!confirm("첨삭을 승인하시겠습니까?")) return;
-					$.ajax({ // 💥💥💥 from : 근우 -> url 해당 resumeNo로 수정해야해요~~~
-						url: "/resume/acceptAdvice/${resumeDetail.resume.resumeNo}",
-						type: "GET",
-						success: function (response) {
-							alert(response.message);
-							location.reload();
-						},
-						error: function () {
-							alert("첨삭 승인 처리 중 오류가 발생했습니다.");
-							location.reload();
-						}
-					});
-				});
-				// 첨삭 거절 버튼 클릭 이벤트
-				$("#rejectAdviceBtn").on("click", function () {
-					// 첨삭 거절 확인 컨펌
-					if (!confirm("첨삭을 거절하시겠습니까?")) return;
-					// 💥💥💥 from : 근우 -> url 해당 resumeNo랑 ownerUid=이력서 주인 uid로 수정해야해요~~~
-					const mentorUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}";
-					// const mentiUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}&userUid=";
-					$.ajax({
-						url: mentorUrl,
-						type: "GET",
-						success: function (response) {
-							alert(response.message);
-							location.reload();
-						},
-						error: function () {
-							alert("첨삭 거절 처리 중 오류가 발생했습니다.");
-							location.reload();
-						}
-					});
-				});
+				// // 첨삭 승인 버튼 클릭 이벤트
+				// $("#acceptAdviceBtn").on("click", function () {
+				// 	// 첨삭 승인 확인 컨펌
+				// 	if (!confirm("첨삭을 승인하시겠습니까?")) return;
+				// 	$.ajax({ // 💥💥💥 from : 근우 -> url 해당 resumeNo로 수정해야해요~~~
+				// 		url: "/resume/acceptAdvice/${resumeDetail.resume.resumeNo}",
+				// 		type: "GET",
+				// 		success: function (response) {
+				// 			alert(response.message);
+				// 			location.reload();
+				// 		},
+				// 		error: function () {
+				// 			alert("첨삭 승인 처리 중 오류가 발생했습니다.");
+				// 			location.reload();
+				// 		}
+				// 	});
+				// });
+				// // 첨삭 거절 버튼 클릭 이벤트
+				// $("#rejectAdviceBtn").on("click", function () {
+				// 	// 첨삭 거절 확인 컨펌
+				// 	if (!confirm("첨삭을 거절하시겠습니까?")) return;
+				// 	// 💥💥💥 from : 근우 -> url 해당 resumeNo랑 ownerUid=이력서 주인 uid로 수정해야해요~~~
+				// 	const mentorUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}";
+				// 	// const mentiUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}&userUid=";
+				// 	$.ajax({
+				// 		url: mentorUrl,
+				// 		type: "GET",
+				// 		success: function (response) {
+				// 			alert(response.message);
+				// 			location.reload();
+				// 		},
+				// 		error: function () {
+				// 			alert("첨삭 거절 처리 중 오류가 발생했습니다.");
+				// 			location.reload();
+				// 		}
+				// 	});
+				// });
 
 				//---------------------------------------------------------------------------------------------------------------------------------
 				$(document).ready(function () {
@@ -2889,52 +2888,52 @@
 							}),
 							ownerUid: $('#userUidOwner').val()
 						};
-						
+
 
 						if ($(this).attr('id') === 'adviceSaveBtn') {
-						// 첨삭 저장 요청
-						$.ajax({
-							url: '/resume/advice/save',
-							type: 'POST',
-							contentType: 'application/json',
-							data: JSON.stringify(adviceData),
-							success: function (response) {
-								if (response.success) {
-									showValidationModal('첨삭이 저장되었습니다.');
-									setTimeout(() => {
-										window.location.href = '/resume/list';
-									}, 1500);
-								} else {
-									showValidationModal('첨삭 저장에 실패했습니다.');
+							// 첨삭 저장 요청
+							$.ajax({
+								url: '/resume/advice/save',
+								type: 'POST',
+								contentType: 'application/json',
+								data: JSON.stringify(adviceData),
+								success: function (response) {
+									if (response.success) {
+										showValidationModal('첨삭이 저장되었습니다.');
+										setTimeout(() => {
+											window.location.href = '/resume/list';
+										}, 1500);
+									} else {
+										showValidationModal('첨삭 저장에 실패했습니다.');
+									}
+								},
+								error: function (error) {
+									console.error('첨삭 저장 중 오류 발생:', error);
+									showValidationModal('첨삭 저장 중 오류가 발생했습니다.');
 								}
-							},
-							error: function (error) {
-								console.error('첨삭 저장 중 오류 발생:', error);
-								showValidationModal('첨삭 저장 중 오류가 발생했습니다.');
-							}
-						});
-					} else if ($(this).attr('id') === 'endAdviceBtn') {
-						if (!confirm("첨삭을 종료하시겠습니까?")) return;
-						// 첨삭 종료 요청
-						$.ajax({
-							url: '/resume/endAdvice',
-							type: 'POST',
-							contentType: 'application/json',
-							data: JSON.stringify(adviceData),
-							success: function (response) {
-								if (response.success) {
-									showValidationModal('첨삭이 종료되었습니다.');
-									window.location.href = response.url;
-								} else {
-									showValidationModal('첨삭 종료에 실패했습니다.');
+							});
+						} else if ($(this).attr('id') === 'endAdviceBtn') {
+							if (!confirm("첨삭을 종료하시겠습니까?")) return;
+							// 첨삭 종료 요청
+							$.ajax({
+								url: '/resume/endAdvice',
+								type: 'POST',
+								contentType: 'application/json',
+								data: JSON.stringify(adviceData),
+								success: function (response) {
+									if (response.success) {
+										showValidationModal('첨삭이 종료되었습니다.');
+										window.location.href = response.url;
+									} else {
+										showValidationModal('첨삭 종료에 실패했습니다.');
+									}
+								},
+								error: function (error) {
+									console.error('첨삭 종료 중 오류 발생:', error);
+									showValidationModal('첨삭 종료 중 오류가 발생했습니다.');
 								}
-							},
-							error: function (error) {
-								console.error('첨삭 종료 중 오류 발생:', error);
-								showValidationModal('첨삭 종료 중 오류가 발생했습니다.');
-							}
-						});
-					}
+							});
+						}
 					} catch (error) {
 						console.error('파일 처리 중 오류 발생:', error);
 						showValidationModal('파일 처리 중 오류가 발생했습니다.');

@@ -114,7 +114,7 @@
 													}>기업</option>
 												<option value="BOARD" ${param.reportType=='BOARD' ? 'selected' : '' }>
 													게시판</option>
-												<option value="RECRUTMENT" ${param.reportType=='RECRUTMENT' ? 'selected'
+												<option value="RECRUITMENT" ${param.reportType=='RECRUITMENT' ? 'selected'
 													: '' }>채용공고</option>
 											</select>
 										</div>
@@ -221,7 +221,7 @@
 																<c:when test="${report.reportType == 'BOARD'}">
 																	<span class="badge badge-secondary">게시판</span>
 																</c:when>
-																<c:when test="${report.reportType == 'RECRUTMENT'}">
+																<c:when test="${report.reportType == 'RECRUITMENT'}">
 																	<span class="badge badge-dark">채용공고</span>
 																</c:when>
 																<c:otherwise>
