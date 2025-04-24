@@ -625,7 +625,7 @@
 		        		  reportCategory: reportCategory,
 		        		  reportMessage: reportMessage,
 		        		  reportType: "BOARD",
-		        		  reportTargetURL: `/reviewBoard/detail?boardNo=${boardNo}`
+		        		  reportTargetURL: `/reviewBoard/detail?boardNo=\${boardNo}`
 		        		};
 
 		        // 신고 전송
