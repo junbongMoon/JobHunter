@@ -6,6 +6,7 @@ import lombok.Data;
 public class MyRegistrationAdviceSearchDTO {
 	private int uid;
 	private String status;
+	private String type;
 	private int page;
 	
 	public int getOffset() {

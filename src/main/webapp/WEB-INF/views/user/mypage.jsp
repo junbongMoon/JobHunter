@@ -217,11 +217,12 @@
           <h2><i class="bi bi-heart section-icon"></i>내가 받은 첨삭 신청서</h2>
           <div>
 	          <select id="statusSelect" class="form-select" onchange="handleStatusChange()">
-				  <option value="">-- 전체 상태 --</option>
-				  <option value="COMPLETE">완료</option>
-				  <option value="CANCEL">취소</option>
-				  <option value="WAITING">대기</option>
-				  <option value="CHECKING">검토 중</option>
+              <option value="LIVE">*확인 필요*</option>
+              <option value="WAITING">대기 중</option>
+              <option value="CHECKING">검토 중</option>
+              <option value="COMPLETE" style="color: #8d8d8d;">완료한 신청 보기</option>
+              <option value="CANCEL" style="color: #8d8d8d;">만료된 신청 보기</option>
+              <option value="">--전체 내역 보기--</option>
 			  </select>
 		  </div>
         </div>
@@ -320,7 +321,7 @@ function renderPagination(res, pageFunc, container) {
 }
 
 
-function renderPrboard(res) {
+function renderResumeAdvice(res) {
   const items = res.items;
 	  const container = $('#resumeAdviceSection');
 	  container.empty();
@@ -356,7 +357,7 @@ function renderPrboard(res) {
             onclick="viewResumeAdvice(\${item.resumeNo}, \${item.adviceNo})">
             
             <div style="flex: 1;">
-              <div><strong>\${item.title}</strong></div>
+              <div><strong>\${item.title}\${item.mentiUid}</strong></div>
               <div style="font-size: 13px; color: #666;">
                 <div>\${item.mentorName}</div>
                 \${formatDate(item.regDate)}작성
@@ -391,6 +392,7 @@ function getMyResumeAdvice() {
     contentType: 'application/json',
     success: function(res) {
       console.log(res);
+      renderResumeAdvice(res)
     },
     error: function(xhr) {
       console.log("error : " + xhr);
@@ -398,7 +400,7 @@ function getMyResumeAdvice() {
   });
 }
 
-function renderPrboard(res) {
+function renderRegistrationAdvice(res) {
   const items = res.items;
 	  const container = $('#registrationAdviceSection');
 	  container.empty();
@@ -434,7 +436,7 @@ function renderPrboard(res) {
             onclick="viewRegistrationAdvice(\${item.rgAdviceNo})">
             
             <div style="flex: 1;">
-              <div><strong>\${item.title}</strong></div>
+              <div><strong>\${item.title}\${item.mentiUid}</strong></div>
               <div style="font-size: 13px; color: #666;">
                 \${formatDate(item.regDate)} 신청
               </div>
@@ -462,6 +464,8 @@ function handleStatusChange() {
   const selected = document.getElementById('statusSelect').value;
   registrationAdviceData.status = selected || registrationAdviceStatus.NONE;
 
+  console.log(registrationAdviceData.status);
+
   getMyRegistrationAdvice();
 }
 const registrationAdviceStatus = {
@@ -469,11 +473,13 @@ const registrationAdviceStatus = {
   COMPLETE: 'COMPLETE',
   CANCEL: 'CANCEL',
   WAITING: 'WAITING',
-  CHECKING: 'CHECKING'
+  CHECKING: 'CHECKING',
+  LIVE: "LIVE"
 };
 const registrationAdviceData = {
   page: 1,
-  status: registrationAdviceStatus.NONE
+  status: registrationAdviceStatus.LIVE,
+  type: "mentor"
 };
 function getMyRegistrationAdvice() {
   $.ajax({
@@ -487,7 +493,7 @@ function getMyRegistrationAdvice() {
     }),
     success: function(res) {
       console.log(res);
-      renderPrboard(res)
+      renderRegistrationAdvice(res)
     },
     error: function(xhr) {
       console.log("error : " + xhr);
@@ -564,7 +570,7 @@ function renderPrboard(res) {
 }
 function viewPrboard(prBoardNo) {
   // pr보드 글 상세조회 페이지로 보내기
-  console.log(prBoardNo);
+  location.href = `/prboard/detail?prBoardNo=\${prBoardNo}`;
 }
 function goToPrboardPage(pageNum) {
   prboardPage = pageNum;

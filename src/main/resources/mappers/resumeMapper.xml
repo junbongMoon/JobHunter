@@ -337,13 +337,27 @@
 	    ra.status,
 	    ra.mentorUid,
 	    ra.resumeNo,
-	    r.title AS title
+	    r.title AS title,
+	    menti.uid AS mentiUid
 	  FROM registration_advice ra
 	  JOIN resume r ON ra.resumeNo = r.resumeNo
-	  WHERE mentorUid = #{uid}
-	  <if test="status != null and status != ''">
-	    AND status = #{status}
-	  </if>
+	  JOIN users menti ON r.userUid = menti.uid
+	  <choose>
+	    <when test="type == 'mentor'">
+	      WHERE mentorUid = #{uid}
+	    </when>
+	    <when test="type == 'mentor'">
+	      WHERE mentiUid = #{uid}
+	    </when>
+	  </choose>
+	  <choose>
+	    <when test="status == 'LIVE'">
+	      AND status IN ('WAITING', 'CHECKING')
+	    </when>
+	    <when test="status != null and status != ''">
+	      AND status = #{status}
+	    </when>
+	  </choose>
 	  ORDER BY regDate DESC
 	  LIMIT 5 OFFSET #{offset}
 	</select>
@@ -351,9 +365,14 @@
 	<select id="countRegistrationAdviceByMentor" resultType="int">
 	  SELECT COUNT(*) FROM registration_advice
 	  WHERE mentorUid = #{uid}
-	  <if test="status != null and status != ''">
-	    AND status = #{status}
-	  </if>
+	  <choose>
+	    <when test="status == 'LIVE'">
+	      AND status IN ('WAITING', 'CHECKING')
+	    </when>
+	    <when test="status != null and status != ''">
+	      AND status = #{status}
+	    </when>
+	  </choose>
 	</select>
 	
 	<select id="selectResumeAdviceByUserUid" resultType="com.jobhunter.model.resume.ResumeAdviceVO">
@@ -363,10 +382,12 @@
 	    ra.regDate,
 	    ra.mentorUid,
 	    r.title AS title,
-	    u.userName AS mentorName
+	    u.userName AS mentorName,
+	    menti.uid AS mentiUid
 	  FROM resume_advice ra
 	  JOIN resume r ON ra.resumeNo = r.resumeNo
 	  JOIN users u ON ra.mentorUid = u.uid
+	  JOIN users menti ON r.userUid = menti.uid
 	  WHERE r.userUid = #{userUid}
 	  ORDER BY ra.regDate DESC
 	  LIMIT 5 OFFSET #{offset}
