@@ -565,6 +565,14 @@ button.btn-resume {
   font-weight: 600;
   color: #3d4d6a;
 }
+.btn-report{
+	background-color: red !important;
+	color: white !important;
+	border: 2px solid red !important;
+	border-radius: 6px !important;
+	padding: 5px 12px !important;
+	transition: all 0.3s ease !important;
+}
 </style>
 <body>
 	<!-- 헤더 -->
@@ -809,9 +817,21 @@ button.btn-resume {
 														onclick="location.href='/submission/check?boardNo=${RecruitmentDetailInfo.uid}'">
 														이력서 제출
 													</button>
-														<button type="button" class="btn btn-report" id="reportBtn" onclick="reportBoard()">신고하기</button>
+													
 												</c:when>
+												
 												</c:choose>
+												<c:choose>
+													
+													<c:when test="${sessionScope.account.accountType == 'COMPANY' && sessionScope.account.uid ne RecruitmentDetailInfo.refCompany}">
+														<button type="button" class="btn btn-report" onclick="reportBoard()">신고하기</button>
+													</c:when>
+
+													
+													<c:when test="${sessionScope.account.accountType == 'USER'}">
+														<button type="button" class="btn btn-report" onclick="reportBoard()">신고하기</button>
+													</c:when>
+													</c:choose>
 												</div>
 											</div>
 										</div>
