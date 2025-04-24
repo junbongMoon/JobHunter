@@ -5,8 +5,6 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <jsp:include page="adminheader.jsp"></jsp:include>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
@@ -49,6 +47,8 @@
                 loadDayOptions(year, month, "#endDate");
             }
         });
+
+
 
     });
 
@@ -165,11 +165,9 @@
     }
 
     function showAlertModal(message) {
-    $('#alertModalMessage').text(message);
-    const modal = new bootstrap.Modal(document.getElementById('alertModal'));
-    modal.show();
+        $('#alertModalMessage').text(message);
+        $('#alertModal').modal('show'); // Bootstrap 4 방식 (Bootstrap 5에서도 동작 가능)
     }
-
 
 
     function formatDateLabel(rawDate) {
@@ -209,6 +207,14 @@
         const endYear = $("#endYear").val();
         const endMonth = $("#endMonth").val();
         const endDate = $("#endDate").val();
+
+        const selected = $('.stat-check:checked');
+        
+        if(selected.length < 1){
+            showAlertModal("조회하실 항목을 선택해주세요.");
+            return;
+        }
+        
 
         // 유효성 검사
         if (
@@ -328,6 +334,8 @@
     </div>
     </div>
 
+    
+
     <!-- ===== 차트가 포함될 콘텐츠 영역 ===== -->
     <div class="row chartArea">
 
@@ -366,22 +374,20 @@
     <script src="${pageContext.request.contextPath}/resources/adminpagematerials/vendor/chart.js/Chart.min.js"></script>
 
 	<!-- 모달 -->
-<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="alertModalLabel">알림</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+    <div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="alertModalLabel">알림</h5>
+              <button type="button" class="btn-close" data-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body" id="alertModalMessage">메시지 내용</div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">확인</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="modal-body" id="alertModalMessage">
-        메시지 내용
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 </div>
 </body>
