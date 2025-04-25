@@ -14,6 +14,8 @@
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 	rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
@@ -434,7 +436,8 @@
 	<input type="hidden" id="loginUserId" value="${loginUser.userId}" />
 </body>
 <script>
-
+const likeModalElement = document.getElementById('likeModal');
+const likeModal = new bootstrap.Modal(likeModalElement);
 	$(document).ready(function() {
 		const isLiked = $('#isLiked').val() === 'true';
 
@@ -446,7 +449,7 @@
 			$('#unlikeBtn').hide();
 		}
 	});
-
+	
 	// 좋아요 등록
 	$('#likeBtn').click(function() {
 		let currentLikes = parseInt($('#likeCountNum').text()) || 0;
@@ -455,8 +458,10 @@
 		$('#unlikeBtn').show();
 
 		$('#likeModalMessage').text("좋아요가 등록되었습니다!");
-		likeModal.show();
-
+		$('#likeModal').modal('show');
+		
+		const userId = parseInt($('#userId').val());  // 반드시 숫자!
+		const boardNo = parseInt($('#boardNo').val());
 		$.ajax({
 			url : '/reviewBoard/like',
 			type : 'POST',
@@ -484,7 +489,8 @@
 
 		$('#likeModalMessage').text("좋아요가 취소되었습니다.");
 		likeModal.show();
-
+		const userId = parseInt($('#userId').val());  // 반드시 숫자!
+		const boardNo = parseInt($('#boardNo').val());
 		$.ajax({
 			url : '/reviewBoard/unlike',
 			type : 'POST',
@@ -493,6 +499,10 @@
 				userId : userId,
 				boardNo : boardNo
 			}),
+				success: function (res) {
+				    console.log("✅ 좋아요 성공", res);
+				  },
+			
 			error : function() {
 				$('#likeCountNum').text(currentLikes);
 				$('#unlikeBtn').show();
@@ -659,13 +669,18 @@ function loadReplies(page = 1) {
           const writer = reply.writerId ?? '익명';
 
           const html = '<li class="list-group-item">' +
-            '<strong>' + writer + '</strong> (' + date + ')<br>' +
-            '<div class="reply-content">' + reply.content + '</div>' +
-            (reply.userId.toString() === loginUserUid.toString()
-              ? '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" data-replyno="' + replyNo + '" data-content="' + replyContent + '">수정</button>' +
-                '<button class="btn btn-sm btn-outline-danger delete-reply-btn" data-replyno="' + replyNo + '">삭제</button>'
-              : '') +
-            '</li>';
+          '<strong>' + writer + '</strong> (' + date + ')<br>' +
+          '<div class="reply-content">' + reply.content + '</div>' +
+          '<div class="reply-like-section mt-2" data-replyno="' + replyNo + '">' + // ✅ 클래스명 수정
+          '<button class="btn btn-outline-primary btn-sm like-reply-btn"' + (reply.isLiked ? ' style="display:none;"' : '') + '>👍 좋아요</button>' +
+          '<button class="btn btn-outline-danger btn-sm unlike-reply-btn"' + (reply.isLiked ? '' : ' style="display:none;"') + '>❌ 취소</button>' +
+          '&nbsp;<span class="like-count">' + reply.likes + '</span>' +
+          '</div>' +
+          (reply.userId.toString() === loginUserUid.toString()
+            ? '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" data-replyno="' + replyNo + '" data-content="' + replyContent + '">수정</button>' +
+              '<button class="btn btn-sm btn-outline-danger delete-reply-btn" data-replyno="' + replyNo + '">삭제</button>'
+            : '') +
+          '</li>';
           $replyList.append(html);
         });
       }
@@ -697,6 +712,7 @@ function loadReplies(page = 1) {
           `);
         }
       }
+      bindReplyLikeEvents(); 
     },
     error: function () {
       alert('댓글 로딩 중 오류 발생');
@@ -790,7 +806,6 @@ $(document).ready(function () {
       });
     }
   });
-
 		  // 페이지 클릭 이벤트 위임 (중복 방지)
 		  $(document).on('click', '#replyPagination a', function (e) {
 		    e.preventDefault();
@@ -803,6 +818,61 @@ $(document).ready(function () {
 		    loadReplies(parseInt(selectedPage));
 		  });
 		});
+		
+		
+function bindReplyLikeEvents() {
+    // 중복 방지 위해 기존 이벤트 제거 후 재바인딩
+    $(document).off('click', '.like-reply-btn');
+    $(document).off('click', '.unlike-reply-btn');
+
+    $(document).on('click', '.like-reply-btn', function () {
+      const wrapper = $(this).closest('.reply-like-section'); // ✅ 클래스명 수정됨
+      const replyNo = wrapper.data('replyno');
+      const likeCountSpan = wrapper.find('.like-count'); // ✅ 클래스명 수정됨
+      let currentCount = parseInt(likeCountSpan.text());
+
+      $.ajax({
+        url: '/reply/like',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ replyNo: replyNo }),
+        success: function (res) {
+          likeCountSpan.text(currentCount + 1);
+          wrapper.find('.like-reply-btn').hide();
+          wrapper.find('.unlike-reply-btn').show();
+        },
+        error: function (xhr) {
+          alert("좋아요 실패: " + xhr.responseText);
+        }
+      });
+    });
+
+    $(document).on('click', '.unlike-reply-btn', function () {
+      const wrapper = $(this).closest('.reply-like-section');
+      const replyNo = wrapper.data('replyno');
+      const likeCountSpan = wrapper.find('.like-count');
+      let currentCount = parseInt(likeCountSpan.text());
+
+      $.ajax({
+        url: '/reply/unlike',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ replyNo: replyNo }),
+        success: function (res) {
+          likeCountSpan.text(Math.max(currentCount - 1, 0));
+          
+          wrapper.find('.unlike-reply-btn').hide();
+          wrapper.find('.like-reply-btn').show();
+        },
+        error: function (xhr) {
+          alert("좋아요 취소 실패: " + xhr.responseText);
+        }
+      });
+    });
+  }
+
+
+
 
 </script>
 </html>

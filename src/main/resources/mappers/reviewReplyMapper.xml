@@ -111,14 +111,14 @@
 	<!-- 1. 좋아요 추가 -->
 	<insert id="insertReplyLike">
 		INSERT INTO LikesLog (userId, boardNo, LikeType)
-		VALUES (#{userId}, #{replyNo}, 'REPLY')
+		VALUES (#{userId}, #{boardNo}, 'REPLY')
 	</insert>
 
 	<!-- 2. 좋아요 삭제 -->
 	<delete id="deleteReplyLike">
 		DELETE FROM LikesLog
 		WHERE userId = #{userId}
-		AND boardNo = #{replyNo}
+		AND boardNo = #{boardNo}
 		AND LikeType = 'REPLY'
 	</delete>
 
@@ -126,7 +126,7 @@
 	<select id="hasUserLikedReply" resultType="int">
 		SELECT COUNT(*) FROM LikesLog
 		WHERE userId = #{userId}
-		AND boardNo = #{replyNo}
+		AND boardNo = #{boardNo}
 		AND LikeType = 'REPLY'
 	</select>
 

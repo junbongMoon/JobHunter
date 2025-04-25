@@ -18,4 +18,8 @@ public interface ReviewReplyService {
 
 	int getReplyCount(int boardNo) throws Exception;
 
+	boolean likeReply(int replyNo, int userUid) throws Exception;
+
+	boolean unlikeReply(int replyNo, int userUid) throws Exception;
+
 }
