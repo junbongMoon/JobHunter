@@ -1,5 +1,7 @@
 package com.jobhunter.model.advancement;
 
+import com.jobhunter.model.util.FileStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,4 +42,6 @@ public class AdvancementUpFileVODTO {
     private String base64Image;
     
     private int refAdvancementNo;
+    
+    private FileStatus status;
 }
