@@ -43,6 +43,18 @@ public class AdvancementController {
     	return "/advancement/write";
     }
 
+    /**
+     *  @author 문준봉
+     *
+     * <p>
+     * 승급 게시물을 등록하는 메서드
+     * </p>
+     * 
+     * @param advancementDTO
+     * @param request
+     * @return 이동할 페이지
+     *
+     */
     @PostMapping("/save")
     public String saveAdvancement(@ModelAttribute AdvancementDTO advancementDTO, HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -63,6 +75,18 @@ public class AdvancementController {
         }
     }
 
+    /**
+     *  @author 문준봉
+     *
+     * <p>
+     * 파일을 웹서버와 세션에 저장하는 메서드 
+     * </p>
+     * 
+     * @param file
+     * @param request
+     * @return ResponseEntity와 저장된 파일 리스트
+     *
+     */
     @PostMapping("/file")
     public ResponseEntity<List<AdvancementUpFileVODTO>> uploadFile(
             @RequestParam("file") MultipartFile file,
@@ -98,6 +122,18 @@ public class AdvancementController {
         }
     }
     
+    /**
+     *  @author 문준봉
+     *
+     * <p>
+     * 파일을 웹서버와 세션에서 삭제하는 메서드
+     * </p>
+     * 
+     * @param index
+     * @param request
+     * @return ResponseEntity
+     *
+     */
     @PostMapping("/deleteFile")
     public ResponseEntity<?> deleteFileFromSession(@RequestParam("index") int index, HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -125,4 +161,6 @@ public class AdvancementController {
 
         return ResponseEntity.ok().build();
     }
+    
+    
 }
