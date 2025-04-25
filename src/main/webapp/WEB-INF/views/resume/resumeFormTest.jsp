@@ -1262,8 +1262,8 @@
 				const editor = CodeMirror.fromTextArea(document.getElementById("selfIntroTextarea"), {
 					mode: "text/plain",
 					lineNumbers: true,
-					readOnly: false,
-					gutters: ["comment-control-gutter", "CodeMirror-linenumbers", "comment-gutter"]
+					readOnly: ${ !isSameUser },
+				gutters: ["comment-control-gutter", "CodeMirror-linenumbers", "comment-gutter"]
 				});
 
 				const commentMap = {}; // 줄 번호 => 코멘트 저장
@@ -1274,9 +1274,6 @@
 					for (let i = 0; i < editor.lineCount(); i++) {
 						editor.setGutterMarker(i, "comment-control-gutter", makeControlButton(i, "add"));
 					}
-				}
-
-				if (${ isSameUser }) {
 					// + 또는 - 버튼 만들기
 					// 같은 유저 일때는 생성 안하기
 					function makeControlButton(line, type) {
@@ -1309,7 +1306,7 @@
 
 					const form = document.createElement("div");
 					form.innerHTML = `
-        <div style="position:absolute; top:\${topOffset + 25}px; left:100px; top:120px; background:#f9f9f9; padding:10px; border:1px solid #ccc; border-radius:6px; width:400px; z-index:10;">
+        <div style="position:absolute; top:\${topOffset + 25}px; left:100px; top:110px; background:#f9f9f9; padding:10px; border:1px solid #ccc; border-radius:6px; width:800px; z-index:10;">
           <textarea id="inlineCommentInput" class="form-control" placeholder="[\${line + 1}번 라인] 코멘트를 입력하세요"></textarea>
           <div class="mt-2 text-end">
             <button type="button" class="btn btn-sm btn-secondary" onclick="cancelInlineComment()">취소</button>
