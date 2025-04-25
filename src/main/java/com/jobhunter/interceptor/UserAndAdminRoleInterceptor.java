@@ -31,7 +31,7 @@ public class UserAndAdminRoleInterceptor implements HandlerInterceptor {
 			// 계정 상태 서버에있는걸로 갱신
 			account = accUtils.refreshAccount(account);
 
-			if (account.getAccountType() == AccountType.USER || account.getIsAdmin() == "Y") {
+			if (account.getAccountType() == AccountType.USER || account.getIsAdmin().equals("Y")) {
 				return true;
 			}
 			

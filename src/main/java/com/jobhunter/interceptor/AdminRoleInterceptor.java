@@ -29,7 +29,7 @@ public class AdminRoleInterceptor implements HandlerInterceptor {
 			// 계정 상태 서버에있는걸로 갱신
 			account = accUtils.refreshAccount(account);
 
-			if (account.getIsAdmin() == "Y") {
+			if (account.getIsAdmin().equals("Y")) {
 				return true;
 			}
 			

@@ -27,7 +27,7 @@ public class MentorAndAdminRoleInterceptor implements HandlerInterceptor {
 			// 계정 상태 서버에있는걸로 갱신
 			account = accUtils.refreshAccount(account);
 
-			if (account.getIsMentor() == "Y" || account.getIsAdmin() == "Y") {
+			if (account.getIsMentor().equals("Y") || account.getIsAdmin().equals("Y")) {
 				return true;
 			}
 		}
