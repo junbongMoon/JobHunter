@@ -1,5 +1,6 @@
 package com.jobhunter.controller.advancement;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,8 @@ public class AdvancementController {
     private static final Logger logger = LoggerFactory.getLogger(AdvancementController.class);
 
     @GetMapping("/write")
-    public String showAdvancementWrite() {
+    public String showAdvancementWrite( HttpServletRequest request) {
+    	 request.getSession().removeAttribute("newfileList"); 
     	
     	return "/advancement/write";
     }
@@ -53,11 +55,11 @@ public class AdvancementController {
             boolean success = advancementService.SaveAdvancementByMento(advancementDTO, fileList);
             session.removeAttribute("newfileList"); // 저장 후 초기화
             return success ?
-                    "redirect:/advancement/list?action=success" :
-                    "redirect:/advancement/list?action=fail";
+            		 "/user/mypage" :
+                     "/user/mypage";
         } catch (Exception e) {
             logger.error("게시글 저장 실패", e);
-            return "redirect:/advancement/list?action=fail";
+            return "/user/mypage";
         }
     }
 
@@ -94,5 +96,33 @@ public class AdvancementController {
             logger.error("파일 업로드 실패", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+    
+    @PostMapping("/deleteFile")
+    public ResponseEntity<?> deleteFileFromSession(@RequestParam("index") int index, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        List<AdvancementUpFileVODTO> fileList =
+                (List<AdvancementUpFileVODTO>) session.getAttribute("newfileList");
+
+        if (fileList != null && index >= 0 && index < fileList.size()) {
+            AdvancementUpFileVODTO target = fileList.remove(index);
+
+            // 실제 파일 경로로 삭제
+            String realPath = request.getSession().getServletContext().getRealPath("/");
+            String os = System.getProperty("os.name").toLowerCase();
+
+            String mainPath = realPath + target.getNewFileName();
+            String thumbPath = realPath + target.getThumbFileName();
+
+            File mainFile = new File(os.contains("windows") ? mainPath.replace("/", "\\") : mainPath);
+            File thumbFile = new File(os.contains("windows") ? thumbPath.replace("/", "\\") : thumbPath);
+
+            if (mainFile.exists()) mainFile.delete();
+            if (thumbFile.exists()) thumbFile.delete();
+
+            logger.info("서버 파일 삭제 완료: {}, {}", mainFile.getName(), thumbFile.getName());
+        }
+
+        return ResponseEntity.ok().build();
     }
 }
