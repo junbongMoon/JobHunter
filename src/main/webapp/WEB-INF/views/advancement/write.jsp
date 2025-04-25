@@ -8,58 +8,75 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="/resources/assets/css/main.css">
 <script>
-    $(document).ready(function () {
-        $('#fileInput').change(function () {
-            const file = this.files[0];
-            if (!file) return;
+$(document).ready(function () {
+    let fileCount = 0;
 
-            const formData = new FormData();
-            formData.append("file", file);
+    $('#fileInput').change(function () {
+        const file = this.files[0];
+        if (!file) return;
 
-            $.ajax({
-                url: "/advancement/file",
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (fileList) {
-                    if (fileList && fileList.length > 0) {
-                        const lastFile = fileList[fileList.length - 1];
-                        const index = fileList.length - 1;
+        // 파일 크기 제한: 10MB
+        if (file.size > 10 * 1024 * 1024) {
+            alert("파일 크기는 최대 10MB까지 가능합니다.");
+            this.value = ''; // input 초기화
+            return;
+        }
 
-                        const fileId = `file-\${index}`;
-                        let previewHtml = `
-                            <div class="preview-item" id="\${fileId}">
-                                <img class="preview-img" src="data:image/png;base64,\${lastFile.base64Image}" alt="썸네일">
-                                <button type="button" class="delete-btn" data-index="\${index}">X</button>
-                            </div>`;
+        // 최대 3개 제한
+        if ($("#previewArea .preview-item").length >= 3) {
+            alert("최대 3개의 파일만 업로드할 수 있습니다.");
+            this.value = '';
+            return;
+        }
 
-                        $('#previewArea').append(previewHtml);
-                    }
-                },
-                error: function (err) {
-                    alert("파일 업로드 실패");
-                    console.error(err);
+        const formData = new FormData();
+        formData.append("file", file);
+
+        $.ajax({
+            url: "/advancement/file",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (fileList) {
+                if (fileList && fileList.length > 0) {
+                    const lastFile = fileList[fileList.length - 1];
+                    const index = fileList.length - 1;
+
+                    const fileId = `file-\${index}`;
+                    let previewHtml = `
+                        <div class="preview-item" id="\${fileId}">
+                            <img class="preview-img" src="data:image/png;base64,\${lastFile.base64Image}" alt="썸네일">
+                            <button type="button" class="delete-btn" data-index="\${index}">X</button>
+                        </div>`;
+
+                    $('#previewArea').append(previewHtml);
                 }
-            });
-        });
-
-        // 동적 삭제 이벤트 위임
-        $('#previewArea').on('click', '.delete-btn', function () {
-            const index = $(this).data('index');
-            $.ajax({
-                url: '/advancement/deleteFile',
-                type: 'POST',
-                data: { index: index },
-                success: function () {
-                    $(`#file-\${index}`).remove();
-                },
-                error: function () {
-                    alert("파일 삭제 실패");
-                }
-            });
+            },
+            error: function (err) {
+                alert("파일 업로드 실패");
+                console.error(err);
+            }
         });
     });
+
+    // 삭제 시 개수 관리
+    $('#previewArea').on('click', '.delete-btn', function () {
+        const index = $(this).data('index');
+        $.ajax({
+            url: '/advancement/deleteFile',
+            type: 'POST',
+            data: { index: index },
+            success: function () {
+                $(`#file-\${index}`).remove();
+            },
+            error: function () {
+                alert("파일 삭제 실패");
+            }
+        });
+    });
+});
+
 </script>
 
 <style>
