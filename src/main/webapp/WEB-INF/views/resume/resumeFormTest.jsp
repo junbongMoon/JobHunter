@@ -11,6 +11,9 @@
 				<link rel="stylesheet"
 					href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 				<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+				<link rel="stylesheet"
+					href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css" />
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
 			</head>
 
 			<body>
@@ -29,10 +32,13 @@
 				<input type="hidden" id="queryUid" value="${param.uid}">
 
 				<div class="container my-5">
-					<c:if test="${mode == 'checkAdvice'}">
+					<c:if test="${mode == 'checkAdvice' && !isSameUser}">
 						<h2 class="mb-4">[${resumeDetail.resume.title}] 이력서 첨삭</h2>
 					</c:if>
-					<c:if test="${isSameUser}">
+					<c:if test="${isSameUser && mode == 'checkAdvice'}">
+						<h2 class="mb-4">첨삭 완료된 [${resumeDetail.resume.title}] 이력서 수정</h2>
+					</c:if>
+					<c:if test="${isSameUser && mode != 'checkAdvice'}">
 						<h2 class="mb-4">이력서 수정</h2>
 					</c:if>
 
@@ -682,19 +688,59 @@
 
 
 						<!-- 자기소개란 -->
-						<div class="card mb-4">
+						<!-- <div class="card mb-4">
 							<div class="card-header d-flex justify-content-between align-items-center">
 								<span>자기소개</span>
 							</div>
 							<div class="card-body">
-								<textarea class="form-control" id="selfIntroTextarea" rows="8"
-									placeholder="자기소개를 입력하세요(최대 1000자)" maxlength="1000" <c:if
-									test="${!isSameUser}">readonly</c:if>></textarea>
+								<div id="editor-wrapper">
+									<textarea class="form-control" id="selfIntroTextarea" rows="8"
+										placeholder="자기소개를 입력하세요(최대 1000자)" maxlength="1000" <c:if
+										test="${!isSameUser}">readonly</c:if>></textarea>
+								</div>
 								<div class="text-end">
 									<span id="charCount" class="text-muted">0 / 1000</span>
 								</div>
 							</div>
+						</div> -->
+
+						<!-- 테스트용 -->
+						<div class="card mb-4">
+							<div class="card-header d-flex justify-content-between align-items-center">
+								<span>자기소개</span>
+								<c:if test="${!isSameUser}">
+									<span class="text-muted1" style="color: white; font-size: 14px;">+ 버튼을 클릭하시면
+										코멘트를
+										작성 할 수 있습니다.</span>
+								</c:if>
+								<c:if test="${isSameUser && mode == 'checkAdvice'}">
+									<span class="text-muted1" style="color: white; font-size: 14px;">💬 버튼을 클릭하시면
+										첨삭 코멘트를 확인 할 수 있습니다.</span>
+								</c:if>
+							</div>
+							<div class="card-body">
+								<div id="editor-wrapper">
+									<c:if test="${!isSameUser}">
+										<textarea class="form-control" id="selfIntroTextarea" rows="10"
+											placeholder="자기소개를 입력하세요(최대 1000자)" maxlength="1000"
+											readonly>${resumeDetail.resume.introduce}</textarea>
+									</c:if>
+									<c:if test="${isSameUser}">
+										<textarea class="form-control" id="selfIntroTextarea" rows="10"
+											placeholder="자기소개를 입력하세요(최대 1000자)"
+											maxlength="1000">${resumeDetail.resume.introduce}</textarea>
+									</c:if>
+								</div>
+								<div id="comment-container"></div>
+								<!-- <div class="text-end">
+										<span id="charCount" class="text-muted">${resumeDetail.resume.introduce}'.length
+											+ ' / 1000</span>
+									</div> -->
+							</div>
 						</div>
+
+						<!-- $('#selfIntroTextarea').val('${resumeDetail.resume.introduce}'); -->
+						<!-- $('#charCount').text('${resumeDetail.resume.introduce}'.length + ' / 1000'); -->
 
 
 						<!-- 파일 첨부 -->
@@ -734,9 +780,16 @@
 									<span>첨삭 의견</span>
 								</div>
 								<div class="card-body">
-									<textarea class="form-control" id="adviceTextarea" rows="15"
-										placeholder="이력서에 대한 첨삭 의견을 입력하세요(최대 3000자)"
-										maxlength="3000">${advice.adviceContent}</textarea>
+									<c:if test="${isSameUser}">
+										<textarea class="form-control" id="adviceTextarea" rows="15"
+											placeholder="이력서에 대한 첨삭 의견을 입력하세요(최대 3000자)" maxlength="3000"
+											readonly>${advice.adviceContent}</textarea>
+									</c:if>
+									<c:if test="${!isSameUser}">
+										<textarea class="form-control" id="adviceTextarea" rows="15"
+											placeholder="이력서에 대한 첨삭 의견을 입력하세요(최대 3000자)"
+											maxlength="3000">${advice.adviceContent}</textarea>
+									</c:if>
 									<div class="text-end">
 										<span id="adviceCharCount" class="text-muted">${fn:length(advice.adviceContent)}
 											/ 3000</span>
@@ -1185,9 +1238,245 @@
 					--heading-color: #37517E;
 					--heading-font: 'Poppins', sans-serif;
 				}
+
+				.CodeMirror pre {
+					padding-left: 20px !important;
+					/* 기본은 4px 이상일 수 있음 */
+				}
+
+				.CodeMirror .comment-control-gutter {
+					width: 20px;
+				}
+
+				.comment-control-button {
+					width: 20px;
+					font-weight: bold;
+					color: #007bff;
+					text-align: center;
+					cursor: pointer;
+				}
 			</style>
 
 			<script>
+				//---------------------------------------------------------------------------------------------------------------------------------
+				const editor = CodeMirror.fromTextArea(document.getElementById("selfIntroTextarea"), {
+					mode: "text/plain",
+					lineNumbers: true,
+					readOnly: false,
+					gutters: ["comment-control-gutter", "CodeMirror-linenumbers", "comment-gutter"]
+				});
+
+				const commentMap = {}; // 줄 번호 => 코멘트 저장
+				let activeCommentLine = null;
+
+				if (${ !isSameUser }) {
+					// 초기: 모든 줄에 + 버튼 넣기
+					for (let i = 0; i < editor.lineCount(); i++) {
+						editor.setGutterMarker(i, "comment-control-gutter", makeControlButton(i, "add"));
+					}
+				}
+
+				if (${ isSameUser }) {
+					// + 또는 - 버튼 만들기
+					// 같은 유저 일때는 생성 안하기
+					function makeControlButton(line, type) {
+						const marker = document.createElement("div");
+						marker.innerText = type === "add" ? "+" : "–";
+						marker.className = "comment-control-button";
+						marker.title = type === "add" ? "코멘트 추가" : "코멘트 삭제";
+
+						marker.onclick = function (e) {
+							e.preventDefault();
+							e.stopPropagation();
+
+							if (type === "add") {
+								const coords = editor.charCoords({ line: line, ch: 0 }, "page");
+								showInlineCommentForm(line, coords.top);
+							} else {
+								removeComment(line);
+							}
+						};
+
+						return marker;
+					}
+				}
+
+				// 코멘트 입력창 표시
+				function showInlineCommentForm(line, topOffset) {
+					activeCommentLine = line;
+					const container = document.getElementById("comment-container");
+					container.innerHTML = "";
+
+					const form = document.createElement("div");
+					form.innerHTML = `
+        <div style="position:absolute; top:\${topOffset + 25}px; left:100px; top:120px; background:#f9f9f9; padding:10px; border:1px solid #ccc; border-radius:6px; width:400px; z-index:10;">
+          <textarea id="inlineCommentInput" class="form-control" placeholder="[\${line + 1}번 라인] 코멘트를 입력하세요"></textarea>
+          <div class="mt-2 text-end">
+            <button type="button" class="btn btn-sm btn-secondary" onclick="cancelInlineComment()">취소</button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="submitInlineComment()">저장</button>
+          </div>
+        </div>
+      `;
+					container.appendChild(form);
+				}
+
+				// 코멘트 저장
+				function submitInlineComment() {
+					const comment = document.getElementById("inlineCommentInput").value;
+					if (!comment) return;
+
+					commentMap[Number(activeCommentLine)] = comment;
+
+					editor.setGutterMarker(activeCommentLine, "comment-gutter", makeCommentIcon(activeCommentLine));
+					editor.setGutterMarker(activeCommentLine, "comment-control-gutter", makeControlButton(activeCommentLine, "remove"));
+
+					saveCommentToServer(1, activeCommentLine, comment);
+					cancelInlineComment();
+				}
+
+				// 💬 아이콘 생성 + 클릭 시 코멘트 보기
+				function makeCommentIcon(line) {
+					const marker = document.createElement("div");
+					marker.innerText = "💬";
+					marker.title = "코멘트 보기";
+					marker.style.fontSize = "14px";
+					marker.style.cursor = "pointer";
+
+					marker.onclick = function (e) {
+						e.preventDefault();
+						e.stopPropagation();
+
+						const comment = commentMap[line];
+						if (comment) {
+							showCommentTooltip(line, comment);
+						}
+					};
+
+					return marker;
+				}
+
+				// 💬 클릭 시 말풍선으로 코멘트 보기
+				function showCommentTooltip(line, comment) {
+					const container = document.getElementById("comment-container");
+					container.innerHTML = "";
+
+					const coords = editor.charCoords({ line: line, ch: 0 }, "page");
+
+					const tooltip = document.createElement("div");
+					tooltip.style.position = "absolute";
+					tooltip.style.top = `${coords.top + 25}px`;
+					tooltip.style.left = "100px";
+					tooltip.style.top = "120px";
+					tooltip.style.background = "#fff";
+					tooltip.style.border = "1px solid #ccc";
+					tooltip.style.borderRadius = "6px";
+					tooltip.style.padding = "10px";
+					tooltip.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+					tooltip.style.zIndex = 20;
+					tooltip.style.width = "400px";
+					tooltip.innerHTML = `
+        <div><strong>[\${line + 1}번] 코멘트:</strong></div>
+        <div style="margin-top:5px; white-space: pre-wrap;">\${comment}</div>
+        <div class="text-end mt-2">
+          <button class="btn btn-sm btn-outline-secondary" onclick="cancelInlineComment()">닫기</button>
+        </div>
+      `;
+
+					container.appendChild(tooltip);
+				}
+
+				// 입력창 또는 말풍선 닫기
+				function cancelInlineComment() {
+					document.getElementById("comment-container").innerHTML = "";
+					activeCommentLine = null;
+				}
+
+				// 코멘트 삭제
+				function removeComment(line) {
+					editor.setGutterMarker(line, "comment-gutter", null);
+					editor.setGutterMarker(line, "comment-control-gutter", makeControlButton(line, "add"));
+
+					delete commentMap[line];
+					console.log(`줄 \${line + 1} 코멘트 삭제됨`);
+				}
+
+				// 서버 저장 요청
+				function saveCommentToServer(resumeId, lineNumber, commentText) {
+					$.ajax({
+						url: "/saveResumeComment",
+						method: "POST",
+						data: {
+							resumeId: resumeId,
+							lineNumber: lineNumber,
+							commentText: commentText
+						},
+						success: () => console.log("코멘트 저장 완료"),
+						error: () => alert("저장 실패 ㅠㅠ")
+					});
+				}
+
+				// const editor = CodeMirror.fromTextArea(document.getElementById("selfIntroTextarea1"), {
+				// 	mode: "text/plain",
+				// 	lineNumbers: true,
+				// 	readOnly: true,
+				// 	gutters: ["CodeMirror-linenumbers", "comment-gutter"]
+				// });
+
+				// let activeCommentLine = null; // 현재 코멘트 입력 중인 줄
+
+				// editor.on("gutterClick", function (cm, lineNumber) {
+				// 	if (activeCommentLine === lineNumber) return; // 이미 열려 있으면 무시
+				// 	activeCommentLine = lineNumber;
+
+				// 	const coords = cm.charCoords({ line: lineNumber, ch: 0 }, "page");
+				// 	showInlineCommentForm(lineNumber, coords.top);
+				// });
+
+				// function showInlineCommentForm(line, topOffset) {
+				// 	// 기존 입력창 제거
+				// 	document.getElementById("comment-container").innerHTML = "";
+
+				// 	// 코멘트 입력창 HTML 생성
+				// 	const container = document.getElementById("comment-container");
+				// 	const form = document.createElement("div");
+				// 	form.innerHTML = `
+				// 	<div style="position:absolute; top:${topOffset + 25}px; left:100px; background:#f9f9f9; padding:10px; border:1px solid #ccc; border-radius:6px; width:400px; z-index:10">
+				// 	<textarea id="inlineCommentInput" class="form-control" placeholder="코멘트를 입력하세요"></textarea>
+				// 	<div class="mt-2 text-end">
+				// 	<button type="button" class="btn btn-sm btn-secondary" onclick="cancelInlineComment()">취소</button>
+				// 	<button type="button" class="btn btn-sm btn-primary" onclick="saveInlineComment(${line})">저장</button>
+				// 	</div>
+				// 	</div>
+				// 	`;
+				// 	container.appendChild(form);
+				// }
+
+				// function cancelInlineComment() {
+				// 	document.getElementById("comment-container").innerHTML = "";
+				// 	activeCommentLine = null;
+				// }
+
+				// function saveInlineComment(line) {
+				// 	const comment = document.getElementById("inlineCommentInput").value;
+				// 	if (!comment) return;
+
+				// 	// 💬 표시
+				// 	editor.setGutterMarker(line, "comment-gutter", makeCommentIcon(line));
+
+				// 	// 서버로 저장 요청 (ajax 등으로 가능)
+				// 	console.log("저장: 줄", line + 1, "코멘트:", comment);
+				// 	cancelInlineComment();
+				// }
+
+				// function makeCommentIcon(line) {
+				// 	const marker = document.createElement("div");
+				// 	marker.innerText = "💬";
+				// 	marker.title = "코멘트 있음";
+				// 	marker.style.fontSize = "13px";
+				// 	marker.style.cursor = "pointer";
+				// 	return marker;
+				// }
+
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// // 첨삭 승인 버튼 클릭 이벤트
 				// $("#acceptAdviceBtn").on("click", function () {
@@ -1766,7 +2055,8 @@
 									institution: $(this).find('.institution').val()
 								};
 							}).get(),
-							introduce: $('#selfIntroTextarea').val(),
+							// introduce: $('#selfIntroTextarea').val(),
+							introduce: editor.getValue(),
 							files: uploadedFiles,
 							userUid: $('#userUid').val(),
 							profileBase64: $('#profileBase64').val()
@@ -2111,16 +2401,7 @@
 					// 페이지 로드 시 자격증 초기화
 					initializeLicense();
 					//---------------------------------------------------------------------------------------------------------------------------------
-					// 페이지 로드 시 기존 자기소개 표시
-					function initializeSelfIntro() {
-						<c:if test="${not empty resumeDetail.resume.introduce}">
-							$('#selfIntroTextarea').val('${resumeDetail.resume.introduce}');
-							$('#charCount').text('${resumeDetail.resume.introduce}'.length + ' / 1000');
-						</c:if>
-					}
 
-					// 페이지 로드 시 자기소개 초기화
-					initializeSelfIntro();
 					//---------------------------------------------------------------------------------------------------------------------------------
 					// 자기소개 입력란 몇글자 썻는지 알 수 있게 하기
 					$('#selfIntroTextarea').on('input', function () {
