@@ -125,6 +125,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 
 		if (fileList.size() > 0) {
 			for (RecruitmentnoticeBoardUpfiles file : fileList) {
+				file.setStatus(FileStatus.COMPLETE);
 				// 여기서 insert
 				file.setRefrecruitmentnoticeNo(recNo);
 				recdao.insertRecruitmentFile(file);

@@ -5,5 +5,5 @@ package com.jobhunter.model.util;
 //주로 코드의 가독성을 높이고, 특정 값들만 사용하도록 제한할 때 유용합니다.
 //문자열에 비해 주어진 값들만 사용할 수 있으므로 타입의 안전성을 보장 한다.
 public enum FileStatus {
-	NEW, DELETE
+	NEW, DELETE, COMPLETE
 }
