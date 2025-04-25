@@ -324,81 +324,81 @@ public class ResumeController {
 	 * @return 이력서 수정 폼 JSP 경로 또는 오류 페이지
 	 * @author 유지원
 	 */
-	@GetMapping({"/edit/{resumeNo}", "/advice/{resumeNo}", "/checkAdvice/{resumeNo}"})
-	public String editResumeForm(@PathVariable int resumeNo, @RequestParam int uid, Model model, HttpSession session, HttpServletRequest request) {
-		AccountVO account = (AccountVO) session.getAttribute("account");
-		int userUid = account.getUid();
-		try {
-			// 수정으로 접근했을 때만 이력서 상태 확인
-			if (request.getRequestURI().contains("/edit/") && resumeService.isResumeChecked(resumeNo)) {
-				model.addAttribute("error", "기업에서 확인중인 이력서는 수정할 수 없습니다.");
-				return "error";
-			}
-
-			// 첨삭 상태 확인
-			if (request.getRequestURI().contains("/edit/") && resumeService.isResumeAdvice(resumeNo)) {
-				model.addAttribute("error", "첨삭 중인 이력서는 수정할 수 없습니다.");
-				return "error";
-			}
-			// 기존 이력서 정보 조회
-			ResumeDetailDTO resumeDetail = resumeService.getResumeDetailWithAll(resumeNo);
-			model.addAttribute("resumeDetail", resumeDetail);
-
-			// 지역 목록 조회
-			List<RegionDTO> regionList = resumeService.getAllRegions();
-			model.addAttribute("regionList", regionList);
-
-			// 업직종 대분류 목록 조회
-			List<MajorCategoryDTO> majorList = resumeService.getAllMajorCategories();
-			model.addAttribute("majorList", majorList);
-
-			// 선택된 시군구 목록 조회
-			List<SigunguVO> selectedSigungu = resumeService.getResumeSigungu(resumeNo);
-			model.addAttribute("selectedSigungu", selectedSigungu);
-
-			// 선택된 업직종 목록 조회
-			List<SubCategoryVO> selectedSubCategory = resumeService.getResumeSubCategory(resumeNo);
-			model.addAttribute("selectedSubCategory", selectedSubCategory);
-
-			// 고용형태 ENUM 목록 추가
-			model.addAttribute("jobFormList", JobForm.values());
-
-			// 학력 레벨 ENUM 목록 추가
-			model.addAttribute("educationLevelList", EducationLevel.values());
-
-			// 학력 상태 ENUM 목록 추가
-			model.addAttribute("educationStatusList", EducationStatus.values());
-
-			// 현재 날짜를 YYYY-MM-DD 형식으로 추가
-			String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			model.addAttribute("today", today);
-
-			// 이력서의 유저정보를 가져옴
-			UserVO user = resumeService.getUserInfo(uid);
-			model.addAttribute("user", user);
-			
-			String uri = request.getRequestURI();
-			if (uri.contains("advice")) {
-				model.addAttribute("mode", "advice");
-
-			} else if (uri.contains("checkAdvice")) {
-				// 첨삭 내용 조회
-				ResumeAdviceDTO advice = resumeService.getAdvice(resumeNo);
-				if (advice != null) {
-					model.addAttribute("advice", advice);
-					// 첨삭 파일 조회
-					List<ResumeAdviceUpfileDTO> adviceFiles = resumeService.getAdviceFiles(advice.getAdviceNo());
-					model.addAttribute("adviceFiles", adviceFiles);
-				}
-				model.addAttribute("mode", "checkAdvice");
-			}
-
-			return "resume/resumeForm";
-		} catch (Exception e) {
-			model.addAttribute("error", "이력서 정보를 불러오는 중 오류가 발생했습니다.");
-			return "error";
-		}
-	}
+//	@GetMapping({"/edit/{resumeNo}", "/advice/{resumeNo}", "/checkAdvice/{resumeNo}"})
+//	public String editResumeForm(@PathVariable int resumeNo, @RequestParam int uid, Model model, HttpSession session, HttpServletRequest request) {
+//		AccountVO account = (AccountVO) session.getAttribute("account");
+//		int userUid = account.getUid();
+//		try {
+//			// 수정으로 접근했을 때만 이력서 상태 확인
+//			if (request.getRequestURI().contains("/edit/") && resumeService.isResumeChecked(resumeNo)) {
+//				model.addAttribute("error", "기업에서 확인중인 이력서는 수정할 수 없습니다.");
+//				return "error";
+//			}
+//
+//			// 첨삭 상태 확인
+//			if (request.getRequestURI().contains("/edit/") && resumeService.isResumeAdvice(resumeNo)) {
+//				model.addAttribute("error", "첨삭 중인 이력서는 수정할 수 없습니다.");
+//				return "error";
+//			}
+//			// 기존 이력서 정보 조회
+//			ResumeDetailDTO resumeDetail = resumeService.getResumeDetailWithAll(resumeNo);
+//			model.addAttribute("resumeDetail", resumeDetail);
+//
+//			// 지역 목록 조회
+//			List<RegionDTO> regionList = resumeService.getAllRegions();
+//			model.addAttribute("regionList", regionList);
+//
+//			// 업직종 대분류 목록 조회
+//			List<MajorCategoryDTO> majorList = resumeService.getAllMajorCategories();
+//			model.addAttribute("majorList", majorList);
+//
+//			// 선택된 시군구 목록 조회
+//			List<SigunguVO> selectedSigungu = resumeService.getResumeSigungu(resumeNo);
+//			model.addAttribute("selectedSigungu", selectedSigungu);
+//
+//			// 선택된 업직종 목록 조회
+//			List<SubCategoryVO> selectedSubCategory = resumeService.getResumeSubCategory(resumeNo);
+//			model.addAttribute("selectedSubCategory", selectedSubCategory);
+//
+//			// 고용형태 ENUM 목록 추가
+//			model.addAttribute("jobFormList", JobForm.values());
+//
+//			// 학력 레벨 ENUM 목록 추가
+//			model.addAttribute("educationLevelList", EducationLevel.values());
+//
+//			// 학력 상태 ENUM 목록 추가
+//			model.addAttribute("educationStatusList", EducationStatus.values());
+//
+//			// 현재 날짜를 YYYY-MM-DD 형식으로 추가
+//			String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//			model.addAttribute("today", today);
+//
+//			// 이력서의 유저정보를 가져옴
+//			UserVO user = resumeService.getUserInfo(uid);
+//			model.addAttribute("user", user);
+//			
+//			String uri = request.getRequestURI();
+//			if (uri.contains("advice")) {
+//				model.addAttribute("mode", "advice");
+//
+//			} else if (uri.contains("checkAdvice")) {
+//				// 첨삭 내용 조회
+//				ResumeAdviceDTO advice = resumeService.getAdvice(resumeNo);
+//				if (advice != null) {
+//					model.addAttribute("advice", advice);
+//					// 첨삭 파일 조회
+//					List<ResumeAdviceUpfileDTO> adviceFiles = resumeService.getAdviceFiles(advice.getAdviceNo());
+//					model.addAttribute("adviceFiles", adviceFiles);
+//				}
+//				model.addAttribute("mode", "checkAdvice");
+//			}
+//
+//			return "resume/resumeForm";
+//		} catch (Exception e) {
+//			model.addAttribute("error", "이력서 정보를 불러오는 중 오류가 발생했습니다.");
+//			return "error";
+//		}
+//	}
 
 	/**
 	 * 기존에 작성된 이력서를 수정(저장)합니다.
@@ -476,10 +476,10 @@ public class ResumeController {
 	public ResponseEntity<Map<String, Object>> endAdvice(@RequestBody ResumeAdviceDTO adviceDTO, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		int userUid = account.getUid();
-		
+
 		int resumeNo = adviceDTO.getResumeNo();
 		int ownerUid = adviceDTO.getOwnerUid();
-		
+
 		Map<String, Object> response = new HashMap<>();
 		try {
 			resumeService.saveAdvice(adviceDTO);
@@ -499,6 +499,84 @@ public class ResumeController {
 			response.put("message", "첨삭 종료 처리 중 오류가 발생했습니다.");
 			response.put("success", false);
 			return ResponseEntity.ok().body(response);
+		}
+	}
+	
+	
+//	테스트용 메서드 입니다. -- 이력서 첨삭 기능 개선 중....
+	@GetMapping({"/edit/{resumeNo}", "/advice/{resumeNo}", "/checkAdvice/{resumeNo}"})
+	public String editResumeForm(@PathVariable int resumeNo, @RequestParam int uid, Model model, HttpSession session, HttpServletRequest request) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+		int userUid = account.getUid();
+		try {
+			// 수정으로 접근했을 때만 이력서 상태 확인
+			if (request.getRequestURI().contains("/edit/") && resumeService.isResumeChecked(resumeNo)) {
+				model.addAttribute("error", "기업에서 확인중인 이력서는 수정할 수 없습니다.");
+				return "error";
+			}
+
+			// 첨삭 상태 확인
+			if (request.getRequestURI().contains("/edit/") && resumeService.isResumeAdvice(resumeNo)) {
+				model.addAttribute("error", "첨삭 중인 이력서는 수정할 수 없습니다.");
+				return "error";
+			}
+			// 기존 이력서 정보 조회
+			ResumeDetailDTO resumeDetail = resumeService.getResumeDetailWithAll(resumeNo);
+			model.addAttribute("resumeDetail", resumeDetail);
+
+			// 지역 목록 조회
+			List<RegionDTO> regionList = resumeService.getAllRegions();
+			model.addAttribute("regionList", regionList);
+
+			// 업직종 대분류 목록 조회
+			List<MajorCategoryDTO> majorList = resumeService.getAllMajorCategories();
+			model.addAttribute("majorList", majorList);
+
+			// 선택된 시군구 목록 조회
+			List<SigunguVO> selectedSigungu = resumeService.getResumeSigungu(resumeNo);
+			model.addAttribute("selectedSigungu", selectedSigungu);
+
+			// 선택된 업직종 목록 조회
+			List<SubCategoryVO> selectedSubCategory = resumeService.getResumeSubCategory(resumeNo);
+			model.addAttribute("selectedSubCategory", selectedSubCategory);
+
+			// 고용형태 ENUM 목록 추가
+			model.addAttribute("jobFormList", JobForm.values());
+
+			// 학력 레벨 ENUM 목록 추가
+			model.addAttribute("educationLevelList", EducationLevel.values());
+
+			// 학력 상태 ENUM 목록 추가
+			model.addAttribute("educationStatusList", EducationStatus.values());
+
+			// 현재 날짜를 YYYY-MM-DD 형식으로 추가
+			String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			model.addAttribute("today", today);
+
+			// 이력서의 유저정보를 가져옴
+			UserVO user = resumeService.getUserInfo(uid);
+			model.addAttribute("user", user);
+			
+			String uri = request.getRequestURI();
+			if (uri.contains("advice")) {
+				model.addAttribute("mode", "advice");
+
+			} else if (uri.contains("checkAdvice")) {
+				// 첨삭 내용 조회
+				ResumeAdviceDTO advice = resumeService.getAdvice(resumeNo);
+				if (advice != null) {
+					model.addAttribute("advice", advice);
+					// 첨삭 파일 조회
+					List<ResumeAdviceUpfileDTO> adviceFiles = resumeService.getAdviceFiles(advice.getAdviceNo());
+					model.addAttribute("adviceFiles", adviceFiles);
+				}
+				model.addAttribute("mode", "checkAdvice");
+			}
+
+			return "resume/resumeFormTest";
+		} catch (Exception e) {
+			model.addAttribute("error", "이력서 정보를 불러오는 중 오류가 발생했습니다.");
+			return "error";
 		}
 	}
 }
