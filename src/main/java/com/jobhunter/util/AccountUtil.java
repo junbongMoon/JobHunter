@@ -1,5 +1,9 @@
 package com.jobhunter.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Component;
@@ -28,42 +32,132 @@ public class AccountUtil {
 		try {
 			return accountService.refreshAccount(uid, type);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return sessionAccount;
 		}
 	}
-	
-	public Boolean checkUid(HttpSession session, int uid) {
-		AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
-		
-		return sessionAccount != null && sessionAccount.getUid() == uid;
+
+	public static boolean checkType(AccountType allowType, AccountVO sessionAccount) {
+		List<AccountType> allowTypes = new ArrayList<AccountType>();
+		allowTypes.add(allowType);
+		return checkType(allowTypes, sessionAccount);
+	}
+
+	public static boolean checkType(List<AccountType> allowTypes, AccountVO sessionAccount) {
+		if (sessionAccount == null) {
+			return false;
+		}
+
+		if (allowTypes != null && !allowTypes.isEmpty()) {
+			// 관리자 우선 패스
+			if (allowTypes.contains(AccountType.ADMIN) && "Y".equalsIgnoreCase(sessionAccount.getIsAdmin())) {
+				return true;
+			}
+
+			// 멘토 체크
+			if (allowTypes.contains(AccountType.MENTOR) && "Y".equalsIgnoreCase(sessionAccount.getIsMentor())) {
+				return true;
+			}
+
+			// 나머지 역할
+			return allowTypes.contains(sessionAccount.getAccountType());
+
+		}
+
+		return false;
 	}
 	
-	public boolean checkOwnershipOrAdmin(AccountVO acc, boolean isAdminAllowed, Object... conditions) {
+	public static boolean checkUid(AccountVO sessionAccount, int... uids) {
+		List<AccountType> allowTypes = new ArrayList<AccountType>();
+		return checkUid(allowTypes, sessionAccount, uids);
+	}
+	
+	public static boolean checkUid(List<AccountType> allowTypes, AccountVO sessionAccount, int... uids) {
+		if (sessionAccount == null) {
+			return false;
+		}
+
+		if (allowTypes != null && !allowTypes.isEmpty()) {
+	    	// 관리자 우선 패스
+		    if (allowTypes.contains(AccountType.ADMIN) && "Y".equalsIgnoreCase(sessionAccount.getIsAdmin())) {
+		    	return true;
+		    }
+		    
+		    // 멘토 체크
+		    if (allowTypes.contains(AccountType.MENTOR) && "Y".equalsIgnoreCase(sessionAccount.getIsMentor())) {
+		    	return true;
+		    }
+		    
+	    }
+	    
+	    for (int uid : uids) {
+	        if (sessionAccount.getUid() == uid) {
+	            return true;
+	        }
+	    }
+	    
+		return false;
+	}
+	
+	public static boolean checkAuth(AccountVO sessionAccount, Object... conditions) {
+		List<AccountType> allowTypes = new ArrayList<AccountType>();
+		return checkAuth(allowTypes, sessionAccount, conditions);
+	}
+	
+	public static boolean checkAuth(AccountType allowType, AccountVO sessionAccount, Object... conditions) {
+		List<AccountType> allowTypes = new ArrayList<AccountType>();
+		allowTypes.add(allowType);
+		return checkAuth(allowTypes, sessionAccount, conditions);
+	}
+	
+	public static boolean checkAuth(List<AccountType> allowTypes, AccountVO sessionAccount, Object... conditions) {
+		if (sessionAccount == null) {
+			return false;
+		}
+
 	    if (conditions.length % 2 != 0) {
 	         System.out.println("AccountUtil.checkOwnershipOrAdmin_조건은 uid와 AccountType의 쌍으로 입력되어야 합니다.");
+	         return false;
 	    }
-
-	    // 관리자 우선 패스
-	    if ("Y".equalsIgnoreCase(acc.getIsAdmin())) return true;
+	    
+	    if (allowTypes != null && !allowTypes.isEmpty()) {
+	    	// 관리자 우선 패스
+		    if (allowTypes.contains(AccountType.ADMIN) && "Y".equalsIgnoreCase(sessionAccount.getIsAdmin())) {
+		    	return true;
+		    }
+		    
+		    // 멘토 체크
+		    if (allowTypes.contains(AccountType.MENTOR) && "Y".equalsIgnoreCase(sessionAccount.getIsMentor())) {
+		    	return true;
+		    }
+	    }
+	    
 
 	    for (int i = 0; i < conditions.length; i += 2) {
 	        Object uidObj = conditions[i];
 	        Object typeObj = conditions[i + 1];
 
 	        if (!(uidObj instanceof Integer) || !(typeObj instanceof AccountType)) {
-	            throw new IllegalArgumentException("조건은 (Integer uid, AccountType type) 쌍이어야 합니다.");
+	        	System.out.println("AccountUtil.checkOwnershipOrAdmin_조건은 (Integer uid, AccountType type) 쌍이어야 합니다.");
+	            return false;
 	        }
 
 	        int allowedUid = (int) uidObj;
 	        AccountType allowedType = (AccountType) typeObj;
 
-	        if (acc.getUid() == allowedUid && acc.getAccountType() == allowedType) {
+	        if (sessionAccount.getUid() == allowedUid && sessionAccount.getAccountType() == allowedType) {
 	            return true;
 	        }
 	    }
 
 	    return false;
+	}
+	
+	public static AccountVO getAccount(HttpServletRequest request) {
+		return getAccount(request.getSession());
+	}
+	
+	public static AccountVO getAccount(HttpSession session) {
+		return (AccountVO) session.getAttribute("account");
 	}
 }

@@ -6,31 +6,43 @@ import javax.servlet.http.HttpSession;
 public class RedirectUtil {
 
     public static void saveRedirectUrl(HttpServletRequest request, HttpSession session) {
-        saveRedirectUrl(request, session, "redirectUrl");
-    }
-
-    public static void saveRedirectUrl(HttpServletRequest request, HttpSession session, String attributeName) {
-        if (session.getAttribute(attributeName) != null) return;
-
         String method = request.getMethod();
         if ("GET".equalsIgnoreCase(method)) {
             String uri = request.getRequestURI();
             String query = request.getQueryString();
             String fullUrl = uri + (query != null ? "?" + query : "");
             
-            if (!isLoginPage(uri)) {
-                session.setAttribute(attributeName, fullUrl);
+            if (uri != null && !uri.contains("/account/login")) {
+                session.setAttribute("redirectUrl", fullUrl);
             }
         } else {
             String referer = request.getHeader("Referer");
             
-            if (referer != null && !isLoginPage(referer)) {
-                session.setAttribute(attributeName, referer);
+            if (referer != null && referer.contains("/account/login")) {
+                session.setAttribute("redirectUrl", referer);
             }
         }
     }
     
-    private static boolean isLoginPage(String url) {
-        return url != null && url.contains("/account/login");
+    public static String getFailedRefererUrl(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String referer = request.getHeader("Referer");
+        String fallback = request.getContextPath() + "/";
+
+        session.setAttribute("accessFail", "checkFail");
+
+        // referer가 없으면 fallback
+        return (referer != null) ? referer : fallback;
     }
+    
+    public static boolean isApiRequest(HttpServletRequest request) {
+	    String requestedWith = request.getHeader("X-Requested-With");
+	    String accept = request.getHeader("Accept");
+	    String contentType = request.getContentType();
+
+	    // AJAX 요청 또는 명시적으로 JSON을 요청한 경우
+	    return "XMLHttpRequest".equalsIgnoreCase(requestedWith)
+	        || (accept != null && accept.contains("application/json"))
+	        || (contentType != null && contentType.contains("application/json"));
+	}
 }

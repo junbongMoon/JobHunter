@@ -752,8 +752,7 @@ function renderResumeList(items) {
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            cursor: pointer;">
+            align-items: center;">
             
             <div style="flex: 1;">
               <div><strong>\${item.recruitTitle}</strong></div>

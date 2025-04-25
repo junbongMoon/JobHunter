@@ -328,6 +328,7 @@
   * License: https://bootstrapmade.com/license/
     ======================================================== -->
 		</head>
+
 		<!-- 알럿 모달 -->
 		<div id="publicModalOverlay" class="public-modal-overlay" style="display: none;"></div>
 		<div id="publicModal" class="public-modal-box" style="display: none;">
@@ -477,6 +478,17 @@
 				<!-- Scroll Top -->
 				<a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
 						class="bi bi-arrow-up-short"></i></a>
+
+				<!-- 권한체커 인터셉터 걸렸을때 표시용 -->
+				<c:if test="${not empty sessionScope.accessFail}">
+					<script>
+						if ("${sessionScope.accessFail}" == "checkFail") {
+							window.publicModals.show("접근권한이 없습니다.")
+						}
+					</script>
+					<c:remove var="accessFail" scope="session" />
+				</c:if>
+
 			</header>
 			</body>
 
@@ -487,7 +499,6 @@
 		<div id="accountType" style="display: none;" data-accountType="${sessionScope.account.accountType}"></div>
 
 		<script>
-
 
 			window.publicSessionUid = "${sessionScope.account.uid}";
 			window.publicSessionAccType = "${sessionScope.account.accountType}";

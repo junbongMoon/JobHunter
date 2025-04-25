@@ -2,7 +2,6 @@ package com.jobhunter.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,12 +10,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.jobhunter.customexception.NeedAuthException;
 import com.jobhunter.model.account.AccountVO;
-import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.util.AccountUtil;
 import com.jobhunter.util.RedirectUtil;
 
 @Component
-public class UserRoleInterceptor implements HandlerInterceptor {
+public class MentorAndAdminRoleInterceptor implements HandlerInterceptor {
 
 	@Autowired
 	private AccountUtil accUtils;
@@ -24,17 +22,14 @@ public class UserRoleInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-
 		AccountVO account = AccountUtil.getAccount(request);
 		if (account != null) {
-			
 			// 계정 상태 서버에있는걸로 갱신
 			account = accUtils.refreshAccount(account);
 
-			if (account.getAccountType() == AccountType.USER) {
+			if (account.getIsMentor() == "Y" || account.getIsAdmin() == "Y") {
 				return true;
 			}
-
 		}
 		
 		if (RedirectUtil.isApiRequest(request)) { // 비동기 체크
@@ -42,6 +37,7 @@ public class UserRoleInterceptor implements HandlerInterceptor {
 		} else {
 			response.sendRedirect(RedirectUtil.getFailedRefererUrl(request));
 		}
+		
 		return false;
 	}
 

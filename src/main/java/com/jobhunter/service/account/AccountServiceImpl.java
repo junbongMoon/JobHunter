@@ -175,6 +175,16 @@ public class AccountServiceImpl implements AccountService {
 	}
 	
 	@Override
+	public AccountVO findAccountByAutoKakao(String kakaoId) throws Exception {
+		AccountLoginDAO dao = getDAO(AccountType.USER);
+		AccountVO account = dao.getAccountByAutoKakao(kakaoId);
+		if (account != null) {
+			dao.setLoginTime(account.getUid());
+		}
+		return account;
+	}
+	
+	@Override
 	public Boolean checkDuplicateContact(String target, AccountType type, String targetType) throws Exception {
 		return getDAO(type).findAccountByContact(target, targetType) != null;
 	}

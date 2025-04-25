@@ -58,6 +58,41 @@
 	<beans:bean id="RoleCheckInterceptor"
 		class="com.jobhunter.interceptor.RoleCheckInterceptor">
 	</beans:bean>
+	
+	<!-- 어드민 확인 인터셉터 -->
+	<beans:bean id="AdminRoleInterceptor"
+		class="com.jobhunter.interceptor.AdminRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 기업 확인 인터셉터 -->
+	<beans:bean id="CompanyRoleInterceptor"
+		class="com.jobhunter.interceptor.CompanyRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 기업 or 어드민 확인 인터셉터 -->
+	<beans:bean id="CompanyAndAdminRoleInterceptor"
+		class="com.jobhunter.interceptor.CompanyAndAdminRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 개인 확인 인터셉터 -->
+	<beans:bean id="UserRoleInterceptor"
+		class="com.jobhunter.interceptor.UserRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 개인 or 어드민 확인 인터셉터 -->
+	<beans:bean id="UserAndAdminRoleInterceptor"
+		class="com.jobhunter.interceptor.UserAndAdminRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 멘토 확인 인터셉터 -->
+	<beans:bean id="MentorRoleInterceptor"
+		class="com.jobhunter.interceptor.MentorRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 멘토 or 어드민 확인 인터셉터 -->
+	<beans:bean id="MentorAndAdminRoleInterceptor"
+		class="com.jobhunter.interceptor.MentorAndAdminRoleInterceptor">
+	</beans:bean>
 
 	<!-- 본인확인 인터셉터_쿼리스트링으로 [ ?uid=101&accountType=company ] 처럼 uid랑 accountType 붙여놓고 걸면 동작.
 		accountType은 com.jobhunter.model.customenum.AccountType 참고(대소문자 구분 없음) 
@@ -79,8 +114,6 @@
 			<mapping path="/user/mypage" />
 			<mapping path="/reviewBoard/write"/>
 			<mapping path="/company/companyInfo" />
-			<mapping path="/account/testLoginAjax" />
-			<mapping path="/account/testGetLogin" />
 			<mapping path="/resume/**" />
 			<mapping path="/recruitmentnotice/save"/>
 			<mapping path="/recruitmentnotice/modify"/>
@@ -92,31 +125,29 @@
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
 		
+		<!-- 자동로그인 -->
 		<interceptor>
-			<mapping path="/account/testGetBlocked" />
-			<beans:ref bean="AccountStatInterceptor" />
-		</interceptor>
-		
-		<interceptor>
-			<mapping path="/account/testGetRole" />
-			<beans:ref bean="RoleCheckInterceptor" />
-		</interceptor>
-
-		<interceptor>
-			<mapping path="/user/mypage" />
-			<mapping path="/company/companyInfo" />
-			<mapping path="/account/testGetOwner" />
-			<beans:ref bean="OwnerInterceptor" />
-		</interceptor>
-		
-		<interceptor>
+			<mapping path="/reviewBoard/write" />
 			<mapping path="/account/login" />
 			<beans:ref bean="autoLoginInterceptor" />
 		</interceptor>
 		
+		<!-- 유저 확인 인터셉터 -->
 		<interceptor>
-			<mapping path="/reviewBoard/write" />
-			<beans:ref bean="autoLoginInterceptor" />
+		    <mapping path="/reviewBoard/write" />
+		    <beans:ref bean="UserRoleInterceptor" />
+		</interceptor>
+		
+		<!-- 어드민 확인 인터셉터 -->
+		<interceptor>
+		    <mapping path="/admin/**" />
+		    <beans:ref bean="AdminRoleInterceptor" />
+		</interceptor>
+		
+		<interceptor>
+			<mapping path="/user/mypage" />
+			<mapping path="/company/companyInfo" />
+			<beans:ref bean="OwnerInterceptor" />
 		</interceptor>
 		
 	</interceptors>
