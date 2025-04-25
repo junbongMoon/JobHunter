@@ -88,7 +88,19 @@
         width: 22px;
         height: 22px;
     }
-</style>
+    
+    .submitBtn{
+        margin-top: 20px;
+        padding: 8px 20px;
+        font-size: 16px;
+        border-radius: 8px;
+    }
+
+    .form-actions {
+        text-align: right;
+        margin-top: 20px;
+    }
+    </style>
 </head>
 <body>
 <jsp:include page="../header.jsp"></jsp:include>
@@ -132,7 +144,7 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary">저장하기</button>
+            <button type="submit" class="btn btn-primary submitBtn">저장하기</button>
         </div>
     </form>
 </div>
