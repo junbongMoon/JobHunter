@@ -3,6 +3,9 @@ package com.jobhunter.service.advancement;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jobhunter.dao.advancement.AdvancementDAO;
 import com.jobhunter.model.advancement.AdvancementDTO;
@@ -14,7 +17,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdvancementServiceImpl implements AdvancementService {
 	private final AdvancementDAO advancementDAO;
-
+	
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public boolean SaveAdvancementByMento(AdvancementDTO advancementDTO, List<AdvancementUpFileVODTO> fileList)
 			throws Exception {
