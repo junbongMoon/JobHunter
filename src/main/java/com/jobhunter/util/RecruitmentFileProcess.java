@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jobhunter.model.advancement.AdvancementUpFileVODTO;
 import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 
 @Component
@@ -293,5 +294,24 @@ public class RecruitmentFileProcess {
 		String month = year + File.separator + new DecimalFormat("00").format(cal.get(Calendar.MONTH) + 1);
 		String date = month + File.separator + new DecimalFormat("00").format(cal.get(Calendar.DATE));
 		return new String[] { year, month, date };
+	}
+	
+	public AdvancementUpFileVODTO saveFileToRealPathForAdvancement(
+	        MultipartFile file,
+	        HttpServletRequest request,
+	        String saveFileDir) throws IOException {
+
+	    // 기본 구조는 기존과 같고, 마지막에 DTO만 변경
+	    RecruitmentnoticeBoardUpfiles origin = this.saveFileToRealPath(file, request, saveFileDir);
+
+	    return AdvancementUpFileVODTO.builder()
+	        .originalFileName(origin.getOriginalFileName())
+	        .newFileName(origin.getNewFileName())
+	        .thumbFileName(origin.getThumbFileName())
+	        .fileType(origin.getFileType())
+	        .ext(origin.getExt())
+	        .size(origin.getSize())
+	        .base64Image(origin.getBase64Image())
+	        .build();
 	}
 }
