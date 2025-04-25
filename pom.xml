@@ -201,9 +201,15 @@
 
 		<!-- https://mvnrepository.com/artifact/javax.mail/mail 메일 송신 라이브러리 -->
 		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+
+		<dependency>
 			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4.7</version>
+			<artifactId>javax.mail-api</artifactId>
+			<version>1.6.2</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-aop 
@@ -241,14 +247,14 @@
 			<artifactId>junit</artifactId>
 			<version>4.7</version>
 			<scope>test</scope>
-		</dependency>		
-		
-		<!-- https://mvnrepository.com/artifact/com.google.guava/guava 
-		최대갯수와 유효기간이 있는 캐시 맵 들어간 라이브러리-->
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava 최대갯수와 유효기간이 
+			있는 캐시 맵 들어간 라이브러리 -->
 		<dependency>
-		    <groupId>com.google.guava</groupId>
-		    <artifactId>guava</artifactId>
-		    <version>33.4.8-jre</version>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>33.4.8-jre</version>
 		</dependency>
 
 
