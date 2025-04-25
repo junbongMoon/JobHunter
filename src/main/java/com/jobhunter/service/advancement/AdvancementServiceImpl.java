@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jobhunter.dao.advancement.AdvancementDAO;
 import com.jobhunter.model.advancement.AdvancementDTO;
 import com.jobhunter.model.advancement.AdvancementUpFileVODTO;
+import com.jobhunter.model.advancement.AdvancementVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +39,15 @@ public class AdvancementServiceImpl implements AdvancementService {
 		}
 		
 		return result;
+	}
+
+	@Override
+	public AdvancementVO getAdvancementById(int advancementNo) throws Exception {
+		AdvancementVO advancementVO = advancementDAO.selectAdvancementByAdvancementNo(advancementNo);
+		if(advancementVO.getAdvancementNo() > 0) {
+			List<AdvancementUpFileVODTO> fileList = advancementDAO.getfileListByAdvancement(advancementVO.getAdvancementNo());
+		}
+		return null;
 	}
 	
 	

@@ -1,10 +1,13 @@
 package com.jobhunter.dao.advancement;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.advancement.AdvancementDTO;
 import com.jobhunter.model.advancement.AdvancementUpFileVODTO;
+import com.jobhunter.model.advancement.AdvancementVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +40,20 @@ public class AdvancementDAOImpl implements AdvancementDAO {
 	@Override
 	public int insertAdvancementFileUpload(AdvancementUpFileVODTO file) throws Exception {
 		return ses.insert(NS + ".insertAdvancementFile", file);
+	}
+
+
+	@Override
+	public AdvancementVO selectAdvancementByAdvancementNo(int advancementNo) throws Exception {
+		
+		return ses.selectOne(NS + ".getAdvancementByAdvancementNo", advancementNo);
+	}
+
+
+	@Override
+	public List<AdvancementUpFileVODTO> getfileListByAdvancement(int advancementNo) throws Exception {
+		
+		return ses.selectList(NS + ".getAdvanceFileListByadvancementNo", advancementNo);
 	}
 	
 	

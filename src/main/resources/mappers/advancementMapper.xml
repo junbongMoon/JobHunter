@@ -18,12 +18,39 @@
 	<insert id="insertAdvancementFile"
 		parameterType="com.jobhunter.model.advancement.AdvancementUpFileVODTO">
 		INSERT INTO advancementUpfiles
-		(originalFileName, newFileName, thumbFileName, fileType, ext, size, base64Image,
+		(originalFileName,
+		newFileName, thumbFileName, fileType, ext, size, base64Image,
 		refAdvancementNo, status)
 		VALUES
-		(#{originalFileName}, #{newFileName}, #{thumbFileName},
-		#{fileType}, #{ext}, #{size}, #{base64Image}, #{refAdvancementNo}, 'NEW')
+		(#{originalFileName}, #{newFileName},
+		#{thumbFileName},
+		#{fileType}, #{ext}, #{size}, #{base64Image},
+		#{refAdvancementNo}, 'NEW')
 	</insert>
+
+	<select id="getAdvancementByAdvancementNo">
+		select a.* from advancement a
+		where a.advancementNo =
+		#{advancementNo}
+	</select>
+
+	<select id="getAdvanceFileListByadvancementNo"
+		parameterType="int"
+		resultType="com.jobhunter.model.advancement.AdvancementUpFileVODTO">
+		SELECT
+		upfileNo,
+		originalFileName,
+		newFileName,
+		thumbFileName,
+		fileType,
+		ext,
+		size,
+		base64Image,
+		refAdvancementNo,
+		status
+		FROM advancementUpfiles
+		WHERE refAdvancementNo = #{advancementNo}
+	</select>
 
 
 </mapper>
