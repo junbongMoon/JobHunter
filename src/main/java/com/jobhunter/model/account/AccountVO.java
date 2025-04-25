@@ -37,6 +37,7 @@ public class AccountVO {
     private Integer loginCnt; // 로그인 실패 횟수
     private String isSocial; // 소셜 로그인 여부 ("Y": 소셜 로그인 사용자, "N": 일반 사용자)
     private String isAdmin; //  관리자 권한 ("Y": 관리자, "N": 일반 사용자)
+    private String isMentor; //  멘토 권한 ("Y": 멘토, "N": 일반 사용자)
     private String profileImg; // 프로필사진
     
     public void setProfileImg(String profileImg) {

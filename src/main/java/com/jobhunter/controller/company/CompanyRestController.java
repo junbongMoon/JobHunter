@@ -1,6 +1,5 @@
 package com.jobhunter.controller.company;
 
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -181,8 +180,9 @@ public class CompanyRestController {
 	@PatchMapping(value = "/password", consumes = "application/json")
 	public ResponseEntity<Void> changePassword(@RequestBody PasswordDTO dto, HttpSession session) {
 		try {
+			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
 			
-			if (!accUtil.checkUid(session, Integer.parseInt(dto.getUid()))) {
+			if (!accUtil.checkUid(sessionAccount, Integer.parseInt(dto.getUid()))) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 
@@ -215,8 +215,10 @@ public class CompanyRestController {
 	@PatchMapping(value = "/contact", consumes = "application/json")
 	public ResponseEntity<String> changeContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
 		try {
+
+			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
 			
-			if (!accUtil.checkUid(session, Integer.parseInt(dto.getUid()))) {
+			if (!accUtil.checkUid(sessionAccount, Integer.parseInt(dto.getUid()))) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 
@@ -322,7 +324,9 @@ public class CompanyRestController {
 	public ResponseEntity<ResponseJsonMsg> deleteAccount(@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
 
-			if (!accUtil.checkUid(session, uid)) {
+			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
+
+			if (!accUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 
@@ -341,7 +345,9 @@ public class CompanyRestController {
 	public ResponseEntity<Void> deleteCancelAccount(@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
 
-			if (!accUtil.checkUid(session, uid)) {
+			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
+
+			if (!accUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 

@@ -30,8 +30,7 @@ public class AccountController {
 	private final AccountService accountService;
 
 	@GetMapping("/unlock")
-	public void unlock() {
-	}
+	public void unlock() {}
 
 	// 인터셉터 없이 로그인버튼 눌러서 들어오는곳
 	@GetMapping("/login/return")
@@ -154,36 +153,6 @@ public class AccountController {
 	@GetMapping("/find/password")
 	public String findPassword() {
 		return "account/searchPassword";
-	}
-
-	@GetMapping("/doc")
-	public String testPage() {
-		return "account/doc";
-	}
-
-	@GetMapping("/testLoginAjax")
-	public String testLoginPage() {
-		return "account/test";
-	}
-
-	@GetMapping("/testGetLogin")
-	public String testGetLoginPage() {
-		return "account/test";
-	}
-
-	@GetMapping("/testGetOwner")
-	public String testGetOwnerPage() {
-		return "account/test";
-	}
-
-	@GetMapping("/testGetRole")
-	public String testGetRolePage() {
-		return "account/test";
-	}
-
-	@GetMapping("/testGetBlocked")
-	public String testGetBlockedPage() {
-		return "account/test";
 	}
 
 }

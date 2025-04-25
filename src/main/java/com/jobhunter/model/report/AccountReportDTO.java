@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class AccountReportDTO {
 	private ReportType reportType;
+	private Integer reportTargetPK;
 	private Integer targetAccountUid;
 	private AccountType targetAccountType;
 	private Integer reporterAccountUid;
@@ -29,11 +30,8 @@ public class AccountReportDTO {
 		}
 	}
 	
-	public void setReportTargetURL() {
-		if (this.targetAccountType == AccountType.USER) {			
-			this.reportTargetURL = "/admin/userDetail/" + Integer.toString(targetAccountUid);
-		} else if (this.targetAccountType == AccountType.COMPANY) {
-			this.reportTargetURL = "/admin/companyDetail/" + Integer.toString(targetAccountUid);
-		}
-    }
+	public void setReportTargetPK() {
+		this.reportTargetPK = this.targetAccountUid;
+	}
+	
 }

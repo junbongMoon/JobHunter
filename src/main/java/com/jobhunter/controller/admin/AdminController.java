@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -28,10 +27,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.admin.Pagination;
 import com.jobhunter.model.company.CompanyVO;
+import com.jobhunter.model.report.ReportMessageVO;
 import com.jobhunter.model.status.StatusVODTO;
 import com.jobhunter.model.status.TotalStatusVODTO;
 import com.jobhunter.model.user.UserVO;
-import com.jobhunter.model.report.ReportMessageVO;
 import com.jobhunter.service.admin.AdminService;
 import com.jobhunter.service.status.StatusService;
 

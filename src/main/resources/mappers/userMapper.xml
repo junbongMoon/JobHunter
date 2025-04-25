@@ -32,6 +32,13 @@
 		where userId = #{id} and
 		password = sha1(md5(#{password}))
 	</select>
+	
+	<select id="findByKakaoId" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where socialId = #{kakaoId}
+	</select>
 
 	<update id="setLastLoginDate">
 		UPDATE users

@@ -205,6 +205,14 @@
         <div id="reviewSection"></div>
       </section>
 
+      <!-- 첨삭답변 -->
+      <section data-aos="fade-up" data-aos-delay="400">
+        <div class="section-title">
+          <h2><i class="bi bi-heart section-icon"></i>답변받은 이력서 첨삭</h2>
+        </div>
+        <div id="resumeAdviceSection"></div>
+      </section>
+
       <!-- 멘토등록글 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
@@ -213,7 +221,7 @@
         <div id="prboardSection"></div>
       </section>
 
-      <!-- 리뷰 영역 -->
+      <!-- 첨삭신청 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
           <h2><i class="bi bi-heart section-icon"></i>첨삭 요청</h2>
@@ -233,14 +241,6 @@
           </div>
         </div>
         <div id="registrationAdviceSection"></div>
-      </section>
-
-      <!-- 리뷰 영역 -->
-      <section data-aos="fade-up" data-aos-delay="400">
-        <div class="section-title">
-          <h2><i class="bi bi-heart section-icon"></i>답변받은 이력서 첨삭</h2>
-        </div>
-        <div id="resumeAdviceSection"></div>
       </section>
     </div>
   </div>
@@ -359,10 +359,10 @@ function renderResumeAdvice(res) {
             justify-content: space-between;
             align-items: center;
             cursor: pointer;"
-            onclick="viewResumeAdvice(\${item.resumeNo}, \${item.mentiUid})">
+            onclick="viewResumeAdvice(\${item.resumeNo}, \${item.menteeUid})">
             
             <div style="flex: 1;">
-              <div><strong>\${item.title}\${item.mentiUid}</strong></div>
+              <div><strong>\${item.title}\${item.menteeUid}</strong></div>
               <div style="font-size: 13px; color: #666;">
                 <div>\${item.mentorName}</div>
                 \${formatDate(item.regDate)}작성
@@ -379,8 +379,8 @@ function renderResumeAdvice(res) {
 
     renderPagination(res, "goToResumeAdvice", container)
 }
-function viewResumeAdvice(resumeNo, mentiUid) {
-  location.href=`/resume/checkAdvice/\${resumeNo}?uid=\${mentiUid}`
+function viewResumeAdvice(resumeNo, menteeUid) {
+  location.href=`/resume/checkAdvice/\${resumeNo}?uid=\${menteeUid}`
 }
 
 function goToResumeAdvice(pageNum) {
@@ -482,14 +482,14 @@ function renderRegistrationAdvice(res) {
 	  items.forEach(item => {
 
       const confirmBtn = `
-        <button class='btn-edit' onclick="acceptAdviceModal(\${item.resumeNo}, \${item.mentiUid})">승인</button>
-        <button class='btn-edit' onclick="rejectAdviceModal(\${item.resumeNo}, \${item.mentiUid})" style='background:var(--bs-gray-300); color:var(--default-color)'>거절</button>`;
+        <button class='btn-edit' onclick="acceptAdviceModal(\${item.resumeNo}, \${item.menteeUid})">승인</button>
+        <button class='btn-edit' onclick="rejectAdviceModal(\${item.resumeNo}, \${item.menteeUid})" style='background:var(--bs-gray-300); color:var(--default-color)'>거절</button>`;
 
       const status = {
         COMPLETE: "<span style='color:var(--bs-teal);'>첨삭완료</span>",
         CANCEL: "<span style='color:var(--bs-red)'>취소</span>",
         WAITING: confirmBtn,
-        CHECKING: `<button class='btn-edit' onclick="location.href='/resume/checkAdvice/\${item.resumeNo}?uid=\${item.mentiUid}'">조회 및 수정</button>`,
+        CHECKING: `<button class='btn-edit' onclick="location.href='/resume/checkAdvice/\${item.resumeNo}?uid=\${item.menteeUid}'">조회 및 수정</button>`,
       }
 
       const statusText = status[item.status];
@@ -511,7 +511,7 @@ function renderRegistrationAdvice(res) {
             
               <div style="flex: 1;">
                 <div>
-                <div><strong>\${item.title}\${item.mentiUid}</strong></div>
+                <div><strong>\${item.title}\${item.menteeUid}</strong></div>
                 <div style="font-size: 13px; color: #666;">
                   \${formatDate(item.regDate)} 신청
                 </div></div>
@@ -752,8 +752,7 @@ function renderResumeList(items) {
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            cursor: pointer;">
+            align-items: center;">
             
             <div style="flex: 1;">
               <div><strong>\${item.recruitTitle}</strong></div>
@@ -2333,13 +2332,13 @@ function changeName() {
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
-function acceptAdviceModal(resumeNo, mentiUid) {
+function acceptAdviceModal(resumeNo, menteeUid) {
   window.publicModals.show("첨삭을 승인하시겠습니까?", {cancelText:"취소", onConfirm:()=>{
     $.ajax({
       url: `/resume/acceptAdvice/\${resumeNo}`,
       type: "GET",
       success: function (response) {
-        location.href=`/resume/checkAdvice/\${resumeNo}?uid=\${mentiUid}`
+        location.href=`/resume/checkAdvice/\${resumeNo}?uid=\${menteeUid}`
       },
       error: function () {
         window.publicModals.show("첨삭 승인 처리 중 오류가 발생했습니다.");

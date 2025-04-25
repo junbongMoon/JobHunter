@@ -12,11 +12,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.user.KakaoUserInfoDTO;
 import com.jobhunter.model.user.UserRegisterDTO;
 import com.jobhunter.service.user.UserService;
@@ -31,9 +33,13 @@ public class UserController {
 	private final UserService service;
 	private final AccountUtil accountUtil;
 
-	@GetMapping("/mypage")
-	public void showMypage() {
-		
+	@GetMapping("/mypage/{uid}")
+	public String showMypage(@PathVariable("uid") int uid, HttpServletRequest request) {
+		AccountVO acc = AccountUtil.getAccount(request);
+		if (acc.getAccountType() == AccountType.USER && uid == acc.getUid()) {
+			System.out.println("본인 정보 페이지");
+		}
+		return "/user/mypage";
 	}
 	
 	@GetMapping("/kakao")

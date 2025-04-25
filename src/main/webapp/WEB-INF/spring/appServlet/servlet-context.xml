@@ -40,6 +40,15 @@
 	<context:component-scan base-package="com.jobhunter.interceptor"></context:component-scan>
 	
 
+	
+	<!-- 계정타입(개인/기업) 검사하는 인터셉터(get요청용_rest방식등은 AccountRestController 참조) 
+		_쿼리스트링으로 [ ?accountType=company ] 처럼 accountType 붙여놓고 걸면 동작
+		[ &allowAdmin=true ] 추가로 붙이면 해당역할 아니라도 어드민도 볼수있는 페이지됩니다. -->
+		
+	<!-- !!개별 인터셉터로 분리에 따라 사용 자제!! -->
+	<beans:bean id="RoleCheckInterceptor"
+		class="com.jobhunter.interceptor.RoleCheckInterceptor">
+	</beans:bean>
 
 	<!-- 로그인 했는지 안했는지 검사하는 인터셉터 -->
 	<beans:bean id="authLoginInterceptor"
@@ -52,11 +61,39 @@
 		class="com.jobhunter.interceptor.AccountStatInterceptor">
 	</beans:bean>
 	
-	<!-- 계정타입(개인/기업) 검사하는 인터셉터(get요청용_rest방식등은 AccountRestController 참조) 
-		_쿼리스트링으로 [ ?accountType=company ] 처럼 accountType 붙여놓고 걸면 동작
-		[ &allowAdmin=true ] 추가로 붙이면 해당역할 아니라도 어드민도 볼수있는 페이지됩니다. -->
-	<beans:bean id="RoleCheckInterceptor"
-		class="com.jobhunter.interceptor.RoleCheckInterceptor">
+	<!-- 어드민 확인 인터셉터 -->
+	<beans:bean id="AdminRoleInterceptor"
+		class="com.jobhunter.interceptor.AdminRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 기업 확인 인터셉터 -->
+	<beans:bean id="CompanyRoleInterceptor"
+		class="com.jobhunter.interceptor.CompanyRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 기업 or 어드민 확인 인터셉터 -->
+	<beans:bean id="CompanyAndAdminRoleInterceptor"
+		class="com.jobhunter.interceptor.CompanyAndAdminRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 개인 확인 인터셉터 -->
+	<beans:bean id="UserRoleInterceptor"
+		class="com.jobhunter.interceptor.UserRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 개인 or 어드민 확인 인터셉터 -->
+	<beans:bean id="UserAndAdminRoleInterceptor"
+		class="com.jobhunter.interceptor.UserAndAdminRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 멘토 확인 인터셉터 -->
+	<beans:bean id="MentorRoleInterceptor"
+		class="com.jobhunter.interceptor.MentorRoleInterceptor">
+	</beans:bean>
+	
+	<!-- 멘토 or 어드민 확인 인터셉터 -->
+	<beans:bean id="MentorAndAdminRoleInterceptor"
+		class="com.jobhunter.interceptor.MentorAndAdminRoleInterceptor">
 	</beans:bean>
 
 	<!-- 본인확인 인터셉터_쿼리스트링으로 [ ?uid=101&accountType=company ] 처럼 uid랑 accountType 붙여놓고 걸면 동작.
@@ -79,8 +116,6 @@
 			<mapping path="/user/mypage" />
 			<mapping path="/reviewBoard/write"/>
 			<mapping path="/company/companyInfo" />
-			<mapping path="/account/testLoginAjax" />
-			<mapping path="/account/testGetLogin" />
 			<mapping path="/resume/**" />
 			<mapping path="/recruitmentnotice/save"/>
 			<mapping path="/recruitmentnotice/modify"/>
@@ -92,31 +127,29 @@
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
 		
+		<!-- 자동로그인 -->
 		<interceptor>
-			<mapping path="/account/testGetBlocked" />
-			<beans:ref bean="AccountStatInterceptor" />
-		</interceptor>
-		
-		<interceptor>
-			<mapping path="/account/testGetRole" />
-			<beans:ref bean="RoleCheckInterceptor" />
-		</interceptor>
-
-		<interceptor>
-			<mapping path="/user/mypage" />
-			<mapping path="/company/companyInfo" />
-			<mapping path="/account/testGetOwner" />
-			<beans:ref bean="OwnerInterceptor" />
-		</interceptor>
-		
-		<interceptor>
+			<mapping path="/reviewBoard/write" />
 			<mapping path="/account/login" />
 			<beans:ref bean="autoLoginInterceptor" />
 		</interceptor>
 		
+		<!-- 유저 확인 인터셉터 -->
 		<interceptor>
-			<mapping path="/reviewBoard/write" />
-			<beans:ref bean="autoLoginInterceptor" />
+		    <mapping path="/reviewBoard/write" />
+		    <beans:ref bean="UserRoleInterceptor" />
+		</interceptor>
+		
+		<!-- 어드민 확인 인터셉터 -->
+		<interceptor>
+		    <mapping path="/admin/**" />
+		    <beans:ref bean="AdminRoleInterceptor" />
+		</interceptor>
+		
+		<interceptor>
+			<mapping path="/user/mypage" />
+			<mapping path="/company/companyInfo" />
+			<beans:ref bean="OwnerInterceptor" />
 		</interceptor>
 		
 	</interceptors>

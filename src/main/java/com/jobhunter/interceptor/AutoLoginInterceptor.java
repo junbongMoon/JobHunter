@@ -18,55 +18,66 @@ import com.jobhunter.service.account.AccountService;
 public class AutoLoginInterceptor implements HandlerInterceptor {
 
 	@Autowired
-    private AccountService accountService;
-	
+	private AccountService accountService;
+
 	@Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
-        HttpSession session = request.getSession();
-        
-        if (session != null && session.getAttribute("account") != null) {
-            return true; // 이미 로그인 되어 있음
-        }
-        
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                String name = cookie.getName();
-                
-                try {
-                	if ("userAutoLogin".equals(name) || "companyAutoLogin".equals(name)) {
-                		String sessionId = cookie.getValue();
-                		AccountType type = ("userAutoLogin".equals(name))?AccountType.USER:AccountType.COMPANY;
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+		HttpSession session = request.getSession();
 
-                        AccountVO account = accountService.findAccountByAutoLogin(sessionId, type);
-                        if (session != null && account != null) {
-                        	session.setAttribute("account", account);
-                            return true;
-                        }
-                    
-                	}
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+		if (session != null && session.getAttribute("account") != null) {
+			return true; // 이미 로그인 되어 있음
+		}
 
-        return true; // 자동 로그인 쿠키 없음
-        
-    }
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				String name = cookie.getName();
+
+				try {
+					if ("kakaoAutoLogin".equals(name)) {
+						String kakaoId = cookie.getValue();
+
+						AccountVO account = accountService.findAccountByAutoKakao(kakaoId);
+						if (session != null && account != null) {
+							session.setAttribute("account", account);
+							return true;
+						}
+
+					}
+					
+					if ("userAutoLogin".equals(name) || "companyAutoLogin".equals(name)) {
+						String sessionId = cookie.getValue();
+						AccountType type = ("userAutoLogin".equals(name)) ? AccountType.USER : AccountType.COMPANY;
+
+						AccountVO account = accountService.findAccountByAutoLogin(sessionId, type);
+						if (session != null && account != null) {
+							session.setAttribute("account", account);
+							return true;
+						}
+
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return true; // 자동 로그인 쿠키 없음
+
+	}
 
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

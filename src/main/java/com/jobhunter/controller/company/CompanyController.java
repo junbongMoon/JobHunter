@@ -6,12 +6,15 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.service.company.CompanyService;
+import com.jobhunter.util.AccountUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,9 +32,13 @@ import lombok.RequiredArgsConstructor;
 public class CompanyController {
 	private final CompanyService service;
 	
-	@GetMapping("/companyInfo")
-	public void showCompanyInfo() {
-		
+	@GetMapping("/companyInfo/{uid}")
+	public String showCompanyInfo(@PathVariable("uid") int uid, HttpServletRequest request) {
+		AccountVO acc = AccountUtil.getAccount(request);
+		if (acc.getAccountType() == AccountType.COMPANY && uid == acc.getUid()) {
+			System.out.println("본인 정보 페이지");
+		}
+		return "/company/companyInfo";
 	}
 	
 	@GetMapping("/register")
