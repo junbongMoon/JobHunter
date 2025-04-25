@@ -5,7 +5,7 @@
 <mapper namespace="com.jobhunter.mapper.advancementmapper">
 
 	<insert id="saveAdvancement"
-		parameterType="com.jobhunter.dto.AdvancementDTO"
+		parameterType="com.jobhunter.model.advancement.AdvancementDTO"
 		useGeneratedKeys="true" keyProperty="advancementNo"
 		keyColumn="advancementNo">
 		insert into advancement
