@@ -4,6 +4,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.advancement.AdvancementDTO;
+import com.jobhunter.model.advancement.AdvancementUpFileVODTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +31,12 @@ public class AdvancementDAOImpl implements AdvancementDAO {
 	public int insertAdvancementByMento(AdvancementDTO advancementDTO) throws Exception {
 		
 		return ses.insert(NS + ".saveAdvancement", advancementDTO);
+	}
+
+
+	@Override
+	public int insertAdvancementFileUpload(AdvancementUpFileVODTO file) throws Exception {
+		return ses.insert(NS + ".insertAdvancementFile", file);
 	}
 	
 	

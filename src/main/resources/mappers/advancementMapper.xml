@@ -4,12 +4,25 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.advancementmapper">
 
-	<insert id="saveAdvancement" parameterType="com.jobhunter.dto.AdvancementDTO" useGeneratedKeys="true" 
-	keyProperty="advancementNo" keyColumn="advancementNo">
-	insert into advancement
-	(title, writer, refUser, content)
-	values
-	(#{title}, #{writer}, #{refUser}, #{content})
+	<insert id="saveAdvancement"
+		parameterType="com.jobhunter.dto.AdvancementDTO"
+		useGeneratedKeys="true" keyProperty="advancementNo"
+		keyColumn="advancementNo">
+		insert into advancement
+		(title, writer, refUser, content)
+		values
+		(#{title}, #{writer}, #{refUser}, #{content})
+	</insert>
+
+	<!-- 첨부파일 등록 -->
+	<insert id="insertAdvancementFile"
+		parameterType="com.jobhunter.model.advancement.AdvancementUpFileVODTO">
+		INSERT INTO advancementUpfiles
+		(originalFileName, newFileName, thumbFileName, fileType, ext, size, base64Image,
+		refAdvancementNo, status)
+		VALUES
+		(#{originalFileName}, #{newFileName}, #{thumbFileName},
+		#{fileType}, #{ext}, #{size}, #{base64Image}, #{refAdvancementNo}, 'NEW')
 	</insert>
 
 
