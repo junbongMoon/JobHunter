@@ -395,7 +395,7 @@
 									</c:when>
 									<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 										<a class="nav-link dropdown-toggle"
-											href="/company/companyInfo?uid=${sessionScope.account.uid}&accountType=company"
+											href="/company/companyInfo/${sessionScope.account.uid}"
 											id="mypageDropdown" role="button">
 											My Page
 										</a>
@@ -404,7 +404,7 @@
 									</c:when>
 									<c:otherwise>
 										<a class="nav-link dropdown-toggle"
-											href="/user/mypage?uid=${sessionScope.account.uid}&accountType=user"
+											href="/user/mypage/${sessionScope.account.uid}"
 											id="mypageDropdown" role="button">
 											My Page
 										</a>

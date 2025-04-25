@@ -40,6 +40,15 @@
 	<context:component-scan base-package="com.jobhunter.interceptor"></context:component-scan>
 	
 
+	
+	<!-- 계정타입(개인/기업) 검사하는 인터셉터(get요청용_rest방식등은 AccountRestController 참조) 
+		_쿼리스트링으로 [ ?accountType=company ] 처럼 accountType 붙여놓고 걸면 동작
+		[ &allowAdmin=true ] 추가로 붙이면 해당역할 아니라도 어드민도 볼수있는 페이지됩니다. -->
+		
+	<!-- !!개별 인터셉터로 분리에 따라 사용 자제!! -->
+	<beans:bean id="RoleCheckInterceptor"
+		class="com.jobhunter.interceptor.RoleCheckInterceptor">
+	</beans:bean>
 
 	<!-- 로그인 했는지 안했는지 검사하는 인터셉터 -->
 	<beans:bean id="authLoginInterceptor"
@@ -50,13 +59,6 @@
 		] 혹은 [ ?checkStatType=DELETE ] 붙이면 그것만 검사 가능 둘다쓸거면 그냥 인터셉터 걸기만 하면 됩니다. -->
 	<beans:bean id="AccountStatInterceptor"
 		class="com.jobhunter.interceptor.AccountStatInterceptor">
-	</beans:bean>
-	
-	<!-- 계정타입(개인/기업) 검사하는 인터셉터(get요청용_rest방식등은 AccountRestController 참조) 
-		_쿼리스트링으로 [ ?accountType=company ] 처럼 accountType 붙여놓고 걸면 동작
-		[ &allowAdmin=true ] 추가로 붙이면 해당역할 아니라도 어드민도 볼수있는 페이지됩니다. -->
-	<beans:bean id="RoleCheckInterceptor"
-		class="com.jobhunter.interceptor.RoleCheckInterceptor">
 	</beans:bean>
 	
 	<!-- 어드민 확인 인터셉터 -->
