@@ -391,7 +391,7 @@ function goToResumeAdvice(pageNum) {
 let resumeAdvicePage = 1
 function getMyResumeAdvice() {
   $.ajax({
-    url: `/resume/myResumeAdvice/\${uid}/\${resumeAdvicePage}`,
+    url: `/resume/myResumeAdvice/\${resumeAdvicePage}`,
     method: 'POST',
     contentType: 'application/json',
     success: function(res) {
@@ -567,10 +567,8 @@ function getMyRegistrationAdvice() {
     method: 'POST',
     contentType: 'application/json',
     data: JSON.stringify({
-      uid: uid,
       page: registrationAdviceData.page,
-      status: registrationAdviceData.status,
-      type: type
+      status: registrationAdviceData.status
     }),
     success: function(res) {
       console.log(res);
@@ -1054,7 +1052,12 @@ function getInfo() {
         updateUserDetailInfo(result);
         updateUserModifyInfo(result);
       },
-      error: (xhr) => window.publicModals.show("정보 로딩에 실패하였습니다. 잠시후 새로고침해 주세요.")
+      error: (xhr) => {
+        console.log('xhr.code: ', xhr)
+        window.publicModals.show(
+          "정보 로딩에 실패하였습니다. 잠시후 새로고침해 주세요."
+        )
+      }
   });
 }
 

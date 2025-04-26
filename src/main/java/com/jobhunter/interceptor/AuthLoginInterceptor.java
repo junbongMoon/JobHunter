@@ -35,8 +35,11 @@ public class AuthLoginInterceptor implements HandlerInterceptor {
 		RedirectUtil.saveRedirectUrl(request, session);
 
 		if (RedirectUtil.isApiRequest(request)) { // 비동기면 에러코드 보내서 뷰단에서 알아서 로그인페이지로 보내도록 유도
+			System.out.println("혹시 여기 왔냐?");
 			NeedAuthException.writeToAuthResponse(response);
+			response.flushBuffer();
 		} else {
+			System.out.println("아님 여기?");
 			response.sendRedirect(request.getContextPath() + "/account/login");
 		}
 

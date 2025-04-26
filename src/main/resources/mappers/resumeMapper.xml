@@ -386,6 +386,9 @@
 	    <when test="type == 'mentee'">
 	      WHERE mentee.uid = #{uid}
 	    </when>
+	    <otherwise>
+	      1 = 0
+	    </otherwise>
 	  </choose>
 	  <choose>
 	    <when test="status == 'LIVE'">
@@ -400,8 +403,21 @@
 	</select>
 	
 	<select id="countRegistrationAdviceByMentor" resultType="int">
-	  SELECT COUNT(rgAdviceNo) FROM registration_advice
-	  WHERE mentorUid = #{uid}
+	  SELECT COUNT(rgAdviceNo)
+	  FROM registration_advice ra
+	  JOIN resume r ON ra.resumeNo = r.resumeNo
+	  JOIN users mentee ON r.userUid = mentee.uid
+	  <choose>
+	    <when test="type == 'mentor'">
+	      WHERE mentorUid = #{uid}
+	    </when>
+	    <when test="type == 'mentee'">
+	      WHERE mentee.uid = #{uid}
+	    </when>
+	    <otherwise>
+	      1 = 0
+	    </otherwise>
+	  </choose>
 	  <choose>
 	    <when test="status == 'LIVE'">
 	      AND status IN ('WAITING', 'CHECKING')

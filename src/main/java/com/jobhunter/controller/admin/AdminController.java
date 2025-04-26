@@ -27,11 +27,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.admin.Pagination;
 import com.jobhunter.model.company.CompanyVO;
+import com.jobhunter.model.mentor.MentorRequestVO;
 import com.jobhunter.model.report.ReportMessageVO;
 import com.jobhunter.model.status.StatusVODTO;
 import com.jobhunter.model.status.TotalStatusVODTO;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.service.admin.AdminService;
+import com.jobhunter.service.mentor.MentorService;
 import com.jobhunter.service.status.StatusService;
 
 import lombok.RequiredArgsConstructor;
@@ -49,6 +51,7 @@ public class AdminController {
 
 	private final StatusService statusService;
 	private final AdminService adminService;
+	private final MentorService mentorService;
 	
 	/**
 	 * 관리자 홈 페이지를 반환합니다.
@@ -492,6 +495,28 @@ public class AdminController {
 	public String showUserCompanyChartDetail(Model model) {
 		
 		return "admin/adminChartDetail";
+	}
+	
+	@GetMapping("/admin/mentorRequestList")
+	public String adminMentorRequestList() {
+		try {
+			System.out.println("아");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "admin/adminMentorRequestList";
+	}
+	
+	@GetMapping("/admin/mentorRequest/{requestNo}")
+	public String adminMentorRequest(@PathVariable("requestNo") int requestNo, Model model) {
+		
+		try {
+			MentorRequestVO vo = mentorService.selectMentorRequestDetail(requestNo);
+			model.addAttribute("item", vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "admin/adminMentorRequestDetail";
 	}
 	
 }

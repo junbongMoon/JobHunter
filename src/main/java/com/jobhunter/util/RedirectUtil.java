@@ -7,6 +7,7 @@ public class RedirectUtil {
 
     public static void saveRedirectUrl(HttpServletRequest request, HttpSession session) {
         String method = request.getMethod();
+        System.out.println(method);
         if ("GET".equalsIgnoreCase(method)) {
             String uri = request.getRequestURI();
             String query = request.getQueryString();

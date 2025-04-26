@@ -29,7 +29,7 @@ public class PointServiceImpl implements PointService {
             }
 
             // 포인트 로그 저장
-            pointDAO.submitAdvicePointLog(mentorUid, sessionUid, point, rgAdviceNo);
+//            pointDAO.submitAdvicePointLog(mentorUid, sessionUid, point, rgAdviceNo);
         } catch (Exception e) {
             throw new Exception("포인트 처리 중 오류가 발생했습니다: " + e.getMessage());
         }

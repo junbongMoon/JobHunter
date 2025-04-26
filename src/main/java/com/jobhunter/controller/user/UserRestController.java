@@ -145,7 +145,7 @@ public class UserRestController {
 
 			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
 
-			if (!accUtil.checkUid(sessionAccount, uid)) {
+			if (!AccountUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 
@@ -166,7 +166,7 @@ public class UserRestController {
 
 			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
 
-			if (!accUtil.checkUid(sessionAccount, uid)) {
+			if (!AccountUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 

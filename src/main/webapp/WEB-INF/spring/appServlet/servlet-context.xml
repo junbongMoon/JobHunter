@@ -113,9 +113,9 @@
 
 		<interceptor>
 			<mapping path="/reviewBoard/modify"/>
-			<mapping path="/user/mypage" />
+			<mapping path="/user/mypage/**" />
 			<mapping path="/reviewBoard/write"/>
-			<mapping path="/company/companyInfo" />
+			<mapping path="/company/companyInfo/**" />
 			<mapping path="/resume/**" />
 			<mapping path="/recruitmentnotice/save"/>
 			<mapping path="/recruitmentnotice/modify"/>
@@ -147,8 +147,8 @@
 		</interceptor>
 		
 		<interceptor>
-			<mapping path="/user/mypage" />
-			<mapping path="/company/companyInfo" />
+			<mapping path="/user/mypage/**" />
+			<mapping path="/company/companyInfo/**" />
 			<beans:ref bean="OwnerInterceptor" />
 		</interceptor>
 		

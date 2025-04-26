@@ -41,10 +41,9 @@
 	  	}
 		const firstLogin = urlParams.get('firstLogin');
 		if (firstLogin == "company") {
-	  		window.publicModals.show("회원가입을 환영합니다.<br>상세정보의 입력을 위하여<br>기업정보 페이지로 이동하시겠습니까?", {onConfirm: redirectcompanyInfoPage,cancelText:"취소"})
-	  	}
-	  	function redirectcompanyInfoPage() {
-			location.href = "company/companyInfo?uid=${sessionScope.account.uid}&accountType=company";
+	  		window.publicModals.show("회원가입을 환영합니다.<br>상세정보의 입력을 위하여<br>기업정보 페이지로 이동하시겠습니까?", {onConfirm: ()=>{location.href = "company/companyInfo/{sessionScope.account.uid}";},cancelText:"취소"})
+	  	} else if (firstLogin == "user") {
+	  		window.publicModals.show("회원가입을 환영합니다.<br>상세정보의 입력을 위하여<br>마이페이지로 이동하시겠습니까?", {onConfirm: ()=>{location.href = "user/mypage/{sessionScope.account.uid}";},cancelText:"취소"})
 	  	}
 	</script>
 		<!-- 풋터 -->
