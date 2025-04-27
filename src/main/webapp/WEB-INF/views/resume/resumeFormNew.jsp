@@ -1487,9 +1487,10 @@
 						return;
 					}
 
-					const payType = $('input[name="payType"]:checked').length;
-					if (payType === 0) {
-						showValidationModal("희망 금액을 입력해주세요");
+					const payType = $('input[name="payType"]:checked').val();
+					const payTypeCount = $('input[name="payType"]:checked').length;
+					if (payTypeCount === 0) {
+						showValidationModal("희망 급여 형태를 선택해주세요");
 						$(".payTypeBox").attr("tabindex", -1).focus();
 						resetSubmitButton();
 						return;
@@ -1605,6 +1606,20 @@
 							resetSubmitButton();
 							return;
 						}
+					}
+
+					const startDateInput = document.querySelector('.start-date');
+					const endDateInput = document.querySelector('.end-date');
+
+					const startDate = new Date(startDateInput.value);
+					const endDate = new Date(endDateInput.value);
+
+					if (startDate > endDate) {
+						showValidationModal('근무기간 입력이 잘못되었습니다!');
+						$("#myHistoryBox").attr("tabindex", -1).focus();
+						endDateInput.value = ''; // 종료일 초기화
+						resetSubmitButton();
+						return;
 					}
 
 					console.log("유효성 검사 통과");
@@ -2535,5 +2550,22 @@
 						window.location.href = '/resume/list';
 					}
 				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 근무기간 유효성 검사
+				const startDateInput = document.querySelector('.start-date');
+				const endDateInput = document.querySelector('.end-date');
+
+				function validateWorkPeriod() {
+					const startDate = new Date(startDateInput.value);
+					const endDate = new Date(endDateInput.value);
+
+					if (startDate > endDate) {
+						showValidationModal('근무기간 입력이 잘못되었습니다!');
+						endDateInput.value = ''; // 종료일 초기화
+					}
+				}
+
+				startDateInput.addEventListener('change', validateWorkPeriod);
+				endDateInput.addEventListener('change', validateWorkPeriod);
 			});
 		</script>
