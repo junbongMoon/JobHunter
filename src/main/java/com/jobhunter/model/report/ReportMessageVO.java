@@ -11,6 +11,7 @@ import lombok.Data;
 public class ReportMessageVO {
     private Integer reportNo;
     private ReportType reportType;
+    private Integer reportTargetPK;
     private Integer targetAccountUid;
     private AccountType targetAccountType;
     private Integer reporterAccountUid;
