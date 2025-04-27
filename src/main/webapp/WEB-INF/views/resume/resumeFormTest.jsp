@@ -853,7 +853,12 @@
 						</c:if>
 						<!-- <button type="button" class="btn btn-secondary" id="testBtn">코드
 						테스트용 버튼</button> -->
-						<button type="button" class="btn btn-secondary" id="returnBtn">목록으로</button>
+						<c:if test="${isSameUser}">
+							<button type="button" class="btn btn-secondary" id="returnBtn">목록으로</button>
+						</c:if>
+						<c:if test="${!isSameUser}">
+							<button type="button" class="btn btn-secondary" id="returnBtnNotSameUser">목록으로</button>
+						</c:if>
 
 
 						<!-- 첨삭 승인 버튼 체크모양 
@@ -2881,6 +2886,10 @@
 					}
 				});
 
+				$('#returnBtnNotSameUser').on('click', function () {
+					window.location.href = '/user/mypage/' + $('#sessionUserUid').val()
+				});
+
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 첨삭 모드 첨부파일 기능
 				// 첨삭 모드 파일 업로드 관련 변수
@@ -3195,7 +3204,7 @@
 									if (response.success) {
 										showValidationModal('첨삭이 저장되었습니다.');
 										setTimeout(() => {
-											window.location.href = '/resume/list';
+											window.location.href = '/user/mypage/'+$('#sessionUserUid').val();
 										}, 1500);
 									} else {
 										showValidationModal('첨삭 저장에 실패했습니다.');

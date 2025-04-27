@@ -487,7 +487,7 @@ public class ResumeController {
 			boolean result = resumeService.endAdvice(resumeNo, userUid, ownerUid);
 			if (result) {
 				response.put("message", "첨삭이 종료되었습니다.");
-				response.put("url", "/");
+				response.put("url", "/user/mypage/"+userUid);
 				response.put("success", true);
 				return ResponseEntity.ok().body(response);
 			} else {
