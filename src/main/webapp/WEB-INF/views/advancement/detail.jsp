@@ -186,8 +186,8 @@
     </c:if>
   </div>
 
-  <div id="deleteModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
-    <div style="background:white; padding:2rem; border-radius:10px; width:300px; text-align:center;">
+  <div id="deleteModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+    <div style="background:white; padding:2rem; border-radius:10px; width:300px; text-align:center; position:relative; top:100px; margin:0 auto;">
       <h3 style="margin-bottom:1rem;">삭제 확인</h3>
       <p style="margin-bottom:1rem;">"삭제하겠습니다"를 입력하세요.</p>
       <input type="text" id="confirmInput" placeholder="삭제하겠습니다" style="width:100%; padding:0.5rem; margin-bottom:1rem;">
