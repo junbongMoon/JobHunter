@@ -5,6 +5,8 @@ import java.util.List;
 import com.jobhunter.model.advancement.AdvancementDTO;
 import com.jobhunter.model.advancement.AdvancementUpFileVODTO;
 import com.jobhunter.model.advancement.AdvancementVO;
+import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
 
 public interface AdvancementDAO {
 	
@@ -18,4 +20,10 @@ public interface AdvancementDAO {
 	public AdvancementVO selectAdvancementByAdvancementNo(int advancementNo) throws Exception;
 
 	public List<AdvancementUpFileVODTO> getfileListByAdvancement(int advancementNo) throws Exception;
+
+	public int getSearchResultRowCount(int uid, PageRequestDTO pageRequestDTO) throws Exception;
+
+	public int getTotalCountRow(int uid) throws Exception;
+
+	public List<AdvancementVO> selectAdvancementListByPaging(int uid, PageResponseDTO<AdvancementVO> pageResponseDTO) throws Exception;
 }

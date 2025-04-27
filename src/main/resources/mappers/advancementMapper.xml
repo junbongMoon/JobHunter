@@ -48,8 +48,33 @@
 		base64Image,
 		refAdvancementNo,
 		status
-		FROM advancementUpfiles
+		FROM
+		advancementUpfiles
 		WHERE refAdvancementNo = #{advancementNo}
+	</select>
+
+	<select id="getSearchResultRowCount"
+		parameterType="com.jobhunter.model.page.PageRequestDTO"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM advancement
+		WHERE ${searchType} LIKE
+		CONCAT('%', #{searchWord}, '%')
+	</select>
+
+	<select id="getTotalCountRow" parameterType="int"
+		resultType="int">
+		SELECT COUNT(*) FROM advancement WHERE refUser = #{uid}
+	</select>
+
+	<select id="selectAdvancementListByPaging" parameterType="map"
+		resultType="com.jobhunter.model.advancement.AdvancementVO">
+
+		SELECT *
+		FROM advancement
+		WHERE refUser = #{uid}
+		ORDER BY advancementNo DESC
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
 	</select>
 
 

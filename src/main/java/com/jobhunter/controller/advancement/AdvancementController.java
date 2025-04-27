@@ -24,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.jobhunter.model.advancement.AdvancementDTO;
 import com.jobhunter.model.advancement.AdvancementUpFileVODTO;
 import com.jobhunter.model.advancement.AdvancementVO;
+import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.util.FileStatus;
 import com.jobhunter.service.advancement.AdvancementService;
 import com.jobhunter.util.RecruitmentFileProcess;
@@ -166,7 +168,7 @@ public class AdvancementController {
     }
     
     @GetMapping("/modify")
-    public String showModifyPage(@RequestParam("id") int advancementNo, Model model, HttpServletRequest request) {
+    public String showModifyAdvancement(@RequestParam("id") int advancementNo, Model model, HttpServletRequest request) {
         try {
             AdvancementVO advancement = advancementService.getAdvancementById(advancementNo);
 
@@ -184,6 +186,22 @@ public class AdvancementController {
             logger.error("수정 페이지 로딩 실패", e);
             return "redirect:/user/mypage";
         }
+    }
+    
+    @GetMapping("/list")
+    public String showAdvancementListByUid(@RequestParam("uid") int uid,PageRequestDTO pageRequestDTO, Model model) {
+    	PageResponseDTO<AdvancementVO> result = null;
+    	
+    	try {
+			result = advancementService.getAdvancementListByUid(uid, pageRequestDTO);
+			model.addAttribute("pageResponseDTO", result);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	
+    	return "/advancement/list";
     }
     
     

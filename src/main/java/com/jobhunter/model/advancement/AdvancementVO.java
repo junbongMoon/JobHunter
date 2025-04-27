@@ -23,6 +23,7 @@ public class AdvancementVO {
 	private String content;
 	private LocalDateTime postDate;
 	private Status status;
+	private String formattedPostDate;
 	
 	
 	
