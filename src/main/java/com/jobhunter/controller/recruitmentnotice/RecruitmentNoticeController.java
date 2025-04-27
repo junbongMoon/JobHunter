@@ -1,5 +1,6 @@
 package com.jobhunter.controller.recruitmentnotice;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -7,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,9 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * @author 문준봉
- * <p> 공고를 담당하는 Controller</p>
+ *         <p>
+ *         공고를 담당하는 Controller
+ *         </p>
  */
 @Controller
 @RequiredArgsConstructor
@@ -57,7 +59,6 @@ public class RecruitmentNoticeController {
 	private final LikeService likeService;
 	private static final Logger logger = LoggerFactory.getLogger(RecruitmentNoticeController.class);
 
-	
 	/**
 	 * 우대조건을 저장하는 리스트 필드
 	 */
@@ -67,9 +68,8 @@ public class RecruitmentNoticeController {
 	 */
 	private final List<ApplicationDTO> applicationList = new ArrayList<>();
 
-	
 	/**
-	 *  작성 페이지에서 업로드하는 파일들을 저장하는 파일 리스트
+	 * 작성 페이지에서 업로드하는 파일들을 저장하는 파일 리스트
 	 */
 	private List<RecruitmentnoticeBoardUpfiles> fileList = new ArrayList<>();
 	// 게시글 수정시 업로한 파일 객체들을 임시로 저장
@@ -83,11 +83,11 @@ public class RecruitmentNoticeController {
 	private final RecruitmentFileProcess fp;
 
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 회사가 공고를 등록하는 메서드
-	 * </p>
+	 *         <p>
+	 *         회사가 공고를 등록하는 메서드
+	 *         </p>
 	 * 
 	 * @param dto
 	 * @return 리스트페이지로 이동하는 String을 반환
@@ -96,16 +96,14 @@ public class RecruitmentNoticeController {
 	@PostMapping("/save")
 	public String saveRecruitment(@ModelAttribute RecruitmentNoticeDTO dto) {
 		boolean result = false;
-		
 
 		System.out.println("DTO 확인: " + dto);
 		System.out.println("Period 값 확인: " + dto.getPeriod()); // ← 여기도 로그 확인!
-		
 
 		if (dto.getDueDateForString() != null && !dto.getDueDateForString().isEmpty()) {
-	        LocalDate date = LocalDate.parse(dto.getDueDateForString());
-	        dto.setDueDate(Timestamp.valueOf(date.atStartOfDay()));
-	    }
+			LocalDate date = LocalDate.parse(dto.getDueDateForString());
+			dto.setDueDate(Timestamp.valueOf(date.atStartOfDay()));
+		}
 
 		// 저장 로직 호출
 		try {
@@ -115,21 +113,20 @@ public class RecruitmentNoticeController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.out.println(result);
 
 		ListAllClear();
 
 		return "redirect:/recruitmentnotice/listAll"; // 혹은 성공 페이지
 	}
-		
 
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 전체 공고 리스트를 출력하는 메서드
-	 * </p>
+	 *         <p>
+	 *         전체 공고 리스트를 출력하는 메서드
+	 *         </p>
 	 * 
 	 * @param pageRequestDTO
 	 * @param model
@@ -156,11 +153,11 @@ public class RecruitmentNoticeController {
 	}
 
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 회사가 공고를 작성할 때 면접방식을 리스트에 누적 해주는 메서드
-	 * </p>
+	 *         <p>
+	 *         회사가 공고를 작성할 때 면접방식을 리스트에 누적 해주는 메서드
+	 *         </p>
 	 * 
 	 * @param applicationDTO
 	 * @return 면접방식을 담은 리스트를 담은 ResponseEntity
@@ -191,23 +188,16 @@ public class RecruitmentNoticeController {
 
 		return result;
 	}
-	
+
 	@GetMapping("/listMore")
 	public String loadMoreRecruitments(@RequestParam("pageNo") int pageNo,
-	                                   @RequestParam(required = false) String searchType,
-	                                   @RequestParam(required = false) String searchWord,
-	                                   @RequestParam(required = false) String sortOption,
-	                                   Model model) {
+			@RequestParam(required = false) String searchType, @RequestParam(required = false) String searchWord,
+			@RequestParam(required = false) String sortOption, Model model) {
 
-		PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
-			    .pageNo(pageNo)
-			    .rowCntPerPage(10) // ★ 반드시 명시해야 함!
-			    .searchType(searchType)
-			    .searchWord(searchWord)
-			    .sortOption(sortOption)
-			    .build();
+		PageRequestDTO pageRequestDTO = PageRequestDTO.builder().pageNo(pageNo).rowCntPerPage(10) // ★ 반드시 명시해야 함!
+				.searchType(searchType).searchWord(searchWord).sortOption(sortOption).build();
 
-	    PageResponseDTO<RecruitmentDetailInfo> response;
+		PageResponseDTO<RecruitmentDetailInfo> response;
 		try {
 			response = recruitmentService.getEntireRecruitment(pageRequestDTO);
 			model.addAttribute("boardList", response.getBoardList());
@@ -215,18 +205,16 @@ public class RecruitmentNoticeController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    
 
-	    return "recruitmentnotice/recruitmentListFragment";
+		return "recruitmentnotice/recruitmentListFragment";
 	}
 
-
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 공고를 작성할 때 면접방식을 삭제하는 메서드
-	 * </p>
+	 *         <p>
+	 *         공고를 작성할 때 면접방식을 삭제하는 메서드
+	 *         </p>
 	 * 
 	 * @param applicationDTO
 	 * @return 면접방식을 담은 리스트를 담은 ResponseEntity
@@ -250,46 +238,48 @@ public class RecruitmentNoticeController {
 	}
 
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 파일을 저장하는 메서드
-	 * </p>
+	 *         <p>
+	 *         파일을 저장하는 메서드
+	 *         </p>
 	 * 
-	 * @param file
+	 * @param files
 	 * @param request
 	 * @return 공고에 저장 된 파일을 담은 리스트를 담은 ResponseEntity
 	 *
 	 */
 	@PostMapping("/file")
-	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadFile(
-	        @RequestParam("file") MultipartFile file,
-	        HttpServletRequest request) {
-	    try {
-	        RecruitmentnoticeBoardUpfiles uploadedFile = fp.saveFileToRealPath(
-	                file, request, "/resources/recruitmentFiles");
+	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadFile(@RequestParam("file") MultipartFile[] files,
+			HttpServletRequest request) {
 
-	        // 유효한 확장자 검사 (보안 강화)
-	        if (!uploadedFile.getOriginalFileName().matches("^[a-zA-Z0-9_.-]+$")) {
-	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-	        }
+		List<RecruitmentnoticeBoardUpfiles> uploadedFiles = new ArrayList<>();
 
-	        uploadedFile.setStatus(FileStatus.NEW);
-	        fileList.add(uploadedFile);
+		try {
+			for (MultipartFile file : files) {
+				RecruitmentnoticeBoardUpfiles uploadedFile = fp.saveFileToRealPath(file, request,
+						"/resources/recruitmentFiles");
 
-	        return ResponseEntity.ok(fileList);
-	    } catch (IOException e) {
-	        logger.error("파일 업로드 실패", e);
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-	    }
+				uploadedFile.setStatus(FileStatus.NEW);
+				uploadedFiles.add(uploadedFile);
+				this.fileList.add(uploadedFile); // <-- ★ fileList에도 추가해야 save할 때 같이 넘어간다!!
+			}
+			System.out.println(uploadedFiles);
+
+			return ResponseEntity.ok(uploadedFiles);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
 	}
 
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 파일을 삭제하는 메서드
-	 * </p>
+	 *         <p>
+	 *         파일을 삭제하는 메서드
+	 *         </p>
 	 * 
 	 * @param removeFileName
 	 * @return ResponseEntity<List<RecruitmentnoticeBoardUpfiles>>
@@ -297,51 +287,49 @@ public class RecruitmentNoticeController {
 	 */
 	@DeleteMapping("/file")
 	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> removeFile(
-	        @RequestParam("removeFileName") String removeFileName) {
+			@RequestParam("removeFileName") String removeFileName) {
 
-	    // 보안: 파일명 정규식 검사 (파일 경로 침입 방지)
-	    if (!removeFileName.matches("^[a-zA-Z0-9_.-]+$")) {
-	        return ResponseEntity.badRequest().body(fileList);
-	    }
+		// 보안: 파일명 정규식 검사 (파일 경로 침입 방지)
+		if (!removeFileName.matches("^[a-zA-Z0-9_.-]+$")) {
+			return ResponseEntity.badRequest().body(fileList);
+		}
 
-	    fileList.removeIf(file -> {
-	        boolean match = file.getOriginalFileName().equals(removeFileName);
-	        if (match) {
-	            fp.removeFile(file);
-	        }
-	        return match;
-	    });
+		fileList.removeIf(file -> {
+			boolean match = file.getOriginalFileName().equals(removeFileName);
+			if (match) {
+				fp.removeFile(file);
+			}
+			return match;
+		});
 
-	    return ResponseEntity.ok(fileList);
+		return ResponseEntity.ok(fileList);
 	}
-	
 
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 필드의 파일 리스트 전체 초기화 메서드
-	 * </p>
+	 *         <p>
+	 *         필드의 파일 리스트 전체 초기화 메서드
+	 *         </p>
 	 * 
 	 * @return ResponseEntity<Void>
 	 *
 	 */
 	@DeleteMapping("/removeAllFiles")
 	public ResponseEntity<Void> removeAllFiles() {
-	    for (RecruitmentnoticeBoardUpfiles f : fileList) {
-	        fp.removeFile(f);
-	    }
-	    fileList.clear();
-	    return ResponseEntity.ok().build();
+		for (RecruitmentnoticeBoardUpfiles f : fileList) {
+			fp.removeFile(f);
+		}
+		fileList.clear();
+		return ResponseEntity.ok().build();
 	}
 
- 
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 공고를 작성할 때 우대조건을 리스트에 누적 해주는 메서드
-	 * </p>
+	 *         <p>
+	 *         공고를 작성할 때 우대조건을 리스트에 누적 해주는 메서드
+	 *         </p>
 	 * 
 	 * @param advantageDTO
 	 * @return 공고에 저장 된 우대조건을 담은 리스트를 담은 ResponseEntity
@@ -364,13 +352,12 @@ public class RecruitmentNoticeController {
 		return result;
 	}
 
- 
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 회사가 공고를 작성할 때 우대조건을 리스트에서 삭제 해주는 메서드
-	 * </p>
+	 *         <p>
+	 *         회사가 공고를 작성할 때 우대조건을 리스트에서 삭제 해주는 메서드
+	 *         </p>
 	 * 
 	 * @param advantageType
 	 * @return 공고에 저장 된 우대조건을 담은 리스트를 담은 ResponseEntity
@@ -389,13 +376,12 @@ public class RecruitmentNoticeController {
 		return result;
 	}
 
-
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 *  공고를 작성하는 페이지를 출력하는 메서드
-	 * </p>
+	 *         <p>
+	 *         공고를 작성하는 페이지를 출력하는 메서드
+	 *         </p>
 	 * 
 	 *
 	 */
@@ -404,121 +390,108 @@ public class RecruitmentNoticeController {
 		ListAllClear();
 
 	}
- 
+
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 공고 상세 페이지, 수정 페이지를 출력
-	 * </p>
+	 *         <p>
+	 *         공고 상세 페이지, 수정 페이지를 출력
+	 *         </p>
 	 * 
 	 * @param uid
 	 * @param model
 	 * @param req
-	 * @return 쿼리스트링으로 상태를 알려주고 리스트 페이지를 반환 
+	 * @return 쿼리스트링으로 상태를 알려주고 리스트 페이지를 반환
 	 *
 	 */
-	@GetMapping(value = {"/detail", "/modify"})
+	@GetMapping(value = { "/detail", "/modify" })
 	public String showRecruitment(@RequestParam("uid") int uid, Model model, HttpServletRequest req) {
 		System.out.println(uid);
-		
-		String returnPage ="";
-		
+
+		String returnPage = "";
+
 		// 기존 리스트 초기화
-					ListAllClear();
-		
+		ListAllClear();
+
 		try {
 			RecruitmentDetailInfo detailInfo = recruitmentService.getRecruitmentByUid(uid);
-			
-			 if (req.getRequestURI().contains("detail")) {
-		            AccountVO loginUser = (AccountVO) req.getSession().getAttribute("account");
-		            int viewerUid = loginUser != null ? loginUser.getUid() : 0;
 
-		            detailInfo = recruitmentService.getRecruitmentWithViewLog(uid, viewerUid);
-		            
-		            
-		            // ⭐ 좋아요 정보 추가
-		            boolean hasLiked = likeService.hasLiked(viewerUid, uid, "RECRUIT");
-		            int likeCnt = likeService.getLikeCntByRecruitment(uid, "RECRUIT");
-		            
-		            
-		            model.addAttribute("hasLiked", hasLiked);
-		            model.addAttribute("likeCnt", likeCnt);
-		        } else {
-		            detailInfo = recruitmentService.getRecruitmentByUid(uid);
-		        }
-			
-			
+			if (req.getRequestURI().contains("detail")) {
+				AccountVO loginUser = (AccountVO) req.getSession().getAttribute("account");
+				int viewerUid = loginUser != null ? loginUser.getUid() : 0;
+
+				detailInfo = recruitmentService.getRecruitmentWithViewLog(uid, viewerUid);
+
+				// ⭐ 좋아요 정보 추가
+				boolean hasLiked = likeService.hasLiked(viewerUid, uid, "RECRUIT");
+				int likeCnt = likeService.getLikeCntByRecruitment(uid, "RECRUIT");
+
+				model.addAttribute("hasLiked", hasLiked);
+				model.addAttribute("likeCnt", likeCnt);
+			} else {
+				detailInfo = recruitmentService.getRecruitmentByUid(uid);
+			}
+
 			// 우대 조건
-			if(detailInfo.getAdvantage().size() > 0) {
-				for(Advantage advantage : detailInfo.getAdvantage()) {
-					AdvantageDTO advdto = AdvantageDTO.builder()
-							.advantageType(advantage.getAdvantageType()).build();
-							this.advantageList.add(advdto);
+			if (detailInfo.getAdvantage().size() > 0) {
+				for (Advantage advantage : detailInfo.getAdvantage()) {
+					AdvantageDTO advdto = AdvantageDTO.builder().advantageType(advantage.getAdvantageType()).build();
+					this.advantageList.add(advdto);
 				}
 			}
-			
+
 			// 파일 리스트
-			if(detailInfo.getFileList().size() > 0) {
+			if (detailInfo.getFileList().size() > 0) {
 				this.fileList = detailInfo.getFileList();
 				this.modifyFileList = detailInfo.getFileList();
 				System.out.println(modifyFileList);
 			}
-			
+
 			// 면접 방식
-			for(Application application : detailInfo.getApplication()) {
-				ApplicationDTO appdto = ApplicationDTO.builder()
-						.method(application.getMethod())
-						.detail(application.getDetail())
-						.build();
-				
+			for (Application application : detailInfo.getApplication()) {
+				ApplicationDTO appdto = ApplicationDTO.builder().method(application.getMethod())
+						.detail(application.getDetail()).build();
+
 				this.applicationList.add(appdto);
-				
-				
-				
+
 			}
-			
-		    // 이전/다음 글 추가
+
+			// 이전/다음 글 추가
 			RecruitmentNotice prevPost = recruitmentService.getPreviousPost(uid);
 			RecruitmentNotice nextPost = recruitmentService.getNextPost(uid);
 
-			
 			String applicationsJson = new ObjectMapper().writeValueAsString(this.applicationList);
 			model.addAttribute("applicationsJson", applicationsJson);
 			model.addAttribute("RecruitmentDetailInfo", detailInfo);
-		    model.addAttribute("prevPost", prevPost);
-		    model.addAttribute("nextPost", nextPost);
+			model.addAttribute("prevPost", prevPost);
+			model.addAttribute("nextPost", nextPost);
 
-			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			returnPage = "redirect:./listAll?status=fail";
 
 		}
-		
-		
-		if(req.getRequestURI().contains("detail")){
+
+		if (req.getRequestURI().contains("detail")) {
 			returnPage = "recruitmentnotice/detail";
-		}else if(req.getRequestURI().contains("modify")) {
+		} else if (req.getRequestURI().contains("modify")) {
 			returnPage = "recruitmentnotice/modify";
 		}
-		
+
 		if (returnPage.equals("")) {
-		    returnPage = "redirect:/recruitmentnotice/listAll?status=fail";
+			returnPage = "redirect:/recruitmentnotice/listAll?status=fail";
 		}
 
 		return returnPage;
 	}
-	
-	
-	 
+
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 *공고를 수정하는 메서드
-	 * </p>
+	 *         <p>
+	 *         공고를 수정하는 메서드
+	 *         </p>
 	 * 
 	 * @param dto
 	 * @param applicationJson
@@ -528,55 +501,99 @@ public class RecruitmentNoticeController {
 	 *
 	 */
 	@PostMapping("/modify")
-	public String modifyRecruitment(
-	        @ModelAttribute RecruitmentNoticeDTO dto,
-	        @RequestParam("applicationJson") String applicationJson,
-	        @RequestParam("advantageJson") String advantageJson, @RequestParam("uid") int uid) {
+	public String modifyRecruitment(@ModelAttribute RecruitmentNoticeDTO dto,
+			@RequestParam("applicationJson") String applicationJson,
+			@RequestParam("advantageJson") String advantageJson,
+			@RequestParam("modifyFileListJson") String modifyFileListJson, @RequestParam("uid") int uid,
+			HttpServletRequest request // ✅ request 추가
+	) {
 		dto.setUid(uid);
-	    boolean result = false;
+		boolean result = false;
+		List<RecruitmentnoticeBoardUpfiles> deletedFiles = new ArrayList<>();
 
-	    System.out.println("수정할 DTO: " + dto);
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
 
-	    try {
-	        ObjectMapper objectMapper = new ObjectMapper();
+			List<ApplicationDTO> applications = objectMapper.readValue(applicationJson,
+					new TypeReference<List<ApplicationDTO>>() {
+					});
+			List<AdvantageDTO> advantages = objectMapper.readValue(advantageJson,
+					new TypeReference<List<AdvantageDTO>>() {
+					});
+			List<RecruitmentnoticeBoardUpfiles> modifyFileList = new ArrayList<>();
 
-	        List<ApplicationDTO> applications = objectMapper.readValue(applicationJson, new TypeReference<List<ApplicationDTO>>() {});
-	        List<AdvantageDTO> advantages = objectMapper.readValue(advantageJson, new TypeReference<List<AdvantageDTO>>() {});
+			if (modifyFileListJson != null && !modifyFileListJson.isEmpty()) {
+				modifyFileList = objectMapper.readValue(modifyFileListJson,
+						new TypeReference<List<RecruitmentnoticeBoardUpfiles>>() {
+						});
+			}
 
-	        if (dto.getDueDateForString() != null && !dto.getDueDateForString().isEmpty()) {
-	            LocalDate date = LocalDate.parse(dto.getDueDateForString());
-	            dto.setDueDate(Timestamp.valueOf(date.atStartOfDay()));
-	        }
+			if (dto.getDueDateForString() != null && !dto.getDueDateForString().isEmpty()) {
+				LocalDate date = LocalDate.parse(dto.getDueDateForString());
+				dto.setDueDate(Timestamp.valueOf(date.atStartOfDay()));
+			}
 
-	        // 기존 데이터 불러오기
-	        RecruitmentDetailInfo existing = recruitmentService.getRecruitmentByUid(uid);
+			RecruitmentDetailInfo existing = recruitmentService.getRecruitmentByUid(uid);
 
-	        // 서비스로 수정 로직 위임
-	        System.out.println("DTO: " + dto);
-	        System.out.println("applicationJson: " + applicationJson);
-	        System.out.println("advantageJson: " + advantageJson);
-	        recruitmentService.modifyRecruitmentNotice(dto, advantages, applications, modifyFileList, existing, uid);
+			// ❗ 삭제할 파일 목록 따로 수집
+			for (RecruitmentnoticeBoardUpfiles oldFile : existing.getFileList()) {
+				boolean stillExists = modifyFileList.stream()
+						.anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()));
 
-	        result = true;
+				if (!stillExists) {
+					deletedFiles.add(oldFile);
+				}
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+			// DB만 수정
+			recruitmentService.modifyRecruitmentNotice(dto, advantages, applications, modifyFileList, existing, uid);
 
-	    ListAllClear(); // 리스트 초기화
+			result = true;
 
-	    return result
-	            ? "redirect:/recruitmentnotice/listAll"
-	            : "redirect:/recruitmentnotice/modify?uid=" + uid + "&status=fail";
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if (result) {
+			// ✅ 파일 삭제 (DB 성공했을 때만!)
+			String realPath = request.getSession().getServletContext().getRealPath("/");
+			for (RecruitmentnoticeBoardUpfiles file : deletedFiles) {
+				deletePhysicalFile(realPath, file);
+			}
+		}
+
+		ListAllClear();
+		return result ? "redirect:/recruitmentnotice/listAll"
+				: "redirect:/recruitmentnotice/modify?uid=" + uid + "&status=fail";
 	}
 
+	private void deletePhysicalFile(String realPath, RecruitmentnoticeBoardUpfiles file) {
+		try {
+			String os = System.getProperty("os.name").toLowerCase();
+
+			String mainPath = realPath + file.getNewFileName();
+			String thumbPath = realPath + file.getThumbFileName();
+
+			File mainFile = new File(os.contains("windows") ? mainPath.replace("/", "\\") : mainPath);
+			File thumbFile = new File(os.contains("windows") ? thumbPath.replace("/", "\\") : thumbPath);
+
+			if (mainFile.exists())
+				mainFile.delete();
+			if (thumbFile.exists())
+				thumbFile.delete();
+
+			System.out.println("삭제 완료: " + mainFile.getName() + ", " + thumbFile.getName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 공고를 삭제하는 메서드
-	 * </p>
+	 *         <p>
+	 *         공고를 삭제하는 메서드
+	 *         </p>
 	 * 
 	 * @param uid
 	 * @return Boolean을 담은 ResponseEntity
@@ -585,145 +602,141 @@ public class RecruitmentNoticeController {
 	@DeleteMapping("/remove/{uid}")
 	public ResponseEntity<Boolean> removeRecruitment(@PathVariable("uid") int uid) {
 		ResponseEntity<Boolean> result = null;
-		
+
 		try {
-			if(recruitmentService.removeRecruitmentByUid(uid)) {			
+			if (recruitmentService.removeRecruitmentByUid(uid)) {
 				result = ResponseEntity.ok().body(true);
-			}else {
+			} else {
 				result = ResponseEntity.badRequest().body(false);
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	    
-	    return result; 
+
+		return result;
 	}
-	
- 
-    /**
-     *  @author 문준봉
-     *
-     * <p>
-     * 파일 상태 업데이트
-     * </p>
-     * 
-     * @param fileName
-     * @param status
-     * @return ResponseEntity<Void>
-     *
-     */
-    @PostMapping("/file/status")
-    public ResponseEntity<Void> updateFileStatus(
-            @RequestParam("fileName") String fileName,
-            @RequestParam("status") String status) {
-
-    	System.out.println(fileName);
-    	
-        for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
-            if (file.getOriginalFileName().equals(fileName)) {
-                if ("delete".equalsIgnoreCase(status)) {
-                    file.setStatus(FileStatus.DELETE);
-                    
-                } else if ("cancel".equalsIgnoreCase(status)) {
-                    file.setStatus(null);
-                }
-            }
-        }
-        System.out.println(modifyFileList);
-
-        return ResponseEntity.ok().build();
-    }
-
-     
-    /**
-     *  @author 문준봉
-     *
-     * <p>
-     * 수정 취소 시 파일 상태 롤백 및 삭제
-     * </p>
-     * 
-     * @return ResponseEntity<Void>
-     *
-     */
-    @PostMapping("/file/cancel")
-    public ResponseEntity<Void> cancelFileModifications() {
-        for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
-            if (file.getStatus() == FileStatus.DELETE) {
-                file.setStatus(null);
-            } else if (file.getStatus() == FileStatus.NEW) {
-                fp.removeFile(file);
-            }
-        }
-        modifyFileList.clear();
-        return ResponseEntity.ok().build();
-    }
-
- 
-    /**
-     *  @author 문준봉
-     *
-     * <p>
-     * 파일 수정 최종 반영
-     * </p>
-     * 
-     * @return ResponseEntity<Void>
-     *
-     */
-    @PostMapping("/file/finalize")
-    public ResponseEntity<Void> finalizeFileModifications() {
-        for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
-            if (file.getStatus() == FileStatus.DELETE) {
-                fp.removeFile(file); // 실제 파일 삭제
-                recruitmentService.deleteFileFromDatabase(file.getBoardUpFileNo()); // DB에서 삭제
-            }
-        }
-        modifyFileList.clear();
-        return ResponseEntity.ok().build();
-    }
-
-    // 
-    /**
-     *  @author 문준봉
-     *
-     * <p>
-     * 수정 시 새로 업로드된 파일 추가
-     * </p>
-     * 
-     * @param file
-     * @param request
-     * @return 공고에 저장 된 파일을 담은 리스트를 담은 ResponseEntity
-     *
-     */
-    @PostMapping("/file/modify")
-    public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadModifyFile(
-            @RequestParam("file") MultipartFile file,
-            HttpServletRequest request) {
-        try {
-            RecruitmentnoticeBoardUpfiles uploadedFile = fp.saveFileToRealPath(
-                    file, request, "/resources/recruitmentFiles");
-
-            if (!uploadedFile.getOriginalFileName().matches("^[a-zA-Z0-9_.-]+$")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-            }
-
-            uploadedFile.setStatus(FileStatus.NEW);
-            modifyFileList.add(uploadedFile);
-
-            return ResponseEntity.ok(modifyFileList);
-        } catch (IOException e) {
-            logger.error("파일 업로드 실패", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-	
 
 	/**
-	 *  @author 문준봉
+	 * @author 문준봉
 	 *
-	 * <p>
-	 * 이 컨트롤러의 필드를 전부 비워주는 메서드
-	 * </p>
+	 *         <p>
+	 *         파일 상태 업데이트
+	 *         </p>
+	 * 
+	 * @param fileName
+	 * @param status
+	 * @return ResponseEntity<Void>
+	 *
+	 */
+	@PostMapping("/file/status")
+	public ResponseEntity<Void> updateFileStatus(@RequestParam("fileName") String fileName,
+			@RequestParam("status") String status) {
+
+		System.out.println(fileName);
+
+		for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
+			if (file.getOriginalFileName().equals(fileName)) {
+				if ("delete".equalsIgnoreCase(status)) {
+					file.setStatus(FileStatus.DELETE);
+
+				} else if ("cancel".equalsIgnoreCase(status)) {
+					file.setStatus(null);
+				}
+			}
+		}
+		System.out.println(modifyFileList);
+
+		return ResponseEntity.ok().build();
+	}
+
+	/**
+	 * @author 문준봉
+	 *
+	 *         <p>
+	 *         수정 취소 시 파일 상태 롤백 및 삭제
+	 *         </p>
+	 * 
+	 * @return ResponseEntity<Void>
+	 *
+	 */
+	@PostMapping("/file/cancel")
+	public ResponseEntity<Void> cancelFileModifications() {
+		for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
+			if (file.getStatus() == FileStatus.DELETE) {
+				file.setStatus(null);
+			} else if (file.getStatus() == FileStatus.NEW) {
+				fp.removeFile(file);
+			}
+		}
+		modifyFileList.clear();
+		return ResponseEntity.ok().build();
+	}
+
+	/**
+	 * @author 문준봉
+	 *
+	 *         <p>
+	 *         파일 수정 최종 반영
+	 *         </p>
+	 * 
+	 * @return ResponseEntity<Void>
+	 *
+	 */
+	@PostMapping("/file/finalize")
+	public ResponseEntity<Void> finalizeFileModifications() {
+		System.out.println("호출됬나?");
+		for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
+			if (file.getStatus() == FileStatus.DELETE) {
+				fp.removeFile(file); // 실제 파일 삭제
+				recruitmentService.deleteFileFromDatabase(file.getBoardUpFileNo()); // DB에서 삭제
+			}
+		}
+		modifyFileList.clear();
+		return ResponseEntity.ok().build();
+	}
+
+	//
+	/**
+	 * @author 문준봉
+	 *
+	 *         <p>
+	 *         수정 시 새로 업로드된 파일 추가
+	 *         </p>
+	 * 
+	 * @param file
+	 * @param request
+	 * @return 공고에 저장 된 파일을 담은 리스트를 담은 ResponseEntity
+	 *
+	 */
+	@PostMapping("/file/modify")
+	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> uploadModifyFile(
+			@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+		try {
+			RecruitmentnoticeBoardUpfiles uploadedFile = fp.saveFileToRealPath(file, request,
+					"/resources/recruitmentFiles");
+
+			if (!uploadedFile.getOriginalFileName().matches("^[a-zA-Z0-9_.-]+$")) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+			}
+
+			uploadedFile.setStatus(FileStatus.NEW);
+			modifyFileList.add(uploadedFile);
+			System.out.println(modifyFileList);
+
+			return ResponseEntity.ok(modifyFileList);
+		} catch (IOException e) {
+			logger.error("파일 업로드 실패", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+
+	/**
+	 * @author 문준봉
+	 *
+	 *         <p>
+	 *         이 컨트롤러의 필드를 전부 비워주는 메서드
+	 *         </p>
 	 * 
 	 *
 	 */
