@@ -26,14 +26,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.admin.Pagination;
+import com.jobhunter.model.advancement.MentorRequestVO;
 import com.jobhunter.model.company.CompanyVO;
-import com.jobhunter.model.mentor.MentorRequestVO;
 import com.jobhunter.model.report.ReportMessageVO;
 import com.jobhunter.model.status.StatusVODTO;
 import com.jobhunter.model.status.TotalStatusVODTO;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.service.admin.AdminService;
-import com.jobhunter.service.mentor.MentorService;
+import com.jobhunter.service.advancement.AdvancementService;
 import com.jobhunter.service.status.StatusService;
 
 import lombok.RequiredArgsConstructor;
@@ -51,7 +51,7 @@ public class AdminController {
 
 	private final StatusService statusService;
 	private final AdminService adminService;
-	private final MentorService mentorService;
+	private final AdvancementService advancementService;
 	
 	/**
 	 * 관리자 홈 페이지를 반환합니다.
@@ -511,12 +511,37 @@ public class AdminController {
 	public String adminMentorRequest(@PathVariable("requestNo") int requestNo, Model model) {
 		
 		try {
-			MentorRequestVO vo = mentorService.selectMentorRequestDetail(requestNo);
+			MentorRequestVO vo = advancementService.selectMentorRequestDetail(requestNo);
 			model.addAttribute("item", vo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return "admin/adminMentorRequestDetail";
+	}
+	
+	@GetMapping("/mentor/mentorRequest/pass/{requestNo}")
+    public String passMentorRequest(@PathVariable("requestNo") int requestNo) {
+        
+        try {
+        	advancementService.confirmMentorRequest(requestNo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return "admin/adminMentorRequestList";
+    }
+	
+	@PostMapping("/mentor/mentorRequest/failure")
+	public ResponseEntity<?> failureMentorRequest(@RequestBody Map<String, Object> map) {
+	    try {
+	        int requestNo = Integer.parseInt(String.valueOf(map.get("requestNo")));
+	        String rejectMessage = (String) map.get("rejectMessage");
+
+	        advancementService.dropMentorRequest(requestNo, rejectMessage);
+	        return ResponseEntity.ok().build(); // 성공
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("거부 처리 실패");
+	    }
 	}
 	
 }

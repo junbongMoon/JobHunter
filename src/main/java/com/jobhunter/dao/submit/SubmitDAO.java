@@ -178,6 +178,9 @@ public interface SubmitDAO {
 
 	List<UserVO> selectUsersWhoAppliedPaged(int uid, int pageIndex, int pageSize) throws Exception;
 
+
+	void updateSubmitStatus(int registrationNo, String status);
+
 	
 	
 }

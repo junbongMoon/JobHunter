@@ -50,7 +50,9 @@ public interface UserDAO {
 
 	Timestamp getDeleteAccount(Integer uid) throws Exception;
 
-	void cancelDeleteAccount(Integer uid) throws Exception; 
+	void cancelDeleteAccount(Integer uid) throws Exception;
+
+	void setUserMentorFlagByAdvancementNo(int advancementNo) throws Exception; 
 
 		
 	

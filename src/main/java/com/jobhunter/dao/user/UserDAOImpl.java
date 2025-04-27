@@ -171,4 +171,9 @@ public class UserDAOImpl implements UserDAO {
 	    
 		ses.update(NS + ".updateName", paramMap);
 	}
+	
+	@Override
+	public void setUserMentorFlagByAdvancementNo(int advancementNo) throws Exception {
+		ses.update(NS + ".setUserMentorFlagByAdvancementNo", advancementNo);
+	}
 }

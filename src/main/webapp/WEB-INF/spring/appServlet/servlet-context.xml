@@ -36,7 +36,7 @@
 	
 	
 	<!-- controller 패키지 안에 객체로  -->
-	<context:component-scan base-package="com.jobhunter.controller"></context:component-scan>	
+	<context:component-scan base-package="com.jobhunter.controller"></context:component-scan>
 	<context:component-scan base-package="com.jobhunter.interceptor"></context:component-scan>
 	
 
@@ -144,12 +144,6 @@
 		<interceptor>
 		    <mapping path="/admin/**" />
 		    <beans:ref bean="AdminRoleInterceptor" />
-		</interceptor>
-		
-		<interceptor>
-			<mapping path="/user/mypage/**" />
-			<mapping path="/company/companyInfo/**" />
-			<beans:ref bean="OwnerInterceptor" />
 		</interceptor>
 		
 	</interceptors>

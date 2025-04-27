@@ -198,6 +198,14 @@ uri="http://java.sun.com/jsp/jstl/fmt"%>
             >
               <i class="fas fa-undo fa-sm"></i> 전체 초기화
             </button>
+            <button
+              type="button"
+              id="SearchBtn"
+              class="btn btn-primary btn-sm"
+              style="margin-left: 10px"
+            >
+              검색
+            </button>
           </div>
 
           <div class="row mt-3">
@@ -272,6 +280,20 @@ uri="http://java.sun.com/jsp/jstl/fmt"%>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- 신청 출력 영역 -->
+      <div class="card shadow mb-4">
+        <div
+          class="card-header py-3"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <h6 class="m-0 font-weight-bold text-primary">신청 목록</h6>
 
           <!-- 정렬 옵션 버튼 -->
           <div class="mt-3">
@@ -288,13 +310,6 @@ uri="http://java.sun.com/jsp/jstl/fmt"%>
               </button>
             </span>
           </div>
-        </div>
-      </div>
-
-      <!-- 신청 출력 영역 -->
-      <div class="card shadow mb-4">
-        <div class="card-header py-3">
-          <h6 class="m-0 font-weight-bold text-primary">신청 목록</h6>
         </div>
         <div class="card-body">
           <!-- 신청 목록 카드 -->
@@ -437,18 +452,18 @@ uri="http://java.sun.com/jsp/jstl/fmt"%>
           const statusBadge = getStatusBadge(item.status);
 
           const cardHtml = `
-                <div class="mentor-card">
-                    <div class="mentor-card-header">
-                        <h3 class="mentor-title">\${item.title}</h3>
-                        <div class="mentor-status">\${statusBadge}</div>
-                    </div>
-                    <div class="mentor-card-body">
-                        <p><strong>작성자:</strong> \${item.writer}</p>
-                        <p><strong>작성일:</strong> \${formatDateForDisplay(item.postDate)}</p>
-                        \${item.rejectMessage ? '<p><strong>반려 사유:</strong> \${item.rejectMessage}</p>' : ''}
-                    </div>
-                </div>
-            `;
+        	    <div class="mentor-card" onclick="location.href='/admin/mentorRequest/\${item.advancementNo}'" style="cursor: pointer;">
+        	        <div class="mentor-card-header">
+        	            <h3 class="mentor-title">\${item.title}</h3>
+        	            <div class="mentor-status">\${statusBadge}</div>
+        	        </div>
+        	        <div class="mentor-card-body">
+        	            <p><strong>작성자:</strong> \${item.writer}</p>
+        	            <p><strong>작성일:</strong> \${formatDateForDisplay(item.postDate)}</p>
+        	            \${item.rejectMessage ? `<p><strong>반려 사유:</strong> \${item.rejectMessage}</p>` : ''}
+        	        </div>
+        	    </div>
+        	`;
 
           $container.append(cardHtml);
         });
@@ -505,8 +520,9 @@ uri="http://java.sun.com/jsp/jstl/fmt"%>
       }
 
       // 페이지 버튼 클릭시
-      function goToPage(page) {
-        fetchMentorRequests(page); // 선택한 페이지로 검색
+      function goToPage(targetPage) {
+        page = targetPage;
+        fetchMentorRequests(); // 선택한 페이지로 검색
       }
 
       function openSearchTap() {
@@ -518,27 +534,40 @@ uri="http://java.sun.com/jsp/jstl/fmt"%>
       }
 
       $("#rowCntPerPage").on("change", function () {
+        page = 1;
         fetchMentorRequests();
       });
 
       $("#dateRange").on("change", function () {
+        page = 1;
         fetchMentorRequests();
       });
 
       $("#status").on("change", function () {
+        page = 1;
         fetchMentorRequests();
       });
 
       $("#clearSearchTypes").on("click", function () {
+        page = 1;
         fetchMentorRequests();
       });
 
-      $("#searchWord").on("keyup", function () {
+      $("#searchWord").on("keydown", function (e) {
+        if (e.key === "Enter") {
+          page = 1;
+          fetchMentorRequests();
+        }
+      });
+
+      $("#SearchBtn").on("click", function () {
+        page = 1;
         fetchMentorRequests();
       });
 
       // 정렬 버튼 클릭시
       $(".sort-option").on("click", function () {
+        page = 1;
         const clickedOption =
           $(this).attr("id") === "sortPostDate" ? "POSTDATE" : "CONFIRMDATE";
 

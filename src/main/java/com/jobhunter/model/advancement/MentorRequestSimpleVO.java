@@ -1,4 +1,4 @@
-package com.jobhunter.model.mentor;
+package com.jobhunter.model.advancement;
 
 import java.util.Date;
 

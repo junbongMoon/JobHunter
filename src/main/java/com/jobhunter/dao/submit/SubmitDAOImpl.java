@@ -302,5 +302,15 @@ public class SubmitDAOImpl implements SubmitDAO {
 		
 		return ses.selectList(NS + ".selectUsersWhoAppliedPaged", param);
 	}
+
+
+	@Override
+	public void updateSubmitStatus(int registrationNo, String status) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("registrationNo", registrationNo);
+		param.put("status", status);
+		
+		ses.update(NS + ".updateSubmitStatus", param);
+	}
 	
 }

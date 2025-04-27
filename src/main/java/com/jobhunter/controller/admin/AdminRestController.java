@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jobhunter.model.mentor.MentorRequestListOfPageVO;
-import com.jobhunter.model.mentor.MentorRequestListSearchDTO;
-import com.jobhunter.model.mentor.MentorRequestSimpleVO;
-import com.jobhunter.service.mentor.MentorService;
+import com.jobhunter.model.advancement.MentorRequestListOfPageVO;
+import com.jobhunter.model.advancement.MentorRequestListSearchDTO;
+import com.jobhunter.model.advancement.MentorRequestSimpleVO;
+import com.jobhunter.service.advancement.AdvancementService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,16 +22,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminRestController {
 	
-	private final MentorService mentorService;
+	private final AdvancementService advancementService;
 	
 	@PostMapping("/mentor/request-list")
     public MentorRequestListOfPageVO<MentorRequestSimpleVO> getMentorRequestList(@RequestBody MentorRequestListSearchDTO searchDTO) {
-        System.out.println("받은 검색 조건: " + searchDTO);
         
         MentorRequestListOfPageVO<MentorRequestSimpleVO> result = null;
         
         try {
-        	result = mentorService.getMentorRequestList(searchDTO);
+        	result = advancementService.getMentorRequestList(searchDTO);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

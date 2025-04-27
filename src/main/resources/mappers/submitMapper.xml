@@ -588,7 +588,12 @@
 		ORDER BY
 		reg.regDate DESC
 		LIMIT #{pageIndex}, #{pageSize}
-
 	</select>
+	
+	<update id="updateSubmitStatus">
+	    UPDATE registration
+	    SET status = #{status}
+	    WHERE registrationNo = #{registrationNo}
+	</update>
 
 </mapper>

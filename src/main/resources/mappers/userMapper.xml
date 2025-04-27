@@ -259,5 +259,15 @@
 		set point = point + #{point}
 		where uid = #{userUid}
 	</update>
+	
+	<update id="setUserMentorFlagByAdvancementNo">
+	    UPDATE users
+	    SET isMentor = 'Y'
+	    WHERE uid = (
+	        SELECT refUser
+	        FROM advancement
+	        WHERE advancementNo = #{advancementNo}
+	    )
+	</update>
 
 </mapper>

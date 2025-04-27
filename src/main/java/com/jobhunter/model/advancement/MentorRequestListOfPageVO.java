@@ -1,4 +1,4 @@
-package com.jobhunter.model.mentor;
+package com.jobhunter.model.advancement;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,10 +24,6 @@ public class MentorRequestListOfPageVO<T> {
     // 전체 페이지 수
     private int totalPages;
 
-    // 이전/다음 페이지 존재 여부
-    private boolean hasPrevPage;
-    private boolean hasNextPage;
-
     // 이전/다음 블럭 존재 여부
     private boolean hasPrevBlock;
     private boolean hasNextBlock;
@@ -41,31 +37,28 @@ public class MentorRequestListOfPageVO<T> {
 
     // 현재 페이지 항목들
     private List<T> items;
+    
+    // 블록당 페이지 수 (고정)
+    private final int blockSize = 10;
 
-    // 생성자에서 페이징 계산까지 수행
-    public MentorRequestListOfPageVO(List<T> items, int page, int totalRowCount) {
+    public MentorRequestListOfPageVO(List<T> items, int page, int rowCntPerPage, int totalRowCount) {
         this.items = items;
         this.page = page;
+        this.rowCntPerPage = rowCntPerPage;
         this.totalRowCount = totalRowCount;
 
-        final int blockSize = 10;   // 한 블럭당 페이지 수
+        // 총 페이지 수 계산
+        this.totalPages = (int) Math.ceil((double) totalRowCount / rowCntPerPage);
 
-        // 총 페이지 수
-        this.totalPages = (int) Math.ceil((double) totalRowCount / this.rowCntPerPage);
-
-        // 페이지 기준 이전/다음
-        this.hasPrevPage = page > 1;
-        this.hasNextPage = page < totalPages;
-
-        // 블럭 계산
+        // 블록 시작/끝 계산
         this.startPage = ((page - 1) / blockSize) * blockSize + 1;
         this.endPage = Math.min(startPage + blockSize - 1, totalPages);
 
-        // 블럭 기준 이전/다음
+        // 블록 기준 이전/다음 존재 여부
         this.hasPrevBlock = startPage > 1;
         this.hasNextBlock = endPage < totalPages;
 
-        // 블럭 내 페이지 리스트
+        // 현재 블록 내 페이지 리스트 생성
         this.pageList = new ArrayList<>();
         for (int i = startPage; i <= endPage; i++) {
             pageList.add(i);
