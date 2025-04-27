@@ -68,8 +68,23 @@
 		</choose>
 		<choose>
 			<when
-				test="sortDirection != null and sortDirection.name() == 'ASC'">ASC</when>
-			<otherwise>DESC</otherwise>
+				test="sortDirection != null and sortDirection.name() == 'ASC'">
+				ASC
+			</when>
+			<otherwise>
+				DESC
+			</otherwise>
+		</choose>
+		,
+		advancementNo
+		<choose>
+			<when
+				test="sortDirection != null and sortDirection.name() == 'ASC'">
+				ASC
+			</when>
+			<otherwise>
+				DESC
+			</otherwise>
 		</choose>
 
 		LIMIT #{rowCntPerPage} OFFSET #{offset}
@@ -120,55 +135,58 @@
 	</select>
 
 	<!-- MentorRequestVO + MentorRequestUpFileVO 리스트 함께 조회 -->
-    <select id="selectMentorRequestDetail" resultMap="mentorRequestDetailMap">
-        SELECT
-            a.advancementNo,
-            a.title,
-            a.writer,
-            a.refUser,
-            a.postDate,
-            a.content,
-            a.status,
-            a.confirmDate,
-            a.rejectMessage,
-            u.upfileNo,
-            u.originalFileName,
-            u.newFileName,
-            u.thumbFileName,
-            u.fileType,
-            u.ext,
-            u.size,
-            u.base64Image,
-            u.refAdvancementNo
-        FROM advancement a
-        LEFT JOIN advancementUpfiles u
-          ON a.advancementNo = u.refAdvancementNo
-        WHERE a.advancementNo = #{advancementNo}
-    </select>
+	<select id="selectMentorRequestDetail"
+		resultMap="mentorRequestDetailMap">
+		SELECT
+		a.advancementNo,
+		a.title,
+		a.writer,
+		a.refUser,
+		a.postDate,
+		a.content,
+		a.status,
+		a.confirmDate,
+		a.rejectMessage,
+		u.upfileNo,
+		u.originalFileName,
+		u.newFileName,
+		u.thumbFileName,
+		u.fileType,
+		u.ext,
+		u.size,
+		u.base64Image,
+		u.refAdvancementNo
+		FROM advancement a
+		LEFT JOIN advancementUpfiles u
+		ON a.advancementNo = u.refAdvancementNo
+		WHERE a.advancementNo = #{advancementNo}
+	</select>
 
-    <!-- MentorRequestVO + MentorRequestUpFileVO 매핑 -->
-    <resultMap id="mentorRequestDetailMap" type="com.jobhunter.model.mentor.MentorRequestVO">
-        <id property="advancementNo" column="advancementNo"/>
-        <result property="title" column="title"/>
-        <result property="writer" column="writer"/>
-        <result property="refUser" column="refUser"/>
-        <result property="postDate" column="postDate"/>
-        <result property="content" column="content"/>
-        <result property="status" column="status"/>
-        <result property="confirmDate" column="confirmDate"/>
-        <result property="rejectMessage" column="rejectMessage"/>
+	<!-- MentorRequestVO + MentorRequestUpFileVO 매핑 -->
+	<resultMap id="mentorRequestDetailMap"
+		type="com.jobhunter.model.mentor.MentorRequestVO">
+		<id property="advancementNo" column="advancementNo" />
+		<result property="title" column="title" />
+		<result property="writer" column="writer" />
+		<result property="refUser" column="refUser" />
+		<result property="postDate" column="postDate" />
+		<result property="content" column="content" />
+		<result property="status" column="status" />
+		<result property="confirmDate" column="confirmDate" />
+		<result property="rejectMessage" column="rejectMessage" />
 
-        <collection property="upfiles" ofType="com.jobhunter.model.mentor.MentorRequestUpFileVO">
-            <id property="upfileNo" column="upfileNo"/>
-            <result property="originalFileName" column="originalFileName"/>
-            <result property="newFileName" column="newFileName"/>
-            <result property="thumbFileName" column="thumbFileName"/>
-            <result property="fileType" column="fileType"/>
-            <result property="ext" column="ext"/>
-            <result property="size" column="size"/>
-            <result property="base64Image" column="base64Image"/>
-            <result property="refAdvancementNo" column="refAdvancementNo"/>
-        </collection>
-    </resultMap>
+		<collection property="upfiles"
+			ofType="com.jobhunter.model.mentor.MentorRequestUpFileVO">
+			<id property="upfileNo" column="upfileNo" />
+			<result property="originalFileName" column="originalFileName" />
+			<result property="newFileName" column="newFileName" />
+			<result property="thumbFileName" column="thumbFileName" />
+			<result property="fileType" column="fileType" />
+			<result property="ext" column="ext" />
+			<result property="size" column="size" />
+			<result property="base64Image" column="base64Image" />
+			<result property="refAdvancementNo" column="refAdvancementNo" />
+		</collection>
+	</resultMap>
 
 </mapper>
