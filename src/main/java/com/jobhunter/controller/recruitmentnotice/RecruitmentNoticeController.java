@@ -600,11 +600,23 @@ public class RecruitmentNoticeController {
 	 *
 	 */
 	@DeleteMapping("/remove/{uid}")
-	public ResponseEntity<Boolean> removeRecruitment(@PathVariable("uid") int uid) {
+	public ResponseEntity<Boolean> removeRecruitment(@PathVariable("uid") int uid, HttpServletRequest request) {
 		ResponseEntity<Boolean> result = null;
 
 		try {
+			
+			RecruitmentDetailInfo detailInfo = recruitmentService.getRecruitmentByUid(uid);
+			
 			if (recruitmentService.removeRecruitmentByUid(uid)) {
+				
+				if (detailInfo != null && detailInfo.getFileList() != null) {
+	                String realPath = request.getSession().getServletContext().getRealPath("/");
+
+	                for (RecruitmentnoticeBoardUpfiles file : detailInfo.getFileList()) {
+	                    deletePhysicalFile(realPath, file);
+	                }
+	            }
+				
 				result = ResponseEntity.ok().body(true);
 			} else {
 				result = ResponseEntity.badRequest().body(false);
