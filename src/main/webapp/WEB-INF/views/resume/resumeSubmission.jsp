@@ -392,7 +392,7 @@
 							<!-- 첨삭 신청 시 마감기한 입력 필드 추가 -->
 							<div id="dueDateInputArea" style="display: none;" class="mb-3">
 								<label for="adviceDueDate" class="form-label">첨삭 마감기한</label>
-								<input type="date" class="form-control" id="adviceDueDate" required>
+								<input type="date" class="form-control" id="adviceDueDate" required min="">
 								<small class="text-muted normal-text" style="display: block;">첨삭을 완료해야 하는 마감기한을 선택해주세요.</small>
 								<div class="text-muted warning-text" style="display: none; font-size: 16px;">마감기한은 필수 입력 사항입니다.</div>
 							</div>
@@ -1044,4 +1044,8 @@
 				$('.normal-text').css('display', 'block');
 				$('.warning-text').css('display', 'none');
 			});
+			//---------------------------------------------------------------------------------------------------------------------------------
+			// 마감 기한 입력 필드에 현재 날짜를 최소값으로 설정
+			const today = new Date().toLocaleDateString('en-CA'); // 'YYYY-MM-DD' 형식으로 변환
+			document.getElementById('adviceDueDate').min = today;
 		</script>
