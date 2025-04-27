@@ -435,20 +435,26 @@ public class ResumeServiceImpl implements ResumeService {
 	 * @return 성공 여부
 	 */
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean endAdvice(int resumeNo, int userUid, int ownerUid) throws Exception {
+		// 첨삭 종료 처리
 		int adviceResult = rdao.changeAdviceStatus(resumeNo, userUid, "COMPLETE");
 		if (adviceResult > 0) {
-			// 첨삭 종료한 rgAdviceNo 가져오기
-			int rgAdviceNo = rdao.getRegistrationAdviceNo(userUid, resumeNo);
+			// 첨삭 내용 테이블 COMPLETE로 업데이트
+			int adviceStatusResult = rdao.updateAdviceStatus(resumeNo, "COMPLETE");
+			if (adviceStatusResult > 0) {
+				// 첨삭 종료한 rgAdviceNo 가져오기
+				int rgAdviceNo = rdao.getRegistrationAdviceNo(userUid, resumeNo);
 			// 포인트 로그에 포인트 차감 내역이 COMPLETE로 업데이트 됩니다.
 			int pointResult = pointDAO.updatePointLog(rgAdviceNo, "COMPLETE", "end");
 			if (pointResult > 0) {
 				// 첨삭을 완료한 유저의 포인트를 증가시킵니다.
-				userDAO.updateUserPoint(userUid, 1000);
-				return true;
+					userDAO.updateUserPoint(userUid, 1000);
+					return true;
+				}
 			}
 		}
 		return false;
-
 	}
+
 }

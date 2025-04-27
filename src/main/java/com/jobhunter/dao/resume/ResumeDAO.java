@@ -226,4 +226,16 @@ public interface ResumeDAO {
 	 */
 	int changeAdviceStatus(int resumeNo, int userUid, String status) throws Exception;
 
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 내용 상태를 변경하는 메서드
+	 * </p>
+	 * 
+	 * @param int resumeNo 이력서 번호
+	 * @param String status 첨삭 상태
+	 * @return 성공 여부
+	 */
+	int updateAdviceStatus(int resumeNo, String status) throws Exception;
 }

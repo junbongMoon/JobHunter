@@ -392,4 +392,12 @@ public class ResumeDAOImpl implements ResumeDAO {
 		params.put("status", status);
 		return ses.update(NS + ".changeAdviceStatus", params);
 	}
+
+	@Override
+	public int updateAdviceStatus(int resumeNo, String status) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("resumeNo", resumeNo);
+		params.put("status", status);
+		return ses.update(NS + ".updateAdviceStatus", params);
+	}
 }
