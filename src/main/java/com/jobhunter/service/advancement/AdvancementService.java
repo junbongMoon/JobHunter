@@ -20,5 +20,7 @@ public interface AdvancementService {
 	public PageResponseDTO<AdvancementVO> getAdvancementListByUid(int uid, PageRequestDTO pageRequestDTO) throws Exception;
 
 	public boolean modifyAdvancementByMento(AdvancementDTO advancementDTO, List<AdvancementUpFileVODTO> fileList) throws Exception;
+
+	public boolean deleteAdvancementById(int advancementNo, String realPath) throws Exception;
 	
 }

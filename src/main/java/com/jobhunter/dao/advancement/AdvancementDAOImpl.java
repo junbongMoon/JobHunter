@@ -89,5 +89,10 @@ public class AdvancementDAOImpl implements AdvancementDAO {
     public int deleteFilesByAdvancementNo(int advancementNo) throws Exception {
         return ses.delete(NS + ".deleteFilesByAdvancementNo", advancementNo);
     }
+    
+    @Override
+    public int deleteAdvancementById(int advancementNo) throws Exception {
+        return ses.delete(NS + ".deleteAdvancementById", advancementNo);
+    }
 
 }

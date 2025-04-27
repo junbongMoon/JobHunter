@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.advancement.AdvancementDTO;
 import com.jobhunter.model.advancement.AdvancementUpFileVODTO;
 import com.jobhunter.model.advancement.AdvancementVO;
@@ -256,5 +257,21 @@ public class AdvancementController {
         }
     }
     
+    @PostMapping("/delete")
+    public String deleteAdvancement(@RequestParam("advancementNo") int advancementNo, HttpServletRequest request) {
+        try {
+        	String realPath = request.getSession().getServletContext().getRealPath("/");
+
+            // 세션에서 account 꺼내고 uid 얻기
+            int uid = ((AccountVO) request.getSession().getAttribute("account")).getUid();
+
+            boolean success = advancementService.deleteAdvancementById(advancementNo, realPath);
+            
+            return success ? "redirect:/advancement/list?uid=" + uid : "/error";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "/error";
+        }
+    }
     
 }

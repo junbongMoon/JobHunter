@@ -5,7 +5,44 @@
 <head>
 <meta charset="UTF-8">
 <title>승급 신청 상세보기</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<script>
+  $(function() {
+  // 삭제 버튼 클릭 시 모달 열기
+  $("#deleteBtn").click(function() {
+    $("#deleteModal").fadeIn();
+  });
+
+  // 취소 버튼 클릭 시 모달 닫기
+  $("#cancelDelete").click(function() {
+    $("#deleteModal").fadeOut();
+  });
+
+  // 삭제 확인
+  $("#confirmDelete").click(function() {
+    if ($("#confirmInput").val().trim() === "삭제하겠습니다") {
+      // 진짜 삭제 요청
+      $.ajax({
+        url: "/advancement/delete", 
+        type: "POST",
+        data: { advancementNo: "${advancement.advancementNo}" },
+        success: function() {
+          alert("삭제가 완료되었습니다.");
+          location.href = "/advancement/list?uid=${sessionScope.account.uid}";
+        },
+        error: function() {
+          alert("삭제 실패. 다시 시도해주세요.");
+        }
+      });
+    } else {
+      alert("정확히 '삭제하겠습니다'를 입력해야 합니다.");
+    }
+  });
+});
+</script>
 <style>
   .pr-detail-container {
     max-width: 800px;
@@ -143,7 +180,22 @@
       <a href="/advancement/modify?id=${advancement.advancementNo}" class="btn btn-modify">
         <i class="fas fa-edit"></i> 수정
       </a>
+      <button type="button" class="btn btn-delete" id="deleteBtn">
+        <i class="fas fa-trash"></i> 삭제
+      </button>
     </c:if>
+  </div>
+
+  <div id="deleteModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:white; padding:2rem; border-radius:10px; width:300px; text-align:center;">
+      <h3 style="margin-bottom:1rem;">삭제 확인</h3>
+      <p style="margin-bottom:1rem;">"삭제하겠습니다"를 입력하세요.</p>
+      <input type="text" id="confirmInput" placeholder="삭제하겠습니다" style="width:100%; padding:0.5rem; margin-bottom:1rem;">
+      <div style="display:flex; justify-content:space-between; gap:10px;">
+        <button id="confirmDelete" style="flex:1; padding:0.5rem; background:#e74c3c; color:white; border:none; border-radius:5px;">삭제</button>
+        <button id="cancelDelete" style="flex:1; padding:0.5rem; background:#ccc; border:none; border-radius:5px;">취소</button>
+      </div>
+    </div>
   </div>
 </div>
 

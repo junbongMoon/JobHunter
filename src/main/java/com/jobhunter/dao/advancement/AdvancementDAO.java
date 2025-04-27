@@ -30,4 +30,6 @@ public interface AdvancementDAO {
 	public int updateAdvancementByMento(AdvancementDTO advancementDTO) throws Exception;
 
 	public int deleteFilesByAdvancementNo(int advancementNo) throws Exception;
+
+	public int deleteAdvancementById(int advancementNo) throws Exception;
 }

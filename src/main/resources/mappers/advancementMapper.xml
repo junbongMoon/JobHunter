@@ -85,15 +85,21 @@
 		UPDATE advancement
 		SET
 		title = #{title},
-		content = #{content}
+		content =
+		#{content}
 		WHERE advancementNo = #{advancementNo}
 	</update>
 
 	<delete id="deleteFilesByAdvancementNo" parameterType="int">
-		DELETE FROM advancementUpfiles
+		DELETE
+		FROM advancementUpfiles
 		WHERE refAdvancementNo = #{advancementNo}
 	</delete>
 
+	<delete id="deleteAdvancementById" parameterType="int">
+		DELETE FROM advancement
+		WHERE advancementNo = #{advancementNo}
+	</delete>
 
 
 </mapper>

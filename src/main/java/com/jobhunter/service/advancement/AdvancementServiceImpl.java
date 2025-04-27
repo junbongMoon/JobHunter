@@ -1,5 +1,6 @@
 package com.jobhunter.service.advancement;
 
+import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -150,6 +151,40 @@ public class AdvancementServiceImpl implements AdvancementService {
 	    }
 
 	    return result;
+	}
+	
+	@Transactional
+	@Override
+	public boolean deleteAdvancementById(int advancementNo, String realPath) throws Exception {
+	    // 1. 첨부파일 목록 조회
+	    List<AdvancementUpFileVODTO> fileList = advancementDAO.getfileListByAdvancement(advancementNo);
+
+	    // 2. 서버에 저장된 실제 파일 삭제
+	    if (fileList != null && !fileList.isEmpty()) {
+	        for (AdvancementUpFileVODTO file : fileList) {
+	            // 여기서 넘겨받은 realPath 사용
+	            String mainPath = realPath + file.getNewFileName();  // 진짜 파일 경로
+	            String thumbPath = realPath + file.getThumbFileName(); // 썸네일 파일 경로
+
+	            File mainFile = new File(mainPath.replace("/", File.separator));
+	            File thumbFile = new File(thumbPath.replace("/", File.separator));
+
+	            if (mainFile.exists()) {
+	                mainFile.delete();
+	            }
+	            if (thumbFile.exists()) {
+	                thumbFile.delete();
+	            }
+	        }
+	    }
+
+	    // 3. DB에서 파일정보 삭제
+	    advancementDAO.deleteFilesByAdvancementNo(advancementNo);
+
+	    // 4. 게시글 삭제
+	    int result = advancementDAO.deleteAdvancementById(advancementNo);
+
+	    return result > 0;
 	}
 
 }
