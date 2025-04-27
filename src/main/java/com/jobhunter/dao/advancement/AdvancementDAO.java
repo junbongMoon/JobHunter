@@ -26,4 +26,8 @@ public interface AdvancementDAO {
 	public int getTotalCountRow(int uid) throws Exception;
 
 	public List<AdvancementVO> selectAdvancementListByPaging(int uid, PageResponseDTO<AdvancementVO> pageResponseDTO) throws Exception;
+
+	public int updateAdvancementByMento(AdvancementDTO advancementDTO) throws Exception;
+
+	public int deleteFilesByAdvancementNo(int advancementNo) throws Exception;
 }

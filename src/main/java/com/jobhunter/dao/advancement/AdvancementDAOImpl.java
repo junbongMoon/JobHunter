@@ -80,5 +80,14 @@ public class AdvancementDAOImpl implements AdvancementDAO {
         return ses.selectList(NS + ".selectAdvancementListByPaging", params);
     }
 	
+    @Override
+    public int updateAdvancementByMento(AdvancementDTO advancementDTO) throws Exception {
+        return ses.update(NS + ".updateAdvancementByMento", advancementDTO);
+    }
+
+    @Override
+    public int deleteFilesByAdvancementNo(int advancementNo) throws Exception {
+        return ses.delete(NS + ".deleteFilesByAdvancementNo", advancementNo);
+    }
 
 }

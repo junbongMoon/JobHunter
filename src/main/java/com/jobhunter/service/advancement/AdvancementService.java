@@ -18,5 +18,7 @@ public interface AdvancementService {
 	
 	// 승급 게시물 리스트를 작성자 uid로 조회하는 게시물
 	public PageResponseDTO<AdvancementVO> getAdvancementListByUid(int uid, PageRequestDTO pageRequestDTO) throws Exception;
+
+	public boolean modifyAdvancementByMento(AdvancementDTO advancementDTO, List<AdvancementUpFileVODTO> fileList) throws Exception;
 	
 }

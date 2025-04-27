@@ -225,5 +225,36 @@ public class AdvancementController {
         }
     }
     
+    /**
+     *  @author 문준봉
+     *
+     * <p>
+     * 승급 게시물을 수정하는 메서드
+     * </p>
+     *
+     * @param advancementDTO
+     * @param request
+     * @return 이동할 페이지
+     */
+    @PostMapping("/modify")
+    public String modifyAdvancement(@ModelAttribute AdvancementDTO advancementDTO, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        List<AdvancementUpFileVODTO> fileList =
+                (List<AdvancementUpFileVODTO>) session.getAttribute("newfileList");
+
+        if (fileList == null) fileList = new ArrayList<>();
+
+        try {
+            boolean success = advancementService.modifyAdvancementByMento(advancementDTO, fileList);
+            session.removeAttribute("newfileList"); // 수정 후 세션 정리
+            return success ? 
+                    "/user/mypage" : 
+                    "/user/mypage";
+        } catch (Exception e) {
+            logger.error("게시글 수정 실패", e);
+            return "/user/mypage";
+        }
+    }
+    
     
 }

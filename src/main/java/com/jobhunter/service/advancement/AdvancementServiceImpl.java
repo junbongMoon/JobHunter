@@ -123,4 +123,33 @@ public class AdvancementServiceImpl implements AdvancementService {
 		return pageResponseDTO;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	@Override
+	public boolean modifyAdvancementByMento(AdvancementDTO advancementDTO, List<AdvancementUpFileVODTO> fileList)
+	        throws Exception {
+
+	    boolean result = false;
+
+	    // 1. 게시물 내용 수정
+	    if (advancementDAO.updateAdvancementByMento(advancementDTO) > 0) {
+	        int advancementNo = advancementDTO.getAdvancementNo();
+
+	        // 2. 기존 파일들 모두 삭제 (DB상에서)
+	        advancementDAO.deleteFilesByAdvancementNo(advancementNo);
+
+	        // 3. 세션에 있는 새로운 파일들 다시 저장
+	        if (fileList != null && !fileList.isEmpty()) {
+	            for (AdvancementUpFileVODTO file : fileList) {
+	                file.setStatus(FileStatus.COMPLETE);
+	                file.setRefAdvancementNo(advancementNo);
+	                advancementDAO.insertAdvancementFileUpload(file);
+	            }
+	        }
+
+	        result = true;
+	    }
+
+	    return result;
+	}
+
 }

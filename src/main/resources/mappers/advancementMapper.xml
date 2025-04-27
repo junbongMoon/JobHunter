@@ -32,7 +32,8 @@
 		resultType="com.jobhunter.model.advancement.AdvancementVO">
 		SELECT a.*
 		FROM advancement a
-		WHERE a.advancementNo = #{advancementNo}
+		WHERE a.advancementNo =
+		#{advancementNo}
 	</select>
 
 	<select id="getAdvanceFileListByadvancementNo"
@@ -78,6 +79,21 @@
 		advancementNo DESC
 		LIMIT #{startRowIndex}, #{rowCntPerPage}
 	</select>
+
+	<update id="updateAdvancementByMento"
+		parameterType="com.jobhunter.model.advancement.AdvancementDTO">
+		UPDATE advancement
+		SET
+		title = #{title},
+		content = #{content}
+		WHERE advancementNo = #{advancementNo}
+	</update>
+
+	<delete id="deleteFilesByAdvancementNo" parameterType="int">
+		DELETE FROM advancementUpfiles
+		WHERE refAdvancementNo = #{advancementNo}
+	</delete>
+
 
 
 </mapper>
