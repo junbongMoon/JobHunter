@@ -68,16 +68,16 @@ public class AdvancementController {
                 (List<AdvancementUpFileVODTO>) session.getAttribute("newfileList");
 
         if (fileList == null) fileList = new ArrayList<>();
-
+        int uid = ((AccountVO) session.getAttribute("account")).getUid();
         try {
             boolean success = advancementService.SaveAdvancementByMento(advancementDTO, fileList);
             session.removeAttribute("newfileList"); // 저장 후 초기화
-            return success ?
-            		 "/user/mypage" :
-                     "/user/mypage";
+            
+            
+            return "redirect:/advancement/list?uid=" + uid;
         } catch (Exception e) {
             logger.error("게시글 저장 실패", e);
-            return "/user/mypage";
+            return "redirect:/advancement/list?uid=" + uid;
         }
     }
 
@@ -248,9 +248,11 @@ public class AdvancementController {
         try {
             boolean success = advancementService.modifyAdvancementByMento(advancementDTO, fileList);
             session.removeAttribute("newfileList"); // 수정 후 세션 정리
-            return success ? 
-                    "/user/mypage" : 
-                    "/user/mypage";
+
+            int advancementNo = advancementDTO.getAdvancementNo(); // ✅ 수정한 게시글 번호를 꺼낸다
+
+            return success ? "redirect:/advancement/detail?advancementNo=" + advancementNo : "/user/mypage";
+
         } catch (Exception e) {
             logger.error("게시글 수정 실패", e);
             return "/user/mypage";
@@ -259,18 +261,19 @@ public class AdvancementController {
     
     @PostMapping("/delete")
     public String deleteAdvancement(@RequestParam("advancementNo") int advancementNo, HttpServletRequest request) {
+    	 int uid = ((AccountVO) request.getSession().getAttribute("account")).getUid();
         try {
         	String realPath = request.getSession().getServletContext().getRealPath("/");
 
             // 세션에서 account 꺼내고 uid 얻기
-            int uid = ((AccountVO) request.getSession().getAttribute("account")).getUid();
+           
 
             boolean success = advancementService.deleteAdvancementById(advancementNo, realPath);
             
-            return success ? "redirect:/advancement/list?uid=" + uid : "/error";
+            return success ? "redirect:/advancement/list?uid=" + uid + "?action=success" : "redirect:/advancement/list?uid=" + uid + "?action=fail";
         } catch (Exception e) {
             e.printStackTrace();
-            return "/error";
+            return "redirect:/advancement/list?uid=" + uid + "?action=fail";
         }
     }
     
