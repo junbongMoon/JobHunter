@@ -260,20 +260,22 @@ public class AdvancementController {
     }
     
     @PostMapping("/delete")
-    public String deleteAdvancement(@RequestParam("advancementNo") int advancementNo, HttpServletRequest request) {
-    	 int uid = ((AccountVO) request.getSession().getAttribute("account")).getUid();
+    public ResponseEntity<Boolean> deleteAdvancement(@RequestParam("advancementNo") int advancementNo, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        int uid = ((AccountVO) session.getAttribute("account")).getUid();
+        
         try {
-        	String realPath = request.getSession().getServletContext().getRealPath("/");
-
-            // 세션에서 account 꺼내고 uid 얻기
-           
-
+            String realPath = request.getSession().getServletContext().getRealPath("/");
             boolean success = advancementService.deleteAdvancementById(advancementNo, realPath);
             
-            return success ? "redirect:/advancement/list?uid=" + uid + "?action=success" : "redirect:/advancement/list?uid=" + uid + "?action=fail";
+            if (success) {
+                return ResponseEntity.ok(true);  // ✅ 성공이면 200 OK
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);  // ❗ 실패면 500
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return "redirect:/advancement/list?uid=" + uid + "?action=fail";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false); // ❗ 예외나면 500
         }
     }
     
