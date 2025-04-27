@@ -204,5 +204,23 @@ public class AdvancementController {
     	return "/advancement/list";
     }
     
+    @GetMapping("/detail")
+    public String showAdvancementDetail(@RequestParam("advancementNo") int advancementNo, Model model) {
+        try {
+            AdvancementVO advancement = advancementService.getAdvancementById(advancementNo);
+
+            if (advancement == null) {
+                return "redirect:/advancement/list?uid=1"; // 글이 없으면 리스트로 리다이렉트
+            }
+
+            model.addAttribute("advancement", advancement);
+            return "/advancement/detail"; // JSP 경로
+
+        } catch (Exception e) {
+            logger.error("상세 페이지 로딩 실패", e);
+            return "redirect:/advancement/list?uid=1";
+        }
+    }
+    
     
 }

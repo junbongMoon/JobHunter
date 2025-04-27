@@ -52,14 +52,18 @@ public class AdvancementServiceImpl implements AdvancementService {
 
 	@Override
 	public AdvancementVO getAdvancementById(int advancementNo) throws Exception {
-		AdvancementVO advancementVO = advancementDAO.selectAdvancementByAdvancementNo(advancementNo);
+	    AdvancementVO advancement = advancementDAO.selectAdvancementByAdvancementNo(advancementNo);
 
-		if (advancementVO != null && advancementVO.getAdvancementNo() > 0) {
-			List<AdvancementUpFileVODTO> fileList = advancementDAO
-					.getfileListByAdvancement(advancementVO.getAdvancementNo());
-			advancementVO.setFileList(fileList);
-		}
-		return advancementVO;
+	    if (advancement != null && advancement.getAdvancementNo() > 0) {
+	        advancement.setFileList(advancementDAO.getfileListByAdvancement(advancement.getAdvancementNo()));
+
+	        if (advancement.getPostDate() != null) {
+	            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+	            advancement.setFormattedPostDate(advancement.getPostDate().format(formatter));
+	        }
+	    }
+
+	    return advancement;
 	}
 
 	@Override
