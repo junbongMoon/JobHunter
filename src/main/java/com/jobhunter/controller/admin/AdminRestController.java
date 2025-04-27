@@ -25,19 +25,17 @@ public class AdminRestController {
 	private final MentorService mentorService;
 	
 	@PostMapping("/mentor/request-list")
-    public void getMentorRequestList(@RequestBody MentorRequestListSearchDTO searchDTO) {
+    public MentorRequestListOfPageVO<MentorRequestSimpleVO> getMentorRequestList(@RequestBody MentorRequestListSearchDTO searchDTO) {
         System.out.println("받은 검색 조건: " + searchDTO);
         
         MentorRequestListOfPageVO<MentorRequestSimpleVO> result = null;
         
         try {
-        	
         	result = mentorService.getMentorRequestList(searchDTO);
-        	
-        	System.out.println(result);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        return result;
     }
 }
