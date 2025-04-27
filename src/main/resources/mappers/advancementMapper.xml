@@ -28,10 +28,11 @@
 		#{refAdvancementNo}, 'NEW')
 	</insert>
 
-	<select id="getAdvancementByAdvancementNo">
-		select a.* from advancement a
-		where a.advancementNo =
-		#{advancementNo}
+	<select id="getAdvancementByAdvancementNo" parameterType="int"
+		resultType="com.jobhunter.model.advancement.AdvancementVO">
+		SELECT a.*
+		FROM advancement a
+		WHERE a.advancementNo = #{advancementNo}
 	</select>
 
 	<select id="getAdvanceFileListByadvancementNo"
@@ -73,7 +74,8 @@
 		SELECT *
 		FROM advancement
 		WHERE refUser = #{uid}
-		ORDER BY advancementNo DESC
+		ORDER BY
+		advancementNo DESC
 		LIMIT #{startRowIndex}, #{rowCntPerPage}
 	</select>
 

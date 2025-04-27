@@ -62,6 +62,8 @@ public class AdvancementServiceImpl implements AdvancementService {
 	            advancement.setFormattedPostDate(advancement.getPostDate().format(formatter));
 	        }
 	    }
+	    
+	    System.out.println("advancement : " + advancement);
 
 	    return advancement;
 	}

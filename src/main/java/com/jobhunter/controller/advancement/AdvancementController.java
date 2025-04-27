@@ -206,12 +206,15 @@ public class AdvancementController {
     
     @GetMapping("/detail")
     public String showAdvancementDetail(@RequestParam("advancementNo") int advancementNo, Model model) {
+    	
+    	System.out.println("디테일 페이지 호출 됬나?");
         try {
             AdvancementVO advancement = advancementService.getAdvancementById(advancementNo);
 
             if (advancement == null) {
                 return "redirect:/advancement/list?uid=1"; // 글이 없으면 리스트로 리다이렉트
             }
+            System.out.println(advancement.getFileList());
 
             model.addAttribute("advancement", advancement);
             return "/advancement/detail"; // JSP 경로
