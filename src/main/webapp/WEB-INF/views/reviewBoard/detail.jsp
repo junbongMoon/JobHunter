@@ -14,8 +14,9 @@
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 	rel="stylesheet">
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-	
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
@@ -360,21 +361,24 @@
 				style="display: none;">❌ 취소</button>
 		</c:if>
 
-		<c:if test="${not empty sessionScope.account 
+		<c:if
+			test="${not empty sessionScope.account 
 		    and sessionScope.account.accountType ne 'COMPANY'
 		    and sessionScope.account.uid eq detail.writerUid}">
-		    <!-- 수정 버튼 -->
-				    <a href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
-				       class="btn-getstarted btn-sm btn-common-shape">✏️ 수정</a>
-				
-				    <!-- 삭제 버튼 -->
-				    <form action="${pageContext.request.contextPath}/reviewBoard/delete" method="post" style="display: inline;">
-				        <input type="hidden" name="boardNo" value="${detail.boardNo}" />
-				        <button type="button" class="btn-getstarted btn-sm delete-btn btn-common-shape" data-boardno="${detail.boardNo}">
-				            🗑 삭제
-				        </button>
-				    </form>
-				</c:if>
+			<!-- 수정 버튼 -->
+			<a
+				href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
+				class="btn-getstarted btn-sm btn-common-shape">✏️ 수정</a>
+
+			<!-- 삭제 버튼 -->
+			<form action="${pageContext.request.contextPath}/reviewBoard/delete"
+				method="post" style="display: inline;">
+				<input type="hidden" name="boardNo" value="${detail.boardNo}" />
+				<button type="button"
+					class="btn-getstarted btn-sm delete-btn btn-common-shape"
+					data-boardno="${detail.boardNo}">🗑 삭제</button>
+			</form>
+		</c:if>
 
 		<!-- 목록으로 -->
 		<a
@@ -398,12 +402,14 @@
 		<!-- 댓글 목록 출력 영역 -->
 		<ul id="replyList" class="list-group"></ul>
 
-		<!--  댓글 작성 영역 추가 -->
-		<div class="mt-4">
-			<textarea id="replyContent" class="form-control" rows="3"
-				placeholder="댓글을 입력해주세요"></textarea>
-			<button id="submitReplyBtn" class="btn btn-primary mt-2">등록</button>
-		</div>
+		<c:if test="${not isCompanyAccount}">
+			<!-- 댓글 작성 영역 추가 -->
+			<div class="mt-4">
+				<textarea id="replyContent" class="form-control" rows="3"
+					placeholder="댓글을 입력해주세요"></textarea>
+				<button id="submitReplyBtn" class="btn btn-primary mt-2">등록</button>
+			</div>
+		</c:if>
 
 		<!-- 댓글 페이징 부분 -->
 		<nav>
@@ -411,6 +417,8 @@
 				id="replyPagination"></ul>
 		</nav>
 	</div>
+
+
 	<!-- 좋아요 알림 모달 -->
 	<div class="modal fade" id="likeModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
@@ -426,7 +434,8 @@
 			</div>
 		</div>
 	</div>
-<div>isCompanyAccount: ${isCompanyAccount}</div>
+
+	<div>isCompanyAccount: ${isCompanyAccount}</div>
 	<input type="hidden" id="loginUserUid"
 		value="${sessionScope.account.uid}">
 	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
@@ -654,7 +663,7 @@ function loadReplies(page = 1) {
       size: 5
     },
     success: function (response) {
-      console.log("👀 서버 응답:", response);
+      console.log("서버 응답:", response);
 
       const replies = response.boardList;
       const totalPages = response.totalPage ?? Math.ceil(response.totalCount / response.size);
@@ -669,27 +678,35 @@ function loadReplies(page = 1) {
       if (!replies || replies.length === 0) {
         $replyList.append('<li class="list-group-item text-muted">등록된 댓글이 없습니다.</li>');
       } else {
-        replies.forEach(reply => {
-          const replyNo = reply.replyNo;
-          const replyContent = (reply.content ?? '').replace(/"/g, '&quot;');
-          const date = (reply.postDate ?? '').substring(0, 10);
-          const writer = reply.writerId ?? '익명';
+    	  replies.forEach(reply => {
+    		    const replyNo = reply.replyNo;
+    		    const replyContent = (reply.content ?? '').replace(/"/g, '&quot;');
+    		    const date = (reply.postDate ?? '').substring(0, 10);
+    		    const writer = reply.writerId ?? '익명';
 
-          const html = '<li class="list-group-item">' +
-          '<strong>' + writer + '</strong> (' + date + ')<br>' +
-          '<div class="reply-content">' + reply.content + '</div>' +
-          '<div class="reply-like-section mt-2" data-replyno="' + replyNo + '">' + // ✅ 클래스명 수정
-          '<button class="btn btn-outline-primary btn-sm like-reply-btn"' + (reply.isLiked ? ' style="display:none;"' : '') + '>👍 좋아요</button>' +
-          '<button class="btn btn-outline-danger btn-sm unlike-reply-btn"' + (reply.isLiked ? '' : ' style="display:none;"') + '>❌ 취소</button>' +
-          '&nbsp;<span class="like-count">' + reply.likes + '</span>' +
-          '</div>' +
-          (reply.userId.toString() === loginUserUid.toString()
-            ? '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" data-replyno="' + replyNo + '" data-content="' + replyContent + '">수정</button>' +
-              '<button class="btn btn-sm btn-outline-danger delete-reply-btn" data-replyno="' + replyNo + '">삭제</button>'
-            : '') +
-          '</li>';
-          $replyList.append(html);
-        });
+    		    let replyHtml = '<li class="list-group-item">' +
+    		      '<strong>' + writer + '</strong> (' + date + ')<br>' +
+    		      '<div class="reply-content">' + reply.content + '</div>';
+
+    		    // ⭐ 좋아요 버튼은 회사 계정이 아니면 보여주기
+    		    if (!isCompanyAccount) {
+    		        replyHtml += '<div class="reply-like-section mt-2" data-replyno="' + replyNo + '">' +
+    		            '<button class="btn btn-outline-primary btn-sm like-reply-btn"' + (reply.isLiked ? ' style="display:none;"' : '') + '>👍 좋아요</button>' +
+    		            '<button class="btn btn-outline-danger btn-sm unlike-reply-btn"' + (reply.isLiked ? '' : ' style="display:none;"') + '>❌ 취소</button>' +
+    		            '&nbsp;<span class="like-count">' + reply.likes + '</span>' +
+    		            '</div>';
+    		    }
+
+    		    // 수정/삭제 버튼은 작성자 본인만
+    		    if (reply.userId.toString() === loginUserUid.toString()) {
+    		        replyHtml += '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" data-replyno="' + replyNo + '" data-content="' + replyContent + '">수정</button>' +
+    		                     '<button class="btn btn-sm btn-outline-danger delete-reply-btn" data-replyno="' + replyNo + '">삭제</button>';
+    		    }
+
+    		    replyHtml += '</li>';
+
+    		    $replyList.append(replyHtml);
+    		});
       }
 
       // 페이징 출력
@@ -833,9 +850,9 @@ function bindReplyLikeEvents() {
     $(document).off('click', '.unlike-reply-btn');
 
     $(document).on('click', '.like-reply-btn', function () {
-      const wrapper = $(this).closest('.reply-like-section'); // ✅ 클래스명 수정됨
+      const wrapper = $(this).closest('.reply-like-section'); 
       const replyNo = wrapper.data('replyno');
-      const likeCountSpan = wrapper.find('.like-count'); // ✅ 클래스명 수정됨
+      const likeCountSpan = wrapper.find('.like-count'); 
       let currentCount = parseInt(likeCountSpan.text());
 
       $.ajax({
