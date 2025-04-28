@@ -28,9 +28,11 @@
 		#{refAdvancementNo}, 'NEW')
 	</insert>
 
-	<select id="getAdvancementByAdvancementNo">
-		select a.* from advancement a
-		where a.advancementNo =
+	<select id="getAdvancementByAdvancementNo" parameterType="int"
+		resultType="com.jobhunter.model.advancement.AdvancementVO">
+		SELECT a.*
+		FROM advancement a
+		WHERE a.advancementNo =
 		#{advancementNo}
 	</select>
 
@@ -48,7 +50,8 @@
 		base64Image,
 		refAdvancementNo,
 		status
-		FROM advancementUpfiles
+		FROM
+		advancementUpfiles
 		WHERE refAdvancementNo = #{advancementNo}
 	</select>
 
@@ -311,5 +314,51 @@
 	    WHERE refUser = #{refUser}
 	    LIMIT 20
 	</update>
+
+	<select id="getSearchResultRowCount"
+		parameterType="com.jobhunter.model.page.PageRequestDTO"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM advancement
+		WHERE ${searchType} LIKE
+		CONCAT('%', #{searchWord}, '%')
+	</select>
+
+	<select id="getTotalCountRow" parameterType="int"
+		resultType="int">
+		SELECT COUNT(*) FROM advancement WHERE refUser = #{uid}
+	</select>
+
+	<select id="selectAdvancementListByPaging" parameterType="map"
+		resultType="com.jobhunter.model.advancement.AdvancementVO">
+
+		SELECT *
+		FROM advancement
+		WHERE refUser = #{uid}
+		ORDER BY
+		advancementNo DESC
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
+	</select>
+
+	<update id="updateAdvancementByMento"
+		parameterType="com.jobhunter.model.advancement.AdvancementDTO">
+		UPDATE advancement
+		SET
+		title = #{title},
+		content =
+		#{content}
+		WHERE advancementNo = #{advancementNo}
+	</update>
+
+	<delete id="deleteFilesByAdvancementNo" parameterType="int">
+		DELETE
+		FROM advancementUpfiles
+		WHERE refAdvancementNo = #{advancementNo}
+	</delete>
+
+	<delete id="deleteAdvancementById" parameterType="int">
+		DELETE FROM advancement
+		WHERE advancementNo = #{advancementNo}
+	</delete>
 
 </mapper>

@@ -9,6 +9,8 @@ import com.jobhunter.model.advancement.MentorRequestListSearchDTO;
 import com.jobhunter.model.advancement.MentorRequestSimpleVO;
 import com.jobhunter.model.advancement.MentorRequestVO;
 import com.jobhunter.model.advancement.MentorRequestVO.Status;
+import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
 
 public interface AdvancementDAO {
 	
@@ -38,4 +40,17 @@ public interface AdvancementDAO {
 	int selectRefUserByAdvancementNo(int advancementNo) throws Exception;
 
 	void setMentorRequestStatusToPassByRefUser(Integer refUser) throws Exception;
+
+	public int getSearchResultRowCount(int uid, PageRequestDTO pageRequestDTO) throws Exception;
+
+	public int getTotalCountRow(int uid) throws Exception;
+
+	public List<AdvancementVO> selectAdvancementListByPaging(int uid, PageResponseDTO<AdvancementVO> pageResponseDTO) throws Exception;
+
+	public int updateAdvancementByMento(AdvancementDTO advancementDTO) throws Exception;
+
+	public int deleteFilesByAdvancementNo(int advancementNo) throws Exception;
+
+	public int deleteAdvancementById(int advancementNo) throws Exception;
+
 }

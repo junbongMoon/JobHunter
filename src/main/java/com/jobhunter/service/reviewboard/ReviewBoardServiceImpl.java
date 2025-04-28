@@ -78,37 +78,13 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-	public boolean addlikes(int userId, int boardNo) throws Exception {
-	    Likes like = Likes.builder()
-	            .userId(userId)
-	            .boardNo(boardNo)
-	            .likeType("REBOARD")
-	            .build();
-
-	    // [유지] 좋아요 시간 조회 (현재는 사용 안함)
-//	   boolean lastLikeTime = Rdao.selectLike(like);
-//	   	
-//	   if (lastLikeTime) {
-//	        // 여기 안은 실행 안 됨 (추후 다시 사용할 여지를 둠)
-//	        throw new IllegalArgumentException("제한된 추천입니다.");
-//	    }
-	    // [비활성화] 24시간 제한 체크 (나중을 위해 주석만 남겨둠)
-	    /*
-	    if (lastLikeTime != null) {
-	        LocalDateTime now = LocalDateTime.now();
-	        long hours = ChronoUnit.HOURS.between(lastLikeTime, now);
-	        if (hours < 24) {
-	            // 24시간 제한으로 인해 좋아요 불가
-	            throw new IllegalArgumentException("24시간 이내에는 다시 추천할 수 없습니다.");
-	        }
-	    }
-	    */
+	public boolean addlikes(Likes likes) throws Exception {
 
 	    // 3. 좋아요 추가
-	    Rdao.insertLike(like);
+	    Rdao.insertLike(likes);
 
 	    // 4. 게시글 좋아요 수 증가
-	    Rdao.updateBoardLikes(boardNo);
+	    Rdao.updateBoardLikes(likes.getBoardNo());
 
 	    return true;
 	}
@@ -134,14 +110,15 @@ public class ReviewBoardServiceImpl implements ReviewBoardService {
 	
 
 	@Override
-	@Transactional(rollbackFor = Exception.class)
-	public boolean removeLike(int userId, int boardNo) throws Exception {
-		int result = Rdao.deleteLike(userId, boardNo);
-		if (result > 0) {
-			Rdao.decreaseBoardLikes(boardNo);
-			return true;
-		}
-		return false;
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+	public boolean removeLike(Likes likes) throws Exception {
+	    int result = Rdao.deleteLike(likes);
+	    if (result > 0) {
+	        Rdao.updateBoardLikes(likes.getBoardNo()); // 좋아요 수 감소
+	        return true;
+	    } else {
+	        return false;
+	    }
 	}
 
 	@Override

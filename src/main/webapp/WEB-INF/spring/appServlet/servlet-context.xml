@@ -15,16 +15,20 @@
 	<!-- Enables the Spring MVC @Controller programming model -->
 	<!-- 이게 적용이 안됨... -->
 	<annotation-driven />
-	
+
 	<!-- 수신된 Multipart 데이터를 순서대로 재조립하는 객체 -->
-   <beans:bean id="multipartResolver"
-      class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-      <beans:property name="maxUploadSize" value="10485760"></beans:property>
-   </beans:bean>
+	<beans:bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<beans:property name="maxUploadSize" value="10485760"></beans:property>
+	</beans:bean>
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving 
 		up static resources in the ${webappRoot}/resources directory -->
 	<resources mapping="/resources/**" location="/resources/" />
+	<resources mapping="/resources/recruitmentFiles/**"
+		location="/resources/recruitmentFiles/" />
+	<resources mapping="/resources/advancementFiles/**"
+		location="/resources/advancementFiles/" />
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
 		in the /WEB-INF/views directory -->
@@ -33,13 +37,10 @@
 		<beans:property name="prefix" value="/WEB-INF/views/" />
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
-	
-	
+  
 	<!-- controller 패키지 안에 객체로  -->
 	<context:component-scan base-package="com.jobhunter.controller"></context:component-scan>
 	<context:component-scan base-package="com.jobhunter.interceptor"></context:component-scan>
-	
-
 	
 	<!-- 계정타입(개인/기업) 검사하는 인터셉터(get요청용_rest방식등은 AccountRestController 참조) 
 		_쿼리스트링으로 [ ?accountType=company ] 처럼 accountType 붙여놓고 걸면 동작
@@ -60,50 +61,50 @@
 	<beans:bean id="AccountStatInterceptor"
 		class="com.jobhunter.interceptor.AccountStatInterceptor">
 	</beans:bean>
-	
+
 	<!-- 어드민 확인 인터셉터 -->
 	<beans:bean id="AdminRoleInterceptor"
 		class="com.jobhunter.interceptor.AdminRoleInterceptor">
 	</beans:bean>
-	
+
 	<!-- 기업 확인 인터셉터 -->
 	<beans:bean id="CompanyRoleInterceptor"
 		class="com.jobhunter.interceptor.CompanyRoleInterceptor">
 	</beans:bean>
-	
+
 	<!-- 기업 or 어드민 확인 인터셉터 -->
 	<beans:bean id="CompanyAndAdminRoleInterceptor"
 		class="com.jobhunter.interceptor.CompanyAndAdminRoleInterceptor">
 	</beans:bean>
-	
+
 	<!-- 개인 확인 인터셉터 -->
 	<beans:bean id="UserRoleInterceptor"
 		class="com.jobhunter.interceptor.UserRoleInterceptor">
 	</beans:bean>
-	
+
 	<!-- 개인 or 어드민 확인 인터셉터 -->
 	<beans:bean id="UserAndAdminRoleInterceptor"
 		class="com.jobhunter.interceptor.UserAndAdminRoleInterceptor">
 	</beans:bean>
-	
+
 	<!-- 멘토 확인 인터셉터 -->
 	<beans:bean id="MentorRoleInterceptor"
 		class="com.jobhunter.interceptor.MentorRoleInterceptor">
 	</beans:bean>
-	
+
 	<!-- 멘토 or 어드민 확인 인터셉터 -->
 	<beans:bean id="MentorAndAdminRoleInterceptor"
 		class="com.jobhunter.interceptor.MentorAndAdminRoleInterceptor">
 	</beans:bean>
 
-	<!-- 본인확인 인터셉터_쿼리스트링으로 [ ?uid=101&accountType=company ] 처럼 uid랑 accountType 붙여놓고 걸면 동작.
-		accountType은 com.jobhunter.model.customenum.AccountType 참고(대소문자 구분 없음) 
-		[ &allowAdmin=true ] 추가로 붙이면 본인 아니라도 어드민도 볼수있는 페이지됩니다 
-		(get요청용_rest방식등은 AccountRestController 참조) -->
+	<!-- 본인확인 인터셉터_쿼리스트링으로 [ ?uid=101&accountType=company ] 처럼 uid랑 accountType 
+		붙여놓고 걸면 동작. accountType은 com.jobhunter.model.customenum.AccountType 참고(대소문자 
+		구분 없음) [ &allowAdmin=true ] 추가로 붙이면 본인 아니라도 어드민도 볼수있는 페이지됩니다 (get요청용_rest방식등은 
+		AccountRestController 참조) -->
 	<beans:bean id="OwnerInterceptor"
 		class="com.jobhunter.interceptor.OwnerInterceptor">
 	</beans:bean>
-	
+
 	<!-- 자동로그인 인터셉터 -->
 	<beans:bean id="autoLoginInterceptor"
 		class="com.jobhunter.interceptor.AutoLoginInterceptor">
@@ -112,40 +113,51 @@
 	<interceptors>
 
 		<interceptor>
+
 			<mapping path="/reviewBoard/modify"/>
 			<mapping path="/user/mypage/**" />
 			<mapping path="/reviewBoard/write"/>
 			<mapping path="/company/companyInfo/**" />
 			<mapping path="/resume/**" />
-			<mapping path="/recruitmentnotice/save"/>
-			<mapping path="/recruitmentnotice/modify"/>
-			<mapping path="/recruitmentnotice/remove"/>
-			<mapping path="/submit/**"/>
+			<mapping path="/recruitmentnotice/save" />
+			<mapping path="/recruitmentnotice/modify" />
+			<mapping path="/recruitmentnotice/remove" />
+			<mapping path="/submit/**" />
 			<mapping path="/submission/**" />
 			<mapping path="/admin/**" />
 			<mapping path="/notification/**" />
+			<mapping path="/prboard/write" />
+			<mapping path="/prboard/modify" />
+			<mapping path="/prboard/remove" />
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
-		
+
 		<!-- 자동로그인 -->
 		<interceptor>
 			<mapping path="/reviewBoard/write" />
 			<mapping path="/account/login" />
 			<beans:ref bean="autoLoginInterceptor" />
 		</interceptor>
-		
+
 		<!-- 유저 확인 인터셉터 -->
 		<interceptor>
-		    <mapping path="/reviewBoard/write" />
-		    <beans:ref bean="UserRoleInterceptor" />
+			<mapping path="/reviewBoard/write" />
+			<beans:ref bean="UserRoleInterceptor" />
 		</interceptor>
-		
+
 		<!-- 어드민 확인 인터셉터 -->
 		<interceptor>
-		    <mapping path="/admin/**" />
-		    <beans:ref bean="AdminRoleInterceptor" />
+			<mapping path="/admin/**" />
+			<beans:ref bean="AdminRoleInterceptor" />
 		</interceptor>
-		
+    
+		<interceptor>
+			<mapping path="/prboard/write" />
+			<mapping path="/prboard/modify" />
+			<mapping path="/prboard/remove" />
+			<beans:ref bean="MentorRoleInterceptor" />
+		</interceptor>
+
 	</interceptors>
 
 

@@ -21,9 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.advancement.AdvancementDTO;
 import com.jobhunter.model.advancement.AdvancementUpFileVODTO;
 import com.jobhunter.model.advancement.AdvancementVO;
+import com.jobhunter.model.page.PageRequestDTO;
+import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.util.FileStatus;
 import com.jobhunter.service.advancement.AdvancementService;
 import com.jobhunter.util.RecruitmentFileProcess;
@@ -65,16 +68,16 @@ public class AdvancementController {
                 (List<AdvancementUpFileVODTO>) session.getAttribute("newfileList");
 
         if (fileList == null) fileList = new ArrayList<>();
-
+        int uid = ((AccountVO) session.getAttribute("account")).getUid();
         try {
             boolean success = advancementService.SaveAdvancementByMento(advancementDTO, fileList);
             session.removeAttribute("newfileList"); // 저장 후 초기화
-            return success ?
-            		 "/user/mypage" :
-                     "/user/mypage";
+            
+            
+            return "redirect:/advancement/list?uid=" + uid;
         } catch (Exception e) {
             logger.error("게시글 저장 실패", e);
-            return "/user/mypage";
+            return "redirect:/advancement/list?uid=" + uid;
         }
     }
 
@@ -166,7 +169,7 @@ public class AdvancementController {
     }
     
     @GetMapping("/modify")
-    public String showModifyPage(@RequestParam("id") int advancementNo, Model model, HttpServletRequest request) {
+    public String showModifyAdvancement(@RequestParam("id") int advancementNo, Model model, HttpServletRequest request) {
         try {
             AdvancementVO advancement = advancementService.getAdvancementById(advancementNo);
 
@@ -186,5 +189,94 @@ public class AdvancementController {
         }
     }
     
+    @GetMapping("/list")
+    public String showAdvancementListByUid(@RequestParam("uid") int uid,PageRequestDTO pageRequestDTO, Model model) {
+    	PageResponseDTO<AdvancementVO> result = null;
+    	
+    	try {
+			result = advancementService.getAdvancementListByUid(uid, pageRequestDTO);
+			model.addAttribute("pageResponseDTO", result);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	
+    	return "/advancement/list";
+    }
+    
+    @GetMapping("/detail")
+    public String showAdvancementDetail(@RequestParam("advancementNo") int advancementNo, Model model) {
+    	
+    	System.out.println("디테일 페이지 호출 됬나?");
+        try {
+            AdvancementVO advancement = advancementService.getAdvancementById(advancementNo);
+
+            if (advancement == null) {
+                return "redirect:/advancement/list?uid=1"; // 글이 없으면 리스트로 리다이렉트
+            }
+            System.out.println(advancement.getFileList());
+
+            model.addAttribute("advancement", advancement);
+            return "/advancement/detail"; // JSP 경로
+
+        } catch (Exception e) {
+            logger.error("상세 페이지 로딩 실패", e);
+            return "redirect:/advancement/list?uid=1";
+        }
+    }
+    
+    /**
+     *  @author 문준봉
+     *
+     * <p>
+     * 승급 게시물을 수정하는 메서드
+     * </p>
+     *
+     * @param advancementDTO
+     * @param request
+     * @return 이동할 페이지
+     */
+    @PostMapping("/modify")
+    public String modifyAdvancement(@ModelAttribute AdvancementDTO advancementDTO, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        List<AdvancementUpFileVODTO> fileList =
+                (List<AdvancementUpFileVODTO>) session.getAttribute("newfileList");
+
+        if (fileList == null) fileList = new ArrayList<>();
+
+        try {
+            boolean success = advancementService.modifyAdvancementByMento(advancementDTO, fileList);
+            session.removeAttribute("newfileList"); // 수정 후 세션 정리
+
+            int advancementNo = advancementDTO.getAdvancementNo(); // ✅ 수정한 게시글 번호를 꺼낸다
+
+            return success ? "redirect:/advancement/detail?advancementNo=" + advancementNo : "/user/mypage";
+
+        } catch (Exception e) {
+            logger.error("게시글 수정 실패", e);
+            return "/user/mypage";
+        }
+    }
+    
+    @PostMapping("/delete")
+    public ResponseEntity<Boolean> deleteAdvancement(@RequestParam("advancementNo") int advancementNo, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        int uid = ((AccountVO) session.getAttribute("account")).getUid();
+        
+        try {
+            String realPath = request.getSession().getServletContext().getRealPath("/");
+            boolean success = advancementService.deleteAdvancementById(advancementNo, realPath);
+            
+            if (success) {
+                return ResponseEntity.ok(true);  // ✅ 성공이면 200 OK
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);  // ❗ 실패면 500
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false); // ❗ 예외나면 500
+        }
+    }
     
 }

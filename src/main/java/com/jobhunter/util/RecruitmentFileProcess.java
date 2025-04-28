@@ -297,21 +297,24 @@ public class RecruitmentFileProcess {
 	}
 	
 	public AdvancementUpFileVODTO saveFileToRealPathForAdvancement(
-	        MultipartFile file,
-	        HttpServletRequest request,
-	        String saveFileDir) throws IOException {
+		    MultipartFile file,
+		    HttpServletRequest request,
+		    String saveFileDir) throws IOException {
 
-	    // 기본 구조는 기존과 같고, 마지막에 DTO만 변경
-	    RecruitmentnoticeBoardUpfiles origin = this.saveFileToRealPath(file, request, saveFileDir);
+		    RecruitmentnoticeBoardUpfiles origin = this.saveFileToRealPath(file, request, saveFileDir);
 
-	    return AdvancementUpFileVODTO.builder()
-	        .originalFileName(origin.getOriginalFileName())
-	        .newFileName(origin.getNewFileName())
-	        .thumbFileName(origin.getThumbFileName())
-	        .fileType(origin.getFileType())
-	        .ext(origin.getExt())
-	        .size(origin.getSize())
-	        .base64Image(origin.getBase64Image())
-	        .build();
-	}
+		    // 여기서 recruitmentFiles를 advancementFiles로 강제 교체
+		    String correctedNewFileName = origin.getNewFileName().replace("/recruitmentFiles", "/advancementFiles");
+		    String correctedThumbFileName = origin.getThumbFileName().replace("/recruitmentFiles", "/advancementFiles");
+
+		    return AdvancementUpFileVODTO.builder()
+		        .originalFileName(origin.getOriginalFileName())
+		        .newFileName(correctedNewFileName)
+		        .thumbFileName(correctedThumbFileName)
+		        .fileType(origin.getFileType())
+		        .ext(origin.getExt())
+		        .size(origin.getSize())
+		        .base64Image(origin.getBase64Image())
+		        .build();
+		}
 }

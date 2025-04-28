@@ -1,6 +1,7 @@
 package com.jobhunter.model.recruitmentnotice;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import com.jobhunter.model.customenum.JobForm;
 import com.jobhunter.model.customenum.MilitaryServe;
@@ -59,5 +60,6 @@ public class RecruitmentNoticeDTO {
 	// 직업
 	private int subcategoryNo;
 
+	private List<RecruitmentnoticeBoardUpfiles> fileList;
 	
 }
