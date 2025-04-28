@@ -36,7 +36,7 @@ public class UserController {
 	@GetMapping("/mypage/{uid}")
 	public String showMypage(@PathVariable("uid") int uid, HttpServletRequest request) {
 		AccountVO acc = AccountUtil.getAccount(request);
-		if (acc.getAccountType() == AccountType.USER && uid == acc.getUid()) {
+		if (acc != null && acc.getAccountType() == AccountType.USER && uid == acc.getUid()) {
 			System.out.println("본인 정보 페이지");
 		}
 		return "/user/mypage";

@@ -73,11 +73,9 @@ class ReviewBoardDAOImpl implements ReviewBoardDAO {
 	}
 
 	@Override
-	public int deleteLike(int userId, int boardNo) throws Exception {
-		Map<String, Object> map = new HashMap<>();
-		map.put("userId", userId);
-		map.put("boardNo", boardNo);
-		return ses.delete(NS + ".deleteLike", map);
+	public int deleteLike(Likes likes) throws Exception {
+	
+		return ses.delete(NS + ".deleteLike", likes);
 	}
 
 	@Override

@@ -681,8 +681,22 @@ function sendEmailCode() {
 
 function okMobile() {
 	const mobile = $("#authMobile").val()
-	$("#mobile").val(mobile)
-	$("#mobileInfoMark").text(`인증에 성공하였습니다. (현재 전화번호 : \${mobile})`).removeClass().addClass("info-ok");
+	$.ajax({
+      type: 'POST',
+      url: '/account/auth/mobile/verify',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        confirmMobile: mobile,
+		confirmType: "registCompany"
+      }),
+      success: function(res) {
+        $("#mobile").val(mobile)
+		$("#mobileInfoMark").text(`인증에 성공하였습니다. (현재 전화번호 : \${mobile})`).removeClass().addClass("info-ok");
+      },
+      error: function(err) {
+        $("#mobileInfoMark").text(`서버가 불안정합니다. 잠시 후 다시 시도해 주세요.`).removeClass().addClass("info-warning");
+      }
+    });
 }
 
 async function verifyPhoneCode() {
@@ -727,7 +741,8 @@ function verifyEmailCode() {
 		method: "POST",
 		contentType: "application/json",
 		data: JSON.stringify({
-		email: email
+		email: email,
+		confirmType: "registCompany"
 		}),
 		success: () => okEmail(),
 		error: (xhr) => {

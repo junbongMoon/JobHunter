@@ -195,6 +195,7 @@ function submitReport() {
   const uid = document.getElementById('reportUid').value;
   const category = document.getElementById('reportCategory').value;
   const message = document.getElementById('reportMessage').value;
+  const reportTargetPK = '${RecruitmentDetailInfo.uid}';
 
   if (!category) {
     alert("신고 사유를 선택해주세요.");
@@ -205,11 +206,12 @@ function submitReport() {
     boardNo: parseInt(uid),
     reporterAccountUid: parseInt(userId),
     reportCategory: category,
+	reportTargetPK: reportTargetPK,
     reportMessage: message,
-    reportType: "RECRUITMENT", // ✅ 서버 ENUM 값에 맞추기
-    targetAccountType: "COMPANY", // ✅ 서버 ENUM 값
-    reporterAccountType : "${sessionScope.account.accountType}", // 👈 대소문자 정확히
-    targetAccountUid : parseInt("${RecruitmentDetailInfo.refCompany}"), // 👈 UID 값 명확히
+    reportType: "RECRUITMENT", //  서버 ENUM 값에 맞추기
+    targetAccountType: "COMPANY", // 서버 ENUM 값
+    reporterAccountType : "${sessionScope.account.accountType}", //  대소문자 정확히
+    targetAccountUid : parseInt("${RecruitmentDetailInfo.refCompany}"), //  UID 값 명확히
     reportTargetURL: `/recruitmentnotice/detail?uid=\${uid}`
   };
 

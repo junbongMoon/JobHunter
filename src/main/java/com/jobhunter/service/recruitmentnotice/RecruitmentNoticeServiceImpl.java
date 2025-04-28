@@ -32,6 +32,7 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.model.util.FileStatus;
 import com.jobhunter.model.util.TenToFivePageVO;
+import com.jobhunter.util.FileProcess;
 
 import lombok.RequiredArgsConstructor;
 
@@ -60,6 +61,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	private final JobDAO jobdao;
 	
 	private final SubmitDAO submitdao;
+
 	
 	 
 	/**
@@ -331,92 +333,83 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public void modifyRecruitmentNotice(RecruitmentNoticeDTO dto, List<AdvantageDTO> newAdvList,
-			List<ApplicationDTO> newAppList, List<RecruitmentnoticeBoardUpfiles> modifyFileList,
-			RecruitmentDetailInfo existing, int uid) throws Exception {
+	        List<ApplicationDTO> newAppList, List<RecruitmentnoticeBoardUpfiles> modifyFileList,
+	        RecruitmentDetailInfo existing, int uid) throws Exception {
 
-		// Step 1: 공고 기본 정보 수정
-		recdao.updateRecruitmentNotice(dto);
-		System.out.println("수정할 파일 리스트 : " + modifyFileList);
+	    // Step 1: 공고 기본 정보 수정
+	    recdao.updateRecruitmentNotice(dto);
 
-		// Step 2: 우대 조건 비교 후 변경
-		List<Advantage> oldAdvList = existing.getAdvantage();
-		for (Advantage old : oldAdvList) {
-			// anyMatch: newAppList 중 하나라도 같은 method가 있으면 true
-			boolean existsInNew = newAdvList.stream()
-					.anyMatch(newAdv -> newAdv.getAdvantageType().equals(old.getAdvantageType()));
-			if (!existsInNew) {
-				recdao.deleteAdvantage(uid, old.getAdvantageType()); // <-- 여기 수정
-			}
-		}
+	    // Step 2: 우대 조건 비교 후 변경
+	    List<Advantage> oldAdvList = existing.getAdvantage();
+	    for (Advantage old : oldAdvList) {
+	        boolean existsInNew = newAdvList.stream()
+	            .anyMatch(newAdv -> newAdv.getAdvantageType().equals(old.getAdvantageType()));
+	        if (!existsInNew) {
+	            recdao.deleteAdvantage(uid, old.getAdvantageType());
+	        }
+	    }
+	    for (AdvantageDTO newAdv : newAdvList) {
+	        boolean existsInOld = oldAdvList.stream()
+	            .anyMatch(old -> old.getAdvantageType().equals(newAdv.getAdvantageType()));
+	        if (!existsInOld) {
+	            newAdv.setRecruitmentNoticeUid(uid);
+	            recdao.insertAdvantageWithRecruitmentNotice(newAdv);
+	        }
+	    }
 
-		for (AdvantageDTO newAdv : newAdvList) {
-			boolean existsInOld = oldAdvList.stream()
-					.anyMatch(old -> old.getAdvantageType().equals(newAdv.getAdvantageType()));
-			if (!existsInOld) {
-				newAdv.setRecruitmentNoticeUid(uid);
-				recdao.insertAdvantageWithRecruitmentNotice(newAdv);
-			}
-		}
+	    // Step 3: 면접 방식 비교 후 변경
+	    List<Application> oldAppList = existing.getApplication();
+	    for (Application old : oldAppList) {
+	        boolean existsInNew = newAppList.stream()
+	            .anyMatch(newApp -> newApp.getMethod() == old.getMethod());
+	        if (!existsInNew) {
+	            recdao.deleteApplication(uid, old.getMethod());
+	        }
+	    }
+	    for (ApplicationDTO newApp : newAppList) {
+	        Optional<Application> matchedOldOpt = oldAppList.stream()
+	            .filter(old -> old.getMethod() == newApp.getMethod())
+	            .findFirst();
 
-		// Step 3: 면접방식 비교 후 변경 (method가 같을 때 삭제)
-		List<Application> oldAppList = existing.getApplication();
-		for (Application old : oldAppList) {
-			// anyMatch: newAppList 중 하나라도 같은 method가 있으면 true
-			boolean existsInNew = newAppList.stream().anyMatch(newApp -> newApp.getMethod() == old.getMethod());
-			
-			if (!existsInNew) {
-				// method가 사라졌다면 삭제
-				recdao.deleteApplication(uid, old.getMethod());
-			}
-		}
+	        if (matchedOldOpt.isPresent()) {
+	            Application oldApp = matchedOldOpt.get();
+	            if (!Objects.equals(oldApp.getDetail(), newApp.getDetail())) {
+	                recdao.deleteApplication(uid, newApp.getMethod());
+	                newApp.setRecruitmentNoticeUid(uid);
+	                recdao.insertApplicationWithRecruitmentNotice(newApp);
+	            }
+	        } else {
+	            newApp.setRecruitmentNoticeUid(uid);
+	            recdao.insertApplicationWithRecruitmentNotice(newApp);
+	        }
+	    }
 
-		// 새로운 면접 방식이면 추가
-		for (ApplicationDTO newApp : newAppList) {
-		    Optional<Application> matchedOldOpt = oldAppList.stream()
-		        .filter(old -> old.getMethod() == newApp.getMethod())
-		        .findFirst();
+	    // Step 4: 파일 비교 → DB만 삭제 (물리파일 삭제는 안함)
+	    List<RecruitmentnoticeBoardUpfiles> oldFileList = existing.getFileList();
+	    for (RecruitmentnoticeBoardUpfiles oldFile : oldFileList) {
+	        boolean stillExists = modifyFileList.stream()
+	            .anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()));
 
-		    if (matchedOldOpt.isPresent()) {
-		        Application oldApp = matchedOldOpt.get();
-		        if (!Objects.equals(oldApp.getDetail(), newApp.getDetail())) {
-		            // detail이 다르면 기존 것을 삭제 후 insert
-		            recdao.deleteApplication(uid, newApp.getMethod());
+	        if (!stillExists) {
+	            recdao.deleteFileFromDatabase(oldFile.getBoardUpFileNo());
+	            // ❌ 파일 삭제는 하지 않는다.
+	        }
+	    }
+	    for (RecruitmentnoticeBoardUpfiles newFile : modifyFileList) {
+	        boolean existsInOld = oldFileList.stream()
+	            .anyMatch(oldFile -> oldFile.getOriginalFileName().equals(newFile.getOriginalFileName()));
 
-		            newApp.setRecruitmentNoticeUid(uid);
-		            recdao.insertApplicationWithRecruitmentNotice(newApp);
-		        }
-		        // detail이 같다면 아무 작업 안 함
-		    } else {
-		        // 기존에 없던 방식이면 insert
-		        newApp.setRecruitmentNoticeUid(uid);
-		        recdao.insertApplicationWithRecruitmentNotice(newApp);
-		    }
-		}
+	        if (!existsInOld && FileStatus.NEW.equals(newFile.getStatus())) {
+	            newFile.setRefrecruitmentnoticeNo(uid);
+	            recdao.insertRecruitmentFile(newFile);
+	        }
+	    }
 
-		// Step 4: 파일 비교 후 변경
-		List<RecruitmentnoticeBoardUpfiles> oldFileList = existing.getFileList();
-		for (RecruitmentnoticeBoardUpfiles oldFile : oldFileList) {
-			boolean stillExists = modifyFileList.stream()
-					.anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()));
-			if (!stillExists) {
-				recdao.deleteFileFromDatabase(uid);; // DB + 물리 파일도 제거 필요
-			}
-		}
-		for (RecruitmentnoticeBoardUpfiles newFile : modifyFileList) {
-		    boolean existsInOld = oldFileList.stream()
-		        .anyMatch(oldFile -> oldFile.getOriginalFileName().equals(newFile.getOriginalFileName()));
-
-		    if (!existsInOld && FileStatus.NEW.equals(newFile.getStatus())) {
-		        newFile.setRefrecruitmentnoticeNo(uid);
-		        recdao.insertRecruitmentFile(newFile);
-		    }
-		}
-
-		// Step 5: 직업군, 지역 등 외래키 정보 갱신
-		jobdao.updateMajorCategoryWithRecruitmentnotice(uid, dto.getMajorcategoryNo());
-		jobdao.updateSubCategoryWithRecruitmentnotice(uid, dto.getSubcategoryNo());
-		regiondao.updateRegionWithRecruitmentNotice(uid, dto.getRegionNo());
-		regiondao.updateSigunguWithRecruitmentNotice(uid, dto.getSigunguNo());
+	    // Step 5: 직업군, 지역 업데이트
+	    jobdao.updateMajorCategoryWithRecruitmentnotice(uid, dto.getMajorcategoryNo());
+	    jobdao.updateSubCategoryWithRecruitmentnotice(uid, dto.getSubcategoryNo());
+	    regiondao.updateRegionWithRecruitmentNotice(uid, dto.getRegionNo());
+	    regiondao.updateSigunguWithRecruitmentNotice(uid, dto.getSigunguNo());
 	}
     
 	

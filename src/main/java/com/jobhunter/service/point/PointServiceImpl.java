@@ -21,6 +21,7 @@ public class PointServiceImpl implements PointService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     public void submitAdvicePointLog(int mentorUid, int sessionUid, int point, int rgAdviceNo) throws Exception {
+
 //        try {
 //            // user -1000 포인트 차감
 //            int updateResult = userDAO.updateUserPoint(sessionUid, point);
@@ -34,5 +35,6 @@ public class PointServiceImpl implements PointService {
 //            throw new Exception("포인트 처리 중 오류가 발생했습니다: " + e.getMessage());
 //        }
 //    }
+      
     }
 }

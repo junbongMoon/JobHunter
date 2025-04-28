@@ -317,11 +317,6 @@ public class ResumeServiceImpl implements ResumeService {
 	
 	@Override
 	public TenToFivePageVO<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto) {
-		List<String> validStatuses = Arrays.asList("COMPLETE", "CANCEL", "WAITING", "CHECKING", "LIVE");
-
-		if (!validStatuses.contains(dto.getStatus())) {
-		    dto.setStatus(null);
-		}
 		List<RegistrationAdviceVO> vo = rdao.selectRegistrationAdviceByMentorWithPaging(dto);
 		int totalCnt = rdao.countRegistrationAdviceByMentor(dto);
 		TenToFivePageVO<RegistrationAdviceVO> result = new TenToFivePageVO<RegistrationAdviceVO>(vo, dto.getPage(), totalCnt);

@@ -443,6 +443,7 @@
 		FROM recruitmentnotice
 		WHERE uid
 		&lt; #{uid} AND status = 'Y'
+		and duedate > now()
 		ORDER BY uid DESC
 		LIMIT 1
 	</select>
@@ -454,6 +455,7 @@
 		FROM recruitmentnotice
 		WHERE uid
 		&gt; #{uid} AND status = 'Y'
+		and duedate > now()
 		ORDER BY uid ASC
 		LIMIT 1
 	</select>

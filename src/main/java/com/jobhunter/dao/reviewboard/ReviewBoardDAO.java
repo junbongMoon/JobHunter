@@ -22,13 +22,13 @@ public interface ReviewBoardDAO {
 
 	ReviewDetailViewDTO selectReviewInfo(int boardNo) throws Exception;
 
-//	boolean selectLike(Likes like) throws Exception;
+
 
 	int insertLike(Likes like) throws Exception;
 
 	int updateBoardLikes(int boardNo) throws Exception;
 
-	int deleteLike(int userId, int boardNo) throws Exception;
+	int deleteLike(Likes like) throws Exception;
 
 	int decreaseBoardLikes(int boardNo) throws Exception;
 
@@ -63,5 +63,7 @@ public interface ReviewBoardDAO {
 	List<ReviewBoardWithReplyVO> findMyReviewWithReply(RPageRequestDTO dto) throws Exception;
 
 	int findMyReviewWithReplyCnt(RPageRequestDTO dto) throws Exception;
+
+
 
 }

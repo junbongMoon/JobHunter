@@ -339,10 +339,15 @@ public class SubmitServiceImpl implements SubmitService {
 	public ResumeDetailInfoBySubmitAndUser selectSubmitAndResumeDetailInfo(int registrationNo, AccountVO account) throws Exception {
 		
 		int companyUid = submitDAO.getCompanyUidByRegistrationNo(registrationNo);
-		if((companyUid == account.getUid() && account.getAccountType() == AccountType.COMPANY) || account.getIsAdmin() == "Y") {
-			return submitDAO.selectSubmitAndResumeDetailInfo(registrationNo);
+		
+		if (companyUid == account.getUid() && account.getAccountType() == AccountType.COMPANY) {
+			// 신청서의 대상자 본인임
+			submitDAO.updateSubmitStatus(registrationNo, "CHECKED");
+		} else if(!account.getIsAdmin().equals("Y")) {
+			// 본인도 아닌데 어드민조차 아닐때
+			return null;
 		}
-	    return null;
+		return submitDAO.selectSubmitAndResumeDetailInfo(registrationNo);
 	}
 	
 	@Override

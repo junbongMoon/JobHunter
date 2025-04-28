@@ -79,13 +79,17 @@ public class UserRestController {
 	}
 
 	@PostMapping(value = "/password", consumes = "application/json")
-	public ResponseEntity<Boolean> checkPassword(@RequestBody PasswordDTO dto) {
+	public ResponseEntity<Boolean> checkPassword(@RequestBody PasswordDTO dto, HttpSession session) {
 		boolean isMatch = false;
 		try {
 			isMatch = service.checkPassword(dto.getUid(), dto.getPassword());
+			if(isMatch) {
+				session.setAttribute(dto.getWhereFrom(), dto.getUid());
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 		return ResponseEntity.ok(isMatch);
 	}
@@ -93,7 +97,6 @@ public class UserRestController {
 	@PatchMapping(value = "/password", consumes = "application/json")
 	public ResponseEntity<Void> changePassword(@RequestBody PasswordDTO dto) {
 		try {
-			System.out.println(dto);
 			service.updatePassword(dto.getUid(), dto.getPassword());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -145,7 +148,7 @@ public class UserRestController {
 
 			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
 
-			if (!accUtil.checkUid(sessionAccount, uid)) {
+			if (!AccountUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 
@@ -166,7 +169,7 @@ public class UserRestController {
 
 			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
 
-			if (!accUtil.checkUid(sessionAccount, uid)) {
+			if (!AccountUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 
