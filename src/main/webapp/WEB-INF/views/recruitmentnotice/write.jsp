@@ -15,6 +15,8 @@
 	let errorMessage = "";
 	let focusElement = null;
 	let upfiles = [];
+	const MAX_FILES = 3;
+	const MAX_FILE_SIZE = 8 * 1024 * 1024;
 	
 
 	$(function() {
@@ -75,11 +77,25 @@
     e.preventDefault();
     $(this).css("background-color", "#eee");
 
-    let files = e.originalEvent.dataTransfer.files;
-    for (let i = 0; i < files.length; i++) {
-        let file = files[i];
-        uploadFileAndShowPreview(file);
-    }
+	let files = e.originalEvent.dataTransfer.files;
+
+	// 현재 업로드된 파일 수 체크
+	if ($(".preview tr").length + files.length > MAX_FILES) {
+		showModal("파일은 최대 3개까지만 업로드할 수 있습니다.");
+		return;
+	}
+
+	for (let i = 0; i < files.length; i++) {
+		let file = files[i];
+
+		// 파일 크기 체크
+		if (file.size > MAX_FILE_SIZE) {
+			showModal(file.name + " 파일이 8MB를 초과합니다. 다시 선택해주세요.");
+			continue;
+		}
+
+		uploadFileAndShowPreview(file);
+	}
 	});
 
 	$(document).on("click", "#goToListBtn", function () {
@@ -363,6 +379,10 @@ function showThumbnail(file) {
       "<td><img src='/resources/images/success.png' width='20'></td>");
 	}
 
+	function showModal(message) {
+    $(".modal-body").text(message);
+    $("#MyModal").modal("show");
+}
 
 	// 면접타입 유효성 검사
 	function isValidApplication() {
