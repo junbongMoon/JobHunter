@@ -130,6 +130,9 @@
 			<mapping path="/submission/**" />
 			<mapping path="/admin/**" />
 			<mapping path="/notification/**" />
+			<mapping path="/prboard/write" />
+			<mapping path="/prboard/modify" />
+			<mapping path="/prboard/remove" />
 			<beans:ref bean="authLoginInterceptor" />
 		</interceptor>
 
@@ -156,6 +159,13 @@
 			<mapping path="/user/mypage" />
 			<mapping path="/company/companyInfo" />
 			<beans:ref bean="OwnerInterceptor" />
+		</interceptor>
+
+		<interceptor>
+			<mapping path="/prboard/write" />
+			<mapping path="/prboard/modify" />
+			<mapping path="/prboard/remove" />
+			<beans:ref bean="MentorRoleInterceptor" />
 		</interceptor>
 
 	</interceptors>
