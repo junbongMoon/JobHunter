@@ -46,6 +46,7 @@
 
 						<!-- 이력서 제목 -->
 						<div class="card mb-4">
+							<!-- <div>디버깅 : ${comment}, ${advice}, ${debug}, ${debug2}</div> -->
 							<div class="card-header">
 								이력서 제목<span class="essentialPoint">*</span>
 							</div>
@@ -1330,7 +1331,9 @@
 					commentMap[Number(activeCommentLine)] = comment;
 
 					editor.setGutterMarker(activeCommentLine, "comment-gutter", makeCommentIcon(activeCommentLine));
-					editor.setGutterMarker(activeCommentLine, "comment-control-gutter", makeControlButton(activeCommentLine, "remove"));
+					if (${ !isSameUser }) {
+						editor.setGutterMarker(activeCommentLine, "comment-control-gutter", makeControlButton(activeCommentLine, "remove"));
+					}
 					console.log("activeCommentLine: " + activeCommentLine);
 					console.log("comment: " + comment);
 					saveCommentToServer(activeCommentLine, comment);
@@ -1397,7 +1400,9 @@
 				// 코멘트 삭제
 				function removeComment(line) {
 					editor.setGutterMarker(line, "comment-gutter", null);
-					editor.setGutterMarker(line, "comment-control-gutter", makeControlButton(line, "add"));
+					if (${ !isSameUser }) {
+						editor.setGutterMarker(line, "comment-control-gutter", makeControlButton(line, "add"));
+					}
 
 					delete commentMap[line];
 					console.log(`줄 \${line + 1} 코멘트 삭제됨`);
@@ -1443,7 +1448,9 @@
 					commentList.forEach(comment => {
 						commentMap[comment.lineNo] = comment.commentText;
 						editor.setGutterMarker(comment.lineNo, "comment-gutter", makeCommentIcon(comment.lineNo));
-						editor.setGutterMarker(comment.lineNo, "comment-control-gutter", makeControlButton(comment.lineNo, "remove"));
+						if (${ !isSameUser }) {
+							editor.setGutterMarker(comment.lineNo, "comment-control-gutter", makeControlButton(comment.lineNo, "remove"));
+						}
 						pendingComments.push({
 							lineNo: comment.lineNo,
 							commentText: comment.commentText,
