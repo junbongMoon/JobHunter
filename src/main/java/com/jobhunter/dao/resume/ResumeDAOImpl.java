@@ -272,8 +272,11 @@ public class ResumeDAOImpl implements ResumeDAO {
 	}
 
 	@Override
-	public ResumeAdviceDTO getAdvice(int resumeNo) throws Exception {
-		return ses.selectOne(NS + ".getAdvice", resumeNo);
+	public ResumeAdviceDTO getAdvice(int resumeNo, String mode) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("resumeNo", resumeNo);
+		params.put("mode", mode);
+		return ses.selectOne(NS + ".getAdvice", params);
 	}
 
 	@Override
@@ -386,12 +389,12 @@ public class ResumeDAOImpl implements ResumeDAO {
 	// }
 
 	@Override
-	public int changeAdviceStatus(int resumeNo, int userUid, String status) throws Exception {
+	public int changeAdviceStatus(int resumeNo, int userUid, String status, String mode) throws Exception {
 		Map<String, Object> params = new HashMap<>();
 		params.put("resumeNo", resumeNo);
 		params.put("userUid", userUid);
 		params.put("status", status);
-		params.put("mode", "endAdvice");
+		params.put("mode", mode);
 		return ses.update(NS + ".changeAdviceStatus", params);
 	}
 

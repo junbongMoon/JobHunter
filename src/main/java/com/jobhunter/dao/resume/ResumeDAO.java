@@ -131,7 +131,8 @@ public interface ResumeDAO {
 
 	List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo) throws Exception;
 
-	ResumeAdviceDTO getAdvice(int resumeNo) throws Exception;
+	ResumeAdviceDTO getAdvice(int resumeNo, String mode) throws Exception;
+
 	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) throws Exception;
 
 	/**
@@ -225,7 +226,7 @@ public interface ResumeDAO {
 	 * @param String status 첨삭 상태
 	 * @return 성공 여부
 	 */
-	int changeAdviceStatus(int resumeNo, int userUid, String status) throws Exception;
+	int changeAdviceStatus(int resumeNo, int userUid, String status, String mode) throws Exception;
 
 	/**
 	 *  @author 유지원

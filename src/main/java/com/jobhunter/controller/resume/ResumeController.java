@@ -565,7 +565,7 @@ public class ResumeController {
 
 			} else if (uri.contains("checkAdvice")) {
 				// 첨삭 내용 조회
-				ResumeAdviceDTO advice = resumeService.getAdvice(resumeNo);
+				ResumeAdviceDTO advice = resumeService.getAdvice(resumeNo, userUid, user.getUid());
 				if (advice != null) {
 					model.addAttribute("advice", advice);
 					// 첨삭 파일 조회
