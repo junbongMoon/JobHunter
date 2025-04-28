@@ -358,22 +358,21 @@
 				style="display: none;">❌ 취소</button>
 		</c:if>
 
-		<!-- 수정/삭제 버튼은 작성자 본인일 때만 노출 -->
-		<c:if test="${not empty sessionScope.account and sessionScope.account.uid eq detail.writerUid}">
-			<!-- 수정 버튼 -->
-			<a
-				href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
-				class="btn-getstarted btn-sm btn-common-shape">✏️ 수정</a>
-
-			<!-- 삭제 버튼 -->
-			<form action="${pageContext.request.contextPath}/reviewBoard/delete"
-				method="post" style="display: inline;">
-				<input type="hidden" name="boardNo" value="${detail.boardNo}" />
-				<button type="button"
-					class="btn-getstarted btn-sm delete-btn btn-common-shape"
-					data-boardno="${detail.boardNo}">🗑 삭제</button>
-			</form>
-		</c:if>
+		<c:if test="${not empty sessionScope.account 
+		    and sessionScope.account.accountType ne 'COMPANY'
+		    and sessionScope.account.uid eq detail.writerUid}">
+		    <!-- 수정 버튼 -->
+				    <a href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
+				       class="btn-getstarted btn-sm btn-common-shape">✏️ 수정</a>
+				
+				    <!-- 삭제 버튼 -->
+				    <form action="${pageContext.request.contextPath}/reviewBoard/delete" method="post" style="display: inline;">
+				        <input type="hidden" name="boardNo" value="${detail.boardNo}" />
+				        <button type="button" class="btn-getstarted btn-sm delete-btn btn-common-shape" data-boardno="${detail.boardNo}">
+				            🗑 삭제
+				        </button>
+				    </form>
+				</c:if>
 
 		<!-- 목록으로 -->
 		<a
@@ -514,34 +513,47 @@ $(document).ready(function() {
 });
 
 
+function showModal(title, message, callback) {
+    $('#resultModalTitle').text(title);
+    $('#resultModalMessage').text(message);
+    $('#resultModal').modal('show');
 
+    if (callback) {
+        $('#resultModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+            callback();
+        });
+    }
+}
 	
 	//게시물삭제 
 	$(document).ready(function () {
-  		$(".delete-btn").click(function () {
-    		let boardNo = $(this).data("boardno");
+    $(".delete-btn").click(function () {
+        let boardNo = $(this).data("boardno");
 
-			    if (confirm("정말 삭제하시겠습니까?")) {
-			      $.ajax({
-			        url: "${pageContext.request.contextPath}/reviewBoard/delete",
-			        type: "POST",
-			        data: {
-			          boardNo: boardNo
-			        },
-			        success: function (res) {
-			          alert(res.message);
-			          if (res.success) {
-			            window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
-			          }
-			        },
-			        error: function (xhr, status, error) {
-			          console.error("삭제 실패:", error);
-			          alert("삭제 중 오류가 발생했습니다.");
-			        }
-			      });
-			    }
-			  });
-			});
+        if (confirm("정말 삭제하시겠습니까?")) {
+            $.ajax({
+                url: "${pageContext.request.contextPath}/reviewBoard/delete",
+                type: "POST",
+                contentType: "application/charset=UTF-8",
+                data: { boardNo: boardNo },
+                success: function (res) {
+                    if (res.success) {
+                        showModal("삭제 완료", res.message, function () {
+                            window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
+                        });
+                    } else {
+                        showModal("삭제 실패", res.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.error("삭제 실패:", xhr.responseText);
+                    showModal("❌ 서버 오류", "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+                }
+            });
+        }
+    });
+});
+
 		
 	$(document).ready(function () {
 		  const loginUserUid = parseInt($('#loginUserUid').val());    // 로그인한 사용자 UID

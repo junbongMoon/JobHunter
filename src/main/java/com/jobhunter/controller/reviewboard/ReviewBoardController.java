@@ -122,14 +122,12 @@ public class ReviewBoardController {
 			}
 
 			boolean isLiked = false;
-			
 
 			if (account != null) {
 				int userId = account.getUid();
 				service.insertViews(userId, boardNo, "REBOARD"); // 조회수 추가
 				isLiked = service.hasUserLiked(userId, boardNo);
 
-			
 				if (account.getAccountType() == AccountType.COMPANY) {
 					isCompanyAccount = true;
 				}
@@ -151,69 +149,68 @@ public class ReviewBoardController {
 	@PostMapping(value = "/like", produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public ResponseEntity<MessageCallDTO> addLike(@RequestBody Likes likes, HttpSession session) {
-	    AccountVO account = (AccountVO) session.getAttribute("account");
+		AccountVO account = (AccountVO) session.getAttribute("account");
 
-	    // 로그인 체크
-	    if (account == null || account.getUid() == 0) {
-	        return ResponseEntity.status(401).body(new MessageCallDTO("로그인이 필요합니다.", false));
-	    }
+		// 로그인 체크
+		if (account == null || account.getUid() == 0) {
+			return ResponseEntity.status(401).body(new MessageCallDTO("로그인이 필요합니다.", false));
+		}
 
-	    // 회사 계정 체크
-	    if (account.getAccountType() == AccountType.COMPANY) {
-	        return ResponseEntity.status(403).body(new MessageCallDTO("회사 계정은 좋아요를 등록할 수 없습니다.", false));
-	    }
+		// 회사 계정 체크
+		if (account.getAccountType() == AccountType.COMPANY) {
+			return ResponseEntity.status(403).body(new MessageCallDTO("회사 계정은 좋아요를 등록할 수 없습니다.", false));
+		}
 
-	    // 세션에서 userId 주입
-	    likes.setUserId(account.getUid());
-	    likes.setLikeType("REBOARD"); // 여기서 LikeType도 서버에서 확실히 세팅하는게 좋아.
+		// 세션에서 userId 주입
+		likes.setUserId(account.getUid());
+		likes.setLikeType("REBOARD"); // 여기서 LikeType도 서버에서 확실히 세팅하는게 좋아.
 
-	    try {
-	        boolean alreadyLiked = service.hasUserLiked(likes.getUserId(), likes.getBoardNo());
-	        if (alreadyLiked) {
-	            return ResponseEntity.badRequest().body(new MessageCallDTO("이미 좋아요를 누르셨습니다.", false));
-	        }
+		try {
+			boolean alreadyLiked = service.hasUserLiked(likes.getUserId(), likes.getBoardNo());
+			if (alreadyLiked) {
+				return ResponseEntity.badRequest().body(new MessageCallDTO("이미 좋아요를 누르셨습니다.", false));
+			}
 
-	        // 고친 부분: Likes 객체 통으로 넘긴다
-	        service.addlikes(likes);
+			// 고친 부분: Likes 객체 통으로 넘긴다
+			service.addlikes(likes);
 
-	        return ResponseEntity.ok(new MessageCallDTO("좋아요가 등록되었습니다.", true));
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return ResponseEntity.status(500).body(new MessageCallDTO("서버 오류 발생", false));
-	    }
+			return ResponseEntity.ok(new MessageCallDTO("좋아요가 등록되었습니다.", true));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(500).body(new MessageCallDTO("서버 오류 발생", false));
+		}
 	}
-
 
 	@PostMapping(value = "/unlike", produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public ResponseEntity<MessageCallDTO> cancelLike(@RequestBody Likes likes, HttpSession session) {
-	    AccountVO account = (AccountVO) session.getAttribute("account");
+		AccountVO account = (AccountVO) session.getAttribute("account");
 
-	    // 1. 로그인 체크
-	    if (account == null || account.getUid() == 0) {
-	        return ResponseEntity.status(401).body(new MessageCallDTO("로그인이 필요합니다.", false));
-	    }
+		// 1. 로그인 체크
+		if (account == null || account.getUid() == 0) {
+			return ResponseEntity.status(401).body(new MessageCallDTO("로그인이 필요합니다.", false));
+		}
 
-	    // 2. 회사 계정 체크
-	    if (account.getAccountType() == AccountType.COMPANY) {
-	        return ResponseEntity.status(403).body(new MessageCallDTO("회사 계정은 좋아요를 취소할 수 없습니다.", false));
-	    }
+		// 2. 회사 계정 체크
+		if (account.getAccountType() == AccountType.COMPANY) {
+			return ResponseEntity.status(403).body(new MessageCallDTO("회사 계정은 좋아요를 취소할 수 없습니다.", false));
+		}
 
-	    // 3. 세션에서 userId 세팅
-	    likes.setUserId(account.getUid());
+		// 3. 세션에서 userId 세팅
+		likes.setUserId(account.getUid());
 
-	    try {
-	        boolean success = service.removeLike(likes); // ✨ 수정! userId, boardNo 담긴 Likes 객체 통으로 넘긴다
+		try {
+			boolean success = service.removeLike(likes); // ✨ 수정! userId, boardNo 담긴 Likes 객체 통으로 넘긴다
 
-	        if (success) {
-	            return ResponseEntity.ok(new MessageCallDTO("좋아요가 취소되었습니다.", true));
-	        } else {
-	            return ResponseEntity.status(400).body(new MessageCallDTO("좋아요 취소가 실패했습니다.", false));
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return ResponseEntity.status(500).body(new MessageCallDTO("서버 오류 발생", false));
-	    }
+			if (success) {
+				return ResponseEntity.ok(new MessageCallDTO("좋아요가 취소되었습니다.", true));
+			} else {
+				return ResponseEntity.status(400).body(new MessageCallDTO("좋아요 취소가 실패했습니다.", false));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(500).body(new MessageCallDTO("서버 오류 발생", false));
+		}
 	}
 
 	@GetMapping("/modify")
@@ -245,10 +242,28 @@ public class ReviewBoardController {
 	}
 
 	@PostMapping("/modify")
-	public String updateReview(@ModelAttribute WriteBoardDTO modify) {
+	public String updateReview(@ModelAttribute WriteBoardDTO modify, HttpSession session) {
 		String returnPage;
 
+		AccountVO account = (AccountVO) session.getAttribute("account");
+
+		// 1. 로그인 체크
+		if (account == null) {
+			return "redirect:/member/login"; // 로그인 안 했으면 로그인 페이지로
+		}
+
+		// 2. 회사 계정 차단
+		if (account.getAccountType() == AccountType.COMPANY) {
+			return "redirect:/reviewBoard/detail?boardNo=" + modify.getBoardNo() + "&status=forbidden";
+		}
+
 		try {
+			// 3. 작성자 본인 확인
+			WriteBoardDTO original = service.getReviewBoardUpdate(modify.getBoardNo());
+			if (original == null || original.getWriter() != account.getUid()) {
+				return "redirect:/reviewBoard/detail?boardNo=" + modify.getBoardNo() + "&status=forbidden";
+			}
+
 			boolean result = service.updateReviewBoard(modify);
 
 			if (result) {
@@ -263,35 +278,41 @@ public class ReviewBoardController {
 		return returnPage;
 	}
 
-	@PostMapping(value = "/delete", produces = "application/json")
+	@PostMapping("/delete")
 	@ResponseBody
 	public ResponseEntity<MessageCallDTO> deleteBoardNo(@RequestParam("boardNo") int boardNo, HttpSession session) {
 		try {
 			AccountVO account = (AccountVO) session.getAttribute("account");
+
+			// 1. 로그인 체크
 			if (account == null) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 						.body(MessageCallDTO.builder().message("로그인이 필요합니다.").success(false).build());
 			}
 
+			// 2. 회사 계정 차단
+			if (account.getAccountType() == AccountType.COMPANY) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN)
+						.body(MessageCallDTO.builder().message("회사 계정은 게시글을 삭제할 수 없습니다.").success(false).build());
+			}
+
 			int userUid = account.getUid();
 
-			// 게시글 정보 조회
+			// 3. 작성자 본인 확인
 			WriteBoardDTO writeBoardDTO = service.getReviewBoardUpdate(boardNo);
-
-			// 작성자 본인인지 확인
-			if (writeBoardDTO.getWriter() != userUid) {
+			if (writeBoardDTO == null || writeBoardDTO.getWriter() != userUid) {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN)
 						.body(MessageCallDTO.builder().message("본인의 게시글만 삭제할 수 있습니다.").success(false).build());
 			}
 
-			// 삭제 수행
+			// 4. 삭제 수행
 			service.deleteBoard(boardNo);
 			return ResponseEntity.ok(MessageCallDTO.builder().message("게시글이 삭제되었습니다.").success(true).build());
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(MessageCallDTO.builder().message("삭제 중 오류 발생").success(false).build());
+					.body(MessageCallDTO.builder().message("삭제 중 서버 오류 발생").success(false).build());
 		}
 	}
 
