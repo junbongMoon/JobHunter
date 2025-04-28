@@ -55,6 +55,266 @@
 		WHERE refAdvancementNo = #{advancementNo}
 	</select>
 
+	<!-- 리스트 조회 -->
+	<select id="selectMentorRequestSimpleList"
+		resultType="com.jobhunter.model.advancement.MentorRequestSimpleVO">
+		SELECT
+		advancementNo,
+		title,
+		writer,
+		refUser,
+		postDate,
+		status,
+		confirmDate,
+		rejectMessage
+		FROM advancement
+		<where>
+			<!-- 검색어 -->
+			<if
+				test="searchWord != null and searchWord != '' and searchTypes != null and searchTypes.size() > 0">
+				<foreach item="type" collection="searchTypes" separator="or"
+					open="(" close=")">
+					<choose>
+						<when test="type.name() == 'TITLE'">
+							title LIKE CONCAT('%', #{searchWord}, '%')
+						</when>
+						<when test="type.name() == 'WRITER'">
+							writer LIKE CONCAT('%', #{searchWord}, '%')
+						</when>
+						<when test="type.name() == 'CONTENT'">
+							content LIKE CONCAT('%', #{searchWord}, '%')
+						</when>
+						<when test="type.name() == 'REJECT'">
+							rejectMessage LIKE CONCAT('%', #{searchWord}, '%')
+						</when>
+					</choose>
+				</foreach>
+			</if>
+
+			<!-- 상태 검색 -->
+			<if test="status != null and status.name() != 'ALL'">
+				<choose>
+					<!-- COMPLETE면 PASS, FAILURE 둘 다 -->
+					<when test="status.name() == 'COMPLETE'">
+						AND status IN ('PASS', 'FAILURE')
+					</when>
+					<!-- UNCOMPLETE면 WAITING, CHECKED 둘 다 -->
+					<when test="status.name() == 'UNCOMPLETE'">
+						AND status IN ('WAITING', 'CHECKED')
+					</when>
+					<!-- 그 외에는 단일 상태 -->
+					<otherwise>
+						AND status = #{status}
+					</otherwise>
+				</choose>
+			</if>
+
+			<!-- 작성일 범위 검색 -->
+			<if test="searchStartDate != null">
+				AND postDate <![CDATA[>=]]>
+				#{searchStartDate}
+			</if>
+			<if test="searchEndDate != null">
+				AND postDate <![CDATA[<=]]>
+				#{searchEndDate}
+			</if>
+		</where>
+
+		<!-- 정렬 -->
+		ORDER BY
+		<choose>
+			<when
+				test="sortOption != null and sortOption.name() == 'CONFIRMDATE'">
+				confirmDate
+			</when>
+			<otherwise>
+				postDate
+			</otherwise>
+		</choose>
+		<choose>
+			<when
+				test="sortDirection != null and sortDirection.name() == 'ASC'">
+				ASC
+			</when>
+			<otherwise>
+				DESC
+			</otherwise>
+		</choose>
+		,
+		advancementNo
+		<choose>
+			<when
+				test="sortDirection != null and sortDirection.name() == 'ASC'">
+				ASC
+			</when>
+			<otherwise>
+				DESC
+			</otherwise>
+		</choose>
+
+		LIMIT #{rowCntPerPage} OFFSET #{offset}
+	</select>
+
+	<!-- 총 개수 조회 -->
+	<select id="countMentorRequestSimpleList" resultType="int">
+		SELECT COUNT(*)
+		FROM advancement
+		<where>
+			<!-- 검색어 -->
+			<if
+				test="searchWord != null and searchWord != '' and searchTypes != null and searchTypes.size() > 0">
+				<foreach item="type" collection="searchTypes" separator="or"
+					open="(" close=")">
+					<choose>
+						<when test="type.name() == 'TITLE'">
+							title LIKE CONCAT('%', #{searchWord}, '%')
+						</when>
+						<when test="type.name() == 'WRITER'">
+							writer LIKE CONCAT('%', #{searchWord}, '%')
+						</when>
+						<when test="type.name() == 'CONTENT'">
+							content LIKE CONCAT('%', #{searchWord}, '%')
+						</when>
+						<when test="type.name() == 'REJECT'">
+							rejectMessage LIKE CONCAT('%', #{searchWord}, '%')
+						</when>
+					</choose>
+				</foreach>
+			</if>
+
+			<!-- 상태 검색 -->
+			<if test="status != null and status.name() != 'ALL'">
+				<choose>
+					<!-- COMPLETE면 PASS, FAILURE 둘 다 -->
+					<when test="status.name() == 'COMPLETE'">
+						AND status IN ('PASS', 'FAILURE')
+					</when>
+					<!-- UNCOMPLETE면 WAITING, CHECKED 둘 다 -->
+					<when test="status.name() == 'UNCOMPLETE'">
+						AND status IN ('WAITING', 'CHECKED')
+					</when>
+					<!-- 그 외에는 단일 상태 -->
+					<otherwise>
+						AND status = #{status}
+					</otherwise>
+				</choose>
+			</if>
+
+			<!-- 작성일 범위 검색 -->
+			<if test="searchStartDate != null">
+				AND postDate <![CDATA[>=]]>
+				#{searchStartDate}
+			</if>
+			<if test="searchEndDate != null">
+				AND postDate <![CDATA[<=]]>
+				#{searchEndDate}
+			</if>
+		</where>
+	</select>
+
+	<!-- MentorRequestVO + MentorRequestUpFileVO 리스트 함께 조회 -->
+	<select id="selectMentorRequestDetail"
+		resultMap="mentorRequestDetailMap">
+		SELECT
+		a.advancementNo,
+		a.title,
+		a.writer,
+		a.refUser,
+		a.postDate,
+		a.content,
+		a.status,
+		a.confirmDate,
+		a.rejectMessage,
+		u.upfileNo,
+		u.originalFileName,
+		u.newFileName,
+		u.thumbFileName,
+		u.fileType,
+		u.ext,
+		u.size,
+		u.base64Image,
+		u.refAdvancementNo
+		FROM
+		advancement a
+		LEFT JOIN advancementUpfiles u
+		ON a.advancementNo =
+		u.refAdvancementNo
+		WHERE a.advancementNo = #{advancementNo}
+	</select>
+
+	<!-- MentorRequestVO + MentorRequestUpFileVO 매핑 -->
+	<resultMap id="mentorRequestDetailMap"
+		type="com.jobhunter.model.advancement.MentorRequestVO">
+		<id property="advancementNo" column="advancementNo" />
+		<result property="title" column="title" />
+		<result property="writer" column="writer" />
+		<result property="refUser" column="refUser" />
+		<result property="postDate" column="postDate" />
+		<result property="content" column="content" />
+		<result property="status" column="status" />
+		<result property="confirmDate" column="confirmDate" />
+		<result property="rejectMessage" column="rejectMessage" />
+
+		<collection property="upfiles"
+			ofType="com.jobhunter.model.advancement.MentorRequestUpFileVO">
+			<id property="upfileNo" column="upfileNo" />
+			<result property="originalFileName" column="originalFileName" />
+			<result property="newFileName" column="newFileName" />
+			<result property="thumbFileName" column="thumbFileName" />
+			<result property="fileType" column="fileType" />
+			<result property="ext" column="ext" />
+			<result property="size" column="size" />
+			<result property="base64Image" column="base64Image" />
+			<result property="refAdvancementNo" column="refAdvancementNo" />
+		</collection>
+	</resultMap>
+	
+	<update id="setMentorRequestStatusToChecked">
+	    UPDATE advancement
+	    <set>
+	        status = 'CHECKED'
+	    </set>
+	    WHERE advancementNo = #{advancementNo}
+	    AND status = 'WAITING'
+	</update>
+	
+	<update id="setMentorRequestStatusToPass">
+	    UPDATE advancement
+	    <set>
+	        status = 'PASS'
+	        , confirmDate = NOW()
+	        , rejectMessage = null
+	    </set>
+	    WHERE advancementNo = #{advancementNo}
+	</update>
+	
+	<update id="setMentorRequestStatusToFail">
+	    UPDATE advancement
+	    <set>
+	        status = 'FAILURE'
+	        , confirmDate = NOW()
+	        , rejectMessage = #{rejectMessage}
+	    </set>
+	    WHERE advancementNo = #{advancementNo}
+	</update>
+	
+	<select id="selectRefUserByAdvancementNo" resultType="int">
+	    SELECT refUser
+	    FROM advancement
+	    WHERE advancementNo = #{advancementNo}
+	</select>
+	
+	<update id="setMentorRequestStatusToPassByRefUser">
+	    UPDATE advancement
+	    <set>
+	        status = 'PASS'
+	        , confirmDate = NOW()
+	        , rejectMessage = null
+	    </set>
+	    WHERE refUser = #{refUser}
+	    LIMIT 20
+	</update>
+
 	<select id="getSearchResultRowCount"
 		parameterType="com.jobhunter.model.page.PageRequestDTO"
 		resultType="int">
@@ -100,6 +360,5 @@
 		DELETE FROM advancement
 		WHERE advancementNo = #{advancementNo}
 	</delete>
-
 
 </mapper>

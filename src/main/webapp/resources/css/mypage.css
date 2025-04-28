@@ -1,3 +1,7 @@
+.section-title {
+  padding-bottom: 5px;
+}
+
 #modifySection {
     opacity: 0;
     transition: opacity 0.5s ease;
@@ -219,7 +223,10 @@
   .sections-grid section:nth-child(3),
   .sections-grid section:nth-child(4),
   .sections-grid section:nth-child(5),
-  .sections-grid section:nth-child(6) {
+  .sections-grid section:nth-child(6),
+  .sections-grid section:nth-child(7),
+  .sections-grid section:nth-child(8)
+   {
     grid-column: 1 / -1;
   }
 

@@ -37,12 +37,14 @@ public class AccountUtil {
 		}
 	}
 
+	// sessionAccount의 권한이 allowType과 맞으면 true
 	public static boolean checkType(AccountType allowType, AccountVO sessionAccount) {
 		List<AccountType> allowTypes = new ArrayList<AccountType>();
 		allowTypes.add(allowType);
 		return checkType(allowTypes, sessionAccount);
 	}
 
+	// sessionAccount의 권한이 allowTypes중 하나라도 맞으면 true
 	public static boolean checkType(List<AccountType> allowTypes, AccountVO sessionAccount) {
 		if (sessionAccount == null) {
 			return false;
@@ -67,11 +69,14 @@ public class AccountUtil {
 		return false;
 	}
 	
+	// uids중 하나라도 sessionAccount의 uid와 같은게 있는지 비교(계정타입 비교 없음_무조건 개인 혹은 무조건 기업으로 고정되어있을때 사용)
 	public static boolean checkUid(AccountVO sessionAccount, int... uids) {
 		List<AccountType> allowTypes = new ArrayList<AccountType>();
 		return checkUid(allowTypes, sessionAccount, uids);
 	}
 	
+	// sessionAccount의 권한이 allowTypes중 하나라도 맞거나
+	// uids중 하나라도 sessionAccount의 uid와 같은게 있는지 비교(계정타입 비교 없음_무조건 개인 혹은 무조건 기업으로 고정되어있을때 사용)
 	public static boolean checkUid(List<AccountType> allowTypes, AccountVO sessionAccount, int... uids) {
 		if (sessionAccount == null) {
 			return false;

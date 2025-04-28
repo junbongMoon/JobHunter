@@ -806,52 +806,47 @@ function showNewPwdModal(text, uid) {
 }
 
 function changePassword() {
-const changePassword = $('#changePassword').val();
-const checkPassword = $('#checkPassword').val();
-const changeUid = $('#changeUid').val();
+	const changePassword = $('#changePassword').val();
+	const checkPassword = $('#checkPassword').val();
+	const changeUid = $('#changeUid').val();
 
-const selectedType = $('input[name="targetType"]:checked').val();
+	const pwdRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[a-zA-Z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,20}$/;
 
-const pwdRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[a-zA-Z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,20}$/;
+	if (!pwdRegex.test(changePassword)) {
+		const failedText = `<div style="color:red; margin-top: 10px; font-size:0.8em">비밀번호는 영어와 숫자, 특수문자를 전부 포함한 6~20자여야 합니다.</div>`
+		showNewPwdModal(failedText, changeUid)
+		return;
+	}
 
-if (!pwdRegex.test(changePassword)) {
-  const failedText = `<div style="color:red; margin-top: 10px; font-size:0.8em">비밀번호는 영어와 숫자, 특수문자를 전부 포함한 6~20자여야 합니다.</div>`
-  showNewPwdModal(failedText, changeUid)
-  return;
-}
-
-if (changePassword !== checkPassword) {
-  const failedText = `<div style="color:red; margin-top: 10px; text-size:0.8em">비밀번호 재입력란을 다시 한번 확인해주세요.</div>`
-  showNewPwdModal(failedText, changeUid)
-  return;
-}
-
-let targetUrl = "/user/password"
-
-if (selectedType === 'COMPANY') {
-	targetUrl = "/company/password"
-}
-
-$.ajax({
-  url: targetUrl,
-  method: "patch",
-  contentType: "application/json",
-  data: JSON.stringify({ uid: changeUid, password: changePassword }),
-  success: () => {
-	window.publicModals.show(
-		"비밀번호가 변경되었습니다. 로그인페이지로 이동하시겠습니까?",
-		{
-			confirmText: '이동',
-			cancelText: '취소',
-			onConfirm: () => {location.href = "/account/login";}
-		});
-  },
-  error: (xhr) => {
-	const failedText = `<div style="color:red; margin-top: 10px; text-size:0.8em">비밀번호 변경중 오류가 발생했습니다. 잠시후 다시 시도해 주세요.</div>`
+	if (changePassword !== checkPassword) {
+	const failedText = `<div style="color:red; margin-top: 10px; text-size:0.8em">비밀번호 재입력란을 다시 한번 확인해주세요.</div>`
 	showNewPwdModal(failedText, changeUid)
 	return;
-  }
-});
+}
+
+	const selectedType = $('input[name="targetType"]:checked').val();
+	const targetUrl = selectedType === 'COMPANY' ? "/company/password" : "/user/password";
+
+	$.ajax({
+	url: targetUrl,
+	method: "patch",
+	contentType: "application/json",
+	data: JSON.stringify({ uid: changeUid, password: changePassword }),
+	success: () => {
+		window.publicModals.show(
+			"비밀번호가 변경되었습니다. 로그인페이지로 이동하시겠습니까?",
+			{
+				confirmText: '이동',
+				cancelText: '취소',
+				onConfirm: () => {location.href = "/account/login";}
+			});
+	},
+	error: (xhr) => {
+		const failedText = `<div style="color:red; margin-top: 10px; text-size:0.8em">비밀번호 변경중 오류가 발생했습니다. 잠시후 다시 시도해 주세요.</div>`
+		showNewPwdModal(failedText, changeUid)
+		return;
+	}
+	});
 }
 
 

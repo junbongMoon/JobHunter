@@ -5,6 +5,10 @@ import java.util.List;
 import com.jobhunter.model.advancement.AdvancementDTO;
 import com.jobhunter.model.advancement.AdvancementUpFileVODTO;
 import com.jobhunter.model.advancement.AdvancementVO;
+import com.jobhunter.model.advancement.MentorRequestListSearchDTO;
+import com.jobhunter.model.advancement.MentorRequestSimpleVO;
+import com.jobhunter.model.advancement.MentorRequestVO;
+import com.jobhunter.model.advancement.MentorRequestVO.Status;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 
@@ -21,6 +25,22 @@ public interface AdvancementDAO {
 
 	public List<AdvancementUpFileVODTO> getfileListByAdvancement(int advancementNo) throws Exception;
 
+	List<MentorRequestSimpleVO> selectMentorRequestSimpleList(MentorRequestListSearchDTO dto) throws Exception;
+
+	int countMentorRequestSimpleList(MentorRequestListSearchDTO dto) throws Exception;
+
+	MentorRequestVO selectMentorRequestDetail(Integer advancementNo) throws Exception;
+
+	void setMentorRequestStatusToFail(int requestNo, String rejectMessage) throws Exception;
+
+	void setMentorRequestStatusToChecked(Integer advancementNo) throws Exception;
+
+	void setMentorRequestStatusToPass(Integer advancementNo) throws Exception;
+
+	int selectRefUserByAdvancementNo(int advancementNo) throws Exception;
+
+	void setMentorRequestStatusToPassByRefUser(Integer refUser) throws Exception;
+
 	public int getSearchResultRowCount(int uid, PageRequestDTO pageRequestDTO) throws Exception;
 
 	public int getTotalCountRow(int uid) throws Exception;
@@ -32,4 +52,5 @@ public interface AdvancementDAO {
 	public int deleteFilesByAdvancementNo(int advancementNo) throws Exception;
 
 	public int deleteAdvancementById(int advancementNo) throws Exception;
+
 }

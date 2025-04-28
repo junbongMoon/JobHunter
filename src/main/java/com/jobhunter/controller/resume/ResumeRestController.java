@@ -98,21 +98,36 @@ public class ResumeRestController {
 	
 
 	@PostMapping(value = "/myRegistrationAdvice")
-	public TenToFivePageVO<RegistrationAdviceVO> getMyRegistrationAdvice(@RequestBody MyRegistrationAdviceSearchDTO dto) {
+	public TenToFivePageVO<RegistrationAdviceVO> getMyRegistrationAdvice(@RequestBody MyRegistrationAdviceSearchDTO dto, HttpSession session) {
 		try {
-			return resumeService.selectRegistrationAdviceByMentorWithPaging(dto);
+			
+			AccountVO sessionAcc = (AccountVO)session.getAttribute("account");
+
+			if (sessionAcc != null) {
+				
+				dto.setUid(sessionAcc.getUid());
+				
+				if(sessionAcc.getIsMentor().equals("Y")) {
+					dto.setType("mentor");
+				} else {
+					dto.setType("mentee");
+				}
+				
+				return resumeService.selectRegistrationAdviceByMentorWithPaging(dto);				
+			}
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 		return null;
 	}
 	
-	@PostMapping(value = "/myResumeAdvice/{uid}/{page}")
-	public TenToFivePageVO<ResumeAdviceVO> getMyResumeAdviceByUserUid(@PathVariable("uid") int uid, @PathVariable("page")int page) {
+	@PostMapping(value = "/myResumeAdvice/{page}")
+	public TenToFivePageVO<ResumeAdviceVO> getMyResumeAdviceByUserUid(@PathVariable("page")int page, HttpSession session) {
 		try {
-			return resumeService.selectResumeAdviceByUserUid(uid, page);
+			AccountVO sessionAcc = (AccountVO)session.getAttribute("account");
+			return resumeService.selectResumeAdviceByUserUid(sessionAcc.getUid(), page);
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 		return null;
 	}

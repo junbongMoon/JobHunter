@@ -5,11 +5,19 @@ import lombok.Data;
 @Data
 public class MyRegistrationAdviceSearchDTO {
 	private int uid;
-	private String status;
+	private Status status;
 	private String type;
 	private int page;
 	
 	public int getOffset() {
 		return (page - 1) * 5;
 	}
+	
+	public enum Status {
+		COMPLETE,
+		CANCEL,
+		WAITING,
+		CHECKING,
+		LIVE
+    }
 }

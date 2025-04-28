@@ -188,51 +188,54 @@
       <!-- 이력서 영역 -->
       <section data-aos="fade-up" data-aos-delay="300">
         <div class="section-title">
-          <h2><i class="bi bi-heart section-icon"></i>신청한 이력서</h2>
-          <span><button class="btn-edit" onclick="resumeReadOnly()" id="resumeReadOnlyBtn">조회된 신청서만 검색</button></span>
-          <span style="float:right"><button class="btn-edit" onclick="resumeSortOption()" id="resumeSortOptionBtn">최신순으로 정렬</button></span>
+          <h2 onclick="toggleResumeSectionItems()" style="cursor: pointer;"><i class="bi bi-heart section-icon"></i>신청한 이력서<span style="font-size:0.7em"> ▼ </span></h2>
+          <span class="resumeSectionItems" style="display:none;"><button class="btn-edit" onclick="resumeReadOnly()" id="resumeReadOnlyBtn">조회된 신청서만 검색</button></span>
+          <span class="resumeSectionItems" style="display:none; float:right"><button class="btn-edit" onclick="resumeSortOption()" id="resumeSortOptionBtn">최신순으로 정렬</button></span>
           
         </div>
-        <div id="resumeSection"></div>
+        <div id="resumeSection" class="resumeSectionItems" style="display:none;"></div>
       </section>
 
       <!-- 리뷰 영역 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
-          <h2><i class="bi bi-heart section-icon"></i>작성한 리뷰</h2>
-          <button class="btn-edit" onclick="openReviewSearchModal()">리뷰 검색 옵션</button>
+          <h2 onclick="toggleReviewSectionItems()" style="cursor: pointer;"><i class="bi bi-heart section-icon"></i>작성한 리뷰<span style="font-size:0.7em"> ▼ </span></h2>
+          <button class="btn-edit reviewSectionItems" style="display:none;" onclick="openReviewSearchModal()">리뷰 검색 옵션</button>
         </div>
-        <div id="reviewSection"></div>
+        <div id="reviewSection" class="reviewSectionItems" style="display:none;"></div>
       </section>
 
       <!-- 첨삭답변 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
-          <h2><i class="bi bi-heart section-icon"></i>답변받은 이력서 첨삭</h2>
+          <h2 onclick="toggleResumeAdviceSectionItems()" style="cursor: pointer;"><i class="bi bi-heart section-icon"></i>답변받은 이력서 첨삭<span style="font-size:0.7em"> ▼ </span></h2>
         </div>
-        <div id="resumeAdviceSection"></div>
+        <div id="resumeAdviceSection" class="resumeAdviceSectionItems" style="display:none;"></div>
       </section>
 
+	<c:if test="${account.isMentor == 'Y'}">
       <!-- 멘토등록글 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
-          <h2><i class="bi bi-heart section-icon"></i>등록한 멘토pr글</h2>
+          <h2 onclick="togglePrboardSectionItems()" style="cursor: pointer;"><i class="bi bi-heart section-icon"></i>등록한 멘토pr글<span style="font-size:0.7em"> ▼ </span></h2>
         </div>
-        <div id="prboardSection"></div>
+        <div id="prboardSection" class="prboardSectionItems" style="display:none;"></div>
       </section>
-
+	</c:if>
       <!-- 첨삭신청 -->
       <section data-aos="fade-up" data-aos-delay="400">
         <div class="section-title">
-          <h2><i class="bi bi-heart section-icon"></i>첨삭 요청</h2>
-          <div class="registrationAdviceSelectBox">
+          <h2 onclick="toggleRegistrationAdviceSectionItems()" style="cursor: pointer;"><i class="bi bi-heart section-icon"></i>첨삭 요청<span style="font-size:0.7em"> ▼ </span></h2>
+          <div class="registrationAdviceSelectBox registrationAdviceSectionItems" style="display:none;">
+          	<c:if test="${account.isMentor == 'Y'}">
             <select id="typeSelect" class="form-select" onchange="handleTypeChange()">
-              <option value="mentee">내가 신청한 첨삭요청</option>
               <option value="mentor">내가 받은 첨삭요청</option>
+              <option value="mentee">내가 신청한 첨삭요청</option>
             </select>
+            </c:if>
             <select id="statusSelect" class="form-select" onchange="handleStatusChange()">
-              <option value="LIVE">*확인 필요*</option>
-              <option value="WAITING">대기 중</option>
+              <option value="LIVE">*처리 대기 중*</option>
+              <option value="WAITING">미확인</option>
               <option value="CHECKING">검토 중</option>
               <option value="COMPLETE" style="color: #8d8d8d;">완료한 신청 보기</option>
               <option value="CANCEL" style="color: #8d8d8d;">취소된 신청 보기</option>
@@ -240,8 +243,9 @@
             </select>
           </div>
         </div>
-        <div id="registrationAdviceSection"></div>
+        <div id="registrationAdviceSection" class="registrationAdviceSectionItems" style="display:none;"></div>
       </section>
+      
     </div>
   </div>
 
@@ -296,6 +300,8 @@ Kakao.isInitialized();
 		});
 	}
 // #endregion 카톡
+
+// #region 본인 작성 글 리스트들 출력
 function renderPagination(res, pageFunc, container) {
   const { pageList, currentPage, hasPrevBlock, hasNextBlock, startPage, endPage } = res;
 
@@ -391,7 +397,7 @@ function goToResumeAdvice(pageNum) {
 let resumeAdvicePage = 1
 function getMyResumeAdvice() {
   $.ajax({
-    url: `/resume/myResumeAdvice/\${uid}/\${resumeAdvicePage}`,
+    url: `/resume/myResumeAdvice/\${resumeAdvicePage}`,
     method: 'POST',
     contentType: 'application/json',
     success: function(res) {
@@ -558,7 +564,7 @@ const registrationAdviceStatus = {
 const registrationAdviceData = {
   page: 1,
   status: registrationAdviceStatus.LIVE,
-  type: "mentee"
+  type: "mentor"
 };
 function getMyRegistrationAdvice() {
   const type = registrationAdviceData.type;
@@ -567,10 +573,8 @@ function getMyRegistrationAdvice() {
     method: 'POST',
     contentType: 'application/json',
     data: JSON.stringify({
-      uid: uid,
       page: registrationAdviceData.page,
-      status: registrationAdviceData.status,
-      type: type
+      status: registrationAdviceData.status
     }),
     success: function(res) {
       console.log(res);
@@ -611,7 +615,7 @@ function renderPrboard(res) {
 	    container.html(`
 	      <div class="empty-state">
 	        <i class="fas fa-folder-open"></i><br>
-	        검색된 신청글이 없습니다.
+	        등록된 멘토 첨삭 지원 프로필이 없습니다.
 	      </div>
 	    `);
 	    return;
@@ -661,15 +665,6 @@ function goToPrboardPage(pageNum) {
   prboardPage = pageNum;
 	getMyPrboard();
 }
-
-$(()=>{
-  getInfo();
-  getMyResumes();
-  getMyReview();
-  getMyRegistrationAdvice();
-  getMyPrboard();
-  getMyResumeAdvice();
-})
 
 function viewRecruitDetail(uid) {
   location.href = `/recruitmentnotice/detail?uid=\${uid}`;
@@ -935,6 +930,8 @@ function viewReviewDetail(boardNo) {
   location.href = `/reviewBoard/detail?boardNo=\${boardNo}&page=1`;
 }
 
+// #endregion
+
 // #region 전역 변수 및 초기화
 const uid = "${sessionScope.account.uid}"
 let sessionMobile = "${sessionScope.account.mobile}";
@@ -1037,28 +1034,7 @@ function formatNumber(e) {
 }
 // #endregion
 
-// #region 정보 서버에있는걸로 갱신
-function getInfo() {
-  $.ajax({
-      url: "/user/info/${sessionScope.account.uid}",
-      method: "GET",
-      success: (result) => {
-        isSocial = result.isSocial == 'Y';
-        sessionMobile = result.mobile;
-  		  sessionEmail = result.email;
-        console.log(result.blockDeadline);
-        console.log(result.deleteDeadline);
-        updateDeleteAccountInfo(result.deleteDeadline, result.blockDeadline)
-        resetUserModifyForm();
-        updateBasicInfo(result);
-        updateUserDetailInfo(result);
-        updateUserModifyInfo(result);
-      },
-      error: (xhr) => window.publicModals.show("정보 로딩에 실패하였습니다. 잠시후 새로고침해 주세요.")
-  });
-}
-
-// #region 계정삭제 관련 (백엔드 미구현)
+// #region 계정삭제 관련
 function updateDeleteAccountInfo(deleteDeadline, blockDeadline) {
   if (deleteDeadline) {
     $('#accountDeleteDateTitle').text('삭제 대기중...')
@@ -1077,12 +1053,49 @@ function updateDeleteAccountInfo(deleteDeadline, blockDeadline) {
   }
 }
 
+// 계정 삭제 신청 전 본인인증(기존 비밀번호)
 function deleteAccount() {
-	  window.publicModals.show("<div>정말로 삭제하시겠습니까?</div><div style='font-size:0.7em; color:var(--bs-gray-600)'>계정은 3일 뒤 삭제되며 포인트가 소멸할 수 있습니다.</div>", {
-      cancelText : '취소',
-      onConfirm : checkedDeleteAccount
-    })
+  window.publicModals.show(`<input type="password" id="nowPassword" placeholder="현재 비밀번호를 입력하세요" style="min-width: 300px;">`, {
+    onConfirm: checkPasswordToDeleteAccount,
+    cancelText: "취소",
+    size_x: "350px",
+  })
+}
+
+function checkPasswordToDeleteAccount() {
+  const failedDTO = {
+      onConfirm: deleteAccount,
+      cancelText: "취소"
+    }
+
+  const nowPassword = document.getElementById('nowPassword').value
+
+  if (!nowPassword) {
+    window.publicModals.show('현재 비밀번호를 입력해주세요.', failedDTO);
+    return false; // 공용모달 안닫음
   }
+
+  $.ajax({
+    url: "/user/password",
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "deleteAccountUser" }),
+    success: (result) => {
+      if (result === true) {
+        window.publicModals.show("<div>정말로 삭제하시겠습니까?</div><div style='font-size:0.7em; color:var(--bs-gray-600)'>계정은 3일 뒤 삭제되며 포인트가 소멸할 수 있습니다.</div>", {
+          cancelText : '취소',
+          onConfirm : checkedDeleteAccount
+        })
+      } else {
+        window.publicModals.show("비밀번호가 틀렸습니다.", failedDTO);
+      }
+    },
+    error: (xhr) => {
+      window.publicModals.show("비밀번호 확인 중 오류 발생", failedDTO);
+    }
+  });
+  return false;
+}
 
   function checkedDeleteAccount() {
     $.ajax({
@@ -1117,6 +1130,32 @@ function deleteAccount() {
     });
   }
 // #endregion
+
+// #region 정보 서버에있는걸로 갱신
+function getInfo() {
+  $.ajax({
+      url: "/user/info/${sessionScope.account.uid}",
+      method: "GET",
+      success: (result) => {
+        isSocial = result.isSocial == 'Y';
+        sessionMobile = result.mobile;
+  		  sessionEmail = result.email;
+        console.log(result.blockDeadline);
+        console.log(result.deleteDeadline);
+        updateDeleteAccountInfo(result.deleteDeadline, result.blockDeadline)
+        resetUserModifyForm();
+        updateBasicInfo(result);
+        updateUserDetailInfo(result);
+        updateUserModifyInfo(result);
+      },
+      error: (xhr) => {
+        console.log('xhr.code: ', xhr)
+        window.publicModals.show(
+          "정보 로딩에 실패하였습니다. 잠시후 새로고침해 주세요."
+        )
+      }
+  });
+}
 
 // 기본정보 로딩
 function updateBasicInfo(userInfo) {
@@ -1330,6 +1369,15 @@ function updateUserModifyInfo(result) {
 
 // #endregion 정보 서버에있는걸로 갱신
 
+$(()=>{
+  getInfo();
+  getMyResumes();
+  getMyReview();
+  getMyRegistrationAdvice();
+  getMyPrboard();
+  getMyResumeAdvice();
+})
+
 // #region 상세정보 수정 관련
 // 상세정보 수정 창 열기
 function modyfiInfoTapOpen () {
@@ -1437,7 +1485,7 @@ function showCodeModal(confirmFunc, isfailed) {
 }
 
 // #region 비번변경
-// 비밀번호 변경 전 1차 본인인증(기존 비밀번호)
+// 비밀번호 변경 전 1차 본인인증(기존 비밀번호) 보내기
 function openPasswordModal() {
 
   const modalText = `
@@ -1450,8 +1498,8 @@ function openPasswordModal() {
     size_x: "350px",
   })
 }
-  
-// 비밀번호 변경 전 1차 본인인증(기존 비밀번호)
+
+// 비밀번호 변경 전 1차 본인인증(기존 비밀번호) 체크
 function checkPassword() {
 
   const failedDTO = {
@@ -1469,7 +1517,7 @@ function checkPassword() {
     url: "/user/password",
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ uid, password: nowPassword }),
+    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "chagePwdUser" }),
     success: (result) => {
       if (result === true) {
         showVerificationOptions();
@@ -2049,8 +2097,6 @@ function changeEmailFunc(changeEmail) {
     }
   }
 
-  
-  
 // #region 주소검색API용 함수들
 let addrCurrentPage = 0;
 const addressSelect = document.getElementById("addressSelect");
@@ -2363,6 +2409,64 @@ function rejectAdviceModal(resumeNo, userUid) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
+// #endregion 섹션들 드롭다운느낌 처리용 함수들
+// 이력서 영역 토글
+let isResumeSectionVisible = false;  // 처음엔 숨김 상태
+
+function toggleResumeSectionItems() {
+  if (isResumeSectionVisible) {
+    $('.resumeSectionItems').hide();
+  } else {
+    $('.resumeSectionItems').show();
+  }
+  isResumeSectionVisible = !isResumeSectionVisible;
+}
+
+// reviewSectionItems 토글
+let isReviewSectionVisible = false;
+function toggleReviewSectionItems() {
+  if (isReviewSectionVisible) {
+    $('.reviewSectionItems').hide();
+  } else {
+    $('.reviewSectionItems').show();
+  }
+  isReviewSectionVisible = !isReviewSectionVisible;
+}
+
+// resumeAdviceSectionItems 토글
+let isResumeAdviceSectionVisible = false;
+function toggleResumeAdviceSectionItems() {
+  if (isResumeAdviceSectionVisible) {
+    $('.resumeAdviceSectionItems').hide();
+  } else {
+    $('.resumeAdviceSectionItems').show();
+  }
+  isResumeAdviceSectionVisible = !isResumeAdviceSectionVisible;
+}
+
+// prboardSectionItems 토글
+let isPrboardSectionVisible = false;
+function togglePrboardSectionItems() {
+  if (isPrboardSectionVisible) {
+    $('.prboardSectionItems').hide();
+  } else {
+    $('.prboardSectionItems').show();
+  }
+  isPrboardSectionVisible = !isPrboardSectionVisible;
+}
+
+// registrationAdviceSectionItems 토글
+let isRegistrationAdviceSectionVisible = false;
+function toggleRegistrationAdviceSectionItems() {
+  if (isRegistrationAdviceSectionVisible) {
+    $('.registrationAdviceSectionItems').hide();
+  } else {
+    $('.registrationAdviceSectionItems').show();
+  }
+  isRegistrationAdviceSectionVisible = !isRegistrationAdviceSectionVisible;
+}
+
+// #region 섹션들 드롭다운느낌 처리용 함수들
 </script>
 <!-- 풋터 -->
 <jsp:include page="/WEB-INF/views/footer.jsp"></jsp:include>
