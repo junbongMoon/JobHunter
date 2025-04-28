@@ -686,7 +686,8 @@ function okMobile() {
       url: '/account/auth/mobile/verify',
       contentType: 'application/json',
       data: JSON.stringify({
-        confirmMobile: mobile
+        confirmMobile: mobile,
+		confirmType: "registCompany"
       }),
       success: function(res) {
         $("#mobile").val(mobile)
@@ -740,7 +741,8 @@ function verifyEmailCode() {
 		method: "POST",
 		contentType: "application/json",
 		data: JSON.stringify({
-		email: email
+		email: email,
+		confirmType: "registCompany"
 		}),
 		success: () => okEmail(),
 		error: (xhr) => {

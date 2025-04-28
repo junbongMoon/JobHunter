@@ -190,7 +190,8 @@ public class AccountRestController {
 			@RequestBody Map<String, String> emailTmp, HttpSession session) {
 
 		String email = emailTmp.get("email");
-
+		String verifiedEmailWhere = emailTmp.get("confirmType");
+		
 		EmailAuth emailAuth = (EmailAuth) session.getAttribute("emailCode:" + email);
 
 		if (emailAuth == null) {
@@ -211,6 +212,7 @@ public class AccountRestController {
 		
 		// 세션에 "이 사람은 이메일 인증 완료" 플래그 저장
 		session.setAttribute("verifiedEmail", email);
+//		session.setAttribute("verifiedEmailWhere", verifiedEmailWhere);
 
 		// 세션에 사용자한테도 인증성공했다고 넣어주기
 		AccountVO account = (AccountVO) session.getAttribute("account");
@@ -228,12 +230,18 @@ public class AccountRestController {
 	@PostMapping(value = "/auth/mobile/verify", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<?> verifyMobile(@RequestBody Map<String, String> body, HttpSession session) {
 	    String mobile = body.get("confirmMobile");
+	    String verifiedMobileWhere = body.get("confirmType");
 	    if (mobile == null || mobile.isEmpty()) {
 	        return ResponseEntity.badRequest().body("전화번호가 없습니다.");
 	    }
+	    
+//	    if (verifiedMobileWhere == null || verifiedMobileWhere.isEmpty()) {
+//	        return ResponseEntity.badRequest().body("잘못된 접근 방식입니다.");
+//	    }
 
 	    // 세션에 "이 사람은 전화번호 인증 완료" 플래그 저장
 	    session.setAttribute("verifiedMobile", mobile);
+//	    session.setAttribute("verifiedMobileWhere", verifiedMobileWhere);
 
 	    return ResponseEntity.ok("전화번호 인증 저장 완료");
 	}

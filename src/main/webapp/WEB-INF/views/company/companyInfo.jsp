@@ -642,7 +642,7 @@ function checkPasswordToDeleteAccount() {
     url: "/company/password",
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ uid, password: nowPassword }),
+    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "deleteAccountCompany" }),
     success: (result) => {
       if (result === true) {
         window.publicModals.show("<div>정말로 삭제하시겠습니까?</div><div style='font-size:0.7em; color:var(--bs-gray-600)'>계정은 3일 뒤 삭제됩니다.</div>", {
@@ -923,7 +923,7 @@ function checkPassword() {
     url: "/company/password",
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ uid, password: nowPassword }),
+    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "chagePwdCompany" }),
     success: (result) => {
       if (result == true) {
         showVerificationOptions();

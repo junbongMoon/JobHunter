@@ -153,13 +153,18 @@ public class CompanyRestController {
 	 *         </ul>
 	 */
 	@PostMapping(value = "/password", consumes = "application/json")
-	public ResponseEntity<Boolean> checkPassword(@RequestBody PasswordDTO dto) {
+	public ResponseEntity<Boolean> checkPassword(@RequestBody PasswordDTO dto, HttpSession session) {
+		boolean isMatch = false;
 		try {
-			return ResponseEntity.ok(service.checkPassword(dto.getUid(), dto.getPassword()));
+			isMatch = service.checkPassword(dto.getUid(), dto.getPassword());
+			if(isMatch) {
+				session.setAttribute(dto.getWhereFrom(), dto.getUid());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
+		return ResponseEntity.ok(isMatch);
 	}
 
 	/**

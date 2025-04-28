@@ -1079,7 +1079,7 @@ function checkPasswordToDeleteAccount() {
     url: "/user/password",
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ uid, password: nowPassword }),
+    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "deleteAccountUser" }),
     success: (result) => {
       if (result === true) {
         window.publicModals.show("<div>정말로 삭제하시겠습니까?</div><div style='font-size:0.7em; color:var(--bs-gray-600)'>계정은 3일 뒤 삭제되며 포인트가 소멸할 수 있습니다.</div>", {
@@ -1485,7 +1485,7 @@ function showCodeModal(confirmFunc, isfailed) {
 }
 
 // #region 비번변경
-// 비밀번호 변경 전 1차 본인인증(기존 비밀번호)
+// 비밀번호 변경 전 1차 본인인증(기존 비밀번호) 보내기
 function openPasswordModal() {
 
   const modalText = `
@@ -1498,8 +1498,8 @@ function openPasswordModal() {
     size_x: "350px",
   })
 }
-  
-// 비밀번호 변경 전 1차 본인인증(기존 비밀번호)
+
+// 비밀번호 변경 전 1차 본인인증(기존 비밀번호) 체크
 function checkPassword() {
 
   const failedDTO = {
@@ -1517,7 +1517,7 @@ function checkPassword() {
     url: "/user/password",
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ uid, password: nowPassword }),
+    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "chagePwdUser" }),
     success: (result) => {
       if (result === true) {
         showVerificationOptions();
