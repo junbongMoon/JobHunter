@@ -446,24 +446,25 @@ function showModal(title, message, callback) {
     }
 }
 
-		$(document).ready(function () {
+$(document).ready(function () {
       
-      $(".delete-btn").click(function () {
+	$(".delete-btn").click(function () {
         let boardNo = $(this).data("boardno");
 
         if (confirm("정말 삭제하시겠습니까?")) {
             $.ajax({
                 url: "${pageContext.request.contextPath}/reviewBoard/delete",
                 type: "POST",
-                contentType: "application/charset=UTF-8",
-                data: { boardNo: boardNo },
+                data: {
+                    boardNo: boardNo
+                },
                 success: function (res) {
                     if (res.success) {
-                        showModal("삭제 완료", res.message, function () {
-                            window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
-                        });
+                    	 alert(res.message); // 간단히 alert 띄우고
+                         window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
+                        
                     } else {
-                        showModal("삭제 실패", res.message);
+                        showModal("⚠️ 삭제 실패", res.message);
                     }
                 },
                 error: function (xhr) {
