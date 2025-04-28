@@ -28,8 +28,8 @@ import com.jobhunter.model.resume.EducationLevel;
 import com.jobhunter.model.resume.EducationStatus;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
-import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceCommentDTO;
+import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
@@ -571,6 +571,9 @@ public class ResumeController {
 					// 첨삭 파일 조회
 					List<ResumeAdviceUpfileDTO> adviceFiles = resumeService.getAdviceFiles(advice.getAdviceNo());
 					model.addAttribute("adviceFiles", adviceFiles);
+					// 첨삭 코멘트 조회
+					List<ResumeAdviceCommentDTO> comments = resumeService.getAdviceComments(advice.getAdviceNo());
+					model.addAttribute("comments", comments);
 				}
 				model.addAttribute("mode", "checkAdvice");
 			}

@@ -391,6 +391,7 @@ public class ResumeDAOImpl implements ResumeDAO {
 		params.put("resumeNo", resumeNo);
 		params.put("userUid", userUid);
 		params.put("status", status);
+		params.put("mode", "endAdvice");
 		return ses.update(NS + ".changeAdviceStatus", params);
 	}
 
@@ -405,5 +406,10 @@ public class ResumeDAOImpl implements ResumeDAO {
 	@Override
 	public int insertAdviceComment(ResumeAdviceCommentDTO commentDTO) throws Exception {
 		return ses.insert(NS + ".insertAdviceComment", commentDTO);
+	}
+
+	@Override
+	public List<ResumeAdviceCommentDTO> getAdviceComments(int adviceNo) throws Exception {
+		return ses.selectList(NS + ".getAdviceComments", adviceNo);
 	}
 }

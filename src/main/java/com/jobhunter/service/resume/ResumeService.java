@@ -137,17 +137,15 @@ public interface ResumeService {
 	 */
 	boolean endAdvice(int resumeNo, int userUid, int ownerUid) throws Exception;
 
-
-	// /**
-	//  *  @author 유지원
-	//  *
-	//  * <p>
-	//  * 이력서 첨삭 코멘트를 저장하는 메서드
-	//  * </p>
-	//  * 
-	//  * @param ResumeAdviceCommentDTO commentDTO 코멘트 정보
-	//  * @return 성공 여부
-	//  */
-	// boolean saveResumeComment(ResumeAdviceCommentDTO commentDTO) throws Exception;
-	
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 코멘트를 조회하는 메서드
+	 * </p>
+	 * 
+	 * @param int adviceNo 첨삭 번호
+	 * @return 첨삭 코멘트 목록
+	 */
+	List<ResumeAdviceCommentDTO> getAdviceComments(int adviceNo) throws Exception;
 }

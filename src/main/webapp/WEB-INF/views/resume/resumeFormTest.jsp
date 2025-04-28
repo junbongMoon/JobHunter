@@ -1423,130 +1423,36 @@
 					console.log("pendingComments: " + pendingComments);
 				}
 
-				// // 서버 저장 요청
-				// function saveCommentToServer(lineNo, commentText) {
-				// 	console.log("lineNo: " + lineNo);
-				// 	console.log("commentText: " + commentText);
-				// 	console.log("resumeNo: " + $("#resumeNo").val());
-				// 	console.log("mentorUid: " + $("#sessionUserUid").val());
-				// 	$.ajax({
-				// 		url: "/resume/saveResumeComment",
-				// 		method: "POST",
-				// 		data: {
-				// 			resumeNo: $("#resumeNo").val(),
-				// 			lineNo: lineNo,
-				// 			commentText: commentText,
-				// 			mentorUid: $("#sessionUserUid").val()
 
-				// 		},
-				// 		success: () => console.log("코멘트 저장 완료"),
-				// 		error: () => alert("저장 실패 ㅠㅠ")
-				// 	});
-				// }
 
-				// const editor = CodeMirror.fromTextArea(document.getElementById("selfIntroTextarea1"), {
-				// 	mode: "text/plain",
-				// 	lineNumbers: true,
-				// 	readOnly: true,
-				// 	gutters: ["CodeMirror-linenumbers", "comment-gutter"]
-				// });
-
-				// let activeCommentLine = null; // 현재 코멘트 입력 중인 줄
-
-				// editor.on("gutterClick", function (cm, lineNumber) {
-				// 	if (activeCommentLine === lineNumber) return; // 이미 열려 있으면 무시
-				// 	activeCommentLine = lineNumber;
-
-				// 	const coords = cm.charCoords({ line: lineNumber, ch: 0 }, "page");
-				// 	showInlineCommentForm(lineNumber, coords.top);
-				// });
-
-				// function showInlineCommentForm(line, topOffset) {
-				// 	// 기존 입력창 제거
-				// 	document.getElementById("comment-container").innerHTML = "";
-
-				// 	// 코멘트 입력창 HTML 생성
-				// 	const container = document.getElementById("comment-container");
-				// 	const form = document.createElement("div");
-				// 	form.innerHTML = `
-				// 	<div style="position:absolute; top:${topOffset + 25}px; left:100px; background:#f9f9f9; padding:10px; border:1px solid #ccc; border-radius:6px; width:400px; z-index:10">
-				// 	<textarea id="inlineCommentInput" class="form-control" placeholder="코멘트를 입력하세요"></textarea>
-				// 	<div class="mt-2 text-end">
-				// 	<button type="button" class="btn btn-sm btn-secondary" onclick="cancelInlineComment()">취소</button>
-				// 	<button type="button" class="btn btn-sm btn-primary" onclick="saveInlineComment(${line})">저장</button>
-				// 	</div>
-				// 	</div>
-				// 	`;
-				// 	container.appendChild(form);
-				// }
-
-				// function cancelInlineComment() {
-				// 	document.getElementById("comment-container").innerHTML = "";
-				// 	activeCommentLine = null;
-				// }
-
-				// function saveInlineComment(line) {
-				// 	const comment = document.getElementById("inlineCommentInput").value;
-				// 	if (!comment) return;
-
-				// 	// 💬 표시
-				// 	editor.setGutterMarker(line, "comment-gutter", makeCommentIcon(line));
-
-				// 	// 서버로 저장 요청 (ajax 등으로 가능)
-				// 	console.log("저장: 줄", line + 1, "코멘트:", comment);
-				// 	cancelInlineComment();
-				// }
-
-				// function makeCommentIcon(line) {
-				// 	const marker = document.createElement("div");
-				// 	marker.innerText = "💬";
-				// 	marker.title = "코멘트 있음";
-				// 	marker.style.fontSize = "13px";
-				// 	marker.style.cursor = "pointer";
-				// 	return marker;
-				// }
-
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// // 첨삭 승인 버튼 클릭 이벤트
-				// $("#acceptAdviceBtn").on("click", function () {
-				// 	// 첨삭 승인 확인 컨펌
-				// 	if (!confirm("첨삭을 승인하시겠습니까?")) return;
-				// 	$.ajax({ // 💥💥💥 from : 근우 -> url 해당 resumeNo로 수정해야해요~~~
-				// 		url: "/resume/acceptAdvice/${resumeDetail.resume.resumeNo}",
-				// 		type: "GET",
-				// 		success: function (response) {
-				// 			alert(response.message);
-				// 			location.reload();
-				// 		},
-				// 		error: function () {
-				// 			alert("첨삭 승인 처리 중 오류가 발생했습니다.");
-				// 			location.reload();
-				// 		}
-				// 	});
-				// });
-				// // 첨삭 거절 버튼 클릭 이벤트
-				// $("#rejectAdviceBtn").on("click", function () {
-				// 	// 첨삭 거절 확인 컨펌
-				// 	if (!confirm("첨삭을 거절하시겠습니까?")) return;
-				// 	// 💥💥💥 from : 근우 -> url 해당 resumeNo랑 ownerUid=이력서 주인 uid로 수정해야해요~~~
-				// 	const mentorUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}";
-				// 	// const mentiUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}&userUid=";
-				// 	$.ajax({
-				// 		url: mentorUrl,
-				// 		type: "GET",
-				// 		success: function (response) {
-				// 			alert(response.message);
-				// 			location.reload();
-				// 		},
-				// 		error: function () {
-				// 			alert("첨삭 거절 처리 중 오류가 발생했습니다.");
-				// 			location.reload();
-				// 		}
-				// 	});
-				// });
 
 				//---------------------------------------------------------------------------------------------------------------------------------
 				$(document).ready(function () {
+
+					const commentList = [
+						<c:forEach var="comment" items="${comments}" varStatus="status">
+							{
+								lineNo: ${comment.lineNo},
+							commentText: "${fn:escapeXml(comment.commentText)}"
+     					}<c:if test="${!status.last}">,</c:if>
+						</c:forEach>
+					];
+
+					// const commentMap = {};
+
+					commentList.forEach(comment => {
+						commentMap[comment.lineNo] = comment.commentText;
+						editor.setGutterMarker(comment.lineNo, "comment-gutter", makeCommentIcon(comment.lineNo));
+						editor.setGutterMarker(comment.lineNo, "comment-control-gutter", makeControlButton(comment.lineNo, "remove"));
+						pendingComments.push({
+							lineNo: comment.lineNo,
+							commentText: comment.commentText,
+							resumeNo: comment.resumeNo,
+							mentorUid: comment.mentorUid,
+							adviceNo: comment.adviceNo
+						});
+					});
+
 					// 이력서 주인 uid와 쿼리스트링 uid가 다르면 튕기게하기
 					const userUidOwner = $("#userUidOwner").val();
 					const queryUid = "${param.uid}";
@@ -3271,6 +3177,7 @@
 										showValidationModal('첨삭이 종료되었습니다.');
 										window.location.href = response.url;
 									} else {
+										console.log(response);
 										showValidationModal('첨삭 종료에 실패했습니다.');
 									}
 								},

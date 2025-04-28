@@ -366,6 +366,12 @@
         SET status = #{status}
         WHERE resumeNo = #{resumeNo}
         AND mentorUid = #{userUid}
+        <if test="mode == 'endAdvice'">
+            AND status = 'CHECKING'
+        </if>
+        <if test="mode != 'endAdvice'">
+            AND status = 'WAITING'
+        </if>
     </update>
     
     <select id="selectRegistrationAdviceByMentorWithPaging" resultType="com.jobhunter.model.resume.RegistrationAdviceVO">
@@ -450,5 +456,11 @@
         INSERT INTO resume_advice_comment (adviceNo, commentText, mentorUid, resumeNo, lineNo)
         VALUES (#{adviceNo}, #{commentText}, #{mentorUid}, #{resumeNo}, #{lineNo})
     </insert>
+
+    <!-- 첨삭 코멘트 조회 -->
+    <select id="getAdviceComments" parameterType="int" resultType="com.jobhunter.model.resume.ResumeAdviceCommentDTO">
+        SELECT * FROM resume_advice_comment
+        WHERE adviceNo = #{adviceNo}
+    </select>
     
 </mapper>

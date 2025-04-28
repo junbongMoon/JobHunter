@@ -467,19 +467,9 @@ public class ResumeServiceImpl implements ResumeService {
 	}
 	
 
-	// /**
-	//  *  @author 유지원
-	//  *
-	//  * <p>
-	//  * 이력서 첨삭 코멘트를 저장하는 메서드
-	//  * </p>
-	//  * 
-	//  * @param ResumeAdviceCommentDTO commentDTO 코멘트 정보
-	//  * @return 성공 여부
-	//  */
-	// @Override
-	// public boolean saveResumeComment(ResumeAdviceCommentDTO commentDTO) throws Exception {
-	// 	return rdao.insertResumeComment(commentDTO);
-	// }
+	@Override
+	public List<ResumeAdviceCommentDTO> getAdviceComments(int adviceNo) throws Exception {
+		return rdao.getAdviceComments(adviceNo);
+	}
 
 }
