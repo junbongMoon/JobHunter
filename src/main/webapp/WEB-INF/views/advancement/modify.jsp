@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -129,7 +131,7 @@
         </div>
 
         <input type="hidden" name="refUser" value="${advancement.refUser}">
-        <input type="hidden" name="advancementNo" value="{advancement.advancementNo}">
+        <input type="hidden" name="advancementNo" value="${advancement.advancementNo}">
 
         <div class="form-group">
             <label class="form-label">내용</label>
@@ -140,9 +142,19 @@
             <label class="form-label">첨부 파일</label>
             <div class="file-upload-area">
                 <input type="file" id="fileInput" class="form-control" accept="image/*">
-                <div id="previewArea" class="preview-area"></div>
+                <div id="previewArea" class="preview-area">
+                    <c:if test="${not empty advancement.fileList}">
+                        <c:forEach var="file" items="${advancement.fileList}" varStatus="status">
+                            <div class="preview-item" id="file-${status.index}">
+                                <img class="preview-img" src="${pageContext.request.contextPath}${file.thumbFileName}" alt="${file.originalFileName}">
+                                <button type="button" class="delete-btn" data-index="${status.index}">X</button>
+                            </div>
+                        </c:forEach>
+                    </c:if>
+                </div>
             </div>
         </div>
+        
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary submitBtn">저장하기</button>
