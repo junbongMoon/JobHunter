@@ -107,12 +107,6 @@ public class ResumeRestController {
 				
 				dto.setUid(sessionAcc.getUid());
 				
-				if(sessionAcc.getIsMentor().equals("Y")) {
-					dto.setType("mentor");
-				} else {
-					dto.setType("mentee");
-				}
-				
 				return resumeService.selectRegistrationAdviceByMentorWithPaging(dto);				
 			}
 		} catch (Exception e) {

@@ -574,7 +574,8 @@ function getMyRegistrationAdvice() {
     contentType: 'application/json',
     data: JSON.stringify({
       page: registrationAdviceData.page,
-      status: registrationAdviceData.status
+      status: registrationAdviceData.status,
+      type: registrationAdviceData.type
     }),
     success: function(res) {
       console.log(res);

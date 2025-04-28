@@ -386,25 +386,26 @@
 	  FROM registration_advice ra
 	  JOIN resume r ON ra.resumeNo = r.resumeNo
 	  JOIN users mentee ON r.userUid = mentee.uid
-	  <choose>
-	    <when test="type == 'mentor'">
-	      WHERE mentorUid = #{uid}
-	    </when>
-	    <when test="type == 'mentee'">
-	      WHERE mentee.uid = #{uid}
-	    </when>
-	    <otherwise>
-	      1 = 0
-	    </otherwise>
-	  </choose>
-	  <choose>
-	    <when test="status == 'LIVE'">
-	      AND status IN ('WAITING', 'CHECKING')
-	    </when>
-	    <when test="status != null and status != ''">
-	      AND status = #{status}
-	    </when>
-	  </choose>
+	  WHERE 1=1
+	  <if test="type == 'mentor'">
+	    AND mentorUid = #{uid}
+	  </if>
+	  <if test="type == 'mentee'">
+	    AND mentee.uid = #{uid}
+	  </if>
+	  <if test="type == null">
+	    AND 1 = 0
+	  </if>
+		<if test="statusName != null">
+		  <choose>
+		    <when test="statusName == 'LIVE'">
+		      AND status IN ('WAITING', 'CHECKING')
+		    </when>
+		    <otherwise>
+		      AND status = #{statusName}
+		    </otherwise>
+		  </choose>
+		</if>
 	  ORDER BY regDate DESC
 	  LIMIT 5 OFFSET #{offset}
 	</select>
@@ -414,25 +415,28 @@
 	  FROM registration_advice ra
 	  JOIN resume r ON ra.resumeNo = r.resumeNo
 	  JOIN users mentee ON r.userUid = mentee.uid
-	  <choose>
-	    <when test="type == 'mentor'">
-	      WHERE mentorUid = #{uid}
-	    </when>
-	    <when test="type == 'mentee'">
-	      WHERE mentee.uid = #{uid}
-	    </when>
-	    <otherwise>
-	      1 = 0
-	    </otherwise>
-	  </choose>
-	  <choose>
-	    <when test="status == 'LIVE'">
-	      AND status IN ('WAITING', 'CHECKING')
-	    </when>
-	    <when test="status != null and status != ''">
-	      AND status = #{status}
-	    </when>
-	  </choose>
+	  WHERE
+		(
+		  <choose>
+		    <when test="type == 'mentor'">
+		      mentorUid = #{uid}
+		    </when>
+		    <when test="type == 'mentee'">
+		      mentee.uid = #{uid}
+		    </when>
+		    <otherwise>
+		      1 = 0
+		    </otherwise>
+		  </choose>
+		)
+		<if test="statusName != null">
+		  <if test="statusName == 'LIVE'">
+		    AND status IN ('WAITING', 'CHECKING')
+		  </if>
+		  <if test="statusName != 'LIVE'">
+		    AND status = #{statusName}
+		  </if>
+		</if>
 	</select>
 	
 	<select id="selectResumeAdviceByUserUid" resultType="com.jobhunter.model.resume.ResumeAdviceVO">

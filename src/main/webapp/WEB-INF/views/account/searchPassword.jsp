@@ -522,7 +522,7 @@ function formatPhoneNumber(input1, input2, input3) {
 
 // #endregion
 
-// 인증 유형 탭 전환
+// #region 인증 유형 탭 전환
 const tabs = document.querySelectorAll('.account-type-tab');
 tabs.forEach(tab => {
 	tab.addEventListener('click', function () {
@@ -557,7 +557,7 @@ $('#targetMethod').on('change', () => {
 		$('#targetMobile').show()
 	}
 })
-
+// #endregion
 
 function sendCode() {
 	$('#modalOpenBtn').prop('disabled', true);
