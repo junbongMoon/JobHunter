@@ -1379,7 +1379,7 @@
 					tooltip.style.padding = "10px";
 					tooltip.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
 					tooltip.style.zIndex = 20;
-					tooltip.style.width = "400px";
+					tooltip.style.width = "600px";
 					tooltip.innerHTML = `
         <div><strong>[\${line + 1}번] 코멘트:</strong></div>
         <div style="margin-top:5px; white-space: pre-wrap;">\${comment}</div>
