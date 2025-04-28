@@ -292,7 +292,7 @@
 	<!-- 기존 첨삭 내용 삭제 -->
 	<delete id="deleteExistingAdvice" parameterType="map">
 		DELETE FROM resume_advice 
-		WHERE resumeNo = #{resumeNo} AND mentorUid = #{mentorUid}
+		WHERE resumeNo = #{resumeNo} AND mentorUid = #{mentorUid} AND status = 'CHECKING'
 	</delete>
 
 	<!-- 이력서 첨삭 파일 정보 저장 -->
@@ -310,7 +310,13 @@
             regDate,
             mentorUid
         FROM resume_advice
-        WHERE resumeNo = #{resumeNo} AND status = 'CHECKING'
+        WHERE resumeNo = #{resumeNo} 
+        <if test="mode != 'sameUser'">
+        AND status = 'CHECKING'
+        </if>
+        <if test="mode == 'sameUser'">
+        AND status = 'COMPLETE'
+        </if>
         ORDER BY regDate DESC
         LIMIT 1
     </select>
@@ -366,11 +372,11 @@
         SET status = #{status}
         WHERE resumeNo = #{resumeNo}
         AND mentorUid = #{userUid}
-        <if test="mode == 'endAdvice'">
-            AND status = 'CHECKING'
+        <if test="mode != null and mode == 'endAdvice'">
+        AND status = 'CHECKING'
         </if>
-        <if test="mode != 'endAdvice'">
-            AND status = 'WAITING'
+        <if test="mode == null or mode != 'endAdvice'">
+        AND status = 'WAITING'
         </if>
     </update>
     
