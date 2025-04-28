@@ -10,7 +10,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.jobhunter.customexception.AccountLockException;
-import com.jobhunter.customexception.NeedLoginException;
+import com.jobhunter.customexception.NeedAuthException;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.UnlockDTO;
 import com.jobhunter.model.customenum.AccountType;
@@ -43,7 +43,7 @@ public class OwnerInterceptor implements HandlerInterceptor {
 		try {
 			// 로그인 안 했거나 인증이 필요할 때
 			if (account == null) {
-				throw new NeedLoginException();
+				throw new NeedAuthException();
 			} else if ("Y".equals(account.getRequiresVerification())) {
 				throw new AccountLockException(new UnlockDTO(account));
 			}
@@ -69,7 +69,7 @@ public class OwnerInterceptor implements HandlerInterceptor {
 
 		} catch (AccountLockException a) {
 			errorParam = "accessFail=lockedAccount";
-		} catch (NeedLoginException n) {
+		} catch (NeedAuthException n) {
 			errorParam = "accessFail=needLogin";
 		} catch (Exception e) {
 			errorParam = "accessFail=checkFail";

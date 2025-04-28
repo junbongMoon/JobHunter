@@ -22,9 +22,9 @@ public class ReportServiceImpl implements ReportService {
 	@Override
 	public void saveAccountReport(AccountReportDTO dto) throws Exception {
 		
-		// reportType, reportTargetURL 자동 설정
+		// reportType, reportTargetPK 자동 설정
 	    dto.setReportType();
-	    dto.setReportTargetURL();
+	    dto.setReportTargetPK();
 	   
 	    dao.insertAccountReport(dto);
 	}

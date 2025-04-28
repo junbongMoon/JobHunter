@@ -19,6 +19,7 @@
 	let uid = '${RecruitmentDetailInfo.uid}';
 	let companyUid = '${sessionScope.account.uid}';
 	let applications;
+	let modifyFileList = [];
 	
 
 	
@@ -454,27 +455,40 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 	}, 500);
 
 	// 저장 버튼 클릭 시 JSON 데이터 세팅
-$("#write").on("click", function () {
+	$("#write").on("click", function (e) {
+    e.preventDefault(); // 기본 제출 막기
 
-  const rawPay = getRawPay();
-  $("#pay").val(rawPay);  // 실제 서버 제출 전에 값을 "123456" 같은 숫자형으로 변경
+    if (!isValidRecruitmentForm()) {
+      return false; // 유효성 검증 실패시 중단
+    }
 
-  const apps = [];
+	$("#modifyFileListJson").val(JSON.stringify(modifyFileList));
 
-  $(".application-checkbox:checked").each(function () {
-    const method = $(this).val();
-    const detail = $(`.method-detail[data-method='\${method}']`).val();
-    apps.push({ method, detail });
+    const rawPay = getRawPay();
+    $("#pay").val(rawPay);
+
+    const apps = [];
+    $(".application-checkbox:checked").each(function () {
+      const method = $(this).val();
+      const detail = $(`.method-detail[data-method='\${method}']`).val();
+      apps.push({ method, detail });
+    });
+
+    const advantages = [];
+    $(".advantage-item input[type='hidden']").each(function () {
+      advantages.push({ advantageType: $(this).val() });
+    });
+
+    $("#applicationJson").val(JSON.stringify(apps));
+    $("#advantageJson").val(JSON.stringify(advantages));
+
+	//  여기 추가
+	$("#modifyFileListJson").val(JSON.stringify(modifyFileList));
+
+    // finalize 먼저 호출하고 성공하면 form 제출
+	$("form[role='form']").submit();
+
   });
-
-  const advantages = [];
-  $(".advantage-item input[type='hidden']").each(function () {
-    advantages.push({ advantageType: $(this).val() });
-  });
-
-  $("#applicationJson").val(JSON.stringify(apps));
-  $("#advantageJson").val(JSON.stringify(advantages));
-});
 
 });
 
@@ -532,39 +546,37 @@ function uploadModifyFileAndShowPreview(file) {
     formData.append("file", file);
 
     $.ajax({
-        url: "/recruitmentnotice/file/modify",
+        url: "/recruitmentnotice/file",
         type: "POST",
         data: formData,
         contentType: false,
         processData: false,
         success: function(response) {
-            console.log("수정 파일 업로드 성공", response);
-			const uploadedFileInfo = response[response.length - 1];
-			showModifyFileThumbnail(uploadedFileInfo, "NEW");
+            const uploadedFile = response[response.length - 1]; // 제일 마지막 파일
+            uploadedFile.status = "NEW"; // 새 파일은 NEW 상태
+            modifyFileList.push(uploadedFile);
+            showModifyFileThumbnail(uploadedFile);
         },
         error: function() {
-            alert("파일 업로드 실패");
-        }
+			$(".modal-body").text("파일 업로드 실패했습니다. 다시 시도해주세요.");
+			$("#MyModal").modal("show");
+		}
     });
 }
 
-function showModifyFileThumbnail(fileInfo, status = "") {
+function showModifyFileThumbnail(fileInfo) {
     const safeId = fileInfo.originalFileName.replace(/[^a-zA-Z0-9]/g, "_");
 
-    const isImage = fileInfo.fileType && fileInfo.fileType.startsWith("image/");
-    const thumbnailUrl = isImage && fileInfo.thumbFileName
+    const thumbnailUrl = fileInfo.fileType.startsWith("image/")
         ? fileInfo.thumbFileName
         : "/resources/images_mjb/noimage.png";
 
     const html = `
-        <tr id="thumb_\${safeId}" data-status="\${status}">
-            <td>
-                <img src="\${thumbnailUrl}" width="60" height="60" alt="썸네일 이미지"
-                     onerror="this.src='/resources/images_mjb/noimage.png'" />
-            </td>
+        <tr id="thumb_\${safeId}">
+            <td><img src="\${thumbnailUrl}" width="60" height="60" alt="썸네일"></td>
             <td>\${fileInfo.originalFileName}</td>
             <td>
-                <button type="button" class="btn btn-sm btn-danger" onclick="markFileAsDeleted('\${fileInfo.originalFileName}')">X</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="markFileAsDeleted('\${fileInfo.originalFileName}')">삭제</button>
             </td>
         </tr>
     `;
@@ -572,27 +584,22 @@ function showModifyFileThumbnail(fileInfo, status = "") {
     $(".preview").append(html);
 }
 
+function createSafeId(fileName) {
+    return fileName.replace(/[^a-zA-Z0-9]/g, "_");
+}
+
 
 // 삭제 버튼 클릭시 삭제상태로 변경
 function markFileAsDeleted(fileName) {
-    const safeId = fileName.replace(/[^a-zA-Z0-9]/g, "_"); // 안전한 ID 생성
-
-    $.ajax({
-        url: "/recruitmentnotice/file/status",
-        type: "POST",
-        data: {
-            fileName: fileName,
-            status: "delete"
-        },
-        success: function () {
-            const $targetRow = $(`#thumb_${safeId}`);
-            $targetRow.addClass("table-danger").css("text-decoration", "line-through");
-            $targetRow.remove(); // 또는 이 줄 생략해서 선만 긋기
-        },
-        error: function () {
-            alert("파일 삭제 상태 전환 실패");
+    modifyFileList = modifyFileList.map(file => {
+        if (file.originalFileName === fileName) {
+            file.status = "DELETE";
         }
+        return file;
     });
+
+    const safeId = fileName.replace(/[^a-zA-Z0-9]/g, "_");
+    $(`#thumb_${safeId}`).addClass("table-danger").css("text-decoration", "line-through");
 }
 
 // 파일 수정 취소
@@ -1123,7 +1130,8 @@ label {
 		<div class="container" data-aos="fade-up" data-aos-delay="100">
 			
 			<form method="post" role="form" action="/recruitmentnotice/modify?uid=${RecruitmentDetailInfo.uid}">
-
+				
+				<textarea name="modifyFileListJson" id="modifyFileListJson" hidden></textarea>
 				<div class="form-header categories-widget widget-item">
 					<h3>채용 공고</h3>
 					<p>하단에 정보를 입력해주세요</p>

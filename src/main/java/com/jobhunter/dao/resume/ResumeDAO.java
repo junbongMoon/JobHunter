@@ -145,7 +145,7 @@ public interface ResumeDAO {
 	 * @return 성공하면 1, 실패하면 0
 	 *
 	 */
-	int insertRegistrationAdvice(int mentorUid, int resumeNo) throws Exception;
+	int insertRegistrationAdvice(int mentorUid, int resumeNo, String dueDate) throws Exception;
 	
 	/**
 	 *  @author 유지원

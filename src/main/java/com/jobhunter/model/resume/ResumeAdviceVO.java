@@ -22,5 +22,5 @@ public class ResumeAdviceVO {
     private int mentorUid;
     private String mentorName;
     private String title;
-    private int mentiUid;
+    private int menteeUid;
 } 

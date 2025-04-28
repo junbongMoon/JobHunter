@@ -14,12 +14,13 @@ public class PointDAOImpl implements PointDAO {
 	private final String NS = "com.jobhunter.mapper.pointmapper";
 
 	@Override
-	public void submitAdvicePointLog(int mentorUid, int sessionUid, int point, int rgAdviceNo) throws Exception {
+	public void submitAdvicePointLog(int mentorUid, int sessionUid, int point, int rgAdviceNo, String dueDate) throws Exception {
 		Map<String, Object> params = new HashMap<>();
 		params.put("mentorUid", mentorUid);
 		params.put("sessionUid", sessionUid);
 		params.put("point", point);
 		params.put("rgAdviceNo", rgAdviceNo);
+		params.put("dueDate", dueDate);
 		ses.insert(NS + ".submitAdvicePointLog", params);
 	}
 

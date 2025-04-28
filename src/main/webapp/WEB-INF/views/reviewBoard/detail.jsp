@@ -14,6 +14,8 @@
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 	rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
@@ -432,16 +434,53 @@
 	<input type="hidden" id="loginUserId" value="${loginUser.userId}" />
 </body>
 <script>
-				//likeModal 변수 초기화
-$(document).ready(function() {
+function showModal(title, message, callback) {
+    $('#resultModalTitle').text(title);
+    $('#resultModalMessage').text(message);
+    $('#resultModal').modal('show');
+
+    if (callback) {
+        $('#resultModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+            callback();
+        });
+    }
+}
+
+		$(document).ready(function () {
+      
+      $(".delete-btn").click(function () {
+        let boardNo = $(this).data("boardno");
+
+        if (confirm("정말 삭제하시겠습니까?")) {
+            $.ajax({
+                url: "${pageContext.request.contextPath}/reviewBoard/delete",
+                type: "POST",
+                contentType: "application/charset=UTF-8",
+                data: { boardNo: boardNo },
+                success: function (res) {
+                    if (res.success) {
+                        showModal("삭제 완료", res.message, function () {
+                            window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
+                        });
+                    } else {
+                        showModal("삭제 실패", res.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.error("삭제 실패:", xhr.responseText);
+                    showModal("❌ 서버 오류", "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+                }
+            });
+        }
+    });
+      
 	 const likeModalElement = document.getElementById('likeModal');
 	 const likeModal = new bootstrap.Modal(likeModalElement);
-	
-	
+      
 	const isCompanyAccount = $('#isCompanyAccount').val() === 'true'; // 회사 계정 여부
     const isLiked = $('#isLiked').val() === 'true'; // 좋아요 여부
-
-    // 회사 계정이면 버튼을 숨기거나 비활성화
+      
+      // 회사 계정이면 버튼을 숨기거나 비활성화
     if (isCompanyAccount) {
         $('#likeBtn').hide();
         $('#unlikeBtn').hide();
@@ -510,84 +549,46 @@ $(document).ready(function() {
             }
         });
     });
-});
-
-
-function showModal(title, message, callback) {
-    $('#resultModalTitle').text(title);
-    $('#resultModalMessage').text(message);
-    $('#resultModal').modal('show');
-
-    if (callback) {
-        $('#resultModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
-            callback();
-        });
-    }
-}
-	
-	//게시물삭제 
-	$(document).ready(function () {
-    $(".delete-btn").click(function () {
-        let boardNo = $(this).data("boardno");
-
-        if (confirm("정말 삭제하시겠습니까?")) {
-            $.ajax({
-                url: "${pageContext.request.contextPath}/reviewBoard/delete",
-                type: "POST",
-                contentType: "application/charset=UTF-8",
-                data: { boardNo: boardNo },
-                success: function (res) {
-                    if (res.success) {
-                        showModal("삭제 완료", res.message, function () {
-                            window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
-                        });
-                    } else {
-                        showModal("삭제 실패", res.message);
-                    }
-                },
-                error: function (xhr) {
-                    console.error("삭제 실패:", xhr.responseText);
-                    showModal("❌ 서버 오류", "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-                }
-            });
-        }
-    });
-});
-
 		
-	$(document).ready(function () {
 		  const loginUserUid = parseInt($('#loginUserUid').val());    // 로그인한 사용자 UID
 		  const writerId = parseInt($('#postWriterUid').val());       // 게시글 작성자 UID
 		  const boardNo = parseInt($('#boardNo').val());
-
-		  // 신고 버튼 클릭
+      
+		  // 고유 키 생성: 신고자_uid_피신고자_uid_게시글번호
+		  const reportKey = `report_${loginUserUid}_${writerId}_${boardNo}`;
+		
 		  $('#reportBtn').on('click', function () {
-
-		    // 본인 글은 신고 불가
+		    // 본인 글 신고 방지
 		    if (loginUserUid === writerId) {
 		      window.publicModals.show("본인의 게시물은 신고할 수 없습니다.");
 		      return;
 		    }
-
-		    // 커스텀 모달 내용 (신고 선택)
+		
+		    // 중복 신고 방지
+		    if (localStorage.getItem(reportKey)) {
+		      window.publicModals.show("이미 신고한 게시물입니다.");
+		      return;
+		    }
+		
+		    // 모달 내용 구성
 		    const content = `
-		    	  <div class="report-modal-body">  
-		    <h5>신고하기</h5>
-		      <select id="reportReason" class="form-select mb-2">
-		        <option value="">-- 신고 사유 선택 --</option>
-		        <option value="SPAM">스팸/광고성 메시지</option>
-		        <option value="HARASSMENT">욕설/괴롭힘</option>
-		        <option value="FALSE_INFO">허위 정보</option>
-		        <option value="ILLEGAL_ACTIVITY">불법 행위</option>
-		        <option value="INAPPROPRIATE_CONTENT">부적절한 프로필/사진</option>
-		        <option value="MISCONDUCT">부적절한 행동/요구</option>
-		        <option value="ETC">기타 사유</option>
-		      </select>
-		      <textarea id="reportMessage" rows="4" placeholder="자세한 내용을 입력해주세요" class="form-control mb-2"></textarea>
+		      <div class="report-modal-body">  
+		        <h5>신고하기</h5>
+		        <select id="reportReason" class="form-select mb-2">
+		          <option value="">-- 신고 사유 선택 --</option>
+		          <option value="SPAM">스팸/광고성 메시지</option>
+		          <option value="HARASSMENT">욕설/괴롭힘</option>
+		          <option value="FALSE_INFO">허위 정보</option>
+		          <option value="ILLEGAL_ACTIVITY">불법 행위</option>
+		          <option value="INAPPROPRIATE_CONTENT">부적절한 프로필/사진</option>
+		          <option value="MISCONDUCT">부적절한 행동/요구</option>
+		          <option value="ETC">기타 사유</option>
+		        </select>
+		        <textarea id="reportMessage" rows="4" placeholder="자세한 내용을 입력해주세요" class="form-control mb-2"></textarea>
 		      </div>
-		      `;
-
-		    // 모달 띄우기
+		    `;
+		
+		    // 모달 출력
 		    window.publicModals.show(content, {
 		      confirmText: "제출",
 		      cancelText: "취소",
@@ -596,30 +597,32 @@ function showModal(title, message, callback) {
 		      onConfirm: function () {
 		        const reportCategory = $('#reportReason').val();
 		        const reportMessage = $('#reportMessage').val();
-
+		
 		        if (!reportCategory) {
 		          window.publicModals.show("신고 사유를 선택해주세요.");
-		          return;
+		          return false; // false → 모달 유지
 		        }
-
+		
 		        const reportData = {
-		        		  boardNo: boardNo,
-		        		  targetAccountUid: writerId,                     
-		        		  targetAccountType: "USER",                       
-		        		  reporterAccountUid: loginUserUid,
-		        		  reportCategory: reportCategory,
-		        		  reportMessage: reportMessage,
-		        		  reportType: "BOARD",
-		        		  reportTargetURL: `/reviewBoard/detail?boardNo=\${boardNo}`
-		        		};
-
-		        // 신고 전송
+		          boardNo: boardNo,
+		          targetAccountUid: writerId,
+		          targetAccountType: "USER",
+		          reporterAccountUid: loginUserUid,
+		          reportCategory: reportCategory,
+		          reportMessage: reportMessage,
+		          reportType: "BOARD",
+		          reportTargetURL: `/reviewBoard/detail?boardNo=${boardNo}`
+		        };
+		
+		        // AJAX로 신고 전송
 		        $.ajax({
 		          type: 'POST',
 		          url: '/report/board',
 		          contentType: 'application/json',
 		          data: JSON.stringify(reportData),
 		          success: function () {
+		            // 신고 성공 시 localStorage에 기록 저장
+		            localStorage.setItem(reportKey, 'true');
 		            window.publicModals.show("신고가 접수되었습니다.");
 		          },
 		          error: function (xhr) {
@@ -632,10 +635,9 @@ function showModal(title, message, callback) {
 		});
 
 
-	//게시물 신고	  
+
+
 				
-
-
 	//댓글 등록 
 
 const boardNo = parseInt($('#boardNo').val());
@@ -673,13 +675,18 @@ function loadReplies(page = 1) {
           const writer = reply.writerId ?? '익명';
 
           const html = '<li class="list-group-item">' +
-            '<strong>' + writer + '</strong> (' + date + ')<br>' +
-            '<div class="reply-content">' + reply.content + '</div>' +
-            (reply.userId.toString() === loginUserUid.toString()
-              ? '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" data-replyno="' + replyNo + '" data-content="' + replyContent + '">수정</button>' +
-                '<button class="btn btn-sm btn-outline-danger delete-reply-btn" data-replyno="' + replyNo + '">삭제</button>'
-              : '') +
-            '</li>';
+          '<strong>' + writer + '</strong> (' + date + ')<br>' +
+          '<div class="reply-content">' + reply.content + '</div>' +
+          '<div class="reply-like-section mt-2" data-replyno="' + replyNo + '">' + // ✅ 클래스명 수정
+          '<button class="btn btn-outline-primary btn-sm like-reply-btn"' + (reply.isLiked ? ' style="display:none;"' : '') + '>👍 좋아요</button>' +
+          '<button class="btn btn-outline-danger btn-sm unlike-reply-btn"' + (reply.isLiked ? '' : ' style="display:none;"') + '>❌ 취소</button>' +
+          '&nbsp;<span class="like-count">' + reply.likes + '</span>' +
+          '</div>' +
+          (reply.userId.toString() === loginUserUid.toString()
+            ? '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" data-replyno="' + replyNo + '" data-content="' + replyContent + '">수정</button>' +
+              '<button class="btn btn-sm btn-outline-danger delete-reply-btn" data-replyno="' + replyNo + '">삭제</button>'
+            : '') +
+          '</li>';
           $replyList.append(html);
         });
       }
@@ -711,6 +718,7 @@ function loadReplies(page = 1) {
           `);
         }
       }
+      bindReplyLikeEvents(); 
     },
     error: function () {
       alert('댓글 로딩 중 오류 발생');
@@ -804,7 +812,6 @@ $(document).ready(function () {
       });
     }
   });
-
 		  // 페이지 클릭 이벤트 위임 (중복 방지)
 		  $(document).on('click', '#replyPagination a', function (e) {
 		    e.preventDefault();
@@ -817,6 +824,61 @@ $(document).ready(function () {
 		    loadReplies(parseInt(selectedPage));
 		  });
 		});
+		
+		
+function bindReplyLikeEvents() {
+    // 중복 방지 위해 기존 이벤트 제거 후 재바인딩
+    $(document).off('click', '.like-reply-btn');
+    $(document).off('click', '.unlike-reply-btn');
+
+    $(document).on('click', '.like-reply-btn', function () {
+      const wrapper = $(this).closest('.reply-like-section'); // ✅ 클래스명 수정됨
+      const replyNo = wrapper.data('replyno');
+      const likeCountSpan = wrapper.find('.like-count'); // ✅ 클래스명 수정됨
+      let currentCount = parseInt(likeCountSpan.text());
+
+      $.ajax({
+        url: '/reply/like',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ replyNo: replyNo }),
+        success: function (res) {
+          likeCountSpan.text(currentCount + 1);
+          wrapper.find('.like-reply-btn').hide();
+          wrapper.find('.unlike-reply-btn').show();
+        },
+        error: function (xhr) {
+          alert("좋아요 실패: " + xhr.responseText);
+        }
+      });
+    });
+
+    $(document).on('click', '.unlike-reply-btn', function () {
+      const wrapper = $(this).closest('.reply-like-section');
+      const replyNo = wrapper.data('replyno');
+      const likeCountSpan = wrapper.find('.like-count');
+      let currentCount = parseInt(likeCountSpan.text());
+
+      $.ajax({
+        url: '/reply/unlike',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ replyNo: replyNo }),
+        success: function (res) {
+          likeCountSpan.text(Math.max(currentCount - 1, 0));
+          
+          wrapper.find('.unlike-reply-btn').hide();
+          wrapper.find('.like-reply-btn').show();
+        },
+        error: function (xhr) {
+          alert("좋아요 취소 실패: " + xhr.responseText);
+        }
+      });
+    });
+  }
+
+
+
 
 </script>
 </html>

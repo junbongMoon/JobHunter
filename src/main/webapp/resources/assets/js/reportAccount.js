@@ -116,11 +116,12 @@ function sendReport(targetAccountUid, targetAccountType) {
 
   const dto = {
     reportCategory: reportReason,                     // enum ReportCategory (e.g. "SPAM")
+    reportTargetPk: targetAccountUid,				  // 신고대상 PK( 계정신고이기에 신고 대상 계정 UID와 동일)
     reportMessage: reportDetail,                      // 상세 사유
-    targetAccountUid: targetAccountUid,               // 신고 대상 UID
+    targetAccountUid: targetAccountUid,               // 신고 대상 계정 UID
     targetAccountType: targetAccountType,             // "USER" or "COMPANY"
-    reporterAccountUid: window.publicSessionUid,      // 현재 유저 UID
-    reporterAccountType: window.publicSessionAccType  // 현재 유저 타입
+    reporterAccountUid: window.publicSessionUid,      // 현재 로그인 계정 UID
+    reporterAccountType: window.publicSessionAccType  // 현재 로그인 계정 타입
   };
 
   console.log("신고 데이터 DTO:", dto);

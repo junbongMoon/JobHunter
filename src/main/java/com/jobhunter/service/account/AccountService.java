@@ -20,4 +20,6 @@ public interface AccountService {
 	Boolean checkDuplicateContact(String target, AccountType type, String targetType) throws Exception;
 
 	Map<String, Object> getIdByContect(findIdDTO dto) throws Exception;
+
+	AccountVO findAccountByAutoKakao(String kakaoId) throws Exception;
 }

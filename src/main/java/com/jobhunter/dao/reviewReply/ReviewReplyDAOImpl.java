@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.reviewReply.ReviewReplyDTO;
+import com.jobhunter.model.reviewboard.Likes;
 
 import lombok.RequiredArgsConstructor;
 
@@ -60,6 +61,36 @@ public class ReviewReplyDAOImpl implements ReviewReplyDAO {
     @Override
     public int countRepliesByBoardNo(int boardNo) throws Exception {
         return ses.selectOne(NS + ".countRepliesByBoardNo", boardNo);
+    }
+
+    // 댓글 좋아요 여부 확인
+    @Override
+    public int hasUserLikedReply(Likes like) throws Exception {
+        return ses.selectOne(NS + ".hasUserLikedReply", like);
+    }
+
+    // 댓글 좋아요 추가
+    @Override
+    public int insertReplyLike(Likes like) throws Exception {
+        return ses.insert(NS + ".insertReplyLike", like);
+    }
+
+    // 댓글 좋아요 수 증가
+    @Override
+    public int updateReplyLikes(int replyNo) throws Exception {
+        return ses.update(NS + ".incrementReplyLikes", replyNo);
+    }
+
+    // 댓글 좋아요 삭제
+    @Override
+    public int deleteReplyLike(Likes like) throws Exception {
+        return ses.delete(NS + ".deleteReplyLike", like);
+    }
+
+    // 댓글 좋아요 수 감소
+    @Override
+    public int decreaseReplyLikes(int replyNo) throws Exception {
+        return ses.update(NS + ".decrementReplyLikes", replyNo);
     }
 }
 

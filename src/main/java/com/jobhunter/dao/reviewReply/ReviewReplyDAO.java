@@ -3,6 +3,7 @@ package com.jobhunter.dao.reviewReply;
 import java.util.List;
 
 import com.jobhunter.model.reviewReply.ReviewReplyDTO;
+import com.jobhunter.model.reviewboard.Likes;
 
 public interface ReviewReplyDAO {
     List<ReviewReplyDTO> selectRepliesByBoardNo(int boardNo) throws Exception;
@@ -19,4 +20,22 @@ public interface ReviewReplyDAO {
 
 
 	int countRepliesByBoardNo(int boardNo) throws Exception;
+	
+	
+	int hasUserLikedReply(Likes like) throws Exception;
+
+
+	int insertReplyLike(Likes like) throws Exception;
+
+
+	int updateReplyLikes(int replyNo) throws Exception;
+
+
+	int deleteReplyLike(Likes like) throws Exception;
+
+
+	int decreaseReplyLikes(int replyNo) throws Exception;
+	
+
+	
 }

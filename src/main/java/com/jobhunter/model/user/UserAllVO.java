@@ -30,7 +30,8 @@ public class UserAllVO {
     private Gender gender; // 성별 (MALE: 남성, FEMALE: 여성)
     private Integer age; // 나이
     private Timestamp regDate; // 가입 일자
-    private AccountType accountType; // 회원 유형 (NORMAL: 일반 사용자, ADMIN: 관리자)
+    private AccountType accountType; // 회원 유형
+    private String isMentor; //  멘토 권한 ("Y": 멘토, "N": 일반 사용자)
     private String requiresVerification; // 인증 필요 여부 ("Y" 또는 "N")
     private Timestamp blockDeadline; // 계정 정지 기한
     private Timestamp deleteDeadline; // 계정 삭제 대기 기한

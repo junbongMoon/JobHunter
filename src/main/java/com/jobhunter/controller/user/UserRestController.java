@@ -1,6 +1,5 @@
 package com.jobhunter.controller.user;
 
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.sql.Timestamp;
 import java.util.Base64;
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jobhunter.customexception.NeedLoginException;
+import com.jobhunter.customexception.NeedAuthException;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.etc.ResponseJsonMsg;
 import com.jobhunter.model.user.ContactUpdateDTO;
@@ -62,14 +61,14 @@ public class UserRestController {
 			HttpSession session) {
 		try {
 			
-			if (uid == null) { throw new NeedLoginException();}
+			if (uid == null) { throw new NeedAuthException();}
 
 			userInfoDTO.setUid(uid);
 
 			service.updateUserInfo(userInfoDTO);
 			return ResponseEntity.ok(Collections.singletonMap("result", "success"));
 
-		} catch (NeedLoginException n) {
+		} catch (NeedAuthException n) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body(Collections.singletonMap("result", "잘못된 요청입니다."));
 		} catch (Exception e) {
@@ -144,7 +143,9 @@ public class UserRestController {
 	public ResponseEntity<ResponseJsonMsg> deleteAccount(@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
 
-			if (!accUtil.checkUid(session, uid)) {
+			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
+
+			if (!accUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 
@@ -163,7 +164,9 @@ public class UserRestController {
 	public ResponseEntity<Void> deleteCancelAccount(@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
 
-			if (!accUtil.checkUid(session, uid)) {
+			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
+
+			if (!accUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 

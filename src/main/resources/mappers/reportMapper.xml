@@ -10,23 +10,23 @@
 	<insert id="insertAccountReport" parameterType="com.jobhunter.model.report.AccountReportDTO">
 		INSERT INTO reportMessage (
 			reportType,
+			reportTargetPK,
 			targetAccountUid,
 			targetAccountType,
 			reporterAccountUid,
 			reporterAccountType,
 			reportCategory,
-			reportMessage,
-			reportTargetURL
+			reportMessage
 		)
 		VALUES (
 			#{reportType},
+			#{reportTargetPK},
 			#{targetAccountUid},
 			#{targetAccountType},
 			#{reporterAccountUid},
 			#{reporterAccountType},
 			#{reportCategory},
-			#{reportMessage},
-			#{reportTargetURL}
+			#{reportMessage}
 		)
 	</insert>
 <!-- 계정 신고 관련 매퍼 -->
@@ -38,6 +38,7 @@
   INSERT INTO reportMessage (
     reportType,
     targetAccountUid,
+    reportTargetPK,
     targetAccountType,
     reporterAccountUid,
     reporterAccountType,
@@ -48,6 +49,7 @@
   ) VALUES (
     #{reportType},
     #{targetAccountUid},
+    #{reportTargetPK},
     #{targetAccountType},
     #{reporterAccountUid},
     #{reporterAccountType},

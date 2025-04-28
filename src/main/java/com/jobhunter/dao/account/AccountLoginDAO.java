@@ -34,4 +34,8 @@ public interface AccountLoginDAO {
 	
 	AccountVO getIdByContect(findIdDTO dto) throws Exception;
 
+    default AccountVO getAccountByAutoKakao(String kakaoId) throws Exception {
+        throw new UnsupportedOperationException("getAccountByAutoKakao는 지원되지 않는 구현체입니다.");
+    }
+
 }

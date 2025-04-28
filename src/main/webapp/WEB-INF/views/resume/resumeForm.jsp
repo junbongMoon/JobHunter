@@ -29,10 +29,10 @@
 				<input type="hidden" id="queryUid" value="${param.uid}">
 
 				<div class="container my-5">
-					<c:if test="${mode == 'advice'}">
+					<c:if test="${mode == 'checkAdvice'}">
 						<h2 class="mb-4">[${resumeDetail.resume.title}] 이력서 첨삭</h2>
 					</c:if>
-					<c:if test="${mode != 'advice'}">
+					<c:if test="${isSameUser}">
 						<h2 class="mb-4">이력서 수정</h2>
 					</c:if>
 
@@ -163,7 +163,7 @@
 													<!-- 조건: mode가 'advice'이면 disabled 속성 추가 -->
 													<input class="form-check-input" type="checkbox" name="jobForm"
 														value="${jobForm.name()}" id="${jobForm.name()}" ${isChecked
-														? 'checked' : '' } <c:if test="${mode == 'advice'}">disabled
+														? 'checked' : '' } <c:if test="${!isSameUser}">disabled
 													</c:if>
 													/>
 													<label class="form-check-label"
@@ -189,32 +189,32 @@
 											<div class="form-check form-check-inline">
 												<input class="form-check-input" type="radio" name="payType" value="시급"
 													id="hourly" ${resumeDetail.resume.payType=='시급' ? 'checked' : '' }
-													<c:if test="${mode == 'advice'}">disabled</c:if> />
+													<c:if test="${!isSameUser}">disabled</c:if> />
 												<label class="form-check-label" for="hourly">시급</label>
 											</div>
 											<div class="form-check form-check-inline">
 												<input class="form-check-input" type="radio" name="payType" value="일급"
 													id="daily" ${resumeDetail.resume.payType=='일급' ? 'checked' : '' }
-													<c:if test="${mode == 'advice'}">disabled</c:if> />
+													<c:if test="${!isSameUser}">disabled</c:if> />
 												<label class="form-check-label" for="daily">일급</label>
 											</div>
 											<div class="form-check form-check-inline">
 												<input class="form-check-input" type="radio" name="payType" value="월급"
 													id="monthly" ${resumeDetail.resume.payType=='월급' ? 'checked' : '' }
-													<c:if test="${mode == 'advice'}">disabled</c:if> />
+													<c:if test="${!isSameUser}">disabled</c:if> />
 												<label class="form-check-label" for="monthly">월급</label>
 											</div>
 											<div class="form-check form-check-inline">
 												<input class="form-check-input" type="radio" name="payType" value="연봉"
 													id="yearly" ${resumeDetail.resume.payType=='연봉' ? 'checked' : '' }
-													<c:if test="${mode == 'advice'}">disabled</c:if> />
+													<c:if test="${!isSameUser}">disabled</c:if> />
 												<label class="form-check-label" for="yearly">연봉</label>
 											</div>
 											<div class="form-check form-check-inline">
 												<input class="form-check-input" type="radio" name="payType"
 													value="협의 후 결정" id="negotiable"
 													${resumeDetail.resume.payType=='협의 후 결정' ? 'checked' : '' } <c:if
-													test="${mode == 'advice'}">disabled</c:if> />
+													test="${!isSameUser}">disabled</c:if> />
 												<label class="form-check-label" for="negotiable">협의 후
 													결정</label>
 											</div>
@@ -224,7 +224,7 @@
 										<input type="text" class="form-control text-end" id="payAmount" name="pay"
 											placeholder="금액 입력(숫자만 입력 가능해요)" maxlength="11"
 											value="${resumeDetail.resume.pay}" ${resumeDetail.resume.payType=='협의 후 결정'
-											? 'disabled' : '' } <c:if test="${mode == 'advice'}">disabled</c:if> />
+											? 'disabled' : '' } <c:if test="${!isSameUser}">disabled</c:if> />
 										<span class="ms-2">원</span>
 									</div>
 								</div>
@@ -689,7 +689,7 @@
 							<div class="card-body">
 								<textarea class="form-control" id="selfIntroTextarea" rows="8"
 									placeholder="자기소개를 입력하세요(최대 1000자)" maxlength="1000" <c:if
-									test="${mode == 'advice'}">readonly</c:if>></textarea>
+									test="${!isSameUser}">readonly</c:if>></textarea>
 								<div class="text-end">
 									<span id="charCount" class="text-muted">0 / 1000</span>
 								</div>

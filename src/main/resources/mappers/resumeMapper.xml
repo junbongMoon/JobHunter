@@ -332,14 +332,15 @@
 
     <!-- 이력서 첨삭 신청 저장 -->
 	<insert id="insertRegistrationAdvice" parameterType="map">
-		INSERT INTO registration_advice (regDate, status, mentorUid, resumeNo)
-		VALUES (NOW(), 'WAITING', #{mentorUid}, #{resumeNo})
+		INSERT INTO registration_advice (regDate, status, mentorUid, resumeNo, dueDate)
+		VALUES (NOW(), 'WAITING', #{mentorUid}, #{resumeNo}, #{dueDate})
 	</insert>
 	
 	<!-- 이력서 첨삭 신청 중복 확인 -->
 	<select id="checkDuplicateAdvice" parameterType="map" resultType="int">
 		SELECT COUNT(*) FROM registration_advice 
 		WHERE resumeNo = #{resumeNo}
+        AND (status = 'WAITING' OR status = 'CHECKING')
 	</select>
 
 	<!-- 이력서 첨삭 상태 확인 -->
