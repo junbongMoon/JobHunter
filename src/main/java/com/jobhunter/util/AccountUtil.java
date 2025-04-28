@@ -115,6 +115,16 @@ public class AccountUtil {
 		return checkAuth(allowTypes, sessionAccount, conditions);
 	}
 	
+	// sessionAccount의 권한(admin, mentor)이 allowTypes의 권한중 하나라도 맞거나
+	// sessionAccount의 uid와 계정타입이 conditions에 들어온 값중 하나라도 맞을 경우 true
+	// conditions은 int uid, AccountType type 쌍으로 입력
+	// ex) checkAuth(allowTypes, sessionAccount, 
+	//					1, AccountType.USER,
+	//					4, AccountType.COMPANY,
+	//					1, AccountType.COMPANY,
+	//					23, AccountType.USER
+	//				)
+	// => uid 1번인 개인회원, 23인 개인회원, 4인 기업회원, 1인 기업회원 4명이 들어갈 수 있는 페이지
 	public static boolean checkAuth(List<AccountType> allowTypes, AccountVO sessionAccount, Object... conditions) {
 		if (sessionAccount == null) {
 			return false;
@@ -158,10 +168,12 @@ public class AccountUtil {
 	    return false;
 	}
 	
+	// 리퀘스트 넘겨주면 해당 리퀘스트의 세션에 접속된 계정 가져와주는 메서드
 	public static AccountVO getAccount(HttpServletRequest request) {
 		return getAccount(request.getSession());
 	}
 	
+	// 세션 넘겨주면 해당 세션에 접속된 계정 가져와주는 메서드
 	public static AccountVO getAccount(HttpSession session) {
 		return (AccountVO) session.getAttribute("account");
 	}
