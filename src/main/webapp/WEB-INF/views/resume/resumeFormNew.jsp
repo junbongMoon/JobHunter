@@ -134,7 +134,7 @@
 
 					<!-- 희망 급여 -->
 					<div class="card mb-4">
-						<div class="card-header">
+						<div class="card-header payTypeBox">
 							희망 급여<span class="essentialPoint">*</span>
 						</div>
 						<div class="card-body">
@@ -232,7 +232,7 @@
 
 					<!-- 희망 업직종 -->
 					<div class="card mb-4">
-						<div class="card-header" id="wishJobBox">
+						<div class="card-header wishJobBox" id="wishJobBox">
 							희망 업직종<span class="essentialPoint">*</span>
 						</div>
 						<div class="card-body">
@@ -1241,208 +1241,208 @@
 					});
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
-				// 코드 테스트용 버튼 클릭 이벤트
-				$('#testBtn').on('click', function () {
-					// 유효성 검사
-					const title = $('#title').val().trim();
-					const titleLength = $('#title').val().length;
-					if (!title) {
-						showValidationModal("이력서 제목을 입력해주세요.", "#title");
-						return;
-					}
+				// // 코드 테스트용 버튼 클릭 이벤트
+				// $('#testBtn').on('click', function () {
+				// 	// 유효성 검사
+				// 	const title = $('#title').val().trim();
+				// 	const titleLength = $('#title').val().length;
+				// 	if (!title) {
+				// 		showValidationModal("이력서 제목을 입력해주세요.", "#title");
+				// 		return;
+				// 	}
 
-					if (titleLength > 30) {
-						showValidationModal("이력서 제목은 30자 이내로 작성해주세요.", "#title");
-						return;
-					}
+				// 	if (titleLength > 30) {
+				// 		showValidationModal("이력서 제목은 30자 이내로 작성해주세요.", "#title");
+				// 		return;
+				// 	}
 
-					if (!$('#profileBase64').val()) {
-						showValidationModal("사진을 등록해 주세요.");
-						$(".photoUploadBox").attr("tabindex", -1).focus();
-						return;
-					}
+				// 	if (!$('#profileBase64').val()) {
+				// 		showValidationModal("사진을 등록해 주세요.");
+				// 		$(".photoUploadBox").attr("tabindex", -1).focus();
+				// 		return;
+				// 	}
 
-					const jobFormCount = $('input[name="jobForm"]:checked').length;
-					if (jobFormCount === 0) {
-						showValidationModal("희망 고용형태를 하나 이상 선택해주세요.", "#fullTime");
-						return;
-					}
+				// 	const jobFormCount = $('input[name="jobForm"]:checked').length;
+				// 	if (jobFormCount === 0) {
+				// 		showValidationModal("희망 고용형태를 하나 이상 선택해주세요.", "#fullTime");
+				// 		return;
+				// 	}
 
-					const payType = $('input[name="payType"]:checked').val();
-					const payAmount = $('#payAmount').val().trim();
-					if (payType !== '협의 후 결정' && (!payAmount || payAmount <= 0)) {
-						showValidationModal("희망 금액을 입력해주세요", "#payAmount");
-						return;
-					}
+				// 	const payType = $('input[name="payType"]:checked').val();
+				// 	const payAmount = $('#payAmount').val().trim();
+				// 	if (payType !== '협의 후 결정' && (!payAmount || payAmount <= 0)) {
+				// 		showValidationModal("희망 금액을 입력해주세요", "#payAmount");
+				// 		return;
+				// 	}
 
-					const regionCount = $('#selectedRegions .badge').length;
-					if (regionCount === 0) {
-						showValidationModal("희망 근무지를 선택해 주세요");
-						$("#wishRegion").attr("tabindex", -1).focus();
-						return;
-					}
+				// 	const regionCount = $('#selectedRegions .badge').length;
+				// 	if (regionCount === 0) {
+				// 		showValidationModal("희망 근무지를 선택해 주세요");
+				// 		$("#wishRegion").attr("tabindex", -1).focus();
+				// 		return;
+				// 	}
 
-					const jobTypeCount = $('#selectedJobTypes .badge').length;
-					if (jobTypeCount === 0) {
-						showValidationModal("희망 업직종을 선택해 주세요");
-						$("#wishJobBox").attr("tabindex", -1).focus();
-						return;
-					}
+				// 	const jobTypeCount = $('#selectedJobTypes .badge').length;
+				// 	if (jobTypeCount === 0) {
+				// 		showValidationModal("희망 업직종을 선택해 주세요");
+				// 		$("#wishJobBox").attr("tabindex", -1).focus();
+				// 		return;
+				// 	}
 
-					const meritCount = $('#selectedMerits .badge').length;
-					if (meritCount === 0) {
-						showValidationModal("성격 및 강점을 선택해 주세요");
-						$("#myMerits").attr("tabindex", -1).focus();
-						return;
-					}
+				// 	const meritCount = $('#selectedMerits .badge').length;
+				// 	if (meritCount === 0) {
+				// 		showValidationModal("성격 및 강점을 선택해 주세요");
+				// 		$("#myMerits").attr("tabindex", -1).focus();
+				// 		return;
+				// 	}
 
-					// 학력을 추가하였는가 확인하고 추가하였다면 값을 입력하지 않았을 시 학력사항에 입력사항이 누락되었음을 알리고 입력을 하도록 유도
-					const educationItems = $('.education-item'); // each -> 
-					if (educationItems.length > 0) {
-						let isValid = true;
+				// 	// 학력을 추가하였는가 확인하고 추가하였다면 값을 입력하지 않았을 시 학력사항에 입력사항이 누락되었음을 알리고 입력을 하도록 유도
+				// 	const educationItems = $('.education-item'); // each -> 
+				// 	if (educationItems.length > 0) {
+				// 		let isValid = true;
 
-						educationItems.each(function () {
-							const educationLevel = $(this).find('.education-level').val();
-							const educationStatus = $(this).find('.education-status').val();
-							const graduationDate = $(this).find('.graduation-date').val();
-							const customInput = $(this).find('.custom-input').val().trim();
+				// 		educationItems.each(function () {
+				// 			const educationLevel = $(this).find('.education-level').val();
+				// 			const educationStatus = $(this).find('.education-status').val();
+				// 			const graduationDate = $(this).find('.graduation-date').val();
+				// 			const customInput = $(this).find('.custom-input').val().trim();
 
-							if (!educationLevel || !educationStatus || !graduationDate || !customInput) {
-								isValid = false;
-								return false; // each 중단
-							}
-						});
+				// 			if (!educationLevel || !educationStatus || !graduationDate || !customInput) {
+				// 				isValid = false;
+				// 				return false; // each 중단
+				// 			}
+				// 		});
 
-						if (!isValid) {
-							showValidationModal("학력사항에 입력사항이 누락되었습니다.");
-							$("#myEducationBox").attr("tabindex", -1).focus();
-							return;
-						}
-					}
+				// 		if (!isValid) {
+				// 			showValidationModal("학력사항에 입력사항이 누락되었습니다.");
+				// 			$("#myEducationBox").attr("tabindex", -1).focus();
+				// 			return;
+				// 		}
+				// 	}
 
-					// 경력사항 유효성 검사 -> 학력과 유사한 형식
-					const historyItems = $('.history-item');
-					if (historyItems.length > 0) {
-						let isValid = true;
+				// 	// 경력사항 유효성 검사 -> 학력과 유사한 형식
+				// 	const historyItems = $('.history-item');
+				// 	if (historyItems.length > 0) {
+				// 		let isValid = true;
 
-						historyItems.each(function () {
-							const companyName = $(this).find('.company-name').val().trim();
-							const jobDescription = $(this).find('.job-description').val().trim();
-							const startDate = $(this).find('.start-date').val();
-							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
-							const endDate = $(this).find('.end-date').val();
+				// 		historyItems.each(function () {
+				// 			const companyName = $(this).find('.company-name').val().trim();
+				// 			const jobDescription = $(this).find('.job-description').val().trim();
+				// 			const startDate = $(this).find('.start-date').val();
+				// 			const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
+				// 			const endDate = $(this).find('.end-date').val();
 
-							if (!companyName || !jobDescription || !startDate) {
-								isValid = false;
-								focusElement = $(this).find(':input[value=""]:first');
-								return false; // each 중단
-							}
+				// 			if (!companyName || !jobDescription || !startDate) {
+				// 				isValid = false;
+				// 				focusElement = $(this).find(':input[value=""]:first');
+				// 				return false; // each 중단
+				// 			}
 
-							// 재직중이 아닌 경우에만 종료일 체크
-							if (!isCurrentlyEmployed && !endDate) {
-								isValid = false;
-								return false;
-							}
-						});
+				// 			// 재직중이 아닌 경우에만 종료일 체크
+				// 			if (!isCurrentlyEmployed && !endDate) {
+				// 				isValid = false;
+				// 				return false;
+				// 			}
+				// 		});
 
-						if (!isValid) {
-							showValidationModal("경력사항에 입력사항이 누락되었습니다.");
-							$("#myHistoryBox").attr("tabindex", -1).focus();
-							return;
-						}
-					}
+				// 		if (!isValid) {
+				// 			showValidationModal("경력사항에 입력사항이 누락되었습니다.");
+				// 			$("#myHistoryBox").attr("tabindex", -1).focus();
+				// 			return;
+				// 		}
+				// 	}
 
-					// 자격증 유효성 검사
-					const licenseItems = $('.license-item');
-					if (licenseItems.length > 0) {
-						let isValid = true;
+				// 	// 자격증 유효성 검사
+				// 	const licenseItems = $('.license-item');
+				// 	if (licenseItems.length > 0) {
+				// 		let isValid = true;
 
-						licenseItems.each(function () {
-							const licenseName = $(this).find('.license-name').val().trim();
-							const acquisitionDate = $(this).find('.acquisition-date').val();
-							const institution = $(this).find('.institution').val();
+				// 		licenseItems.each(function () {
+				// 			const licenseName = $(this).find('.license-name').val().trim();
+				// 			const acquisitionDate = $(this).find('.acquisition-date').val();
+				// 			const institution = $(this).find('.institution').val();
 
-							if (!licenseName || !acquisitionDate || !institution) {
-								isValid = false;
-								return false; // each 중단
-							}
+				// 			if (!licenseName || !acquisitionDate || !institution) {
+				// 				isValid = false;
+				// 				return false; // each 중단
+				// 			}
 
-							if (!isValid) {
-								showValidationModal("자격증 정보가 누락되었습니다.");
-								$("#myLicenseBox").attr("tabindex", -1).focus();
-								return;
-							}
-						});
-					}
+				// 			if (!isValid) {
+				// 				showValidationModal("자격증 정보가 누락되었습니다.");
+				// 				$("#myLicenseBox").attr("tabindex", -1).focus();
+				// 				return;
+				// 			}
+				// 		});
+				// 	}
 
-					console.log("유효성 검사 통과");
+				// 	console.log("유효성 검사 통과");
 
-					// 폼 데이터 수집
-					const formData = {
-						title: $('#title').val(),
-						payType: $('input[name="payType"]:checked').val(),
-						pay: $('#payAmount').val().replace(/,/g, ''),
-						jobForms: $('input[name="jobForm"]:checked').map(function () {
-							return {
-								form: $(this).val()
-							};
-						}).get(),
-						sigunguNos: $('#selectedRegions').find('.badge').map(function () {
-							return $(this).data("sigungu");
-						}).get(),
-						subcategoryNos: $('#selectedJobTypes').find('.badge').map(function () {
-							return $(this).data("sub");
-						}).get(),
-						merits: $('#selectedMerits').find('.badge').map(function () {
-							return {
-								meritContent: $(this).data('merit')
-							};
-						}).get(),
-						educations: $('.education-item').map(function () {
-							return {
-								educationLevel: $(this).find('.education-level').val(),
-								educationStatus: $(this).find('.education-status').val(),
-								graduationDate: $(this).find('.graduation-date').val(),
-								customInput: $(this).find('.custom-input').val()
-							};
-						}).get(),
-						histories: $('.history-item').map(function () {
-							const $endDate = $(this).find('.end-date');
-							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
-							return {
-								companyName: $(this).find('.company-name').val(),
-								position: $(this).find('.position').val(),
-								jobDescription: $(this).find('.job-description').val(),
-								startDate: $(this).find('.start-date').val(),
-								endDate: isCurrentlyEmployed ? null : $endDate.val()
-							};
-						}).get(),
-						licenses: $('.license-item').map(function () {
-							return {
-								licenseName: $(this).find('.license-name').val(),
-								acquisitionDate: $(this).find('.acquisition-date').val(),
-								institution: $(this).find('.institution').val()
-							};
-						}).get(),
-						introduce: $('#selfIntroTextarea').val(),
-						files: uploadedFiles,
-						userUid: $('#userUid').val(),
-						profileBase64: $('#profileBase64').val()
-					};
+				// 	// 폼 데이터 수집
+				// 	const formData = {
+				// 		title: $('#title').val(),
+				// 		payType: $('input[name="payType"]:checked').val(),
+				// 		pay: $('#payAmount').val().replace(/,/g, ''),
+				// 		jobForms: $('input[name="jobForm"]:checked').map(function () {
+				// 			return {
+				// 				form: $(this).val()
+				// 			};
+				// 		}).get(),
+				// 		sigunguNos: $('#selectedRegions').find('.badge').map(function () {
+				// 			return $(this).data("sigungu");
+				// 		}).get(),
+				// 		subcategoryNos: $('#selectedJobTypes').find('.badge').map(function () {
+				// 			return $(this).data("sub");
+				// 		}).get(),
+				// 		merits: $('#selectedMerits').find('.badge').map(function () {
+				// 			return {
+				// 				meritContent: $(this).data('merit')
+				// 			};
+				// 		}).get(),
+				// 		educations: $('.education-item').map(function () {
+				// 			return {
+				// 				educationLevel: $(this).find('.education-level').val(),
+				// 				educationStatus: $(this).find('.education-status').val(),
+				// 				graduationDate: $(this).find('.graduation-date').val(),
+				// 				customInput: $(this).find('.custom-input').val()
+				// 			};
+				// 		}).get(),
+				// 		histories: $('.history-item').map(function () {
+				// 			const $endDate = $(this).find('.end-date');
+				// 			const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
+				// 			return {
+				// 				companyName: $(this).find('.company-name').val(),
+				// 				position: $(this).find('.position').val(),
+				// 				jobDescription: $(this).find('.job-description').val(),
+				// 				startDate: $(this).find('.start-date').val(),
+				// 				endDate: isCurrentlyEmployed ? null : $endDate.val()
+				// 			};
+				// 		}).get(),
+				// 		licenses: $('.license-item').map(function () {
+				// 			return {
+				// 				licenseName: $(this).find('.license-name').val(),
+				// 				acquisitionDate: $(this).find('.acquisition-date').val(),
+				// 				institution: $(this).find('.institution').val()
+				// 			};
+				// 		}).get(),
+				// 		introduce: $('#selfIntroTextarea').val(),
+				// 		files: uploadedFiles,
+				// 		userUid: $('#userUid').val(),
+				// 		profileBase64: $('#profileBase64').val()
+				// 	};
 
-					// 이력서 번호가 있는 경우 추가
-					const resumeNo = '${resumeDetail.resume.resumeNo}';
-					if (resumeNo) {
-						formData.resumeNo = resumeNo;
-					}
-					// URL에서 uid 파라미터 가져오기
-					const urlParams = new URLSearchParams(window.location.search);
-					const uid = urlParams.get('uid');
-					console.log('uid:', uid);
+				// 	// 이력서 번호가 있는 경우 추가
+				// 	const resumeNo = '${resumeDetail.resume.resumeNo}';
+				// 	if (resumeNo) {
+				// 		formData.resumeNo = resumeNo;
+				// 	}
+				// 	// URL에서 uid 파라미터 가져오기
+				// 	const urlParams = new URLSearchParams(window.location.search);
+				// 	const uid = urlParams.get('uid');
+				// 	console.log('uid:', uid);
 
-					console.log('저장할 데이터:', formData);
+				// 	console.log('저장할 데이터:', formData);
 
-				});
+				// });
 				//---------------------------------------------------------------------------------------------------------------------------------
 				//---------------------------------------------------------------------------------------------------------------------------------
 				let isSubmitting = false; // 중복 제출 방지용
@@ -1481,28 +1481,41 @@
 
 					const jobFormCount = $('input[name="jobForm"]:checked').length;
 					if (jobFormCount === 0) {
-						showValidationModal("희망 고용형태를 하나 이상 선택해주세요.", "#fullTime");
+						showValidationModal("희망 고용형태를 하나 이상 선택해주세요.");
+						$(".jobTypeBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
 						return;
 					}
 
 					const payType = $('input[name="payType"]:checked').val();
+					const payTypeCount = $('input[name="payType"]:checked').length;
+					if (payTypeCount === 0) {
+						showValidationModal("희망 급여 형태를 선택해주세요");
+						$(".payTypeBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
+						return;
+					}
 					const payAmount = $('#payAmount').val().trim();
 					if (payType !== '협의 후 결정' && (!payAmount || payAmount <= 0)) {
-						showValidationModal("희망 금액을 입력해주세요", "#payAmount");
+						showValidationModal("희망 금액을 입력해주세요");
+						$(".payTypeBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
 						return;
 					}
 
 					const regionCount = $('#selectedRegions .badge').length;
 					if (regionCount === 0) {
 						showValidationModal("희망 근무지를 선택해 주세요");
-						$("#wishRegion").attr("tabindex", -1).focus();
+						$(".wishRegionBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
 						return;
 					}
 
 					const jobTypeCount = $('#selectedJobTypes .badge').length;
 					if (jobTypeCount === 0) {
 						showValidationModal("희망 업직종을 선택해 주세요");
-						$("#wishJobBox").attr("tabindex", -1).focus();
+						$(".wishJobBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
 						return;
 					}
 
@@ -1510,6 +1523,7 @@
 					if (meritCount === 0) {
 						showValidationModal("성격 및 강점을 선택해 주세요");
 						$("#myMerits").attr("tabindex", -1).focus();
+						resetSubmitButton();
 						return;
 					}
 
@@ -1533,6 +1547,7 @@
 						if (!isValid) {
 							showValidationModal("학력사항에 입력사항이 누락되었습니다.");
 							$("#myEducationBox").attr("tabindex", -1).focus();
+							resetSubmitButton();
 							return;
 						}
 					}
@@ -1564,6 +1579,7 @@
 						if (!isValid) {
 							showValidationModal("경력사항에 입력사항이 누락되었습니다.");
 							$("#myHistoryBox").attr("tabindex", -1).focus();
+							resetSubmitButton();
 							return;
 						}
 					}
@@ -1587,8 +1603,23 @@
 						if (!isValid) {
 							showValidationModal("자격증 정보가 누락되었습니다.");
 							$("#myLicenseBox").attr("tabindex", -1).focus();
+							resetSubmitButton();
 							return;
 						}
+					}
+
+					const startDateInput = document.querySelector('.start-date');
+					const endDateInput = document.querySelector('.end-date');
+
+					const startDate = new Date(startDateInput.value);
+					const endDate = new Date(endDateInput.value);
+
+					if (startDate > endDate) {
+						showValidationModal('근무기간 입력이 잘못되었습니다!');
+						$("#myHistoryBox").attr("tabindex", -1).focus();
+						endDateInput.value = ''; // 종료일 초기화
+						resetSubmitButton();
+						return;
 					}
 
 					console.log("유효성 검사 통과");
@@ -2519,5 +2550,22 @@
 						window.location.href = '/resume/list';
 					}
 				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 근무기간 유효성 검사
+				const startDateInput = document.querySelector('.start-date');
+				const endDateInput = document.querySelector('.end-date');
+
+				function validateWorkPeriod() {
+					const startDate = new Date(startDateInput.value);
+					const endDate = new Date(endDateInput.value);
+
+					if (startDate > endDate) {
+						showValidationModal('근무기간 입력이 잘못되었습니다!');
+						endDateInput.value = ''; // 종료일 초기화
+					}
+				}
+
+				startDateInput.addEventListener('change', validateWorkPeriod);
+				endDateInput.addEventListener('change', validateWorkPeriod);
 			});
 		</script>

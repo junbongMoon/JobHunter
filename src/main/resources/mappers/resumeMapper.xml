@@ -310,7 +310,7 @@
             regDate,
             mentorUid
         FROM resume_advice
-        WHERE resumeNo = #{resumeNo}
+        WHERE resumeNo = #{resumeNo} AND status = 'CHECKING'
         ORDER BY regDate DESC
         LIMIT 1
     </select>
@@ -341,12 +341,13 @@
 		SELECT COUNT(*) FROM registration_advice 
 		WHERE resumeNo = #{resumeNo}
         AND (status = 'WAITING' OR status = 'CHECKING')
+        <!-- AND mentorUid = #{mentorUid} -->
 	</select>
 
 	<!-- 이력서 첨삭 상태 확인 -->
 	<select id="checkResumeAdvice" parameterType="int" resultType="int">
 		SELECT COUNT(*) FROM registration_advice
-		WHERE resumeNo = #{resumeNo} AND status = 'CHECKING'
+		WHERE resumeNo = #{resumeNo} AND (status = 'CHECKING' OR status = 'WAITING')
 	</select>
 
     <!-- 첨삭 신청 번호 조회 -->
@@ -365,6 +366,12 @@
         SET status = #{status}
         WHERE resumeNo = #{resumeNo}
         AND mentorUid = #{userUid}
+        <if test="mode == 'endAdvice'">
+            AND status = 'CHECKING'
+        </if>
+        <if test="mode != 'endAdvice'">
+            AND status = 'WAITING'
+        </if>
     </update>
     
     <select id="selectRegistrationAdviceByMentorWithPaging" resultType="com.jobhunter.model.resume.RegistrationAdviceVO">
@@ -452,5 +459,24 @@
 	  JOIN resume r ON ra.resumeNo = r.resumeNo
 	  WHERE r.userUid = #{userUid}
 	</select>
+
+    <!-- 첨삭 내용 상태 변경 -->
+    <update id="updateAdviceStatus" parameterType="map">
+        UPDATE resume_advice
+        SET status = #{status}
+        WHERE resumeNo = #{resumeNo}
+    </update>
+
+    <!-- 첨삭 코멘트 저장 -->
+    <insert id="insertAdviceComment" parameterType="com.jobhunter.model.resume.ResumeAdviceCommentDTO">
+        INSERT INTO resume_advice_comment (adviceNo, commentText, mentorUid, resumeNo, lineNo)
+        VALUES (#{adviceNo}, #{commentText}, #{mentorUid}, #{resumeNo}, #{lineNo})
+    </insert>
+
+    <!-- 첨삭 코멘트 조회 -->
+    <select id="getAdviceComments" parameterType="int" resultType="com.jobhunter.model.resume.ResumeAdviceCommentDTO">
+        SELECT * FROM resume_advice_comment
+        WHERE adviceNo = #{adviceNo}
+    </select>
     
 </mapper>

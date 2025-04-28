@@ -287,8 +287,16 @@
 														</td>
 														<td>
 															<c:if test="${not empty report.reportTargetURL}">
-																<a href="${report.reportTargetURL}&reportNo=${report.reportNo}"
-																	target="_blank">보기</a>
+																<c:choose>
+																	<c:when test="${report.reportType == 'BOARD'}">
+																		<a href="/reviewBoard/detail/?boardNo=${report.reportTargetPK}"
+																			target="_blank">보기</a>
+																	</c:when>
+																	<c:when test="${report.reportType == 'RECRUITMENT'}">
+																		<a href="/recruitmentnotice/detail/?uid=${report.reportTargetPK}"
+																			target="_blank">보기</a>
+																	</c:when>
+																</c:choose>
 															</c:if>
 														</td>
 														<td>

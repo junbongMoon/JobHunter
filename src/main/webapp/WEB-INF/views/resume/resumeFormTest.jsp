@@ -184,7 +184,7 @@
 
 						<!-- 희망 급여 -->
 						<div class="card mb-4">
-							<div class="card-header">
+							<div class="card-header payTypeBox">
 								희망 급여<span class="essentialPoint">*</span>
 							</div>
 							<div class="card-body">
@@ -295,7 +295,7 @@
 
 						<!-- 희망 업직종 -->
 						<div class="card mb-4">
-							<div class="card-header" id="wishJobBox">
+							<div class="card-header wishJobBox" id="wishJobBox">
 								희망 업직종<span class="essentialPoint">*</span>
 							</div>
 							<div class="card-body">
@@ -853,7 +853,12 @@
 						</c:if>
 						<!-- <button type="button" class="btn btn-secondary" id="testBtn">코드
 						테스트용 버튼</button> -->
-						<button type="button" class="btn btn-secondary" id="returnBtn">목록으로</button>
+						<c:if test="${isSameUser}">
+							<button type="button" class="btn btn-secondary" id="returnBtn">목록으로</button>
+						</c:if>
+						<c:if test="${!isSameUser}">
+							<button type="button" class="btn btn-secondary" id="returnBtnNotSameUser">목록으로</button>
+						</c:if>
 
 
 						<!-- 첨삭 승인 버튼 체크모양 
@@ -1326,8 +1331,9 @@
 
 					editor.setGutterMarker(activeCommentLine, "comment-gutter", makeCommentIcon(activeCommentLine));
 					editor.setGutterMarker(activeCommentLine, "comment-control-gutter", makeControlButton(activeCommentLine, "remove"));
-
-					saveCommentToServer(1, activeCommentLine, comment);
+					console.log("activeCommentLine: " + activeCommentLine);
+					console.log("comment: " + comment);
+					saveCommentToServer(activeCommentLine, comment);
 					cancelInlineComment();
 				}
 
@@ -1397,124 +1403,56 @@
 					console.log(`줄 \${line + 1} 코멘트 삭제됨`);
 				}
 
-				// 서버 저장 요청
-				function saveCommentToServer(resumeId, lineNumber, commentText) {
-					$.ajax({
-						url: "/saveResumeComment",
-						method: "POST",
-						data: {
-							resumeId: resumeId,
-							lineNumber: lineNumber,
-							commentText: commentText
-						},
-						success: () => console.log("코멘트 저장 완료"),
-						error: () => alert("저장 실패 ㅠㅠ")
-					});
+				let pendingComments = []; // 서버에 저장되지 않은 댓글 배열
+
+				// 댓글 저장 함수 (서버에 즉시 저장하지 않고 배열에 추가)
+				function saveCommentToServer(lineNo, commentText) {
+					console.log("lineNo: " + lineNo);
+					console.log("commentText: " + commentText);
+					console.log("resumeNo: " + $("#resumeNo").val());
+					console.log("mentorUid: " + $("#sessionUserUid").val());
+					// 댓글 객체 생성
+					const comment = {
+						lineNo: lineNo,
+						commentText: commentText,
+						resumeNo: $("#resumeNo").val(),
+						mentorUid: $("#sessionUserUid").val(),
+						adviceNo: null // 조언 저장 후 설정됨
+					};
+					pendingComments.push(comment);
+					console.log("pendingComments: " + pendingComments);
 				}
 
-				// const editor = CodeMirror.fromTextArea(document.getElementById("selfIntroTextarea1"), {
-				// 	mode: "text/plain",
-				// 	lineNumbers: true,
-				// 	readOnly: true,
-				// 	gutters: ["CodeMirror-linenumbers", "comment-gutter"]
-				// });
 
-				// let activeCommentLine = null; // 현재 코멘트 입력 중인 줄
 
-				// editor.on("gutterClick", function (cm, lineNumber) {
-				// 	if (activeCommentLine === lineNumber) return; // 이미 열려 있으면 무시
-				// 	activeCommentLine = lineNumber;
-
-				// 	const coords = cm.charCoords({ line: lineNumber, ch: 0 }, "page");
-				// 	showInlineCommentForm(lineNumber, coords.top);
-				// });
-
-				// function showInlineCommentForm(line, topOffset) {
-				// 	// 기존 입력창 제거
-				// 	document.getElementById("comment-container").innerHTML = "";
-
-				// 	// 코멘트 입력창 HTML 생성
-				// 	const container = document.getElementById("comment-container");
-				// 	const form = document.createElement("div");
-				// 	form.innerHTML = `
-				// 	<div style="position:absolute; top:${topOffset + 25}px; left:100px; background:#f9f9f9; padding:10px; border:1px solid #ccc; border-radius:6px; width:400px; z-index:10">
-				// 	<textarea id="inlineCommentInput" class="form-control" placeholder="코멘트를 입력하세요"></textarea>
-				// 	<div class="mt-2 text-end">
-				// 	<button type="button" class="btn btn-sm btn-secondary" onclick="cancelInlineComment()">취소</button>
-				// 	<button type="button" class="btn btn-sm btn-primary" onclick="saveInlineComment(${line})">저장</button>
-				// 	</div>
-				// 	</div>
-				// 	`;
-				// 	container.appendChild(form);
-				// }
-
-				// function cancelInlineComment() {
-				// 	document.getElementById("comment-container").innerHTML = "";
-				// 	activeCommentLine = null;
-				// }
-
-				// function saveInlineComment(line) {
-				// 	const comment = document.getElementById("inlineCommentInput").value;
-				// 	if (!comment) return;
-
-				// 	// 💬 표시
-				// 	editor.setGutterMarker(line, "comment-gutter", makeCommentIcon(line));
-
-				// 	// 서버로 저장 요청 (ajax 등으로 가능)
-				// 	console.log("저장: 줄", line + 1, "코멘트:", comment);
-				// 	cancelInlineComment();
-				// }
-
-				// function makeCommentIcon(line) {
-				// 	const marker = document.createElement("div");
-				// 	marker.innerText = "💬";
-				// 	marker.title = "코멘트 있음";
-				// 	marker.style.fontSize = "13px";
-				// 	marker.style.cursor = "pointer";
-				// 	return marker;
-				// }
-
-				//---------------------------------------------------------------------------------------------------------------------------------
-				// // 첨삭 승인 버튼 클릭 이벤트
-				// $("#acceptAdviceBtn").on("click", function () {
-				// 	// 첨삭 승인 확인 컨펌
-				// 	if (!confirm("첨삭을 승인하시겠습니까?")) return;
-				// 	$.ajax({ // 💥💥💥 from : 근우 -> url 해당 resumeNo로 수정해야해요~~~
-				// 		url: "/resume/acceptAdvice/${resumeDetail.resume.resumeNo}",
-				// 		type: "GET",
-				// 		success: function (response) {
-				// 			alert(response.message);
-				// 			location.reload();
-				// 		},
-				// 		error: function () {
-				// 			alert("첨삭 승인 처리 중 오류가 발생했습니다.");
-				// 			location.reload();
-				// 		}
-				// 	});
-				// });
-				// // 첨삭 거절 버튼 클릭 이벤트
-				// $("#rejectAdviceBtn").on("click", function () {
-				// 	// 첨삭 거절 확인 컨펌
-				// 	if (!confirm("첨삭을 거절하시겠습니까?")) return;
-				// 	// 💥💥💥 from : 근우 -> url 해당 resumeNo랑 ownerUid=이력서 주인 uid로 수정해야해요~~~
-				// 	const mentorUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}";
-				// 	// const mentiUrl = "/resume/rejectAdvice/${resumeDetail.resume.resumeNo}?ownerUid=${resumeDetail.resume.userUid}&userUid=";
-				// 	$.ajax({
-				// 		url: mentorUrl,
-				// 		type: "GET",
-				// 		success: function (response) {
-				// 			alert(response.message);
-				// 			location.reload();
-				// 		},
-				// 		error: function () {
-				// 			alert("첨삭 거절 처리 중 오류가 발생했습니다.");
-				// 			location.reload();
-				// 		}
-				// 	});
-				// });
 
 				//---------------------------------------------------------------------------------------------------------------------------------
 				$(document).ready(function () {
+
+					const commentList = [
+						<c:forEach var="comment" items="${comments}" varStatus="status">
+							{
+								lineNo: ${comment.lineNo},
+							commentText: "${fn:escapeXml(comment.commentText)}"
+     					}<c:if test="${!status.last}">,</c:if>
+						</c:forEach>
+					];
+
+					// const commentMap = {};
+
+					commentList.forEach(comment => {
+						commentMap[comment.lineNo] = comment.commentText;
+						editor.setGutterMarker(comment.lineNo, "comment-gutter", makeCommentIcon(comment.lineNo));
+						editor.setGutterMarker(comment.lineNo, "comment-control-gutter", makeControlButton(comment.lineNo, "remove"));
+						pendingComments.push({
+							lineNo: comment.lineNo,
+							commentText: comment.commentText,
+							resumeNo: comment.resumeNo,
+							mentorUid: comment.mentorUid,
+							adviceNo: comment.adviceNo
+						});
+					});
+
 					// 이력서 주인 uid와 쿼리스트링 uid가 다르면 튕기게하기
 					const userUidOwner = $("#userUidOwner").val();
 					const queryUid = "${param.uid}";
@@ -1821,28 +1759,41 @@
 
 						const jobFormCount = $('input[name="jobForm"]:checked').length;
 						if (jobFormCount === 0) {
-							showValidationModal("희망 고용형태를 하나 이상 선택해주세요.", "#fullTime");
+							showValidationModal("희망 고용형태를 하나 이상 선택해주세요.");
+							$(".jobTypeBox").attr("tabindex", -1).focus();
+							resetSubmitButton();
 							return;
 						}
 
 						const payType = $('input[name="payType"]:checked').val();
+						const payTypeCount = $('input[name="payType"]:checked').length;
+						if (payTypeCount === 0) {
+							showValidationModal("희망 급여 형태를 선택해주세요");
+							$(".payTypeBox").attr("tabindex", -1).focus();
+							resetSubmitButton();
+							return;
+						}
 						const payAmount = $('#payAmount').val().trim();
 						if (payType !== '협의 후 결정' && (!payAmount || payAmount <= 0)) {
-							showValidationModal("희망 금액을 입력해주세요", "#payAmount");
+							showValidationModal("희망 금액을 입력해주세요");
+							$(".payTypeBox").attr("tabindex", -1).focus();
+							resetSubmitButton();
 							return;
 						}
 
 						const regionCount = $('#selectedRegions .badge').length;
 						if (regionCount === 0) {
 							showValidationModal("희망 근무지를 선택해 주세요");
-							$("#wishRegion").attr("tabindex", -1).focus();
+							$(".wishRegionBox").attr("tabindex", -1).focus();
+							resetSubmitButton();
 							return;
 						}
 
 						const jobTypeCount = $('#selectedJobTypes .badge').length;
 						if (jobTypeCount === 0) {
 							showValidationModal("희망 업직종을 선택해 주세요");
-							$("#wishJobBox").attr("tabindex", -1).focus();
+							$(".wishJobBox").attr("tabindex", -1).focus();
+							resetSubmitButton();
 							return;
 						}
 
@@ -1850,6 +1801,7 @@
 						if (meritCount === 0) {
 							showValidationModal("성격 및 강점을 선택해 주세요");
 							$("#myMerits").attr("tabindex", -1).focus();
+							resetSubmitButton();
 							return;
 						}
 
@@ -1873,6 +1825,7 @@
 							if (!isValid) {
 								showValidationModal("학력사항에 입력사항이 누락되었습니다.");
 								$("#myEducationBox").attr("tabindex", -1).focus();
+								resetSubmitButton();
 								return;
 							}
 						}
@@ -1904,6 +1857,7 @@
 							if (!isValid) {
 								showValidationModal("경력사항에 입력사항이 누락되었습니다.");
 								$("#myHistoryBox").attr("tabindex", -1).focus();
+								resetSubmitButton();
 								return;
 							}
 						}
@@ -1927,8 +1881,23 @@
 							if (!isValid) {
 								showValidationModal("자격증 정보가 누락되었습니다.");
 								$("#myLicenseBox").attr("tabindex", -1).focus();
+								resetSubmitButton();
 								return;
 							}
+						}
+
+						const startDateInput = document.querySelector('.start-date');
+						const endDateInput = document.querySelector('.end-date');
+
+						const startDate = new Date(startDateInput.value);
+						const endDate = new Date(endDateInput.value);
+
+						if (startDate > endDate) {
+							showValidationModal('근무기간 입력이 잘못되었습니다!');
+							$("#myHistoryBox").attr("tabindex", -1).focus();
+							endDateInput.value = ''; // 종료일 초기화
+							resetSubmitButton();
+							return;
 						}
 
 						console.log("유효성 검사 통과");
@@ -2865,6 +2834,10 @@
 					}
 				});
 
+				$('#returnBtnNotSameUser').on('click', function () {
+					window.location.href = '/user/mypage/' + $('#sessionUserUid').val()
+				});
+
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 첨삭 모드 첨부파일 기능
 				// 첨삭 모드 파일 업로드 관련 변수
@@ -3164,7 +3137,8 @@
 									status: file.status
 								};
 							}),
-							ownerUid: $('#userUidOwner').val()
+							ownerUid: $('#userUidOwner').val(),
+							comments: pendingComments
 						};
 
 
@@ -3179,7 +3153,7 @@
 									if (response.success) {
 										showValidationModal('첨삭이 저장되었습니다.');
 										setTimeout(() => {
-											window.location.href = '/resume/list';
+											window.location.href = '/user/mypage/' + $('#sessionUserUid').val();
 										}, 1500);
 									} else {
 										showValidationModal('첨삭 저장에 실패했습니다.');
@@ -3203,6 +3177,7 @@
 										showValidationModal('첨삭이 종료되었습니다.');
 										window.location.href = response.url;
 									} else {
+										console.log(response);
 										showValidationModal('첨삭 종료에 실패했습니다.');
 									}
 								},
@@ -3217,6 +3192,24 @@
 						showValidationModal('파일 처리 중 오류가 발생했습니다.');
 					}
 				});
+
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 근무기간 유효성 검사
+				const startDateInput = document.querySelector('.start-date');
+				const endDateInput = document.querySelector('.end-date');
+
+				function validateWorkPeriod() {
+					const startDate = new Date(startDateInput.value);
+					const endDate = new Date(endDateInput.value);
+
+					if (startDate > endDate) {
+						showValidationModal('근무기간 입력이 잘못되었습니다!');
+						endDateInput.value = ''; // 종료일 초기화
+					}
+				}
+
+				startDateInput.addEventListener('change', validateWorkPeriod);
+				endDateInput.addEventListener('change', validateWorkPeriod);
 
 		});
 			</script>

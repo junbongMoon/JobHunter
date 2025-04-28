@@ -33,6 +33,7 @@ import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.model.util.TenToFivePageVO;
+import com.jobhunter.model.resume.ResumeAdviceCommentDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -281,6 +282,14 @@ public class ResumeServiceImpl implements ResumeService {
 		// 첨삭 내용 저장
 		rdao.insertAdvice(adviceDTO);
 
+		if (adviceDTO.getComments() != null && !adviceDTO.getComments().isEmpty()) {
+			// 첨삭 코멘트 저장
+			for (ResumeAdviceCommentDTO commentDTO : adviceDTO.getComments()) {
+				commentDTO.setAdviceNo(adviceDTO.getAdviceNo());
+				rdao.insertAdviceComment(commentDTO);
+			}
+		}
+
 		// 첨부파일 정보가 있는 경우 저장
 		if (adviceDTO.getFiles() != null && !adviceDTO.getFiles().isEmpty()) {
 			for (com.jobhunter.model.resume.ResumeAdviceUpfileDTO fileDTO : adviceDTO.getFiles()) {
@@ -430,20 +439,32 @@ public class ResumeServiceImpl implements ResumeService {
 	 * @return 성공 여부
 	 */
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean endAdvice(int resumeNo, int userUid, int ownerUid) throws Exception {
+		// 첨삭 종료 처리
 		int adviceResult = rdao.changeAdviceStatus(resumeNo, userUid, "COMPLETE");
 		if (adviceResult > 0) {
-			// 첨삭 종료한 rgAdviceNo 가져오기
-			int rgAdviceNo = rdao.getRegistrationAdviceNo(userUid, resumeNo);
-			// 포인트 로그에 포인트 차감 내역이 COMPLETE로 업데이트 됩니다.
-			int pointResult = pointDAO.updatePointLog(rgAdviceNo, "COMPLETE", "end");
-			if (pointResult > 0) {
-				// 첨삭을 완료한 유저의 포인트를 증가시킵니다.
-				userDAO.updateUserPoint(userUid, 1000);
-				return true;
+			// 첨삭 내용 테이블 COMPLETE로 업데이트
+			int adviceStatusResult = rdao.updateAdviceStatus(resumeNo, "COMPLETE");
+			if (adviceStatusResult > 0) {
+				// 첨삭 종료한 rgAdviceNo 가져오기
+				int rgAdviceNo = rdao.getRegistrationAdviceNo(userUid, resumeNo);
+				// 포인트 로그에 포인트 차감 내역이 COMPLETE로 업데이트 됩니다.
+				int pointResult = pointDAO.updatePointLog(rgAdviceNo, "COMPLETE", "end");
+				if (pointResult > 0) {
+					// 첨삭을 완료한 유저의 포인트를 증가시킵니다.
+					userDAO.updateUserPoint(userUid, 1000);
+					return true;
+				}
 			}
 		}
 		return false;
-
 	}
+	
+
+	@Override
+	public List<ResumeAdviceCommentDTO> getAdviceComments(int adviceNo) throws Exception {
+		return rdao.getAdviceComments(adviceNo);
+	}
+
 }

@@ -32,10 +32,10 @@
                 <div class="col-lg-2 col-md-3 footer-links">
                     <h4>Email</h4>
                     <ul>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">junbong@junbong.com</a></li>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">sungbin@sungbin.com</a></li>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">jiwon@jiwon.com</a></li>
-                        <li><i class="bi bi-chevron-right"></i> <a href="#">keunwoo@keunwoo.com</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">moonjoon1234@naver.com</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">tjdqlzld555@naver.com</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">mondols98@naver.com</a></li>
+                        <li><i class="bi bi-chevron-right"></i> <a href="#">dbrrmsdn51@naver.com</a></li>
                     </ul>
                 </div>
 

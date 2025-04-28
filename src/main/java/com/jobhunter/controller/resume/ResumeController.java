@@ -28,6 +28,7 @@ import com.jobhunter.model.resume.EducationLevel;
 import com.jobhunter.model.resume.EducationStatus;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
+import com.jobhunter.model.resume.ResumeAdviceCommentDTO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 import com.jobhunter.model.resume.ResumeDTO;
@@ -487,7 +488,7 @@ public class ResumeController {
 			boolean result = resumeService.endAdvice(resumeNo, userUid, ownerUid);
 			if (result) {
 				response.put("message", "첨삭이 종료되었습니다.");
-				response.put("url", "/");
+				response.put("url", "/user/mypage/"+userUid);
 				response.put("success", true);
 				return ResponseEntity.ok().body(response);
 			} else {
@@ -505,7 +506,8 @@ public class ResumeController {
 	
 //	테스트용 메서드 입니다. -- 이력서 첨삭 기능 개선 중....
 	@GetMapping({"/edit/{resumeNo}", "/advice/{resumeNo}", "/checkAdvice/{resumeNo}"})
-	public String editResumeForm(@PathVariable int resumeNo, @RequestParam int uid, Model model, HttpSession session, HttpServletRequest request) {
+	public String editResumeForm(@PathVariable int resumeNo, @RequestParam int uid, Model model, HttpSession session,
+			HttpServletRequest request) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		int userUid = account.getUid();
 		try {
@@ -556,7 +558,7 @@ public class ResumeController {
 			// 이력서의 유저정보를 가져옴
 			UserVO user = resumeService.getUserInfo(uid);
 			model.addAttribute("user", user);
-			
+
 			String uri = request.getRequestURI();
 			if (uri.contains("advice")) {
 				model.addAttribute("mode", "advice");
@@ -569,6 +571,9 @@ public class ResumeController {
 					// 첨삭 파일 조회
 					List<ResumeAdviceUpfileDTO> adviceFiles = resumeService.getAdviceFiles(advice.getAdviceNo());
 					model.addAttribute("adviceFiles", adviceFiles);
+					// 첨삭 코멘트 조회
+					List<ResumeAdviceCommentDTO> comments = resumeService.getAdviceComments(advice.getAdviceNo());
+					model.addAttribute("comments", comments);
 				}
 				model.addAttribute("mode", "checkAdvice");
 			}
@@ -579,4 +584,5 @@ public class ResumeController {
 			return "error";
 		}
 	}
+
 }

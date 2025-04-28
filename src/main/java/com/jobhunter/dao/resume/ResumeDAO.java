@@ -22,6 +22,7 @@ import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.resume.ResumeAdviceCommentDTO;
 
 public interface ResumeDAO {
 	// 이력서 저장
@@ -226,4 +227,40 @@ public interface ResumeDAO {
 	 */
 	int changeAdviceStatus(int resumeNo, int userUid, String status) throws Exception;
 
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 내용 상태를 변경하는 메서드
+	 * </p>
+	 * 
+	 * @param int resumeNo 이력서 번호
+	 * @param String status 첨삭 상태
+	 * @return 성공 여부
+	 */
+	int updateAdviceStatus(int resumeNo, String status) throws Exception;
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 코멘트를 저장하는 메서드
+	 * </p>
+	 * 
+	 * @param ResumeAdviceCommentDTO commentDTO 코멘트 정보
+	 * @return 성공 여부
+	 */
+	int insertAdviceComment(ResumeAdviceCommentDTO commentDTO) throws Exception;
+
+	/**
+	 *  @author 유지원
+	 *
+	 * <p>
+	 * 이력서 첨삭 코멘트를 조회하는 메서드
+	 * </p>
+	 * 
+	 * @param int adviceNo 첨삭 번호
+	 * @return 첨삭 코멘트 목록
+	 */
+	List<ResumeAdviceCommentDTO> getAdviceComments(int adviceNo) throws Exception;
 }
