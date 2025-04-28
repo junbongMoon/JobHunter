@@ -3,6 +3,7 @@ package com.jobhunter.service.reviewboard;
 import java.util.List;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.reviewboard.Likes;
 import com.jobhunter.model.reviewboard.RPageRequestDTO;
 import com.jobhunter.model.reviewboard.RPageResponseDTO;
 import com.jobhunter.model.reviewboard.RecruitmentnoticContentDTO;
@@ -27,10 +28,10 @@ public interface ReviewBoardService {
 	ReviewDetailViewDTO getReviewDetail(int boardNo) throws Exception;
 
 	// 좋아요 기능
-	boolean addlikes(int userId, int boardNo) throws Exception;
+	boolean addlikes(Likes likes) throws Exception;
 
 	// 좋아요 취소
-	boolean removeLike(int userId, int boardNo) throws Exception;
+	boolean removeLike(Likes likes) throws Exception;
 
 	// 상세 페이지에 좋아요가 잇는지 없는지 조회 메서
 	boolean hasUserLiked(int userId, int boardNo) throws Exception;
@@ -54,6 +55,9 @@ public interface ReviewBoardService {
 	List<String> getCompanyList() throws Exception;
 
 	TenToFivePageVO<ReviewBoardWithReplyVO> getMyReview(RPageRequestDTO dto) throws Exception;
+
+
+
 
 
 	

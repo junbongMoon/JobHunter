@@ -224,24 +224,23 @@
 	padding: 0 20px;
 }
 
-  .report-modal-body select,
-  .report-modal-body textarea {
-    font-size: 15px;
-    padding: 10px;
-    width: 100%;
-    border-radius: 6px;
-  }
+.report-modal-body select, .report-modal-body textarea {
+	font-size: 15px;
+	padding: 10px;
+	width: 100%;
+	border-radius: 6px;
+}
 
-  .report-modal-body textarea {
-    width:200px;
-    resize: none;
-    height: 300px;
-  }
+.report-modal-body textarea {
+	width: 200px;
+	resize: none;
+	height: 300px;
+}
 
-  .report-modal-body h2 {
-    font-size: 22px;
-    margin-bottom: 12px;
-  }
+.report-modal-body h2 {
+	font-size: 22px;
+	margin-bottom: 12px;
+}
 </style>
 
 
@@ -353,29 +352,29 @@
 
 		<!-- 좋아요 버튼 -->
 
-		<button id="likeBtn" class="btn btn-outline-primary btn-common-shape">👍
-			좋아요</button>
-		<button id="unlikeBtn" class="btn btn-outline-danger btn-common-shape"
-			style="display: none;">❌ 취소</button>
-
-
-		<!-- 수정 버튼 -->
-		<c:if test="${sessionScope.account.uid eq detail.writerUid}">
-			<!-- 수정 버튼 -->
-			<a
-				href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
-				class="btn-getstarted btn-sm btn-common-shape">✏️ 수정</a>
-
-			<!-- 삭제 버튼 -->
-			<form action="${pageContext.request.contextPath}/reviewBoard/delete"
-				method="post" style="display: inline;">
-				<input type="hidden" name="boardNo" value="${detail.boardNo}" />
-				<button type="button"
-					class="btn-getstarted btn-sm delete-btn btn-common-shape"
-					data-boardno="${detail.boardNo}">🗑 삭제</button>
-
-			</form>
+		<c:if test="${!isCompanyAccount}">
+			<button id="likeBtn" class="btn btn-outline-primary btn-common-shape">👍
+				좋아요</button>
+			<button id="unlikeBtn"
+				class="btn btn-outline-danger btn-common-shape"
+				style="display: none;">❌ 취소</button>
 		</c:if>
+
+		<c:if test="${not empty sessionScope.account 
+		    and sessionScope.account.accountType ne 'COMPANY'
+		    and sessionScope.account.uid eq detail.writerUid}">
+		    <!-- 수정 버튼 -->
+				    <a href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
+				       class="btn-getstarted btn-sm btn-common-shape">✏️ 수정</a>
+				
+				    <!-- 삭제 버튼 -->
+				    <form action="${pageContext.request.contextPath}/reviewBoard/delete" method="post" style="display: inline;">
+				        <input type="hidden" name="boardNo" value="${detail.boardNo}" />
+				        <button type="button" class="btn-getstarted btn-sm delete-btn btn-common-shape" data-boardno="${detail.boardNo}">
+				            🗑 삭제
+				        </button>
+				    </form>
+				</c:if>
 
 		<!-- 목록으로 -->
 		<a
@@ -393,6 +392,7 @@
 
 	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
 	<input type="hidden" id="isLiked" value="${isLiked}" />
+	<input type="hidden" id="isCompanyAccount" value="${isCompanyAccount}" />
 
 	<div id="replySection">
 		<!-- 댓글 목록 출력 영역 -->
@@ -426,9 +426,7 @@
 			</div>
 		</div>
 	</div>
-
-
-	
+<div>isCompanyAccount: ${isCompanyAccount}</div>
 	<input type="hidden" id="loginUserUid"
 		value="${sessionScope.account.uid}">
 	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
@@ -436,118 +434,126 @@
 	<input type="hidden" id="loginUserId" value="${loginUser.userId}" />
 </body>
 <script>
-const likeModalElement = document.getElementById('likeModal');
-const likeModal = new bootstrap.Modal(likeModalElement);
-	$(document).ready(function() {
-		const isLiked = $('#isLiked').val() === 'true';
+function showModal(title, message, callback) {
+    $('#resultModalTitle').text(title);
+    $('#resultModalMessage').text(message);
+    $('#resultModal').modal('show');
 
-		if (isLiked) {
-			$('#likeBtn').hide();
-			$('#unlikeBtn').show();
-		} else {
-			$('#likeBtn').show();
-			$('#unlikeBtn').hide();
-		}
-	});
-	
-	// 좋아요 등록
-	$('#likeBtn').click(function() {
-		let currentLikes = parseInt($('#likeCountNum').text()) || 0;
-		$('#likeCountNum').text(currentLikes + 1);
-		$('#likeBtn').hide();
-		$('#unlikeBtn').show();
+    if (callback) {
+        $('#resultModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+            callback();
+        });
+    }
+}
 
-		$('#likeModalMessage').text("좋아요가 등록되었습니다!");
-		$('#likeModal').modal('show');
-		
-		const userId = parseInt($('#userId').val());  // 반드시 숫자!
-		const boardNo = parseInt($('#boardNo').val());
-		$.ajax({
-			url : '/reviewBoard/like',
-			type : 'POST',
-			contentType : 'application/json',
-			data : JSON.stringify({
-				userId : userId,
-				boardNo : boardNo
-			}),
-			error : function() {
-				$('#likeCountNum').text(currentLikes);
-				$('#likeBtn').show();
-				$('#unlikeBtn').hide();
-				$('#likeModalMessage').text("좋아요 등록 중 오류가 발생했습니다.");
-				likeModal.show();
-			}
-		});
-	});
-
-	// 좋아요 취소
-	$('#unlikeBtn').click(function() {
-		let currentLikes = parseInt($('#likeCountNum').text()) || 0;
-		$('#likeCountNum').text(currentLikes - 1);
-		$('#unlikeBtn').hide();
-		$('#likeBtn').show();
-
-		$('#likeModalMessage').text("좋아요가 취소되었습니다.");
-		likeModal.show();
-		const userId = parseInt($('#userId').val());  // 반드시 숫자!
-		const boardNo = parseInt($('#boardNo').val());
-		$.ajax({
-			url : '/reviewBoard/unlike',
-			type : 'POST',
-			contentType : 'application/json',
-			data : JSON.stringify({
-				userId : userId,
-				boardNo : boardNo
-			}),
-				success: function (res) {
-				    console.log("✅ 좋아요 성공", res);
-				  },
-			
-			error : function() {
-				$('#likeCountNum').text(currentLikes);
-				$('#unlikeBtn').show();
-				$('#likeBtn').hide();
-				$('#likeModalMessage').text("좋아요 취소 중 오류가 발생했습니다.");
-				likeModal.show();
-			}
-		});
-	});
-		
-	
-	//게시물삭제 
-	$(document).ready(function () {
-  		$(".delete-btn").click(function () {
-    		let boardNo = $(this).data("boardno");
-
-			    if (confirm("정말 삭제하시겠습니까?")) {
-			      $.ajax({
-			        url: "${pageContext.request.contextPath}/reviewBoard/delete",
-			        type: "POST",
-			        data: {
-			          boardNo: boardNo
-			        },
-			        success: function (res) {
-			          alert(res.message);
-			          if (res.success) {
-			            window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
-			          }
-			        },
-			        error: function (xhr, status, error) {
-			          console.error("삭제 실패:", error);
-			          alert("삭제 중 오류가 발생했습니다.");
-			        }
-			      });
-			    }
-			  });
-			});
-	
-	//신고 js
-		
 		$(document).ready(function () {
+      
+      $(".delete-btn").click(function () {
+        let boardNo = $(this).data("boardno");
+
+        if (confirm("정말 삭제하시겠습니까?")) {
+            $.ajax({
+                url: "${pageContext.request.contextPath}/reviewBoard/delete",
+                type: "POST",
+                contentType: "application/charset=UTF-8",
+                data: { boardNo: boardNo },
+                success: function (res) {
+                    if (res.success) {
+                        showModal("삭제 완료", res.message, function () {
+                            window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
+                        });
+                    } else {
+                        showModal("삭제 실패", res.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.error("삭제 실패:", xhr.responseText);
+                    showModal("❌ 서버 오류", "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+                }
+            });
+        }
+    });
+      
+	 const likeModalElement = document.getElementById('likeModal');
+	 const likeModal = new bootstrap.Modal(likeModalElement);
+      
+	const isCompanyAccount = $('#isCompanyAccount').val() === 'true'; // 회사 계정 여부
+    const isLiked = $('#isLiked').val() === 'true'; // 좋아요 여부
+      
+      // 회사 계정이면 버튼을 숨기거나 비활성화
+    if (isCompanyAccount) {
+        $('#likeBtn').hide();
+        $('#unlikeBtn').hide();
+        return; // 회사 계정이면 이후 코드 실행 안 함
+    }
+
+    // 회사 계정이 아니면 좋아요 상태에 따라 버튼 토글
+    if (isLiked) {
+        $('#likeBtn').hide();
+        $('#unlikeBtn').show();
+    } else {
+        $('#likeBtn').show();
+        $('#unlikeBtn').hide();
+    }
+
+    // 좋아요 등록
+    $('#likeBtn').click(function() {
+        let currentLikes = parseInt($('#likeCountNum').text()) || 0;
+        $('#likeCountNum').text(currentLikes + 1);
+        $('#likeBtn').hide();
+        $('#unlikeBtn').show();
+
+        $('#likeModalMessage').text('좋아요가 추가되었습니다!');
+        likeModal.show();
+
+        $.ajax({
+            url: '/reviewBoard/like',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                boardNo: parseInt(boardNo)
+            }),
+            error: function() {
+                $('#likeCountNum').text(currentLikes);
+                $('#likeBtn').show();
+                $('#unlikeBtn').hide();
+                $('#likeModalMessage').text("좋아요 등록 중 오류가 발생했습니다.");
+                likeModal.show();
+            }
+        });
+    });
+
+    // 좋아요 취소
+    $('#unlikeBtn').click(function() {
+        let currentLikes = parseInt($('#likeCountNum').text()) || 0;
+        $('#likeCountNum').text(currentLikes - 1);
+        $('#unlikeBtn').hide();
+        $('#likeBtn').show();
+
+        $('#likeModalMessage').text('좋아요가 취소되었습니다.');
+        likeModal.show();
+
+        $.ajax({
+            url: '/reviewBoard/unlike',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                boardNo: parseInt(boardNo)
+            }),
+            error: function() {
+                $('#likeCountNum').text(currentLikes);
+                $('#unlikeBtn').show();
+                $('#likeBtn').hide();
+                $('#likeModalMessage').text("좋아요 취소 중 오류가 발생했습니다.");
+                likeModal.show();
+            }
+        });
+    });
+		
 		  const loginUserUid = parseInt($('#loginUserUid').val());    // 로그인한 사용자 UID
 		  const writerId = parseInt($('#postWriterUid').val());       // 게시글 작성자 UID
 		  const boardNo = parseInt($('#boardNo').val());
-		
+      
 		  // 고유 키 생성: 신고자_uid_피신고자_uid_게시글번호
 		  const reportKey = `report_${loginUserUid}_${writerId}_${boardNo}`;
 		
