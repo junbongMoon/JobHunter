@@ -444,5 +444,11 @@
         SET status = #{status}
         WHERE resumeNo = #{resumeNo}
     </update>
+
+    <!-- 첨삭 코멘트 저장 -->
+    <insert id="insertAdviceComment" parameterType="com.jobhunter.model.resume.ResumeAdviceCommentDTO">
+        INSERT INTO resume_advice_comment (adviceNo, commentText, mentorUid, resumeNo, lineNo)
+        VALUES (#{adviceNo}, #{commentText}, #{mentorUid}, #{resumeNo}, #{lineNo})
+    </insert>
     
 </mapper>

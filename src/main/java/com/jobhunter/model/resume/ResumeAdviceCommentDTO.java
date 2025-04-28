@@ -1,8 +1,5 @@
 package com.jobhunter.model.resume;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,13 +13,11 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResumeAdviceDTO {
-    private int adviceNo;
+public class ResumeAdviceCommentDTO {
+    private int commentNo;
     private int resumeNo;
-    private String adviceContent;
-    private LocalDateTime regDate;
-    private List<ResumeAdviceUpfileDTO> files;
+    private int lineNo;
+    private String commentText;
     private int mentorUid;
-    private List<ResumeAdviceCommentDTO> comments;
-    private int ownerUid;
+    private int adviceNo;
 } 

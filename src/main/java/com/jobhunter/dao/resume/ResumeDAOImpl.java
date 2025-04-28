@@ -27,6 +27,7 @@ import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 import com.jobhunter.model.user.UserVO;
+import com.jobhunter.model.resume.ResumeAdviceCommentDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -399,5 +400,10 @@ public class ResumeDAOImpl implements ResumeDAO {
 		params.put("resumeNo", resumeNo);
 		params.put("status", status);
 		return ses.update(NS + ".updateAdviceStatus", params);
+	}
+
+	@Override
+	public int insertAdviceComment(ResumeAdviceCommentDTO commentDTO) throws Exception {
+		return ses.insert(NS + ".insertAdviceComment", commentDTO);
 	}
 }

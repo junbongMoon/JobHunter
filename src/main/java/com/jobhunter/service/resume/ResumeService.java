@@ -13,6 +13,7 @@ import com.jobhunter.model.resume.ResumeDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.resume.ResumeVO;
+import com.jobhunter.model.resume.ResumeAdviceCommentDTO;
 import com.jobhunter.model.resume.SigunguDTO;
 import com.jobhunter.model.resume.SigunguVO;
 import com.jobhunter.model.resume.SubCategoryDTO;
@@ -136,4 +137,17 @@ public interface ResumeService {
 	 */
 	boolean endAdvice(int resumeNo, int userUid, int ownerUid) throws Exception;
 
+
+	// /**
+	//  *  @author 유지원
+	//  *
+	//  * <p>
+	//  * 이력서 첨삭 코멘트를 저장하는 메서드
+	//  * </p>
+	//  * 
+	//  * @param ResumeAdviceCommentDTO commentDTO 코멘트 정보
+	//  * @return 성공 여부
+	//  */
+	// boolean saveResumeComment(ResumeAdviceCommentDTO commentDTO) throws Exception;
+	
 }

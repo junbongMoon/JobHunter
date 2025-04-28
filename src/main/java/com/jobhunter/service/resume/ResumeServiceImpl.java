@@ -33,6 +33,7 @@ import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.model.util.TenToFivePageVO;
+import com.jobhunter.model.resume.ResumeAdviceCommentDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -281,6 +282,14 @@ public class ResumeServiceImpl implements ResumeService {
 		// 첨삭 내용 저장
 		rdao.insertAdvice(adviceDTO);
 
+		if (adviceDTO.getComments() != null && !adviceDTO.getComments().isEmpty()) {
+			// 첨삭 코멘트 저장
+			for (ResumeAdviceCommentDTO commentDTO : adviceDTO.getComments()) {
+				commentDTO.setAdviceNo(adviceDTO.getAdviceNo());
+				rdao.insertAdviceComment(commentDTO);
+			}
+		}
+
 		// 첨부파일 정보가 있는 경우 저장
 		if (adviceDTO.getFiles() != null && !adviceDTO.getFiles().isEmpty()) {
 			for (com.jobhunter.model.resume.ResumeAdviceUpfileDTO fileDTO : adviceDTO.getFiles()) {
@@ -445,10 +454,10 @@ public class ResumeServiceImpl implements ResumeService {
 			if (adviceStatusResult > 0) {
 				// 첨삭 종료한 rgAdviceNo 가져오기
 				int rgAdviceNo = rdao.getRegistrationAdviceNo(userUid, resumeNo);
-			// 포인트 로그에 포인트 차감 내역이 COMPLETE로 업데이트 됩니다.
-			int pointResult = pointDAO.updatePointLog(rgAdviceNo, "COMPLETE", "end");
-			if (pointResult > 0) {
-				// 첨삭을 완료한 유저의 포인트를 증가시킵니다.
+				// 포인트 로그에 포인트 차감 내역이 COMPLETE로 업데이트 됩니다.
+				int pointResult = pointDAO.updatePointLog(rgAdviceNo, "COMPLETE", "end");
+				if (pointResult > 0) {
+					// 첨삭을 완료한 유저의 포인트를 증가시킵니다.
 					userDAO.updateUserPoint(userUid, 1000);
 					return true;
 				}
@@ -456,5 +465,21 @@ public class ResumeServiceImpl implements ResumeService {
 		}
 		return false;
 	}
+	
+
+	// /**
+	//  *  @author 유지원
+	//  *
+	//  * <p>
+	//  * 이력서 첨삭 코멘트를 저장하는 메서드
+	//  * </p>
+	//  * 
+	//  * @param ResumeAdviceCommentDTO commentDTO 코멘트 정보
+	//  * @return 성공 여부
+	//  */
+	// @Override
+	// public boolean saveResumeComment(ResumeAdviceCommentDTO commentDTO) throws Exception {
+	// 	return rdao.insertResumeComment(commentDTO);
+	// }
 
 }
