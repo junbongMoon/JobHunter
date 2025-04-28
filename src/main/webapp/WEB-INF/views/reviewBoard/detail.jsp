@@ -222,24 +222,23 @@
 	padding: 0 20px;
 }
 
-  .report-modal-body select,
-  .report-modal-body textarea {
-    font-size: 15px;
-    padding: 10px;
-    width: 100%;
-    border-radius: 6px;
-  }
+.report-modal-body select, .report-modal-body textarea {
+	font-size: 15px;
+	padding: 10px;
+	width: 100%;
+	border-radius: 6px;
+}
 
-  .report-modal-body textarea {
-    width:200px;
-    resize: none;
-    height: 300px;
-  }
+.report-modal-body textarea {
+	width: 200px;
+	resize: none;
+	height: 300px;
+}
 
-  .report-modal-body h2 {
-    font-size: 22px;
-    margin-bottom: 12px;
-  }
+.report-modal-body h2 {
+	font-size: 22px;
+	margin-bottom: 12px;
+}
 </style>
 
 
@@ -351,14 +350,16 @@
 
 		<!-- 좋아요 버튼 -->
 
-		<button id="likeBtn" class="btn btn-outline-primary btn-common-shape">👍
-			좋아요</button>
-		<button id="unlikeBtn" class="btn btn-outline-danger btn-common-shape"
-			style="display: none;">❌ 취소</button>
+		<c:if test="${!isCompanyAccount}">
+			<button id="likeBtn" class="btn btn-outline-primary btn-common-shape">👍
+				좋아요</button>
+			<button id="unlikeBtn"
+				class="btn btn-outline-danger btn-common-shape"
+				style="display: none;">❌ 취소</button>
+		</c:if>
 
-
-		<!-- 수정 버튼 -->
-		<c:if test="${sessionScope.account.uid eq detail.writerUid}">
+		<!-- 수정/삭제 버튼은 작성자 본인일 때만 노출 -->
+		<c:if test="${not empty sessionScope.account and sessionScope.account.uid eq detail.writerUid}">
 			<!-- 수정 버튼 -->
 			<a
 				href="${pageContext.request.contextPath}/reviewBoard/modify?boardNo=${detail.boardNo}"
@@ -371,7 +372,6 @@
 				<button type="button"
 					class="btn-getstarted btn-sm delete-btn btn-common-shape"
 					data-boardno="${detail.boardNo}">🗑 삭제</button>
-
 			</form>
 		</c:if>
 
@@ -391,6 +391,7 @@
 
 	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
 	<input type="hidden" id="isLiked" value="${isLiked}" />
+	<input type="hidden" id="isCompanyAccount" value="${isCompanyAccount}" />
 
 	<div id="replySection">
 		<!-- 댓글 목록 출력 영역 -->
@@ -424,48 +425,7 @@
 			</div>
 		</div>
 	</div>
-
-	<!-- 신고 버튼 모달  -->
-	<%-- <div class="modal fade" id="reportModal" tabindex="-1"
-		aria-labelledby="reportModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-
-				<div class="modal-header">
-					<h5 class="modal-title" id="reportModalLabel">신고하기</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="닫기"></button>
-				</div>
-
-				<div class="modal-body">
-
-					<input type="hidden" id="loginUserUid" value="${loginUser.uid}">
-
-					<label for="reportCategory" class="form-label">신고 사유</label> <select
-						name="reportCategory" id="reportCategory" class="form-select"
-						required>
-						<option value="" disabled selected>-- 신고 사유 선택 --</option>
-						<option value="SPAM">스팸/광고성 메시지</option>
-						<option value="HARASSMENT">욕설/괴롭힘</option>
-						<option value="FALSE_INFO">허위 정보</option>
-						<option value="ILLEGAL_ACTIVITY">불법 행위</option>
-						<option value="INAPPROPRIATE_CONTENT">부적절한 프로필/사진</option>
-						<option value="MISCONDUCT">부적절한 행동/요구</option>
-						<option value="ETC">기타 사유</option>
-					</select> <label for="reportMessage" class="form-label mt-3">신고 내용</label>
-					<textarea class="form-control" id="reportMessage" rows="4"
-						placeholder="자세한 내용을 입력해주세요"></textarea>
-				</div>
-
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary"
-						data-bs-dismiss="modal">닫기</button>
-					<button type="button" id="submitReportBtn" class="btn btn-danger">제출</button>
-				</div> --%>
-
-	<!-- 		</div>
-		</div>
-	</div> -->
+<div>isCompanyAccount: ${isCompanyAccount}</div>
 	<input type="hidden" id="loginUserUid"
 		value="${sessionScope.account.uid}">
 	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
@@ -473,75 +433,88 @@
 	<input type="hidden" id="loginUserId" value="${loginUser.userId}" />
 </body>
 <script>
+				//likeModal 변수 초기화
+$(document).ready(function() {
+	 const likeModalElement = document.getElementById('likeModal');
+	 const likeModal = new bootstrap.Modal(likeModalElement);
+	
+	
+	const isCompanyAccount = $('#isCompanyAccount').val() === 'true'; // 회사 계정 여부
+    const isLiked = $('#isLiked').val() === 'true'; // 좋아요 여부
 
-	$(document).ready(function() {
-		const isLiked = $('#isLiked').val() === 'true';
+    // 회사 계정이면 버튼을 숨기거나 비활성화
+    if (isCompanyAccount) {
+        $('#likeBtn').hide();
+        $('#unlikeBtn').hide();
+        return; // 회사 계정이면 이후 코드 실행 안 함
+    }
 
-		if (isLiked) {
-			$('#likeBtn').hide();
-			$('#unlikeBtn').show();
-		} else {
-			$('#likeBtn').show();
-			$('#unlikeBtn').hide();
-		}
-	});
+    // 회사 계정이 아니면 좋아요 상태에 따라 버튼 토글
+    if (isLiked) {
+        $('#likeBtn').hide();
+        $('#unlikeBtn').show();
+    } else {
+        $('#likeBtn').show();
+        $('#unlikeBtn').hide();
+    }
 
-	// 좋아요 등록
-	$('#likeBtn').click(function() {
-		let currentLikes = parseInt($('#likeCountNum').text()) || 0;
-		$('#likeCountNum').text(currentLikes + 1);
-		$('#likeBtn').hide();
-		$('#unlikeBtn').show();
+    // 좋아요 등록
+    $('#likeBtn').click(function() {
+        let currentLikes = parseInt($('#likeCountNum').text()) || 0;
+        $('#likeCountNum').text(currentLikes + 1);
+        $('#likeBtn').hide();
+        $('#unlikeBtn').show();
 
-		$('#likeModalMessage').text("좋아요가 등록되었습니다!");
-		likeModal.show();
+        $('#likeModalMessage').text('좋아요가 추가되었습니다!');
+        likeModal.show();
 
-		$.ajax({
-			url : '/reviewBoard/like',
-			type : 'POST',
-			contentType : 'application/json',
-			data : JSON.stringify({
-				userId : userId,
-				boardNo : boardNo
-			}),
-			error : function() {
-				$('#likeCountNum').text(currentLikes);
-				$('#likeBtn').show();
-				$('#unlikeBtn').hide();
-				$('#likeModalMessage').text("좋아요 등록 중 오류가 발생했습니다.");
-				likeModal.show();
-			}
-		});
-	});
+        $.ajax({
+            url: '/reviewBoard/like',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                boardNo: parseInt(boardNo)
+            }),
+            error: function() {
+                $('#likeCountNum').text(currentLikes);
+                $('#likeBtn').show();
+                $('#unlikeBtn').hide();
+                $('#likeModalMessage').text("좋아요 등록 중 오류가 발생했습니다.");
+                likeModal.show();
+            }
+        });
+    });
 
-	// 좋아요 취소
-	$('#unlikeBtn').click(function() {
-		let currentLikes = parseInt($('#likeCountNum').text()) || 0;
-		$('#likeCountNum').text(currentLikes - 1);
-		$('#unlikeBtn').hide();
-		$('#likeBtn').show();
+    // 좋아요 취소
+    $('#unlikeBtn').click(function() {
+        let currentLikes = parseInt($('#likeCountNum').text()) || 0;
+        $('#likeCountNum').text(currentLikes - 1);
+        $('#unlikeBtn').hide();
+        $('#likeBtn').show();
 
-		$('#likeModalMessage').text("좋아요가 취소되었습니다.");
-		likeModal.show();
+        $('#likeModalMessage').text('좋아요가 취소되었습니다.');
+        likeModal.show();
 
-		$.ajax({
-			url : '/reviewBoard/unlike',
-			type : 'POST',
-			contentType : 'application/json',
-			data : JSON.stringify({
-				userId : userId,
-				boardNo : boardNo
-			}),
-			error : function() {
-				$('#likeCountNum').text(currentLikes);
-				$('#unlikeBtn').show();
-				$('#likeBtn').hide();
-				$('#likeModalMessage').text("좋아요 취소 중 오류가 발생했습니다.");
-				likeModal.show();
-			}
-		});
-	});
-		
+        $.ajax({
+            url: '/reviewBoard/unlike',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                boardNo: parseInt(boardNo)
+            }),
+            error: function() {
+                $('#likeCountNum').text(currentLikes);
+                $('#unlikeBtn').show();
+                $('#likeBtn').hide();
+                $('#likeModalMessage').text("좋아요 취소 중 오류가 발생했습니다.");
+                likeModal.show();
+            }
+        });
+    });
+});
+
+
+
 	
 	//게시물삭제 
 	$(document).ready(function () {
