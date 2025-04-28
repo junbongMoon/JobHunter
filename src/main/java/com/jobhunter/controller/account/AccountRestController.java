@@ -109,7 +109,20 @@ public class AccountRestController {
 
 	// =======================여기까지 권한체커===========================
 
-	// 인증 성공하고 계정 잠금 해제해주는 api
+	/**
+	 * 계정 잠금 해제 API
+	 * <p>
+	 * 로그인 n회 실패시 잠긴 계정을 연락처 인증 이후 잠금해제시켜주는 API
+	 * </p>
+	 * 
+	 * @param dto
+	 * @param session
+	 * @return
+	 * 
+	 * <ul>
+	 * 		<li>반환할 데이터 설멍</li>
+	 * </ul>
+	 */
 	@PostMapping(value = "/auth", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> verify(@RequestBody VerificationRequestDTO dto, HttpSession session) {
 
@@ -143,7 +156,6 @@ public class AccountRestController {
 			try {
 				// 중복이면 true반환
 				Boolean dupleEmail =accountService.checkDuplicateContact(email, accountType, "email");
-				System.out.println("dupleEmail : "+ dupleEmail);
 				if (dupleEmail) {
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미 가입된 이메일입니다.");
 				}
@@ -168,7 +180,7 @@ public class AccountRestController {
 
 			return ResponseEntity.ok("인증 메일을 전송했습니다. (유효시간 5분)");
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("메일 전송 실패: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일의 전송에 실패했습니다. 잠시후 다시 시도해주세요.");
 		}
 	}
 
@@ -196,6 +208,9 @@ public class AccountRestController {
 		}
 
 		// 인증 성공
+		
+		// 세션에 "이 사람은 이메일 인증 완료" 플래그 저장
+		session.setAttribute("verifiedEmail", email);
 
 		// 세션에 사용자한테도 인증성공했다고 넣어주기
 		AccountVO account = (AccountVO) session.getAttribute("account");
@@ -207,6 +222,20 @@ public class AccountRestController {
 		// 세션 청소
 		session.removeAttribute("emailCode:" + email);
 		return ResponseEntity.ok("인증 성공!");
+	}
+	
+	// 전화번호 인증 확인(인증 성공한 전화번호 세션에 저장)
+	@PostMapping(value = "/auth/mobile/verify", produces = "text/plain;charset=UTF-8")
+	public ResponseEntity<?> verifyMobile(@RequestBody Map<String, String> body, HttpSession session) {
+	    String mobile = body.get("confirmMobile");
+	    if (mobile == null || mobile.isEmpty()) {
+	        return ResponseEntity.badRequest().body("전화번호가 없습니다.");
+	    }
+
+	    // 세션에 "이 사람은 전화번호 인증 완료" 플래그 저장
+	    session.setAttribute("verifiedMobile", mobile);
+
+	    return ResponseEntity.ok("전화번호 인증 저장 완료");
 	}
 
 	// 전화번호 중복 확인

@@ -161,11 +161,7 @@
 </main>
 
 <script>
-$(()=>{
-  getInfo();
-  getMyRecruit();
-})
-
+// #region 본인 작성 글 리스트들 출력
 function recruitSearchModal() {
 	const text = `
 	<div id="recruitSearchBox">
@@ -461,10 +457,6 @@ function renderResumePagination(uid, onlyUnread, res) {
 	  container.html(html);
 	}
 
-
-
-
-
   function renderPagination(res) {
   const { pageList, currentPage, hasPrevBlock, hasNextBlock, startPage, endPage } = res;
   const container = $('#recruitSection');
@@ -495,9 +487,7 @@ function renderResumePagination(uid, onlyUnread, res) {
   html += '</div>';
   container.append(html);
 }
-
-
-
+// #endregion
 
 // #region 전역 변수 및 초기화
 const uid = "${sessionScope.account.uid}"
@@ -607,31 +597,7 @@ function formatNumber(e) {
 }
 // #endregion
 
-// #region 정보 서버에있는걸로 갱신
-function getInfo() {
-  $.ajax({
-      url: "/company/info/${sessionScope.account.uid}",
-      method: "GET",
-      success: (result) => {
-        sessionMobile = result.mobile;
-  		  sessionEmail = result.email;
-        updateDeleteAccountInfo(result.deleteDeadline, result.blockDeadline)
-        resetUserModifyForm();
-        updateBasicInfo(result);
-        updateCompanyDetailInfo(result);
-        updateCompanyModifyInfo(result);
-        
-      },
-      error: (xhr) => {
-        if (xhr.status == 404) {
-        	window.publicModals.show("장시간 대기로 로그인이 해제되었습니다.<br>새로고침 후 다시 시도해주세요.",{size_x:"350px"})
-        }
-        window.publicModals.show("서버와의 연결이 불안정하여<br>정보 로딩에 실패하였습니다.<br>잠시 후 다시 시도해주세요.")
-      }
-  });
-}
-
-// #region 계정삭제 관련 (백엔드 미구현)
+// #region 계정삭제 관련
 function updateDeleteAccountInfo(deleteDeadline, blockDeadline) {
   if (deleteDeadline) {
     $('#accountDeleteDateTitle').text('삭제 대기중...')
@@ -650,12 +616,49 @@ function updateDeleteAccountInfo(deleteDeadline, blockDeadline) {
   }
 }
 
+// 계정 삭제 신청 전 본인인증(기존 비밀번호)
 function deleteAccount() {
-	  window.publicModals.show("<div>정말로 삭제하시겠습니까?</div>", {
-      cancelText : '취소',
-      onConfirm : checkedDeleteAccount
-    })
+  window.publicModals.show(`<input type="password" id="nowPassword" placeholder="현재 비밀번호를 입력하세요" style="min-width: 300px;">`, {
+    onConfirm: checkPasswordToDeleteAccount,
+    cancelText: "취소",
+    size_x: "350px",
+  })
+}
+
+function checkPasswordToDeleteAccount() {
+  const failedDTO = {
+      onConfirm: deleteAccount,
+      cancelText: "취소"
+    }
+
+  const nowPassword = document.getElementById('nowPassword').value
+
+  if (!nowPassword) {
+    window.publicModals.show('현재 비밀번호를 입력해주세요.', failedDTO);
+    return false; // 공용모달 안닫음
   }
+
+  $.ajax({
+    url: "/company/password",
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({ uid, password: nowPassword }),
+    success: (result) => {
+      if (result === true) {
+        window.publicModals.show("<div>정말로 삭제하시겠습니까?</div><div style='font-size:0.7em; color:var(--bs-gray-600)'>계정은 3일 뒤 삭제됩니다.</div>", {
+          cancelText : '취소',
+          onConfirm : checkedDeleteAccount
+        })
+      } else {
+        window.publicModals.show("비밀번호가 틀렸습니다.", failedDTO);
+      }
+    },
+    error: (xhr) => {
+      window.publicModals.show("비밀번호 확인 중 오류 발생", failedDTO);
+    }
+  });
+  return false;
+}
 
   function checkedDeleteAccount() {
     $.ajax({
@@ -690,6 +693,30 @@ function deleteAccount() {
     });
   }
 // #endregion
+
+// #region 정보 서버에있는걸로 갱신
+function getInfo() {
+  $.ajax({
+      url: "/company/info/${sessionScope.account.uid}",
+      method: "GET",
+      success: (result) => {
+        sessionMobile = result.mobile;
+  		  sessionEmail = result.email;
+        updateDeleteAccountInfo(result.deleteDeadline, result.blockDeadline)
+        resetUserModifyForm();
+        updateBasicInfo(result);
+        updateCompanyDetailInfo(result);
+        updateCompanyModifyInfo(result);
+        
+      },
+      error: (xhr) => {
+        if (xhr.status == 404) {
+        	window.publicModals.show("장시간 대기로 로그인이 해제되었습니다.<br>새로고침 후 다시 시도해주세요.",{size_x:"350px"})
+        }
+        window.publicModals.show("서버와의 연결이 불안정하여<br>정보 로딩에 실패하였습니다.<br>잠시 후 다시 시도해주세요.")
+      }
+  });
+}
 
 // 기본정보 로딩
 function updateBasicInfo(companyInfo) {
@@ -776,6 +803,11 @@ function updateCompanyModifyInfo(result) {
 }
 
 // #endregion 정보 서버에있는걸로 갱신
+
+$(()=>{
+  getInfo();
+  getMyRecruit();
+})
 
 // #region 상세정보 수정 관련
 // 상세정보 수정 창 열기

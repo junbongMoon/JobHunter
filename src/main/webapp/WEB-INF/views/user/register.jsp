@@ -688,17 +688,29 @@ function sendEmailCode() {
     		});
         },
         error: (xhr) => {
-			$("#emailInfoMark").text(`이메일의 전송에 실패했습니다. 잠시후 다시 시도해주세요.`).removeClass().addClass("info-warning");
+			$("#emailInfoMark").text(xhr.responseText).removeClass().addClass("info-warning");
 			$('#sendEmailBtn').prop('disabled', false);
-			console.log("메일 전송 중 오류 발생: " + xhr.responseText)
 		}
     });
 }
 
 function okMobile() {
 	const mobile = $("#authMobile").val()
-	$("#mobile").val(mobile)
-	$("#mobileInfoMark").text(`인증에 성공하였습니다. (현재 전화번호 : \${mobile})`).removeClass().addClass("info-ok");
+	$.ajax({
+      type: 'POST',
+      url: '/account/auth/mobile/verify',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        confirmMobile: mobile
+      }),
+      success: function(res) {
+        $("#mobile").val(mobile)
+		$("#mobileInfoMark").text(`인증에 성공하였습니다. (현재 전화번호 : \${mobile})`).removeClass().addClass("info-ok");
+      },
+      error: function(err) {
+        $("#mobileInfoMark").text(`서버가 불안정합니다. 잠시 후 다시 시도해 주세요.`).removeClass().addClass("info-warning");
+      }
+    });
 }
 
 async function verifyPhoneCode() {
@@ -718,7 +730,6 @@ async function verifyPhoneCode() {
       await confirmationResult.confirm(code);
       okMobile();
     } catch (error) {
-      console.error("코드 인증 실패:", error);
       window.publicModals.show("잘못된 인증 코드입니다.");
     }
 }
