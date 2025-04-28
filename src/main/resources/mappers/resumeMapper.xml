@@ -289,6 +289,15 @@
 		VALUES (#{resumeNo}, #{adviceContent}, #{mentorUid})
 	</insert>
 
+    <!-- 첨삭 번호 업데이트 -->
+    <update id="updateAdviceNo" parameterType="map">
+        UPDATE registration_advice
+        SET adviceNo = #{adviceNo}
+        WHERE resumeNo = #{resumeNo}
+        AND mentorUid = #{mentorUid}
+        AND status = 'CHECKING'
+    </update>
+
 	<!-- 기존 첨삭 내용 삭제 -->
 	<delete id="deleteExistingAdvice" parameterType="map">
 		DELETE FROM resume_advice 
@@ -302,23 +311,10 @@
 	</insert> 
 
     <!-- 첨삭 내용 조회 -->
-    <select id="getAdvice" parameterType="int" resultType="com.jobhunter.model.resume.ResumeAdviceDTO">
-        SELECT 
-            adviceNo,
-            resumeNo,
-            adviceContent,
-            regDate,
-            mentorUid
+    <select id="getAdvice" parameterType="map" resultType="com.jobhunter.model.resume.ResumeAdviceDTO">
+        SELECT *
         FROM resume_advice
-        WHERE resumeNo = #{resumeNo} 
-        <if test="mode != 'sameUser'">
-        AND status = 'CHECKING'
-        </if>
-        <if test="mode == 'sameUser'">
-        AND status = 'COMPLETE'
-        </if>
-        ORDER BY regDate DESC
-        LIMIT 1
+        WHERE adviceNo = #{adviceNo}
     </select>
 
     <!-- 첨삭 파일 조회 -->
@@ -387,6 +383,7 @@
 	    ra.status,
 	    ra.mentorUid,
 	    ra.resumeNo,
+	    ra.adviceNo,
 	    r.title AS title,
 	    mentee.uid AS menteeUid
 	  FROM registration_advice ra

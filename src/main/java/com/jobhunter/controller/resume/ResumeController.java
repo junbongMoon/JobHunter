@@ -506,7 +506,7 @@ public class ResumeController {
 	
 //	테스트용 메서드 입니다. -- 이력서 첨삭 기능 개선 중....
 	@GetMapping({"/edit/{resumeNo}", "/advice/{resumeNo}", "/checkAdvice/{resumeNo}"})
-	public String editResumeForm(@PathVariable int resumeNo, @RequestParam int uid, Model model, HttpSession session,
+	public String editResumeForm(@PathVariable int resumeNo, @RequestParam int uid, @RequestParam(required = false) String adviceNo, Model model, HttpSession session,
 			HttpServletRequest request) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		int userUid = account.getUid();
@@ -560,12 +560,15 @@ public class ResumeController {
 			model.addAttribute("user", user);
 
 			String uri = request.getRequestURI();
-			if (uri.contains("advice")) {
-				model.addAttribute("mode", "advice");
+
+			if (adviceNo == null || "undefined".equals(adviceNo)) {
+				model.addAttribute("mode", "checkAdvice");
+				model.addAttribute("debug", "디버깅용");
 
 			} else if (uri.contains("checkAdvice")) {
 				// 첨삭 내용 조회
-				ResumeAdviceDTO advice = resumeService.getAdvice(resumeNo, userUid, user.getUid());
+				ResumeAdviceDTO advice = resumeService.getAdvice(resumeNo, Integer.parseInt(adviceNo));
+				model.addAttribute("debug2", "디버깅용2");
 				if (advice != null) {
 					model.addAttribute("advice", advice);
 					// 첨삭 파일 조회

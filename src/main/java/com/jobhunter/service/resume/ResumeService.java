@@ -75,7 +75,7 @@ public interface ResumeService {
 
 	void deleteExistingAdvice(int resumeNo, int mentorUid) throws Exception;
 
-	ResumeAdviceDTO getAdvice(int resumeNo, int userUid, int ownerUid) throws Exception;
+	ResumeAdviceDTO getAdvice(int resumeNo, int adviceNo) throws Exception;
 
 	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) throws Exception;
 	

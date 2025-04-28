@@ -282,6 +282,9 @@ public class ResumeServiceImpl implements ResumeService {
 		// 첨삭 내용 저장
 		rdao.insertAdvice(adviceDTO);
 
+		// 첨삭 등록 테이블에 adviceNo 업데이트
+		rdao.updateAdviceNo(adviceDTO.getResumeNo(), adviceDTO.getMentorUid(), adviceDTO.getAdviceNo());
+
 		if (adviceDTO.getComments() != null && !adviceDTO.getComments().isEmpty()) {
 			// 첨삭 코멘트 저장
 			for (ResumeAdviceCommentDTO commentDTO : adviceDTO.getComments()) {
@@ -305,10 +308,8 @@ public class ResumeServiceImpl implements ResumeService {
 	}
 
 	@Override
-	public ResumeAdviceDTO getAdvice(int resumeNo, int userUid, int ownerUid) throws Exception {
-		boolean isSameUser = userUid == ownerUid;
-		String mode = isSameUser ? "sameUser" : "otherUser";
-		return rdao.getAdvice(resumeNo, mode);
+	public ResumeAdviceDTO getAdvice(int resumeNo, int adviceNo) throws Exception {
+		return rdao.getAdvice(resumeNo, adviceNo);
 	}
 
 	@Override

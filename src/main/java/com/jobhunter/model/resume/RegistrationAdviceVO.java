@@ -13,4 +13,5 @@ public class RegistrationAdviceVO {
     private int mentorUid;
     private int resumeNo;
     private int menteeUid;
+    private int adviceNo;
 }
