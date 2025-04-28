@@ -393,11 +393,6 @@
 	</div>
 
 
-
-	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
-	<input type="hidden" id="isLiked" value="${isLiked}" />
-	<input type="hidden" id="isCompanyAccount" value="${isCompanyAccount}" />
-
 	<div id="replySection">
 		<!-- 댓글 목록 출력 영역 -->
 		<ul id="replyList" class="list-group"></ul>
@@ -434,13 +429,14 @@
 			</div>
 		</div>
 	</div>
-
-	<div>isCompanyAccount: ${isCompanyAccount}</div>
+<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
+	<input type="hidden" id="isLiked" value="${isLiked}" />
+	<input type="hidden" id="isCompanyAccount" value="${isCompanyAccount}" />
 	<input type="hidden" id="loginUserUid"
 		value="${sessionScope.account.uid}">
 	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
-	<input type="hidden" id="postWriterUid" value="${detail.writerUid}">
 	<input type="hidden" id="loginUserId" value="${loginUser.userId}" />
+	<input type="hidden" id="postWriterUid" value="${detail.writerUid}">
 </body>
 <script>
 function showModal(title, message, callback) {
@@ -561,9 +557,13 @@ $(document).ready(function () {
     });
 		
 		  const loginUserUid = parseInt($('#loginUserUid').val());    // 로그인한 사용자 UID
-		  const writerId = parseInt($('#postWriterUid').val());       // 게시글 작성자 UID
 		  const boardNo = parseInt($('#boardNo').val());
-      
+		  const writerId = parseInt($('#postWriterUid').val(), 10);
+		  const reportTargetPK = parseInt($('#postWriterUid').val(), 10)
+		  
+		  console.log("writerId:", writerId);
+		  console.log("reportTargetPK:", reportTargetPK);
+
 		  // 고유 키 생성: 신고자_uid_피신고자_uid_게시글번호
 		  const reportKey = `report_${loginUserUid}_${writerId}_${boardNo}`;
 		
@@ -575,10 +575,7 @@ $(document).ready(function () {
 		    }
 		
 		    // 중복 신고 방지
-		    if (localStorage.getItem(reportKey)) {
-		      window.publicModals.show("이미 신고한 게시물입니다.");
-		      return;
-		    }
+		
 		
 		    // 모달 내용 구성
 		    const content = `
@@ -614,14 +611,15 @@ $(document).ready(function () {
 		        }
 		
 		        const reportData = {
-		          boardNo: boardNo,
+		          boardNo:boardNo,
 		          targetAccountUid: writerId,
+		          reportTargetPK: reportTargetPK,
 		          targetAccountType: "USER",
 		          reporterAccountUid: loginUserUid,
 		          reportCategory: reportCategory,
 		          reportMessage: reportMessage,
 		          reportType: "BOARD",
-		          reportTargetURL: `/reviewBoard/detail?boardNo=${boardNo}`
+		          reportTargetURL: `/reviewBoard/detail?boardNo=\${boardNo}`
 		        };
 		
 		        // AJAX로 신고 전송
@@ -631,7 +629,10 @@ $(document).ready(function () {
 		          contentType: 'application/json',
 		          data: JSON.stringify(reportData),
 		          success: function () {
-		            // 신고 성공 시 localStorage에 기록 저장
+		        	  console.log('${detail.userId}');
+		        	  
+		        	  console.log($('#postWriterUid').val());
+		        	  // 신고 성공 시 localStorage에 기록 저장
 		            localStorage.setItem(reportKey, 'true');
 		            window.publicModals.show("신고가 접수되었습니다.");
 		          },
