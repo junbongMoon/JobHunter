@@ -574,7 +574,8 @@ function getMyRegistrationAdvice() {
     contentType: 'application/json',
     data: JSON.stringify({
       page: registrationAdviceData.page,
-      status: registrationAdviceData.status
+      status: registrationAdviceData.status,
+      type: registrationAdviceData.type
     }),
     success: function(res) {
       console.log(res);
@@ -692,7 +693,6 @@ const requestResumeData = {
     prioritizeUnread: true
   };
 
-
 function getMyResumes() {
   const listContainer = $('#resumeSection')
 
@@ -715,7 +715,6 @@ function getMyResumes() {
     }
   });
 }
-
 
 function renderResumeList(items) {
 	  const container = $('#resumeSection');
@@ -1035,6 +1034,7 @@ function formatNumber(e) {
 // #endregion
 
 // #region 계정삭제 관련
+
 function updateDeleteAccountInfo(deleteDeadline, blockDeadline) {
   if (deleteDeadline) {
     $('#accountDeleteDateTitle').text('삭제 대기중...')

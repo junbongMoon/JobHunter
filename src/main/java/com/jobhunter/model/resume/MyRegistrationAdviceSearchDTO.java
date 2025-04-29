@@ -13,6 +13,10 @@ public class MyRegistrationAdviceSearchDTO {
 		return (page - 1) * 5;
 	}
 	
+	public String getStatusName() {
+        return status != null ? status.name() : null;
+    }
+	
 	public enum Status {
 		COMPLETE,
 		CANCEL,
