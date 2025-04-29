@@ -176,7 +176,7 @@
       <i class="fas fa-list"></i> 목록으로
     </a>
 
-    <c:if test="${sessionScope.account.uid == advancement.refUser}">
+    <c:if test="${sessionScope.account.uid == advancement.refUser and sessionScope.account.accountType == 'USER'}">
       <a href="/advancement/modify?id=${advancement.advancementNo}" class="btn btn-modify">
         <i class="fas fa-edit"></i> 수정
       </a>
