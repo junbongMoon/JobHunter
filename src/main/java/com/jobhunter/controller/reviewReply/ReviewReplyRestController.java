@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,7 +57,7 @@ public class ReviewReplyRestController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 
-		dto.setUserId(account.getUid());
+		
 
 		try {
 			boolean result = service.insertReply(dto);
@@ -84,7 +85,7 @@ public class ReviewReplyRestController {
 		if (account == null || dto.getUserId() != account.getUid()) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
-
+		dto.setUserId(account.getUid());
 		try {
 			boolean result = service.updateReply(dto);
 			if (result) {
@@ -99,24 +100,26 @@ public class ReviewReplyRestController {
 		}
 	}
 
-	@PostMapping("/delete")
+	@DeleteMapping("/delete")
 	public ResponseEntity<Boolean> deleteReply(@RequestBody ReviewReplyDTO dto, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
+
 		if (account == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
 		}
+
 		if (dto.getReplyNo() <= 0) {
-			System.out.println(dto.getReplyNo());
+
 			return ResponseEntity.badRequest().build();
 		}
-		boolean result = false;
+
 		try {
-			result = service.deleteReply(dto.getReplyNo(), account.getUid());
+			boolean result = service.deleteReply(dto.getReplyNo(), account.getUid());
+			return result ? ResponseEntity.ok(true) : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
 		}
-		return result ? ResponseEntity.ok(true) : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
 	}
 
 	// 댓글 좋아요 추가
