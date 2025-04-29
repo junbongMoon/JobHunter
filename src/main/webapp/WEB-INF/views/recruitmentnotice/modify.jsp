@@ -95,7 +95,11 @@
     // 우대조건 추가 처리
     $(".addAdvantageBtn").on("click", function () {
       const val = $("#advantage").val().trim();
-      if (!val) return alert("우대조건을 입력해주세요");
+      if (!val){
+		$(".modal-body").text("우대조건을 입력해주세요.");
+		$("#MyModal").modal("show");
+		 return;
+	  } 
 
       $.ajax({
         url: "/recruitmentnotice/advantage",
@@ -114,7 +118,10 @@
           $(".advantageArea").append(html);
           $("#advantage").val("");
         },
-        error: function () { alert("우대조건 저장 실패"); }
+        error: function () { 
+			$(".modal-body").text("우대조건 저장 실패.");
+            $("#MyModal").modal("show");
+		}
       });
     });
 		
@@ -541,9 +548,6 @@ function showModifyFileThumbnail(fileInfo) {
     $(".preview").append(html);
 }
 
-function createSafeId(fileName) {
-    return fileName.replace(/[^a-zA-Z0-9]/g, "_");
-}
 
 
 // 삭제 버튼 클릭시 삭제상태로 변경
@@ -566,10 +570,13 @@ function cancelFileModifications() {
         type: "POST",
         success: function() {
             $(".preview").empty();  // 모두 비워줌
-            alert("파일 수정 내역이 취소되었습니다.");
+			$(".modal-body").text("파일 수정 내역이 취소되었습니다.");
+			$("#MyModal").modal("show");
         },
         error: function() {
-            alert("수정 취소 실패");
+			$(".modal-body").text("수정 취소 실패.");
+			$("#MyModal").modal("show");
+
         }
     });
 }
@@ -582,7 +589,8 @@ function finalizeFileModifications() {
             console.log("삭제 처리 완료");
         },
         error: function() {
-            alert("파일 최종 반영 실패");
+			$(".modal-body").text(`파일 최종 반영 실패.`);	
+			$("#MyModal").modal("show");
         }
     });
 }
@@ -607,20 +615,14 @@ function renderApplicationMethods(applications) {
   });
 }
 
-function markUploadSuccess(fileName) {
-    const safeId = CSS.escape(fileName);
-    document.querySelector(`#\${safeId}`).insertAdjacentHTML(
-      "beforeend",
-      "<td><img src='/resources/images/success.png' width='20'></td>"
-    );
-}
-
 
 	// 면접타입 유효성 검사
 	function isValidApplication() {
   let checked = $(".application-checkbox:checked").length;
   if (checked === 0) {
-    alert("면접방식을 최소 하나 이상 선택해주세요.");
+	$(".modal-body").text(`면접방식을 최소 하나 이상 선택해주세요.`);	
+	$("#MyModal").modal("show");
+
     return false;
   }
   return true;
@@ -705,21 +707,6 @@ function markUploadSuccess(fileName) {
     }
 }
 
-	async function selectRegionAndCategory() {
-		const regionNo = '${RecruitmentDetailInfo.region.regionNo}';
-		const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';
-		const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}';
-		const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}';
-
-		$(".Region").val(regionNo).trigger("change");
-		await getSigungu(regionNo);
-		$(".Sigungu").val(sigunguNo).trigger("change");
-
-		$(".MajorCategory").val(majorcategoryNo).trigger("change");
-		await getSubCategory(majorcategoryNo);
-		$(".SubCategory").val(subcategoryNo).trigger("change");
-	}
-
 
 	async function getRegion() {
     return $.ajax({
@@ -784,7 +771,8 @@ function addAdvantage() {
     const advantageValue = $("#advantage").val().trim();
 
     if (!advantageValue) {
-        alert("우대조건을 입력하세요");
+	$(".modal-body").text(`우대 조건을 입력하세요`);	
+	$("#MyModal").modal("show");
         return;
     }
 
@@ -808,7 +796,8 @@ function addAdvantage() {
             });
 
             if (alreadyExists) {
-                alert("이미 추가된 우대조건입니다.");
+				$(".modal-body").text(`이미 추가 된 우대 조건입니다.`);	
+				$("#MyModal").modal("show");
                 return;
             }
 
@@ -823,7 +812,9 @@ function addAdvantage() {
             $("#advantage").val("");
         },
         error: function () {
-            alert("우대조건 저장 실패");
+			$(".modal-body").text(`우대조건 저장 실패`);	
+			$("#MyModal").modal("show");
+            
         }
     });
 }
@@ -1081,7 +1072,7 @@ label {
 					<h3>채용 공고</h3>
 					<p>하단에 정보를 입력해주세요</p>
 				</div>
-				<input type="hidden" id="refCompany" name="refCompany" value="1"><!-- 내일 근우씨한테 물어봐서 회사 uid 값 넣기 -->
+				<input type="hidden" id="refCompany" name="refCompany" value="${sessionScope.account.uid}"><!-- 내일 근우씨한테 물어봐서 회사 uid 값 넣기 -->
 				
 				<div class="row gy-3">
 					<div class="col-md-6">
@@ -1103,7 +1094,6 @@ label {
 
 						</div>
 					</div>
-					<input type="hidden" id="refCompany" value="1">
 					<div class="col-12">
 						<div class="input-group">
 							<label for="website" class="form-check-label">공고 제목</label> <input
