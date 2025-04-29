@@ -21,14 +21,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jobhunter.customexception.NeedAuthException;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.advancement.AdvancementDTO;
 import com.jobhunter.model.advancement.AdvancementUpFileVODTO;
 import com.jobhunter.model.advancement.AdvancementVO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.util.FileStatus;
 import com.jobhunter.service.advancement.AdvancementService;
+import com.jobhunter.util.AccountUtil;
 import com.jobhunter.util.RecruitmentFileProcess;
 
 import lombok.RequiredArgsConstructor;
@@ -170,11 +173,20 @@ public class AdvancementController {
     
     @GetMapping("/modify")
     public String showModifyAdvancement(@RequestParam("id") int advancementNo, Model model, HttpServletRequest request) {
+    	
+        HttpSession session = request.getSession();
+        AccountVO sessionAccount = AccountUtil.getAccount(session);
+
         try {
             AdvancementVO advancement = advancementService.getAdvancementById(advancementNo);
 
+
             if (advancement == null) {
                 return "redirect:/user/mypage"; // 존재하지 않으면 마이페이지로 리디렉션
+            }
+            
+            if (!AccountUtil.checkAuth(sessionAccount, advancement.getRefUser(), AccountType.COMPANY)) {
+                throw new NeedAuthException(); // ← 또는 "return /error/403"
             }
 
             // 기존 업로드된 파일 세션에 등록 (선택 사항)
@@ -190,10 +202,16 @@ public class AdvancementController {
     }
     
     @GetMapping("/list")
-    public String showAdvancementListByUid(@RequestParam("uid") int uid,PageRequestDTO pageRequestDTO, Model model) {
+    public String showAdvancementListByUid(@RequestParam("uid") int uid,PageRequestDTO pageRequestDTO, Model model, HttpServletRequest request) {
     	PageResponseDTO<AdvancementVO> result = null;
+        AccountVO sessionAccount = AccountUtil.getAccount(request);
     	
     	try {
+    	    if (!AccountUtil.checkUid(sessionAccount, uid)) {
+    	        
+    	        return "/user/mypage";
+    	    }
+
 			result = advancementService.getAdvancementListByUid(uid, pageRequestDTO);
 			model.addAttribute("pageResponseDTO", result);
 		} catch (Exception e) {
@@ -262,9 +280,18 @@ public class AdvancementController {
     @PostMapping("/delete")
     public ResponseEntity<Boolean> deleteAdvancement(@RequestParam("advancementNo") int advancementNo, HttpServletRequest request) {
         HttpSession session = request.getSession();
+        AccountVO sessionAccount = AccountUtil.getAccount(session);
         int uid = ((AccountVO) session.getAttribute("account")).getUid();
         
         try {
+        	
+        	AdvancementVO advancement = advancementService.getAdvancementById(advancementNo);
+        	
+            if (!AccountUtil.checkAuth(sessionAccount, advancement.getRefUser(), AccountType.COMPANY)) {
+                throw new NeedAuthException(); // 또는 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                
+            }
+        	
             String realPath = request.getSession().getServletContext().getRealPath("/");
             boolean success = advancementService.deleteAdvancementById(advancementNo, realPath);
             
