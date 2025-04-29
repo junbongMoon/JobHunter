@@ -64,133 +64,8 @@
 		getRegion();
 		getMajorCategory();
 		
-		// 기존 공고값 세팅
-		setTimeout(() => {
-      const title = '${RecruitmentDetailInfo.title}';
-      const workType = '${RecruitmentDetailInfo.workType}';
-      const payType = '${RecruitmentDetailInfo.payType}';
-      const pay = '${RecruitmentDetailInfo.pay}';
-      const period = '${RecruitmentDetailInfo.period}';
-      const personalHistory = '${RecruitmentDetailInfo.personalHistory}';
-      const militaryService = '${RecruitmentDetailInfo.militaryService}';
-      const detail = `<c:out value='${RecruitmentDetailInfo.detail}' escapeXml='false'/>`;
-      const manager = '${RecruitmentDetailInfo.manager}';
-      const dueDate = '<fmt:formatDate value="${RecruitmentDetailInfo.dueDate}" pattern="yyyy-MM-dd"/>';
-      const regionNo = '${RecruitmentDetailInfo.region.regionNo}';
-      const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';
-      const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}';
-      const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}';
-
-	  // workType이 PART_TIME이면 PHONE, TEXT DOM 추가
-if (workType === "PART_TIME") {
-  const phoneAndTextHtml = `
-    <div class="col-12 mb-2 parttime-only" id="phoneOption">
-      <div class="d-flex align-items-center">
-        <div class="form-check me-3 d-flex align-items-center">
-          <input class="form-check-input application-checkbox" type="checkbox" id="PHONE" value="PHONE">
-          <label class="form-check-label ms-2" for="PHONE">전화</label>
-        </div>
-        <div class="flex-grow-1">
-          <div class="input-group">
-            <input type="text" class="form-control method-detail" placeholder="전화 면접에 대한 추가내용이 있다면 작성하세요..." data-method="PHONE" style="display: none;">
-            <button type="button" class="btn btn-primary save-method-btn" data-method="PHONE" style="display: none;">저장</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-12 mb-2 parttime-only" id="textOption">
-      <div class="d-flex align-items-center">
-        <div class="form-check me-3 d-flex align-items-center">
-          <input class="form-check-input application-checkbox" type="checkbox" id="TEXT" value="TEXT">
-          <label class="form-check-label ms-2" for="TEXT">문자</label>
-        </div>
-        <div class="flex-grow-1">
-          <div class="input-group">
-            <input type="text" class="form-control method-detail" placeholder="" data-method="TEXT" style="display: none;">
-            <button type="button" class="btn btn-primary save-method-btn" data-method="TEXT" style="display: none;">저장</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  $("#application-methods").append(phoneAndTextHtml);
-
-
-}
-
-	  console.log("선택한 시군구, 직업군 : " + sigunguNo, subcategoryNo);
-
-      // 제목, 담당자, 날짜 등 텍스트 필드 세팅
-      $('#title').val(title);
-      $('#pay').val(Number(pay).toLocaleString());
-      $('#manager').val(manager);
-      $('#date').val(dueDate);
-
-      // summernote 내용 세팅
-      $('#summernote').summernote('code', detail);
-
-      // 라디오 세팅
-      $(`input[name="workType"][value="\${workType}"]`).prop("checked", true).trigger("change");
-      $(`input[name="payType"][value="\${payType}"]`).prop("checked", true);
-      $(`input[name="personalHistory"][value="\${personalHistory}"]`).prop("checked", true);
-      $(`input[name="militaryService"][value="\${militaryService}"]`).prop("checked", true);
-
-
-	  
-	  const jsonStr = '<c:out value="${applicationsJson}" escapeXml="false" />';
-	  console.log(jsonStr);
-	  
-  try {
-    
-    if (jsonStr && jsonStr.trim().length > 0) {
-      applications = JSON.parse(jsonStr);
-	  console.log(jsonStr);
-    }
-  } catch (e) {
-    console.error("applicationsJson 파싱 오류:", e);
-  }
-
-
-	console.log("applicationsJson raw:", jsonStr);
-	console.log("parsed applications:", applications);
-      // 셀렉트 필드 세팅 (선택 후 로딩 기다림)
-    setTimeout(() => {
-  $(".Region").val(regionNo).trigger("change");
-
-
-    setTimeout(() => {
-        $(".MajorCategory").val(majorcategoryNo).trigger("change");
-    setTimeout(() => {
-    getSubCategory(majorcategoryNo);
-    setTimeout(() => {
-      $(".SubCategory").val(subcategoryNo).trigger("change");
-
-	setTimeout(() => {
-    renderApplicationMethods(applications);
-  }, 500);
-
-
-    }, 200);
- 	 }, 200);
-	}, 300);
-
-	 // 근무 시간 분해
-	 const timeRegex = /^(\d{2}:\d{2})~(\d{2}:\d{2})(?: \((.+)\))?$/;
-      const match = period.match(timeRegex);
-      if (match) {
-        const [, startTime, endTime, detailType] = match;
-        $('#startTime').val(startTime);
-        $('#endTime').val(endTime);
-        if (detailType) $('#workDetailType').val(detailType);
-      }
-
-     
-    }, 300);
-
-
-
-	
+		
+		initializePage();
 
     // 이벤트 위임으로 동적 삭제 처리
     $(document).on("click", ".advantage-item .btn-outline-danger", function () {
@@ -450,9 +325,6 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 		}
 	});
 	
-	instalRecruitment();
-
-	}, 500);
 
 	// 저장 버튼 클릭 시 JSON 데이터 세팅
 	$("#write").on("click", function (e) {
@@ -492,51 +364,130 @@ $(".returnList, .btn-close, .btn-secondary").on("click", function () {
 
 });
 
+async function initializePage() {
+    try {
+        console.log("초기화 시작");
 
-// 수정 페이지에 들어왔을 때 공고의 정보를 입력해주는 함수
-function instalRecruitment() {
-	const title = '${RecruitmentDetailInfo.title}';
-	const workType = '${RecruitmentDetailInfo.workType}';
-	const payType = '${RecruitmentDetailInfo.payType}';
-	const pay = '${RecruitmentDetailInfo.pay}';
-	const period = '${RecruitmentDetailInfo.period}';
-	const personalHistory = '${RecruitmentDetailInfo.personalHistory}';
-	const militaryService = '${RecruitmentDetailInfo.militaryService}';
-	const detail = '${RecruitmentDetailInfo.detail}';
-	const manager = '${RecruitmentDetailInfo.manager}';
-	const dueDate = '<fmt:formatDate value="${RecruitmentDetailInfo.dueDate}" pattern="yyyy-MM-dd"/>'; // JSTL 형식 유지
-	const regionNo = '${RecruitmentDetailInfo.region.regionNo}';
-	const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';
-	const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}'
-	const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}'
+        await getRegion();
+        await getMajorCategory();
 
-	// 입력 값 세팅
-	$('#title').val(title);
-	$(`input[name="workType"][value="\${workType}"]`).prop("checked", true).trigger("change");
-	$(`input[name="payType"][value="\${payType}"]`).prop("checked", true);
-	$('#pay').val(pay.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")); // 쉼표 추가
-	$(`input[name="personalHistory"][value="\${personalHistory}"]`).prop("checked", true);
-	$(`input[name="militaryService"][value="\${militaryService}"]`).prop("checked", true);
-	$('#summernote').summernote('code', detail);
-	$('#manager').val(manager);
-	$('#date').val(dueDate);
-	$('#regionNo').val(regionNo);
-	$('#sigunguNo').val(sigunguNo);
-	$('#majorcategoryNo').val(majorcategoryNo);
-	$('#subcategoryNo').val(subcategoryNo);
+        // 기본 데이터 세팅
+        const regionNo = '${RecruitmentDetailInfo.region.regionNo}';
+        const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';
+        const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}';
+        const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}';
 
-	// 근무 시간 분해 (예: "08:00~17:00 (주 5일제)")
-	const timeRegex = /^(\d{2}:\d{2})~(\d{2}:\d{2})(?: \((.+)\))?$/;
-	const match = period.match(timeRegex);
+        // 지역 세팅
+        if (regionNo) {
+            $('.Region').val(regionNo).trigger('change');
+            await getSigungu(regionNo);
+            $('.Sigungu').val(sigunguNo).trigger('change');
+            $('#regionNo').val(regionNo);
+            $('#sigunguNo').val(sigunguNo);
+        }
 
-	if (match) {
-		const [, startTime, endTime, detailType] = match;
-		$('#startTime').val(startTime);
-		$('#endTime').val(endTime);
-		if (detailType) {
-			$('#workDetailType').val(detailType);
-		}
-	}
+        // 직업군 세팅
+        if (majorcategoryNo) {
+            $('.MajorCategory').val(majorcategoryNo).trigger('change');
+            await getSubCategory(majorcategoryNo);
+            $('.SubCategory').val(subcategoryNo).trigger('change');
+            $('#majorcategoryNo').val(majorcategoryNo);
+            $('#subcategoryNo').val(subcategoryNo);
+        }
+
+        // 입력값들 세팅
+        setRecruitmentFields();
+
+        // 지원 방법 세팅
+        const jsonStr = `<c:out value='${applicationsJson}' escapeXml='false'/>`;
+        if (jsonStr && jsonStr.trim().length > 0) {
+            applications = JSON.parse(jsonStr);
+            renderApplicationMethods(applications);
+        }
+
+        console.log("초기화 완료");
+
+    } catch (error) {
+        console.error("초기화 에러:", error);
+    }
+}
+
+
+
+function setRecruitmentFields() {
+    const title = '${RecruitmentDetailInfo.title}';
+    const workType = '${RecruitmentDetailInfo.workType}';
+    const payType = '${RecruitmentDetailInfo.payType}';
+    const pay = '${RecruitmentDetailInfo.pay}';
+    const period = '${RecruitmentDetailInfo.period}';
+    const personalHistory = '${RecruitmentDetailInfo.personalHistory}';
+    const militaryService = '${RecruitmentDetailInfo.militaryService}';
+    const detail = `<c:out value='${RecruitmentDetailInfo.detail}' escapeXml='false'/>`;
+    const manager = '${RecruitmentDetailInfo.manager}';
+    const dueDate = '<fmt:formatDate value="${RecruitmentDetailInfo.dueDate}" pattern="yyyy-MM-dd"/>';
+
+    $('#title').val(title);
+    $('#pay').val(Number(pay).toLocaleString());
+    $('#manager').val(manager);
+    $('#date').val(dueDate);
+    $('#summernote').summernote('code', detail);
+
+    $(`input[name="workType"][value="\${workType}"]`).prop('checked', true).trigger('change');
+    $(`input[name="payType"][value="\${payType}"]`).prop('checked', true);
+    $(`input[name="personalHistory"][value="\${personalHistory}"]`).prop('checked', true);
+    $(`input[name="militaryService"][value="\${militaryService}"]`).prop('checked', true);
+
+    // 근무시간 분해
+    const timeRegex = /^(\d{2}:\d{2})~(\d{2}:\d{2})(?: \((.+)\))?$/;
+    const match = period.match(timeRegex);
+    if (match) {
+        const [, startTime, endTime, workDetailType] = match;
+        $('#startTime').val(startTime);
+        $('#endTime').val(endTime);
+        if (workDetailType) {
+            $('#workDetailType').val(workDetailType);
+        }
+    }
+
+    // 아르바이트일 경우 전화/문자 추가 DOM 삽입
+    if (workType === "PART_TIME") {
+        appendPhoneTextOption();
+    }
+}
+
+function appendPhoneTextOption() {
+    const phoneAndTextHtml = `
+    <div class="col-12 mb-2 parttime-only" id="phoneOption">
+      <div class="d-flex align-items-center">
+        <div class="form-check me-3 d-flex align-items-center">
+          <input class="form-check-input application-checkbox" type="checkbox" id="PHONE" value="PHONE">
+          <label class="form-check-label ms-2" for="PHONE">전화</label>
+        </div>
+        <div class="flex-grow-1">
+          <div class="input-group">
+            <input type="text" class="form-control method-detail" data-method="PHONE" style="display: none;">
+            <button type="button" class="btn btn-primary save-method-btn" data-method="PHONE" style="display: none;">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 mb-2 parttime-only" id="textOption">
+      <div class="d-flex align-items-center">
+        <div class="form-check me-3 d-flex align-items-center">
+          <input class="form-check-input application-checkbox" type="checkbox" id="TEXT" value="TEXT">
+          <label class="form-check-label ms-2" for="TEXT">문자</label>
+        </div>
+        <div class="flex-grow-1">
+          <div class="input-group">
+            <input type="text" class="form-control method-detail" data-method="TEXT" style="display: none;">
+            <button type="button" class="btn btn-primary save-method-btn" data-method="TEXT" style="display: none;">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    `;
+
+    $("#application-methods").append(phoneAndTextHtml);
 }
 	
 
@@ -696,6 +647,7 @@ function markUploadSuccess(fileName) {
     });
   }
 
+
 		 // 면접 타입 삭제 함수
 		 function deleteApplication(method) {
     $.ajax({
@@ -713,108 +665,95 @@ function markUploadSuccess(fileName) {
   }
 
 
-	function getMajorCategory() {
-		$.ajax({
-			url : '/Category/major',
-			type : 'get',
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log("산업군 :", data);
-				let majorSelect = $(".MajorCategory");
-				majorSelect.empty();
-
-				majorSelect.append('<option value="-1">산업군 선택</option>');
-
-				$.each(data, function(index, majorCategory) {
-					majorSelect
-							.append(`<option value="\${majorCategory.majorcategoryNo}">
-									\${majorCategory.jobName} </option>`);
-				});
-			},
-			error : function(err) {
-				console.error("산업군 데이터 불러오기 실패", err);
-			}
-		});
-	}
-	
-	function getSubCategory(majorNo) {
-		$.ajax({
-			url : '/Category/sub/' + majorNo,
-			type : 'get',
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log("산업군 :", data);
-				let subSelect = $(".SubCategory");
-				subSelect.empty();
-
-				subSelect.append('<option value="-1">산업군 선택</option>');
-
-				$.each(data, function(index, subCategory) {
-					subSelect
-							.append(`<option value="\${subCategory.subcategoryNo}">
-									\${subCategory.jobName}</option>`);
-				});
-			},
-			error : function(err) {
-				console.error("직업 데이터 불러오기 실패", err);
-			}
-		});
-	}
-
-	function getRegion() {
-		$.ajax({
-			url : '/region/list',
-			type : 'get',
-			dataType : 'json',
-			async : false,
-			success : function(data) {
-				console.log("도시 데이터:", data);
-				let regionSelect = $(".Region");
-				regionSelect.empty();
-
-				regionSelect.append('<option value="-1">도시 선택</option>');
-
-				$.each(data, function(index, region) {
-					regionSelect
-							.append('<option value="' + region.regionNo + '">'
-									+ region.name + '</option>');
-				});
-			},
-			error : function(err) {
-				console.error("도시 데이터 불러오기 실패", err);
-			}
-		});
-	}
-
-	function getSigungu(regionNo) {
-    const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';  // 여기 확실히 수정!
-    $.ajax({
-        url: '/region/sigungu/' + regionNo,
-        type: 'get',
+  async function getMajorCategory() {
+    return $.ajax({
+        url: '/Category/major',
+        type: 'GET',
         dataType: 'json',
-        async: false,
-        success: function (data) {
-            console.log("시군구 데이터:", data);
-			console.log("regionNo 넘기는 값:", regionNo);
-            let sigunguSelect = $(".Sigungu");
-            sigunguSelect.empty().append('<option value="-1">시군구 선택</option>');
-
-            $.each(data, function (index, sigungu) {
-                sigunguSelect.append(`<option value="\${sigungu.sigunguNo}">\${sigungu.name}</option>`);
-            });
-
-            if (sigunguNo && sigunguNo !== '-1') {
-  			sigunguSelect.val(String(sigunguNo)).trigger("change"); //change 이벤트도 트리거!
-  			console.log("자동 선택된 시군구:", sigunguNo);
-  			$("#sigunguNo").val(sigunguNo); // 히든필드에도 반영
-			}
-        },
-        error: function (err) {
-            console.error("시군구 데이터 불러오기 실패", err);
-        }
+    }).then(data => {
+        const majorSelect = $(".MajorCategory");
+        majorSelect.empty().append('<option value="-1">산업군 선택</option>');
+        data.forEach(major => {
+            majorSelect.append(`<option value="\${major.majorcategoryNo}">\${major.jobName}</option>`);
+        });
     });
+}
+	
+	async function getSubCategory(majorNo) {
+    try {
+        const data = await $.ajax({
+            url: '/Category/sub/' + majorNo,
+            type: 'GET',
+            dataType: 'json',
+        });
+
+        const subSelect = $(".SubCategory");
+        subSelect.empty().append('<option value="-1">직업 선택</option>');
+
+        data.forEach(sub => {
+            subSelect.append(`<option value="\${sub.subcategoryNo}">\${sub.jobName}</option>`);
+        });
+
+    } catch (err) {
+        console.error("직업 데이터 불러오기 실패", err);
+    }
+}
+
+	async function selectRegionAndCategory() {
+		const regionNo = '${RecruitmentDetailInfo.region.regionNo}';
+		const sigunguNo = '${RecruitmentDetailInfo.sigungu.sigunguNo}';
+		const majorcategoryNo = '${RecruitmentDetailInfo.majorCategory.majorcategoryNo}';
+		const subcategoryNo = '${RecruitmentDetailInfo.subcategory.subcategoryNo}';
+
+		$(".Region").val(regionNo).trigger("change");
+		await getSigungu(regionNo);
+		$(".Sigungu").val(sigunguNo).trigger("change");
+
+		$(".MajorCategory").val(majorcategoryNo).trigger("change");
+		await getSubCategory(majorcategoryNo);
+		$(".SubCategory").val(subcategoryNo).trigger("change");
+	}
+
+
+	async function getRegion() {
+    return $.ajax({
+        url: '/region/list',
+        type: 'GET',
+        dataType: 'json',
+    }).then(data => {
+        const regionSelect = $(".Region");
+        regionSelect.empty().append('<option value="-1">도시 선택</option>');
+        data.forEach(region => {
+            regionSelect.append(`<option value="\${region.regionNo}">\${region.name}</option>`);
+        });
+    });
+}
+
+	async function getSigungu(regionNo) {
+    try {
+        const sigunguNo = `${RecruitmentDetailInfo.sigungu.sigunguNo}`; // 문자열 보장
+        const data = await $.ajax({
+            url: '/region/sigungu/' + regionNo,
+            type: 'GET',
+            dataType: 'json',
+        });
+
+        const sigunguSelect = $(".Sigungu");
+        sigunguSelect.empty().append('<option value="-1">시군구 선택</option>');
+
+        data.forEach(sigungu => {
+            sigunguSelect.append(`<option value="\${sigungu.sigunguNo}">\${sigungu.name}</option>`);
+        });
+
+        if (sigunguNo && sigunguNo !== '-1') {
+            sigunguSelect.val(String(sigunguNo)).trigger("change");
+            console.log("자동 선택된 시군구:", sigunguNo);
+            $("#sigunguNo").val(sigunguNo);
+        }
+
+    } catch (err) {
+        console.error("시군구 데이터 불러오기 실패", err);
+    }
 }
 
 
