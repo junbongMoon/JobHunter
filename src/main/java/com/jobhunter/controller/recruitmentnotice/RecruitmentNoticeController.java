@@ -135,6 +135,7 @@ public class RecruitmentNoticeController {
 	 */
 	@GetMapping("/listAll")
 	public String showRecruitmentList(PageRequestDTO pageRequestDTO, Model model) {
+		
 		try {
 
 			PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO;
@@ -411,6 +412,7 @@ public class RecruitmentNoticeController {
 		String returnPage = "";
 
 		// 기존 리스트 초기화
+		
 		ListAllClear();
 
 		try {
@@ -525,6 +527,7 @@ public class RecruitmentNoticeController {
 			List<RecruitmentnoticeBoardUpfiles> modifyFileList = new ArrayList<>();
 
 			if (modifyFileListJson != null && !modifyFileListJson.isEmpty()) {
+				System.out.println(modifyFileList);
 				modifyFileList = objectMapper.readValue(modifyFileListJson,
 						new TypeReference<List<RecruitmentnoticeBoardUpfiles>>() {
 						});
@@ -539,13 +542,22 @@ public class RecruitmentNoticeController {
 
 			// ❗ 삭제할 파일 목록 따로 수집
 			for (RecruitmentnoticeBoardUpfiles oldFile : existing.getFileList()) {
-				boolean stillExists = modifyFileList.stream()
-						.anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()));
+			    boolean fileDeleted = modifyFileList.stream()
+			        .anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()) && FileStatus.DELETE.equals(newFile.getStatus()));
 
-				if (!stillExists) {
-					deletedFiles.add(oldFile);
-				}
+			    if (fileDeleted) {
+			        deletedFiles.add(oldFile);
+			    }
 			}
+			
+			if (result) {
+
+			    for (RecruitmentnoticeBoardUpfiles file : deletedFiles) {
+			        fp.removeFile(file);
+			    }
+			}
+			
+			System.out.println(modifyFileList);
 
 			// DB만 수정
 			recruitmentService.modifyRecruitmentNotice(dto, advantages, applications, modifyFileList, existing, uid);

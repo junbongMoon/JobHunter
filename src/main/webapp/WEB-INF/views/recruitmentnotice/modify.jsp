@@ -520,6 +520,8 @@ function uploadModifyFileAndShowPreview(file) {
             uploadedFile.status = "NEW"; // 새 파일은 NEW 상태
             modifyFileList.push(uploadedFile);
             showModifyFileThumbnail(uploadedFile);
+
+			$("#modifyFileListJson").val(JSON.stringify(modifyFileList));
         },
         error: function() {
 			$(".modal-body").text("파일 업로드 실패했습니다. 다시 시도해주세요.");
@@ -560,7 +562,9 @@ function markFileAsDeleted(fileName) {
     });
 
     const safeId = fileName.replace(/[^a-zA-Z0-9]/g, "_");
-    $(`#thumb_${safeId}`).addClass("table-danger").css("text-decoration", "line-through");
+    $(`#thumb_\${safeId}`).addClass("table-danger").css("text-decoration", "line-through");
+
+	$("#modifyFileListJson").val(JSON.stringify(modifyFileList));
 }
 
 // 파일 수정 취소
@@ -1407,7 +1411,7 @@ label {
 									<div class="col-12 text-center">
 										<table class="preview mt-3">
 											<c:forEach var="file" items="${RecruitmentDetailInfo.fileList}">
-												<tr id="thumb_${safeId}">
+												<tr id="thumb_${file.originalFileName.replaceAll('[^a-zA-Z0-9]', '_')}">
       												<td><img src="${file.thumbFileName}" width="60" /></td>
       												<td>${file.originalFileName}</td>
       												<td>

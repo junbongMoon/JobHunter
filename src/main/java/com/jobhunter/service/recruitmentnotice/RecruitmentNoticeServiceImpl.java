@@ -335,7 +335,6 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	public void modifyRecruitmentNotice(RecruitmentNoticeDTO dto, List<AdvantageDTO> newAdvList,
 	        List<ApplicationDTO> newAppList, List<RecruitmentnoticeBoardUpfiles> modifyFileList,
 	        RecruitmentDetailInfo existing, int uid) throws Exception {
-
 	    // Step 1: 공고 기본 정보 수정
 	    recdao.updateRecruitmentNotice(dto);
 
@@ -385,23 +384,15 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	    }
 
 	    // Step 4: 파일 비교 → DB만 삭제 (물리파일 삭제는 안함)
-	    List<RecruitmentnoticeBoardUpfiles> oldFileList = existing.getFileList();
-	    for (RecruitmentnoticeBoardUpfiles oldFile : oldFileList) {
-	        boolean stillExists = modifyFileList.stream()
-	            .anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()));
-
-	        if (!stillExists) {
-	            recdao.deleteFileFromDatabase(oldFile.getBoardUpFileNo());
-	            // ❌ 파일 삭제는 하지 않는다.
-	        }
-	    }
-	    for (RecruitmentnoticeBoardUpfiles newFile : modifyFileList) {
-	        boolean existsInOld = oldFileList.stream()
-	            .anyMatch(oldFile -> oldFile.getOriginalFileName().equals(newFile.getOriginalFileName()));
-
-	        if (!existsInOld && FileStatus.NEW.equals(newFile.getStatus())) {
-	            newFile.setRefrecruitmentnoticeNo(uid);
-	            recdao.insertRecruitmentFile(newFile);
+	    // Step 4: 파일 관리
+	    for (RecruitmentnoticeBoardUpfiles file : modifyFileList) {
+	        if (FileStatus.DELETE.equals(file.getStatus())) {
+	            recdao.deleteFileFromDatabase(file.getBoardUpFileNo());
+	            // ❗ 여기서는 물리 삭제는 하지 않는다! 컨트롤러에서 따로 한다!
+	        } else if (FileStatus.NEW.equals(file.getStatus())) {
+	            file.setRefrecruitmentnoticeNo(uid);
+	            file.setStatus(FileStatus.COMPLETE);
+	            recdao.insertRecruitmentFile(file);
 	        }
 	    }
 
