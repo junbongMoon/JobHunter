@@ -115,6 +115,8 @@ public interface ResumeDAO {
 
 	void insertAdvice(ResumeAdviceDTO adviceDTO) throws Exception;
 
+	void updateAdviceNo(int resumeNo, int mentorUid, int adviceNo) throws Exception;
+
 	void insertAdviceFile(ResumeAdviceUpfileDTO fileDTO) throws Exception; 
 
 	void deleteExistingAdvice(int resumeNo, int mentorUid) throws Exception;
@@ -131,7 +133,8 @@ public interface ResumeDAO {
 
 	List<ResumeAdviceUpfileDTO> selectAdviceFiles(int adviceNo) throws Exception;
 
-	ResumeAdviceDTO getAdvice(int resumeNo) throws Exception;
+	ResumeAdviceDTO getAdvice(int resumeNo, int adviceNo) throws Exception;
+
 	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) throws Exception;
 
 	/**
@@ -225,7 +228,7 @@ public interface ResumeDAO {
 	 * @param String status 첨삭 상태
 	 * @return 성공 여부
 	 */
-	int changeAdviceStatus(int resumeNo, int userUid, String status) throws Exception;
+	int changeAdviceStatus(int resumeNo, int userUid, String status, String mode) throws Exception;
 
 	/**
 	 *  @author 유지원
@@ -263,4 +266,7 @@ public interface ResumeDAO {
 	 * @return 첨삭 코멘트 목록
 	 */
 	List<ResumeAdviceCommentDTO> getAdviceComments(int adviceNo) throws Exception;
+
+
+
 }

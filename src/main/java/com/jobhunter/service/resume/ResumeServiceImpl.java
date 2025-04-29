@@ -282,6 +282,9 @@ public class ResumeServiceImpl implements ResumeService {
 		// 첨삭 내용 저장
 		rdao.insertAdvice(adviceDTO);
 
+		// 첨삭 등록 테이블에 adviceNo 업데이트
+		rdao.updateAdviceNo(adviceDTO.getResumeNo(), adviceDTO.getMentorUid(), adviceDTO.getAdviceNo());
+
 		if (adviceDTO.getComments() != null && !adviceDTO.getComments().isEmpty()) {
 			// 첨삭 코멘트 저장
 			for (ResumeAdviceCommentDTO commentDTO : adviceDTO.getComments()) {
@@ -305,8 +308,8 @@ public class ResumeServiceImpl implements ResumeService {
 	}
 
 	@Override
-	public ResumeAdviceDTO getAdvice(int resumeNo) throws Exception {
-		return rdao.getAdvice(resumeNo);
+	public ResumeAdviceDTO getAdvice(int resumeNo, int adviceNo) throws Exception {
+		return rdao.getAdvice(resumeNo, adviceNo);
 	}
 
 	@Override
@@ -385,7 +388,7 @@ public class ResumeServiceImpl implements ResumeService {
 	 */
 	@Override
 	public boolean acceptAdvice(int resumeNo, int userUid) throws Exception {
-		int adviceResult = rdao.changeAdviceStatus(resumeNo, userUid, "CHECKING");
+		int adviceResult = rdao.changeAdviceStatus(resumeNo, userUid, "CHECKING", "acceptAdvice");
 		return adviceResult > 0;
 	}
 
@@ -408,7 +411,7 @@ public class ResumeServiceImpl implements ResumeService {
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean rejectAdvice(int resumeNo, int userUid, int ownerUid) throws Exception {
 		// 첨삭 거절 처리
-		int adviceResult = rdao.changeAdviceStatus(resumeNo, userUid, "CANCEL");
+		int adviceResult = rdao.changeAdviceStatus(resumeNo, userUid, "CANCEL", "rejectAdvice");
 		if (adviceResult > 0) {
 			// 첨삭 거절한 rgAdviceNo 가져오기
 			int rgAdviceNo = rdao.getRegistrationAdviceNo(userUid, resumeNo);
@@ -442,7 +445,7 @@ public class ResumeServiceImpl implements ResumeService {
 	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean endAdvice(int resumeNo, int userUid, int ownerUid) throws Exception {
 		// 첨삭 종료 처리
-		int adviceResult = rdao.changeAdviceStatus(resumeNo, userUid, "COMPLETE");
+		int adviceResult = rdao.changeAdviceStatus(resumeNo, userUid, "COMPLETE", "endAdvice");
 		if (adviceResult > 0) {
 			// 첨삭 내용 테이블 COMPLETE로 업데이트
 			int adviceStatusResult = rdao.updateAdviceStatus(resumeNo, "COMPLETE");

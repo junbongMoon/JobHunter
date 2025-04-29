@@ -257,6 +257,15 @@ public class ResumeDAOImpl implements ResumeDAO {
 	}
 
 	@Override
+	public void updateAdviceNo(int resumeNo, int mentorUid, int adviceNo) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("resumeNo", resumeNo);
+		params.put("mentorUid", mentorUid);
+		params.put("adviceNo", adviceNo);
+		ses.update(NS + ".updateAdviceNo", params);
+	}
+
+	@Override
 	public void insertAdviceFile(ResumeAdviceUpfileDTO fileDTO) throws Exception {
 		ses.insert(NS + ".insertAdviceFile", fileDTO);
 	}
@@ -272,8 +281,11 @@ public class ResumeDAOImpl implements ResumeDAO {
 	}
 
 	@Override
-	public ResumeAdviceDTO getAdvice(int resumeNo) throws Exception {
-		return ses.selectOne(NS + ".getAdvice", resumeNo);
+	public ResumeAdviceDTO getAdvice(int resumeNo, int adviceNo) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("resumeNo", resumeNo);
+		params.put("adviceNo", adviceNo);
+		return ses.selectOne(NS + ".getAdvice", params);
 	}
 
 	@Override
@@ -386,12 +398,12 @@ public class ResumeDAOImpl implements ResumeDAO {
 	// }
 
 	@Override
-	public int changeAdviceStatus(int resumeNo, int userUid, String status) throws Exception {
+	public int changeAdviceStatus(int resumeNo, int userUid, String status, String mode) throws Exception {
 		Map<String, Object> params = new HashMap<>();
 		params.put("resumeNo", resumeNo);
 		params.put("userUid", userUid);
 		params.put("status", status);
-		params.put("mode", "endAdvice");
+		params.put("mode", mode);
 		return ses.update(NS + ".changeAdviceStatus", params);
 	}
 
