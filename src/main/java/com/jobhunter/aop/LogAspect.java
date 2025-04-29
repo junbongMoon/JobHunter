@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LogAspect {
 
-    @Before("execution(* com.jobhunter.service..*(..))")
+//    @Before("execution(* com.jobhunter.service..*(..))")
     public void logBefore(JoinPoint joinPoint) {
         log.info("🔍 AOP 실행: {}", joinPoint.getSignature().toShortString());
     }

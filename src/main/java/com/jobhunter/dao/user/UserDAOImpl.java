@@ -8,7 +8,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.user.ContactUpdateDTO;
 import com.jobhunter.model.user.KakaoUserInfoDTO;
+import com.jobhunter.model.user.PasswordDTO;
 import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.model.user.UserRegisterDTO;
 import com.jobhunter.model.user.UserVO;
@@ -35,7 +37,7 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public AccountVO findByUidAndPassword(String uid, String password) throws Exception {
+	public AccountVO findByUidAndPassword(int uid, String password) throws Exception {
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uid", uid);
 		paramMap.put("password", password);
@@ -51,24 +53,13 @@ public class UserDAOImpl implements UserDAO {
 	}
 	
 	@Override
-	public void updatePassword(String uid, String newPassword) throws Exception {
-	    Map<String, Object> paramMap = new HashMap<>();
-	    paramMap.put("uid", uid);
-	    paramMap.put("password", newPassword);
-	    
-	    ses.update(NS + ".updatePassword", paramMap);
+	public void updatePassword(PasswordDTO dto) throws Exception {
+	    ses.update(NS + ".updatePassword", dto);
 	}
 	
 	@Override
-	public void updateEmail(Map<String, String> paramMap) throws Exception {
-	    
-	    ses.update(NS + ".updateEmail", paramMap);
-	}
-	
-	@Override
-	public void updateMobile(Map<String, String> paramMap) throws Exception {
-	    
-	    ses.update(NS + ".updateMobile", paramMap);
+	public void updateContact(ContactUpdateDTO dto) throws Exception {
+	    ses.update(NS + ".updateContact", dto);
 	}
 
 	@Override
@@ -120,12 +111,12 @@ public class UserDAOImpl implements UserDAO {
 	}
 	
 	@Override
-	public int deleteMobile(String uid) throws Exception {
+	public int deleteMobile(int uid) throws Exception {
 		return ses.update(NS + ".deleteMobile", uid);
 	}
 	
 	@Override
-	public int deleteEmail(String uid) throws Exception {
+	public int deleteEmail(int uid) throws Exception {
 		return ses.update(NS + ".deleteEmail", uid);
 	}
 

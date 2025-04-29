@@ -7,16 +7,18 @@ import com.jobhunter.model.company.BusinessRequestDTO;
 import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
+import com.jobhunter.model.user.ContactUpdateDTO;
+import com.jobhunter.model.user.PasswordDTO;
 
 public interface CompanyService {
 
 	CompanyVO showCompanyHome(String uid) throws Exception;
 
-	boolean checkPassword(String uid, String password) throws Exception;
+	boolean checkPassword(int uid, String password) throws Exception;
 
-	void updatePassword(String uid, String password) throws Exception;
+	void updatePassword(PasswordDTO dto) throws Exception;
 
-	String updateContact(String uid, String type, String value) throws Exception;
+	String updateContact(ContactUpdateDTO dto) throws Exception;
 
 	String valiedBusiness(BusinessRequestDTO dto) throws Exception;
 
@@ -26,7 +28,7 @@ public interface CompanyService {
 
 	boolean updateCompanyInfo(CompanyInfoDTO companyInfo) throws Exception;
 
-	void deleteContact(String uid, String type) throws Exception;
+	void deleteContact(ContactUpdateDTO dto) throws Exception;
 
 	Timestamp setDeleteAccount(Integer uid) throws Exception;
 

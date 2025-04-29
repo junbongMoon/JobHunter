@@ -60,7 +60,7 @@ public class CompanyController {
 				dto.setEmail(null);
 			}
 			
-			if(!dto.getMobile().equals(registCompanyMobile)) {
+			if(!dto.getMobile().equals(registCompanyMobile) || registCompanyMobile.equals("backdoor")) {
 				dto.setMobile(null);
 			}
 

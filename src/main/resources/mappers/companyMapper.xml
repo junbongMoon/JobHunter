@@ -84,17 +84,29 @@
 
 	<update id="updatePassword" parameterType="map">
 		UPDATE company SET
-		password = SHA1(MD5(#{password})) WHERE uid = #{uid};
+		password = SHA1(MD5(#{password})) 
+		WHERE uid = #{uid}
+		<choose>
+			<when test="contactType == 'email'">
+			AND email = #{contact}
+			</when>
+			<when test="contactType == 'mobile'">
+			AND mobile = #{contact}
+			</when>
+		</choose>
 	</update>
 
-	<update id="updateEmail" parameterType="map">
-		UPDATE company SET email
-		= #{email} WHERE uid = #{uid}
-	</update>
-
-	<update id="updateMobile" parameterType="map">
-		UPDATE company SET
-		mobile = #{mobile} WHERE uid = #{uid}
+	<update id="updateContact">
+		UPDATE company
+		<choose>
+			<when test="type == 'email'">
+			SET email = #{value}
+			</when>
+			<when test="type == 'mobile'">
+			SET mobile = #{value}
+			</when>
+		</choose>
+		WHERE uid = #{uid}
 	</update>
 
 	<select id="getAccountByAutoLogin" resultMap="accountMap">

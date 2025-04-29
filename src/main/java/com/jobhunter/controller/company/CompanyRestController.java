@@ -22,10 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jobhunter.customexception.NeedAuthException;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.company.BusinessRequestDTO;
 import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyVO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.etc.ResponseJsonMsg;
 import com.jobhunter.model.user.ContactUpdateDTO;
 import com.jobhunter.model.user.PasswordDTO;
@@ -70,10 +72,10 @@ public class CompanyRestController {
 	 *         </ul>
 	 */
 	@GetMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
-	public ResponseEntity<CompanyVO> myinfo(@PathVariable("uid") String uid) {
+	public ResponseEntity<CompanyVO> myinfo(@PathVariable("uid") String uid, HttpSession ses) {
 		try {
 
-			if (uid == null) {
+			if (uid == null || AccountUtil.checkAuth(AccountUtil.getAccount(ses), uid, AccountType.COMPANY)) {
 				throw new NoSuchElementException();
 			}
 
@@ -115,9 +117,9 @@ public class CompanyRestController {
 	public ResponseEntity<ResponseJsonMsg> updateCompanyInfo(@RequestBody CompanyInfoDTO companyInfo,
 			@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
-
-			if (uid == null) {
-				throw new NoSuchElementException();
+			AccountVO vo = AccountUtil.getAccount(session);
+			if(uid == null || AccountUtil.checkAuth(vo, uid, AccountType.COMPANY)) {
+				throw new NeedAuthException();
 			}
 
 			companyInfo.setUid(uid);
@@ -183,13 +185,29 @@ public class CompanyRestController {
 	@PatchMapping(value = "/password", consumes = "application/json")
 	public ResponseEntity<Void> changePassword(@RequestBody PasswordDTO dto, HttpSession session) {
 		try {
-			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
+			// 1차 인증 완료했던 uid 및 연락처
+			int checkedUid = Integer.parseInt(session.getAttribute("chagePwdCompany").toString());
+			String checkedMobile = session.getAttribute("changePwdCompanyMobile").toString();
+			String checkedEmail = session.getAttribute("changePwdCompanyEmail").toString();
 			
-			if (!AccountUtil.checkUid(sessionAccount, Integer.parseInt(dto.getUid()))) {
+			session.removeAttribute("chagePwdCompany");
+			session.removeAttribute("changePwdCompanyMobile");
+			session.removeAttribute("changePwdCompanyEmail");
+			
+			if (!AccountUtil.checkAuth(AccountUtil.getAccount(session), dto.getUid(), AccountType.COMPANY)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
+			
+			dto.setUid(checkedUid);
+			if(checkedMobile != null) {
+				dto.setContact(checkedMobile);
+				dto.setContactType("mobile");
+			} else if (checkedEmail != null) {
+				dto.setContact(checkedEmail);
+				dto.setContactType("email");
+			}
 
-			service.updatePassword(dto.getUid(), dto.getPassword());
+			service.updatePassword(dto);
 			return ResponseEntity.ok().build();
 		} catch (AccessDeniedException e) {
 			e.printStackTrace();
@@ -199,7 +217,7 @@ public class CompanyRestController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-
+	
 	/**
 	 * 연락처 변경
 	 * <p>
@@ -217,16 +235,30 @@ public class CompanyRestController {
 	 */
 	@PatchMapping(value = "/contact", consumes = "application/json")
 	public ResponseEntity<String> changeContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
+		String changeContactCompanyMobile = (String)session.getAttribute("changeContactCompanyMobile");
+		String changeContactCompanyEmail = (String)session.getAttribute("changeContactCompanyEmail");
+		
 		try {
-
+			if (changeContactCompanyMobile != null && changeContactCompanyMobile.equals("0000")) {
+				dto.setType("mobile");
+			} else if (changeContactCompanyMobile != null) {
+				dto.setType("mobile");
+				dto.setValue(changeContactCompanyMobile);
+			} else if (changeContactCompanyEmail != null) {
+				dto.setType("email");
+				dto.setValue(changeContactCompanyEmail);
+			} else {
+				throw new AccessDeniedException("잘못된 사용자");
+			}
+			
 			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
 			
-			if (!AccountUtil.checkUid(sessionAccount, Integer.parseInt(dto.getUid()))) {
+			if (!AccountUtil.checkAuth(sessionAccount, dto.getUid(), AccountType.COMPANY)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 
-			String updatedValue = service.updateContact(dto.getUid(), dto.getType(), dto.getValue());
-
+			String updatedValue = service.updateContact(dto);
+			accUtil.refreshAccount(sessionAccount);
 			return ResponseEntity.ok(updatedValue);
 		} catch (AccessDeniedException e) {
 			e.printStackTrace();
@@ -313,7 +345,13 @@ public class CompanyRestController {
 	@DeleteMapping(value = "/contact", consumes = "application/json")
 	public ResponseEntity<HttpStatus> deleteContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
 		try {
-			service.deleteContact(dto.getUid(), dto.getType());
+			AccountVO sesAcc = AccountUtil.getAccount(session);
+			
+			if (!AccountUtil.checkAuth(sesAcc, dto.getUid(), AccountType.COMPANY)) {
+				throw new Exception();
+			}
+			
+			service.deleteContact(dto);
 
 			accUtil.refreshAccount((AccountVO) session.getAttribute("account"));
 			return ResponseEntity.ok().build();

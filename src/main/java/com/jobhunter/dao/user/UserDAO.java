@@ -4,7 +4,9 @@ import java.sql.Timestamp;
 import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.user.ContactUpdateDTO;
 import com.jobhunter.model.user.KakaoUserInfoDTO;
+import com.jobhunter.model.user.PasswordDTO;
 import com.jobhunter.model.user.UserInfoDTO;
 import com.jobhunter.model.user.UserRegisterDTO;
 import com.jobhunter.model.user.UserVO;
@@ -13,13 +15,11 @@ public interface UserDAO {
 
 	UserVO getUserInfo(String uid) throws Exception;
 
-	AccountVO findByUidAndPassword(String uid, String password) throws Exception;
+	AccountVO findByUidAndPassword(int uid, String password) throws Exception;
 
-	void updatePassword(String uid, String newPassword) throws Exception;
-
-	void updateEmail(Map<String, String> paramMap) throws Exception;
-
-	void updateMobile(Map<String, String> paramMap) throws Exception;
+	void updatePassword(PasswordDTO dto) throws Exception;
+	
+	void updateContact(ContactUpdateDTO dto) throws Exception;
 
 	int updateUserInfo(UserInfoDTO userInfo) throws Exception;
 
@@ -35,9 +35,9 @@ public interface UserDAO {
 
 	int linkToKakao(KakaoUserInfoDTO userInfo) throws Exception;
 
-	int deleteEmail(String uid) throws Exception;
+	int deleteEmail(int uid) throws Exception;
 
-	int deleteMobile(String uid) throws Exception;
+	int deleteMobile(int uid) throws Exception;
 
 	void setDeleteAccount(Integer uid) throws Exception;
 

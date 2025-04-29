@@ -160,7 +160,7 @@ public class UserController {
 				dto.setEmail(null);
 			}
 
-			if (!dto.getMobile().equals(registUserMobile)) {
+			if (!dto.getMobile().equals(registUserMobile) || registUserMobile.equals("backdoor")) {
 				dto.setMobile(null);
 			}
 
