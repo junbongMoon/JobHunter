@@ -361,20 +361,6 @@
         ORDER BY regDate DESC
         LIMIT 1
     </select>
-
-    <!-- 첨삭 상태 변경 -->
-    <update id="changeAdviceStatus" parameterType="map">
-        UPDATE registration_advice
-        SET status = #{status}
-        WHERE resumeNo = #{resumeNo}
-        AND mentorUid = #{userUid}
-        <if test="mode != null and mode == 'endAdvice'">
-        AND status = 'CHECKING'
-        </if>
-        <if test="mode == null or mode != 'endAdvice'">
-        AND status = 'WAITING'
-        </if>
-    </update>
     
     <!-- 유저 한명의 관련된 유효기간 만료 신청들 상태 갱신 -->
     <update id="changeAdviceStatus">

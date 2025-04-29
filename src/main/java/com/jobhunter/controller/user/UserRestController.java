@@ -118,7 +118,7 @@ public class UserRestController {
 	}
 
 	@GetMapping(value = "/check/id", produces = "application/json;charset=UTF-8")
-	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String userId) {
+	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String userId, HttpSession session) {
 		boolean exists = false;
 		try {
 			exists = service.isUserIdExists(userId);

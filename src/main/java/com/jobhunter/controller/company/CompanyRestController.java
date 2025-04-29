@@ -78,8 +78,6 @@ public class CompanyRestController {
 			}
 
 			CompanyVO companyVO = service.showCompanyHome(uid);
-			
-			System.out.println("컴퍼니 컨트롤러 VO : " + companyVO);
 
 			if (companyVO == null) {
 				throw new NoSuchElementException();
@@ -286,7 +284,7 @@ public class CompanyRestController {
 	 * </ul>
 	 */
 	@GetMapping(value = "/check/id", produces = "application/json;charset=UTF-8")
-	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String companyId) {
+	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String companyId, HttpSession session) {
 
 		boolean exists = false;
 		try {

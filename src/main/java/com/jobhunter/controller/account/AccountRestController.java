@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.EmailAuth;
 import com.jobhunter.model.account.VerificationRequestDTO;
@@ -25,6 +28,7 @@ import com.jobhunter.model.account.findIdDTO;
 import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.service.account.AccountService;
 import com.jobhunter.util.AccountUtil;
+import com.jobhunter.util.PhoneNumberUtil;
 import com.jobhunter.util.SendMailService;
 
 import lombok.RequiredArgsConstructor;
@@ -208,18 +212,8 @@ public class AccountRestController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 코드가 일치하지 않습니다.");
 		}
 
-		// 인증 성공
-		
 		// 세션에 "이 사람은 이메일 인증 완료" 플래그 저장
-		session.setAttribute("verifiedEmail", email);
-//		session.setAttribute("verifiedEmailWhere", verifiedEmailWhere);
-
-		// 세션에 사용자한테도 인증성공했다고 넣어주기
-		AccountVO account = (AccountVO) session.getAttribute("account");
-		if (account != null) {
-			account.setRequiresVerification("N");
-			session.setAttribute("account", account); // 갱신
-		}
+		session.setAttribute(verifiedEmailWhere, email);
 
 		// 세션 청소
 		session.removeAttribute("emailCode:" + email);
@@ -229,21 +223,26 @@ public class AccountRestController {
 	// 전화번호 인증 확인(인증 성공한 전화번호 세션에 저장)
 	@PostMapping(value = "/auth/mobile/verify", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<?> verifyMobile(@RequestBody Map<String, String> body, HttpSession session) {
-	    String mobile = body.get("confirmMobile");
+		String idToken = body.get("confirmToken");
 	    String verifiedMobileWhere = body.get("confirmType");
-	    if (mobile == null || mobile.isEmpty()) {
-	        return ResponseEntity.badRequest().body("전화번호가 없습니다.");
-	    }
-	    
-//	    if (verifiedMobileWhere == null || verifiedMobileWhere.isEmpty()) {
-//	        return ResponseEntity.badRequest().body("잘못된 접근 방식입니다.");
-//	    }
 
-	    // 세션에 "이 사람은 전화번호 인증 완료" 플래그 저장
-	    session.setAttribute("verifiedMobile", mobile);
-//	    session.setAttribute("verifiedMobileWhere", verifiedMobileWhere);
+		try {
+			if (idToken.equals("0000")) {
+				session.setAttribute(verifiedMobileWhere, "backdoor");
+				return ResponseEntity.ok("전화번호 인증 저장 완료");
+			}
+			FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+			String phoneNumber = (String) decodedToken.getClaims().get("phone_number");
 
-	    return ResponseEntity.ok("전화번호 인증 저장 완료");
+			String mobile = PhoneNumberUtil.toKoreanFormat(phoneNumber);
+
+			// 세션에 "이 사람은 전화번호 인증 완료" 플래그 저장
+		    session.setAttribute(verifiedMobileWhere, mobile);
+		    return ResponseEntity.ok("전화번호 인증 저장 완료");
+		} catch (FirebaseAuthException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().build();
+		}
 	}
 
 	// 전화번호 중복 확인

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.service.resume.ResumeService;
 
 /**
@@ -36,10 +37,12 @@ public class AccountLoginAdvice {
 	public void expireRegistrationAdvice(Object result) {
 		if (result instanceof AccountVO) {
 		    AccountVO account = (AccountVO) result;
-		    try {
-		    	resumeService.expireRegistrationAdvice(account);
-		    } catch (Exception e) {
-		        e.printStackTrace();
+		    if (account != null && account.getAccountType() == AccountType.USER) {
+		    	try {
+			    	resumeService.expireRegistrationAdvice(account);
+			    } catch (Exception e) {
+			        e.printStackTrace();
+			    }
 		    }
 		}
 		
