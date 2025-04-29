@@ -284,6 +284,15 @@
 	margin-bottom: 0.6rem;
 	}
 
+	.write-btn{
+		background-color: #3d4d6a !important;
+		color: white !important;
+		border: 2px solid #3d4d6a !important;
+		border-radius: 6px !important;
+		padding: 6px 14px !important;
+		transition: all 0.3s ease !important;
+	}
+
 </style>
 <body>
 	<!-- 헤더 -->

@@ -15,6 +15,8 @@
 	let errorMessage = "";
 	let focusElement = null;
 	let upfiles = [];
+	const MAX_FILES = 3;
+	const MAX_FILE_SIZE = 8 * 1024 * 1024;
 	
 
 	$(function() {
@@ -75,11 +77,25 @@
     e.preventDefault();
     $(this).css("background-color", "#eee");
 
-    let files = e.originalEvent.dataTransfer.files;
-    for (let i = 0; i < files.length; i++) {
-        let file = files[i];
-        uploadFileAndShowPreview(file);
-    }
+	let files = e.originalEvent.dataTransfer.files;
+
+	// 현재 업로드된 파일 수 체크
+	if ($(".preview tr").length + files.length > MAX_FILES) {
+		showModal("파일은 최대 3개까지만 업로드할 수 있습니다.");
+		return;
+	}
+
+	for (let i = 0; i < files.length; i++) {
+		let file = files[i];
+
+		// 파일 크기 체크
+		if (file.size > MAX_FILE_SIZE) {
+			showModal(file.name + " 파일이 8MB를 초과합니다. 다시 선택해주세요.");
+			continue;
+		}
+
+		uploadFileAndShowPreview(file);
+	}
 	});
 
 	$(document).on("click", "#goToListBtn", function () {
@@ -311,7 +327,7 @@ function uploadFileAndShowPreview(file) {
             showThumbnail(file);
         },
         error: function() {
-            alert("파일 업로드 실패");
+            showModal("파일 업로드 실패");
         }
     });
 }
@@ -351,7 +367,7 @@ function showThumbnail(file) {
             $(`#thumb_${safeId}`).remove();
         },
         error: function() {
-            alert("파일 삭제 실패");
+            showModal("파일 삭제 실패");
         }
     });
 	}
@@ -363,12 +379,16 @@ function showThumbnail(file) {
       "<td><img src='/resources/images/success.png' width='20'></td>");
 	}
 
+	function showModal(message) {
+    $(".modal-body").text(message);
+    $("#MyModal").modal("show");
+}
 
 	// 면접타입 유효성 검사
 	function isValidApplication() {
   let checked = $(".application-checkbox:checked").length;
   if (checked === 0) {
-    alert("면접방식을 최소 하나 이상 선택해주세요.");
+    showModal("면접방식을 최소 하나 이상 선택해주세요.");
     return false;
   }
   	return true;
@@ -389,7 +409,7 @@ function showThumbnail(file) {
         	console.log(data)
      	 },
         error: function () {
-        alert(`${method} 방식 저장 실패`);
+			showModal(`\${method} 방식 저장 실패`);
       	}
     	});
   	}
@@ -528,7 +548,26 @@ function showThumbnail(file) {
 		const advantageValue = $("#advantage").val().trim();
 
 		if (!advantageValue) {
-			alert("우대조건을 입력하세요");
+			showModal("우대조건을 입력하세요");
+			return;
+		}
+
+		// 현재 등록된 우대조건 수 체크
+		if ($(".advantageArea .advantage-item").length >= 3) {
+			showModal("우대조건은 최대 3개까지만 등록할 수 있습니다.");
+			return;
+		}
+
+		// 중복 여부 확인 (DOM에서 먼저 검사)
+		let alreadyExists = false;
+		$(".advantageArea input[type='hidden']").each(function () {
+			if ($(this).val() === advantageValue) {
+				alreadyExists = true;
+			}
+		});
+
+		if (alreadyExists) {
+			showModal("이미 추가된 우대조건입니다.");
 			return;
 		}
 
@@ -538,21 +577,8 @@ function showThumbnail(file) {
 			contentType: "application/json",
 			data: JSON.stringify({ advantageType: advantageValue }),
 			success: function (response) {
-				if (!response || !Array.isArray(response)) {
-					console.warn("응답 데이터 없음 또는 배열 아님");
-					return;
-				}
-
-				// 중복 여부 확인 (이미 DOM에 존재하는 값인지)
-				let alreadyExists = false;
-				$(".advantageArea input[type='hidden']").each(function () {
-					if ($(this).val() === advantageValue) {
-						alreadyExists = true;
-					}
-				});
-
-				if (alreadyExists) {
-					alert("이미 추가된 우대조건입니다.");
+				if (!response) {
+					console.warn("응답 데이터 없음");
 					return;
 				}
 
@@ -567,7 +593,7 @@ function showThumbnail(file) {
 				$("#advantage").val("");
 			},
 			error: function () {
-				alert("우대조건 저장 실패");
+				showModal("우대조건 저장 실패");
 			}
 		});
 	}
