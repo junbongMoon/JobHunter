@@ -26,6 +26,12 @@
 
 	$(function() {
 
+		const modifyFileListJson = '<c:out value="${modifyFileListJson}" escapeXml="false"/>';
+
+		if (modifyFileListJson && modifyFileListJson.length > 0) {
+		modifyFileList = JSON.parse(modifyFileListJson);
+		}
+
 		console.log("작성한 회사 uid : " + companyUid);
 		const today = new Date();
 		today.setHours(0,0,0,0); // 오늘 자정으로 설정

@@ -445,6 +445,8 @@ public class RecruitmentNoticeController {
 				this.fileList = detailInfo.getFileList();
 				this.modifyFileList = detailInfo.getFileList();
 				System.out.println(modifyFileList);
+				String modifyFileListJson = new ObjectMapper().writeValueAsString(this.modifyFileList);
+				model.addAttribute("modifyFileListJson", modifyFileListJson);
 			}
 
 			// 면접 방식
