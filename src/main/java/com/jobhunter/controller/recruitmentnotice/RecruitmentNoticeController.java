@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.Advantage;
@@ -41,6 +42,7 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 import com.jobhunter.model.util.FileStatus;
 import com.jobhunter.service.like.LikeService;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
+import com.jobhunter.util.AccountUtil;
 import com.jobhunter.util.RecruitmentFileProcess;
 
 import lombok.RequiredArgsConstructor;
@@ -414,15 +416,16 @@ public class RecruitmentNoticeController {
 	@GetMapping(value = { "/detail", "/modify" })
 	public String showRecruitment(@RequestParam("uid") int uid, Model model, HttpServletRequest req) {
 		System.out.println(uid);
-
+		AccountVO sessionAccount = AccountUtil.getAccount(req);
 		String returnPage = "";
 
 		// 기존 리스트 초기화
 		
 		ListAllClear();
+		RecruitmentDetailInfo detailInfo = null;
 
 		try {
-			RecruitmentDetailInfo detailInfo = recruitmentService.getRecruitmentByUid(uid);
+			detailInfo = recruitmentService.getRecruitmentByUid(uid);
 
 			if (req.getRequestURI().contains("detail")) {
 				AccountVO loginUser = (AccountVO) req.getSession().getAttribute("account");
@@ -486,7 +489,11 @@ public class RecruitmentNoticeController {
 		if (req.getRequestURI().contains("detail")) {
 			returnPage = "recruitmentnotice/detail";
 		} else if (req.getRequestURI().contains("modify")) {
-			returnPage = "recruitmentnotice/modify";
+	        if (!AccountUtil.checkAuth(sessionAccount, detailInfo.getRefCompany(), AccountType.COMPANY)) {
+	        	returnPage = "recruitmentnotice/detail";
+	        }else {
+	        	returnPage = "recruitmentnotice/modify";
+	        }	
 		}
 
 		if (returnPage.equals("")) {
@@ -624,8 +631,16 @@ public class RecruitmentNoticeController {
 		ResponseEntity<Boolean> result = null;
 
 		try {
-			
+	        AccountVO sessionAccount = AccountUtil.getAccount(request);
+		
 			RecruitmentDetailInfo detailInfo = recruitmentService.getRecruitmentByUid(uid);
+			
+	        int writerUid = detailInfo.getRefCompany();
+
+	        // ✅ 권한 체크
+	        if (!AccountUtil.checkAuth(sessionAccount, writerUid, AccountType.COMPANY)) {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
+	        }
 			
 			if (recruitmentService.removeRecruitmentByUid(uid)) {
 				
