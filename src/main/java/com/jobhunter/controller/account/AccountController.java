@@ -90,7 +90,6 @@ public class AccountController {
 			AccountVO account = accountService.loginAccount(loginDto, sessionId);
 
 			session.removeAttribute("remainingSeconds");
-			
 			session.setAttribute("account", account);
 
 			if (loginDto.getAutoLogin() != null) { // 자동로그인 쿠키발급

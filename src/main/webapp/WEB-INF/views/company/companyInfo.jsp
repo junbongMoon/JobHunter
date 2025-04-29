@@ -662,7 +662,7 @@ function checkPasswordToDeleteAccount() {
 
   function checkedDeleteAccount() {
     $.ajax({
-      url: `/user/info/${sessionScope.account.uid}`,
+      url: `/company/info/${sessionScope.account.uid}`,
       method: "DELETE",
       contentType: "application/json",
       success: (res) => {

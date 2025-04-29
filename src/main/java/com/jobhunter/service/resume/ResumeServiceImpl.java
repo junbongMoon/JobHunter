@@ -1,7 +1,9 @@
 package com.jobhunter.service.resume;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jobhunter.dao.point.PointDAO;
 import com.jobhunter.dao.resume.ResumeDAO;
 import com.jobhunter.dao.user.UserDAO;
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.resume.EducationDTO;
 import com.jobhunter.model.resume.JobFormDTO;
 import com.jobhunter.model.resume.LicenseDTO;
@@ -20,6 +23,7 @@ import com.jobhunter.model.resume.MyRegistrationAdviceSearchDTO;
 import com.jobhunter.model.resume.PersonalHistoryDTO;
 import com.jobhunter.model.resume.RegionDTO;
 import com.jobhunter.model.resume.RegistrationAdviceVO;
+import com.jobhunter.model.resume.ResumeAdviceCommentDTO;
 import com.jobhunter.model.resume.ResumeAdviceDTO;
 import com.jobhunter.model.resume.ResumeAdviceUpfileDTO;
 import com.jobhunter.model.resume.ResumeAdviceVO;
@@ -33,7 +37,7 @@ import com.jobhunter.model.resume.SubCategoryDTO;
 import com.jobhunter.model.resume.SubCategoryVO;
 import com.jobhunter.model.user.UserVO;
 import com.jobhunter.model.util.TenToFivePageVO;
-import com.jobhunter.model.resume.ResumeAdviceCommentDTO;
+import com.jobhunter.util.resume.FileProcessForResume;
 
 import lombok.RequiredArgsConstructor;
 
@@ -252,7 +256,7 @@ public class ResumeServiceImpl implements ResumeService {
 	public void submitResume(int resumeNo, int recruitmentNo) throws Exception {
 		rdao.insertRegistration(resumeNo, recruitmentNo);
 	}
-	
+
 	// 유저가 공고에 이력서 제출하였는가 확인
 	@Override
 	public boolean isResumeAlreadySubmitted(int userUid, int recruitmentNo) throws Exception {
@@ -278,7 +282,7 @@ public class ResumeServiceImpl implements ResumeService {
 	public void saveAdvice(ResumeAdviceDTO adviceDTO) throws Exception {
 		// 기존 첨삭 내용 삭제
 		rdao.deleteExistingAdvice(adviceDTO.getResumeNo(), adviceDTO.getMentorUid());
-		
+
 		// 첨삭 내용 저장
 		rdao.insertAdvice(adviceDTO);
 
@@ -317,15 +321,16 @@ public class ResumeServiceImpl implements ResumeService {
 		return rdao.getAdviceFiles(adviceNo);
 	}
 
-	
 	@Override
-	public TenToFivePageVO<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto) {
+	public TenToFivePageVO<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(
+			MyRegistrationAdviceSearchDTO dto) {
 		List<RegistrationAdviceVO> vo = rdao.selectRegistrationAdviceByMentorWithPaging(dto);
 		int totalCnt = rdao.countRegistrationAdviceByMentor(dto);
-		TenToFivePageVO<RegistrationAdviceVO> result = new TenToFivePageVO<RegistrationAdviceVO>(vo, dto.getPage(), totalCnt);
+		TenToFivePageVO<RegistrationAdviceVO> result = new TenToFivePageVO<RegistrationAdviceVO>(vo, dto.getPage(),
+				totalCnt);
 		return result;
 	}
-	
+
 	@Override
 	public TenToFivePageVO<ResumeAdviceVO> selectResumeAdviceByUserUid(int uid, int page) {
 		int offset = (page - 1) * 5;
@@ -333,14 +338,14 @@ public class ResumeServiceImpl implements ResumeService {
 		int totalCnt = rdao.countResumeAdviceByUserUid(uid);
 		TenToFivePageVO<ResumeAdviceVO> result = new TenToFivePageVO<ResumeAdviceVO>(vo, page, totalCnt);
 		return result;
-    }
+	}
 
-/**
-	 *  @author 유지원
+	/**
+	 * @author 유지원
 	 *
-	 * <p>
-	 * 이력서 첨삭 신청을 처리하는 메서드
-	 * </p>
+	 *         <p>
+	 *         이력서 첨삭 신청을 처리하는 메서드
+	 *         </p>
 	 * 
 	 * @param int mentorUid 첨삭자 UID
 	 * @param int resumeNo 이력서 번호
@@ -366,7 +371,7 @@ public class ResumeServiceImpl implements ResumeService {
 				userDAO.updateUserPoint(sessionUid, -1000);
 
 				return true;
-			} 
+			}
 		}
 		return false;
 	}
@@ -377,11 +382,11 @@ public class ResumeServiceImpl implements ResumeService {
 	}
 
 	/**
-	 *  @author 유지원
+	 * @author 유지원
 	 *
-	 * <p>
-	 * 이력서 첨삭 승인을 처리하는 메서드
-	 * </p>
+	 *         <p>
+	 *         이력서 첨삭 승인을 처리하는 메서드
+	 *         </p>
 	 * 
 	 * @param int resumeNo 이력서 번호
 	 * @return 성공 여부
@@ -393,14 +398,12 @@ public class ResumeServiceImpl implements ResumeService {
 	}
 
 	/**
-	 *  @author 유지원
+	 * @author 유지원
 	 *
-	 * <p>
-	 * 이력서 첨삭 거절을 처리하는 메서드
-	 * 거절을 하면 첨삭 상태가 첨삭 대기에서 첨삭 거절로 변경됩니다.
-	 * 포인트 로그에 포인트 차감 내역이 CANCEL로 업데이트 됩니다.
-	 * 포인트를 지불한 유저의 포인트를 돌려줍니다.
-	 * </p>
+	 *         <p>
+	 *         이력서 첨삭 거절을 처리하는 메서드 거절을 하면 첨삭 상태가 첨삭 대기에서 첨삭 거절로 변경됩니다. 포인트 로그에 포인트
+	 *         차감 내역이 CANCEL로 업데이트 됩니다. 포인트를 지불한 유저의 포인트를 돌려줍니다.
+	 *         </p>
 	 * 
 	 * @param int resumeNo 이력서 번호
 	 * @param int userUid 첨삭자 UID
@@ -427,14 +430,12 @@ public class ResumeServiceImpl implements ResumeService {
 	}
 
 	/**
-	 *  @author 유지원
+	 * @author 유지원
 	 *
-	 * <p>
-	 * 이력서 첨삭 종료를 처리하는 메서드
-	 * 종료를 하면 첨삭 상태가 CHECKING 에서 COMPLETE로 변경됩니다.
-	 * 포인트 로그에 포인트 차감 내역이 COMPLETE로 업데이트 됩니다.
-	 * 첨삭을 완료한 유저의 포인트를 증가시킵니다.
-	 * </p>
+	 *         <p>
+	 *         이력서 첨삭 종료를 처리하는 메서드 종료를 하면 첨삭 상태가 CHECKING 에서 COMPLETE로 변경됩니다. 포인트
+	 *         로그에 포인트 차감 내역이 COMPLETE로 업데이트 됩니다. 첨삭을 완료한 유저의 포인트를 증가시킵니다.
+	 *         </p>
 	 * 
 	 * @param int resumeNo 이력서 번호
 	 * @param int userUid 첨삭자 UID
@@ -463,11 +464,48 @@ public class ResumeServiceImpl implements ResumeService {
 		}
 		return false;
 	}
-	
 
 	@Override
 	public List<ResumeAdviceCommentDTO> getAdviceComments(int adviceNo) throws Exception {
 		return rdao.getAdviceComments(adviceNo);
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public void expireRegistrationAdvice(AccountVO loginAcc) throws Exception {
+		// 계정과 관련된 만료 신청서 삭제
+	    List<Integer> registrationAdviceNos = rdao.findOverdueRegistrationAdviceNos(loginAcc.getUid(),
+	            loginAcc.getLastLoginDate());
+
+	    for (Integer rgAdviceNo : registrationAdviceNos) {
+	        cancelRegistrationAdviceAndRestorePoint(rgAdviceNo);
+	    }
+	}
+
+	private final FileProcessForResume fileProcessForResume;
+
+	// 첨삭 신청서 no기준 취소처리
+	public void cancelRegistrationAdviceAndRestorePoint(int rgAdviceNo) throws Exception {
+		// 1. registration_advice CANCEL 처리
+		rdao.cancelRegistrationAdvice(rgAdviceNo);
+
+		// 2. adviceNo 조회
+		Integer adviceNo = rdao.findAdviceNoByRgAdviceNo(rgAdviceNo);
+
+		List<ResumeUpfileDTO> upfiles = new ArrayList<>();
+
+		if (adviceNo != null && adviceNo != 0) {
+			// 3. 파일 리스트 가져오기
+			upfiles = rdao.findResumeUpfilesByAdviceNo(adviceNo);
+			upfiles.forEach(upfile -> {
+				fileProcessForResume.removeFile(upfile); // 실제 서버에서 해당 파일 삭제
+			});
+
+			// 4. resume_advice 삭제
+			rdao.deleteResumeAdviceByAdviceNo(adviceNo);
+		}
+
+		// 5. pointLog 상태 CANCEL, finalDate NOW() 처리 + pointLog 로 user 포인트 복구 처리
+		rdao.cancelPointLogAndRestoreUserPointByRgAdviceNo(rgAdviceNo);
+	}
 }

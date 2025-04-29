@@ -187,7 +187,7 @@ public class CompanyRestController {
 		try {
 			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
 			
-			if (!accUtil.checkUid(sessionAccount, Integer.parseInt(dto.getUid()))) {
+			if (!AccountUtil.checkUid(sessionAccount, Integer.parseInt(dto.getUid()))) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 
@@ -223,7 +223,7 @@ public class CompanyRestController {
 
 			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
 			
-			if (!accUtil.checkUid(sessionAccount, Integer.parseInt(dto.getUid()))) {
+			if (!AccountUtil.checkUid(sessionAccount, Integer.parseInt(dto.getUid()))) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 
@@ -330,16 +330,19 @@ public class CompanyRestController {
 		try {
 
 			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
+			int checkedUid = Integer.parseInt(session.getAttribute("deleteAccountCompany").toString());
 
-			if (!accUtil.checkUid(sessionAccount, uid)) {
+			if (!AccountUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
+			} else if(checkedUid != sessionAccount.getUid()) {
+				throw new AccessDeniedException("인증 만료");
 			}
 
 			Timestamp deadline = service.setDeleteAccount(uid);
 			return ResponseEntity.ok().body(ResponseJsonMsg.success(deadline.toString()));
 		} catch (AccessDeniedException e) {
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseJsonMsg.notFound());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseJsonMsg.notFound(e.getMessage()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseJsonMsg.error());
@@ -352,7 +355,7 @@ public class CompanyRestController {
 
 			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
 
-			if (!accUtil.checkUid(sessionAccount, uid)) {
+			if (!AccountUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
 

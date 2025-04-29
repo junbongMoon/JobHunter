@@ -365,7 +365,7 @@ function renderResumeAdvice(res) {
             justify-content: space-between;
             align-items: center;
             cursor: pointer;"
-            onclick="viewResumeAdvice(\${item.resumeNo}, \${item.menteeUid}, \${item.adviceNo})">
+            onclick="viewResumeAdvice(\${item.resumeNo}, \${item.menteeUid})">
             
             <div style="flex: 1;">
               <div><strong>\${item.title}\${item.menteeUid}</strong></div>
@@ -385,8 +385,8 @@ function renderResumeAdvice(res) {
 
     renderPagination(res, "goToResumeAdvice", container)
 }
-function viewResumeAdvice(resumeNo, menteeUid, adviceNo) {
-  location.href=`/resume/checkAdvice/\${resumeNo}?uid=\${menteeUid}&adviceNo=\${adviceNo}`
+function viewResumeAdvice(resumeNo, menteeUid) {
+  location.href=`/resume/checkAdvice/\${resumeNo}?uid=\${menteeUid}`
 }
 
 function goToResumeAdvice(pageNum) {
@@ -495,7 +495,7 @@ function renderRegistrationAdvice(res) {
         COMPLETE: "<span style='color:var(--bs-teal);'>첨삭완료</span>",
         CANCEL: "<span style='color:var(--bs-red)'>취소</span>",
         WAITING: confirmBtn,
-        CHECKING: `<button class='btn-edit' onclick="location.href='/resume/checkAdvice/\${item.resumeNo}?uid=\${item.menteeUid}&adviceNo=\${item.adviceNo}'">조회 및 수정</button>`,
+        CHECKING: `<button class='btn-edit' onclick="location.href='/resume/checkAdvice/\${item.resumeNo}?uid=\${item.menteeUid}'">조회 및 수정</button>`,
       }
 
       const statusText = status[item.status];

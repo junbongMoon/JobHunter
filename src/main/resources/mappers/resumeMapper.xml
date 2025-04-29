@@ -376,6 +376,20 @@
         </if>
     </update>
     
+    <!-- 유저 한명의 관련된 유효기간 만료 신청들 상태 갱신 -->
+    <update id="changeAdviceStatus">
+        UPDATE registration_advice
+        SET status = #{status}
+        WHERE resumeNo = #{resumeNo}
+        AND mentorUid = #{userUid}
+        <if test="mode != null and mode == 'endAdvice'">
+        AND status = 'CHECKING'
+        </if>
+        <if test="mode == null or mode != 'endAdvice'">
+        AND status = 'WAITING'
+        </if>
+    </update>
+    
     <select id="selectRegistrationAdviceByMentorWithPaging" resultType="com.jobhunter.model.resume.RegistrationAdviceVO">
 	  SELECT 
 	    ra.rgAdviceNo,
@@ -485,5 +499,64 @@
         SELECT * FROM resume_advice_comment
         WHERE adviceNo = #{adviceNo}
     </select>
+    
+    <!-- 유저 한명에 대해 관련된 만료 첨삭 신청글 검색 -->
+    <select id="findOverdueRegistrationAdviceNos" parameterType="map" resultType="int">
+	    SELECT ra.rgAdviceNo
+	    FROM registration_advice ra
+	    JOIN resume r ON ra.resumeNo = r.resumeNo
+	    WHERE (
+	        ra.mentorUid = #{uid}
+	        OR r.userUid = #{uid}
+	    )
+	    AND ra.status IN ('WAITING', 'CHECKING')
+	    AND ra.dueDate &lt; NOW()
+	    AND ra.dueDate > #{lastLoginDate}
+	</select>
+
+	<!-- 글번호로 취소상태로 변경 -->
+	<update id="cancelRegistrationAdvice" parameterType="int">
+	    UPDATE registration_advice
+	    SET status = 'CANCEL'
+	    WHERE rgAdviceNo = #{rgAdviceNo}
+	</update>
+	
+	<!-- 신청글번호로 첨삭글번호 검색(파일처리 및 삭제에 여러번 사용해서 조인대신 분리) -->
+	<select id="findAdviceNoByRgAdviceNo" parameterType="int" resultType="int">
+	    SELECT adviceNo
+	    FROM registration_advice
+	    WHERE rgAdviceNo = #{rgAdviceNo}
+	</select>
+	
+	<!-- 첨삭글번호로 파일리스트 가져오기 -->
+	<select id="findResumeUpfilesByAdviceNo" parameterType="int" resultType="com.jobhunter.model.resume.ResumeUpfileDTO">
+	    SELECT
+	        adviceUpfileNo AS boardUpFileNo,
+	        originalFileName,
+	        newFileName,
+	        ext,
+	        size,
+	        base64Image,
+	        (SELECT resumeNo FROM resume_advice WHERE adviceNo = #{adviceNo}) AS resumeNo
+	    FROM resume_advice_upfiles
+	    WHERE adviceNo = #{adviceNo}
+	</select>
+	
+	<!-- 첨삭글 삭제 -->
+	<delete id="deleteResumeAdviceByAdviceNo" parameterType="int">
+	    DELETE FROM resume_advice
+	    WHERE adviceNo = #{adviceNo}
+	</delete>
+	
+	<!-- 신청글번호로 포인트로그 취소상태로 변경 및 유저 포인트 복구 -->
+	<update id="cancelPointLogAndRestoreUserPointByRgAdviceNo" parameterType="int">
+	    UPDATE users u
+	    JOIN pointLog p ON u.uid = p.toUid
+	    SET 
+	        u.point = u.point + (p.point * -1),
+	        p.finalDate = NOW(),
+	        p.status = 'CANCEL'
+	    WHERE p.rgAdviceNo = #{rgAdviceNo}
+	</update>
     
 </mapper>

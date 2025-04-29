@@ -147,11 +147,11 @@ public class UserRestController {
 		try {
 
 			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
-			int checkedUid = (int) session.getAttribute("deleteAccountUser");
+			int checkedUid = Integer.parseInt(session.getAttribute("deleteAccountUser").toString());
 
 			if (!AccountUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
-			} else if(checkedUid == sessionAccount.getUid()) {
+			} else if(checkedUid != sessionAccount.getUid()) {
 				throw new AccessDeniedException("인증 만료");
 			}
 
