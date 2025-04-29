@@ -559,7 +559,7 @@ $(document).ready(function () {
 		  const loginUserUid = parseInt($('#loginUserUid').val());    // 로그인한 사용자 UID
 		  const boardNo = parseInt($('#boardNo').val());
 		  const writerId = parseInt($('#postWriterUid').val(), 10);
-		  const reportTargetPK = parseInt($('#postWriterUid').val(), 10)
+		  const reportTargetPK = parseInt($('#boardNo').val(), 10)
 		  
 		  console.log("writerId:", writerId);
 		  console.log("reportTargetPK:", reportTargetPK);
