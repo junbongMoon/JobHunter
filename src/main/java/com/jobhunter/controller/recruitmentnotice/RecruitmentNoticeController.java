@@ -286,24 +286,33 @@ public class RecruitmentNoticeController {
 	 * @return ResponseEntity<List<RecruitmentnoticeBoardUpfiles>>
 	 *
 	 */
-	@DeleteMapping("/file")
+	@DeleteMapping("/file/{removeFileName:.+}")
 	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> removeFile(
-			@RequestParam("removeFileName") String removeFileName) {
+	        @PathVariable("removeFileName") String removeFileName,
+	        HttpServletRequest request) {
 
-		// 보안: 파일명 정규식 검사 (파일 경로 침입 방지)
-		if (!removeFileName.matches("^[a-zA-Z0-9_.-]+$")) {
-			return ResponseEntity.badRequest().body(fileList);
-		}
+	    System.out.println("삭제할 파일명 : " + removeFileName);
 
-		fileList.removeIf(file -> {
-			boolean match = file.getOriginalFileName().equals(removeFileName);
-			if (match) {
-				fp.removeFile(file);
-			}
-			return match;
-		});
+	    // 보안: 파일명 정규식 검사
+	    if (!removeFileName.matches("^[a-zA-Z0-9_.-]+$")) {
+	        return ResponseEntity.badRequest().body(fileList);
+	    }
 
-		return ResponseEntity.ok(fileList);
+	    String realPath = request.getSession().getServletContext().getRealPath("/");
+
+	    fileList.removeIf(file -> {
+	        System.out.println("file.originalFileName: [" + file.getOriginalFileName() + "]");
+	        System.out.println("removeFileName:       [" + removeFileName + "]");
+	        System.out.println("equals? " + file.getOriginalFileName().equals(removeFileName));
+
+	        boolean match = file.getOriginalFileName().equals(removeFileName);
+	        if (match) {
+	        	fp.removeFile(file);
+	        }
+	        return match;
+	    });
+
+	    return ResponseEntity.ok(fileList);
 	}
 
 	/**
