@@ -38,7 +38,7 @@
 					<c:if test="${isSameUser && mode == 'checkAdvice'}">
 						<h2 class="mb-4">첨삭 완료된 [${resumeDetail.resume.title}] 이력서 수정</h2>
 					</c:if>
-					<c:if test="${isSameUser && mode != 'checkAdvice'}">
+					<c:if test="${isSameUser && mode == 'edit'}">
 						<h2 class="mb-4">이력서 수정</h2>
 					</c:if>
 
@@ -1449,1021 +1449,1021 @@
 						commentMap[comment.lineNo] = comment.commentText;
 						editor.setGutterMarker(comment.lineNo, "comment-gutter", makeCommentIcon(comment.lineNo));
 						if (${ !isSameUser }) {
-							editor.setGutterMarker(comment.lineNo, "comment-control-gutter", makeControlButton(comment.lineNo, "remove"));
-						}
-						pendingComments.push({
-							lineNo: comment.lineNo,
-							commentText: comment.commentText,
-							resumeNo: comment.resumeNo,
-							mentorUid: comment.mentorUid,
-							adviceNo: comment.adviceNo
-						});
-					});
-
-					// 이력서 주인 uid와 쿼리스트링 uid가 다르면 튕기게하기
-					const userUidOwner = $("#userUidOwner").val();
-					const queryUid = "${param.uid}";
-					if (userUidOwner !== queryUid) {
-						window.location.href = "/";
+						editor.setGutterMarker(comment.lineNo, "comment-control-gutter", makeControlButton(comment.lineNo, "remove"));
 					}
-					// 시/도 클릭하면...
-					$(".region-item").on("click", function () {
-						// 기존에 누른 시/도 해제 및 현재 시/도 선택
-						$(".region-item").removeClass("selected");
-						$(this).addClass("selected");
+					pendingComments.push({
+						lineNo: comment.lineNo,
+						commentText: comment.commentText,
+						resumeNo: comment.resumeNo,
+						mentorUid: comment.mentorUid,
+						adviceNo: comment.adviceNo
+					});
+				});
 
-						// 선택된 시/도의 번호와 시/군/구 목록 가져오기
-						let regionNo = $(this).data("region");
-						let $sigunguList = $("#sigunguList");
+				// 이력서 주인 uid와 쿼리스트링 uid가 다르면 튕기게하기
+				const userUidOwner = $("#userUidOwner").val();
+				const queryUid = "${param.uid}";
+				if (userUidOwner !== queryUid) {
+					window.location.href = "/";
+				}
+				// 시/도 클릭하면...
+				$(".region-item").on("click", function () {
+					// 기존에 누른 시/도 해제 및 현재 시/도 선택
+					$(".region-item").removeClass("selected");
+					$(this).addClass("selected");
 
-						// AJAX 요청으로 시/군/구 목록 가져오기
-						$.ajax({
-							url: "/resume/getSigungu",
-							type: "GET",
-							data: { regionNo: regionNo },
-							dataType: "json",
-							success: function (response) {
-								if (response.error) {
-									$sigunguList.html('<li class="list-group-item text-danger">' + response.error + '</li>');
-									return;
-								}
+					// 선택된 시/도의 번호와 시/군/구 목록 가져오기
+					let regionNo = $(this).data("region");
+					let $sigunguList = $("#sigunguList");
 
-								$sigunguList.empty(); // 목록 초기화
+					// AJAX 요청으로 시/군/구 목록 가져오기
+					$.ajax({
+						url: "/resume/getSigungu",
+						type: "GET",
+						data: { regionNo: regionNo },
+						dataType: "json",
+						success: function (response) {
+							if (response.error) {
+								$sigunguList.html('<li class="list-group-item text-danger">' + response.error + '</li>');
+								return;
+							}
 
-								// 시/군/구 목록 동적 생성
-								$.each(response, function (index, sigungu) {
-									// 리스트 생성
-									let $li = $("<li>").addClass("list-group-item sigungu-item");
+							$sigunguList.empty(); // 목록 초기화
 
-									// 체크박스 생성
-									let $checkbox = $("<input>")
-										.attr({
-											type: "checkbox",
-											class: "form-check-input me-2",
-											value: sigungu.sigunguNo,
-											id: "sigungu_" + sigungu.sigunguNo,
-											"data-name": sigungu.name,
-											"data-region": regionNo,
-											"data-sigungu": sigungu.sigunguNo // 시/군/구 번호 추가
-										});
+							// 시/군/구 목록 동적 생성
+							$.each(response, function (index, sigungu) {
+								// 리스트 생성
+								let $li = $("<li>").addClass("list-group-item sigungu-item");
 
-									// 라벨 생성
-									let $label = $("<label>")
-										.attr({
-											class: "form-check-label",
-											for: "sigungu_" + sigungu.sigunguNo
-										})
-										.text(sigungu.name);
+								// 체크박스 생성
+								let $checkbox = $("<input>")
+									.attr({
+										type: "checkbox",
+										class: "form-check-input me-2",
+										value: sigungu.sigunguNo,
+										id: "sigungu_" + sigungu.sigunguNo,
+										"data-name": sigungu.name,
+										"data-region": regionNo,
+										"data-sigungu": sigungu.sigunguNo // 시/군/구 번호 추가
+									});
 
-									// 체크박스와 라벨을 리스트에 추가
-									$li.append($checkbox).append($label);
+								// 라벨 생성
+								let $label = $("<label>")
+									.attr({
+										class: "form-check-label",
+										for: "sigungu_" + sigungu.sigunguNo
+									})
+									.text(sigungu.name);
 
-									// 체크박스 상태 변경 이벤트
-									$checkbox.on("change", function () {
-										let selectedRegions = $("#selectedRegions");
-										let sigunguNo = $(this).data("sigungu");
-										let sigunguName = $(this).data("name");
-										let currentRegion = $(this).data("region");
-										let regionName = $(".region-item.selected").text().replace("▶", "").trim();
+								// 체크박스와 라벨을 리스트에 추가
+								$li.append($checkbox).append($label);
 
-										// 현재 선택된 시/도의 체크박스만 처리
-										if (currentRegion === regionNo) {
-											if ($(this).prop("checked")) {
-												// 체크박스가 체크되면 선택된 지역 목록에 추가
-												let $badge = $("<span>")
-													.addClass("badge bg-primary me-2")
-													.text(regionName + " " + sigunguName)
-													.attr("data-region", regionNo)
-													.attr("data-sigungu", sigunguNo); // 시/군/구 번호 저장
+								// 체크박스 상태 변경 이벤트
+								$checkbox.on("change", function () {
+									let selectedRegions = $("#selectedRegions");
+									let sigunguNo = $(this).data("sigungu");
+									let sigunguName = $(this).data("name");
+									let currentRegion = $(this).data("region");
+									let regionName = $(".region-item.selected").text().replace("▶", "").trim();
 
-												// 삭제 버튼 생성 및 삭제 기능
-												let $removeBtn = $("<button>")
-													.addClass("btn-close ms-2")
-													.attr("type", "button")  // type="button" 추가
-													.on("click", function (e) {
-														e.preventDefault();
-														e.stopPropagation();
+									// 현재 선택된 시/도의 체크박스만 처리
+									if (currentRegion === regionNo) {
+										if ($(this).prop("checked")) {
+											// 체크박스가 체크되면 선택된 지역 목록에 추가
+											let $badge = $("<span>")
+												.addClass("badge bg-primary me-2")
+												.text(regionName + " " + sigunguName)
+												.attr("data-region", regionNo)
+												.attr("data-sigungu", sigunguNo); // 시/군/구 번호 저장
 
-														const $badge = $(this).parent();
-														const sigunguNo = $badge.data("sigungu");
-														const regionName = $badge.text().trim().split(' ')[1];
+											// 삭제 버튼 생성 및 삭제 기능
+											let $removeBtn = $("<button>")
+												.addClass("btn-close ms-2")
+												.attr("type", "button")  // type="button" 추가
+												.on("click", function (e) {
+													e.preventDefault();
+													e.stopPropagation();
 
-														$badge.remove();
-														$(`input[data-sigungu="${sigunguNo}"]`).prop("checked", false);
+													const $badge = $(this).parent();
+													const sigunguNo = $badge.data("sigungu");
+													const regionName = $badge.text().trim().split(' ')[1];
 
-														// 해당 텍스트와 일치하는 체크박스 찾아서 해제
-														$('.sigungu-item input[type="checkbox"]').each(function () {
-															if ($(this).data('name') === regionName) {
-																$(this).prop('checked', false);
-															}
-														});
+													$badge.remove();
+													$(`input[data-sigungu="${sigunguNo}"]`).prop("checked", false);
+
+													// 해당 텍스트와 일치하는 체크박스 찾아서 해제
+													$('.sigungu-item input[type="checkbox"]').each(function () {
+														if ($(this).data('name') === regionName) {
+															$(this).prop('checked', false);
+														}
 													});
-
-												$badge.append($removeBtn);
-												selectedRegions.append($badge);
-											} else {
-												// 체크박스가 해제되면 선택된 지역 목록에서 제거
-												selectedRegions.find(".badge").each(function () {
-													if ($(this).data("sigungu") === sigunguNo) {
-														$(this).remove();
-													}
 												});
-											}
+
+											$badge.append($removeBtn);
+											selectedRegions.append($badge);
 										} else {
-											// 다른 시/도의 체크박스는 체크 해제
-											$(this).prop("checked", false);
+											// 체크박스가 해제되면 선택된 지역 목록에서 제거
+											selectedRegions.find(".badge").each(function () {
+												if ($(this).data("sigungu") === sigunguNo) {
+													$(this).remove();
+												}
+											});
 										}
-									});
-
-									// 이미 선택된 시/군/구인 경우 체크박스 체크
-									$("#selectedRegions").find(".badge").each(function () {
-										if ($(this).data("sigungu") === sigungu.sigunguNo) {
-											$checkbox.prop("checked", true);
-											return false; // each 중단
-										}
-									});
-
-									$sigunguList.append($li);
+									} else {
+										// 다른 시/도의 체크박스는 체크 해제
+										$(this).prop("checked", false);
+									}
 								});
-							},
-							error: function (xhr, status, error) {
-								console.error("Error:", error);
-								$sigunguList.html('<li class="list-group-item text-danger">불러오기 실패</li>');
-							}
-						});
+
+								// 이미 선택된 시/군/구인 경우 체크박스 체크
+								$("#selectedRegions").find(".badge").each(function () {
+									if ($(this).data("sigungu") === sigungu.sigunguNo) {
+										$checkbox.prop("checked", true);
+										return false; // each 중단
+									}
+								});
+
+								$sigunguList.append($li);
+							});
+						},
+						error: function (xhr, status, error) {
+							console.error("Error:", error);
+							$sigunguList.html('<li class="list-group-item text-danger">불러오기 실패</li>');
+						}
 					});
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 대분류 클릭
-					$(".major-item").on("click", function () {
-						// 이전 선택 해제 및 현재 항목 선택 표시
-						$(".major-item").removeClass("selected");
-						$(this).addClass("selected");
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 대분류 클릭
+				$(".major-item").on("click", function () {
+					// 이전 선택 해제 및 현재 항목 선택 표시
+					$(".major-item").removeClass("selected");
+					$(this).addClass("selected");
 
-						// 선택된 대분류의 번호와 소분류 목록 가져오기
-						let majorNo = $(this).data("major");
-						let $subCategoryList = $("#subCategoryList");
+					// 선택된 대분류의 번호와 소분류 목록 가져오기
+					let majorNo = $(this).data("major");
+					let $subCategoryList = $("#subCategoryList");
 
-						// AJAX 요청으로 소분류 목록 가져오기
-						$.ajax({
-							url: "/resume/getSubCategory",
-							type: "GET",
-							data: { majorNo: majorNo },
-							dataType: "json",
-							success: function (response) {
-								if (response.error) {
-									$subCategoryList.html('<li class="list-group-item text-danger">' + response.error + '</li>');
-									return;
-								}
+					// AJAX 요청으로 소분류 목록 가져오기
+					$.ajax({
+						url: "/resume/getSubCategory",
+						type: "GET",
+						data: { majorNo: majorNo },
+						dataType: "json",
+						success: function (response) {
+							if (response.error) {
+								$subCategoryList.html('<li class="list-group-item text-danger">' + response.error + '</li>');
+								return;
+							}
 
-								$subCategoryList.empty(); // 목록 초기화
+							$subCategoryList.empty(); // 목록 초기화
 
-								// 소분류 목록 동적 생성
-								$.each(response, function (index, sub) {
-									// 리스트 생성
-									let $li = $("<li>").addClass("list-group-item sub-item");
+							// 소분류 목록 동적 생성
+							$.each(response, function (index, sub) {
+								// 리스트 생성
+								let $li = $("<li>").addClass("list-group-item sub-item");
 
-									// 체크박스 생성
-									let $checkbox = $("<input>")
-										.attr({
-											type: "checkbox",
-											class: "form-check-input me-2",
-											value: sub.subcategoryNo,
-											id: "sub_" + sub.subcategoryNo,
-											"data-name": sub.jobName,
-											"data-major": majorNo,
-											"data-sub": sub.subcategoryNo // 소분류 번호 추가
-										});
+								// 체크박스 생성
+								let $checkbox = $("<input>")
+									.attr({
+										type: "checkbox",
+										class: "form-check-input me-2",
+										value: sub.subcategoryNo,
+										id: "sub_" + sub.subcategoryNo,
+										"data-name": sub.jobName,
+										"data-major": majorNo,
+										"data-sub": sub.subcategoryNo // 소분류 번호 추가
+									});
 
-									// 라벨 생성
-									let $label = $("<label>")
-										.attr({
-											class: "form-check-label",
-											for: "sub_" + sub.subcategoryNo
-										})
-										.text(sub.jobName);
+								// 라벨 생성
+								let $label = $("<label>")
+									.attr({
+										class: "form-check-label",
+										for: "sub_" + sub.subcategoryNo
+									})
+									.text(sub.jobName);
 
-									// 체크박스와 라벨을 리스트에 추가
-									$li.append($checkbox).append($label);
+								// 체크박스와 라벨을 리스트에 추가
+								$li.append($checkbox).append($label);
 
-									// 체크박스 상태 변경
-									$checkbox.on("change", function () {
-										let selectedJobTypes = $("#selectedJobTypes");
-										let subNo = $(this).data("sub");
-										let subName = $(this).data("name");
-										let currentMajor = $(this).data("major");
+								// 체크박스 상태 변경
+								$checkbox.on("change", function () {
+									let selectedJobTypes = $("#selectedJobTypes");
+									let subNo = $(this).data("sub");
+									let subName = $(this).data("name");
+									let currentMajor = $(this).data("major");
 
-										// 현재 선택된 대분류의 체크박스만 처리
-										if (currentMajor === majorNo) {
-											if ($(this).prop("checked")) {
-												// 체크박스가 체크되면 선택된 업직종 목록에 추가
-												let $badge = $("<span>")
-													.addClass("badge bg-primary me-2")
-													.text(subName)
-													.attr("data-major", majorNo)
-													.attr("data-sub", subNo);
+									// 현재 선택된 대분류의 체크박스만 처리
+									if (currentMajor === majorNo) {
+										if ($(this).prop("checked")) {
+											// 체크박스가 체크되면 선택된 업직종 목록에 추가
+											let $badge = $("<span>")
+												.addClass("badge bg-primary me-2")
+												.text(subName)
+												.attr("data-major", majorNo)
+												.attr("data-sub", subNo);
 
-												// 삭제 버튼 생성 및 삭제 기능
-												let $removeBtn = $("<button>")
-													.addClass("btn-close ms-2")
-													.attr("type", "button")
-													.on("click", function (e) {
-														e.preventDefault();
-														e.stopPropagation();
+											// 삭제 버튼 생성 및 삭제 기능
+											let $removeBtn = $("<button>")
+												.addClass("btn-close ms-2")
+												.attr("type", "button")
+												.on("click", function (e) {
+													e.preventDefault();
+													e.stopPropagation();
 
-														const $badge = $(this).parent();
-														const jobName = $badge.text().trim();
+													const $badge = $(this).parent();
+													const jobName = $badge.text().trim();
 
-														$badge.remove();
+													$badge.remove();
 
-														// 해당 텍스트와 일치하는 체크박스 찾아서 해제
-														$('.sub-item input[type="checkbox"]').each(function () {
-															if ($(this).data('name') === jobName) {
-																$(this).prop('checked', false);
-															}
-														});
+													// 해당 텍스트와 일치하는 체크박스 찾아서 해제
+													$('.sub-item input[type="checkbox"]').each(function () {
+														if ($(this).data('name') === jobName) {
+															$(this).prop('checked', false);
+														}
 													});
-
-												$badge.append($removeBtn);
-												selectedJobTypes.append($badge);
-											} else {
-												// 체크박스가 해제되면 선택된 업직종 목록에서 제거
-												selectedJobTypes.find(".badge").each(function () {
-													if ($(this).data("sub") === subNo) {
-														$(this).remove();
-													}
 												});
-											}
+
+											$badge.append($removeBtn);
+											selectedJobTypes.append($badge);
 										} else {
-											// 다른 대분류의 체크박스는 체크 해제
-											$(this).prop("checked", false);
+											// 체크박스가 해제되면 선택된 업직종 목록에서 제거
+											selectedJobTypes.find(".badge").each(function () {
+												if ($(this).data("sub") === subNo) {
+													$(this).remove();
+												}
+											});
 										}
-									});
-
-									// 이미 선택된 소분류인 경우 체크박스 체크
-									$("#selectedJobTypes").find(".badge").each(function () {
-										if ($(this).data("sub") === sub.subcategoryNo) {
-											$checkbox.prop("checked", true);
-											return false; // each 중단
-										}
-									});
-
-									$subCategoryList.append($li);
+									} else {
+										// 다른 대분류의 체크박스는 체크 해제
+										$(this).prop("checked", false);
+									}
 								});
-							},
-							error: function (xhr, status, error) {
-								console.error("Error:", error);
-								$subCategoryList.html('<li class="list-group-item text-danger">불러오기 실패</li>');
+
+								// 이미 선택된 소분류인 경우 체크박스 체크
+								$("#selectedJobTypes").find(".badge").each(function () {
+									if ($(this).data("sub") === sub.subcategoryNo) {
+										$checkbox.prop("checked", true);
+										return false; // each 중단
+									}
+								});
+
+								$subCategoryList.append($li);
+							});
+						},
+						error: function (xhr, status, error) {
+							console.error("Error:", error);
+							$subCategoryList.html('<li class="list-group-item text-danger">불러오기 실패</li>');
+						}
+					});
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 급여 입력 활성화 / 비활성화	
+				document.querySelectorAll('input[name="payType"]').forEach(radio => {
+					radio.addEventListener('change', function () {
+						const payInput = document.getElementById("payAmount");
+						if (this.value === "협의 후 결정") {
+							payInput.value = "";
+							payInput.disabled = true;
+						} else {
+							payInput.disabled = false;
+						}
+					});
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				let isSubmitting = false; // 중복 제출 방지용
+				// 최종 저장 버튼 클릭 이벤트
+				$('#finalSaveBtn').on('click', function () {
+					if (isSubmitting) return; // 이미 제출 중이면 무시
+
+					isSubmitting = true; // 제출 시작
+					$('#finalSaveBtn').prop('disabled', true); // 버튼 비활성화
+
+					// 버튼 안에 스피너 보여주기
+					$('#finalSaveBtn .btn-text').addClass('d-none');
+					$('#finalSaveBtn .spinner-border').removeClass('d-none');
+
+					// 유효성 검사
+					const title = $('#title').val().trim();
+					const titleLength = $('#title').val().length;
+					if (!title) {
+						showValidationModal("이력서 제목을 입력해주세요.", "#title");
+						resetSubmitButton();
+						return;
+					}
+
+					if (titleLength > 30) {
+						showValidationModal("이력서 제목은 30자 이내로 작성해주세요.", "#title");
+						resetSubmitButton();
+						return;
+					}
+
+					if (!$('#profileBase64').val()) {
+						showValidationModal("사진을 등록해 주세요.");
+						$(".photoUploadBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
+						return;
+					}
+
+					const jobFormCount = $('input[name="jobForm"]:checked').length;
+					if (jobFormCount === 0) {
+						showValidationModal("희망 고용형태를 하나 이상 선택해주세요.");
+						$(".jobTypeBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
+						return;
+					}
+
+					const payType = $('input[name="payType"]:checked').val();
+					const payTypeCount = $('input[name="payType"]:checked').length;
+					if (payTypeCount === 0) {
+						showValidationModal("희망 급여 형태를 선택해주세요");
+						$(".payTypeBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
+						return;
+					}
+					const payAmount = $('#payAmount').val().trim();
+					if (payType !== '협의 후 결정' && (!payAmount || payAmount <= 0)) {
+						showValidationModal("희망 금액을 입력해주세요");
+						$(".payTypeBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
+						return;
+					}
+
+					const regionCount = $('#selectedRegions .badge').length;
+					if (regionCount === 0) {
+						showValidationModal("희망 근무지를 선택해 주세요");
+						$(".wishRegionBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
+						return;
+					}
+
+					const jobTypeCount = $('#selectedJobTypes .badge').length;
+					if (jobTypeCount === 0) {
+						showValidationModal("희망 업직종을 선택해 주세요");
+						$(".wishJobBox").attr("tabindex", -1).focus();
+						resetSubmitButton();
+						return;
+					}
+
+					const meritCount = $('#selectedMerits .badge').length;
+					if (meritCount === 0) {
+						showValidationModal("성격 및 강점을 선택해 주세요");
+						$("#myMerits").attr("tabindex", -1).focus();
+						resetSubmitButton();
+						return;
+					}
+
+					// 학력을 추가하였는가 확인하고 추가하였다면 값을 입력하지 않았을 시 학력사항에 입력사항이 누락되었음을 알리고 입력을 하도록 유도
+					const educationItems = $('.education-item'); // each -> 
+					if (educationItems.length > 0) {
+						let isValid = true;
+
+						educationItems.each(function () {
+							const educationLevel = $(this).find('.education-level').val();
+							const educationStatus = $(this).find('.education-status').val();
+							const graduationDate = $(this).find('.graduation-date').val();
+							const customInput = $(this).find('.custom-input').val().trim();
+
+							if (!educationLevel || !educationStatus || !graduationDate || !customInput) {
+								isValid = false;
+								return false; // each 중단
 							}
 						});
-					});
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 급여 입력 활성화 / 비활성화	
-					document.querySelectorAll('input[name="payType"]').forEach(radio => {
-						radio.addEventListener('change', function () {
-							const payInput = document.getElementById("payAmount");
-							if (this.value === "협의 후 결정") {
-								payInput.value = "";
-								payInput.disabled = true;
-							} else {
-								payInput.disabled = false;
+
+						if (!isValid) {
+							showValidationModal("학력사항에 입력사항이 누락되었습니다.");
+							$("#myEducationBox").attr("tabindex", -1).focus();
+							resetSubmitButton();
+							return;
+						}
+					}
+
+					// 경력사항 유효성 검사 -> 학력과 유사한 형식
+					const historyItems = $('.history-item');
+					if (historyItems.length > 0) {
+						let isValid = true;
+
+						historyItems.each(function () {
+							const companyName = $(this).find('.company-name').val().trim();
+							const jobDescription = $(this).find('.job-description').val().trim();
+							const startDate = $(this).find('.start-date').val();
+							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
+							const endDate = $(this).find('.end-date').val();
+
+							if (!companyName || !jobDescription || !startDate) {
+								isValid = false;
+								return false;
+							}
+
+							// 재직중이 아닌 경우에만 종료일 체크
+							if (!isCurrentlyEmployed && !endDate) {
+								isValid = false;
+								return false;
 							}
 						});
-					});
-					//---------------------------------------------------------------------------------------------------------------------------------
-					let isSubmitting = false; // 중복 제출 방지용
-					// 최종 저장 버튼 클릭 이벤트
-					$('#finalSaveBtn').on('click', function () {
-						if (isSubmitting) return; // 이미 제출 중이면 무시
 
-						isSubmitting = true; // 제출 시작
-						$('#finalSaveBtn').prop('disabled', true); // 버튼 비활성화
-
-						// 버튼 안에 스피너 보여주기
-						$('#finalSaveBtn .btn-text').addClass('d-none');
-						$('#finalSaveBtn .spinner-border').removeClass('d-none');
-
-						// 유효성 검사
-						const title = $('#title').val().trim();
-						const titleLength = $('#title').val().length;
-						if (!title) {
-							showValidationModal("이력서 제목을 입력해주세요.", "#title");
-							resetSubmitButton();
-							return;
-						}
-
-						if (titleLength > 30) {
-							showValidationModal("이력서 제목은 30자 이내로 작성해주세요.", "#title");
-							resetSubmitButton();
-							return;
-						}
-
-						if (!$('#profileBase64').val()) {
-							showValidationModal("사진을 등록해 주세요.");
-							$(".photoUploadBox").attr("tabindex", -1).focus();
-							resetSubmitButton();
-							return;
-						}
-
-						const jobFormCount = $('input[name="jobForm"]:checked').length;
-						if (jobFormCount === 0) {
-							showValidationModal("희망 고용형태를 하나 이상 선택해주세요.");
-							$(".jobTypeBox").attr("tabindex", -1).focus();
-							resetSubmitButton();
-							return;
-						}
-
-						const payType = $('input[name="payType"]:checked').val();
-						const payTypeCount = $('input[name="payType"]:checked').length;
-						if (payTypeCount === 0) {
-							showValidationModal("희망 급여 형태를 선택해주세요");
-							$(".payTypeBox").attr("tabindex", -1).focus();
-							resetSubmitButton();
-							return;
-						}
-						const payAmount = $('#payAmount').val().trim();
-						if (payType !== '협의 후 결정' && (!payAmount || payAmount <= 0)) {
-							showValidationModal("희망 금액을 입력해주세요");
-							$(".payTypeBox").attr("tabindex", -1).focus();
-							resetSubmitButton();
-							return;
-						}
-
-						const regionCount = $('#selectedRegions .badge').length;
-						if (regionCount === 0) {
-							showValidationModal("희망 근무지를 선택해 주세요");
-							$(".wishRegionBox").attr("tabindex", -1).focus();
-							resetSubmitButton();
-							return;
-						}
-
-						const jobTypeCount = $('#selectedJobTypes .badge').length;
-						if (jobTypeCount === 0) {
-							showValidationModal("희망 업직종을 선택해 주세요");
-							$(".wishJobBox").attr("tabindex", -1).focus();
-							resetSubmitButton();
-							return;
-						}
-
-						const meritCount = $('#selectedMerits .badge').length;
-						if (meritCount === 0) {
-							showValidationModal("성격 및 강점을 선택해 주세요");
-							$("#myMerits").attr("tabindex", -1).focus();
-							resetSubmitButton();
-							return;
-						}
-
-						// 학력을 추가하였는가 확인하고 추가하였다면 값을 입력하지 않았을 시 학력사항에 입력사항이 누락되었음을 알리고 입력을 하도록 유도
-						const educationItems = $('.education-item'); // each -> 
-						if (educationItems.length > 0) {
-							let isValid = true;
-
-							educationItems.each(function () {
-								const educationLevel = $(this).find('.education-level').val();
-								const educationStatus = $(this).find('.education-status').val();
-								const graduationDate = $(this).find('.graduation-date').val();
-								const customInput = $(this).find('.custom-input').val().trim();
-
-								if (!educationLevel || !educationStatus || !graduationDate || !customInput) {
-									isValid = false;
-									return false; // each 중단
-								}
-							});
-
-							if (!isValid) {
-								showValidationModal("학력사항에 입력사항이 누락되었습니다.");
-								$("#myEducationBox").attr("tabindex", -1).focus();
-								resetSubmitButton();
-								return;
-							}
-						}
-
-						// 경력사항 유효성 검사 -> 학력과 유사한 형식
-						const historyItems = $('.history-item');
-						if (historyItems.length > 0) {
-							let isValid = true;
-
-							historyItems.each(function () {
-								const companyName = $(this).find('.company-name').val().trim();
-								const jobDescription = $(this).find('.job-description').val().trim();
-								const startDate = $(this).find('.start-date').val();
-								const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
-								const endDate = $(this).find('.end-date').val();
-
-								if (!companyName || !jobDescription || !startDate) {
-									isValid = false;
-									return false;
-								}
-
-								// 재직중이 아닌 경우에만 종료일 체크
-								if (!isCurrentlyEmployed && !endDate) {
-									isValid = false;
-									return false;
-								}
-							});
-
-							if (!isValid) {
-								showValidationModal("경력사항에 입력사항이 누락되었습니다.");
-								$("#myHistoryBox").attr("tabindex", -1).focus();
-								resetSubmitButton();
-								return;
-							}
-						}
-
-						// 자격증 유효성 검사
-						const licenseItems = $('.license-item');
-						if (licenseItems.length > 0) {
-							let isValid = true;
-
-							licenseItems.each(function () {
-								const licenseName = $(this).find('.license-name').val().trim();
-								const acquisitionDate = $(this).find('.acquisition-date').val();
-								const institution = $(this).find('.institution').val().trim();
-
-								if (!licenseName || !acquisitionDate || !institution) {
-									isValid = false;
-									return false; // each 중단
-								}
-							});
-
-							if (!isValid) {
-								showValidationModal("자격증 정보가 누락되었습니다.");
-								$("#myLicenseBox").attr("tabindex", -1).focus();
-								resetSubmitButton();
-								return;
-							}
-						}
-
-						const startDateInput = document.querySelector('.start-date');
-						const endDateInput = document.querySelector('.end-date');
-
-						const startDate = new Date(startDateInput.value);
-						const endDate = new Date(endDateInput.value);
-
-						if (startDate > endDate) {
-							showValidationModal('근무기간 입력이 잘못되었습니다!');
+						if (!isValid) {
+							showValidationModal("경력사항에 입력사항이 누락되었습니다.");
 							$("#myHistoryBox").attr("tabindex", -1).focus();
-							endDateInput.value = ''; // 종료일 초기화
 							resetSubmitButton();
 							return;
 						}
+					}
 
-						console.log("유효성 검사 통과");
+					// 자격증 유효성 검사
+					const licenseItems = $('.license-item');
+					if (licenseItems.length > 0) {
+						let isValid = true;
 
-						// 삭제된 파일이 있으면 서버에 삭제 요청
-						if (deletedFiles.length > 0) {
-							// 각 파일에 대해 개별적으로 삭제 요청
-							let deletePromises = deletedFiles.map(function (fileName) {
-								// 비동기 작업을 처리하기 위한 Promise 객체 생성
-								return new Promise(function (resolve, reject) {
-									$.ajax({
-										url: "/resume/deleteFile",
-										type: "POST",
-										data: JSON.stringify({
-											originalFileName: fileName,
-											newFileName: fileName,
-											ext: fileName.split('.').pop(),
-											size: 0
-										}),
-										contentType: "application/json",
-										success: function (result) {
-											if (result.success) {
-												resolve();
-											} else {
-												reject(result.message || "파일 삭제에 실패했습니다.");
-											}
-										},
-										error: function () {
-											reject("파일 삭제 중 오류가 발생했습니다.");
+						licenseItems.each(function () {
+							const licenseName = $(this).find('.license-name').val().trim();
+							const acquisitionDate = $(this).find('.acquisition-date').val();
+							const institution = $(this).find('.institution').val().trim();
+
+							if (!licenseName || !acquisitionDate || !institution) {
+								isValid = false;
+								return false; // each 중단
+							}
+						});
+
+						if (!isValid) {
+							showValidationModal("자격증 정보가 누락되었습니다.");
+							$("#myLicenseBox").attr("tabindex", -1).focus();
+							resetSubmitButton();
+							return;
+						}
+					}
+
+					const startDateInput = document.querySelector('.start-date');
+					const endDateInput = document.querySelector('.end-date');
+
+					const startDate = new Date(startDateInput.value);
+					const endDate = new Date(endDateInput.value);
+
+					if (startDate > endDate) {
+						showValidationModal('근무기간 입력이 잘못되었습니다!');
+						$("#myHistoryBox").attr("tabindex", -1).focus();
+						endDateInput.value = ''; // 종료일 초기화
+						resetSubmitButton();
+						return;
+					}
+
+					console.log("유효성 검사 통과");
+
+					// 삭제된 파일이 있으면 서버에 삭제 요청
+					if (deletedFiles.length > 0) {
+						// 각 파일에 대해 개별적으로 삭제 요청
+						let deletePromises = deletedFiles.map(function (fileName) {
+							// 비동기 작업을 처리하기 위한 Promise 객체 생성
+							return new Promise(function (resolve, reject) {
+								$.ajax({
+									url: "/resume/deleteFile",
+									type: "POST",
+									data: JSON.stringify({
+										originalFileName: fileName,
+										newFileName: fileName,
+										ext: fileName.split('.').pop(),
+										size: 0
+									}),
+									contentType: "application/json",
+									success: function (result) {
+										if (result.success) {
+											resolve();
+										} else {
+											reject(result.message || "파일 삭제에 실패했습니다.");
 										}
-									});
+									},
+									error: function () {
+										reject("파일 삭제 중 오류가 발생했습니다.");
+									}
 								});
 							});
+						});
 
-							// 모든 삭제 요청이 완료된 후 폼 데이터 수집 및 저장 진행
-							Promise.all(deletePromises)
-								.then(function () {
-									console.log("모든 파일 삭제 성공");
-									submitFormData();
-								})
-								.catch(function (error) {
-									showValidationModal(error);
-								});
-						} else {
-							// 삭제된 파일이 없으면 바로 폼 데이터 수집 및 저장 진행
-							submitFormData();
+						// 모든 삭제 요청이 완료된 후 폼 데이터 수집 및 저장 진행
+						Promise.all(deletePromises)
+							.then(function () {
+								console.log("모든 파일 삭제 성공");
+								submitFormData();
+							})
+							.catch(function (error) {
+								showValidationModal(error);
+							});
+					} else {
+						// 삭제된 파일이 없으면 바로 폼 데이터 수집 및 저장 진행
+						submitFormData();
+					}
+				});
+
+				// 폼 데이터 수집 및 저장 함수
+				function submitFormData() {
+					// 대기 중인 파일들을 서버에 업로드
+					if (pendingFiles.length > 0) {
+						// 각 파일에 대해 업로드 Promise 생성
+						const uploadPromises = pendingFiles.map(fileInfo => uploadFile(fileInfo));
+
+						// 모든 파일 업로드가 완료된 후 폼 데이터 수집 및 저장 진행
+						Promise.all(uploadPromises)
+							.then(() => {
+								console.log("모든 파일 업로드 성공");
+								// 대기 중인 파일 목록 초기화
+								pendingFiles = [];
+								// 폼 데이터 수집 및 저장 진행
+								saveFormData();
+							})
+							.catch(error => {
+								showValidationModal(error);
+							});
+					} else {
+						// 대기 중인 파일이 없으면 바로 폼 데이터 수집 및 저장 진행
+						saveFormData();
+					}
+				}
+
+				// 폼 데이터 수집 및 저장 함수
+				function saveFormData() {
+					// 폼 데이터 수집 .map() -> .get()으로 배열 변환해서 값 가져오기
+					const formData = {
+						title: $('#title').val(),
+						payType: $('input[name="payType"]:checked').val(),
+						pay: $('#payAmount').val().replace(/,/g, ''),
+						jobForms: $('input[name="jobForm"]:checked').map(function () {
+							return {
+								form: $(this).val()
+							};
+						}).get(),
+						sigunguNos: $('#selectedRegions').find('.badge').map(function () {
+							return $(this).data("sigungu");
+						}).get(),
+						subcategoryNos: $('#selectedJobTypes').find('.badge').map(function () {
+							return $(this).data("sub");
+						}).get(),
+						merits: $('#selectedMerits').find('.badge').map(function () {
+							return {
+								meritContent: $(this).data('merit')
+							};
+						}).get(),
+						educations: $('.education-item').map(function () {
+							return {
+								educationLevel: $(this).find('.education-level').val(),
+								educationStatus: $(this).find('.education-status').val(),
+								graduationDate: $(this).find('.graduation-date').val(),
+								customInput: $(this).find('.custom-input').val()
+							};
+						}).get(),
+						histories: $('.history-item').map(function () {
+							const $endDate = $(this).find('.end-date');
+							const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
+							return {
+								companyName: $(this).find('.company-name').val(),
+								position: $(this).find('.position').val(),
+								jobDescription: $(this).find('.job-description').val(),
+								startDate: $(this).find('.start-date').val(),
+								endDate: isCurrentlyEmployed ? null : $endDate.val()
+							};
+						}).get(),
+						licenses: $('.license-item').map(function () {
+							return {
+								licenseName: $(this).find('.license-name').val(),
+								acquisitionDate: $(this).find('.acquisition-date').val(),
+								institution: $(this).find('.institution').val()
+							};
+						}).get(),
+						// introduce: $('#selfIntroTextarea').val(),
+						introduce: editor.getValue(),
+						files: uploadedFiles,
+						userUid: $('#userUid').val(),
+						profileBase64: $('#profileBase64').val()
+					};
+
+					// 이력서 번호가 있는 경우 추가(수정기능)
+					const resumeNo = '${resumeDetail.resume.resumeNo}';
+					if (resumeNo) {
+						formData.resumeNo = resumeNo;
+					}
+
+					console.log('저장할 데이터:', formData);
+
+					// URL에서 uid(공고uid) 파라미터 가져오기
+					const urlParams = new URLSearchParams(window.location.search);
+					const uid = urlParams.get('uid');
+					console.log('uid:', uid);
+
+					// 저장 또는 수정 요청
+					const url = resumeNo ? `/resume/update/${resumeNo}` : '/resume/submit-final';
+					$.ajax({
+						url: url,
+						type: 'POST',
+						data: JSON.stringify(formData),
+						contentType: 'application/json',
+						success: function (response) {
+							if (response.success) {
+								window.location.href = response.redirectUrl;
+							} else {
+								showValidationModal(response.message || "저장 중 오류가 발생했습니다.");
+							}
+						},
+						error: function (xhr, status, error) {
+							console.error('Error details:', {
+								status: status,
+								error: error,
+								response: xhr.responseText
+							});
+							isSubmitting = false; // 중복 방지 플래그 해제
+							$('#finalSaveBtn').prop('disabled', false); // 버튼 복원
+							$('#finalSaveBtn .btn-text').removeClass('d-none');
+							$('#finalSaveBtn .spinner-border').addClass('d-none');
+							showValidationModal("저장 중 오류가 발생했습니다.");
+						}
+					});
+				}
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 유효성 검사 모달
+				function showValidationModal(message, focusSelector) {
+					$('#validationMessage').text(message); // 메시지 설정
+					$('#validationModal').modal('show');   // 모달 띄우기
+
+					// 모달이 닫히면 해당 요소로 포커스 이동
+					$('#validationCheckBtn').off('click').on('click', function () {
+						if (focusSelector) {
+							$(focusSelector).focus();
+						}
+					});
+				}
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 성격 및 강점 버튼 클릭 이벤트
+				$('.merit-btn').on('click', function () {
+					const merit = $(this).data('merit');
+					const selectedMerits = $('#selectedMerits');
+
+					// 이미 선택된 성격인지 확인 (텍스트 내용으로 비교)
+					let isDuplicate = false;
+					let $existingBadge = null;
+					selectedMerits.find('.badge').each(function () {
+						if ($(this).text().trim() === merit) {
+							isDuplicate = true;
+							$existingBadge = $(this);
+							return false; // each 루프 중단
 						}
 					});
 
-					// 폼 데이터 수집 및 저장 함수
-					function submitFormData() {
-						// 대기 중인 파일들을 서버에 업로드
-						if (pendingFiles.length > 0) {
-							// 각 파일에 대해 업로드 Promise 생성
-							const uploadPromises = pendingFiles.map(fileInfo => uploadFile(fileInfo));
-
-							// 모든 파일 업로드가 완료된 후 폼 데이터 수집 및 저장 진행
-							Promise.all(uploadPromises)
-								.then(() => {
-									console.log("모든 파일 업로드 성공");
-									// 대기 중인 파일 목록 초기화
-									pendingFiles = [];
-									// 폼 데이터 수집 및 저장 진행
-									saveFormData();
-								})
-								.catch(error => {
-									showValidationModal(error);
-								});
-						} else {
-							// 대기 중인 파일이 없으면 바로 폼 데이터 수집 및 저장 진행
-							saveFormData();
-						}
-					}
-
-					// 폼 데이터 수집 및 저장 함수
-					function saveFormData() {
-						// 폼 데이터 수집 .map() -> .get()으로 배열 변환해서 값 가져오기
-						const formData = {
-							title: $('#title').val(),
-							payType: $('input[name="payType"]:checked').val(),
-							pay: $('#payAmount').val().replace(/,/g, ''),
-							jobForms: $('input[name="jobForm"]:checked').map(function () {
-								return {
-									form: $(this).val()
-								};
-							}).get(),
-							sigunguNos: $('#selectedRegions').find('.badge').map(function () {
-								return $(this).data("sigungu");
-							}).get(),
-							subcategoryNos: $('#selectedJobTypes').find('.badge').map(function () {
-								return $(this).data("sub");
-							}).get(),
-							merits: $('#selectedMerits').find('.badge').map(function () {
-								return {
-									meritContent: $(this).data('merit')
-								};
-							}).get(),
-							educations: $('.education-item').map(function () {
-								return {
-									educationLevel: $(this).find('.education-level').val(),
-									educationStatus: $(this).find('.education-status').val(),
-									graduationDate: $(this).find('.graduation-date').val(),
-									customInput: $(this).find('.custom-input').val()
-								};
-							}).get(),
-							histories: $('.history-item').map(function () {
-								const $endDate = $(this).find('.end-date');
-								const isCurrentlyEmployed = $(this).find('.currently-employed').is(':checked');
-								return {
-									companyName: $(this).find('.company-name').val(),
-									position: $(this).find('.position').val(),
-									jobDescription: $(this).find('.job-description').val(),
-									startDate: $(this).find('.start-date').val(),
-									endDate: isCurrentlyEmployed ? null : $endDate.val()
-								};
-							}).get(),
-							licenses: $('.license-item').map(function () {
-								return {
-									licenseName: $(this).find('.license-name').val(),
-									acquisitionDate: $(this).find('.acquisition-date').val(),
-									institution: $(this).find('.institution').val()
-								};
-							}).get(),
-							// introduce: $('#selfIntroTextarea').val(),
-							introduce: editor.getValue(),
-							files: uploadedFiles,
-							userUid: $('#userUid').val(),
-							profileBase64: $('#profileBase64').val()
-						};
-
-						// 이력서 번호가 있는 경우 추가(수정기능)
-						const resumeNo = '${resumeDetail.resume.resumeNo}';
-						if (resumeNo) {
-							formData.resumeNo = resumeNo;
+					if (isDuplicate) {
+						// 이미 선택된 항목이면 제거
+						$existingBadge.remove();
+						// 버튼 스타일 초기화
+						$(this).removeClass('btn-primary').addClass('btn-outline-primary');
+					} else {
+						// 현재 선택된 항목 수 확인
+						const currentCount = selectedMerits.find('.badge').length;
+						if (currentCount >= 5) {
+							showValidationModal("성격 및 강점은 최대 5개까지 선택 가능합니다.");
+							return;
 						}
 
-						console.log('저장할 데이터:', formData);
+						// 새로운 뱃지 생성
+						const $badge = $('<span>')
+							.addClass('badge bg-primary me-2 mb-2')
+							.text(merit)
+							.attr('data-merit', merit);
 
-						// URL에서 uid(공고uid) 파라미터 가져오기
-						const urlParams = new URLSearchParams(window.location.search);
-						const uid = urlParams.get('uid');
-						console.log('uid:', uid);
+						// 삭제 버튼 추가
+						const $removeBtn = $('<button>')
+							.addClass('btn-close ms-2')
+							.attr('aria-label', merit + ' 삭제')
+							.on('click', function (e) {
+								e.preventDefault();
+								e.stopPropagation();
 
-						// 저장 또는 수정 요청
-						const url = resumeNo ? `/resume/update/${resumeNo}` : '/resume/submit-final';
-						$.ajax({
-							url: url,
-							type: 'POST',
-							data: JSON.stringify(formData),
-							contentType: 'application/json',
-							success: function (response) {
-								if (response.success) {
-									window.location.href = response.redirectUrl;
-								} else {
-									showValidationModal(response.message || "저장 중 오류가 발생했습니다.");
-								}
-							},
-							error: function (xhr, status, error) {
-								console.error('Error details:', {
-									status: status,
-									error: error,
-									response: xhr.responseText
-								});
-								isSubmitting = false; // 중복 방지 플래그 해제
-								$('#finalSaveBtn').prop('disabled', false); // 버튼 복원
-								$('#finalSaveBtn .btn-text').removeClass('d-none');
-								$('#finalSaveBtn .spinner-border').addClass('d-none');
-								showValidationModal("저장 중 오류가 발생했습니다.");
-							}
-						});
+								$badge.remove();
+								// 삭제 시 버튼 스타일 초기화
+								$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-primary').addClass('btn-outline-primary');
+							});
+
+						$badge.append($removeBtn);
+						selectedMerits.append($badge);
+
+						// 버튼 스타일 변경
+						$(this).removeClass('btn-outline-primary').addClass('btn-primary');
 					}
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 유효성 검사 모달
-					function showValidationModal(message, focusSelector) {
-						$('#validationMessage').text(message); // 메시지 설정
-						$('#validationModal').modal('show');   // 모달 띄우기
+				});
 
-						// 모달이 닫히면 해당 요소로 포커스 이동
-						$('#validationCheckBtn').off('click').on('click', function () {
-							if (focusSelector) {
-								$(focusSelector).focus();
-							}
-						});
-					}
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 성격 및 강점 버튼 클릭 이벤트
-					$('.merit-btn').on('click', function () {
-						const merit = $(this).data('merit');
-						const selectedMerits = $('#selectedMerits');
+				// 페이지 로드 시 기존 선택된 성격 및 강점에 대한 버튼 스타일 설정
+				$('#selectedMerits .badge').each(function () {
+					const merit = $(this).data('merit');
+					$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-outline-primary').addClass('btn-primary');
+				});
 
-						// 이미 선택된 성격인지 확인 (텍스트 내용으로 비교)
-						let isDuplicate = false;
-						let $existingBadge = null;
-						selectedMerits.find('.badge').each(function () {
-							if ($(this).text().trim() === merit) {
-								isDuplicate = true;
-								$existingBadge = $(this);
-								return false; // each 루프 중단
-							}
-						});
+				// 기존 성격 및 강점 배지의 삭제 버튼 이벤트
+				$('#selectedMerits').on('click', '.btn-close', function (e) {
+					e.preventDefault();
+					e.stopPropagation();
 
-						if (isDuplicate) {
-							// 이미 선택된 항목이면 제거
-							$existingBadge.remove();
-							// 버튼 스타일 초기화
-							$(this).removeClass('btn-primary').addClass('btn-outline-primary');
-						} else {
-							// 현재 선택된 항목 수 확인
-							const currentCount = selectedMerits.find('.badge').length;
-							if (currentCount >= 5) {
-								showValidationModal("성격 및 강점은 최대 5개까지 선택 가능합니다.");
-								return;
-							}
+					const $badge = $(this).parent();
+					const merit = $badge.data('merit');
 
-							// 새로운 뱃지 생성
-							const $badge = $('<span>')
-								.addClass('badge bg-primary me-2 mb-2')
-								.text(merit)
-								.attr('data-merit', merit);
+					$badge.remove();
+					// 삭제 시 버튼 스타일 초기화
+					$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-primary').addClass('btn-outline-primary');
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 성격 및 강점 선택 모달이 열리기 전에 버튼 스타일 설정
+				$('#meritModal').on('show.bs.modal', function () {
+					// 모든 버튼 초기화
+					$('.merit-btn').removeClass('btn-primary').addClass('btn-outline-primary');
 
-							// 삭제 버튼 추가
-							const $removeBtn = $('<button>')
-								.addClass('btn-close ms-2')
-								.attr('aria-label', merit + ' 삭제')
-								.on('click', function (e) {
-									e.preventDefault();
-									e.stopPropagation();
+					// 현재 선택된 배지들의 텍스트 수집
+					const selectedMerits = [];
+					$('#selectedMerits .badge').each(function () {
+						selectedMerits.push($(this).text().trim().replace('삭제', '').trim());
+					});
 
-									$badge.remove();
-									// 삭제 시 버튼 스타일 초기화
-									$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-primary').addClass('btn-outline-primary');
-								});
-
-							$badge.append($removeBtn);
-							selectedMerits.append($badge);
-
-							// 버튼 스타일 변경
+					// 각 버튼을 순회하면서 선택된 배지의 텍스트와 비교
+					$('.merit-btn').each(function () {
+						const buttonText = $(this).text().trim();
+						if (selectedMerits.includes(buttonText)) {
 							$(this).removeClass('btn-outline-primary').addClass('btn-primary');
 						}
 					});
+				});
 
-					// 페이지 로드 시 기존 선택된 성격 및 강점에 대한 버튼 스타일 설정
+				// 성격 및 강점 선택 모달이 열린 후 포커스 관리
+				$('#meritModal').on('shown.bs.modal', function () {
+					// 모달이 열릴 때 첫 번째 버튼에 포커스
+					$(this).find('.merit-btn').first().focus();
+				});
+
+				// 모달이 닫힐 때 버튼 스타일 초기화
+				$('#meritModal').on('hidden.bs.modal', function () {
+					// 모든 버튼 초기화
+					$('.merit-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+
+					// 선택된 항목들의 버튼 스타일 변경
 					$('#selectedMerits .badge').each(function () {
 						const merit = $(this).data('merit');
 						$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-outline-primary').addClass('btn-primary');
 					});
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 학력 추가 버튼 클릭 이벤트
+				$('#addEducationBtn').on('click', function () {
+					const template = document.querySelector('#educationTemplate');
+					const clone = template.content.cloneNode(true);
+					$('#educationContainer').append(clone);
+				});
 
-					// 기존 성격 및 강점 배지의 삭제 버튼 이벤트
-					$('#selectedMerits').on('click', '.btn-close', function (e) {
-						e.preventDefault();
-						e.stopPropagation();
+				// 학력 삭제 버튼 클릭 이벤트
+				$(document).on('click', '.remove-education', function () {
+					$(this).closest('.education-item').remove();
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 페이지 로드 시 기존 학력사항 표시
+				function initializeEducation() {
+					const educationTemplate = document.querySelector('#educationTemplate');
 
-						const $badge = $(this).parent();
-						const merit = $badge.data('merit');
+					<c:forEach var="education" items="${resumeDetail.educations}" varStatus="status">
+						const educationClone${status.index} = educationTemplate.content.cloneNode(true);
 
-						$badge.remove();
-						// 삭제 시 버튼 스타일 초기화
-						$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-primary').addClass('btn-outline-primary');
+						// 기존 값 설정
+						$(educationClone${status.index}).find('.education-level').val('${education.educationLevel}');
+						$(educationClone${status.index}).find('.education-status').val('${education.educationStatus}');
+
+						// 날짜 형식 변환 (yyyy-MM-dd)
+						<c:if test="${not empty education.graduationDate}">
+							const graduationDate${status.index} = new Date('${education.graduationDate}');
+							const formattedDate${status.index} = graduationDate${status.index}.getFullYear() + '-' +
+							String(graduationDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
+							String(graduationDate${status.index}.getDate()).padStart(2, '0');
+							$(educationClone${status.index}).find('.graduation-date').val(formattedDate${status.index});
+						</c:if>
+
+						$(educationClone${status.index}).find('.custom-input').val('${education.customInput}');
+
+						$('#educationContainer').append(educationClone${status.index});
+					</c:forEach>
+				}
+
+				// 페이지 로드 시 학력사항 초기화
+				initializeEducation();
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 경력 추가 버튼 클릭 이벤트
+				let count = 0; // id 중복 방지 만들기 위한 count
+				$('#addHistoryBtn').on('click', function () {
+					const template = document.querySelector('#historyTemplate');
+					const clone = template.content.cloneNode(true) // 깊은 복제 -> 자식 요소까지 복사
+
+					count++;
+
+					const newItemId = 'jobDescription' + count;
+					const newCountId = 'jobDescriptionCount' + count;
+
+					$(clone).find('.job-description').attr('id', newItemId);
+					$(clone).find('#jobDescriptionCount').attr('id', newCountId);
+
+					$(clone).find('.job-description').on('input', function () {
+						const currentLength = $(this).val().length;
+						const maxLength = 100;
+						const remainingLength = maxLength - currentLength;
+						$(this).closest('.history-item').find('#' + newCountId).text(currentLength + ' / ' + '100');
 					});
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 성격 및 강점 선택 모달이 열리기 전에 버튼 스타일 설정
-					$('#meritModal').on('show.bs.modal', function () {
-						// 모든 버튼 초기화
-						$('.merit-btn').removeClass('btn-primary').addClass('btn-outline-primary');
 
-						// 현재 선택된 배지들의 텍스트 수집
-						const selectedMerits = [];
-						$('#selectedMerits .badge').each(function () {
-							selectedMerits.push($(this).text().trim().replace('삭제', '').trim());
-						});
+					$('#historyContainer').append($(clone));
+				});
 
-						// 각 버튼을 순회하면서 선택된 배지의 텍스트와 비교
-						$('.merit-btn').each(function () {
-							const buttonText = $(this).text().trim();
-							if (selectedMerits.includes(buttonText)) {
-								$(this).removeClass('btn-outline-primary').addClass('btn-primary');
-							}
-						});
-					});
+				// 경력 삭제 버튼 클릭 이벤트
+				$(document).on('click', '.remove-history', function () {
+					$(this).closest('.history-item').remove();
+				});
 
-					// 성격 및 강점 선택 모달이 열린 후 포커스 관리
-					$('#meritModal').on('shown.bs.modal', function () {
-						// 모달이 열릴 때 첫 번째 버튼에 포커스
-						$(this).find('.merit-btn').first().focus();
-					});
-
-					// 모달이 닫힐 때 버튼 스타일 초기화
-					$('#meritModal').on('hidden.bs.modal', function () {
-						// 모든 버튼 초기화
-						$('.merit-btn').removeClass('btn-primary').addClass('btn-outline-primary');
-
-						// 선택된 항목들의 버튼 스타일 변경
-						$('#selectedMerits .badge').each(function () {
-							const merit = $(this).data('merit');
-							$(`.merit-btn[data-merit="${merit}"]`).removeClass('btn-outline-primary').addClass('btn-primary');
-						});
-					});
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 학력 추가 버튼 클릭 이벤트
-					$('#addEducationBtn').on('click', function () {
-						const template = document.querySelector('#educationTemplate');
-						const clone = template.content.cloneNode(true);
-						$('#educationContainer').append(clone);
-					});
-
-					// 학력 삭제 버튼 클릭 이벤트
-					$(document).on('click', '.remove-education', function () {
-						$(this).closest('.education-item').remove();
-					});
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 페이지 로드 시 기존 학력사항 표시
-					function initializeEducation() {
-						const educationTemplate = document.querySelector('#educationTemplate');
-
-						<c:forEach var="education" items="${resumeDetail.educations}" varStatus="status">
-							const educationClone${status.index} = educationTemplate.content.cloneNode(true);
-
-							// 기존 값 설정
-							$(educationClone${status.index}).find('.education-level').val('${education.educationLevel}');
-							$(educationClone${status.index}).find('.education-status').val('${education.educationStatus}');
-
-							// 날짜 형식 변환 (yyyy-MM-dd)
-							<c:if test="${not empty education.graduationDate}">
-								const graduationDate${status.index} = new Date('${education.graduationDate}');
-								const formattedDate${status.index} = graduationDate${status.index}.getFullYear() + '-' +
-								String(graduationDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
-								String(graduationDate${status.index}.getDate()).padStart(2, '0');
-								$(educationClone${status.index}).find('.graduation-date').val(formattedDate${status.index});
-							</c:if>
-
-							$(educationClone${status.index}).find('.custom-input').val('${education.customInput}');
-
-							$('#educationContainer').append(educationClone${status.index});
-						</c:forEach>
+				// 재직중 체크박스 이벤트
+				$(document).on('change', '.currently-employed', function () {
+					const $endDate = $(this).closest('.history-item').find('.end-date');
+					if ($(this).is(':checked')) {
+						$endDate.val('').prop('disabled', true);
+					} else {
+						$endDate.prop('disabled', false);
 					}
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 페이지 로드 시 기존 경력사항 표시
+				function initializeHistory() {
+					const historyTemplate = document.querySelector('#historyTemplate');
 
-					// 페이지 로드 시 학력사항 초기화
-					initializeEducation();
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 경력 추가 버튼 클릭 이벤트
-					let count = 0; // id 중복 방지 만들기 위한 count
-					$('#addHistoryBtn').on('click', function () {
-						const template = document.querySelector('#historyTemplate');
-						const clone = template.content.cloneNode(true) // 깊은 복제 -> 자식 요소까지 복사
+					<c:forEach var="history" items="${resumeDetail.histories}" varStatus="status">
+						const historyClone${status.index} = historyTemplate.content.cloneNode(true);
 
-						count++;
+						// 기존 값 설정
+						$(historyClone${status.index}).find('.company-name').val('${history.companyName}');
+						$(historyClone${status.index}).find('.position').val('${history.position}');
+						$(historyClone${status.index}).find('.job-description').val('${history.jobDescription}');
 
-						const newItemId = 'jobDescription' + count;
-						const newCountId = 'jobDescriptionCount' + count;
-
-						$(clone).find('.job-description').attr('id', newItemId);
-						$(clone).find('#jobDescriptionCount').attr('id', newCountId);
-
-						$(clone).find('.job-description').on('input', function () {
-							const currentLength = $(this).val().length;
-							const maxLength = 100;
-							const remainingLength = maxLength - currentLength;
-							$(this).closest('.history-item').find('#' + newCountId).text(currentLength + ' / ' + '100');
-						});
-
-						$('#historyContainer').append($(clone));
-					});
-
-					// 경력 삭제 버튼 클릭 이벤트
-					$(document).on('click', '.remove-history', function () {
-						$(this).closest('.history-item').remove();
-					});
-
-					// 재직중 체크박스 이벤트
-					$(document).on('change', '.currently-employed', function () {
-						const $endDate = $(this).closest('.history-item').find('.end-date');
-						if ($(this).is(':checked')) {
-							$endDate.val('').prop('disabled', true);
-						} else {
-							$endDate.prop('disabled', false);
-						}
-					});
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 페이지 로드 시 기존 경력사항 표시
-					function initializeHistory() {
-						const historyTemplate = document.querySelector('#historyTemplate');
-
-						<c:forEach var="history" items="${resumeDetail.histories}" varStatus="status">
-							const historyClone${status.index} = historyTemplate.content.cloneNode(true);
-
-							// 기존 값 설정
-							$(historyClone${status.index}).find('.company-name').val('${history.companyName}');
-							$(historyClone${status.index}).find('.position').val('${history.position}');
-							$(historyClone${status.index}).find('.job-description').val('${history.jobDescription}');
-
-							// 시작일 설정
-							<c:if test="${not empty history.startDate}">
-								const startDate${status.index} = new Date('${history.startDate}');
-								const formattedStartDate${status.index} = startDate${status.index}.getFullYear() + '-' +
-								String(startDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
-								String(startDate${status.index}.getDate()).padStart(2, '0');
-								$(historyClone${status.index}).find('.start-date').val(formattedStartDate${status.index});
-							</c:if>
+						// 시작일 설정
+						<c:if test="${not empty history.startDate}">
+							const startDate${status.index} = new Date('${history.startDate}');
+							const formattedStartDate${status.index} = startDate${status.index}.getFullYear() + '-' +
+							String(startDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
+							String(startDate${status.index}.getDate()).padStart(2, '0');
+							$(historyClone${status.index}).find('.start-date').val(formattedStartDate${status.index});
+						</c:if>
 
 						// 종료일 설정 (재직중이 아닌 경우에만)
-							<c:if test="${not empty history.endDate}">
-								const endDate${status.index} = new Date('${history.endDate}');
-								const formattedEndDate${status.index} = endDate${status.index}.getFullYear() + '-' +
-								String(endDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
-								String(endDate${status.index}.getDate()).padStart(2, '0');
-								$(historyClone${status.index}).find('.end-date').val(formattedEndDate${status.index});
-							</c:if>
+						<c:if test="${not empty history.endDate}">
+							const endDate${status.index} = new Date('${history.endDate}');
+							const formattedEndDate${status.index} = endDate${status.index}.getFullYear() + '-' +
+							String(endDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
+							String(endDate${status.index}.getDate()).padStart(2, '0');
+							$(historyClone${status.index}).find('.end-date').val(formattedEndDate${status.index});
+						</c:if>
 
 						// 재직중 체크박스 상태 설정
-							<c:if test="${empty history.endDate}">
-								$(historyClone${status.index}).find('.currently-employed').prop('checked', true);
-								$(historyClone${status.index}).find('.end-date').prop('disabled', true);
-							</c:if>
+						<c:if test="${empty history.endDate}">
+							$(historyClone${status.index}).find('.currently-employed').prop('checked', true);
+							$(historyClone${status.index}).find('.end-date').prop('disabled', true);
+						</c:if>
 
 						// 담당업무 글자수 카운트 설정
-							const jobDescriptionLength${status.index} = '${history.jobDescription}'.length;
-							$(historyClone${status.index}).find('#jobDescriptionCount').text(jobDescriptionLength${status.index} + ' / 100');
+						const jobDescriptionLength${status.index} = '${history.jobDescription}'.length;
+						$(historyClone${status.index}).find('#jobDescriptionCount').text(jobDescriptionLength${status.index} + ' / 100');
 
-							$('#historyContainer').append(historyClone${status.index});
-						</c:forEach>
+						$('#historyContainer').append(historyClone${status.index});
+					</c:forEach>
+				}
+
+				// 페이지 로드 시 경력사항 초기화
+				initializeHistory();
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 자격증 추가 버튼 클릭 이벤트
+				$('#addLicenseBtn').on('click', function () {
+					const licenseBoxCount = $('.license-item').length;
+					if (licenseBoxCount >= 10) {
+						showValidationModal("자격증은 최대 10개까지 저장 가능합니다.");
+						return;
 					}
+					const template = document.querySelector('#licenseTemplate');
+					const clone = template.content.cloneNode(true);
+					$('#licenseContainer').append(clone);
+				});
 
-					// 페이지 로드 시 경력사항 초기화
-					initializeHistory();
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 자격증 추가 버튼 클릭 이벤트
-					$('#addLicenseBtn').on('click', function () {
-						const licenseBoxCount = $('.license-item').length;
-						if (licenseBoxCount >= 10) {
-							showValidationModal("자격증은 최대 10개까지 저장 가능합니다.");
-							return;
-						}
-						const template = document.querySelector('#licenseTemplate');
-						const clone = template.content.cloneNode(true);
-						$('#licenseContainer').append(clone);
-					});
+				// 자격증 삭제 버튼 클릭 이벤트
+				$(document).on('click', '.remove-license', function () {
+					$(this).closest('.license-item').remove();
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 페이지 로드 시 기존 자격증 표시
+				function initializeLicense() {
+					const licenseTemplate = document.querySelector('#licenseTemplate');
 
-					// 자격증 삭제 버튼 클릭 이벤트
-					$(document).on('click', '.remove-license', function () {
-						$(this).closest('.license-item').remove();
-					});
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 페이지 로드 시 기존 자격증 표시
-					function initializeLicense() {
-						const licenseTemplate = document.querySelector('#licenseTemplate');
+					<c:forEach var="license" items="${resumeDetail.licenses}" varStatus="status">
+						const licenseClone${status.index} = licenseTemplate.content.cloneNode(true);
 
-						<c:forEach var="license" items="${resumeDetail.licenses}" varStatus="status">
-							const licenseClone${status.index} = licenseTemplate.content.cloneNode(true);
+						// 기존 값 설정
+						$(licenseClone${status.index}).find('.license-name').val('${license.licenseName}');
+						$(licenseClone${status.index}).find('.institution').val('${license.institution}');
 
-							// 기존 값 설정
-							$(licenseClone${status.index}).find('.license-name').val('${license.licenseName}');
-							$(licenseClone${status.index}).find('.institution').val('${license.institution}');
-
-							// 취득일자 설정
-							<c:if test="${not empty license.acquisitionDate}">
-								const acquisitionDate${status.index} = new Date('${license.acquisitionDate}');
-								const formattedAcquisitionDate${status.index} = acquisitionDate${status.index}.getFullYear() + '-' +
-								String(acquisitionDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
-								String(acquisitionDate${status.index}.getDate()).padStart(2, '0');
-								$(licenseClone${status.index}).find('.acquisition-date').val(formattedAcquisitionDate${status.index});
-							</c:if>
-
-							$('#licenseContainer').append(licenseClone${status.index});
-						</c:forEach>
-					}
-
-					// 페이지 로드 시 자격증 초기화
-					initializeLicense();
-					//---------------------------------------------------------------------------------------------------------------------------------
-
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 자기소개 입력란 몇글자 썻는지 알 수 있게 하기
-					$('#selfIntroTextarea').on('input', function () {
-						const currentLength = $(this).val().length;
-						const maxLength = 1000;
-						const remainingLength = maxLength - currentLength;
-						$('#charCount').text(currentLength + ' / ' + '1000');
-					});
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 금액 입력에 숫자외 다른 문자를 입력하면 입력 못하게 하고 모달띄우기 ','는 가능
-					$('#payAmount').on('input', function () {
-						let value = $(this).val();
-
-						// 콤마 제거하고 숫자만 남긴 값 추출
-						let payOnlyNumber = value.replace(/,/g, '');
-
-						// 숫자만 입력되었는지 확인
-						if (!/^\d*$/.test(payOnlyNumber) && value !== '') {
-							showValidationModal("숫자만 입력 가능해요");
-							$(this).val('');
-							return;
-						}
-
-						// 숫자가 맞다면 3자리 콤마 형식으로 변경
-						let result = Number(payOnlyNumber).toLocaleString();
-						$(this).val(result);
-					});
-					//---------------------------------------------------------------------------------------------------------------------------------
-					// 파일 업로드
-					let uploadedFiles = [];
-					const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-					const MAX_FILES = 10;
-					// 삭제된 파일 목록 초기화
-					let deletedFiles = [];
-					// 임시 저장된 파일 목록 (서버에 아직 업로드되지 않은 파일)
-					let pendingFiles = [];
-
-					// 페이지 로드 시 기존 첨부파일 표시
-					function initializeFiles() {
-						<c:if test="${not empty resumeDetail.files}">
-							<c:forEach var="file" items="${resumeDetail.files}">
-								uploadedFiles.push({
-									"originalFileName": "${file.originalFileName}",
-								"newFileName": "${file.newFileName}",
-								"ext": "${file.ext}",
-								"size": Number("${file.size}"),
-								"base64Image": "${file.base64Image}"
-								});
-								showFilePreview({
-									"originalFileName": "${file.originalFileName}",
-								"newFileName": "${file.newFileName}",
-								"ext": "${file.ext}",
-								"size": Number("${file.size}"),
-								"base64Image": "${file.base64Image}"
-								});
-							</c:forEach>
-							updateFileText();
+						// 취득일자 설정
+						<c:if test="${not empty license.acquisitionDate}">
+							const acquisitionDate${status.index} = new Date('${license.acquisitionDate}');
+							const formattedAcquisitionDate${status.index} = acquisitionDate${status.index}.getFullYear() + '-' +
+							String(acquisitionDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
+							String(acquisitionDate${status.index}.getDate()).padStart(2, '0');
+							$(licenseClone${status.index}).find('.acquisition-date').val(formattedAcquisitionDate${status.index});
 						</c:if>
+
+						$('#licenseContainer').append(licenseClone${status.index});
+					</c:forEach>
+				}
+
+				// 페이지 로드 시 자격증 초기화
+				initializeLicense();
+				//---------------------------------------------------------------------------------------------------------------------------------
+
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 자기소개 입력란 몇글자 썻는지 알 수 있게 하기
+				$('#selfIntroTextarea').on('input', function () {
+					const currentLength = $(this).val().length;
+					const maxLength = 1000;
+					const remainingLength = maxLength - currentLength;
+					$('#charCount').text(currentLength + ' / ' + '1000');
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 금액 입력에 숫자외 다른 문자를 입력하면 입력 못하게 하고 모달띄우기 ','는 가능
+				$('#payAmount').on('input', function () {
+					let value = $(this).val();
+
+					// 콤마 제거하고 숫자만 남긴 값 추출
+					let payOnlyNumber = value.replace(/,/g, '');
+
+					// 숫자만 입력되었는지 확인
+					if (!/^\d*$/.test(payOnlyNumber) && value !== '') {
+						showValidationModal("숫자만 입력 가능해요");
+						$(this).val('');
+						return;
 					}
 
-					// 페이지 로드 시 첨부파일 초기화
-					initializeFiles();
+					// 숫자가 맞다면 3자리 콤마 형식으로 변경
+					let result = Number(payOnlyNumber).toLocaleString();
+					$(this).val(result);
+				});
+				//---------------------------------------------------------------------------------------------------------------------------------
+				// 파일 업로드
+				let uploadedFiles = [];
+				const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+				const MAX_FILES = 10;
+				// 삭제된 파일 목록 초기화
+				let deletedFiles = [];
+				// 임시 저장된 파일 목록 (서버에 아직 업로드되지 않은 파일)
+				let pendingFiles = [];
 
-					// 파일 입력 이벤트
-					$('#fileInput').on('change', function (e) {
-						handleFiles(e.target.files);
-					});
+				// 페이지 로드 시 기존 첨부파일 표시
+				function initializeFiles() {
+					<c:if test="${not empty resumeDetail.files}">
+						<c:forEach var="file" items="${resumeDetail.files}">
+							uploadedFiles.push({
+								"originalFileName": "${file.originalFileName}",
+							"newFileName": "${file.newFileName}",
+							"ext": "${file.ext}",
+							"size": Number("${file.size}"),
+							"base64Image": "${file.base64Image}"
+								});
+							showFilePreview({
+								"originalFileName": "${file.originalFileName}",
+							"newFileName": "${file.newFileName}",
+							"ext": "${file.ext}",
+							"size": Number("${file.size}"),
+							"base64Image": "${file.base64Image}"
+								});
+						</c:forEach>
+						updateFileText();
+					</c:if>
+				}
 
-					// 드래그 앤 드롭 이벤트
-					$('#fileContainer').on('dragenter dragover', function (e) {
-						e.preventDefault(); // 브라우저가 기본적으로 파일을 열거나 다운로드하려는 동작을 막음
-						e.stopPropagation(); // 이벤트가 부모 요소로 전달되지 않도록 함
-						$(this).addClass('border-primary');
-					});
+				// 페이지 로드 시 첨부파일 초기화
+				initializeFiles();
 
-					$('#fileContainer').on('dragleave', function (e) {
-						e.preventDefault();
-						e.stopPropagation();
-						$(this).removeClass('border-primary');
-					});
+				// 파일 입력 이벤트
+				$('#fileInput').on('change', function (e) {
+					handleFiles(e.target.files);
+				});
 
-					$('#fileContainer').on('drop', function (e) {
-						e.preventDefault();
-						e.stopPropagation();
-						$(this).removeClass('border-primary');
-						if (${ isSameUser }) {
-						const files = e.originalEvent.dataTransfer.files;
-						handleFiles(files);
-					}
+				// 드래그 앤 드롭 이벤트
+				$('#fileContainer').on('dragenter dragover', function (e) {
+					e.preventDefault(); // 브라우저가 기본적으로 파일을 열거나 다운로드하려는 동작을 막음
+					e.stopPropagation(); // 이벤트가 부모 요소로 전달되지 않도록 함
+					$(this).addClass('border-primary');
+				});
+
+				$('#fileContainer').on('dragleave', function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+					$(this).removeClass('border-primary');
+				});
+
+				$('#fileContainer').on('drop', function (e) {
+					e.preventDefault();
+					e.stopPropagation();
+					$(this).removeClass('border-primary');
+					if (${ isSameUser }) {
+					const files = e.originalEvent.dataTransfer.files;
+					handleFiles(files);
+				}
 				});
 				// 파일 처리 함수
 				function handleFiles(files) {

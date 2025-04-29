@@ -560,8 +560,10 @@ public class ResumeController {
 			model.addAttribute("user", user);
 
 			String uri = request.getRequestURI();
-
-			if (adviceNo == null || "undefined".equals(adviceNo)) {
+			if (uri.contains("edit")) {
+				model.addAttribute("mode", "edit");
+				
+			} else if (adviceNo == null || "undefined".equals(adviceNo)) {
 				model.addAttribute("mode", "checkAdvice");
 				model.addAttribute("debug", "디버깅용");
 
