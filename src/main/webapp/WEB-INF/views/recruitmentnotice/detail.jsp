@@ -842,7 +842,7 @@ button.btn-resume {
 													<button type="button" class="btn-list"
 													onclick="location.href='/recruitmentnotice/listAll'">목록으로</button>
 													<c:choose>
-														<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
+														<c:when test="${sessionScope.account.accountType == 'COMPANY' and sessionScope.account.uid == RecruitmentDetailInfo.refCompany}">
 													<button type="button" class="btn btn-primary"
 														onclick="location.href='/recruitmentnotice/modify?uid=${RecruitmentDetailInfo.uid}'">수정</button>
 													<button type="button" class="btn btn-danger"
@@ -858,12 +858,7 @@ button.btn-resume {
 												
 												</c:choose>
 												<c:choose>
-													
-													<c:when test="${sessionScope.account.accountType == 'COMPANY' && sessionScope.account.uid ne RecruitmentDetailInfo.refCompany}">
-														<button type="button" class="btn btn-report" onclick="reportBoard()">신고하기</button>
-													</c:when>
-
-													
+																		
 													<c:when test="${sessionScope.account.accountType == 'USER'}">
 														<button type="button" class="btn btn-report" onclick="reportBoard()">신고하기</button>
 													</c:when>
