@@ -542,7 +542,7 @@ function showModifyFileThumbnail(fileInfo) {
             <td><img src="\${thumbnailUrl}" width="60" height="60" alt="썸네일"></td>
             <td>\${fileInfo.originalFileName}</td>
             <td>
-                <button type="button" class="btn btn-danger btn-sm" onclick="markFileAsDeleted('\${fileInfo.originalFileName}')">삭제</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="markFileAsDeleted('\${fileInfo.originalFileName}')">X</button>
             </td>
         </tr>
     `;
