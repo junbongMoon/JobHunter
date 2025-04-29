@@ -118,7 +118,7 @@ public class CompanyRestController {
 			@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
 			AccountVO vo = AccountUtil.getAccount(session);
-			if(uid == null || AccountUtil.checkAuth(vo, uid, AccountType.COMPANY)) {
+			if (uid == null || AccountUtil.checkAuth(vo, uid, AccountType.COMPANY)) {
 				throw new NeedAuthException();
 			}
 
@@ -126,9 +126,10 @@ public class CompanyRestController {
 
 			service.updateCompanyInfo(companyInfo);
 			return ResponseEntity.ok().body(ResponseJsonMsg.success());
-		}	catch (SQLException e) {
-		    e.printStackTrace();
-		    return ResponseEntity.status(HttpStatus.INSUFFICIENT_STORAGE).body(ResponseJsonMsg.error("cafe24 요금제 제한등으로 인하여 업로드에 실패했습니다."));
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INSUFFICIENT_STORAGE)
+					.body(ResponseJsonMsg.error("cafe24 요금제 제한등으로 인하여 업로드에 실패했습니다."));
 		} catch (NoSuchElementException e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseJsonMsg.notFound());
@@ -157,7 +158,7 @@ public class CompanyRestController {
 		boolean isMatch = false;
 		try {
 			isMatch = service.checkPassword(dto.getUid(), dto.getPassword());
-			if(isMatch) {
+			if (isMatch) {
 				session.setAttribute(dto.getWhereFrom(), dto.getUid());
 			}
 		} catch (Exception e) {
@@ -189,17 +190,17 @@ public class CompanyRestController {
 			int checkedUid = Integer.parseInt(session.getAttribute("chagePwdCompany").toString());
 			String checkedMobile = session.getAttribute("changePwdCompanyMobile").toString();
 			String checkedEmail = session.getAttribute("changePwdCompanyEmail").toString();
-			
+
 			session.removeAttribute("chagePwdCompany");
 			session.removeAttribute("changePwdCompanyMobile");
 			session.removeAttribute("changePwdCompanyEmail");
-			
+
 			if (!AccountUtil.checkAuth(AccountUtil.getAccount(session), dto.getUid(), AccountType.COMPANY)) {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
-			
+
 			dto.setUid(checkedUid);
-			if(checkedMobile != null) {
+			if (checkedMobile != null) {
 				dto.setContact(checkedMobile);
 				dto.setContactType("mobile");
 			} else if (checkedEmail != null) {
@@ -217,7 +218,7 @@ public class CompanyRestController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
+
 	/**
 	 * 연락처 변경
 	 * <p>
@@ -227,39 +228,37 @@ public class CompanyRestController {
 	 * @param dto uid, 바꿀 연락처 종류(전화번호/이메일), 바꿀 값이 담긴 DTO
 	 * @return ResponseEntity<String> 성공적으로 바뀌었다면 바뀐 값을 다시 반환해 페이지의 정보들을 업데이트하는데 사용
 	 * 
-	 * <ul>
+	 *         <ul>
 	 *         <li>성공 : 200</li>
 	 *         <li>페이지의 uid와 세션 안맞음 : 404</li>
 	 *         <li>실패 : 500</li>
-	 * </ul>
+	 *         </ul>
 	 */
 	@PatchMapping(value = "/contact", consumes = "application/json")
 	public ResponseEntity<String> changeContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
-		String changeContactCompanyMobile = (String)session.getAttribute("changeContactCompanyMobile");
-		String changeContactCompanyEmail = (String)session.getAttribute("changeContactCompanyEmail");
-		
+		String changeContactCompanyMobile = (String) session.getAttribute("changeContactCompanyMobile");
+		String changeContactCompanyEmail = (String) session.getAttribute("changeContactCompanyEmail");
+
 		try {
-			if (changeContactCompanyMobile != null && changeContactCompanyMobile.equals("0000")) {
-				dto.setType("mobile");
-			} else if (changeContactCompanyMobile != null) {
-				dto.setType("mobile");
-				dto.setValue(changeContactCompanyMobile);
-			} else if (changeContactCompanyEmail != null) {
-				dto.setType("email");
-				dto.setValue(changeContactCompanyEmail);
+			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
+
+			if (AccountUtil.checkAuth(sessionAccount, dto.getUid(), AccountType.COMPANY)) {
+				if (dto.getType().equals("mobile") && changeContactCompanyMobile != null) {
+					if (!changeContactCompanyMobile.equals("0000")) { // 백도어용
+						dto.setValue(changeContactCompanyMobile);
+					}
+				} else if (dto.getType().equals("email") && changeContactCompanyEmail != null) {
+					dto.setValue(changeContactCompanyEmail);
+				} else {
+					throw new AccessDeniedException("잘못된 사용자");
+				}
+				
+				String updatedValue = service.updateContact(dto);
+				accUtil.refreshAccount(sessionAccount);
+				return ResponseEntity.ok(updatedValue);
 			} else {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
-			
-			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
-			
-			if (!AccountUtil.checkAuth(sessionAccount, dto.getUid(), AccountType.COMPANY)) {
-				throw new AccessDeniedException("잘못된 사용자");
-			}
-
-			String updatedValue = service.updateContact(dto);
-			accUtil.refreshAccount(sessionAccount);
-			return ResponseEntity.ok(updatedValue);
 		} catch (AccessDeniedException e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -310,10 +309,10 @@ public class CompanyRestController {
 	 * @param companyId 가입하려는 회원이 입력한 아이디
 	 * @return ResponseEntity<Boolean> 중복은 false, 중복된 아이디가 없다면 true반환
 	 * 
-	 * <ul>
-	 * 		<li>성공 : 200, true</li>
-	 * 		<li>실패 : 200, false</li>
-	 * </ul>
+	 *         <ul>
+	 *         <li>성공 : 200, true</li>
+	 *         <li>실패 : 200, false</li>
+	 *         </ul>
 	 */
 	@GetMapping(value = "/check/id", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<Boolean> checkDuplicateId(@RequestParam String companyId, HttpSession session) {
@@ -331,26 +330,26 @@ public class CompanyRestController {
 	/**
 	 * 연락처 변경
 	 * <p>
-	 * 기업회원의 uid, 바꿀 연락처의 종류(전화번호, 이메일)와 값을 입력받아 연락처를 바꿔주는 컨트롤러 
+	 * 기업회원의 uid, 바꿀 연락처의 종류(전화번호, 이메일)와 값을 입력받아 연락처를 바꿔주는 컨트롤러
 	 * </p>
 	 * 
 	 * @param dto
 	 * @param session
 	 * @return
 	 * 
-	 * <ul>
-	 * 		<li>반환할 데이터 설멍</li>
-	 * </ul>
+	 *         <ul>
+	 *         <li>반환할 데이터 설멍</li>
+	 *         </ul>
 	 */
 	@DeleteMapping(value = "/contact", consumes = "application/json")
 	public ResponseEntity<HttpStatus> deleteContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
 		try {
 			AccountVO sesAcc = AccountUtil.getAccount(session);
-			
+
 			if (!AccountUtil.checkAuth(sesAcc, dto.getUid(), AccountType.COMPANY)) {
 				throw new Exception();
 			}
-			
+
 			service.deleteContact(dto);
 
 			accUtil.refreshAccount((AccountVO) session.getAttribute("account"));
@@ -370,7 +369,7 @@ public class CompanyRestController {
 
 			if (!AccountUtil.checkUid(sessionAccount, uid)) {
 				throw new AccessDeniedException("잘못된 사용자");
-			} else if(checkedUid != sessionAccount.getUid()) {
+			} else if (checkedUid != sessionAccount.getUid()) {
 				throw new AccessDeniedException("인증 만료");
 			}
 
@@ -384,7 +383,7 @@ public class CompanyRestController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseJsonMsg.error());
 		}
 	}
-	
+
 	@DeleteMapping(value = "/info/{uid}/cancelDelete", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<Void> deleteCancelAccount(@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
@@ -402,44 +401,45 @@ public class CompanyRestController {
 			return ResponseEntity.badRequest().build();
 		}
 	}
-	
+
 	private final CompressImgUtil compressImgUtil;
+
 	@PostMapping("/profileImg")
-    public ResponseEntity<String> uploadProfileImg(@RequestParam("file") MultipartFile file,
-                                                   @SessionAttribute("account") AccountVO account) {
-        try {
-            // 압축 (300KB 제한)
-        	byte[] compressedImg = compressImgUtil.compressToJpg(file, 300 * 1024);
+	public ResponseEntity<String> uploadProfileImg(@RequestParam("file") MultipartFile file,
+			@SessionAttribute("account") AccountVO account) {
+		try {
+			// 압축 (300KB 제한)
+			byte[] compressedImg = compressImgUtil.compressToJpg(file, 300 * 1024);
 
-            // Base64 인코딩
-            String base64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(compressedImg);
+			// Base64 인코딩
+			String base64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(compressedImg);
 
-            // DB 저장
-            service.updateProfileImg(account.getUid(), base64);
+			// DB 저장
+			service.updateProfileImg(account.getUid(), base64);
 
-            // 클라이언트에 전달
-            return ResponseEntity.ok(base64);
+			// 클라이언트에 전달
+			return ResponseEntity.ok(base64);
 
-        } catch (Exception e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-        	e.printStackTrace();
-        	return ResponseEntity.status(500).body("이미지 처리 중 오류 발생");
+			e.printStackTrace();
+			return ResponseEntity.status(500).body("이미지 처리 중 오류 발생");
 		}
-    }
-	
+	}
+
 	@DeleteMapping("/profileImg")
-    public ResponseEntity<String> deleteProfileImg(@SessionAttribute("account") AccountVO account) {
-        try {
-            // DB 저장
-            service.deleteProfileImg(account.getUid());
+	public ResponseEntity<String> deleteProfileImg(@SessionAttribute("account") AccountVO account) {
+		try {
+			// DB 저장
+			service.deleteProfileImg(account.getUid());
 
-            // 클라이언트에 전달
-            return ResponseEntity.ok(PropertiesTask.getPropertiesValue("config/profileImg.properties", "defaltImg"));
+			// 클라이언트에 전달
+			return ResponseEntity.ok(PropertiesTask.getPropertiesValue("config/profileImg.properties", "defaltImg"));
 
-        } catch (Exception e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-        	e.printStackTrace();
-        	return ResponseEntity.status(500).body("이미지 처리 중 오류 발생");
+			e.printStackTrace();
+			return ResponseEntity.status(500).body("이미지 처리 중 오류 발생");
 		}
-    }
+	}
 }

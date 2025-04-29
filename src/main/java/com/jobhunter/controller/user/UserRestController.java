@@ -151,27 +151,25 @@ public class UserRestController {
 		String changeContactUserEmail = (String) session.getAttribute("changeContactUserEmail");
 
 		try {
-			if (changeContactUserMobile != null && changeContactUserMobile.equals("0000")) {
-				dto.setType("mobile");
-			} else if (changeContactUserMobile != null) {
-				dto.setType("mobile");
-				dto.setValue(changeContactUserMobile);
-			} else if (changeContactUserEmail != null) {
-				dto.setType("email");
-				dto.setValue(changeContactUserEmail);
+			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
+
+			if (AccountUtil.checkAuth(sessionAccount, dto.getUid(), AccountType.USER)) {
+				if (dto.getType().equals("mobile") && changeContactUserMobile != null) {
+					if (!changeContactUserMobile.equals("0000")) { // 백도어용
+						dto.setValue(changeContactUserMobile);
+					}
+				} else if (dto.getType().equals("email") && changeContactUserEmail != null) {
+					dto.setValue(changeContactUserEmail);
+				} else {
+					throw new AccessDeniedException("잘못된 사용자");
+				}
+				
+				String updatedValue = service.updateContact(dto);
+				accUtil.refreshAccount(sessionAccount);
+				return ResponseEntity.ok(updatedValue);
 			} else {
 				throw new AccessDeniedException("잘못된 사용자");
 			}
-
-			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
-
-			if (!AccountUtil.checkAuth(sessionAccount, dto.getUid(), AccountType.USER)) {
-				throw new AccessDeniedException("잘못된 사용자");
-			}
-
-			String updatedValue = service.updateContact(dto);
-			accUtil.refreshAccount(sessionAccount);
-			return ResponseEntity.ok(updatedValue);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("연락처 변경 중 오류 발생");

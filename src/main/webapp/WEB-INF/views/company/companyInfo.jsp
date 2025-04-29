@@ -1316,14 +1316,19 @@ function confirmChangeContact(type, formattedNumber) {
     method: "patch",
     contentType: "application/json",
     data: JSON.stringify({
+      type: type,
       uid,
       value: formattedNumber
     }),
     success: (val) => {
       if (type == "mobile") {
-        sessionMobile = formattedNumber;
-        $('#nowMobile').text( sessionMobile || '등록된 전화번호 없음')
+        sessionMobile = val;
+        $('#nowMobile').text( val || '등록된 전화번호 없음')
         window.publicModals.show("전화번호가 성공적으로 변경되었습니다.");
+      } else if (type == "email") {
+        sessionEmail = val;
+        $('#nowEmail').text( val || '등록된 이메일 없음')
+        window.publicModals.show("이메일이 성공적으로 변경되었습니다.");
       }
     },
     error: (xhr) => {
@@ -1379,10 +1384,13 @@ async function confirmEmail(changeEmail) {
     url: `/account/auth/email/verify/\${code}`,
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ email: changeEmail }),
+    data: JSON.stringify({ 
+      email: changeEmail,
+      confirmType: "changeContactCompanyEmail"
+    }),
     async: false,
     success: () => {
-      changeEmailFunc(changeEmail)
+      confirmChangeContact("email")
     },
     error: (xhr) => {
       showCodeModal(()=>{confirmEmail(changeEmail)}, true);
@@ -1390,28 +1398,6 @@ async function confirmEmail(changeEmail) {
   });
 }
 
-function changeEmailFunc(changeEmail) {
-  const dto = {
-    type: "email",
-    value: changeEmail,
-    uid
-  };
-
-  $.ajax({
-    url: "/company/contact",
-    method: "patch",
-    contentType: "application/json",
-    data: JSON.stringify(dto),
-    success: (val) => {
-      sessionEmail = changeEmail;
-      $('#nowEmail').text( sessionEmail || '등록된 이메일 없음')
-      window.publicModals.show("이메일이 성공적으로 변경되었습니다.");
-    },
-    error: (xhr) => {
-      window.publicModals.show("서버가 불안정합니다. 잠시 후 다시 시도해주세요.");
-    }
-  });
-}
 // #endregion
 
   function cancleModify() {

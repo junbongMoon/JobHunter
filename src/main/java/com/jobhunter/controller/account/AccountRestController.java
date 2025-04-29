@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.EmailAuth;
+import com.jobhunter.model.account.UnlockDTO;
 import com.jobhunter.model.account.VerificationRequestDTO;
 import com.jobhunter.model.account.findIdDTO;
 import com.jobhunter.model.customenum.AccountType;
@@ -123,25 +124,34 @@ public class AccountRestController {
 	 * @param session
 	 * @return
 	 * 
-	 * <ul>
-	 * 		<li>반환할 데이터 설멍</li>
-	 * </ul>
+	 *         <ul>
+	 *         <li>반환할 데이터 설멍</li>
+	 *         </ul>
 	 */
 	@PostMapping(value = "/auth", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> verify(@RequestBody VerificationRequestDTO dto, HttpSession session) {
 
-		// type들 통일
-		int uid = dto.getUid();
-		AccountType accountType = dto.getAccountType();
+		String unlockAccountMobile = (String) session.getAttribute("unlockAccountMobile");
+		String unlockAccountEmail = (String) session.getAttribute("unlockAccountEmail");
+		UnlockDTO unlock = (UnlockDTO) session.getAttribute("unlockDTO");
 
 		try {
-			accountService.setRequiresVerificationFalse(uid, accountType);
+			
+			if (unlockAccountMobile.equals(unlock.getMobile()) || unlockAccountEmail.equals(unlock.getEmail()) || unlockAccountMobile.equals("0000")) {
+				// type들 통일
+				int uid = dto.getUid();
+				AccountType accountType = dto.getAccountType();
 
-			session.removeAttribute("requiresVerification");
+				accountService.setRequiresVerificationFalse(uid, accountType);
 
-			String redirectUrl = (String) session.getAttribute("redirectUrl");
-			session.removeAttribute("unlockDTO");
-			return ResponseEntity.ok(redirectUrl != null ? redirectUrl : "/");
+				session.removeAttribute("requiresVerification");
+
+				String redirectUrl = (String) session.getAttribute("redirectUrl");
+				session.removeAttribute("unlockDTO");
+				return ResponseEntity.ok(redirectUrl != null ? redirectUrl : "/");
+			} else {
+				throw new NoSuchElementException();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error");
@@ -159,7 +169,7 @@ public class AccountRestController {
 		if (duple) {
 			try {
 				// 중복이면 true반환
-				Boolean dupleEmail =accountService.checkDuplicateContact(email, accountType, "email");
+				Boolean dupleEmail = accountService.checkDuplicateContact(email, accountType, "email");
 				if (dupleEmail) {
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미 가입된 이메일입니다.");
 				}
@@ -195,7 +205,7 @@ public class AccountRestController {
 
 		String email = emailTmp.get("email");
 		String verifiedEmailWhere = emailTmp.get("confirmType");
-		
+
 		EmailAuth emailAuth = (EmailAuth) session.getAttribute("emailCode:" + email);
 
 		if (emailAuth == null) {
@@ -219,12 +229,12 @@ public class AccountRestController {
 		session.removeAttribute("emailCode:" + email);
 		return ResponseEntity.ok("인증 성공!");
 	}
-	
+
 	// 전화번호 인증 확인(인증 성공한 전화번호 세션에 저장)
 	@PostMapping(value = "/auth/mobile/verify", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<?> verifyMobile(@RequestBody Map<String, String> body, HttpSession session) {
 		String idToken = body.get("confirmToken");
-	    String verifiedMobileWhere = body.get("confirmType");
+		String verifiedMobileWhere = body.get("confirmType");
 
 		try {
 			if (idToken.equals("0000")) {
@@ -237,8 +247,8 @@ public class AccountRestController {
 			String mobile = PhoneNumberUtil.toKoreanFormat(phoneNumber);
 
 			// 세션에 "이 사람은 전화번호 인증 완료" 플래그 저장
-		    session.setAttribute(verifiedMobileWhere, mobile);
-		    return ResponseEntity.ok("전화번호 인증 저장 완료");
+			session.setAttribute(verifiedMobileWhere, mobile);
+			return ResponseEntity.ok("전화번호 인증 저장 완료");
 		} catch (FirebaseAuthException e) {
 			e.printStackTrace();
 			return ResponseEntity.badRequest().build();
@@ -266,10 +276,30 @@ public class AccountRestController {
 	// 이메일이나 전화번호로 아이디 찾아주는 API
 	@PostMapping(value = "/find/id", produces = "application/json;charset=UTF-8;")
 	public ResponseEntity<Map<String, Object>> findId(@RequestBody findIdDTO dto, HttpSession session) {
+		String searchIdMobile = (String) session.getAttribute("searchIdMobile");
+		String searchIdEmail = (String) session.getAttribute("searchIdEmail");
 		Map<String, Object> result = new HashMap<>();
 		try {
-			result = accountService.getIdByContect(dto);
+			String valueType = null;
+			if (searchIdMobile.equals("0000")) {
+				valueType = "Mobile"; // 백도어
+			} else if (dto.getTargetType().equals("mobile")) {
+				dto.setTargetValue(searchIdMobile);
+				valueType = "Mobile";
+			} else {
+				dto.setTargetValue(searchIdEmail);
+				valueType = "Email";
+			}
 			
+			result = accountService.getIdByContect(dto);
+			if (dto.getAccountType() == AccountType.USER) {
+				session.setAttribute("chagePwdUser", result.get("Uid"));
+				session.setAttribute("changePwdUser" + valueType, result.get("Uid"));
+			} else {
+				session.setAttribute("chagePwdCompany", result.get("Uid"));
+				session.setAttribute("changePwdCompany" + valueType, result.get("Uid"));
+			}
+
 			return ResponseEntity.status(HttpStatus.OK).body(result);
 		} catch (NoSuchElementException e) {
 			return ResponseEntity.status(HttpStatus.OK).body(null);
