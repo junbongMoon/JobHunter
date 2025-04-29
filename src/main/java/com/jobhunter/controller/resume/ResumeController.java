@@ -562,10 +562,13 @@ public class ResumeController {
 			String uri = request.getRequestURI();
 			if (uri.contains("edit")) {
 				model.addAttribute("mode", "edit");
-				
-			} else if (adviceNo == null || "undefined".equals(adviceNo)) {
+
+			} else if (adviceNo == null || "undefined".equals(adviceNo) || adviceNo.equals("0")) {
 				model.addAttribute("mode", "checkAdvice");
 				model.addAttribute("debug", "디버깅용");
+				int mentorUid = resumeService.getRegistrationAdviceForMentorUid(resumeNo, 0);
+				model.addAttribute("mentorUid", mentorUid);
+				// System.out.println("디버깅용 mentorUid: " + mentorUid); 확인완료
 
 			} else if (uri.contains("checkAdvice")) {
 				// 첨삭 내용 조회
@@ -573,6 +576,8 @@ public class ResumeController {
 				model.addAttribute("debug2", "디버깅용2");
 				if (advice != null) {
 					model.addAttribute("advice", advice);
+					model.addAttribute("mentorUid", advice.getMentorUid());
+					// System.out.println(advice.getMentorUid()); 확인완료
 					// 첨삭 파일 조회
 					List<ResumeAdviceUpfileDTO> adviceFiles = resumeService.getAdviceFiles(advice.getAdviceNo());
 					model.addAttribute("adviceFiles", adviceFiles);

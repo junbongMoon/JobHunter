@@ -30,6 +30,8 @@
 				<c:set var="isSameUser" value="${sessionScope.account.uid == resumeDetail.resume.userUid}" />
 				<input type="hidden" id="isSameUser" value="${isSameUser}">
 				<input type="hidden" id="queryUid" value="${param.uid}">
+				<input type="hidden" id="mode" value="${mode}">
+				<input type="hidden" id="mentorUid" value="${mentorUid}">
 
 				<div class="container my-5">
 					<c:if test="${mode == 'checkAdvice' && !isSameUser}">
@@ -46,7 +48,7 @@
 
 						<!-- 이력서 제목 -->
 						<div class="card mb-4">
-							<!-- <div>디버깅 : ${comment}, ${advice}, ${debug}, ${debug2}</div> -->
+							<!-- <div>디버깅 : ${comment}, ${advice}, ${debug}, ${debug2}, ${mentorUid}, ${mode}</div> -->
 							<div class="card-header">
 								이력서 제목<span class="essentialPoint">*</span>
 							</div>
@@ -1460,12 +1462,30 @@
 					});
 				});
 
-				// 이력서 주인 uid와 쿼리스트링 uid가 다르면 튕기게하기
+				// 접근 제한하기
 				const userUidOwner = $("#userUidOwner").val();
 				const queryUid = "${param.uid}";
-				if (userUidOwner !== queryUid) {
-					window.location.href = "/";
+				const sessionUserUid = $("#sessionUserUid").val();
+				const mentorUid = $("#mentorUid").val();
+				const mode = $("#mode").val();
+				if (mode == "edit") {
+					// 이력서 주인uid와 쿼리스트링 uid가 같고 세션uid와 쿼리스트링 uid가 같아야 허가
+					if (userUidOwner !== queryUid && sessionUserUid !== queryUid) {
+						window.location.href = "/";
+					}
+				} else if (mode == "checkAdvice") {
+					// 이력서 주인uid와 쿼리스트링 uid가 같고 첨삭 멘토uid와 세션uid가 같아야 허가 -> 멘토입장에서 이력서 첨삭할때
+					if (userUidOwner == queryUid && mentorUid == sessionUserUid) {
+						console.log("허가된 접근");
+						// 멘티 입장에서 첨삭 이력서 확인 할때
+					} else if (userUidOwner == queryUid && userUidOwner == sessionUserUid) {
+						console.log("허가된 접근");
+					} else {
+						window.location.href = "/";
+						console.log("거절된 접근");
+					}
 				}
+
 				// 시/도 클릭하면...
 				$(".region-item").on("click", function () {
 					// 기존에 누른 시/도 해제 및 현재 시/도 선택
