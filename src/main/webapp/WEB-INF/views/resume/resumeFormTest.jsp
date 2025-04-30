@@ -1913,18 +1913,20 @@
 						}
 					}
 
-					const startDateInput = document.querySelector('.start-date');
-					const endDateInput = document.querySelector('.end-date');
+					if (historyItems.length > 0) {
+						const startDateInput = document.querySelector('.start-date');
+						const endDateInput = document.querySelector('.end-date');
 
-					const startDate = new Date(startDateInput.value);
-					const endDate = new Date(endDateInput.value);
+						const startDate = new Date(startDateInput.value);
+						const endDate = new Date(endDateInput.value);
 
-					if (startDate > endDate) {
-						showValidationModal('근무기간 입력이 잘못되었습니다!');
-						$("#myHistoryBox").attr("tabindex", -1).focus();
-						endDateInput.value = ''; // 종료일 초기화
-						resetSubmitButton();
-						return;
+						if (startDate > endDate) {
+							showValidationModal('근무기간 입력이 잘못되었습니다!');
+							$("#myHistoryBox").attr("tabindex", -1).focus();
+							endDateInput.value = ''; // 종료일 초기화
+							resetSubmitButton();
+							return;
+						}
 					}
 
 					console.log("유효성 검사 통과");
@@ -3235,8 +3237,10 @@
 					}
 				}
 
-				startDateInput.addEventListener('change', validateWorkPeriod);
-				endDateInput.addEventListener('change', validateWorkPeriod);
+				if (startDateInput && endDateInput) {
+					startDateInput.addEventListener('change', validateWorkPeriod);
+					endDateInput.addEventListener('change', validateWorkPeriod);
+				}
 
 		});
 			</script>

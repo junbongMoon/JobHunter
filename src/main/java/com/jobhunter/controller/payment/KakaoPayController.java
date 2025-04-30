@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.payment.PaymentLogDTO;
 import com.jobhunter.service.user.UserService;
 
@@ -62,8 +63,13 @@ public class KakaoPayController {
         params.add("total_amount", String.valueOf(param.get("total_amount")));
         params.add("vat_amount", "0");
         params.add("tax_free_amount", "0");
+        
+        //http://localhost:8085/
+        //http://koreaite.cafe24.com/kakao/pay/success
         params.add("approval_url", "http://koreaite.cafe24.com/kakao/pay/success");
+        //
         params.add("cancel_url", "http://koreaite.cafe24.com/kakao/pay/cancel");
+        //
         params.add("fail_url", "http://koreaite.cafe24.com/kakao/pay/fail");
         
         String itemName = (String) param.get("item_name");
@@ -104,8 +110,9 @@ public class KakaoPayController {
 
         // 1️⃣ 로그인된 사용자 정보 가져오기
         AccountVO account = (AccountVO) session.getAttribute("account"); // Account는 사용자 클래스
+        System.out.println(account);
         if (account == null) {
-            mav.setViewName("payment/payFail");
+            mav.setViewName("/");
             mav.addObject("error", "세션 만료 또는 로그인 정보 없음");
             return mav;
         }
@@ -113,7 +120,7 @@ public class KakaoPayController {
         String tid = (String) session.getAttribute("tid"); // 또는 memberDTO 등
         
         if (tid == null) {
-            mav.setViewName("payment/payFail");
+            mav.setViewName("user/mypage/" + userId);
             mav.addObject("error", "결제 정보가 유실되었습니다. 다시 시도해주세요.");
             return mav;
         }
@@ -154,11 +161,11 @@ public class KakaoPayController {
             // 3️⃣ 실제 DB에 포인트 충전
             userService.addPoint(Integer.toString(userId), amount, log); // 트랜잭션 서비스 호출
 
-            mav.setViewName("payment/paySuccess");
+            mav.setViewName("redirect:/user/mypage/" + userId);
             mav.addObject("pgToken", pgToken);
         } catch (HttpClientErrorException e) {
             System.out.println("결제 승인 실패: " + e.getResponseBodyAsString());
-            mav.setViewName("payment/payFail");
+            mav.setViewName("redirect:/user/mypage/" + userId);
         } catch (Exception e) {
         	e.printStackTrace();
         	
@@ -168,12 +175,20 @@ public class KakaoPayController {
     }
 
     @RequestMapping("/pay/cancel")
-    public void cancel(HttpServletResponse res) throws IOException {
-        res.getWriter().write("❌ 사용자가 결제를 취소했습니다.");
+    public String cancel(HttpSession session) {
+        AccountVO account = (AccountVO) session.getAttribute("account");
+        if (account != null && account.getAccountType() == AccountType.USER) {
+            return "redirect:/user/mypage/" + account.getUid() + "?msg=payment_cancelled";
+        }
+        return "redirect:/user/mypage/" + account.getUid() ;
     }
 
     @RequestMapping("/pay/fail")
-    public void fail(HttpServletResponse res) throws IOException {
-        res.getWriter().write("❌ 결제 실패!");
+    public String fail(HttpSession session) {
+        AccountVO account = (AccountVO) session.getAttribute("account");
+        if (account != null && account.getAccountType() == AccountType.USER) {
+            return "redirect:/user/mypage/" + account.getUid() ;
+        }
+        return "redirect:/user/mypage/" + account.getUid() ;
     }
 }
