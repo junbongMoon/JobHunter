@@ -12,8 +12,23 @@
 <script>
     $(document).ready(function () {
         $('#fileInput').change(function () {
-            const file = this.files[0];
-            if (!file) return;
+        const file = this.files[0];
+        if (!file) return;
+
+        // 파일 크기 제한: 10MB
+        if (file.size > 10 * 1024 * 1024) {
+            showAlertModal("파일 크기는 최대 10MB까지 가능합니다.");
+            this.value = '';
+            return;
+        }
+
+        // 파일 개수 제한: 기존 + 신규 1개 ≤ 3
+        const existingCount = $("#previewArea .preview-item").length;
+        if (existingCount >= 3) {
+            showAlertModal("최대 3개의 파일만 업로드할 수 있습니다.");
+            this.value = '';
+            return;
+        }
 
             const formData = new FormData();
             formData.append("file", file);
