@@ -53,11 +53,12 @@ public class ReviewReplyRestController {
 	@PostMapping("/add")
 	public ResponseEntity<ReviewReplyDTO> addReply(@RequestBody ReviewReplyDTO dto, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
+		System.out.println("🔥 userId from DTO: " + dto.getUserId());
+		
 		if (account == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
-
-		
+		dto.setUserId(account.getUid());
 
 		try {
 			boolean result = service.insertReply(dto);

@@ -238,6 +238,7 @@
 	font-size: 22px;
 	margin-bottom: 12px;
 }
+
 .reply-left {
 	flex: 1;
 }
@@ -253,6 +254,13 @@
 
 .reply-like-section {
 	text-align: center;
+}
+
+.btn-group-wrapper {
+  display: flex;
+  gap: 8px; /* 버튼 사이 간격 */
+  flex-wrap: wrap; /* 줄 넘김 허용 */
+  align-items: center;
 }
 </style>
 
@@ -360,11 +368,11 @@
 				<td><span id="likeCountText"> <span id="likeCountNum">${detail.likes != null ? detail.likes : 0}</span>명
 				</span></td>
 			</tr>
-			<!-- 추천 버튼 -->
+			
 		</table>
 
 		<!-- 좋아요 버튼 -->
-
+<div class="btn-group-wrapper">
 		<c:if test="${!isCompanyAccount}">
 			<button id="likeBtn" class="btn btn-outline-primary btn-common-shape">👍
 				좋아요</button>
@@ -397,26 +405,35 @@
 			href="/reviewBoard/allBoard?page=${pageRequestDTO.page}&searchType=${pageRequestDTO.searchType}&keyword=${pageRequestDTO.keyword}"
 			class="btn btn-secondary btn-sm btn-rounded">목록으로 돌아가기</a>
 
-		<c:if test="${loginUserId ne detail.userId}">
-			<!-- 본인 게시물이 아닌 경우만 신고 버튼 출력 -->
-			<button id="reportBtn" type="button" class="btn btn-sm btn-danger"
-				data-bs-toggle="modal" data-bs-target="#reportModal">🚨 신고</button>
+		<!-- 신고버튼 -->
+		<c:if test="${loginUserId ne detail.userId and not isCompanyAccount}">
+			<div class="report-btn-wrapper">
+				<button id="reportBtn" type="button" class="btn btn-sm btn-danger"
+					data-bs-toggle="modal" data-bs-target="#reportModal">🚨 신고</button>
+			</div>
 		</c:if>
+		</div>
 	</div>
 
 
-	<div id="replySection">
-		<!-- 댓글 목록 출력 영역 -->
-		<ul id="replyList" class="list-group"></ul>
+<div id="replySection">
+	<!-- 로그인 사용자 UID -->
+	<c:if test="${not empty sessionScope.account}">
+			<input type="hidden" id="loginUserUid"
+		value="${sessionScope.account.uid}">
+	</c:if>
 
-		<c:if test="${not isCompanyAccount}">
-			<!-- 댓글 작성 영역 추가 -->
-			<div class="mt-4">
-				<textarea id="replyContent" class="form-control" rows="3"
-					placeholder="댓글을 입력해주세요"></textarea>
-				<button id="submitReplyBtn" class="btn btn-primary mt-2">등록</button>
-			</div>
-		</c:if>
+	<!-- 댓글 목록 출력 -->
+	<ul id="replyList" class="list-group"></ul>
+
+	<!-- 댓글 입력 영역 (회사 계정 제외) -->
+	<c:if test="${not isCompanyAccount}">
+		<div class="mt-4">
+			<textarea id="replyContent" class="form-control" rows="3" placeholder="댓글을 입력해주세요"></textarea>
+			<button id="submitReplyBtn" class="btn btn-primary mt-2">등록</button>
+		</div>
+	</c:if>
+</div>
 
 		<!-- 댓글 페이징 부분 -->
 		<nav>
@@ -441,6 +458,24 @@
 			</div>
 		</div>
 	</div>
+	
+	<!-- 공용 모달 -->
+<div class="modal fade" id="resultModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 id="resultModalTitle" class="modal-title">확인</h5>
+      </div>
+      <div class="modal-body">
+        <p id="resultModalMessage">정말 삭제하시겠습니까?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="modalConfirmBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
 	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
 	<input type="hidden" id="isLiked" value="${isLiked}" />
 	<input type="hidden" id="isCompanyAccount" value="${isCompanyAccount}" />
@@ -460,23 +495,28 @@
 
 <script>
 function showModal(title, message, callback) {
-    $('#resultModalTitle').text(title);
-    $('#resultModalMessage').text(message);
-    $('#resultModal').modal('show');
+	  $('#resultModalTitle').text(title);
+	  $('#resultModalMessage').text(message);
 
-    if (callback) {
-        $('#resultModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
-            callback();
-        });
-    }
-}
+	  // 이전 이벤트 제거
+	  $('#modalConfirmBtn').off('click');
+
+	  if (callback) {
+	    $('#modalConfirmBtn').on('click', function () {
+	      $('#resultModal').modal('hide');
+	      callback(); 
+	    });
+	  }
+
+	  $('#resultModal').modal('show');
+	}
 
 $(document).ready(function () {
       
 	$(".delete-btn").click(function () {
         let boardNo = $(this).data("boardno");
 
-        if (confirm("정말 삭제하시겠습니까?")) {
+        showModal("⚠️ 확인", "정말 삭제하시겠습니까?", function () {
             $.ajax({
                 url: "${pageContext.request.contextPath}/reviewBoard/delete",
                 type: "POST",
@@ -484,20 +524,20 @@ $(document).ready(function () {
                     boardNo: boardNo
                 },
                 success: function (res) {
-                    if (res.success) {
-                    	 alert(res.message); // 간단히 alert 띄우고
-                         window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
-                        
-                    } else {
-                        showModal("⚠️ 삭제 실패", res.message);
-                    }
+                	if (res.success) {
+                	    showModal("삭제 완료", res.message, function () {
+                	        window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
+                	    });
+                	} else {
+                	    showModal("⚠️ 삭제 실패", res.message);
+                	}
                 },
                 error: function (xhr) {
                     console.error("삭제 실패:", xhr.responseText);
                     showModal("❌ 서버 오류", "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
                 }
             });
-        }
+        });
     });
       
 	 const likeModalElement = document.getElementById('likeModal');
@@ -594,6 +634,10 @@ $(document).ready(function () {
 		      return;
 		    }
 		
+		    const isCompanyAccount = $('#isCompanyAccount').val() === 'true'; 
+		    if (isCompanyAccount) {
+		      $('#reportBtn').hide();
+		    }
 		    // 중복 신고 방지
 		
 		
@@ -624,7 +668,7 @@ $(document).ready(function () {
 		      onConfirm: function () {
 		        const reportCategory = $('#reportReason').val();
 		        const reportMessage = $('#reportMessage').val();
-		
+				
 		        if (!reportCategory) {
 		          window.publicModals.show("신고 사유를 선택해주세요.");
 		          return false; // false → 모달 유지
@@ -790,6 +834,7 @@ $(document).ready(function () {
         contentType: 'application/json',
         data: JSON.stringify({
           boardNo: boardNo,
+          userId: loginUserUid,
           content: content
         }),
         success: function () {
@@ -823,7 +868,7 @@ $(document).ready(function () {
     if (confirm('댓글을 삭제하시겠습니까?')) {
       $.ajax({
         url: '/reply/delete',
-        type: 'POST',
+        type: 'DELETE',
         contentType: 'application/json',
         data: JSON.stringify({ replyNo: replyNo }),
         success: function () {
