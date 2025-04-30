@@ -182,7 +182,7 @@ public class AdvancementController {
 
 
             if (advancement == null) {
-                return "redirect:/user/mypage"; // 존재하지 않으면 마이페이지로 리디렉션
+                return "redirect:/account/login"; // 존재하지 않으면 마이페이지로 리디렉션
             }
             
             if (!AccountUtil.checkAuth(sessionAccount, advancement.getRefUser(), AccountType.COMPANY)) {
@@ -209,7 +209,7 @@ public class AdvancementController {
     	try {
     	    if (!AccountUtil.checkUid(sessionAccount, uid)) {
     	        
-    	        return "/user/mypage";
+    	        return "redirect:/account/login";
     	    }
 
 			result = advancementService.getAdvancementListByUid(uid, pageRequestDTO);
