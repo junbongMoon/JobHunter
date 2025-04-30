@@ -256,6 +256,14 @@
 			<artifactId>guava</artifactId>
 			<version>33.4.8-jre</version>
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/com.google.firebase/firebase-admin -->
+		<!-- fireBase 토큰 인증용 라이브러리 -->
+		<dependency>
+		    <groupId>com.google.firebase</groupId>
+		    <artifactId>firebase-admin</artifactId>
+		    <version>9.2.0</version>
+		</dependency>
 
 
 

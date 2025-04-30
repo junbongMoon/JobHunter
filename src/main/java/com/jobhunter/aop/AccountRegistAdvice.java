@@ -19,7 +19,7 @@ import com.jobhunter.model.account.AccountVO;
  */
 @Component
 @Aspect
-public class AccountLogingAdvice {
+public class AccountRegistAdvice {
    
 	/** 계정관련 로그 남기는 DAO */
 	@Autowired

@@ -33,6 +33,7 @@ public class AccountVO {
     private String requiresVerification; // 인증 필요 여부 ("Y" 또는 "N")
     private Timestamp blockDeadline; // 계정 정지 기한
     private Timestamp deleteDeadline; // 계정 삭제 대기 기한
+    private Timestamp lastLoginDate; // 이전 로그인 일자
     private String blockReason; // 계정 정지 사유
     private Integer loginCnt; // 로그인 실패 횟수
     private String isSocial; // 소셜 로그인 여부 ("Y": 소셜 로그인 사용자, "N": 일반 사용자)

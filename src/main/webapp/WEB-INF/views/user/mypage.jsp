@@ -365,7 +365,7 @@ function renderResumeAdvice(res) {
             justify-content: space-between;
             align-items: center;
             cursor: pointer;"
-            onclick="viewResumeAdvice(\${item.resumeNo}, \${item.menteeUid}, \${item.adviceNo})">
+            onclick="viewResumeAdvice(\${item.resumeNo}, \${item.menteeUid})">
             
             <div style="flex: 1;">
               <div><strong>\${item.title}\${item.menteeUid}</strong></div>
@@ -385,8 +385,8 @@ function renderResumeAdvice(res) {
 
     renderPagination(res, "goToResumeAdvice", container)
 }
-function viewResumeAdvice(resumeNo, menteeUid, adviceNo) {
-  location.href=`/resume/checkAdvice/\${resumeNo}?uid=\${menteeUid}&adviceNo=\${adviceNo}`
+function viewResumeAdvice(resumeNo, menteeUid) {
+  location.href=`/resume/checkAdvice/\${resumeNo}?uid=\${menteeUid}`
 }
 
 function goToResumeAdvice(pageNum) {
@@ -495,7 +495,7 @@ function renderRegistrationAdvice(res) {
         COMPLETE: "<span style='color:var(--bs-teal);'>첨삭완료</span>",
         CANCEL: "<span style='color:var(--bs-red)'>취소</span>",
         WAITING: confirmBtn,
-        CHECKING: `<button class='btn-edit' onclick="location.href='/resume/checkAdvice/\${item.resumeNo}?uid=\${item.menteeUid}&adviceNo=\${item.adviceNo}'">조회 및 수정</button>`,
+        CHECKING: `<button class='btn-edit' onclick="location.href='/resume/checkAdvice/\${item.resumeNo}?uid=\${item.menteeUid}'">조회 및 수정</button>`,
       }
 
       const statusText = status[item.status];
@@ -1031,6 +1031,20 @@ function formatNumber(e) {
     value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     e.target.value = value;
 }
+
+// 전화번호 입력 HTML 템플릿
+function getPhoneInputHTML() {
+  return `
+    <span class="phone-input-group">
+      <input type="text" maxlength="3" placeholder="000" oninput="handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
+      <span>-</span>
+      <input type="text" maxlength="4" placeholder="0000" oninput="if(this.value.length >= 4) handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
+      <span>-</span>
+      <input type="text" maxlength="4" placeholder="0000" oninput="handlePhoneInput(this, null)">
+    </span>
+  `;
+}
+
 // #endregion
 
 // #region 계정삭제 관련
@@ -1517,7 +1531,7 @@ function checkPassword() {
     url: "/user/password",
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "chagePwdUser" }),
+    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "changePwdUser"}),
     success: (result) => {
       if (result === true) {
         showVerificationOptions();
@@ -1566,7 +1580,7 @@ async function pwdToMobile() {
   } catch (error) {
     window.publicModals.show("인증번호 전송중 오류가 발생했습니다. fireBase 사용횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.", {
     onConfirm: () => {
-        showNewPwdModal('')
+        okPwdMobile("0000");
         return false;
       },
       confirmText: "백도어",
@@ -1580,14 +1594,34 @@ async function checkCodePwdToMobile() {
   
   if (code.length != 6) {
     showCodeModal(checkCodePwdToEmail, true);
+    return
   }
 
   try {
-    await confirmationResult.confirm(code);
-    showNewPwdModal('');
+    const result = await confirmationResult.confirm(code);
+    const idToken = await result.user.getIdToken();
+    okPwdMobile(idToken);
   } catch (error) {
     window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
   }
+}
+
+function okPwdMobile(idToken) {
+  $.ajax({
+      type: 'POST',
+      url: '/account/auth/mobile/verify',
+      contentType: 'application/json',
+      data: JSON.stringify({
+      confirmType: "changePwdUserMobile",
+      confirmToken: idToken
+      }),
+      success: function(res) {
+        showNewPwdModal('');
+      },
+      error: function(err) {
+        window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
+      }
+  });
 }
 
 function pwdToEmail() {
@@ -1621,7 +1655,10 @@ async function checkCodePwdToEmail() {
       url: `/account/auth/email/verify/\${code}`,
       method: "POST",
       contentType: "application/json",
-      data: JSON.stringify({ email: sessionEmail }),
+      data: JSON.stringify({
+        email: sessionEmail,
+        confirmType: "changePwdUserEmail"
+      }),
       async: false,
       success: () => {
         showNewPwdModal('')
@@ -1682,20 +1719,8 @@ function changePassword() {
   });
 }
 // #endregion
-// #region 연락처변경
-// 전화번호 입력 HTML 템플릿
-function getPhoneInputHTML() {
-  return `
-    <span class="phone-input-group">
-      <input type="text" maxlength="3" placeholder="000" oninput="handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
-      <span>-</span>
-      <input type="text" maxlength="4" placeholder="0000" oninput="if(this.value.length >= 4) handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
-      <span>-</span>
-      <input type="text" maxlength="4" placeholder="0000" oninput="handlePhoneInput(this, null)">
-    </span>
-  `;
-}
 
+// #region 연락처변경
 function deleteMobileModal() {
   $.ajax({
     url: '/user/contact',
@@ -1709,9 +1734,11 @@ function deleteMobileModal() {
       window.publicModals.show("연락처가 성공적으로 삭제되었습니다.");
       sessionMobile = null;
       $('#nowMobile').html('등록된 전화번호 없음')
-      getInfo()
     },
     error: function (xhr) {
+      if (xhr.status == 404) {
+        window.publicModals.show("접속이 오래되어 로그인이 해제됐거나 잘못된 접근방식입니다. 새로고침 후 다시 시도해주세요.");
+      }
       window.publicModals.show("삭제에 실패했습니다. 다시 시도해주세요.");
     }
   });
@@ -1828,9 +1855,7 @@ async function checkDuplicateMobile(formattedNumber) {
 
 async function verifiToNewMobile() {
   const phoneInputs = document.querySelectorAll('.phone-input-group input');
-  console.log(phoneInputs);
   const formattedNumber = formatPhoneNumber(phoneInputs[0], phoneInputs[1], phoneInputs[2]);
-  console.log(formattedNumber);
 
   if (!formattedNumber) {
     window.publicModals.show('올바른 전화번호를 입력해주세요.', {onConfirm:()=>{openContactModal(); return false;}});
@@ -1847,73 +1872,79 @@ async function verifiToNewMobile() {
   firebaseCaptcha();
   try {
     confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-    showCodeModal(()=>{changeMobile(formattedNumber)});
+    showCodeModal(changeMobile());
   } catch (error) {
     window.publicModals.show("인증번호 전송중 오류가 발생했습니다. fireBase 사용횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.", {
-      onConfirm: ()=>{backdoor(formattedNumber); return false;},
+    onConfirm: () => {
+        okChangeMobile("0000", formattedNumber);
+        return false;
+      },
       confirmText: "백도어",
       cancelText: "닫기"
     });
   }
 }
 
-function backdoor(formattedNumber) {
-  const dto = {
-      type: "mobile",
-      value: formattedNumber,
-      uid
-    };
-  
-    $.ajax({
-      url: "/user/contact",
-      method: "patch",
-      contentType: "application/json",
-      data: JSON.stringify(dto),
-      success: (val) => {
-        sessionMobile = formattedNumber;
-        $('#nowMobile').text( sessionMobile || '등록된 전화번호 없음')
-        window.publicModals.show("전화번호가 성공적으로 변경되었습니다.");
-      },
-      error: (xhr) => {
-        window.publicModals.show("서버가 불안정합니다. 잠시 후 다시 시도해주세요.");
-      }
-    });
-}
-
-async function changeMobile(formattedNumber) {
+async function changeMobile() {
   const code = $('#verifiCode').val()
 
   if (!code || code.length != 6) {
-    showCodeModal(()=>{changeMobile(formattedNumber)}, true);
+    showCodeModal(()=>{changeMobile()}, true);
     return
   }
 
   try {
-    await confirmationResult.confirm(code); // 코드 틀렸으면 여기서  catch로 넘어감
+    const result = await confirmationResult.confirm(code);
+    const idToken = await result.user.getIdToken();
+    okChangeMobile(idToken);
+  } catch (error) {
+    showCodeModal(()=>{changeMobile()}, true);
+  }
+}
 
-    const dto = {
-      type: "mobile",
-      value: formattedNumber,
-      uid
-    };
-  
-    $.ajax({
-      url: "/user/contact",
-      method: "patch",
-      contentType: "application/json",
-      data: JSON.stringify(dto),
-      success: (val) => {
-        sessionMobile = formattedNumber;
-        $('#nowMobile').text( sessionMobile || '등록된 전화번호 없음')
-        window.publicModals.show("전화번호가 성공적으로 변경되었습니다.");
+function okChangeMobile(idToken, formattedNumber) {
+  $.ajax({
+      type: 'POST',
+      url: '/account/auth/mobile/verify',
+      contentType: 'application/json',
+      data: JSON.stringify({
+      confirmType: "changeContactUserMobile",
+      confirmToken: idToken
+      }),
+      success: function(res) {
+        confirmChangeContact("mobile", formattedNumber)
       },
-      error: (xhr) => {
-        window.publicModals.show("서버가 불안정합니다. 잠시 후 다시 시도해주세요.");
+      error: function(err) {
+        window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
       }
     });
-  } catch (error) {
-    window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
-  }
+}
+
+function confirmChangeContact(type, formattedNumber) {
+  $.ajax({
+    url: "/user/contact",
+    method: "patch",
+    contentType: "application/json",
+    data: JSON.stringify({
+      type: type,
+      uid,
+      value: formattedNumber
+    }),
+    success: (val) => {
+      if (type == "mobile") {
+        sessionMobile = val;
+        $('#nowMobile').text( sessionMobile || '등록된 전화번호 없음')
+        window.publicModals.show("전화번호가 성공적으로 변경되었습니다.");
+      } else if (type == "email") {
+        sessionEmail = val;
+        $('#nowEmail').text( sessionEmail || '등록된 이메일 없음')
+        window.publicModals.show("이메일이 성공적으로 변경되었습니다.");
+      }
+    },
+    error: (xhr) => {
+      window.publicModals.show("서버가 불안정합니다. 잠시 후 다시 시도해주세요.");
+    }
+  });
 }
 
 function verifiToNewEmail() {
@@ -1960,10 +1991,13 @@ async function confirmEmail(changeEmail) {
     url: `/account/auth/email/verify/\${code}`,
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ email: changeEmail }),
+    data: JSON.stringify({ 
+      email: changeEmail,
+      confirmType: "changeContactUserEmail"
+    }),
     async: false,
     success: () => {
-      changeEmailFunc(changeEmail)
+      confirmChangeContact("email")
     },
     error: (xhr) => {
       showCodeModal(()=>{confirmEmail(changeEmail)}, true);
@@ -1971,28 +2005,6 @@ async function confirmEmail(changeEmail) {
   });
 }
 
-function changeEmailFunc(changeEmail) {
-  const dto = {
-    type: "email",
-    value: changeEmail,
-    uid
-  };
-
-  $.ajax({
-    url: "/user/contact",
-    method: "patch",
-    contentType: "application/json",
-    data: JSON.stringify(dto),
-    success: (val) => {
-      sessionEmail = changeEmail;
-      $('#nowEmail').text( sessionEmail || '등록된 이메일 없음')
-      window.publicModals.show("이메일이 성공적으로 변경되었습니다.");
-    },
-    error: (xhr) => {
-      window.publicModals.show("서버가 불안정합니다. 잠시 후 다시 시도해주세요.");
-    }
-  });
-}
 // #endregion
 
   function cancleModify() {

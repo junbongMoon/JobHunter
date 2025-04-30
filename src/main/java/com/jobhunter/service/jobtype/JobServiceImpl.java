@@ -12,6 +12,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -22,15 +24,23 @@ import org.xml.sax.InputSource;
 
 import com.jobhunter.dao.jobtype.JobDAO;
 
+
 @Service
+@PropertySource("classpath:config/jobtype.properties")
 public class JobServiceImpl implements JobService {
 
     @Autowired
     private JobDAO jobDAO;
+    
+    @Value("${authKey}")
+    private String apiKey;
 
     @Override
     public void fetchAndSaveJobData() throws Exception {
-        String apiUrl = "https://www.work24.go.kr/cm/openApi/call/wk/callOpenApiSvcInfo212L01.do?authKey=b838fdd0-d6fa-49ea-a988-f0705bed049d&returnType=XML&target=JOBCD";
+        String apiUrl = "https://www.work24.go.kr/cm/openApi/call/wk/callOpenApiSvcInfo212L01.do"
+                + "?authKey=" + apiKey
+                + "&returnType=XML"
+                + "&target=JOBCD";
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.getForEntity(apiUrl, String.class);
@@ -64,8 +74,11 @@ public class JobServiceImpl implements JobService {
     
     @Override
     public void fetchAndSaveSubcategoryData() throws Exception {
-        String apiUrl = "https://www.work24.go.kr/cm/openApi/call/wk/callOpenApiSvcInfo212L01.do?authKey=b838fdd0-d6fa-49ea-a988-f0705bed049d&returnType=XML&target=JOBCD";
-
+    	String apiUrl = "https://www.work24.go.kr/cm/openApi/call/wk/callOpenApiSvcInfo212L01.do"
+                + "?authKey=" + apiKey
+                + "&returnType=XML"
+                + "&target=JOBCD";
+    	
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.getForEntity(apiUrl, String.class);
         String xmlData = response.getBody();

@@ -22,6 +22,7 @@ import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.LoginDTO;
 import com.jobhunter.model.account.LoginFailedDTO;
 import com.jobhunter.model.account.UnlockDTO;
+import com.jobhunter.model.account.VerificationRequestDTO;
 import com.jobhunter.model.account.findIdDTO;
 import com.jobhunter.model.customenum.AccountType;
 
@@ -59,11 +60,21 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public void setRequiresVerificationFalse(int uid, AccountType accountType) throws Exception {
-		AccountLoginDAO dao = getDAO(accountType);
-		dao.setRequiresVerificationFalse(uid);
-		dao.getAccountByUid(uid);
-
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public AccountVO setRequiresVerificationFalse(VerificationRequestDTO dto) throws Exception {
+		// dao단 설정
+		AccountLoginDAO dao = getDAO(dto.getAccountType());
+		
+		// 잠금해제
+		int success = dao.setRequiresVerificationFalse(dto.getUid());
+		// 해제된 계정 자동 로그인용으로 들고오기
+		AccountVO result = dao.getAccountByUid(dto.getUid());
+		
+		if (result == null || success <= 0) {
+			throw new NoSuchElementException();
+		}
+		
+		return result;
 	}
 
 	// 인증 필요 여부 들고가려고 맵으로 반환_그냥 널 체크하면 5번 실패한건지도 모르니까

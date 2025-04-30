@@ -104,13 +104,9 @@
 }
 
 #replyList .list-group-item {
-	background-color: #ffffff;
-	border: 1px solid #ddd;
-	border-radius: 10px;
-	margin-bottom: 15px;
-	padding: 15px 20px;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-	position: relative;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
 }
 
 #replyList .list-group-item strong {
@@ -242,6 +238,30 @@
 	font-size: 22px;
 	margin-bottom: 12px;
 }
+
+.reply-left {
+	flex: 1;
+}
+
+/* 오른쪽: 좋아요 버튼, 좋아요 수 */
+.reply-right {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	justify-content: flex-end;
+	min-width: 60px;
+}
+
+.reply-like-section {
+	text-align: center;
+}
+
+.btn-group-wrapper {
+  display: flex;
+  gap: 8px; /* 버튼 사이 간격 */
+  flex-wrap: wrap; /* 줄 넘김 허용 */
+  align-items: center;
+}
 </style>
 
 
@@ -348,11 +368,11 @@
 				<td><span id="likeCountText"> <span id="likeCountNum">${detail.likes != null ? detail.likes : 0}</span>명
 				</span></td>
 			</tr>
-			<!-- 추천 버튼 -->
+			
 		</table>
 
 		<!-- 좋아요 버튼 -->
-
+<div class="btn-group-wrapper">
 		<c:if test="${!isCompanyAccount}">
 			<button id="likeBtn" class="btn btn-outline-primary btn-common-shape">👍
 				좋아요</button>
@@ -385,26 +405,35 @@
 			href="/reviewBoard/allBoard?page=${pageRequestDTO.page}&searchType=${pageRequestDTO.searchType}&keyword=${pageRequestDTO.keyword}"
 			class="btn btn-secondary btn-sm btn-rounded">목록으로 돌아가기</a>
 
-		<c:if test="${loginUserId ne detail.userId}">
-			<!-- 본인 게시물이 아닌 경우만 신고 버튼 출력 -->
-			<button id="reportBtn" type="button" class="btn btn-sm btn-danger"
-				data-bs-toggle="modal" data-bs-target="#reportModal">🚨 신고</button>
+		<!-- 신고버튼 -->
+		<c:if test="${loginUserId ne detail.userId and not isCompanyAccount}">
+			<div class="report-btn-wrapper">
+				<button id="reportBtn" type="button" class="btn btn-sm btn-danger"
+					data-bs-toggle="modal" data-bs-target="#reportModal">🚨 신고</button>
+			</div>
 		</c:if>
+		</div>
 	</div>
 
 
-	<div id="replySection">
-		<!-- 댓글 목록 출력 영역 -->
-		<ul id="replyList" class="list-group"></ul>
+<div id="replySection">
+	<!-- 로그인 사용자 UID -->
+	<c:if test="${not empty sessionScope.account}">
+			<input type="hidden" id="loginUserUid"
+		value="${sessionScope.account.uid}">
+	</c:if>
 
-		<c:if test="${not isCompanyAccount}">
-			<!-- 댓글 작성 영역 추가 -->
-			<div class="mt-4">
-				<textarea id="replyContent" class="form-control" rows="3"
-					placeholder="댓글을 입력해주세요"></textarea>
-				<button id="submitReplyBtn" class="btn btn-primary mt-2">등록</button>
-			</div>
-		</c:if>
+	<!-- 댓글 목록 출력 -->
+	<ul id="replyList" class="list-group"></ul>
+
+	<!-- 댓글 입력 영역 (회사 계정 제외) -->
+	<c:if test="${not isCompanyAccount}">
+		<div class="mt-4">
+			<textarea id="replyContent" class="form-control" rows="3" placeholder="댓글을 입력해주세요"></textarea>
+			<button id="submitReplyBtn" class="btn btn-primary mt-2">등록</button>
+		</div>
+	</c:if>
+</div>
 
 		<!-- 댓글 페이징 부분 -->
 		<nav>
@@ -429,7 +458,25 @@
 			</div>
 		</div>
 	</div>
-<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
+	
+	<!-- 공용 모달 -->
+<div class="modal fade" id="resultModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 id="resultModalTitle" class="modal-title">확인</h5>
+      </div>
+      <div class="modal-body">
+        <p id="resultModalMessage">정말 삭제하시겠습니까?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-danger" id="modalConfirmBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+	<input type="hidden" id="userId" value="${sessionScope.account.uid}" />
 	<input type="hidden" id="isLiked" value="${isLiked}" />
 	<input type="hidden" id="isCompanyAccount" value="${isCompanyAccount}" />
 	<input type="hidden" id="loginUserUid"
@@ -437,26 +484,39 @@
 	<input type="hidden" id="boardNo" value="${detail.boardNo}" />
 	<input type="hidden" id="loginUserId" value="${loginUser.userId}" />
 	<input type="hidden" id="postWriterUid" value="${detail.writerUid}">
+
+
+
+
+
 </body>
+
+
+
 <script>
 function showModal(title, message, callback) {
-    $('#resultModalTitle').text(title);
-    $('#resultModalMessage').text(message);
-    $('#resultModal').modal('show');
+	  $('#resultModalTitle').text(title);
+	  $('#resultModalMessage').text(message);
 
-    if (callback) {
-        $('#resultModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
-            callback();
-        });
-    }
-}
+	  // 이전 이벤트 제거
+	  $('#modalConfirmBtn').off('click');
+
+	  if (callback) {
+	    $('#modalConfirmBtn').on('click', function () {
+	      $('#resultModal').modal('hide');
+	      callback(); 
+	    });
+	  }
+
+	  $('#resultModal').modal('show');
+	}
 
 $(document).ready(function () {
       
 	$(".delete-btn").click(function () {
         let boardNo = $(this).data("boardno");
 
-        if (confirm("정말 삭제하시겠습니까?")) {
+        showModal("⚠️ 확인", "정말 삭제하시겠습니까?", function () {
             $.ajax({
                 url: "${pageContext.request.contextPath}/reviewBoard/delete",
                 type: "POST",
@@ -464,27 +524,27 @@ $(document).ready(function () {
                     boardNo: boardNo
                 },
                 success: function (res) {
-                    if (res.success) {
-                    	 alert(res.message); // 간단히 alert 띄우고
-                         window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
-                        
-                    } else {
-                        showModal("⚠️ 삭제 실패", res.message);
-                    }
+                	if (res.success) {
+                	    showModal("삭제 완료", res.message, function () {
+                	        window.location.href = "${pageContext.request.contextPath}/reviewBoard/allBoard";
+                	    });
+                	} else {
+                	    showModal("⚠️ 삭제 실패", res.message);
+                	}
                 },
                 error: function (xhr) {
                     console.error("삭제 실패:", xhr.responseText);
                     showModal("❌ 서버 오류", "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
                 }
             });
-        }
+        });
     });
       
 	 const likeModalElement = document.getElementById('likeModal');
 	 const likeModal = new bootstrap.Modal(likeModalElement);
       
-	const isCompanyAccount = $('#isCompanyAccount').val() === 'true'; // 회사 계정 여부
-    const isLiked = $('#isLiked').val() === 'true'; // 좋아요 여부
+	 const isCompanyAccount = $('#isCompanyAccount').val() === 'true'; 
+     const isLiked = $('#isLiked').val() === 'true'; // 좋아요 여부
       
       // 회사 계정이면 버튼을 숨기거나 비활성화
     if (isCompanyAccount) {
@@ -559,7 +619,7 @@ $(document).ready(function () {
 		  const loginUserUid = parseInt($('#loginUserUid').val());    // 로그인한 사용자 UID
 		  const boardNo = parseInt($('#boardNo').val());
 		  const writerId = parseInt($('#postWriterUid').val(), 10);
-		  const reportTargetPK = parseInt($('#postWriterUid').val(), 10)
+		  const reportTargetPK = parseInt($('#boardNo').val(), 10)
 		  
 		  console.log("writerId:", writerId);
 		  console.log("reportTargetPK:", reportTargetPK);
@@ -574,6 +634,10 @@ $(document).ready(function () {
 		      return;
 		    }
 		
+		    const isCompanyAccount = $('#isCompanyAccount').val() === 'true'; 
+		    if (isCompanyAccount) {
+		      $('#reportBtn').hide();
+		    }
 		    // 중복 신고 방지
 		
 		
@@ -604,7 +668,7 @@ $(document).ready(function () {
 		      onConfirm: function () {
 		        const reportCategory = $('#reportReason').val();
 		        const reportMessage = $('#reportMessage').val();
-		
+				
 		        if (!reportCategory) {
 		          window.publicModals.show("신고 사유를 선택해주세요.");
 		          return false; // false → 모달 유지
@@ -653,7 +717,7 @@ $(document).ready(function () {
 
 const boardNo = parseInt($('#boardNo').val());
 const loginUserUid = $('#userId').val();
-
+const isCompanyAccount = $('#isCompanyAccount').val() === 'true'; 
 function loadReplies(page = 1) {
   $.ajax({
     url: '/reply/page',
@@ -676,40 +740,47 @@ function loadReplies(page = 1) {
       $pagination.empty();
 
       // 댓글 출력
-      if (!replies || replies.length === 0) {
-        $replyList.append('<li class="list-group-item text-muted">등록된 댓글이 없습니다.</li>');
-      } else {
-    	  replies.forEach(reply => {
-    		    const replyNo = reply.replyNo;
-    		    const replyContent = (reply.content ?? '').replace(/"/g, '&quot;');
-    		    const date = (reply.postDate ?? '').substring(0, 10);
-    		    const writer = reply.writerId ?? '익명';
+    if (!replies || replies.length === 0) {
+    $replyList.append('<li class="list-group-item text-muted">등록된 댓글이 없습니다.</li>');
+    } else {
+		replies.forEach(reply => {
+		    const replyNo = reply.replyNo;
+		    const replyContent = (reply.content ?? '').replace(/"/g, '&quot;');
+		    const date = (reply.postDate ?? '').substring(0, 10);
+		    const writer = reply.writerId ?? '익명';
 
-    		    let replyHtml = '<li class="list-group-item">' +
-    		      '<strong>' + writer + '</strong> (' + date + ')<br>' +
-    		      '<div class="reply-content">' + reply.content + '</div>';
+		    let replyHtml = '<li class="list-group-item d-flex justify-content-between align-items-start">';
 
-    		    // ⭐ 좋아요 버튼은 회사 계정이 아니면 보여주기
-    		    if (!isCompanyAccount) {
-    		        replyHtml += '<div class="reply-like-section mt-2" data-replyno="' + replyNo + '">' +
-    		            '<button class="btn btn-outline-primary btn-sm like-reply-btn"' + (reply.isLiked ? ' style="display:none;"' : '') + '>👍 좋아요</button>' +
-    		            '<button class="btn btn-outline-danger btn-sm unlike-reply-btn"' + (reply.isLiked ? '' : ' style="display:none;"') + '>❌ 취소</button>' +
-    		            '&nbsp;<span class="like-count">' + reply.likes + '</span>' +
-    		            '</div>';
-    		    }
+		    replyHtml += '<div class="reply-left" style="flex: 1;">';
+		    replyHtml += '<strong>' + writer + '</strong> (' + date + ')<br>';
+		    replyHtml += '<div class="reply-content mt-2 mb-2">' + reply.content + '</div>';
 
-    		    // 수정/삭제 버튼은 작성자 본인만
-    		    if (reply.userId.toString() === loginUserUid.toString()) {
-    		        replyHtml += '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" data-replyno="' + replyNo + '" data-content="' + replyContent + '">수정</button>' +
-    		                     '<button class="btn btn-sm btn-outline-danger delete-reply-btn" data-replyno="' + replyNo + '">삭제</button>';
-    		    }
+		    if (reply.userId.toString() === loginUserUid.toString()) {
+		        replyHtml += '<div class="reply-actions mt-2">';
+		        replyHtml += '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" ' +
+		                     'data-replyno="' + replyNo + '" data-content="' + replyContent + '">수정</button>';
+		        replyHtml += '<button class="btn btn-sm btn-outline-danger delete-reply-btn" ' +
+		                     'data-replyno="' + replyNo + '">삭제</button>';
+		        replyHtml += '</div>';
+		    }
 
-    		    replyHtml += '</li>';
+		    replyHtml += '</div>';
 
-    		    $replyList.append(replyHtml);
-    		});
-      }
+		    if (isCompanyAccount === false || isCompanyAccount === 'false') {
+		        replyHtml += '<div class="reply-right text-end ms-3" style="min-width: 80px;">';
+		        replyHtml += '<div class="reply-like-section" data-replyno="' + replyNo + '">' +
+		            '<button class="btn btn-outline-primary btn-sm like-reply-btn"' + (reply.isLiked ? ' style="display:none;"' : '') + '>👍</button>' +
+		            '<button class="btn btn-outline-danger btn-sm unlike-reply-btn"' + (reply.isLiked ? '' : ' style="display:none;"') + '>❌</button>' +
+		            '<br><span class="like-count small">' + (reply.likes ?? 0) + '</span>' +
+		            '</div>';
+		        replyHtml += '</div>';
+		    }
 
+		    replyHtml += '</li>';
+		    $replyList.append(replyHtml);
+		});
+    }
+	
       // 페이징 출력
       if (response.totalPage > 1) {
         // 이전
@@ -758,22 +829,33 @@ $(document).ready(function () {
     }
 
     $.ajax({
-      url: '/reply/add',
-      type: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({
-        boardNo: boardNo,
-        content: content
-      }),
-      success: function () {
-        $('#replyContent').val('');
-        loadReplies(1); // 첫 페이지로 갱신
-      },
-      error: function () {
-        alert('댓글 등록 중 오류가 발생했습니다.');
-      }
+        url: '/reply/add',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          boardNo: boardNo,
+          userId: loginUserUid,
+          content: content
+        }),
+        success: function () {
+          $('#replyContent').val('');
+          loadReplies(1); // 첫 페이지로 갱신
+        },
+        error: function (xhr, status, error) {
+          console.log("xhr.status:", xhr.status);
+          console.log("error:", error);
+
+          if (xhr.status === 401) {
+            alert('로그인이 필요합니다.');
+            setTimeout(function () {
+              window.location.href = '/account/login';
+            }, 300);
+          } else {
+            alert('댓글 등록 중 오류가 발생했습니다.');
+          }
+        }
+      });
     });
-  });
 
   // 댓글 삭제
   $(document).on('click', '.delete-reply-btn', function () {
@@ -786,7 +868,7 @@ $(document).ready(function () {
     if (confirm('댓글을 삭제하시겠습니까?')) {
       $.ajax({
         url: '/reply/delete',
-        type: 'POST',
+        type: 'DELETE',
         contentType: 'application/json',
         data: JSON.stringify({ replyNo: replyNo }),
         success: function () {
@@ -802,35 +884,53 @@ $(document).ready(function () {
 
   // 댓글 수정
   $(document).on('click', '.edit-reply-btn', function () {
+    const $li = $(this).closest('li');
     const replyNo = $(this).data('replyno');
-    const currentContent = $(this).data('content');
+    const $replyContentDiv = $li.find('.reply-content');
 
-    if (isNaN(replyNo)) {
-      alert("댓글 번호가 유효하지 않습니다.");
-      return;
-    }
+    // 이미 수정모드면 저장 로직 실행
+    if ($li.find('.edit-reply-textarea').length > 0) {
+        const newContent = $li.find('.edit-reply-textarea').val().trim();
 
-    const newContent = prompt('댓글을 수정하세요:', currentContent);
-    if (newContent !== null && newContent.trim() !== '') {
-      $.ajax({
-        url: '/reply/update',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          replyNo: parseInt(replyNo),
-          userId: parseInt(loginUserUid),
-          content: newContent.trim()
-        }),
-        success: function () {
-          alert('댓글이 수정되었습니다.');
-          loadReplies(); // 현재 페이지 유지
-        },
-        error: function () {
-          alert('댓글 수정 중 오류가 발생했습니다.');
+        if (!newContent) {
+            alert("수정할 내용을 입력해주세요.");
+            return;
         }
-      });
+
+        // AJAX 수정 요청
+        $.ajax({
+            url: '/reply/update',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                replyNo: replyNo,
+                content: newContent,
+                userId: parseInt($('#userId').val()),  // 로그인 UID
+                boardNo: parseInt($('#boardNo').val())
+            }),
+            success: function () {
+                alert('댓글이 수정되었습니다.');
+                loadReplies(); // 새로 고침
+            },
+            error: function () {
+                alert('댓글 수정 중 오류가 발생했습니다.');
+            }
+        });
+
+    } else {
+        // 수정 textarea 폼이 없으면 → 생성
+        $('.edit-reply-form').remove(); // 다른 폼 제거
+        const originalContent = $(this).data('content') ?? $replyContentDiv.text().trim();
+        const editForm = `
+            <div class="edit-reply-form mt-2">
+                <textarea class="form-control edit-reply-textarea" rows="3">${originalContent}</textarea>
+            </div>
+        `;
+        $replyContentDiv.after(editForm);
+        $li.find('.edit-reply-textarea').focus();
     }
-  });
+});
+
 		  // 페이지 클릭 이벤트 위임 (중복 방지)
 		  $(document).on('click', '#replyPagination a', function (e) {
 		    e.preventDefault();
@@ -846,55 +946,69 @@ $(document).ready(function () {
 		
 		
 function bindReplyLikeEvents() {
-    // 중복 방지 위해 기존 이벤트 제거 후 재바인딩
-    $(document).off('click', '.like-reply-btn');
-    $(document).off('click', '.unlike-reply-btn');
+	  // 중복 방지 위해 기존 이벤트 제거 후 재바인딩
+	  $(document).off('click', '.like-reply-btn');
+	  $(document).off('click', '.unlike-reply-btn');
 
-    $(document).on('click', '.like-reply-btn', function () {
-      const wrapper = $(this).closest('.reply-like-section'); 
-      const replyNo = wrapper.data('replyno');
-      const likeCountSpan = wrapper.find('.like-count'); 
-      let currentCount = parseInt(likeCountSpan.text());
+	  $(document).on('click', '.like-reply-btn', function () {
+	    const wrapper = $(this).closest('.reply-like-section');
+	    const replyNo = parseInt(wrapper.data('replyno'));
+	    const likeCountSpan = wrapper.find('.like-count');
+	    let currentCount = parseInt(likeCountSpan.text());
 
-      $.ajax({
-        url: '/reply/like',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ replyNo: replyNo }),
-        success: function (res) {
-          likeCountSpan.text(currentCount + 1);
-          wrapper.find('.like-reply-btn').hide();
-          wrapper.find('.unlike-reply-btn').show();
-        },
-        error: function (xhr) {
-          alert("좋아요 실패: " + xhr.responseText);
-        }
-      });
-    });
+	    if (isNaN(replyNo)) {
+	      window.publicModals.show("댓글 번호가 유효하지 않습니다.");
+	      return;
+	    }
 
-    $(document).on('click', '.unlike-reply-btn', function () {
-      const wrapper = $(this).closest('.reply-like-section');
-      const replyNo = wrapper.data('replyno');
-      const likeCountSpan = wrapper.find('.like-count');
-      let currentCount = parseInt(likeCountSpan.text());
+	    $.ajax({
+	      url: '/reply/like',
+	      type: 'POST',
+	      contentType: 'application/json',
+	      data: JSON.stringify({ replyNo: replyNo }),
+	      success: function () {
+	        likeCountSpan.text(currentCount + 1);
+	        wrapper.find('.like-reply-btn').hide();
+	        wrapper.find('.unlike-reply-btn').show();
+	        window.publicModals.show("좋아요가 추가되었습니다.");
+	      },
+	      error: function (xhr) {
+	        console.error("좋아요 실패:", xhr.responseText);
+	        window.publicModals.show("좋아요 실패: " + xhr.responseText);
+	      }
+	    });
+	  });
 
-      $.ajax({
-        url: '/reply/unlike',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ replyNo: replyNo }),
-        success: function (res) {
-          likeCountSpan.text(Math.max(currentCount - 1, 0));
-          
-          wrapper.find('.unlike-reply-btn').hide();
-          wrapper.find('.like-reply-btn').show();
-        },
-        error: function (xhr) {
-          alert("좋아요 취소 실패: " + xhr.responseText);
-        }
-      });
-    });
-  }
+	  $(document).on('click', '.unlike-reply-btn', function () {
+	    const wrapper = $(this).closest('.reply-like-section');
+	    const replyNo = parseInt(wrapper.data('replyno'));
+	    const likeCountSpan = wrapper.find('.like-count');
+	    let currentCount = parseInt(likeCountSpan.text());
+
+	    if (isNaN(replyNo)) {
+	      window.publicModals.show("댓글 번호가 유효하지 않습니다.");
+	      return;
+	    }
+
+	    $.ajax({
+	      url: '/reply/unlike',
+	      type: 'POST',
+	      contentType: 'application/json',
+	      data: JSON.stringify({ replyNo: replyNo }),
+	      success: function () {
+	        likeCountSpan.text(Math.max(currentCount - 1, 0));
+	        wrapper.find('.unlike-reply-btn').hide();
+	        wrapper.find('.like-reply-btn').show();
+	        window.publicModals.show("좋아요가 취소되었습니다.");
+	      },
+	      error: function (xhr) {
+	        console.error("좋아요 취소 실패:", xhr.responseText);
+	        window.publicModals.show("좋아요 취소 실패: " + xhr.responseText);
+	      }
+	    });
+	  });
+	}
+
 
 
 

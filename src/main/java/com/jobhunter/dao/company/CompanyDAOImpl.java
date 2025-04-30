@@ -11,6 +11,8 @@ import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
+import com.jobhunter.model.user.ContactUpdateDTO;
+import com.jobhunter.model.user.PasswordDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +24,7 @@ public class CompanyDAOImpl implements CompanyDAO {
 	private final String NS = "com.jobhunter.mapper.companymapper";
 	
 	@Override
-	public CompanyVO getCompanyInfo(String uid) throws Exception {
+	public CompanyVO getCompanyInfo(int uid) throws Exception {
 		CompanyVO vo = ses.selectOne(NS+".getCompanyInfo", uid);
 		if (vo != null && (vo.getCompanyImg() == null || vo.getCompanyImg().isEmpty())) {
 			vo.setCompanyImg(null); // 세터가 기본이미지 설정함
@@ -37,7 +39,7 @@ public class CompanyDAOImpl implements CompanyDAO {
 	}
 
 	@Override
-	public AccountVO findByUidAndPassword(String uid, String password) throws Exception {
+	public AccountVO findByUidAndPassword(int uid, String password) throws Exception {
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uid", uid);
 		paramMap.put("password", password);
@@ -53,24 +55,13 @@ public class CompanyDAOImpl implements CompanyDAO {
 	}
 	
 	@Override
-	public void updatePassword(String uid, String newPassword) throws Exception {
-	    Map<String, Object> paramMap = new HashMap<>();
-	    paramMap.put("uid", uid);
-	    paramMap.put("password", newPassword);
-	    
-	    ses.update(NS + ".updatePassword", paramMap);
+	public void updatePassword(PasswordDTO dto) throws Exception {
+	    ses.update(NS + ".updatePassword", dto);
 	}
 	
 	@Override
-	public void updateEmail(Map<String, String> paramMap) throws Exception {
-	    
-	    ses.update(NS + ".updateEmail", paramMap);
-	}
-	
-	@Override
-	public void updateMobile(Map<String, String> paramMap) throws Exception {
-	    
-	    ses.update(NS + ".updateMobile", paramMap);
+	public void updateContact(ContactUpdateDTO dto) throws Exception {
+	    ses.update(NS + ".updateContact", dto);
 	}
 
 	@Override
@@ -89,12 +80,12 @@ public class CompanyDAOImpl implements CompanyDAO {
 	}
 	
 	@Override
-	public int deleteMobile(String uid) throws Exception {
+	public int deleteMobile(Integer uid) throws Exception {
 		return ses.update(NS + ".deleteMobile", uid);
 	}
 	
 	@Override
-	public int deleteEmail(String uid) throws Exception {
+	public int deleteEmail(Integer uid) throws Exception {
 		return ses.update(NS + ".deleteEmail", uid);
 	}
 	

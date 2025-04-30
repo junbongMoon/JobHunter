@@ -4,7 +4,9 @@ import lombok.Data;
 
 @Data
 public class PasswordDTO {
-	private String uid;
+	private int uid;
     private String password;
     private String whereFrom;
+    private String contact;
+    private String contactType;
 }

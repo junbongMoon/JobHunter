@@ -35,25 +35,25 @@ public class NotificationController {
 
 	private final NotificationService notificationService;
 
-	/**
-     * 알림 목록 페이지를 반환합니다.
-     *
-     * @param model 뷰로 데이터를 전달할 때 사용
-     * @return 알림 목록 뷰 이름
-     * @author 유지원
-     */
-	@GetMapping("/list")
-	public String openNotifications(Model model, @RequestParam String uid, @RequestParam String accountType) {
-		// 현재 로그인한 사용자의 알림 목록을 가져옵니다.
-		// 실제 구현에서는 세션에서 사용자 정보를 가져와 해당 사용자의 알림만 조회해야 합니다.
-		try {
-			model.addAttribute("messages", notificationService.getNotificationList(uid, accountType));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return "notification/notificationList";
-	}
+	// /**
+    //  * 알림 목록 페이지를 반환합니다.
+    //  *
+    //  * @param model 뷰로 데이터를 전달할 때 사용
+    //  * @return 알림 목록 뷰 이름
+    //  * @author 유지원
+    //  */
+	// @GetMapping("/list")
+	// public String openNotifications(Model model, @RequestParam String uid, @RequestParam String accountType) {
+	// 	// 현재 로그인한 사용자의 알림 목록을 가져옵니다.
+	// 	// 실제 구현에서는 세션에서 사용자 정보를 가져와 해당 사용자의 알림만 조회해야 합니다.
+	// 	try {
+	// 		model.addAttribute("messages", notificationService.getNotificationList(uid, accountType));
+	// 	} catch (Exception e) {
+	// 		// TODO Auto-generated catch block
+	// 		e.printStackTrace();
+	// 	}
+	// 	return "notification/notificationList";
+	// }
 	
 	/**
 	 * 페이지네이션을 지원하는 알림 목록 API

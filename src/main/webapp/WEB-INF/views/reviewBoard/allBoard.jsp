@@ -78,9 +78,10 @@ h2 {
 .btn-write:hover {
 	background-color: #3aa8da;
 }
+
 .search-form-wrapper {
-  max-width: 900px;
-  margin: 0 auto 20px auto;
+	max-width: 900px;
+	margin: 0 auto 20px auto;
 }
 
 .btn-primary {
@@ -103,57 +104,56 @@ h2 {
 
 
 	<div class="search-form-wrapper">
-	<form method="get"
-		action="${pageContext.request.contextPath}/reviewBoard/allBoard"
-		class="row align-items-end gx-3 mb-4" style="max-width: 900px; margin: 0 auto;">
+		<form method="get"
+			action="${pageContext.request.contextPath}/reviewBoard/allBoard"
+			class="row align-items-end gx-3 mb-4"
+			style="max-width: 900px; margin: 0 auto;">
 
-		<!-- 정렬 기준 -->
-		<div class="col-md-3">
-			<label class="form-label"></label> <select name="sortType"
-				class="form-select">
-				<option value="">-- 정렬 기준 --</option>
-				<option value="likes" ${param.sortType == 'likes' ? 'selected' : ''}>추천순</option>
-				<option value="views" ${param.sortType == 'views' ? 'selected' : ''}>조회순</option>
-			</select>
-		</div>
+			<!-- 정렬 기준 -->
+			<div class="col-md-3">
+				<label class="form-label"></label> <select name="sortType"
+					class="form-select">
+					<option value="">-- 정렬 기준 --</option>
+					<option value="likes"
+						${param.sortType == 'likes' ? 'selected' : ''}>추천순</option>
+					<option value="views"
+						${param.sortType == 'views' ? 'selected' : ''}>조회순</option>
+				</select>
+			</div>
 
-		<!-- 합격 여부 -->
-		<div class="col-md-3">
-			<label class="form-label"></label> <select name="resultFilter"
-				class="form-select">
-				<option value="">-- 합격 여부 --</option>
-				<option value="PASSED"
-					${param.resultFilter == 'PASSED' ? 'selected' : ''}>합격</option>
-				<option value="FAILED"
-					${param.resultFilter == 'FAILED' ? 'selected' : ''}>불합격</option>
-				<option value="PENDING"
-					${param.resultFilter == 'PENDING' ? 'selected' : ''}>진행중</option>
-			</select>
-		</div>
+			<!-- 합격 여부 -->
+			<div class="col-md-3">
+				<label class="form-label"></label> <select name="resultFilter"
+					class="form-select">
+					<option value="">-- 합격 여부 --</option>
+					<option value="PASSED"
+						${param.resultFilter == 'PASSED' ? 'selected' : ''}>합격</option>
+					<option value="FAILED"
+						${param.resultFilter == 'FAILED' ? 'selected' : ''}>불합격</option>
+					<option value="PENDING"
+						${param.resultFilter == 'PENDING' ? 'selected' : ''}>진행중</option>
+				</select>
+			</div>
 
-		<!-- 회사 필터 -->
-		<div class="col-md-3">
-			<label class="form-label"></label> <select name="companyFilter"
-				class="form-select">
-				<option value="">-- 회사 선택 --</option>
-				<c:forEach var="com" items="${companyList}">
-					<option value="${com}"
-						${param.companyFilter == com ? 'selected' : ''}>${com}</option>
-				</c:forEach>
-			</select>
-		</div>
+			<!-- 회사 필터: input 텍스트 방식으로 변경 -->
+			<div class="col-md-3">
+				<label class="form-label" for="companyFilter">회사명</label> <input
+					type="text" name="companyFilter" class="form-control"
+					placeholder="회사명을 입력하세요"
+					value="${param.companyFilter != null ? param.companyFilter : ''}" />
+			</div>
 
-		<!-- 검색 버튼 -->
-		<div class="col-md-3 d-flex gap-2">
-			<button type="submit" class="btn btn-primary">검색</button>
-		
+			<!-- 검색 버튼 -->
+			<div class="col-md-3 d-flex gap-2">
+				<button type="submit" class="btn btn-primary">검색</button>
 
-		
-			<button type="button" class="btn btn-secondary"
-				onclick="window.location.href='${pageContext.request.contextPath}/reviewBoard/allBoard'">
-				초기화</button>
-		</div>
-	</form>
+
+
+				<button type="button" class="btn btn-secondary"
+					onclick="window.location.href='${pageContext.request.contextPath}/reviewBoard/allBoard'">
+					초기화</button>
+			</div>
+		</form>
 	</div>
 
 
@@ -191,7 +191,7 @@ h2 {
 			</tr>
 		</c:forEach>
 	</table>
-	
+
 
 	<!-- 페이징 영역 -->
 	<c:set var="page" value="${pageResult.page}" />

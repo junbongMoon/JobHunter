@@ -3,6 +3,9 @@ package com.jobhunter.service.prboard;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.jobhunter.dao.prboard.PRBoardDAO;
@@ -29,7 +32,8 @@ public class PRBoardServiceImpl implements PRBoardService {
 		
 		return result;
 	}
-
+	
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public PageResponseDTO<PRBoardVO> getprBoardByPagination(PageRequestDTO pageRequestDTO) throws Exception {
 		
@@ -96,6 +100,7 @@ public class PRBoardServiceImpl implements PRBoardService {
 	    return result;
 	}
 	
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public TenToFivePageVO<PRBoardVO> selectMyPRBoard (int uid, int page) throws Exception {
 		int offset = (page - 1) * 5;

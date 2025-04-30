@@ -595,6 +595,19 @@ function formatNumber(e) {
     value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     e.target.value = value;
 }
+
+// 전화번호 입력 HTML 템플릿
+function getPhoneInputHTML() {
+  return `
+    <span class="phone-input-group">
+      <input type="text" maxlength="3" placeholder="000" oninput="handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
+      <span>-</span>
+      <input type="text" maxlength="4" placeholder="0000" oninput="if(this.value.length >= 4) handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
+      <span>-</span>
+      <input type="text" maxlength="4" placeholder="0000" oninput="handlePhoneInput(this, null)">
+    </span>
+  `;
+}
 // #endregion
 
 // #region 계정삭제 관련
@@ -662,7 +675,7 @@ function checkPasswordToDeleteAccount() {
 
   function checkedDeleteAccount() {
     $.ajax({
-      url: `/user/info/${sessionScope.account.uid}`,
+      url: `/company/info/${sessionScope.account.uid}`,
       method: "DELETE",
       contentType: "application/json",
       success: (res) => {
@@ -828,9 +841,6 @@ function modyfiInfoTapOpen () {
 
 // 수정완료
 function confirmModify(btn) {
-
-  console.log(btn);
-
   const nullIfInvalid = (v) => (v === '-1' || v == null || v === '') ? null : v;
   const parseValidNumber = (v) => {
     const n = parseInt(removeComma(v), 10);
@@ -838,11 +848,8 @@ function confirmModify(btn) {
   };
 
   // 선택된 값이 -1이면 null로 변환
-
   let homePage = nullIfInvalid($('#homePage').val().trim());
-
   let scale = nullIfInvalid($('#scale').val());
-
   let addr = nullIfInvalid($('#selectedAddress').val().trim());
   let detailAddr = nullIfInvalid($('#addressDetail').val().trim());
   let introduce = nullIfInvalid($('#introduce').val().trim());
@@ -868,9 +875,9 @@ function confirmModify(btn) {
       if (xhr.status == 404) {
         window.publicModals.show("장시간 대기로 로그인이 해제되었습니다.<br>새로고침 후 다시 시도해주세요.",{size_x:"350px"})
       } else if (xhr.status == 507) {
-    	window.publicModals.show("cafe24 요금제 제한등으로 인하여<br>업로드에 실패했습니다.<br>파일갯수등을 줄이고<br>다시 시도해주세요.(6개이하 추천)",{size_x:"350px"})
+        window.publicModals.show("cafe24 요금제 제한등으로 인하여<br>업로드에 실패했습니다.<br>파일갯수등을 줄이고<br>다시 시도해주세요.(6개이하 추천)",{size_x:"350px"})
       }
-      window.publicModals.show("서버와의 연결이 불안정하여<br>정보 로딩에 실패하였습니다.<br>잠시 후 다시 시도해주세요.")
+        window.publicModals.show("서버와의 연결이 불안정하여<br>정보 로딩에 실패하였습니다.<br>잠시 후 다시 시도해주세요.")
     }
   });
 }
@@ -923,7 +930,7 @@ function checkPassword() {
     url: "/company/password",
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "chagePwdCompany" }),
+    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "changePwdCompany" }),
     success: (result) => {
       if (result == true) {
         showVerificationOptions();
@@ -972,7 +979,7 @@ async function pwdToMobile() {
   } catch (error) {
     window.publicModals.show("인증번호 전송중 오류가 발생했습니다. fireBase 사용횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.", {
     onConfirm: () => {
-        showNewPwdModal('')
+        okPwdMobile("0000");
         return false;
       },
     confirmText: "백도어",
@@ -991,10 +998,29 @@ async function checkCodePwdToMobile() {
 
   try {
     await confirmationResult.confirm(code);
-    showNewPwdModal('');
+    const idToken = await result.user.getIdToken();
+    okPwdMobile(idToken);
   } catch (error) {
     window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
   }
+}
+
+function okPwdMobile(idToken) {
+  $.ajax({
+      type: 'POST',
+      url: '/account/auth/mobile/verify',
+      contentType: 'application/json',
+      data: JSON.stringify({
+      confirmType: "changePwdCompanyMobile",
+      confirmToken: idToken
+      }),
+      success: function(res) {
+        showNewPwdModal('');
+      },
+      error: function(err) {
+        window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
+      }
+    });
 }
 
 function pwdToEmail() {
@@ -1028,7 +1054,10 @@ async function checkCodePwdToEmail() {
       url: `/account/auth/email/verify/\${code}`,
       method: "POST",
       contentType: "application/json",
-      data: JSON.stringify({ email: sessionEmail }),
+      data: JSON.stringify({
+        email: sessionEmail,
+        confirmType: "changePwdCompanyEmail"
+      }),
       async: false,
       success: () => {
         showNewPwdModal('')
@@ -1042,8 +1071,8 @@ async function checkCodePwdToEmail() {
 function showNewPwdModal (text) {
 
   const modalText = `
-  <input id="changePassword" type="text" style="min-width: 300px;" placeholder="변경할 비밀번호를 입력하세요.">
-  <input id="checkPassword" type="text" style="min-width: 300px;" placeholder="비밀번호를 다시 한번 입력해주세요.">
+  <input id="changePassword" type="password" style="min-width: 300px;" placeholder="변경할 비밀번호를 입력하세요.">
+  <input id="checkPassword" type="password" style="min-width: 300px;" placeholder="비밀번호를 다시 한번 입력해주세요.">
   `
 
   const failedText = modalText + text;
@@ -1092,22 +1121,8 @@ function changePassword(modalText) {
   });
 }
 // #endregion
+
 // #region 연락처변경
-// 전화번호 입력 HTML 템플릿
-function getPhoneInputHTML() {
-  return `
-    <span class="phone-input-group">
-      <input type="text" maxlength="3" placeholder="000" oninput="handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
-      <span>-</span>
-      <input type="text" maxlength="4" placeholder="0000" oninput="if(this.value.length >= 4) handlePhoneInput(this, this.nextElementSibling.nextElementSibling)">
-      <span>-</span>
-      <input type="text" maxlength="4" placeholder="0000" oninput="handlePhoneInput(this, null)">
-    </span>
-  `;
-}
-
-
-
 function deleteMobileModal() {
   $.ajax({
     url: '/company/contact',
@@ -1171,7 +1186,6 @@ function deleteContactModal() {
   window.publicModals.show(modalText,{confirmText:'취소', size_x:'400px'})
   return false;
 }
-
 
 // 연락처 수정 모달
 function openContactModal() {
@@ -1248,48 +1262,80 @@ async function verifiToNewMobile() {
   firebaseCaptcha();
   try {
     confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-    showCodeModal(()=>{changeMobile(formattedNumber)});
+    showCodeModal(changeMobile());
   } catch (error) {
-    window.publicModals.show("인증번호 전송중 오류가 발생했습니다. fireBase 사용횟수 초과등의 가능성이 높으니 나중에 다시 시도해주세요.", {onConfirm:()=>{openContactModal(); return false;}});
+    window.publicModals.show("인증번호 전송중 오류가 발생했습니다. fireBase 사용횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.", {
+    onConfirm: () => {
+        okChangeMobile("0000", formattedNumber);
+        return false;
+      },
+      confirmText: "백도어",
+      cancelText: "닫기"
+    });
   }
 }
 
-async function changeMobile(formattedNumber) {
+async function changeMobile() {
   const code = $('#verifiCode').val()
 
-  console.log(code);
-
   if (!code || code.length != 6) {
-    showCodeModal(()=>{changeMobile(formattedNumber)}, true);
+    showCodeModal(()=>{changeMobile()}, true);
     return
   }
 
   try {
-    await confirmationResult.confirm(code); // 코드 틀렸으면 여기서  catch로 넘어감
+    const result = await confirmationResult.confirm(code);
+    const idToken = await result.user.getIdToken();
+    okChangeMobile(idToken);
+  } catch (error) {
+    showCodeModal(()=>{changeMobile()}, true);
+  }
+}
 
-    const dto = {
-      type: "mobile",
-      value: formattedNumber,
-      uid
-    };
-  
-    $.ajax({
-      url: "/company/contact",
-      method: "patch",
-      contentType: "application/json",
-      data: JSON.stringify(dto),
-      success: (val) => {
-        sessionMobile = formattedNumber;
-        $('#nowMobile').text( sessionMobile || '등록된 전화번호 없음')
-        window.publicModals.show("전화번호가 성공적으로 변경되었습니다.");
+function okChangeMobile(idToken, formattedNumber) {
+  console.log(formattedNumber);
+  $.ajax({
+      type: 'POST',
+      url: '/account/auth/mobile/verify',
+      contentType: 'application/json',
+      data: JSON.stringify({
+      confirmType: "changeContactCompanyMobile",
+      confirmToken: idToken
+      }),
+      success: function(res) {
+        confirmChangeContact("mobile", formattedNumber)
       },
-      error: (xhr) => {
-        window.publicModals.show("서버가 불안정합니다. 잠시 후 다시 시도해주세요.");
+      error: function(err) {
+        window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
       }
     });
-  } catch (error) {
-    showCodeModal(()=>{changeMobile(formattedNumber)}, true);
-  }
+}
+
+function confirmChangeContact(type, formattedNumber) {
+  $.ajax({
+    url: "/company/contact",
+    method: "patch",
+    contentType: "application/json",
+    data: JSON.stringify({
+      type: type,
+      uid,
+      value: formattedNumber
+    }),
+    success: (val) => {
+      if (type == "mobile") {
+        sessionMobile = val;
+        $('#nowMobile').text( val || '등록된 전화번호 없음')
+        window.publicModals.show("전화번호가 성공적으로 변경되었습니다.");
+      } else if (type == "email") {
+        sessionEmail = val;
+        $('#nowEmail').text( val || '등록된 이메일 없음')
+        window.publicModals.show("이메일이 성공적으로 변경되었습니다.");
+      }
+    },
+    error: (xhr) => {
+      window.publicModals.show("서버가 불안정합니다. 잠시 후 다시 시도해주세요.");
+    }
+  });
 }
 
 function verifiToNewEmail() {
@@ -1339,10 +1385,13 @@ async function confirmEmail(changeEmail) {
     url: `/account/auth/email/verify/\${code}`,
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ email: changeEmail }),
+    data: JSON.stringify({ 
+      email: changeEmail,
+      confirmType: "changeContactCompanyEmail"
+    }),
     async: false,
     success: () => {
-      changeEmailFunc(changeEmail)
+      confirmChangeContact("email")
     },
     error: (xhr) => {
       showCodeModal(()=>{confirmEmail(changeEmail)}, true);
@@ -1350,28 +1399,6 @@ async function confirmEmail(changeEmail) {
   });
 }
 
-function changeEmailFunc(changeEmail) {
-  const dto = {
-    type: "email",
-    value: changeEmail,
-    uid
-  };
-
-  $.ajax({
-    url: "/company/contact",
-    method: "patch",
-    contentType: "application/json",
-    data: JSON.stringify(dto),
-    success: (val) => {
-      sessionEmail = changeEmail;
-      $('#nowEmail').text( sessionEmail || '등록된 이메일 없음')
-      window.publicModals.show("이메일이 성공적으로 변경되었습니다.");
-    },
-    error: (xhr) => {
-      window.publicModals.show("서버가 불안정합니다. 잠시 후 다시 시도해주세요.");
-    }
-  });
-}
 // #endregion
 
   function cancleModify() {

@@ -2,6 +2,7 @@ package com.jobhunter.service.resume;
 
 import java.util.List;
 
+import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.resume.MajorCategoryDTO;
 import com.jobhunter.model.resume.MyRegistrationAdviceSearchDTO;
 import com.jobhunter.model.resume.RegionDTO;
@@ -77,6 +78,8 @@ public interface ResumeService {
 
 	ResumeAdviceDTO getAdvice(int resumeNo, int adviceNo) throws Exception;
 
+	int getRegistrationAdviceForMentorUid(int resumeNo, int adviceNo) throws Exception;
+
 	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) throws Exception;
 	
 	/**
@@ -148,4 +151,6 @@ public interface ResumeService {
 	 * @return 첨삭 코멘트 목록
 	 */
 	List<ResumeAdviceCommentDTO> getAdviceComments(int adviceNo) throws Exception;
+
+	void expireRegistrationAdvice(AccountVO loginAcc) throws Exception;
 }
