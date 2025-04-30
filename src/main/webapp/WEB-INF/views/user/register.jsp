@@ -474,7 +474,7 @@ mark {
 			<input type="hidden" id="email" name="email">
 			<input type="hidden" id="authMobile">
 			<input type="hidden" id="mobile" name="mobile">
-			<mark class="info-defalt"> * 이메일 혹은 전화번호중 최소 하나 이상 인증을 진행해주시기 바랍니다.</mark>
+			<br><mark class="info-defalt"> * 이메일 혹은 전화번호중 최소 하나 이상 인증을 진행해주시기 바랍니다.</mark>
 		</div>
 
 		<hr>

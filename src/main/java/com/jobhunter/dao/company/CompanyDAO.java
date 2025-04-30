@@ -11,7 +11,7 @@ import com.jobhunter.model.user.PasswordDTO;
 
 public interface CompanyDAO {
 
-	CompanyVO getCompanyInfo(String uid) throws Exception;
+	CompanyVO getCompanyInfo(int uid) throws Exception;
 
 	AccountVO findByUidAndPassword(int uid, String password) throws Exception;
 

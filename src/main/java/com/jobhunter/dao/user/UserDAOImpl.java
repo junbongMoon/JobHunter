@@ -25,7 +25,7 @@ public class UserDAOImpl implements UserDAO {
 	private final String NS = "com.jobhunter.mapper.usermapper";
 	
 	@Override
-	public UserVO getUserInfo(String uid) throws Exception {
+	public UserVO getUserInfo(int uid) throws Exception {
 		UserVO user = ses.selectOne(NS + ".getUserInfo", uid);
 
 		// 후처리: 프로필 이미지가 없을 경우 기본 이미지로 설정

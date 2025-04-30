@@ -24,7 +24,7 @@ public class CompanyDAOImpl implements CompanyDAO {
 	private final String NS = "com.jobhunter.mapper.companymapper";
 	
 	@Override
-	public CompanyVO getCompanyInfo(String uid) throws Exception {
+	public CompanyVO getCompanyInfo(int uid) throws Exception {
 		CompanyVO vo = ses.selectOne(NS+".getCompanyInfo", uid);
 		if (vo != null && (vo.getCompanyImg() == null || vo.getCompanyImg().isEmpty())) {
 			vo.setCompanyImg(null); // 세터가 기본이미지 설정함

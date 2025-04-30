@@ -131,7 +131,7 @@ public class AccountUtil {
 		}
 
 	    if (conditions.length % 2 != 0) {
-	         System.out.println("AccountUtil.checkOwnershipOrAdmin_조건은 uid와 AccountType의 쌍으로 입력되어야 합니다.");
+	         System.out.println("AccountUtil.checkAuth : 조건은 uid와 AccountType의 쌍으로 입력되어야 합니다.");
 	         return false;
 	    }
 	    
@@ -151,9 +151,12 @@ public class AccountUtil {
 	    for (int i = 0; i < conditions.length; i += 2) {
 	        Object uidObj = conditions[i];
 	        Object typeObj = conditions[i + 1];
+	    	System.out.println("??????????????");
+	    	System.out.println("uidObj : " + uidObj.getClass());
+	    	System.out.println("typeObj : " + typeObj.getClass());
 
 	        if (!(uidObj instanceof Integer) || !(typeObj instanceof AccountType)) {
-	        	System.out.println("AccountUtil.checkOwnershipOrAdmin_조건은 (Integer uid, AccountType type) 쌍이어야 합니다.");
+	        	System.out.println("AccountUtil.checkAuth조건은 (Integer uid, AccountType type) 쌍이어야 합니다.");
 	            return false;
 	        }
 

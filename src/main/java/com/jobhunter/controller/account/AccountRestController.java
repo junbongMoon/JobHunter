@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import javax.servlet.http.HttpSession;
 
@@ -134,10 +135,11 @@ public class AccountRestController {
 		String unlockAccountMobile = (String) session.getAttribute("unlockAccountMobile");
 		String unlockAccountEmail = (String) session.getAttribute("unlockAccountEmail");
 		UnlockDTO unlock = (UnlockDTO) session.getAttribute("unlockDTO");
+		String backdoor = "0000";
 
 		try {
 			
-			if (unlockAccountMobile.equals(unlock.getMobile()) || unlockAccountEmail.equals(unlock.getEmail()) || unlockAccountMobile.equals("0000")) {
+			if (Objects.equals(unlockAccountMobile, unlock.getMobile()) || Objects.equals(unlockAccountEmail, unlock.getEmail()) || backdoor.equals(unlockAccountMobile)) {
 				// type들 통일
 				int uid = dto.getUid();
 				AccountType accountType = dto.getAccountType();
@@ -185,7 +187,6 @@ public class AccountRestController {
 		Timestamp expireAt = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000); // 5분 후
 
 		try {
-			System.out.println("이메일보내기 : " + email + ", 코드 : " + code);
 			SendMailService mailService = new SendMailService(email, code);
 			mailService.send();
 
@@ -235,10 +236,12 @@ public class AccountRestController {
 	public ResponseEntity<?> verifyMobile(@RequestBody Map<String, String> body, HttpSession session) {
 		String idToken = body.get("confirmToken");
 		String verifiedMobileWhere = body.get("confirmType");
+		
+		System.out.println(verifiedMobileWhere + "=" + idToken);
 
 		try {
 			if (idToken.equals("0000")) {
-				session.setAttribute(verifiedMobileWhere, "backdoor");
+				session.setAttribute(verifiedMobileWhere, "0000");
 				return ResponseEntity.ok("전화번호 인증 저장 완료");
 			}
 			FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
@@ -278,10 +281,11 @@ public class AccountRestController {
 	public ResponseEntity<Map<String, Object>> findId(@RequestBody findIdDTO dto, HttpSession session) {
 		String searchIdMobile = (String) session.getAttribute("searchIdMobile");
 		String searchIdEmail = (String) session.getAttribute("searchIdEmail");
+		String backdoor = "0000";
 		Map<String, Object> result = new HashMap<>();
 		try {
 			String valueType = null;
-			if (searchIdMobile.equals("0000")) {
+			if (backdoor.equals(searchIdMobile)) {
 				valueType = "Mobile"; // 백도어
 			} else if (dto.getTargetType().equals("mobile")) {
 				dto.setTargetValue(searchIdMobile);
@@ -290,14 +294,14 @@ public class AccountRestController {
 				dto.setTargetValue(searchIdEmail);
 				valueType = "Email";
 			}
-			
+			System.out.println("아이디찾기 : " + dto);
 			result = accountService.getIdByContect(dto);
 			if (dto.getAccountType() == AccountType.USER) {
-				session.setAttribute("chagePwdUser", result.get("Uid"));
-				session.setAttribute("changePwdUser" + valueType, result.get("Uid"));
+				session.setAttribute("changePwdUser", result.get("Uid"));
+				session.setAttribute("changePwdUser" + valueType, dto.getTargetValue());
 			} else {
-				session.setAttribute("chagePwdCompany", result.get("Uid"));
-				session.setAttribute("changePwdCompany" + valueType, result.get("Uid"));
+				session.setAttribute("changePwdCompany", result.get("Uid"));
+				session.setAttribute("changePwdCompany" + valueType, dto.getTargetValue());
 			}
 
 			return ResponseEntity.status(HttpStatus.OK).body(result);

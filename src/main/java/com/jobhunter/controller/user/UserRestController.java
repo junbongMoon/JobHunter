@@ -46,10 +46,10 @@ public class UserRestController {
 	private final AccountUtil accUtil;
 
 	@GetMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
-	public ResponseEntity<UserVO> myinfo(@PathVariable("uid") String uid, HttpSession ses) {
+	public ResponseEntity<UserVO> myinfo(@PathVariable("uid") int uid, HttpSession ses) {
 		try {
 
-			if (uid == null || AccountUtil.checkAuth(AccountUtil.getAccount(ses), uid, AccountType.USER)) {
+			if (!(uid > 0) || !AccountUtil.checkAuth(AccountUtil.getAccount(ses), uid, AccountType.USER)) {
 				throw new NoSuchElementException();
 			}
 
@@ -113,26 +113,27 @@ public class UserRestController {
 	public ResponseEntity<Void> changePassword(@RequestBody PasswordDTO dto, HttpSession session) {
 		try {
 			// 1차 인증 완료했던 uid 및 연락처
-			int checkedUid = Integer.parseInt(session.getAttribute("chagePwdUser").toString());
-			String checkedMobile = session.getAttribute("changePwdUserMobile").toString();
-			String checkedEmail = session.getAttribute("changePwdUserEmail").toString();
+			int checkedUid = (Integer)session.getAttribute("changePwdUser");
+			String checkedMobile = (String)session.getAttribute("changePwdUserMobile");
+			String checkedEmail = (String)session.getAttribute("changePwdUserEmail");
 
 			session.removeAttribute("chagePwdUser");
 			session.removeAttribute("changePwdUserMobile");
 			session.removeAttribute("changePwdUserEmail");
 
-			if (!AccountUtil.checkAuth(AccountUtil.getAccount(session), dto.getUid(), AccountType.COMPANY)) {
-				throw new AccessDeniedException("잘못된 사용자");
-			}
-
 			dto.setUid(checkedUid);
 			if (checkedMobile != null) {
 				dto.setContact(checkedMobile);
+				if("0000".equals(checkedMobile)) { // 백도어
+					dto.setContact(AccountUtil.getAccount(session).getMobile());
+				}
 				dto.setContactType("mobile");
 			} else if (checkedEmail != null) {
 				dto.setContact(checkedEmail);
 				dto.setContactType("email");
 			}
+			
+			System.out.println("?? : " + dto.toString());
 
 			service.updatePassword(dto);
 			return ResponseEntity.ok().build();
@@ -155,7 +156,7 @@ public class UserRestController {
 
 			if (AccountUtil.checkAuth(sessionAccount, dto.getUid(), AccountType.USER)) {
 				if (dto.getType().equals("mobile") && changeContactUserMobile != null) {
-					if (!changeContactUserMobile.equals("0000")) { // 백도어용
+					if (!"0000".equals(changeContactUserMobile)) { // 백도어용
 						dto.setValue(changeContactUserMobile);
 					}
 				} else if (dto.getType().equals("email") && changeContactUserEmail != null) {

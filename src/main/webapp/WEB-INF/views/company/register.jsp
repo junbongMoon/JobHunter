@@ -477,7 +477,7 @@ mark {
 			<input type="hidden" id="email" name="email">
 			<input type="hidden" id="authMobile">
 			<input type="hidden" id="mobile" name="mobile">
-			<mark class="info-defalt"> * 이메일 혹은 전화번호중 최소 하나 이상 인증을 진행해주시기 바랍니다.</mark>
+			<br><mark class="info-defalt"> * 이메일 혹은 전화번호중 최소 하나 이상 인증을 진행해주시기 바랍니다.</mark>
 		</div>
 
 		<hr>
@@ -607,7 +607,7 @@ async function sendPhoneCode() {
 		{
 			confirmText: '인증완료',
 			cancelText: '취소',
-			onConfirm: verifyPhoneCode
+			onConfirm: ()=>{verifyPhoneCode(formattedNumber)}
     	});
     } catch (error) {
         console.error("전화번호 인증 실패:", error);
@@ -615,7 +615,7 @@ async function sendPhoneCode() {
         	{
         		confirmText: "백도어",
         		cancelText: "취소",
-        		onConfirm: () => {okMobile("0000")}
+        		onConfirm: () => {okMobile("0000", formattedNumber)}
         	});
     }
 }
@@ -646,7 +646,7 @@ async function checkDuplicateMobile(formattedNumber) {
     return true; // 실패 시 중복된 걸로 취급
   }
 }
-async function verifyPhoneCode() {
+async function verifyPhoneCode(formattedNumber) {
 	const code = document.getElementById("confirmCode").value;
 
 	if (code.length != 6) {
@@ -662,13 +662,13 @@ async function verifyPhoneCode() {
     try {
 	  const result = await confirmationResult.confirm(code);
 	  const idToken = await result.user.getIdToken();
-      okMobile(idToken);
+      okMobile(idToken, formattedNumber);
     } catch (error) {
       console.error("코드 인증 실패:", error);
       window.publicModals.show("잘못된 인증 코드입니다.");
     }
 }
-function okMobile(idToken) {
+function okMobile(idToken, formattedNumber) {
 	$.ajax({
       type: 'POST',
       url: '/account/auth/mobile/verify',
@@ -678,8 +678,8 @@ function okMobile(idToken) {
 		confirmToken: idToken
       }),
       success: function(res) {
-        $("#mobile").val(mobile)
-		$("#mobileInfoMark").text(`인증에 성공하였습니다. (현재 전화번호 : \${mobile})`).removeClass().addClass("info-ok");
+        $("#mobile").val(formattedNumber)
+		$("#mobileInfoMark").text(`인증에 성공하였습니다. (현재 전화번호 : \${formattedNumber})`).removeClass().addClass("info-ok");
       },
       error: function(err) {
         $("#mobileInfoMark").text(`서버가 불안정합니다. 잠시 후 다시 시도해 주세요.`).removeClass().addClass("info-warning");
@@ -712,9 +712,8 @@ function sendEmailCode() {
     		});
         },
         error: (xhr) => {
-			$("#emailInfoMark").text(`이메일의 전송에 실패했습니다. 잠시후 다시 시도해주세요.`).removeClass().addClass("info-warning");
+			$("#emailInfoMark").text(xhr.responseText).removeClass().addClass("info-warning");
 			$('#sendEmailBtn').prop('disabled', false);
-			console.log("메일 전송 중 오류 발생: " + xhr.responseText)
 		}
     });
 }

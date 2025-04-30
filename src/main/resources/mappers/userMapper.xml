@@ -96,8 +96,7 @@
 
 	<!-- 여기까진 로그인용 -->
 
-	<select id="getUserInfo" parameterType="String"
-		resultType="com.jobhunter.model.user.UserVO">
+	<select id="getUserInfo" resultType="com.jobhunter.model.user.UserVO">
 		SELECT * FROM users where uid = #{uid};
 	</select>
 

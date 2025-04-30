@@ -43,7 +43,7 @@ public class CompanyServiceImpl implements CompanyService {
 	}
 	
 	@Override
-	public CompanyVO showCompanyHome(String uid) throws Exception {
+	public CompanyVO showCompanyHome(int uid) throws Exception {
 		return dao.getCompanyInfo(uid);
 	}
 	

@@ -930,7 +930,7 @@ function checkPassword() {
     url: "/company/password",
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "chagePwdCompany" }),
+    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "changePwdCompany" }),
     success: (result) => {
       if (result == true) {
         showVerificationOptions();
@@ -1071,8 +1071,8 @@ async function checkCodePwdToEmail() {
 function showNewPwdModal (text) {
 
   const modalText = `
-  <input id="changePassword" type="text" style="min-width: 300px;" placeholder="변경할 비밀번호를 입력하세요.">
-  <input id="checkPassword" type="text" style="min-width: 300px;" placeholder="비밀번호를 다시 한번 입력해주세요.">
+  <input id="changePassword" type="password" style="min-width: 300px;" placeholder="변경할 비밀번호를 입력하세요.">
+  <input id="checkPassword" type="password" style="min-width: 300px;" placeholder="비밀번호를 다시 한번 입력해주세요.">
   `
 
   const failedText = modalText + text;
@@ -1293,6 +1293,7 @@ async function changeMobile() {
 }
 
 function okChangeMobile(idToken, formattedNumber) {
+  console.log(formattedNumber);
   $.ajax({
       type: 'POST',
       url: '/account/auth/mobile/verify',
@@ -1302,7 +1303,7 @@ function okChangeMobile(idToken, formattedNumber) {
       confirmToken: idToken
       }),
       success: function(res) {
-        confirmChangeContact("mobile")
+        confirmChangeContact("mobile", formattedNumber)
       },
       error: function(err) {
         window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")

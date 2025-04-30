@@ -1,7 +1,6 @@
 package com.jobhunter.dao.user;
 
 import java.sql.Timestamp;
-import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.user.ContactUpdateDTO;
@@ -13,7 +12,7 @@ import com.jobhunter.model.user.UserVO;
 
 public interface UserDAO {
 
-	UserVO getUserInfo(String uid) throws Exception;
+	UserVO getUserInfo(int uid) throws Exception;
 
 	AccountVO findByUidAndPassword(int uid, String password) throws Exception;
 

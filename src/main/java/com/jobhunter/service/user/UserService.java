@@ -15,7 +15,7 @@ import com.jobhunter.model.user.UserVO;
 
 public interface UserService {
 
-	UserVO showMypage(String uid) throws Exception;
+	UserVO showMypage(int uid) throws Exception;
 
 	boolean checkPassword(int uid, String password) throws Exception;
 

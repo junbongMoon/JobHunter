@@ -1,6 +1,7 @@
 package com.jobhunter.controller.user;
 
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +38,6 @@ public class UserController {
 	public String showMypage(@PathVariable("uid") int uid, HttpServletRequest request) {
 		AccountVO acc = AccountUtil.getAccount(request);
 		if (acc != null && acc.getAccountType() == AccountType.USER && uid == acc.getUid()) {
-			System.out.println("본인 정보 페이지");
 		}
 		return "/user/mypage";
 	}
@@ -151,16 +151,17 @@ public class UserController {
 			HttpSession session) {
 		// 실제 회원가입 처리
 		try {
+			String backdoor = "0000";
 			// 실제 인증한 이메일
 			String registUserEmail = (String) session.getAttribute("registUserEmail");
 			// 실제 인증한 이메일
 			String registUserMobile = (String) session.getAttribute("registUserMobile");
 
-			if (!dto.getEmail().equals(registUserEmail)) {
+			if (!Objects.equals(dto.getEmail(), registUserEmail)) {
 				dto.setEmail(null);
 			}
 
-			if (!dto.getMobile().equals(registUserMobile) || registUserMobile.equals("backdoor")) {
+			if (!Objects.equals(dto.getMobile(), registUserMobile) && !backdoor.equals(registUserMobile)) {
 				dto.setMobile(null);
 			}
 
@@ -174,19 +175,7 @@ public class UserController {
 			e.printStackTrace();
 		}
 
-		String redirectUrl = (String) session.getAttribute("redirectUrl");
-		session.removeAttribute("redirectUrl"); // 썼으면 깨끗하게
-
-		// 기본 경로 설정
-		if (redirectUrl == null || redirectUrl.isBlank()) {
-			redirectUrl = "/";
-		}
-
-		// 이미 쿼리스트링이 있는 경우 ?가 있으므로 &로 추가, 없으면 ?로 시작
-		String joinChar = redirectUrl.contains("?") ? "&" : "?";
-		redirectUrl += joinChar + "firstLogin=user";
-
-		return "redirect:" + redirectUrl;
+		return "redirect:/?firstLogin=user";
 	}
 
 	private String formatKakaoUri(HttpServletRequest request) {

@@ -1531,7 +1531,7 @@ function checkPassword() {
     url: "/user/password",
     method: "POST",
     contentType: "application/json",
-    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "chagePwdUser"}),
+    data: JSON.stringify({ uid, password: nowPassword, whereFrom: "changePwdUser"}),
     success: (result) => {
       if (result === true) {
         showVerificationOptions();

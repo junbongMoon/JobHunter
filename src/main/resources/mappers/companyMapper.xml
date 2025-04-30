@@ -67,8 +67,7 @@
 
 	<!-- 여기까진 로그인용 -->
 
-	<select id="getCompanyInfo" parameterType="String"
-		resultType="com.jobhunter.model.company.CompanyVO">
+	<select id="getCompanyInfo" resultType="com.jobhunter.model.company.CompanyVO">
 		SELECT * FROM company where uid = #{uid};
 	</select>
 

@@ -17,7 +17,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.jobhunter.customexception.DuplicateEmailException;
 import com.jobhunter.dao.payment.PaymentDAO;
 import com.jobhunter.dao.user.UserDAO;
 import com.jobhunter.model.account.AccountVO;
@@ -40,7 +39,7 @@ public class UserServiceImpl implements UserService {
 	private final PaymentDAO paymentDAO;
 	
 	@Override
-	public UserVO showMypage(String uid) throws Exception {
+	public UserVO showMypage(int uid) throws Exception {
 		return dao.getUserInfo(uid);
 	}
 	

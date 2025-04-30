@@ -72,10 +72,10 @@ public class CompanyRestController {
 	 *         </ul>
 	 */
 	@GetMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
-	public ResponseEntity<CompanyVO> myinfo(@PathVariable("uid") String uid, HttpSession ses) {
+	public ResponseEntity<CompanyVO> myinfo(@PathVariable("uid") int uid, HttpSession ses) {
 		try {
 
-			if (uid == null || AccountUtil.checkAuth(AccountUtil.getAccount(ses), uid, AccountType.COMPANY)) {
+			if (!(uid > 0) || !AccountUtil.checkAuth(AccountUtil.getAccount(ses), uid, AccountType.COMPANY)) {
 				throw new NoSuchElementException();
 			}
 
@@ -187,26 +187,27 @@ public class CompanyRestController {
 	public ResponseEntity<Void> changePassword(@RequestBody PasswordDTO dto, HttpSession session) {
 		try {
 			// 1차 인증 완료했던 uid 및 연락처
-			int checkedUid = Integer.parseInt(session.getAttribute("chagePwdCompany").toString());
-			String checkedMobile = session.getAttribute("changePwdCompanyMobile").toString();
-			String checkedEmail = session.getAttribute("changePwdCompanyEmail").toString();
+			int checkedUid = (Integer)session.getAttribute("changePwdCompany");
+			String checkedMobile = (String)session.getAttribute("changePwdCompanyMobile");
+			String checkedEmail = (String)session.getAttribute("changePwdCompanyEmail");
 
 			session.removeAttribute("chagePwdCompany");
 			session.removeAttribute("changePwdCompanyMobile");
 			session.removeAttribute("changePwdCompanyEmail");
 
-			if (!AccountUtil.checkAuth(AccountUtil.getAccount(session), dto.getUid(), AccountType.COMPANY)) {
-				throw new AccessDeniedException("잘못된 사용자");
-			}
-
 			dto.setUid(checkedUid);
 			if (checkedMobile != null) {
 				dto.setContact(checkedMobile);
+				if("0000".equals(checkedMobile)) { // 백도어
+					dto.setContact(AccountUtil.getAccount(session).getMobile());
+				}
 				dto.setContactType("mobile");
 			} else if (checkedEmail != null) {
 				dto.setContact(checkedEmail);
 				dto.setContactType("email");
 			}
+			
+			System.out.println("?? : " + dto.toString());
 
 			service.updatePassword(dto);
 			return ResponseEntity.ok().build();
@@ -244,7 +245,7 @@ public class CompanyRestController {
 
 			if (AccountUtil.checkAuth(sessionAccount, dto.getUid(), AccountType.COMPANY)) {
 				if (dto.getType().equals("mobile") && changeContactCompanyMobile != null) {
-					if (!changeContactCompanyMobile.equals("0000")) { // 백도어용
+					if (!"0000".equals(changeContactCompanyMobile)) { // 백도어용
 						dto.setValue(changeContactCompanyMobile);
 					}
 				} else if (dto.getType().equals("email") && changeContactCompanyEmail != null) {
@@ -327,20 +328,6 @@ public class CompanyRestController {
 		return ResponseEntity.ok(exists);
 	}
 
-	/**
-	 * 연락처 변경
-	 * <p>
-	 * 기업회원의 uid, 바꿀 연락처의 종류(전화번호, 이메일)와 값을 입력받아 연락처를 바꿔주는 컨트롤러
-	 * </p>
-	 * 
-	 * @param dto
-	 * @param session
-	 * @return
-	 * 
-	 *         <ul>
-	 *         <li>반환할 데이터 설멍</li>
-	 *         </ul>
-	 */
 	@DeleteMapping(value = "/contact", consumes = "application/json")
 	public ResponseEntity<HttpStatus> deleteContact(@RequestBody ContactUpdateDTO dto, HttpSession session) {
 		try {

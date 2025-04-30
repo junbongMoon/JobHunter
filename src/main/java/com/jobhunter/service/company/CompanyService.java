@@ -12,7 +12,7 @@ import com.jobhunter.model.user.PasswordDTO;
 
 public interface CompanyService {
 
-	CompanyVO showCompanyHome(String uid) throws Exception;
+	CompanyVO showCompanyHome(int uid) throws Exception;
 
 	boolean checkPassword(int uid, String password) throws Exception;
 
