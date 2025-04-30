@@ -1,10 +1,8 @@
 package com.jobhunter.util;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 
-import javax.annotation.PostConstruct;
-
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import com.google.auth.oauth2.GoogleCredentials;
@@ -12,12 +10,11 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
 @Component
-public class FirebaseInitializer {
+public class FirebaseInitializer implements InitializingBean {
 
-	@PostConstruct
-    public void init() {
+    @Override
+    public void afterPropertiesSet() {
         try {
-            // 리소스 파일 읽기
             InputStream serviceAccount = getClass()
                     .getClassLoader()
                     .getResourceAsStream("config/jobhunter-672dd-firebase-adminsdk-fbsvc-d8db3a4148.json");
@@ -27,8 +24,8 @@ public class FirebaseInitializer {
             }
 
             FirebaseOptions options = FirebaseOptions.builder()
-            	    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            	    .build();
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
 
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
