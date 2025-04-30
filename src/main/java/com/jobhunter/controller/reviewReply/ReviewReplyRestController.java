@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -124,45 +125,69 @@ public class ReviewReplyRestController {
 	}
 
 	// 댓글 좋아요 추가
-	@PostMapping("/like")
+	@PostMapping(value = "/like", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> likeReply(@RequestBody Map<String, Integer> payload, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		if (account == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
+				.body("로그인이 필요합니다.");
 		}
+
 		int replyNo = payload.get("replyNo");
 		int userUid = account.getUid();
 		System.out.println("👍 [likeReply] replyNo = " + replyNo + ", userUid = " + userUid);
 		try {
 			boolean result = service.likeReply(replyNo, userUid);
-			return result ? ResponseEntity.ok("좋아요가 추가되었습니다.")
-					: ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 좋아요를 누르셨습니다.");
+			if (result) {
+				return ResponseEntity.ok()
+					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
+					.body("좋아요가 추가되었습니다.");
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
+					.body("이미 좋아요를 누르셨습니다.");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
+				.body("서버 오류 발생");
 		}
 	}
 
+
 	// 댓글 좋아요 취소
-	@PostMapping("/unlike")
+	@PostMapping(value = "/unlike", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> unlikeReply(@RequestBody Map<String, Integer> payload, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		if (account == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
+				.body("로그인이 필요합니다.");
 		}
 
 		int replyNo = payload.get("replyNo");
 		int userUid = account.getUid();
-
 		System.out.println("❌ [unlikeReply] replyNo = " + replyNo + ", userUid = " + userUid);
-
 		try {
 			boolean result = service.unlikeReply(replyNo, userUid);
-			return result ? ResponseEntity.ok("좋아요가 취소되었습니다.")
-					: ResponseEntity.status(HttpStatus.BAD_REQUEST).body("좋아요 상태가 아닙니다.");
+			if (result) {
+				return ResponseEntity.ok()
+					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
+					.body("좋아요가 취소되었습니다.");
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
+					.body("좋아요 상태가 아닙니다.");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
+				.body("서버 오류 발생");
 		}
+	}
+
 	}
 }

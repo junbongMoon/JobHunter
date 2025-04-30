@@ -946,55 +946,69 @@ $(document).ready(function () {
 		
 		
 function bindReplyLikeEvents() {
-    // 중복 방지 위해 기존 이벤트 제거 후 재바인딩
-    $(document).off('click', '.like-reply-btn');
-    $(document).off('click', '.unlike-reply-btn');
+	  // 중복 방지 위해 기존 이벤트 제거 후 재바인딩
+	  $(document).off('click', '.like-reply-btn');
+	  $(document).off('click', '.unlike-reply-btn');
 
-    $(document).on('click', '.like-reply-btn', function () {
-      const wrapper = $(this).closest('.reply-like-section'); 
-      const replyNo = wrapper.data('replyno');
-      const likeCountSpan = wrapper.find('.like-count'); 
-      let currentCount = parseInt(likeCountSpan.text());
+	  $(document).on('click', '.like-reply-btn', function () {
+	    const wrapper = $(this).closest('.reply-like-section');
+	    const replyNo = parseInt(wrapper.data('replyno'));
+	    const likeCountSpan = wrapper.find('.like-count');
+	    let currentCount = parseInt(likeCountSpan.text());
 
-      $.ajax({
-        url: '/reply/like',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ replyNo: replyNo }),
-        success: function (res) {
-          likeCountSpan.text(currentCount + 1);
-          wrapper.find('.like-reply-btn').hide();
-          wrapper.find('.unlike-reply-btn').show();
-        },
-        error: function (xhr) {
-          alert("좋아요 실패: " + xhr.responseText);
-        }
-      });
-    });
+	    if (isNaN(replyNo)) {
+	      window.publicModals.show("댓글 번호가 유효하지 않습니다.");
+	      return;
+	    }
 
-    $(document).on('click', '.unlike-reply-btn', function () {
-      const wrapper = $(this).closest('.reply-like-section');
-      const replyNo = wrapper.data('replyno');
-      const likeCountSpan = wrapper.find('.like-count');
-      let currentCount = parseInt(likeCountSpan.text());
+	    $.ajax({
+	      url: '/reply/like',
+	      type: 'POST',
+	      contentType: 'application/json',
+	      data: JSON.stringify({ replyNo: replyNo }),
+	      success: function () {
+	        likeCountSpan.text(currentCount + 1);
+	        wrapper.find('.like-reply-btn').hide();
+	        wrapper.find('.unlike-reply-btn').show();
+	        window.publicModals.show("좋아요가 추가되었습니다.");
+	      },
+	      error: function (xhr) {
+	        console.error("좋아요 실패:", xhr.responseText);
+	        window.publicModals.show("좋아요 실패: " + xhr.responseText);
+	      }
+	    });
+	  });
 
-      $.ajax({
-        url: '/reply/unlike',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ replyNo: replyNo }),
-        success: function (res) {
-          likeCountSpan.text(Math.max(currentCount - 1, 0));
-          
-          wrapper.find('.unlike-reply-btn').hide();
-          wrapper.find('.like-reply-btn').show();
-        },
-        error: function (xhr) {
-          alert("좋아요 취소 실패: " + xhr.responseText);
-        }
-      });
-    });
-  }
+	  $(document).on('click', '.unlike-reply-btn', function () {
+	    const wrapper = $(this).closest('.reply-like-section');
+	    const replyNo = parseInt(wrapper.data('replyno'));
+	    const likeCountSpan = wrapper.find('.like-count');
+	    let currentCount = parseInt(likeCountSpan.text());
+
+	    if (isNaN(replyNo)) {
+	      window.publicModals.show("댓글 번호가 유효하지 않습니다.");
+	      return;
+	    }
+
+	    $.ajax({
+	      url: '/reply/unlike',
+	      type: 'POST',
+	      contentType: 'application/json',
+	      data: JSON.stringify({ replyNo: replyNo }),
+	      success: function () {
+	        likeCountSpan.text(Math.max(currentCount - 1, 0));
+	        wrapper.find('.unlike-reply-btn').hide();
+	        wrapper.find('.like-reply-btn').show();
+	        window.publicModals.show("좋아요가 취소되었습니다.");
+	      },
+	      error: function (xhr) {
+	        console.error("좋아요 취소 실패:", xhr.responseText);
+	        window.publicModals.show("좋아요 취소 실패: " + xhr.responseText);
+	      }
+	    });
+	  });
+	}
+
 
 
 
