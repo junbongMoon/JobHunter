@@ -336,6 +336,7 @@
 		<result property="saveType" column="saveType" />
 		<result property="userUid" column="userUid" />
 		<result property="profileBase64" column="profileBase64" />
+		<result property="recruitmentNoticePk" column="recruitmentNoticePk"/>
 
 		<result property="userName" column="userName" />
 		<result property="mobile" column="mobile" />
@@ -351,8 +352,6 @@
 			javaType="com.jobhunter.model.submit.RegistrationVO">
 			<id property="registrationNo" column="registrationNo" />
 			<result property="status" column="status" />
-			<result property="recruitmentNoticePk"
-				column="regRecruitmentNoticePk" />
 			<result property="regDate" column="regDate" />
 			<result property="resumePk" column="regResumePk" />
 		</association>
@@ -475,6 +474,7 @@
 		WHERE
 		reg.registrationNo = #{registrationNo}
 	</select>
+	
 	<select id="getCompanyUidByRegistrationNo" resultType="int">
 		SELECT
 		rn.refCompany
