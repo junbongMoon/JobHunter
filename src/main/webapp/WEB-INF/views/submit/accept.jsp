@@ -134,6 +134,13 @@ $(function() {
   
 });
 
+function showAlertModal(message) {
+  $('#alertModalBody').text(message);
+  const modal = new bootstrap.Modal(document.getElementById('alertModal'));
+  modal.show();
+}
+
+
 function translateStatusEnum(status) {
   const statusMap = {
     PASS: '합격',
@@ -172,7 +179,7 @@ function changeStatusByregistration(status, resumePk, recruitmentNoticePk) {
       },
       error: function (xhr, status, error) {
       console.error("상태 변경 실패:", error);
-      alert("상태 변경 중 오류가 발생했습니다.");
+      showAlertModal("상태 변경 중 오류가 발생했습니다.");
       }
 
   });
@@ -723,7 +730,24 @@ label {
 				</div>
 			</div>
 
-			
+			<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="alertModalLabel">알림</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body" id="alertModalBody">
+        <!-- 알림 내용 -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 		</div>
