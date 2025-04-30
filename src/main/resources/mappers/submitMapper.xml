@@ -594,6 +594,7 @@
 	    UPDATE registration
 	    SET status = #{status}
 	    WHERE registrationNo = #{registrationNo}
+	      AND status = 'WAITING'
 	</update>
 
 </mapper>
