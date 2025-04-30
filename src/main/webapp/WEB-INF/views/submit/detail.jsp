@@ -370,16 +370,16 @@
 								</div>
 								<div id="previewContainer" class="mt-3">
 									<c:forEach var="file" items="${submit.files}">
-										<a href="/resources/resumeUpfiles${file.newFileName}" download>
-										<div class="file-preview d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded">
-											<div class="d-flex align-items-center">
-												<i class="bi bi-file-earmark me-2"></i>
-												<div>
-													<div style="word-break: break-all;">${file.originalFileName}</div>
-													<small class="text-muted">${file.size} byte</small>
+										<a href="/resources/resumeUpfiles${file.newFileName}" download="${file.originalFileName}">
+											<div class="file-preview d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded">
+												<div class="d-flex align-items-center">
+													<i class="bi bi-file-earmark me-2"></i>
+													<div>
+														<div style="word-break: break-all;">${file.originalFileName}</div>
+														<small class="text-muted">${file.size} byte</small>
+													</div>
 												</div>
 											</div>
-										</div>
 										</a>
 									</c:forEach>
 								</div>
