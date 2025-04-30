@@ -52,7 +52,7 @@
                 alt="kakao">
             </div>
           </c:if>
-
+          
         </div>
 
         <div class="spacer">
@@ -61,6 +61,11 @@
         <div class="edit-buttons">
         <button class="btn-edit" onclick="openContactModal()"><i class="bi bi-pencil-square"></i> 연락처 수정</button>
         <button class="btn-edit" onclick="openPasswordModal()"><i class="bi bi-key"></i> 비밀번호 변경</button>
+        <c:if test="${account.isMentor == 'N'}">
+            <button class="btn-edit" type="button" onclick="location.href='/advancement/list?uid=${sessionScope.account.uid}'">
+			    멘토신청
+			</button>
+		  </c:if>
         </div>
       </section>
 
