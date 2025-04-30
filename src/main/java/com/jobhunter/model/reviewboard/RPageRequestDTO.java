@@ -1,12 +1,8 @@
 package com.jobhunter.model.reviewboard;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
-@Getter
-@Setter
-@ToString
+@Data
 public class RPageRequestDTO {
     private int page;        // 현재 페이지 번호
     private int size;        // 한 페이지당 게시글 수
