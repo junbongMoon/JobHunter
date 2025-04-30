@@ -506,6 +506,25 @@ function appendPhoneTextOption() {
 
 // 파일 업로드 + 썸네일 표시
 function uploadModifyFileAndShowPreview(file) {
+
+    const maxFiles = 3;
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+        // 1. 총 파일 수 제한 검사 (기존 + 새 추가)
+        const currentFilesCount = modifyFileList.filter(f => f.status !== 'DELETE').length;
+        if (currentFilesCount >= maxFiles) {
+            $(".modal-body").text("최대 3개의 파일만 업로드할 수 있습니다.");
+            $("#MyModal").modal("show");
+            return;
+        }
+
+        // 2. 파일 크기 검사
+        if (file.size > maxSize) {
+            $(".modal-body").text("파일 크기는 최대 10MB까지 가능합니다.");
+            $("#MyModal").modal("show");
+            return;
+        }
+
     const formData = new FormData();
     formData.append("file", file);
 
