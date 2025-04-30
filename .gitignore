@@ -163,6 +163,9 @@ $RECYCLE.BIN/
 #config.properties
 config.properties
 
+# .json
+jobhunter-672dd-firebase-adminsdk-fbsvc-d8db3a4148.json
+
 # database.properties
 jobtype.properties
 database.properties
