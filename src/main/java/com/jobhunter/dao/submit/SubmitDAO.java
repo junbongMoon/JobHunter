@@ -179,8 +179,8 @@ public interface SubmitDAO {
 	List<UserVO> selectUsersWhoAppliedPaged(int uid, int pageIndex, int pageSize) throws Exception;
 
 
-	void updateSubmitStatus(int registrationNo, String status);
+	void updateSubmitStatus(int registrationNo, String status) throws Exception;
 
-	
-	
+
+	List<ResumeUpfileDTO> getFiles(int registrationNo) throws Exception;
 }

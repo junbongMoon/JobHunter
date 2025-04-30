@@ -31,6 +31,8 @@ public class ResumeDetailInfoBySubmitAndUser {
 	private int registrationNo;
 	// 이력서 pk
 	private int resumeNo;
+	// 공고 pk
+	private int recruitmentNoticePk;
 	// 제목
 	private String title;
 	// 급여형태
@@ -60,9 +62,6 @@ public class ResumeDetailInfoBySubmitAndUser {
 
     // 자격증 리스트
     private List<LicenseDTO> licenses;
-    
-    // 첨부파일 리스트
-    private List<ResumeUpfileDTO> files;
     
     // 시군구 
     private List<Sigungu> sigunguList;

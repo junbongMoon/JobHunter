@@ -1,10 +1,14 @@
 package com.jobhunter.controller.submit;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.SubmitFromRecruitVO;
 import com.jobhunter.model.submit.SubmitFromUserVO;
 import com.jobhunter.model.submit.SubmitSearchDTO;
@@ -50,6 +54,16 @@ public class SubmitRestController {
 	public TenToFivePageVO<SubmitFromUserVO> selectSubmitFromUser(@RequestBody SubmitSearchDTO dto) {
 		try {
 			return submitService.selectSubmitFromUser(dto);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@PostMapping("/files/{registrationNo}")
+	public List<ResumeUpfileDTO> getFiles(@PathVariable("registrationNo") int registrationNo) {
+		try {
+			return submitService.getFiles(registrationNo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -305,12 +305,18 @@ public class SubmitDAOImpl implements SubmitDAO {
 
 
 	@Override
-	public void updateSubmitStatus(int registrationNo, String status) {
+	public void updateSubmitStatus(int registrationNo, String status) throws Exception {
 		Map<String, Object> param = new HashMap<>();
 		param.put("registrationNo", registrationNo);
 		param.put("status", status);
 		
 		ses.update(NS + ".updateSubmitStatus", param);
+	}
+
+
+	@Override
+	public List<ResumeUpfileDTO> getFiles(int registrationNo) throws Exception {
+		return ses.selectList(NS + ".selectResumeUpfilesByRegistrationNo", registrationNo);
 	}
 	
 }
