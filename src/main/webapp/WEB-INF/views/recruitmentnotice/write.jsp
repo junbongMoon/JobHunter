@@ -340,13 +340,14 @@ function showThumbnail(file) {
         const base64 = e.target.result;
 
         const safeId = file.name.replace(/[^a-zA-Z0-9]/g, "_");
+		const FileName = file.name;
 
         let html = `
             <tr id="thumb_\${safeId}">
                 <td><img src="\${isImage ? base64 : '/resources/images/noimage.png'}" width="60" /></td>
                 <td>\${file.name}</td>
                 <td>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="removeFile('\${file.name}')">X</button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeFile('\${FileName}')">X</button>
                 </td>
             </tr>
         `;
@@ -356,21 +357,21 @@ function showThumbnail(file) {
 }
 
 // 파일 삭제 함수
-	function removeFile(fileName) {
-    $.ajax({
-        url: "/recruitmentnotice/file",
-        type: "DELETE",
-        data: { removeFileName: fileName },
-        success: function(response) {
-            console.log("삭제 성공", response);
-            const safeId = fileName.replace(/[^a-zA-Z0-9]/g, "_");
-            $(`#thumb_${safeId}`).remove();
-        },
-        error: function() {
-            showModal("파일 삭제 실패");
-        }
-    });
-	}
+function removeFile(fileName) {
+
+  $.ajax({
+    url: `/recruitmentnotice/file/` + fileName,
+    type: "DELETE",
+    success: function(response) {
+      console.log("삭제 성공", response);
+      const safeId = fileName.replace(/[^a-zA-Z0-9]/g, "_");
+      $(`#thumb_\${safeId}`).remove();
+    },
+    error: function() {
+      showModal("파일 삭제 실패");
+    }
+  });
+}
 
 	function markUploadSuccess(fileName) {
     const safeId = CSS.escape(fileName);

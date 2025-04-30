@@ -30,18 +30,24 @@
         type: "POST",
         data: { advancementNo: "${advancement.advancementNo}" },
         success: function() {
-          alert("삭제가 완료되었습니다.");
+          showAlertModal("삭제가 완료되었습니다.");
           location.href = "/advancement/list?uid=${sessionScope.account.uid}";
         },
         error: function() {
-          alert("삭제 실패. 다시 시도해주세요.");
+          showAlertModal("삭제 실패. 다시 시도해주세요.");
         }
       });
     } else {
-      alert("정확히 '삭제하겠습니다'를 입력해야 합니다.");
+      showAlertModal("정확히 '삭제하겠습니다'를 입력해야 합니다.");
     }
   });
 });
+
+function showAlertModal(message) {
+  $('#alertModalBody').text(message);
+  const modal = new bootstrap.Modal(document.getElementById('alertModal'));
+  modal.show();
+}
 </script>
 <style>
   .pr-detail-container {
@@ -176,7 +182,7 @@
       <i class="fas fa-list"></i> 목록으로
     </a>
 
-    <c:if test="${sessionScope.account.uid == advancement.refUser}">
+    <c:if test="${sessionScope.account.uid == advancement.refUser and sessionScope.account.accountType == 'USER'}">
       <a href="/advancement/modify?id=${advancement.advancementNo}" class="btn btn-modify">
         <i class="fas fa-edit"></i> 수정
       </a>
@@ -198,6 +204,25 @@
     </div>
   </div>
 </div>
+
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="alertModalLabel">알림</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body" id="alertModalBody">
+        <!-- 알림 내용 -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <jsp:include page="../footer.jsp"></jsp:include>
 

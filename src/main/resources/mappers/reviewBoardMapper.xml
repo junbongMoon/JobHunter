@@ -163,7 +163,8 @@
 		SELECT boardNo, gonggoUid, writer, companyName,
 		reviewResult, reviewType,
 		reviewLevel, content, typeOtherText
-		FROM reviewBoard
+		FROM
+		reviewBoard
 		WHERE
 		boardNo = #{boardNo}
 	</select>
@@ -219,7 +220,7 @@
 	</update>
 
 
-	
+
 
 
 	<!--검색 기능 쿼리 -->
@@ -235,7 +236,8 @@
 		FROM reviewBoard r
 		JOIN
 		users u
-		ON r.writer = u.uid
+		ON r.writer =
+		u.uid
 		JOIN
 		recruitmentnotice rn ON r.gonggoUid =
 		rn.uid
@@ -248,7 +250,7 @@
 		</if>
 
 		<if test="companyFilter != null and companyFilter.trim() != ''">
-			AND c.companyName = #{companyFilter}
+			AND c.companyName LIKE CONCAT('%', #{companyFilter}, '%')
 		</if>
 
 		<choose>
@@ -281,7 +283,7 @@
 		</if>
 
 		<if test="companyFilter != null and companyFilter.trim() != ''">
-			AND c.companyName = #{companyFilter}
+			AND c.companyName LIKE CONCAT('%', #{companyFilter}, '%')
 		</if>
 	</select>
 
@@ -326,7 +328,8 @@
 		SELECT
 		r.boardNo,
 		r.companyName,
-		CONCAT(LEFT(r.content, 20), IF(CHAR_LENGTH(r.content) > 20, '...', '')) AS content,
+		CONCAT(LEFT(r.content, 20),
+		IF(CHAR_LENGTH(r.content) > 20, '...', '')) AS content,
 		r.postDate,
 		r.likes,
 		r.views,
@@ -335,7 +338,8 @@
 		LEFT JOIN (
 		SELECT boardNo, COUNT(*) AS replyCnt
 		FROM reviewReply
-		WHERE isDeleted = 'N'
+		WHERE
+		isDeleted = 'N'
 		GROUP BY boardNo
 		) rr ON r.boardNo = rr.boardNo
 
@@ -369,11 +373,13 @@
 		SELECT COUNT(*)
 		FROM reviewBoard r
 		LEFT JOIN (
-		SELECT boardNo, COUNT(*) AS replyCnt
+		SELECT boardNo, COUNT(*)
+		AS replyCnt
 		FROM reviewReply
 		WHERE isDeleted = 'N'
 		GROUP BY boardNo
-		) rr ON r.boardNo = rr.boardNo
+		) rr
+		ON r.boardNo = rr.boardNo
 
 		<where>
 			<!-- 댓글 여부 필터 -->

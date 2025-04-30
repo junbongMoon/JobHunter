@@ -318,6 +318,36 @@
 					cursor: pointer;
 					margin-left: 10px;
 				}
+
+				/* 무한 스크롤 로딩 인디케이터 */
+				.loading-indicator {
+					text-align: center;
+					padding: 15px;
+					display: none;
+				}
+
+				.loading-spinner {
+					display: inline-block;
+					width: 30px;
+					height: 30px;
+					border: 3px solid rgba(0, 0, 0, 0.1);
+					border-radius: 50%;
+					border-top-color: #4a6bdf;
+					animation: spin 1s ease-in-out infinite;
+				}
+
+				@keyframes spin {
+					to {
+						transform: rotate(360deg);
+					}
+				}
+
+				.no-more-notifications {
+					text-align: center;
+					padding: 15px;
+					color: #6c757d;
+					display: none;
+				}
 			</style>
 
 			<!-- =======================================================
@@ -356,6 +386,12 @@
 				<div id="notificationList" class="list-group">
 					<!-- 알림 목록이 여기에 동적으로 추가됩니다 -->
 				</div>
+				<div id="loadingIndicator" class="loading-indicator">
+					<div class="loading-spinner"></div>
+				</div>
+				<div id="noMoreNotifications" class="no-more-notifications">
+					더 이상 알림이 없습니다.
+				</div>
 			</div>
 		</div>
 		<!-- 알림 모달 -->
@@ -375,7 +411,7 @@
 						<ul>
 							<li><a href="/" class="active">Home</a></li>
 							<li class="dropdown"><a href="/recruitmentnotice/listAll"><span>채용정보</span> <i
-								class="bi bi-chevron-down toggle-dropdown"></i></a>
+										class="bi bi-chevron-down toggle-dropdown"></i></a>
 								<ul>
 									<li><a href="/recruitmentnotice/listAll">전체 채용정보</a></li>
 									<li><a href="/employment/list">공공기관 제공 채용정보</a></li>
@@ -395,8 +431,8 @@
 									</c:when>
 									<c:when test="${sessionScope.account.accountType == 'COMPANY'}">
 										<a class="nav-link dropdown-toggle"
-											href="/company/companyInfo/${sessionScope.account.uid}"
-											id="mypageDropdown" role="button">
+											href="/company/companyInfo/${sessionScope.account.uid}" id="mypageDropdown"
+											role="button">
 											My Page
 										</a>
 										<!-- 메시지가 있을 때-->
@@ -404,8 +440,8 @@
 									</c:when>
 									<c:otherwise>
 										<a class="nav-link dropdown-toggle"
-											href="/user/mypage/${sessionScope.account.uid}"
-											id="mypageDropdown" role="button">
+											href="/user/mypage/${sessionScope.account.uid}" id="mypageDropdown"
+											role="button">
 											My Page
 										</a>
 										<!-- 메시지가 있을 때-->
@@ -503,54 +539,156 @@
 			window.publicSessionUid = "${sessionScope.account.uid}";
 			window.publicSessionAccType = "${sessionScope.account.accountType}";
 
+			// 무한 스크롤 관련 변수
+			let currentPage = 1;
+			let isLoading = false;
+			let hasMoreNotifications = true;
+			let currentUid = '';
+			let currentAccountType = '';
+
 			// 알림 모달 열기 함수
 			function openNotifications(uid, accountType) {
 				// 모달 표시
 				document.getElementById('notificationModal').style.display = 'block';
 
+				// 변수 초기화
+				currentPage = 1;
+				isLoading = false;
+				hasMoreNotifications = true;
+				currentUid = uid;
+				currentAccountType = accountType;
+
+				// 알림 목록 초기화
+				document.getElementById('notificationList').innerHTML = '';
+				document.getElementById('noMoreNotifications').style.display = 'none';
+
 				// 알림 목록 가져오기
-				fetchNotifications(uid, accountType);
+				fetchNotifications(uid, accountType, currentPage);
+
+				// 스크롤 이벤트 리스너 추가
+				const modalContent = document.querySelector('.notification-modal-content');
+				modalContent.addEventListener('scroll', handleScroll);
+			}
+
+			// 스크롤 이벤트 핸들러
+			function handleScroll() {
+				const modalContent = document.querySelector('.notification-modal-content');
+				const scrollPosition = modalContent.scrollTop + modalContent.clientHeight;
+				const scrollHeight = modalContent.scrollHeight;
+
+				// 스크롤이 하단에 가까워지면 추가 데이터 로드 && 중복 로드 방지 && 불러올 데이터가 있는 경우
+				if (scrollPosition >= scrollHeight - 50 && !isLoading && hasMoreNotifications) {
+					currentPage++;
+					fetchNotifications(currentUid, currentAccountType, currentPage);
+				}
 			}
 
 			// 알림 목록 가져오기 함수
-			function fetchNotifications(uid, accountType) {
-				fetch('/notification/list?uid=' + uid + '&accountType=' + accountType)
-					.then(response => response.text())
-					.then(html => {
+			function fetchNotifications(uid, accountType, page) {
+				// 로딩 중 표시
+				isLoading = true;
+				document.getElementById('loadingIndicator').style.display = 'block';
+
+				fetch('/notification/listWithPaging?uid=' + uid + '&accountType=' + accountType + '&page=' + page + '&pageSize=10')
+					.then(response => response.json())
+					.then(data => {
 						// 알림 목록 컨테이너 가져오기
 						const notificationList = document.getElementById('notificationList');
 
-						// 임시 DOM 요소 생성
-						const tempDiv = document.createElement('div');
-						tempDiv.innerHTML = html;
+						// 알림 목록이 있는 경우
+						if (data.messages && data.messages.length > 0) {
+							// 알림 HTML 생성
+							let notificationsHTML = '';
 
-						// 알림 목록 추출
-						const listGroup = tempDiv.querySelector('.list-group');
+							data.messages.forEach(message => {
+								const isRead = message.isRead === 'Y';
+								const notificationClass = isRead ? 'notification-item read' : 'notification-item unread';
+								const badgeHTML = !isRead ? '<span class="notification-badge">N</span>' : '';
 
-						if (listGroup) {
-							// 알림 목록이 있는 경우
-							notificationList.innerHTML = listGroup.innerHTML;
+								// 날짜 포맷팅
+								const date = new Date(message.regDate);
+								const formattedDate = date.toLocaleDateString('ko-KR', {
+									year: 'numeric',
+									month: '2-digit',
+									day: '2-digit',
+									hour: '2-digit',
+									minute: '2-digit'
+								});
+
+								// 아이콘 결정
+								let iconClass = 'user-icon';
+								if (message.fromUserType === 'COMPANY') {
+									iconClass = 'company-icon';
+								} else if (message.fromUserType === 'ADMIN') {
+									iconClass = 'admin-icon';
+								}
+
+								notificationsHTML += `
+									<div class="\${notificationClass}" data-message-no="\${message.messageNo}">
+										<div class="d-flex align-items-center">
+											<div class="notification-icon \${iconClass}">
+												<i class="fas fa-bell"></i>
+											</div>
+											<div class="flex-grow-1">
+												<div class="notification-title">\${message.title}</div>
+												<div class="notification-content">\${message.content}</div>
+												<div class="notification-time">\${formattedDate}</div>
+											</div>
+										</div>
+										<i class="fas fa-times delete-icon" onclick="deleteNotification(\${message.messageNo})"></i>
+										\${badgeHTML}
+									</div>
+								`;
+							});
+
+							// 첫 페이지인 경우 기존 내용 초기화
+							if (page === 1) {
+								notificationList.innerHTML = notificationsHTML;
+							} else {
+								// 추가 페이지인 경우 기존 내용에 추가
+								notificationList.innerHTML += notificationsHTML;
+							}
 
 							// 이벤트 리스너 추가
 							addNotificationEventListeners(uid, accountType);
+
+							// 더 불러올 알림이 있는지 확인
+							hasMoreNotifications = data.hasMore;
+
+							if (!hasMoreNotifications) {
+								document.getElementById('noMoreNotifications').style.display = 'block';
+							}
 						} else {
 							// 알림이 없는 경우
-							notificationList.innerHTML = `
-								<div class="empty-notification">
-									<i class="fas fa-bell-slash fa-3x mb-3"></i>
-									<p>새로운 알림이 없습니다.</p>
-								</div>
-							`;
+							if (page === 1) {
+								notificationList.innerHTML = `
+									<div class="empty-notification">
+										<i class="fas fa-bell-slash fa-3x mb-3"></i>
+										<p>새로운 알림이 없습니다.</p>
+									</div>
+								`;
+							} else {
+								// 추가 페이지에서 알림이 없는 경우
+								hasMoreNotifications = false;
+								document.getElementById('noMoreNotifications').style.display = 'block';
+							}
 						}
 					})
 					.catch(error => {
 						console.error('알림 목록 가져오기 실패:', error);
-						document.getElementById('notificationList').innerHTML = `
-							<div class="empty-notification">
-								<i class="fas fa-exclamation-circle fa-3x mb-3"></i>
-								<p>알림을 불러오는 중 오류가 발생했습니다.</p>
-							</div>
-						`;
+						if (page === 1) {
+							document.getElementById('notificationList').innerHTML = `
+								<div class="empty-notification">
+									<i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+									<p>알림을 불러오는 중 오류가 발생했습니다.</p>
+								</div>
+							`;
+						}
+					})
+					.finally(() => {
+						// 로딩 완료
+						isLoading = false;
+						document.getElementById('loadingIndicator').style.display = 'none';
 					});
 			}
 
@@ -679,6 +817,10 @@
 			// 모달 닫기 이벤트 리스너
 			document.getElementById('closeNotificationModal').addEventListener('click', function () {
 				document.getElementById('notificationModal').style.display = 'none';
+
+				// 스크롤 이벤트 리스너 제거
+				const modalContent = document.querySelector('.notification-modal-content');
+				modalContent.removeEventListener('scroll', handleScroll);
 			});
 
 			// 모달 외부 클릭 시 닫기
@@ -686,6 +828,10 @@
 				const modal = document.getElementById('notificationModal');
 				if (event.target === modal) {
 					modal.style.display = 'none';
+
+					// 스크롤 이벤트 리스너 제거
+					const modalContent = document.querySelector('.notification-modal-content');
+					modalContent.removeEventListener('scroll', handleScroll);
 				}
 			});
 

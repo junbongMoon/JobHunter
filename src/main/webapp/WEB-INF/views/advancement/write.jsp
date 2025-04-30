@@ -17,14 +17,14 @@ $(document).ready(function () {
 
         // 파일 크기 제한: 10MB
         if (file.size > 10 * 1024 * 1024) {
-            alert("파일 크기는 최대 10MB까지 가능합니다.");
+            showAlertModal("파일 크기는 최대 10MB까지 가능합니다.");
             this.value = ''; // input 초기화
             return;
         }
 
         // 최대 3개 제한
         if ($("#previewArea .preview-item").length >= 3) {
-            alert("최대 3개의 파일만 업로드할 수 있습니다.");
+            showAlertModal("최대 3개의 파일만 업로드할 수 있습니다.");
             this.value = '';
             return;
         }
@@ -54,7 +54,7 @@ $(document).ready(function () {
                 }
             },
             error: function (err) {
-                alert("파일 업로드 실패");
+                showAlertModal("파일 업로드 실패");
                 console.error(err);
             }
         });
@@ -71,11 +71,18 @@ $(document).ready(function () {
                 $(`#file-\${index}`).remove();
             },
             error: function () {
-                alert("파일 삭제 실패");
+                showAlertModal("파일 삭제 실패");
             }
         });
     });
 });
+
+function showAlertModal(message) {
+  $('#alertModalBody').text(message);
+  const modal = new bootstrap.Modal(document.getElementById('alertModal'));
+  modal.show();
+}
+
 
 </script>
 
@@ -166,6 +173,25 @@ $(document).ready(function () {
     </form>
 </div>
 </div>
+
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="alertModalLabel">알림</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+        <div class="modal-body" id="alertModalBody">
+          <!-- 알림 내용 -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </section>
 
 <jsp:include page="../footer.jsp"></jsp:include>

@@ -290,6 +290,14 @@ public class ResumeDAOImpl implements ResumeDAO {
 	}
 
 	@Override
+	public int getRegistrationAdviceForMentorUid(int resumeNo, int adviceNo) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("resumeNo", resumeNo);
+		params.put("adviceNo", adviceNo);
+		return ses.selectOne(NS + ".getRegistrationAdviceForMentorUid", params);
+	}
+
+	@Override
 	public List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) throws Exception {
 		return ses.selectList(NS + ".getAdviceFiles", adviceNo);
 	}

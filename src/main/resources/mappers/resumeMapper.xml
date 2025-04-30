@@ -317,6 +317,15 @@
         WHERE adviceNo = #{adviceNo}
     </select>
 
+    <!-- 첨삭 신청 멘토UID 조회 -->
+    <select id="getRegistrationAdviceForMentorUid" parameterType="map" resultType="int">
+        SELECT mentorUid
+        FROM registration_advice
+        WHERE resumeNo = #{resumeNo}
+        AND adviceNo = #{adviceNo}
+        AND status = 'CHECKING'
+    </select>
+
     <!-- 첨삭 파일 조회 -->
     <select id="getAdviceFiles" parameterType="int" resultType="com.jobhunter.model.resume.ResumeAdviceUpfileDTO">
         SELECT 

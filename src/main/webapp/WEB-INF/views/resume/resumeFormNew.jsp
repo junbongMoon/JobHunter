@@ -1934,34 +1934,7 @@
 					$(this).closest('.education-item').remove();
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
-				// 페이지 로드 시 기존 학력사항 표시
-				function initializeEducation() {
-					const educationTemplate = document.querySelector('#educationTemplate');
 
-					<c:forEach var="education" items="${resumeDetail.educations}" varStatus="status">
-						const educationClone${status.index} = educationTemplate.content.cloneNode(true);
-
-						// 기존 값 설정
-						$(educationClone${status.index}).find('.education-level').val('${education.educationLevel}');
-						$(educationClone${status.index}).find('.education-status').val('${education.educationStatus}');
-
-						// 날짜 형식 변환 (yyyy-MM-dd)
-						<c:if test="${not empty education.graduationDate}">
-							const graduationDate${status.index} = new Date('${education.graduationDate}');
-							const formattedDate${status.index} = graduationDate${status.index}.getFullYear() + '-' +
-							String(graduationDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
-							String(graduationDate${status.index}.getDate()).padStart(2, '0');
-							$(educationClone${status.index}).find('.graduation-date').val(formattedDate${status.index});
-						</c:if>
-
-						$(educationClone${status.index}).find('.custom-input').val('${education.customInput}');
-
-						$('#educationContainer').append(educationClone${status.index});
-					</c:forEach>
-				}
-
-				// 페이지 로드 시 학력사항 초기화
-				initializeEducation();
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 경력 추가 버튼 클릭 이벤트
 				let count = 0; // id 중복 방지 만들기 위한 count
@@ -2002,52 +1975,7 @@
 					}
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
-				// 페이지 로드 시 기존 경력사항 표시
-				function initializeHistory() {
-					const historyTemplate = document.querySelector('#historyTemplate');
 
-					<c:forEach var="history" items="${resumeDetail.histories}" varStatus="status">
-						const historyClone${status.index} = historyTemplate.content.cloneNode(true);
-
-						// 기존 값 설정
-						$(historyClone${status.index}).find('.company-name').val('${history.companyName}');
-						$(historyClone${status.index}).find('.position').val('${history.position}');
-						$(historyClone${status.index}).find('.job-description').val('${history.jobDescription}');
-
-						// 시작일 설정
-						<c:if test="${not empty history.startDate}">
-							const startDate${status.index} = new Date('${history.startDate}');
-							const formattedStartDate${status.index} = startDate${status.index}.getFullYear() + '-' +
-							String(startDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
-							String(startDate${status.index}.getDate()).padStart(2, '0');
-							$(historyClone${status.index}).find('.start-date').val(formattedStartDate${status.index});
-						</c:if>
-
-						// 종료일 설정 (재직중이 아닌 경우에만)
-						<c:if test="${not empty history.endDate}">
-							const endDate${status.index} = new Date('${history.endDate}');
-							const formattedEndDate${status.index} = endDate${status.index}.getFullYear() + '-' +
-							String(endDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
-							String(endDate${status.index}.getDate()).padStart(2, '0');
-							$(historyClone${status.index}).find('.end-date').val(formattedEndDate${status.index});
-						</c:if>
-
-						// 재직중 체크박스 상태 설정
-						<c:if test="${empty history.endDate}">
-							$(historyClone${status.index}).find('.currently-employed').prop('checked', true);
-							$(historyClone${status.index}).find('.end-date').prop('disabled', true);
-						</c:if>
-
-						// 담당업무 글자수 카운트 설정
-						const jobDescriptionLength${status.index} = '${history.jobDescription}'.length;
-						$(historyClone${status.index}).find('#jobDescriptionCount').text(jobDescriptionLength${status.index} + ' / 100');
-
-						$('#historyContainer').append(historyClone${status.index});
-					</c:forEach>
-				}
-
-				// 페이지 로드 시 경력사항 초기화
-				initializeHistory();
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 자격증 추가 버튼 클릭 이벤트
 				$('#addLicenseBtn').on('click', function () {
@@ -2066,43 +1994,9 @@
 					$(this).closest('.license-item').remove();
 				});
 				//---------------------------------------------------------------------------------------------------------------------------------
-				// 페이지 로드 시 기존 자격증 표시
-				function initializeLicense() {
-					const licenseTemplate = document.querySelector('#licenseTemplate');
 
-					<c:forEach var="license" items="${resumeDetail.licenses}" varStatus="status">
-						const licenseClone${status.index} = licenseTemplate.content.cloneNode(true);
-
-						// 기존 값 설정
-						$(licenseClone${status.index}).find('.license-name').val('${license.licenseName}');
-						$(licenseClone${status.index}).find('.institution').val('${license.institution}');
-
-						// 취득일자 설정
-						<c:if test="${not empty license.acquisitionDate}">
-							const acquisitionDate${status.index} = new Date('${license.acquisitionDate}');
-							const formattedAcquisitionDate${status.index} = acquisitionDate${status.index}.getFullYear() + '-' +
-							String(acquisitionDate${status.index}.getMonth() + 1).padStart(2, '0') + '-' +
-							String(acquisitionDate${status.index}.getDate()).padStart(2, '0');
-							$(licenseClone${status.index}).find('.acquisition-date').val(formattedAcquisitionDate${status.index});
-						</c:if>
-
-						$('#licenseContainer').append(licenseClone${status.index});
-					</c:forEach>
-				}
-
-				// 페이지 로드 시 자격증 초기화
-				initializeLicense();
 				//---------------------------------------------------------------------------------------------------------------------------------
-				// 페이지 로드 시 기존 자기소개 표시
-				function initializeSelfIntro() {
-					<c:if test="${not empty resumeDetail.resume.introduce}">
-						$('#selfIntroTextarea').val('${resumeDetail.resume.introduce}');
-						$('#charCount').text('${resumeDetail.resume.introduce}'.length + ' / 1000');
-					</c:if>
-				}
 
-				// 페이지 로드 시 자기소개 초기화
-				initializeSelfIntro();
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 자기소개 입력란 몇글자 썻는지 알 수 있게 하기
 				$('#selfIntroTextarea').on('input', function () {
@@ -2140,31 +2034,6 @@
 				// 임시 저장된 파일 목록 (서버에 아직 업로드되지 않은 파일)
 				let pendingFiles = [];
 
-				// 페이지 로드 시 기존 첨부파일 표시
-				function initializeFiles() {
-					<c:if test="${not empty resumeDetail.files}">
-						<c:forEach var="file" items="${resumeDetail.files}">
-							uploadedFiles.push({
-								originalFileName: '${file.originalFileName}',
-							newFileName: '${file.newFileName}',
-							ext: '${file.ext}',
-							size: ${file.size},
-							base64Image: '${file.base64Image}'
-							});
-							showFilePreview({
-								originalFileName: '${file.originalFileName}',
-							newFileName: '${file.newFileName}',
-							ext: '${file.ext}',
-							size: ${file.size},
-							base64Image: '${file.base64Image}'
-							});
-						</c:forEach>
-						updateFileText();
-					</c:if>
-				}
-
-				// 페이지 로드 시 첨부파일 초기화
-				initializeFiles();
 
 				// 파일 입력 이벤트
 				$('#fileInput').on('change', function (e) {
@@ -2366,124 +2235,10 @@
 				// 로컬스토리지에 임시저장 기능 추가
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 페이지 로드 시 지역 선택 실행
-				initializeSelectedRegions();
 
-				// 페이지 로드 시 선택된 지역에 대한 체크박스 처리
-				function initializeSelectedRegions() {
-					const $badges = $('#selectedRegions .badge');
-
-					// 이미 선택된 지역이 없으면 중단
-					if ($badges.length === 0) return;
-
-					// 선택된 지역들의 데이터 수집
-					const selectedRegions = new Map();
-					$badges.each(function () {
-						const regionNo = $(this).data('region');
-						const sigunguNo = $(this).data('sigungu');
-						if (!selectedRegions.has(regionNo)) {
-							selectedRegions.set(regionNo, []);
-						}
-						selectedRegions.get(regionNo).push(sigunguNo);
-					});
-
-					// 각 시/도에 대해 한 번만 클릭 이벤트 발생
-					selectedRegions.forEach(function (sigunguNos, regionNo) {
-						const $regionItem = $(`.region-item[data-region="${regionNo}"]`);
-						$regionItem.trigger('click');
-
-						// Ajax 완료 후 해당 시군구들 체크
-						$.ajax({
-							url: "/resume/getSigungu",
-							type: "GET",
-							data: { regionNo: regionNo },
-							success: function () {
-								for (let i = 0; i < sigunguNos.length; i++) {
-									$(`#sigungu_${sigunguNos[i]}`).prop('checked', true);
-								}
-							}
-						});
-					});
-
-					// 삭제 버튼 이벤트 처리
-					$('#selectedRegions').on('click', '.btn-close', function (e) {
-						e.preventDefault();
-						e.stopPropagation();
-
-						const $badge = $(this).parent();
-						const sigunguNo = $badge.data('sigungu');
-						const regionName = $badge.text().trim().split(' ')[1]; // 띄어쓰기로 분리 (시/군/구 이름)
-
-						$badge.remove();
-						$(`#sigungu_${sigunguNo}`).prop('checked', false);
-
-						// 해당 텍스트와 일치하는 체크박스 찾아서 해제
-						$('.sigungu-item input[type="checkbox"]').each(function () {
-							if ($(this).data('name') === regionName) {
-								$(this).prop('checked', false);
-							}
-						});
-					});
-				}
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 페이지 로드 시 업직종 선택 실행
-				initializeSelectedJobTypes();
 
-				// 페이지 로드 시 선택된 업직종에 대한 체크박스 처리
-				function initializeSelectedJobTypes() {
-					const $badges = $('#selectedJobTypes .badge');
-
-					// 이미 선택된 업직종이 중단
-					if ($badges.length === 0) return;
-
-					// 선택된 업직종들의 데이터 수집
-					const selectedJobTypes = new Map();
-					$badges.each(function () {
-						const majorNo = $(this).data('major');
-						const subNo = $(this).data('sub');
-						if (!selectedJobTypes.has(majorNo)) {
-							selectedJobTypes.set(majorNo, []);
-						}
-						selectedJobTypes.get(majorNo).push(subNo);
-					});
-
-					// 각 대분류에 대해 한 번만 클릭 이벤트 발생
-					selectedJobTypes.forEach(function (subNos, majorNo) {
-						const $majorItem = $(`.major-item[data-major="${majorNo}"]`);
-						$majorItem.trigger('click');
-
-						// Ajax 완료 후 해당 소분류들 체크
-						$.ajax({
-							url: "/resume/getSubCategory",
-							type: "GET",
-							data: { majorNo: majorNo },
-
-							success: function () {
-								for (let i = 0; i < subNos.length; i++) {
-									$(`#sub_${subNos[i]}`).prop('checked', true);
-								}
-							}
-						});
-					});
-
-					// 삭제 버튼 이벤트 처리
-					$('#selectedJobTypes').on('click', '.btn-close', function (e) {
-						e.preventDefault();
-						e.stopPropagation();
-
-						const $badge = $(this).parent();
-						const subNo = $badge.data('sub');
-						const jobName = $badge.text().trim(); // 배지의 텍스트 가져오기
-
-						$badge.remove();
-
-						// 해당 텍스트와 일치하는 체크박스 찾아서 해제
-						$('.sub-item input[type="checkbox"]').each(function () {
-							if ($(this).data('name') === jobName) {
-								$(this).prop('checked', false);
-							}
-						});
-					});
-				}
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 사진 업로드 이벤트
 				$('#photoUpload').on('change', function (event) {
@@ -2532,13 +2287,7 @@
 					$('#finalSaveBtn .spinner-border').addClass('d-none');
 				}
 				//---------------------------------------------------------------------------------------------------------------------------------
-				// 페이지 로드 시 프로필 이미지 초기화
-				<c:if test="${not empty resumeDetail.resume.profileBase64}">
-					$('#photoPreview').attr('src', '${resumeDetail.resume.profileBase64}').show();
-					$('#profileBase64').val('${resumeDetail.resume.profileBase64}');
-					$('label[for="photoUpload"]').hide();
-					$('#removePhoto').show();
-				</c:if>
+
 				//---------------------------------------------------------------------------------------------------------------------------------
 				// 돌아가기 버튼
 				$('#returnBtn').on('click', function () {
