@@ -14,7 +14,7 @@ public interface ReviewReplyService {
 
 	boolean deleteReply(int replyNo, int userId) throws Exception;
 
-	List<ReviewReplyDTO> getRepliesByBoardNoWithPaging(int boardNo, RPageRequestDTO pageRequestDTO) throws Exception;
+	List<ReviewReplyDTO> getRepliesByBoardNoWithPaging(int boardNo, int loginUserId, RPageRequestDTO pageRequestDTO) throws Exception;
 
 	int getReplyCount(int boardNo) throws Exception;
 

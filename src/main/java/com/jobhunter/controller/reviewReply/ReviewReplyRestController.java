@@ -35,10 +35,11 @@ public class ReviewReplyRestController {
 	// 댓글 목록
 	@GetMapping("/page")
 	public ResponseEntity<RPageResponseDTO<ReviewReplyDTO>> getReplyPage(@RequestParam int boardNo,
-			@ModelAttribute RPageRequestDTO pageRequestDTO) {
-
+			@ModelAttribute RPageRequestDTO pageRequestDTO, HttpSession session) {
+		AccountVO account = (AccountVO) session.getAttribute("account");
+		int loginUserId = (account != null) ? account.getUid() : 0;
 		try {
-			List<ReviewReplyDTO> replies = service.getRepliesByBoardNoWithPaging(boardNo, pageRequestDTO);
+			List<ReviewReplyDTO> replies = service.getRepliesByBoardNoWithPaging(boardNo, loginUserId, pageRequestDTO);
 			int totalCount = service.getReplyCount(boardNo);
 
 			RPageResponseDTO<ReviewReplyDTO> response = new RPageResponseDTO<>(replies, totalCount, pageRequestDTO);
@@ -55,7 +56,7 @@ public class ReviewReplyRestController {
 	public ResponseEntity<ReviewReplyDTO> addReply(@RequestBody ReviewReplyDTO dto, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		System.out.println("🔥 userId from DTO: " + dto.getUserId());
-		
+
 		if (account == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
@@ -130,8 +131,7 @@ public class ReviewReplyRestController {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		if (account == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
-				.body("로그인이 필요합니다.");
+					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8")).body("로그인이 필요합니다.");
 		}
 
 		int replyNo = payload.get("replyNo");
@@ -140,22 +140,18 @@ public class ReviewReplyRestController {
 		try {
 			boolean result = service.likeReply(replyNo, userUid);
 			if (result) {
-				return ResponseEntity.ok()
-					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
-					.body("좋아요가 추가되었습니다.");
+				return ResponseEntity.ok().contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
+						.body("좋아요가 추가되었습니다.");
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
-					.body("이미 좋아요를 누르셨습니다.");
+						.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8")).body("이미 좋아요를 누르셨습니다.");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-				.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
-				.body("서버 오류 발생");
+					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8")).body("서버 오류 발생");
 		}
 	}
-
 
 	// 댓글 좋아요 취소
 	@PostMapping(value = "/unlike", produces = "text/plain;charset=UTF-8")
@@ -163,8 +159,7 @@ public class ReviewReplyRestController {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		if (account == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
-				.body("로그인이 필요합니다.");
+					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8")).body("로그인이 필요합니다.");
 		}
 
 		int replyNo = payload.get("replyNo");
@@ -173,19 +168,16 @@ public class ReviewReplyRestController {
 		try {
 			boolean result = service.unlikeReply(replyNo, userUid);
 			if (result) {
-				return ResponseEntity.ok()
-					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
-					.body("좋아요가 취소되었습니다.");
+				return ResponseEntity.ok().contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
+						.body("좋아요가 취소되었습니다.");
 			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
-					.body("좋아요 상태가 아닙니다.");
+						.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8")).body("좋아요 상태가 아닙니다.");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-				.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
-				.body("서버 오류 발생");
+					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8")).body("서버 오류 발생");
 		}
 	}
 }

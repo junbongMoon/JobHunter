@@ -28,6 +28,8 @@ public class ReviewReplyDTO {
 		private LocalDateTime postDate;
 		private Timestamp updatedAt;
 		private String isDeleted;
+		
+		private boolean isReplyLike; 
 	
 
 }
