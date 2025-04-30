@@ -154,6 +154,7 @@ public class RecruitmentNoticeServiceImpl implements RecruitmentNoticeService {
 	 * @throws Exception
 	 *
 	 */
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public RecruitmentDetailInfo getRecruitmentByUid(int uid) throws Exception {
 

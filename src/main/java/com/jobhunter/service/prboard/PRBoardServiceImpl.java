@@ -100,6 +100,7 @@ public class PRBoardServiceImpl implements PRBoardService {
 	    return result;
 	}
 	
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public TenToFivePageVO<PRBoardVO> selectMyPRBoard (int uid, int page) throws Exception {
 		int offset = (page - 1) * 5;
