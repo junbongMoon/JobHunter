@@ -755,7 +755,7 @@ function loadReplies(page = 1) {
 		    replyHtml += '<strong>' + writer + '</strong> (' + date + ')<br>';
 		    replyHtml += '<div class="reply-content mt-2 mb-2">' + reply.content + '</div>';
 
-		    if (reply.userId.toString() === loginUserUid.toString()) {
+		    if ((reply.userId.toString() === loginUserUid.toString()) && (isCompanyAccount === false || isCompanyAccount === 'false')) {
 		        replyHtml += '<div class="reply-actions mt-2">';
 		        replyHtml += '<button class="btn btn-sm btn-outline-secondary me-1 edit-reply-btn" ' +
 		                     'data-replyno="' + replyNo + '" data-content="' + replyContent + '">수정</button>';

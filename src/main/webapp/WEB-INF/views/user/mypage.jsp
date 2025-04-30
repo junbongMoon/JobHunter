@@ -27,49 +27,36 @@
           <div id="mypageContainer">
             <div class="sections-grid">
 
-              <!-- 기본 정보 -->
-              <section data-aos="fade-up" data-aos-delay="100" class="spacerContainer">
-                <div class="section-title">
-                  <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
-                </div>
-                <div
-                  style="cursor: pointer; border:1px solid var(--bs-gray-300); width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; text-align: center;"
-                  onclick="cropImgModalOpen()" id="profileImgContainer"><span id="profileImg">이미지 로딩중...</span></div>
-                <i style="margin:10px; color:var(--accent-color); cursor: pointer; max-width:90px;"
-                  onclick="deleteImgModal()">이미지 삭제</i>
-                <hr>
-                <div class="info-grid" id="basicInfo">
-                  <div>이름</div>
-                  <div><span id="userName">로딩중...</span><i class="nameChangeBtn" onclick="changeNameModal()">변경</i>
-                  </div>
-                  <div>전화번호</div>
-                  <div id="nowMobile">로딩중...</div>
-                  <div>이메일</div>
-                  <div id="nowEmail">로딩중...</div>
-                  <div>가입일</div>
-                  <div id="regDate">로딩중...</div>
-                  <div>최근 로그인</div>
-                  <div id="lastLoginDate">로딩중...</div>
-                  <div>포인트</div>
-                  <div><span id="userPoint">0</span>포인트 · <i class="nameChangeBtn" onclick="purchasePoints()">충전하기</i>
-                  </div>
-                  <div id="accountDeleteDateTitle" style="color: var(--bs-red); font-size: 0.8em;"></div>
-                  <div id="accountDeleteDateBlock" style="color: var(--bs-red); font-size: 0.8em;"></div>
+      <!-- 기본 정보 -->
+      <section data-aos="fade-up" data-aos-delay="100" class="spacerContainer">
+        <div class="section-title">
+          <h2><i class="bi bi-person-circle section-icon"></i>기본 정보</h2>
+        </div>
+        <div style="cursor: pointer; border:1px solid var(--bs-gray-300); width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; text-align: center;" onclick="cropImgModalOpen()" id="profileImgContainer"><span id="profileImg">이미지 로딩중...</span></div>
+        <i style="margin:10px; color:var(--accent-color); cursor: pointer; max-width:90px;" onclick="deleteImgModal()">이미지 삭제</i><hr>
+        <div class="info-grid" id="basicInfo">
+          <div>이름</div><div><span id="userName">로딩중...</span><i class="nameChangeBtn" onclick="changeNameModal()">변경</i></div>
+          <div>전화번호</div><div id="nowMobile">로딩중...</div>
+          <div>이메일</div><div id="nowEmail">로딩중...</div>
+          <div>가입일</div><div id="regDate">로딩중...</div>
+          <div>최근 로그인</div><div id="lastLoginDate">로딩중...</div>
+          <div>포인트</div><div><span id="userPoint">0</span>포인트 · <i class="nameChangeBtn" onclick="purchasePoints()">충전하기</i></div>
+          <div id="accountDeleteDateTitle" style="color: var(--bs-red); font-size: 0.8em;"></div>
+          <div id="accountDeleteDateBlock" style="color: var(--bs-red); font-size: 0.8em;"></div>
 
-                  <c:if test="${sessionScope.account.isSocial == 'N'}">
-                    <hr>
-                    <hr>
-                    <h4 style="margin-top:7px;">카카오 연동 :</h4>
-                    <div class="btn-kakao" onclick="linkToKakaoBtn()">
-                      <img src="/resources/forKakao/kakao_login_medium_narrow.png" alt="kakao">
-                    </div>
-                  </c:if>
+          <c:if test="${sessionScope.account.isSocial == 'N'}">
+            <hr><hr>
+            <h4 style="margin-top:7px;">카카오 연동 :</h4>
+            <div class="btn-kakao" onclick="linkToKakaoBtn()">
+              <img src="/resources/forKakao/kakao_login_medium_narrow.png"
+                alt="kakao">
+            </div>
+          </c:if>
+          
+        </div>
 
-                </div>
-
-                <div class="spacer">
-                </div>
-
+        <div class="spacer">
+        </div>
                 <div class="edit-buttons">
                   <button class="btn-edit" onclick="openContactModal()"><i class="bi bi-pencil-square"></i> 연락처
                     수정</button>
