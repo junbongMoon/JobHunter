@@ -176,6 +176,7 @@ public class AdvancementController {
     	
         HttpSession session = request.getSession();
         AccountVO sessionAccount = AccountUtil.getAccount(session);
+        int uid = sessionAccount.getUid();
 
         try {
             AdvancementVO advancement = advancementService.getAdvancementById(advancementNo);
@@ -197,7 +198,7 @@ public class AdvancementController {
 
         } catch (Exception e) {
             logger.error("수정 페이지 로딩 실패", e);
-            return "redirect:/user/mypage";
+            return "redirect:/user/mypage/" + uid;
         }
     }
     
@@ -260,6 +261,8 @@ public class AdvancementController {
         HttpSession session = request.getSession();
         List<AdvancementUpFileVODTO> fileList =
                 (List<AdvancementUpFileVODTO>) session.getAttribute("newfileList");
+        AccountVO sessionAccount = AccountUtil.getAccount(session);
+        int uid = sessionAccount.getUid();
 
         if (fileList == null) fileList = new ArrayList<>();
 
@@ -269,11 +272,11 @@ public class AdvancementController {
 
             int advancementNo = advancementDTO.getAdvancementNo(); // ✅ 수정한 게시글 번호를 꺼낸다
 
-            return success ? "redirect:/advancement/detail?advancementNo=" + advancementNo : "/user/mypage";
+            return success ? "redirect:/advancement/detail?advancementNo=" + advancementNo : "redirect:/user/mypage/" + uid;
 
         } catch (Exception e) {
             logger.error("게시글 수정 실패", e);
-            return "/user/mypage";
+            return "redirect:/user/mypage/" + uid;
         }
     }
     
