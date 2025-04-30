@@ -135,6 +135,8 @@ public interface ResumeDAO {
 
 	ResumeAdviceDTO getAdvice(int resumeNo, int adviceNo) throws Exception;
 
+	int getRegistrationAdviceForMentorUid(int resumeNo, int adviceNo) throws Exception;
+
 	List<ResumeAdviceUpfileDTO> getAdviceFiles(int adviceNo) throws Exception;
 
 	/**
