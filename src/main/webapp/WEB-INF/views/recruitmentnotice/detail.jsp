@@ -137,7 +137,7 @@
                 },
                 error: function (xhr, status, error) {
                     console.error('삭제 실패:', error);
-                    alert('삭제에 실패했습니다.');
+                    showAlertModal('삭제에 실패했습니다.');
                 }
             });
         });
@@ -148,6 +148,12 @@
     modal.show();
 }
 
+function showAlertModal(message) {
+  $('#alertModalBody').text(message);
+  const modal = new bootstrap.Modal(document.getElementById('alertModal'));
+  modal.show();
+}
+
 function saveLike(userId, boardNo) {
     $.ajax({
         url: '/like/save',
@@ -155,14 +161,14 @@ function saveLike(userId, boardNo) {
         data: { userId: userId, boardNo: boardNo },
         success: function (res) {
             if (res) {
-                alert("좋아요 완료!");
+                showAlertModal("좋아요 완료!");
                 location.reload(); // 상태 갱신
             } else {
-                alert("이미 좋아요를 눌렀습니다.");
+                showAlertModal("이미 좋아요를 눌렀습니다.");
             }
         },
         error: function () {
-            alert("좋아요 처리 중 오류 발생!");
+            showAlertModal("좋아요 처리 중 오류 발생!");
         }
     });
 }
@@ -173,14 +179,14 @@ function deleteLike(userId, boardNo) {
         method: 'DELETE',
         success: function (res) {
             if (res) {
-                alert("좋아요 취소 완료!");
+                showAlertModal("좋아요 취소 완료!");
                 location.reload();
             } else {
-                alert("좋아요 취소 실패!");
+                showAlertModal("좋아요 취소 실패!");
             }
         },
         error: function () {
-            alert("좋아요 취소 중 오류 발생!");
+            showAlertModal("좋아요 취소 중 오류 발생!");
         }
     });
 }
@@ -198,7 +204,7 @@ function submitReport() {
   const reportTargetPK = '${RecruitmentDetailInfo.uid}';
 
   if (!category) {
-    alert("신고 사유를 선택해주세요.");
+    showAlertModal("신고 사유를 선택해주세요.");
     return;
   }
 
@@ -221,11 +227,11 @@ function submitReport() {
     contentType: 'application/json',
     data: JSON.stringify(reportData),
     success: function () {
-      alert("신고가 접수되었습니다.");
+		showAlertModal("신고가 접수되었습니다.");
       bootstrap.Modal.getInstance(document.getElementById('reportModal')).hide();
     },
     error: function (xhr) {
-      alert("신고 처리 중 오류가 발생했습니다: " + xhr.responseText);
+		showAlertModal("신고 처리 중 오류가 발생했습니다: " + xhr.responseText);
     }
   });
 }
@@ -971,6 +977,25 @@ button.btn-resume {
 				</div>
 
 			</div>
+
+						<!-- 공통 알림 모달 -->
+			<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+					<h5 class="modal-title" id="alertModalLabel">알림</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+					</div>
+					<div class="modal-body" id="alertModalBody">
+					<!-- 알림 내용 -->
+					</div>
+					<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+					</div>
+				</div>
+				</div>
+			</div>
+			
 		</div>
 		<!-- 풋터 -->
 		<jsp:include page="../footer.jsp"></jsp:include>

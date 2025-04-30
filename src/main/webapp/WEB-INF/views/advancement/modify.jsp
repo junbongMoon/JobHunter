@@ -40,7 +40,7 @@
                     }
                 },
                 error: function (err) {
-                    alert("파일 업로드 실패");
+                    showAlertModal("파일 업로드 실패");
                     console.error(err);
                 }
             });
@@ -57,11 +57,18 @@
                     $(`#file-\${index}`).remove();
                 },
                 error: function () {
-                    alert("파일 삭제 실패");
+                    showAlertModal("파일 삭제 실패");
                 }
             });
         });
     });
+
+    function showAlertModal(message) {
+  $('#alertModalBody').text(message);
+  const modal = new bootstrap.Modal(document.getElementById('alertModal'));
+  modal.show();
+}
+
 </script>
 
 <style>
@@ -162,6 +169,25 @@
     </form>
 </div>
 </div>
+
+<!-- 공통 알림 모달 -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="alertModalLabel">알림</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+        <div class="modal-body" id="alertModalBody">
+          <!-- 알림 내용 -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 </section>
 
 <jsp:include page="../footer.jsp"></jsp:include>
