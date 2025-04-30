@@ -178,20 +178,34 @@ public class RecruitmentFileProcess {
 	 *
 	 */
 	public void removeFile(RecruitmentnoticeBoardUpfiles removeFile) {
-		String newFilePath = this.realPath + (this.os.contains("windows")
-				? removeFile.getNewFileName().replace("/", "\\")
-				: removeFile.getNewFileName());
+	    String webPrefix = "/resources/recruitmentFiles";
 
-		File file = new File(newFilePath);
-		file.delete();
+	    String relativeMain = removeFile.getNewFileName().replace(webPrefix, "");
+	    String relativeThumb = removeFile.getThumbFileName().replace(webPrefix, "");
 
-		if (ImageMimeType.isImage(removeFile.getExt().toLowerCase())) {
-			String thumbPath = this.realPath + (this.os.contains("windows")
-					? removeFile.getThumbFileName().replace("/", "\\")
-					: removeFile.getThumbFileName());
-			new File(thumbPath).delete();
-		}
+	    String absoluteMain = this.realPath + (os.contains("windows") ? relativeMain.replace("/", "\\") : relativeMain);
+	    String absoluteThumb = this.realPath + (os.contains("windows") ? relativeThumb.replace("/", "\\") : relativeThumb);
+
+	    File mainFile = new File(absoluteMain);
+	    System.out.println("🔍 [삭제 시도] 메인 파일 경로: " + mainFile.getAbsolutePath());
+	    if (mainFile.exists()) {
+	        System.out.println("✅ 메인 파일 삭제 " + (mainFile.delete() ? "성공" : "실패"));
+	    } else {
+	        System.out.println("❌ 메인 파일이 존재하지 않습니다.");
+	    }
+
+	    if (ImageMimeType.isImage(removeFile.getExt())) {
+	        File thumbFile = new File(absoluteThumb);
+	        System.out.println("🔍 [삭제 시도] 썸네일 경로: " + thumbFile.getAbsolutePath());
+	        if (thumbFile.exists()) {
+	            System.out.println("✅ 썸네일 삭제 " + (thumbFile.delete() ? "성공" : "실패"));
+	        } else {
+	            System.out.println("❌ 썸네일이 존재하지 않습니다.");
+	        }
+	    }
 	}
+	
+
 
 	/**
 	 *  @author 문준봉

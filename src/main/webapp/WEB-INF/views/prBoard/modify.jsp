@@ -20,7 +20,7 @@ $(function(){
   $('form').on('submit', function (e) {
     const title = $('#title').val().trim();
     if (title === '') {
-      alert('제목을 입력해 주세요.');
+      showModal('제목을 입력해 주세요.');
       $('#title').focus();
       e.preventDefault();
       return;
@@ -31,6 +31,12 @@ $(function(){
     history.back();
   });
 });
+
+function showModal(message) {
+	$('#modalAlertMessage').text(message);
+	const alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
+	alertModal.show();
+	}
 </script>
 
 <style>
@@ -98,6 +104,24 @@ $(function(){
       </div>
     </form>
   </div>
+  <!-- 알림 모달 -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="alertModalLabel">알림</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+      </div>
+      <div class="modal-body" id="modalAlertMessage">
+        <!-- 자바스크립트로 내용 바뀜 -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </section>
 
 <jsp:include page="../footer.jsp"/>

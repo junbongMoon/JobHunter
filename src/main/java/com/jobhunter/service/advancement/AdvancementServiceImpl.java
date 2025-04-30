@@ -56,7 +56,8 @@ public class AdvancementServiceImpl implements AdvancementService {
 
 		return result;
 	}
-
+	
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public AdvancementVO getAdvancementById(int advancementNo) throws Exception {
 	    AdvancementVO advancement = advancementDAO.selectAdvancementByAdvancementNo(advancementNo);
@@ -74,7 +75,8 @@ public class AdvancementServiceImpl implements AdvancementService {
 
 	    return advancement;
 	}
-
+	
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public PageResponseDTO<AdvancementVO> getAdvancementListByUid(int uid, PageRequestDTO pageRequestDTO)
 			throws Exception {
@@ -189,7 +191,7 @@ public class AdvancementServiceImpl implements AdvancementService {
 		advancementDAO.setMentorRequestStatusToFail(requestNo, rejectMessage);
   }
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public boolean deleteAdvancementById(int advancementNo, String realPath) throws Exception {
 	    // 1. 첨부파일 목록 조회

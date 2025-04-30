@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.recruitmentnotice.Advantage;
@@ -41,6 +42,7 @@ import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 import com.jobhunter.model.util.FileStatus;
 import com.jobhunter.service.like.LikeService;
 import com.jobhunter.service.recruitmentnotice.RecruitmentNoticeService;
+import com.jobhunter.util.AccountUtil;
 import com.jobhunter.util.RecruitmentFileProcess;
 
 import lombok.RequiredArgsConstructor;
@@ -135,6 +137,7 @@ public class RecruitmentNoticeController {
 	 */
 	@GetMapping("/listAll")
 	public String showRecruitmentList(PageRequestDTO pageRequestDTO, Model model) {
+		
 		try {
 
 			PageResponseDTO<RecruitmentDetailInfo> pageResponseDTO;
@@ -285,24 +288,30 @@ public class RecruitmentNoticeController {
 	 * @return ResponseEntity<List<RecruitmentnoticeBoardUpfiles>>
 	 *
 	 */
-	@DeleteMapping("/file")
-	public ResponseEntity<List<RecruitmentnoticeBoardUpfiles>> removeFile(
-			@RequestParam("removeFileName") String removeFileName) {
+	@DeleteMapping("/file/{removeFileName:.+}")
+	public ResponseEntity<Void> removeFile(
+	        @PathVariable("removeFileName") String removeFileName,
+	        HttpServletRequest request) {
 
-		// 보안: 파일명 정규식 검사 (파일 경로 침입 방지)
-		if (!removeFileName.matches("^[a-zA-Z0-9_.-]+$")) {
-			return ResponseEntity.badRequest().body(fileList);
-		}
+	    System.out.println("삭제할 파일명 : " + removeFileName);
 
-		fileList.removeIf(file -> {
-			boolean match = file.getOriginalFileName().equals(removeFileName);
-			if (match) {
-				fp.removeFile(file);
-			}
-			return match;
-		});
+	    if (!removeFileName.matches("^[a-zA-Z0-9_.-]+$")) {
+	        return ResponseEntity.badRequest().build();
+	    }
 
-		return ResponseEntity.ok(fileList);
+	    String realPath = request.getSession().getServletContext().getRealPath("/");
+
+	    fileList.removeIf(file -> {
+	        System.out.println("file.originalFileName: [" + file.getOriginalFileName() + "]");
+	        System.out.println("removeFileName:       [" + removeFileName + "]");
+	        boolean match = file.getOriginalFileName().equals(removeFileName);
+	        if (match) {
+	            fp.removeFile(file);
+	        }
+	        return match;
+	    });
+
+	    return ResponseEntity.ok().build(); // 🔁 본문 없이 200 OK
 	}
 
 	/**
@@ -407,14 +416,16 @@ public class RecruitmentNoticeController {
 	@GetMapping(value = { "/detail", "/modify" })
 	public String showRecruitment(@RequestParam("uid") int uid, Model model, HttpServletRequest req) {
 		System.out.println(uid);
-
+		AccountVO sessionAccount = AccountUtil.getAccount(req);
 		String returnPage = "";
 
 		// 기존 리스트 초기화
+		
 		ListAllClear();
+		RecruitmentDetailInfo detailInfo = null;
 
 		try {
-			RecruitmentDetailInfo detailInfo = recruitmentService.getRecruitmentByUid(uid);
+			detailInfo = recruitmentService.getRecruitmentByUid(uid);
 
 			if (req.getRequestURI().contains("detail")) {
 				AccountVO loginUser = (AccountVO) req.getSession().getAttribute("account");
@@ -445,6 +456,8 @@ public class RecruitmentNoticeController {
 				this.fileList = detailInfo.getFileList();
 				this.modifyFileList = detailInfo.getFileList();
 				System.out.println(modifyFileList);
+				String modifyFileListJson = new ObjectMapper().writeValueAsString(this.modifyFileList);
+				model.addAttribute("modifyFileListJson", modifyFileListJson);
 			}
 
 			// 면접 방식
@@ -476,7 +489,11 @@ public class RecruitmentNoticeController {
 		if (req.getRequestURI().contains("detail")) {
 			returnPage = "recruitmentnotice/detail";
 		} else if (req.getRequestURI().contains("modify")) {
-			returnPage = "recruitmentnotice/modify";
+	        if (!AccountUtil.checkAuth(sessionAccount, detailInfo.getRefCompany(), AccountType.COMPANY)) {
+	        	returnPage = "recruitmentnotice/detail";
+	        }else {
+	        	returnPage = "recruitmentnotice/modify";
+	        }	
 		}
 
 		if (returnPage.equals("")) {
@@ -523,6 +540,7 @@ public class RecruitmentNoticeController {
 			List<RecruitmentnoticeBoardUpfiles> modifyFileList = new ArrayList<>();
 
 			if (modifyFileListJson != null && !modifyFileListJson.isEmpty()) {
+				System.out.println(modifyFileList);
 				modifyFileList = objectMapper.readValue(modifyFileListJson,
 						new TypeReference<List<RecruitmentnoticeBoardUpfiles>>() {
 						});
@@ -537,13 +555,22 @@ public class RecruitmentNoticeController {
 
 			// ❗ 삭제할 파일 목록 따로 수집
 			for (RecruitmentnoticeBoardUpfiles oldFile : existing.getFileList()) {
-				boolean stillExists = modifyFileList.stream()
-						.anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()));
+			    boolean fileDeleted = modifyFileList.stream()
+			        .anyMatch(newFile -> newFile.getOriginalFileName().equals(oldFile.getOriginalFileName()) && FileStatus.DELETE.equals(newFile.getStatus()));
 
-				if (!stillExists) {
-					deletedFiles.add(oldFile);
-				}
+			    if (fileDeleted) {
+			        deletedFiles.add(oldFile);
+			    }
 			}
+			
+			if (result) {
+
+			    for (RecruitmentnoticeBoardUpfiles file : deletedFiles) {
+			        fp.removeFile(file);
+			    }
+			}
+			
+			System.out.println(modifyFileList);
 
 			// DB만 수정
 			recruitmentService.modifyRecruitmentNotice(dto, advantages, applications, modifyFileList, existing, uid);
@@ -604,8 +631,16 @@ public class RecruitmentNoticeController {
 		ResponseEntity<Boolean> result = null;
 
 		try {
-			
+	        AccountVO sessionAccount = AccountUtil.getAccount(request);
+		
 			RecruitmentDetailInfo detailInfo = recruitmentService.getRecruitmentByUid(uid);
+			
+	        int writerUid = detailInfo.getRefCompany();
+
+	        // ✅ 권한 체크
+	        if (!AccountUtil.checkAuth(sessionAccount, writerUid, AccountType.COMPANY)) {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
+	        }
 			
 			if (recruitmentService.removeRecruitmentByUid(uid)) {
 				

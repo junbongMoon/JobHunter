@@ -1,5 +1,7 @@
 package com.jobhunter.controller.prboard;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,12 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.jobhunter.customexception.NeedAuthException;
+import com.jobhunter.model.account.AccountVO;
+import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.prboard.PRBoardDTO;
 import com.jobhunter.model.prboard.PRBoardVO;
 import com.jobhunter.model.util.TenToFivePageVO;
 import com.jobhunter.service.prboard.PRBoardService;
+import com.jobhunter.util.AccountUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -84,9 +90,14 @@ public class PRBoardController {
     
  // --- Controller ---
     @GetMapping("/modify")
-    public String showModifyPage(@RequestParam("prBoardNo") int prBoardNo, Model model) {
+    public String showModifyPage(@RequestParam("prBoardNo") int prBoardNo, Model model, HttpServletRequest request) {
         try {
             PRBoardVO board = prBoardService.getPRBoardDetail(prBoardNo);
+            
+            AccountVO sessionAccount = AccountUtil.getAccount(request);
+            if (!AccountUtil.checkAuth(sessionAccount, board.getUseruid(), AccountType.USER)) {
+                throw new NeedAuthException(); // ❗권한 없으면 예외 던짐
+            }
             model.addAttribute("prBoard", board);
             return "prBoard/modify";
         } catch (Exception e) {
@@ -110,8 +121,14 @@ public class PRBoardController {
     }
 
     @GetMapping("/remove")
-    public String handleRemove(@RequestParam("prBoardNo") int prBoardNo) {
+    public String handleRemove(@RequestParam("prBoardNo") int prBoardNo, HttpServletRequest request) {
         try {
+            PRBoardVO board = prBoardService.getPRBoardDetail(prBoardNo);
+            AccountVO sessionAccount = AccountUtil.getAccount(request);
+            if (!AccountUtil.checkAuth(sessionAccount, board.getUseruid(), AccountType.USER)) {
+                throw new NeedAuthException();
+            }
+
             prBoardService.deletePRBoard(prBoardNo);
         } catch (Exception e) {
             e.printStackTrace();

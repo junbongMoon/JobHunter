@@ -76,6 +76,7 @@ public class StatusServiceImpl implements StatusService {
 	 *
 	 */
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public StatusVODTO getTodayIncrement() {
 		LocalDate target = LocalDate.now().minusDays(1);
 		LocalDateTime start = target.atStartOfDay();
@@ -210,7 +211,7 @@ public class StatusServiceImpl implements StatusService {
 		return result;
 	}
 
-	
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	@Override
 	public FullStatus getFullStatusByMonth(String ym) throws Exception {
 	    LocalDateTime start = getStartOfMonth(ym);
