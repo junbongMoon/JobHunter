@@ -41,15 +41,6 @@
 	<!-- controller 패키지 안에 객체로  -->
 	<context:component-scan base-package="com.jobhunter.controller"></context:component-scan>
 	<context:component-scan base-package="com.jobhunter.interceptor"></context:component-scan>
-	
-	<!-- 계정타입(개인/기업) 검사하는 인터셉터(get요청용_rest방식등은 AccountRestController 참조) 
-		_쿼리스트링으로 [ ?accountType=company ] 처럼 accountType 붙여놓고 걸면 동작
-		[ &allowAdmin=true ] 추가로 붙이면 해당역할 아니라도 어드민도 볼수있는 페이지됩니다. -->
-		
-	<!-- !!개별 인터셉터로 분리에 따라 사용 자제!! -->
-	<beans:bean id="RoleCheckInterceptor"
-		class="com.jobhunter.interceptor.RoleCheckInterceptor">
-	</beans:bean>
 
 	<!-- 로그인 했는지 안했는지 검사하는 인터셉터 -->
 	<beans:bean id="authLoginInterceptor"
@@ -95,14 +86,6 @@
 	<!-- 멘토 or 어드민 확인 인터셉터 -->
 	<beans:bean id="MentorAndAdminRoleInterceptor"
 		class="com.jobhunter.interceptor.MentorAndAdminRoleInterceptor">
-	</beans:bean>
-
-	<!-- 본인확인 인터셉터_쿼리스트링으로 [ ?uid=101&accountType=company ] 처럼 uid랑 accountType 
-		붙여놓고 걸면 동작. accountType은 com.jobhunter.model.customenum.AccountType 참고(대소문자 
-		구분 없음) [ &allowAdmin=true ] 추가로 붙이면 본인 아니라도 어드민도 볼수있는 페이지됩니다 (get요청용_rest방식등은 
-		AccountRestController 참조) -->
-	<beans:bean id="OwnerInterceptor"
-		class="com.jobhunter.interceptor.OwnerInterceptor">
 	</beans:bean>
 
 	<!-- 자동로그인 인터셉터 -->
