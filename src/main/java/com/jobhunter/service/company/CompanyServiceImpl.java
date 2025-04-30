@@ -25,6 +25,8 @@ import com.jobhunter.model.company.BusinessRequestDTO;
 import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
+import com.jobhunter.model.user.ContactUpdateDTO;
+import com.jobhunter.model.user.PasswordDTO;
 import com.jobhunter.util.PropertiesTask;
 
 import lombok.RequiredArgsConstructor;
@@ -41,12 +43,12 @@ public class CompanyServiceImpl implements CompanyService {
 	}
 	
 	@Override
-	public CompanyVO showCompanyHome(String uid) throws Exception {
+	public CompanyVO showCompanyHome(int uid) throws Exception {
 		return dao.getCompanyInfo(uid);
 	}
 	
 	@Override
-	public boolean checkPassword(String uid, String password) throws Exception {
+	public boolean checkPassword(int uid, String password) throws Exception {
 		AccountVO account = dao.findByUidAndPassword(uid, password);
 		if (account == null) {
 			return false;
@@ -55,26 +57,14 @@ public class CompanyServiceImpl implements CompanyService {
 	}
 	
 	@Override
-	public void updatePassword(String uid, String password) throws Exception {
-	    dao.updatePassword(uid, password);
+	public void updatePassword(PasswordDTO dto) throws Exception {
+	    dao.updatePassword(dto);
 	}
 	
 	@Override
-	public String updateContact(String uid, String type, String value) throws Exception {
-	    Map<String, String> map = new HashMap<>();
-	    map.put("uid", uid);
-
-	    if ("email".equals(type)) {
-	        map.put("email", value);
-	        dao.updateEmail(map);
-	    } else if ("mobile".equals(type)) {
-	        map.put("mobile", value);
-	        dao.updateMobile(map);
-	    } else {
-	        throw new IllegalArgumentException("지원하지 않는 타입입니다.");
-	    }
-
-	    return value;
+	public String updateContact(ContactUpdateDTO dto) throws Exception {
+	    dao.updateContact(dto);
+	    return dto.getValue();
 	}
 	
 	@Override
@@ -130,17 +120,17 @@ public class CompanyServiceImpl implements CompanyService {
 	public 
 	AccountVO registCompany(CompanyRegisterDTO dto) throws Exception {
 		Integer uid = dao.registCompany(dto);
-		return dao.findByUidAndPassword(uid.toString(), dto.getPassword());
+		return dao.findByUidAndPassword(uid, dto.getPassword());
 	}
 	
 	@Override
-	public void deleteContact(String uid, String type) throws Exception {
-		if(type.equals("mobile")) {
-			if(dao.deleteMobile(uid) != 1) {
+	public void deleteContact(ContactUpdateDTO dto) throws Exception {
+		if(dto.getType().equals("mobile")) {
+			if(dao.deleteMobile(dto.getUid()) != 1) {
 				throw new Exception();
 			}
 		} else {
-			if(dao.deleteEmail(uid) != 1) {
+			if(dao.deleteEmail(dto.getUid()) != 1) {
 				throw new Exception();
 			}
 		}

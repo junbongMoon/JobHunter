@@ -1,24 +1,23 @@
 package com.jobhunter.dao.company;
 
 import java.sql.Timestamp;
-import java.util.Map;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.company.CompanyInfoDTO;
 import com.jobhunter.model.company.CompanyRegisterDTO;
 import com.jobhunter.model.company.CompanyVO;
+import com.jobhunter.model.user.ContactUpdateDTO;
+import com.jobhunter.model.user.PasswordDTO;
 
 public interface CompanyDAO {
 
-	CompanyVO getCompanyInfo(String uid) throws Exception;
+	CompanyVO getCompanyInfo(int uid) throws Exception;
 
-	AccountVO findByUidAndPassword(String uid, String password) throws Exception;
+	AccountVO findByUidAndPassword(int uid, String password) throws Exception;
 
-	void updatePassword(String uid, String newPassword) throws Exception;
-
-	void updateEmail(Map<String, String> paramMap) throws Exception;
-
-	void updateMobile(Map<String, String> paramMap) throws Exception;
+	void updatePassword(PasswordDTO dto) throws Exception;
+	
+	void updateContact(ContactUpdateDTO dto) throws Exception;
 
 	boolean findIsCompanyById(String companyId) throws Exception;
 
@@ -26,9 +25,9 @@ public interface CompanyDAO {
 
 	int updateCompanyInfo(CompanyInfoDTO companyInfo) throws Exception;
 
-	int deleteMobile(String uid) throws Exception;
+	int deleteMobile(Integer uid) throws Exception;
 
-	int deleteEmail(String uid) throws Exception;
+	int deleteEmail(Integer uid) throws Exception;
 	
 	void setDeleteAccount(Integer uid) throws Exception;
 

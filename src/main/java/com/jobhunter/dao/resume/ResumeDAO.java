@@ -1,6 +1,8 @@
 package com.jobhunter.dao.resume;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import com.jobhunter.model.resume.EducationDTO;
 import com.jobhunter.model.resume.JobFormDTO;
@@ -269,6 +271,16 @@ public interface ResumeDAO {
 	 */
 	List<ResumeAdviceCommentDTO> getAdviceComments(int adviceNo) throws Exception;
 
+	List<Integer> findOverdueRegistrationAdviceNos(int uid, Timestamp lastLoginDate) throws Exception;
 
+	void cancelRegistrationAdvice(int rgAdviceNo) throws Exception;
+
+	Integer findAdviceNoByRgAdviceNo(int rgAdviceNo) throws Exception;
+
+	List<ResumeUpfileDTO> findResumeUpfilesByAdviceNo(Integer adviceNo) throws Exception;
+
+	void deleteResumeAdviceByAdviceNo(Integer adviceNo) throws Exception;
+
+	void cancelPointLogAndRestoreUserPointByRgAdviceNo(int rgAdviceNo) throws Exception;
 
 }

@@ -1,5 +1,6 @@
 package com.jobhunter.dao.resume;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -431,5 +432,38 @@ public class ResumeDAOImpl implements ResumeDAO {
 	@Override
 	public List<ResumeAdviceCommentDTO> getAdviceComments(int adviceNo) throws Exception {
 		return ses.selectList(NS + ".getAdviceComments", adviceNo);
+	}
+	
+	@Override
+	public List<Integer> findOverdueRegistrationAdviceNos (int uid, Timestamp lastLoginDate) throws Exception {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("uid", uid);
+		param.put("lastLoginDate", lastLoginDate);
+		return ses.selectList(NS + ".findOverdueRegistrationAdviceNos");
+	}
+
+	@Override
+	public void cancelRegistrationAdvice(int rgAdviceNo) throws Exception {
+		ses.update(NS + ".cancelRegistrationAdvice", rgAdviceNo);
+	}
+
+	@Override
+	public Integer findAdviceNoByRgAdviceNo(int rgAdviceNo) throws Exception {
+		return ses.selectOne(NS + ".findAdviceNoByRgAdviceNo", rgAdviceNo);
+	}
+
+	@Override
+	public List<ResumeUpfileDTO> findResumeUpfilesByAdviceNo(Integer adviceNo) throws Exception {
+		return ses.selectList(NS + ".findResumeUpfilesByAdviceNo", adviceNo);
+	}
+
+	@Override
+	public void deleteResumeAdviceByAdviceNo(Integer adviceNo) throws Exception {
+		ses.delete(NS + ".deleteResumeAdviceByAdviceNo", adviceNo);
+	}
+
+	@Override
+	public void cancelPointLogAndRestoreUserPointByRgAdviceNo(int rgAdviceNo) throws Exception {
+		ses.update(NS + ".cancelPointLogAndRestoreUserPointByRgAdviceNo", rgAdviceNo);
 	}
 }

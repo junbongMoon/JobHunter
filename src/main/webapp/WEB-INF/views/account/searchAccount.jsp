@@ -606,7 +606,7 @@ async function sendPhoneCode() {
         	{
         		confirmText: "백도어",
         		cancelText: "취소",
-        		onConfirm: okMobile
+        		onConfirm: ()=>{okMobile("0000")}
         	});
     }
 	$('#modalOpenBtn').prop('disabled', false);
@@ -626,8 +626,9 @@ async function verifyPhoneCode() {
 	}
 
     try {
-		await confirmationResult.confirm(code);
-		okMobile();
+		const result = await confirmationResult.confirm(code);
+		const idToken = await result.user.getIdToken();
+		okMobile(idToken);
     } catch (error) {
 		window.publicModals.show(codeInput.defalt + codeInput.failed,
 			{
@@ -639,8 +640,26 @@ async function verifyPhoneCode() {
     }
 }
 
+function okMobile(idToken) {
+	$.ajax({
+		type: 'POST',
+		url: '/account/auth/mobile/verify',
+		contentType: 'application/json',
+		data: JSON.stringify({
+		confirmType: "searchIdMobile",
+		confirmToken: idToken
+		}),
+		success: function(res) {
+			okAuthMobile()
+		},
+		error: function(err) {
+			window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
+		}
+	});
+}
+
 // 인증성공
-function okMobile() {
+function okAuthMobile() {
 	const phoneInputs = document.querySelectorAll('#targetMobile input');
     const formattedNumber = formatPhoneNumber(phoneInputs[0], phoneInputs[1], phoneInputs[2]);
 	const selectedType = $('input[name="targetType"]:checked').val();
@@ -735,7 +754,8 @@ function verifyEmailCode() {
 		method: "POST",
 		contentType: "application/json",
 		data: JSON.stringify({
-		email: email
+		email: email,
+        confirmType: "searchIdEmail"
 		}),
 		success: () => okEmail(),
 		error: (xhr) => {

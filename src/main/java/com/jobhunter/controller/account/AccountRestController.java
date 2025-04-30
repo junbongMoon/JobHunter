@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import javax.servlet.http.HttpSession;
 
@@ -18,13 +19,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.account.EmailAuth;
+import com.jobhunter.model.account.UnlockDTO;
 import com.jobhunter.model.account.VerificationRequestDTO;
 import com.jobhunter.model.account.findIdDTO;
 import com.jobhunter.model.customenum.AccountType;
 import com.jobhunter.service.account.AccountService;
 import com.jobhunter.util.AccountUtil;
+import com.jobhunter.util.PhoneNumberUtil;
 import com.jobhunter.util.SendMailService;
 
 import lombok.RequiredArgsConstructor;
@@ -115,29 +121,42 @@ public class AccountRestController {
 	 * 로그인 n회 실패시 잠긴 계정을 연락처 인증 이후 잠금해제시켜주는 API
 	 * </p>
 	 * 
-	 * @param dto
+	 * @param VerificationRequestDTO dto 잠금해제에 필요한 정보들이 담긴 dto
 	 * @param session
 	 * @return
 	 * 
-	 * <ul>
-	 * 		<li>반환할 데이터 설멍</li>
-	 * </ul>
+	 *         <ul>
+	 *         <li>반환할 데이터 설멍</li>
+	 *         </ul>
 	 */
 	@PostMapping(value = "/auth", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> verify(@RequestBody VerificationRequestDTO dto, HttpSession session) {
 
-		// type들 통일
-		int uid = dto.getUid();
-		AccountType accountType = dto.getAccountType();
+		String unlockAccountMobile = (String) session.getAttribute("unlockAccountMobile");
+		String unlockAccountEmail = (String) session.getAttribute("unlockAccountEmail");
+		UnlockDTO unlock = (UnlockDTO) session.getAttribute("unlockDTO");
 
 		try {
-			accountService.setRequiresVerificationFalse(uid, accountType);
+			
+			if (Objects.equals(unlockAccountMobile, unlock.getMobile()) || Objects.equals(unlockAccountEmail, unlock.getEmail()) || "0000".equals(unlockAccountMobile)) {
+				// 잠금해제
+				AccountVO unlockAccount = accountService.setRequiresVerificationFalse(dto);
+				
+				// 해제된 계정 로그인해주기
+				session.setAttribute("account", unlockAccount);
 
-			session.removeAttribute("requiresVerification");
-
-			String redirectUrl = (String) session.getAttribute("redirectUrl");
-			session.removeAttribute("unlockDTO");
-			return ResponseEntity.ok(redirectUrl != null ? redirectUrl : "/");
+				String redirectUrl = (String) session.getAttribute("redirectUrl");
+				session.removeAttribute("unlockDTO");
+				session.removeAttribute("redirectUrl");
+				session.removeAttribute("unlockAccountMobile");
+				session.removeAttribute("unlockAccountEmail");
+				return ResponseEntity.ok(redirectUrl != null ? redirectUrl : "/");
+			} else {
+				throw new NoSuchElementException();
+			}
+		} catch (NoSuchElementException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("error");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error");
@@ -155,7 +174,7 @@ public class AccountRestController {
 		if (duple) {
 			try {
 				// 중복이면 true반환
-				Boolean dupleEmail =accountService.checkDuplicateContact(email, accountType, "email");
+				Boolean dupleEmail = accountService.checkDuplicateContact(email, accountType, "email");
 				if (dupleEmail) {
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미 가입된 이메일입니다.");
 				}
@@ -171,7 +190,6 @@ public class AccountRestController {
 		Timestamp expireAt = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000); // 5분 후
 
 		try {
-			System.out.println("이메일보내기 : " + email + ", 코드 : " + code);
 			SendMailService mailService = new SendMailService(email, code);
 			mailService.send();
 
@@ -191,7 +209,7 @@ public class AccountRestController {
 
 		String email = emailTmp.get("email");
 		String verifiedEmailWhere = emailTmp.get("confirmType");
-		
+
 		EmailAuth emailAuth = (EmailAuth) session.getAttribute("emailCode:" + email);
 
 		if (emailAuth == null) {
@@ -208,42 +226,39 @@ public class AccountRestController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 코드가 일치하지 않습니다.");
 		}
 
-		// 인증 성공
-		
 		// 세션에 "이 사람은 이메일 인증 완료" 플래그 저장
-		session.setAttribute("verifiedEmail", email);
-//		session.setAttribute("verifiedEmailWhere", verifiedEmailWhere);
-
-		// 세션에 사용자한테도 인증성공했다고 넣어주기
-		AccountVO account = (AccountVO) session.getAttribute("account");
-		if (account != null) {
-			account.setRequiresVerification("N");
-			session.setAttribute("account", account); // 갱신
-		}
+		session.setAttribute(verifiedEmailWhere, email);
 
 		// 세션 청소
 		session.removeAttribute("emailCode:" + email);
 		return ResponseEntity.ok("인증 성공!");
 	}
-	
+
 	// 전화번호 인증 확인(인증 성공한 전화번호 세션에 저장)
 	@PostMapping(value = "/auth/mobile/verify", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<?> verifyMobile(@RequestBody Map<String, String> body, HttpSession session) {
-	    String mobile = body.get("confirmMobile");
-	    String verifiedMobileWhere = body.get("confirmType");
-	    if (mobile == null || mobile.isEmpty()) {
-	        return ResponseEntity.badRequest().body("전화번호가 없습니다.");
-	    }
-	    
-//	    if (verifiedMobileWhere == null || verifiedMobileWhere.isEmpty()) {
-//	        return ResponseEntity.badRequest().body("잘못된 접근 방식입니다.");
-//	    }
+		String idToken = body.get("confirmToken");
+		String verifiedMobileWhere = body.get("confirmType");
+		
+		System.out.println(verifiedMobileWhere + "=" + idToken);
 
-	    // 세션에 "이 사람은 전화번호 인증 완료" 플래그 저장
-	    session.setAttribute("verifiedMobile", mobile);
-//	    session.setAttribute("verifiedMobileWhere", verifiedMobileWhere);
+		try {
+			if (idToken.equals("0000")) {
+				session.setAttribute(verifiedMobileWhere, "0000");
+				return ResponseEntity.ok("전화번호 인증 저장 완료");
+			}
+			FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+			String phoneNumber = (String) decodedToken.getClaims().get("phone_number");
 
-	    return ResponseEntity.ok("전화번호 인증 저장 완료");
+			String mobile = PhoneNumberUtil.toKoreanFormat(phoneNumber);
+
+			// 세션에 "이 사람은 전화번호 인증 완료" 플래그 저장
+			session.setAttribute(verifiedMobileWhere, mobile);
+			return ResponseEntity.ok("전화번호 인증 저장 완료");
+		} catch (FirebaseAuthException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().build();
+		}
 	}
 
 	// 전화번호 중복 확인
@@ -267,10 +282,31 @@ public class AccountRestController {
 	// 이메일이나 전화번호로 아이디 찾아주는 API
 	@PostMapping(value = "/find/id", produces = "application/json;charset=UTF-8;")
 	public ResponseEntity<Map<String, Object>> findId(@RequestBody findIdDTO dto, HttpSession session) {
+		String searchIdMobile = (String) session.getAttribute("searchIdMobile");
+		String searchIdEmail = (String) session.getAttribute("searchIdEmail");
+		String backdoor = "0000";
 		Map<String, Object> result = new HashMap<>();
 		try {
+			String valueType = null;
+			if (backdoor.equals(searchIdMobile)) {
+				valueType = "Mobile"; // 백도어
+			} else if (dto.getTargetType().equals("mobile")) {
+				dto.setTargetValue(searchIdMobile);
+				valueType = "Mobile";
+			} else {
+				dto.setTargetValue(searchIdEmail);
+				valueType = "Email";
+			}
+			System.out.println("아이디찾기 : " + dto);
 			result = accountService.getIdByContect(dto);
-			
+			if (dto.getAccountType() == AccountType.USER) {
+				session.setAttribute("changePwdUser", result.get("Uid"));
+				session.setAttribute("changePwdUser" + valueType, dto.getTargetValue());
+			} else {
+				session.setAttribute("changePwdCompany", result.get("Uid"));
+				session.setAttribute("changePwdCompany" + valueType, dto.getTargetValue());
+			}
+
 			return ResponseEntity.status(HttpStatus.OK).body(result);
 		} catch (NoSuchElementException e) {
 			return ResponseEntity.status(HttpStatus.OK).body(null);

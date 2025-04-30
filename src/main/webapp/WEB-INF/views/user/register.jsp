@@ -474,7 +474,7 @@ mark {
 			<input type="hidden" id="email" name="email">
 			<input type="hidden" id="authMobile">
 			<input type="hidden" id="mobile" name="mobile">
-			<mark class="info-defalt"> * 이메일 혹은 전화번호중 최소 하나 이상 인증을 진행해주시기 바랍니다.</mark>
+			<br><mark class="info-defalt"> * 이메일 혹은 전화번호중 최소 하나 이상 인증을 진행해주시기 바랍니다.</mark>
 		</div>
 
 		<hr>
@@ -494,6 +494,37 @@ mark {
 </main>
 
 <script>
+// #region 포메팅 함수
+// 전화번호 입력 처리 함수
+function handlePhoneInput(input, nextInput) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+    if (input.value.length >= 3 && nextInput) {
+      	nextInput.focus();
+    }
+}
+// 전화번호 포맷팅 함수
+function formatPhoneNumber(input1, input2, input3) {
+    const num1 = input1.value;
+    const num2 = input2.value;
+    const num3 = input3.value;
+    
+    if (num1.length === 3 && num2.length === 4 && num3.length === 4) {
+      	return `\${num1}-\${num2}-\${num3}`;
+    }
+    return null;
+}
+//국제번호로 변환 (Firebase 용)
+function formatPhoneNumberForFirebase(koreanNumber) {
+  const cleaned = koreanNumber.replace(/-/g, '');
+  return cleaned.startsWith('0') ? '+82' + cleaned.substring(1) : cleaned;
+}
+// 국제번호를 한국 형식으로 되돌림 (서버 전송용)
+function formatToKoreanPhoneNumber(internationalNumber) {
+  return internationalNumber.startsWith("+82")
+    ? internationalNumber.replace("+82", "0").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
+    : internationalNumber;
+}
+// #endregion
 // #region 카톡
 Kakao.init('b50a2700ff109d1ab2de2eca4e07fa23');
 Kakao.isInitialized();
@@ -544,6 +575,7 @@ function firebaseCaptcha() {
     }
 }
 // #endregion 파이어베이스
+// #region 인증관련
 function checkDuplicateId() {
 	$('#checkDuplicateIdBtn').prop('disabled', true);
     const userId = $("#id").val();
@@ -599,11 +631,10 @@ async function sendPhoneCode() {
         	{
         		confirmText: "백도어",
         		cancelText: "취소",
-        		onConfirm: okMobile
+        		onConfirm: () => {okMobile("0000")}
         	});
     }
 }
-
 async function checkDuplicateMobile(formattedNumber) {
   try {
     const res = await fetch('/account/check/mobile', {
@@ -631,37 +662,46 @@ async function checkDuplicateMobile(formattedNumber) {
     return true; // 서버 에러
   }
 }
-// 전화번호 입력 처리 함수
-function handlePhoneInput(input, nextInput) {
-    input.value = input.value.replace(/[^0-9]/g, '');
-    if (input.value.length >= 3 && nextInput) {
-      	nextInput.focus();
+async function verifyPhoneCode() {
+	const code = document.getElementById("confirmCode").value;
+
+	if (code.length != 6) {
+		window.publicModals.show(codeInput.defalt + codeInput.failed,
+			{
+				confirmText: '인증완료',
+				cancelText: '취소',
+				onConfirm: verifyPhoneCode
+    		});
+		return true;
+	}
+
+    try {
+	  const result = await confirmationResult.confirm(code);
+      const idToken = await result.user.getIdToken();
+      okMobile(idToken);
+    } catch (error) {
+      window.publicModals.show("잘못된 인증 코드입니다.");
     }
 }
-// 전화번호 포맷팅 함수
-function formatPhoneNumber(input1, input2, input3) {
-    const num1 = input1.value;
-    const num2 = input2.value;
-    const num3 = input3.value;
-    
-    if (num1.length === 3 && num2.length === 4 && num3.length === 4) {
-      	return `\${num1}-\${num2}-\${num3}`;
-    }
-    return null;
+function okMobile(idToken) {
+	const mobile = $("#authMobile").val()
+	$.ajax({
+      type: 'POST',
+      url: '/account/auth/mobile/verify',
+      contentType: 'application/json',
+      data: JSON.stringify({
+		confirmType: "registUserMobile",
+		confirmToken: idToken
+      }),
+      success: function(res) {
+        $("#mobile").val(mobile)
+		$("#mobileInfoMark").text(`인증에 성공하였습니다. (현재 전화번호 : \${mobile})`).removeClass().addClass("info-ok");
+      },
+      error: function(err) {
+        $("#mobileInfoMark").text(`서버가 불안정합니다. 잠시 후 다시 시도해 주세요.`).removeClass().addClass("info-warning");
+      }
+    });
 }
-//국제번호로 변환 (Firebase 용)
-function formatPhoneNumberForFirebase(koreanNumber) {
-  const cleaned = koreanNumber.replace(/-/g, '');
-  return cleaned.startsWith('0') ? '+82' + cleaned.substring(1) : cleaned;
-}
-// 국제번호를 한국 형식으로 되돌림 (서버 전송용)
-function formatToKoreanPhoneNumber(internationalNumber) {
-  return internationalNumber.startsWith("+82")
-    ? internationalNumber.replace("+82", "0").replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3")
-    : internationalNumber;
-}
-
-
 
 // 이메일 인증 코드 전송
 function sendEmailCode() {
@@ -693,48 +733,6 @@ function sendEmailCode() {
 		}
     });
 }
-
-function okMobile() {
-	const mobile = $("#authMobile").val()
-	$.ajax({
-      type: 'POST',
-      url: '/account/auth/mobile/verify',
-      contentType: 'application/json',
-      data: JSON.stringify({
-        confirmMobile: mobile,
-		confirmType: "registUser"
-      }),
-      success: function(res) {
-        $("#mobile").val(mobile)
-		$("#mobileInfoMark").text(`인증에 성공하였습니다. (현재 전화번호 : \${mobile})`).removeClass().addClass("info-ok");
-      },
-      error: function(err) {
-        $("#mobileInfoMark").text(`서버가 불안정합니다. 잠시 후 다시 시도해 주세요.`).removeClass().addClass("info-warning");
-      }
-    });
-}
-
-async function verifyPhoneCode() {
-	const code = document.getElementById("confirmCode").value;
-
-	if (code.length != 6) {
-		window.publicModals.show(codeInput.defalt + codeInput.failed,
-			{
-				confirmText: '인증완료',
-				cancelText: '취소',
-				onConfirm: verifyPhoneCode
-    		});
-		return true;
-	}
-
-    try {
-      await confirmationResult.confirm(code);
-      okMobile();
-    } catch (error) {
-      window.publicModals.show("잘못된 인증 코드입니다.");
-    }
-}
-
 function verifyEmailCode() {
 	const code = $("#confirmCode").val();
     const email = $("#unCheckedEmail").val();
@@ -756,7 +754,7 @@ function verifyEmailCode() {
 		contentType: "application/json",
 		data: JSON.stringify({
 		email: email,
-		confirmType: "registUser"
+		confirmType: "registUserEmail"
 		}),
 		success: () => okEmail(),
 		error: (xhr) => {
@@ -766,15 +764,14 @@ function verifyEmailCode() {
 		}
     });
 }
-
 function okEmail() {
 	$('#sendEmailBtn').prop('disabled', false);
 	const email = $("#unCheckedEmail").val()
 	$("#email").val(email)
 	$("#emailInfoMark").text(`인증에 성공하였습니다. (현재 이메일 : \${email})`).removeClass().addClass("info-ok");
 }
-// 인증관련
-// message ok next warning
+// #endregion 인증관련
+
 // ==유효성검사==
 
 function confirmAll() {

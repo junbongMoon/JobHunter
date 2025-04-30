@@ -21,9 +21,9 @@ public class UserLoginDAOImpl implements AccountLoginDAO {
 	private final String NS = "com.jobhunter.mapper.usermapper";
 
 	@Override
-	public void setRequiresVerificationFalse(int uid) throws Exception {
+	public int setRequiresVerificationFalse(int uid) throws Exception {
 		// 맵에서 타입(이메일, 전화번호)이랑 값 받아와서 인증필요여부 해제
-		ses.update(NS + ".setVerificationFalse", uid);
+		return ses.update(NS + ".setVerificationFalse", uid);
 	}
 
 	@Override

@@ -367,7 +367,7 @@ async function sendMobileCode() {
     	});
     } catch (error) {
         window.publicModals.show("인증번호 전송중 오류가 발생했습니다. fireBase http이슈 혹은 사용횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.", {
-			onConfirm: okAuth,
+			onConfirm: ()=>{okMobile("0000")},
 			confirmText: "백도어",
 			cancelText: "취소"
 		});
@@ -415,12 +415,31 @@ async function verifyPhoneCode() {
 	}
 
     try {
-      await confirmationResult.confirm(code);
-      okAuth();
-    } catch (error) {
+		const result = await confirmationResult.confirm(code);
+		const idToken = await result.user.getIdToken();
+		okMobile(idToken)
+	} catch (error) {
       console.error("코드 인증 실패:", error);
       window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.");
     }
+}
+
+function okMobile(idToken) {
+	$.ajax({
+		type: 'POST',
+		url: '/account/auth/mobile/verify',
+		contentType: 'application/json',
+		data: JSON.stringify({
+		confirmType: "unlockAccountMobile",
+		confirmToken: idToken
+		}),
+		success: function(res) {
+			okAuth()
+		},
+		error: function(err) {
+			window.publicModals.show("인증에 실패하였습니다. 잠시 후 다시 시도해주세요.")
+		}
+	});
 }
 
 function verifyEmailCode() {
@@ -442,7 +461,8 @@ function verifyEmailCode() {
 		method: "POST",
 		contentType: "application/json",
 		data: JSON.stringify({
-		email: targetEmail
+		email: targetEmail,
+        confirmType: "unlockAccountEmail"
 		}),
 		success: () => {okAuth()},
 		error: (xhr) => {
@@ -464,10 +484,14 @@ function okAuth() {
 			window.publicModals.show("인증에 성공하였습니다.",
 			{
 				confirmText: '확인',
-				onConfirm: (()=>{location.href = "/account/login";})
+				onConfirm: (()=>{
+					console.log(res);
+					location.href = "/account/login";
+				})
             });
         },
         error: (xhr) => {
+			console.log(xhr.status);
 			window.publicModals.show("인증중 문제가 발생하였습니다. 잠시 후 새로고침 뒤 다시 시도해주세요.")
 		}
     });
