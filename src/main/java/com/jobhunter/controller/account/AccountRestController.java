@@ -121,7 +121,7 @@ public class AccountRestController {
 	 * 로그인 n회 실패시 잠긴 계정을 연락처 인증 이후 잠금해제시켜주는 API
 	 * </p>
 	 * 
-	 * @param dto
+	 * @param VerificationRequestDTO dto 잠금해제에 필요한 정보들이 담긴 dto
 	 * @param session
 	 * @return
 	 * 
@@ -135,25 +135,28 @@ public class AccountRestController {
 		String unlockAccountMobile = (String) session.getAttribute("unlockAccountMobile");
 		String unlockAccountEmail = (String) session.getAttribute("unlockAccountEmail");
 		UnlockDTO unlock = (UnlockDTO) session.getAttribute("unlockDTO");
-		String backdoor = "0000";
 
 		try {
 			
-			if (Objects.equals(unlockAccountMobile, unlock.getMobile()) || Objects.equals(unlockAccountEmail, unlock.getEmail()) || backdoor.equals(unlockAccountMobile)) {
-				// type들 통일
-				int uid = dto.getUid();
-				AccountType accountType = dto.getAccountType();
-
-				accountService.setRequiresVerificationFalse(uid, accountType);
-
-				session.removeAttribute("requiresVerification");
+			if (Objects.equals(unlockAccountMobile, unlock.getMobile()) || Objects.equals(unlockAccountEmail, unlock.getEmail()) || "0000".equals(unlockAccountMobile)) {
+				// 잠금해제
+				AccountVO unlockAccount = accountService.setRequiresVerificationFalse(dto);
+				
+				// 해제된 계정 로그인해주기
+				session.setAttribute("account", unlockAccount);
 
 				String redirectUrl = (String) session.getAttribute("redirectUrl");
 				session.removeAttribute("unlockDTO");
+				session.removeAttribute("redirectUrl");
+				session.removeAttribute("unlockAccountMobile");
+				session.removeAttribute("unlockAccountEmail");
 				return ResponseEntity.ok(redirectUrl != null ? redirectUrl : "/");
 			} else {
 				throw new NoSuchElementException();
 			}
+		} catch (NoSuchElementException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("error");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error");

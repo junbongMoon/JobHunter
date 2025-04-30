@@ -18,7 +18,7 @@ public interface AccountLoginDAO {
 
 	void resetFailCount(String accountId) throws Exception;
 	
-	void setRequiresVerificationFalse(int uid) throws Exception;
+	int setRequiresVerificationFalse(int uid) throws Exception;
 
 	Boolean existsAccountId(String accountId) throws Exception;
 

@@ -30,7 +30,12 @@ public class AccountController {
 	private final AccountService accountService;
 
 	@GetMapping("/unlock")
-	public void unlock() {}
+	public String unlock(HttpSession session) {
+		if (session.getAttribute("unlockDTO") == null) {
+			return "/account/login";
+		}
+		return "/account/unlock";
+	}
 
 	// 인터셉터 없이 로그인버튼 눌러서 들어오는곳
 	@GetMapping("/login/return")

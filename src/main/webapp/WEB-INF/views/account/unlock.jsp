@@ -484,10 +484,14 @@ function okAuth() {
 			window.publicModals.show("인증에 성공하였습니다.",
 			{
 				confirmText: '확인',
-				onConfirm: (()=>{location.href = "/account/login";})
+				onConfirm: (()=>{
+					console.log(res);
+					location.href = "/account/login";
+				})
             });
         },
         error: (xhr) => {
+			console.log(xhr.status);
 			window.publicModals.show("인증중 문제가 발생하였습니다. 잠시 후 새로고침 뒤 다시 시도해주세요.")
 		}
     });
