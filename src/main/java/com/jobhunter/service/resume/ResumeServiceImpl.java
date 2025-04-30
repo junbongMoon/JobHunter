@@ -46,7 +46,7 @@ public class ResumeServiceImpl implements ResumeService {
 	private final UserDAO userDAO;
 
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public void finalSaveResume(ResumeDTO resumeDTO) throws Exception {
 		rdao.insertResumeFinal(resumeDTO);
 		saveJobForms(resumeDTO);
@@ -60,7 +60,7 @@ public class ResumeServiceImpl implements ResumeService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public void updateResume(ResumeDTO resumeDTO) throws Exception {
 		rdao.deleteJobForms(resumeDTO.getResumeNo());
 		rdao.deleteMerits(resumeDTO.getResumeNo());
@@ -183,6 +183,7 @@ public class ResumeServiceImpl implements ResumeService {
 
 	// 이력서 리스트 조회
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public List<ResumeVO> getResumeList(int userUid, int page, int pageSize, String searchTitle) throws Exception {
 		List<ResumeVO> resumeList = rdao.selectResumeList(userUid, page, pageSize, searchTitle);
 
@@ -229,6 +230,7 @@ public class ResumeServiceImpl implements ResumeService {
 
 	// 이력서 수정을 위한 해당 이력서 정보 조회
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public ResumeDetailDTO getResumeDetailWithAll(int resumeNo) throws Exception {
 		ResumeDetailDTO resumeDetail = new ResumeDetailDTO();
 		resumeDetail.setResume(rdao.selectResumeDetail(resumeNo));
@@ -324,6 +326,7 @@ public class ResumeServiceImpl implements ResumeService {
 
 	
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public TenToFivePageVO<RegistrationAdviceVO> selectRegistrationAdviceByMentorWithPaging(MyRegistrationAdviceSearchDTO dto) {
 		List<RegistrationAdviceVO> vo = rdao.selectRegistrationAdviceByMentorWithPaging(dto);
 		int totalCnt = rdao.countRegistrationAdviceByMentor(dto);
@@ -332,6 +335,7 @@ public class ResumeServiceImpl implements ResumeService {
 	}
 	
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public TenToFivePageVO<ResumeAdviceVO> selectResumeAdviceByUserUid(int uid, int page) {
 		int offset = (page - 1) * 5;
 		List<ResumeAdviceVO> vo = rdao.selectResumeAdviceByUserUid(uid, offset);
