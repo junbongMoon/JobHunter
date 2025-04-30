@@ -785,22 +785,32 @@ $(document).ready(function () {
     }
 
     $.ajax({
-      url: '/reply/add',
-      type: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({
-        boardNo: boardNo,
-        content: content
-      }),
-      success: function () {
-        $('#replyContent').val('');
-        loadReplies(1); // 첫 페이지로 갱신
-      },
-      error: function () {
-        alert('댓글 등록 중 오류가 발생했습니다.');
-      }
+        url: '/reply/add',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          boardNo: boardNo,
+          content: content
+        }),
+        success: function () {
+          $('#replyContent').val('');
+          loadReplies(1); // 첫 페이지로 갱신
+        },
+        error: function (xhr, status, error) {
+          console.log("xhr.status:", xhr.status);
+          console.log("error:", error);
+
+          if (xhr.status === 401) {
+            alert('로그인이 필요합니다.');
+            setTimeout(function () {
+              window.location.href = '/account/login';
+            }, 300);
+          } else {
+            alert('댓글 등록 중 오류가 발생했습니다.');
+          }
+        }
+      });
     });
-  });
 
   // 댓글 삭제
   $(document).on('click', '.delete-reply-btn', function () {
