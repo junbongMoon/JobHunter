@@ -126,6 +126,7 @@ public class AccountUtil {
 	//				)
 	// => uid 1번인 개인회원, 23인 개인회원, 4인 기업회원, 1인 기업회원 4명이 들어갈 수 있는 페이지
 	public static boolean checkAuth(List<AccountType> allowTypes, AccountVO sessionAccount, Object... conditions) {
+		System.out.println(sessionAccount.getUid() + ":" + sessionAccount.getAccountType());
 		if (sessionAccount == null) {
 			return false;
 		}
@@ -151,9 +152,6 @@ public class AccountUtil {
 	    for (int i = 0; i < conditions.length; i += 2) {
 	        Object uidObj = conditions[i];
 	        Object typeObj = conditions[i + 1];
-	    	System.out.println("??????????????");
-	    	System.out.println("uidObj : " + uidObj.getClass());
-	    	System.out.println("typeObj : " + typeObj.getClass());
 
 	        if (!(uidObj instanceof Integer) || !(typeObj instanceof AccountType)) {
 	        	System.out.println("AccountUtil.checkAuth조건은 (Integer uid, AccountType type) 쌍이어야 합니다.");

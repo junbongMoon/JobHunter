@@ -42,9 +42,8 @@
 
 	<update id="setLastLoginDate">
 		UPDATE users
-		SET lastLoginDate = NOW()
-		where uid =
-		#{uid}
+		SET lastLoginDate = NOW(), loginCnt = 0
+		where uid = #{uid}
 	</update>
 
 	<update id="setAutoLogin">

@@ -1485,6 +1485,7 @@ function confirmModify() {
 // #endregion
 
 function showCodeModal(confirmFunc, isfailed) {
+	console.log(confirmFunc)
   let modalText = `<input type="text" id="verifiCode" placeholder="인증번호를 입력하세요" style="min-width: 300px;">`
 
   if (isfailed) {
@@ -1871,8 +1872,9 @@ async function verifiToNewMobile() {
 
   firebaseCaptcha();
   try {
+	  console.log(phoneNumber)
     confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-    showCodeModal(changeMobile());
+    showCodeModal(changeMobile);
   } catch (error) {
     window.publicModals.show("인증번호 전송중 오류가 발생했습니다. fireBase 사용횟수 초과등의 가능성이 있으니 강제진행을 원하신다면 백도어 버튼을 눌러주세요.", {
     onConfirm: () => {
@@ -1885,6 +1887,7 @@ async function verifiToNewMobile() {
   }
 }
 
+console.log("?");
 async function changeMobile() {
   const code = $('#verifiCode').val()
 

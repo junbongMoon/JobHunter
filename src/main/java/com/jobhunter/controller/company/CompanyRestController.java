@@ -118,7 +118,7 @@ public class CompanyRestController {
 			@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
 			AccountVO vo = AccountUtil.getAccount(session);
-			if (uid == null || AccountUtil.checkAuth(vo, uid, AccountType.COMPANY)) {
+			if (uid == null || !AccountUtil.checkAuth(vo, uid, AccountType.COMPANY)) {
 				throw new NeedAuthException();
 			}
 

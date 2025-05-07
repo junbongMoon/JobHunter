@@ -88,29 +88,40 @@
 		resultMap="RecruitmentDetailMap">
 		SELECT
 		r.*, c.companyName, c.addr AS companyAddr,
-		rg.regionNo, rg.name AS regionName, rg.code,
-		sg.sigunguNo, sg.name AS sigunguName, sg.regionNo,
+		rg.regionNo, rg.name
+		AS regionName, rg.code,
+		sg.sigunguNo, sg.name AS sigunguName,
+		sg.regionNo,
 		mj.majorcategoryNo
 		AS majorNo, mj.jobName AS majorJobName,
 		sj.subcategoryNo AS subNo,
-		sj.jobName AS subJobName, sj.refMajorcategoryNo
+		sj.jobName AS subJobName,
+		sj.refMajorcategoryNo
 		FROM recruitmentnotice
 		r
-		LEFT JOIN where_recruit_region rr ON r.uid = rr.refRecNo
 		LEFT JOIN
-		region rg ON rr.refRegion = rg.regionNo
+		where_recruit_region rr ON r.uid = rr.refRecNo
+		LEFT JOIN
+		region rg ON
+		rr.refRegion = rg.regionNo
 		LEFT JOIN where_recruit_sigungu
-		rs ON r.uid = rs.refRecNo
+		rs ON r.uid =
+		rs.refRecNo
 		LEFT JOIN sigungu sg ON rs.refSigungu =
 		sg.sigunguNo
-		LEFT JOIN jobtype_recruit_major rm ON r.uid = rm.refRecNo
-		LEFT JOIN majorcategory mj ON rm.refMajorNo = mj.majorcategoryNo
 		LEFT
-		JOIN jobtype_recruit_sub rsb ON r.uid = rsb.refRecNo
+		JOIN jobtype_recruit_major rm ON r.uid = rm.refRecNo
 		LEFT JOIN
-		subcategory sj ON rsb.refSubNo = sj.subcategoryNo
+		majorcategory mj ON rm.refMajorNo = mj.majorcategoryNo
+		LEFT
+		JOIN
+		jobtype_recruit_sub rsb ON r.uid = rsb.refRecNo
+		LEFT JOIN
+		subcategory sj
+		ON rsb.refSubNo = sj.subcategoryNo
 		LEFT JOIN company c
-		ON c.uid = r.refCompany
+		ON c.uid =
+		r.refCompany
 
 		<where>
 			r.status = 'Y' AND r.dueDate > now()
@@ -331,9 +342,11 @@
 		rg.regionNo,
 		rg.name AS regionName,
 		rg.code,
-		sg.sigunguNo, sg.name AS sigunguName, sg.regionNo,
+		sg.sigunguNo, sg.name AS
+		sigunguName, sg.regionNo,
 
-		mj.majorcategoryNo AS majorNo, mj.jobName AS majorJobName,
+		mj.majorcategoryNo AS majorNo, mj.jobName AS
+		majorJobName,
 		sj.subcategoryNo AS subNo, sj.jobName AS subJobName,
 		sj.refMajorcategoryNo
 
@@ -445,7 +458,8 @@
 		&lt; #{uid} AND status = 'Y'
 		and duedate > now()
 		ORDER BY uid DESC
-		LIMIT 1
+		LIMIT
+		1
 	</select>
 
 	<!-- 다음 글 -->
@@ -515,109 +529,133 @@
 		SET count = count + 1
 		WHERE uid = #{boardNo}
 	</update>
-	
-	<select id="searchRecruitments" resultType="com.jobhunter.model.recruitmentnotice.RecruitmentWithResume">
+
+	<select id="searchRecruitments"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentWithResume">
 		SELECT
-		    rn.*,
-		    COUNT(DISTINCT r.registrationNo) AS registrationCount,
-		    EXISTS (
-		        SELECT 1 FROM registration r2
-		        WHERE r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
-		    ) AS hasUnreadApplications,
-		    EXISTS (
-		        SELECT 1 FROM application a
-		        WHERE a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
-		    ) AS isApplyViaSite
+		rn.*,
+		COUNT(DISTINCT r.registrationNo) AS registrationCount,
+		EXISTS (
+		SELECT 1 FROM registration r2
+		WHERE r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
+		) AS hasUnreadApplications,
+		EXISTS (
+		SELECT 1 FROM application a
+		WHERE a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
+		) AS isApplyViaSite
 		FROM recruitmentnotice rn
 		LEFT JOIN registration r ON rn.uid = r.recruitmentNoticePk
 		WHERE rn.status = 'Y'
-		
-		<if test="searchKeywordType == 'title' and searchKeyword != null and searchKeyword != ''">
-		    AND (rn.title LIKE CONCAT('%', #{searchKeyword}, '%')
-		         OR rn.miniTitle LIKE CONCAT('%', #{searchKeyword}, '%'))
+		AND rn.refCompany = #{uid} <!-- 작성자(기업 UID) 조건 고정 -->
+
+		<if
+			test="searchKeywordType == 'title' and searchKeyword != null and searchKeyword != ''">
+			AND (rn.title LIKE CONCAT('%', #{searchKeyword}, '%')
+			OR rn.miniTitle LIKE CONCAT('%', #{searchKeyword}, '%'))
 		</if>
-		<if test="searchKeywordType == 'manager' and searchKeyword != null and searchKeyword != ''">
-		    AND rn.manager LIKE CONCAT('%', #{searchKeyword}, '%')
+
+		<if
+			test="searchKeywordType == 'manager' and searchKeyword != null and searchKeyword != ''">
+			AND rn.manager LIKE CONCAT('%', #{searchKeyword}, '%')
 		</if>
-		
+
 		<if test="isNotClosing">
-		    AND rn.dueDate > NOW()
+			AND rn.dueDate > NOW()
 		</if>
-		
+
 		<if test="isNoRead">
-		    AND EXISTS (
-		        SELECT 1 FROM registration r2
-		        WHERE r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
-		    )
+			AND EXISTS (
+			SELECT 1 FROM registration r2
+			WHERE r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
+			)
 		</if>
-		
+
 		<if test="isApplyViaSite">
-		    AND EXISTS (
-		        SELECT 1 FROM application a
-		        WHERE a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
-		    )
+			AND EXISTS (
+			SELECT 1 FROM application a
+			WHERE a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
+			)
 		</if>
-		
+
 		GROUP BY rn.uid
-		
+
 		<choose>
-		    <when test="sortBy == 'LATEST'">
-		        ORDER BY rn.regDate DESC
-		    </when>
-		    <when test="sortBy == 'DUE_SOON'">
-		        ORDER BY rn.dueDate ASC
-		    </when>
-		    <when test="sortBy == 'REG_COUNT'">
-		        ORDER BY registrationCount DESC
-		    </when>
+			<when test="sortBy == 'LATEST'">
+				ORDER BY rn.regDate DESC
+			</when>
+			<when test="sortBy == 'DUE_SOON'">
+				ORDER BY rn.dueDate ASC
+			</when>
+			<when test="sortBy == 'REG_COUNT'">
+				ORDER BY registrationCount DESC
+			</when>
 		</choose>
-		
+
 		LIMIT #{offset}, 5
 	</select>
-	
+
+
 	<select id="countRecruitments" resultType="int">
 		SELECT COUNT(DISTINCT rn.uid)
 		FROM recruitmentnotice rn
-		LEFT JOIN registration r ON rn.uid = r.recruitmentNoticePk
+		LEFT JOIN
+		registration r ON rn.uid = r.recruitmentNoticePk
+		LEFT JOIN company c ON
+		rn.refCompany = c.uid
 		WHERE rn.status = 'Y'
-		
-		<if test="searchKeywordType == 'title' and searchKeyword != null and searchKeyword != ''">
-		    AND (rn.title LIKE CONCAT('%', #{searchKeyword}, '%')
-		         OR rn.miniTitle LIKE CONCAT('%', #{searchKeyword}, '%'))
+		AND rn.refCompany = #{uid} <!-- 
+			작성자(회사) UID 필수 조건 -->
+
+		<if
+			test="searchKeywordType == 'title' and searchKeyword != null and searchKeyword != ''">
+			AND (rn.title LIKE CONCAT('%', #{searchKeyword}, '%')
+			OR
+			rn.miniTitle LIKE CONCAT('%', #{searchKeyword}, '%'))
 		</if>
-		<if test="searchKeywordType == 'manager' and searchKeyword != null and searchKeyword != ''">
-		    AND rn.manager LIKE CONCAT('%', #{searchKeyword}, '%')
+
+		<if
+			test="searchKeywordType == 'manager' and searchKeyword != null and searchKeyword != ''">
+			AND rn.manager LIKE CONCAT('%', #{searchKeyword}, '%')
 		</if>
-		
+
+		<if
+			test="searchKeywordType == 'company' and searchKeyword != null and searchKeyword != ''">
+			AND c.companyName LIKE CONCAT('%', #{searchKeyword}, '%')
+		</if>
+
 		<if test="isNotClosing">
-		    AND rn.dueDate > NOW()
+			AND rn.dueDate > NOW()
 		</if>
-		
+
 		<if test="isNoRead">
-		    AND EXISTS (
-		        SELECT 1 FROM registration r2
-		        WHERE r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
-		    )
+			AND EXISTS (
+			SELECT 1 FROM registration r2
+			WHERE
+			r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
+			)
 		</if>
-		
+
 		<if test="isApplyViaSite">
-		    AND EXISTS (
-		        SELECT 1 FROM application a
-		        WHERE a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
-		    )
+			AND EXISTS (
+			SELECT 1 FROM application a
+			WHERE
+			a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
+			)
 		</if>
 	</select>
 
 	<!-- 좋아요 증가 -->
 	<update id="increaseRecruitmentLikeCnt" parameterType="int">
-		UPDATE recruitmentnotice
+		UPDATE
+		recruitmentnotice
 		SET likeCnt = likeCnt + 1
 		WHERE uid = #{uid}
 	</update>
 
 	<!-- 좋아요 감소 -->
 	<update id="decreaseRecruitmentLikeCnt" parameterType="int">
-		UPDATE recruitmentnotice
+		UPDATE
+		recruitmentnotice
 		SET likeCnt = CASE
 		WHEN likeCnt > 0 THEN likeCnt - 1
 		ELSE 0
