@@ -234,28 +234,36 @@ uri="http://java.sun.com/jsp/jstl/fmt"%>
                   <option value="CUSTOM">직접 입력</option>
                 </select>
               </div>
+              	<div>
+	              <!-- 직접 입력용 날짜 선택 -->
+	              <div id="customDateInputs" style="display: none">
+	                <div class="form-group">
+	                  <label for="searchStartDate">시작일</label>
+	                  <input
+	                    type="datetime-local"
+	                    id="searchStartDate"
+	                    class="form-control"
+	                  />
+	                </div>
+	                <div class="form-group">
+	                  <label for="searchEndDate">종료일</label>
+	                  <input
+	                    type="datetime-local"
+	                    id="searchEndDate"
+	                    class="form-control"
+	                  />
+	                </div>
+		            <button
+		              type="button"
+		              class="btn btn-primary btn-sm"
+		              onclick="fetchMentorRequests()"
+		              >
+		              확인
+		            </button>
+	              </div>
+	            </div>
             </div>
-            <div class="col-md-3">
-              <!-- 직접 입력용 날짜 선택 -->
-              <div id="customDateInputs" style="display: none">
-                <div class="form-group">
-                  <label for="searchStartDate">시작일</label>
-                  <input
-                    type="datetime-local"
-                    id="searchStartDate"
-                    class="form-control"
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="searchEndDate">종료일</label>
-                  <input
-                    type="datetime-local"
-                    id="searchEndDate"
-                    class="form-control"
-                  />
-                </div>
-              </div>
-            </div>
+            
             <div class="col-md-3">
               <!-- 상태 선택 -->
               <div class="form-group">
