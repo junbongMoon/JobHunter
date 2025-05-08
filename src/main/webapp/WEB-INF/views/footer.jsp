@@ -150,25 +150,26 @@
                    password = 'jobMentor**19';
                    break;
             }
-
+            // <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('\${id}')">
+            //                 <i class="fas fa-copy"></i>
+            //             </button>
+            // <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('\${password}')">
+            //                 <i class="fas fa-copy"></i>
+            //             </button>
             loginInfoContent.innerHTML = `
                 <h5 class="mb-3">\${title}</h5>
                 <div class="mb-3">
                     <label class="form-label">아이디</label>
                     <div class="input-group">
                         <input type="text" class="form-control" value="\${id}" readonly>
-                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('\${id}')">
-                            <i class="fas fa-copy"></i>
-                        </button>
+                        
                     </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">비밀번호</label>
                     <div class="input-group">
                         <input type="text" class="form-control" value="\${password}" readonly>
-                        <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('\${password}')">
-                            <i class="fas fa-copy"></i>
-                        </button>
+                        
                     </div>
                 </div>
             `;
@@ -177,14 +178,14 @@
         }
 
         // 클립보드에 복사하는 함수
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                // 복사 성공 시 알림 표시
-                alert('클립보드에 복사되었습니다.');
-            }).catch(err => {
-                console.error('클립보드 복사 실패:', err);
-            });
-        }
+        // function copyToClipboard(text) {
+        //     navigator.clipboard.writeText(text).then(() => {
+        //         // 복사 성공 시 알림 표시
+        //         alert('클립보드에 복사되었습니다.');
+        //     }).catch(err => {
+        //         console.error('클립보드 복사 실패:', err);
+        //     });
+        // }
     </script>
 
     </html>
