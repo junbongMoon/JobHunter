@@ -60,9 +60,6 @@ public class SubmitController {
 	@PutMapping("/status/{status}/{resumePk}/{recruitmentNoticePk}")
 	public ResponseEntity<Boolean> changeStatusByRegistration(@PathVariable("status") Status status,
 			@PathVariable("resumePk") int resumePk, @PathVariable("recruitmentNoticePk") int recruitmentNoticePk) {
-
-		System.out.println(
-				"status : " + status + ", resumePk :" + resumePk + ", recruitmentNoticePk" + recruitmentNoticePk);
 		ResponseEntity<Boolean> result = null;
 
 		submitService.changeStatus(status, resumePk, recruitmentNoticePk);

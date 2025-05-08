@@ -20,8 +20,6 @@ import com.jobhunter.model.message.MessageTargetInfoDTO;
 import com.jobhunter.model.message.USERTYPE;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
-import com.jobhunter.model.recruitmentnotice.RecruitmentWithResume;
-import com.jobhunter.model.recruitmentnotice.RecruitmentWithResumePageDTO;
 import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.RegistrationVO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
@@ -359,5 +357,11 @@ public class SubmitServiceImpl implements SubmitService {
 	    TenToFivePageVO<SubmitFromUserVO> vo = new TenToFivePageVO<SubmitFromUserVO>(list, dto.getPage(), totalItems);
 
 	    return vo;
+	}
+
+	@Override
+	public List<ResumeUpfileDTO> getFiles(int registrationNo) throws Exception {
+		List<ResumeUpfileDTO> result = submitDAO.getFiles(registrationNo);
+		return result;
 	}
 }

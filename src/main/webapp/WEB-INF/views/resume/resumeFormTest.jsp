@@ -2606,7 +2606,7 @@
 						$downloadBtn = $('<a>')
 							.addClass('btn btn-sm btn-primary ms-2')
 							.attr({
-								'href': '/resources/resumeUpfiles/' + fileInfo.newFileName,
+								'href': '/resources/resumeUpfiles' + fileInfo.newFileName,
 								'download': fileInfo.originalFileName
 							})
 							.html('<i class="bi bi-download"></i>');
@@ -3050,7 +3050,7 @@
 						$downloadBtn = $('<a>')
 							.addClass('btn btn-sm btn-primary ms-2')
 							.attr({
-								'href': '/resources/resumeUpfiles/' + fileInfo.newFileName,
+								'href': '/resources/resumeUpfiles' + fileInfo.newFileName,
 								'download': fileInfo.originalFileName
 							})
 							.html('<i class="bi bi-download"></i>');

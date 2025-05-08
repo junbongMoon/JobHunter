@@ -1,11 +1,13 @@
 package com.jobhunter.service.submit;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.jobhunter.model.account.AccountVO;
 import com.jobhunter.model.page.PageRequestDTO;
 import com.jobhunter.model.page.PageResponseDTO;
 import com.jobhunter.model.resume.ResumeDetailDTO;
+import com.jobhunter.model.resume.ResumeUpfileDTO;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmit;
 import com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser;
 import com.jobhunter.model.submit.Status;
@@ -112,4 +114,7 @@ public interface SubmitService {
 
 
 	TenToFivePageVO<SubmitFromUserVO> selectSubmitFromUser(SubmitSearchDTO dto) throws Exception;
+
+
+	public List<ResumeUpfileDTO> getFiles(int registrationNo) throws Exception;
 }

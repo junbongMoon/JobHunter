@@ -131,7 +131,8 @@ public class ReviewReplyRestController {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		if (account == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8")).body("로그인이 필요합니다.");
+					.contentType(MediaType.parseMediaType("text/plain;charset=UTF-8"))
+					.body("로그인이 필요합니다.");
 		}
 
 		int replyNo = payload.get("replyNo");
