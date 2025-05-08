@@ -486,7 +486,7 @@
 												class="d-block border p-2 mb-2 text-decoration-none text-dark rounded hover-effect">
 												📝 공고 쓰기
 											</a>
-											<a href="/recruitmentnotice/listAll"
+											<a href="/company/companyInfo/${sessionScope.account.uid}"
 												class="d-block border p-2 text-decoration-none text-dark rounded hover-effect">
 												📋 공고 조회
 											</a>

@@ -96,6 +96,7 @@ public class AccountController {
 
 			session.removeAttribute("remainingSeconds");
 			session.setAttribute("account", account);
+			System.out.println(account.getMobile());
 
 			if (loginDto.getAutoLogin() != null) { // 자동로그인 쿠키발급
 				String keyName = (loginDto.getAccountType() == AccountType.USER) ? "userAutoLogin" : "companyAutoLogin";

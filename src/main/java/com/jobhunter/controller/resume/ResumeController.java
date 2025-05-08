@@ -84,6 +84,7 @@ public class ResumeController {
 	public String resumeForm(Model model, HttpSession session) {
 		AccountVO account = (AccountVO) session.getAttribute("account");
 		int userUid = account.getUid();
+		System.out.println(account.getMobile());
 		try {
 			// 지역 목록 조회
 			List<RegionDTO> regionList = resumeService.getAllRegions();

@@ -1005,9 +1005,13 @@ function okBusiness() {
 }
 
 function deleteBusiness() {
+	$('#businessBtn').prop('disabled', false);
+	$('#businessBtn').show()
+	$('#deleteBusinessBtn').hide()
 	$('#representative').val('').prop('readonly', false);
 	$('#openDate').val('').prop('readonly', false);
 	$('#businessNum').val('').prop('readonly', false);
+	$('#businessInfoMark').text(`확인되었습니다.`).removeClass().addClass("info-defalt");
 }
 
 // ==유효성검사==

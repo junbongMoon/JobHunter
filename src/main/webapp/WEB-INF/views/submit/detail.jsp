@@ -372,9 +372,7 @@
 				</div>
 				<div class="card-body">
 					<textarea class="form-control" id="selfIntroTextarea" rows="8"
-						readonly>
-								${submit.introduce}
-							</textarea>
+						readonly>${submit.introduce}</textarea>
 				</div>
 			</div>
 
@@ -394,9 +392,10 @@
 				</div>
 			</div>
 
-			<button type="button" class="btn btn-secondary" onclick="passedBtn()">합격</button>
-			<button type="button" class="btn btn-secondary" onclick="failedBtn()">불합격</button>
-			<button type="button" class="btn btn-secondary" id="returnBtn">목록으로</button>
+			<button type="button" class="btn btn-primary" onclick="passedBtn()">합격</button>
+			<button type="button" class="btn btn-danger" onclick="failedBtn()">불합격</button>
+			<button type="button" class="btn btn-secondary" onclick="location.href='/company/companyInfo/${account.uid}'">기업 정보로 돌아가기</button>
+
 	</div>
 	</form>
 	<!-- 풋터 -->
