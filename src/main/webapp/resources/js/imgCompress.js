@@ -152,9 +152,8 @@ function insertSmartImageToSummernote(files, targetEditorSelector, maxSize) {
 
       } catch (err) {
         clearInterval(interval);
-        console.error(`이미지 ${i + 1} 압축 실패`, err);
-        window.publicModals.show(`이미지 ${i + 1} 압축 중 오류가 발생했습니다.`);
-        window.publicModals.hide?.();
+        console.error(`이미지 ${i + 1} 압축 중 오류가 발생했습니다. 파일의 사이즈를 줄여 다시 시도해주세요.`, err);
+        window.publicModals.show(`이미지 ${i + 1} 압축 중 오류가 발생했습니다. 파일의 사이즈를 줄여 다시 시도해주세요.`);
         break;
       }
     }

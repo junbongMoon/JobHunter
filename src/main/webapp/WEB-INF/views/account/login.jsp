@@ -332,7 +332,7 @@
 
 .login-failed-massege {
 	font-size: 14px;
-	color: var(- -bs-red);
+	color: var(--bs-red);
 }
 
 .flex-x-container {

@@ -74,9 +74,10 @@ public class UserRestController {
 			HttpSession session) {
 		try {
 			AccountVO vo = AccountUtil.getAccount(session);
-			if (uid == null || AccountUtil.checkAuth(vo, uid, AccountType.USER)) {
+			if (uid == null || !AccountUtil.checkAuth(vo, uid, AccountType.USER)) {
 				throw new NeedAuthException();
 			}
+			
 
 			userInfoDTO.setUid(uid);
 
@@ -84,6 +85,7 @@ public class UserRestController {
 			return ResponseEntity.ok(Collections.singletonMap("result", "success"));
 
 		} catch (NeedAuthException n) {
+			System.out.println("이거?");
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body(Collections.singletonMap("result", "잘못된 요청입니다."));
 		} catch (Exception e) {
@@ -211,7 +213,6 @@ public class UserRestController {
 	@DeleteMapping(value = "/info/{uid}", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<ResponseJsonMsg> deleteAccount(@PathVariable("uid") Integer uid, HttpSession session) {
 		try {
-
 			AccountVO sessionAccount = (AccountVO) session.getAttribute("account");
 			int checkedUid = Integer.parseInt(session.getAttribute("deleteAccountUser").toString());
 

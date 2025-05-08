@@ -73,6 +73,8 @@ public class AccountServiceImpl implements AccountService {
 		if (result == null || success <= 0) {
 			throw new NoSuchElementException();
 		}
+		dao.resetFailCount(result.getAccountId());
+		dao.setLoginTime(result.getUid());
 		
 		return result;
 	}
