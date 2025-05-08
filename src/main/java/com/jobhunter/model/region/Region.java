@@ -34,4 +34,5 @@ public class Region {
 	 * </p>
 	 */
 	private String name;
+	private Region region;
 }

@@ -412,68 +412,74 @@
 	</resultMap>
 
 	<!-- 육근우_단일 신청서 하나만 상세조회 -->
-	<select id="selectOneResumeByRegistrationNo"
-		resultMap="ResumeDetailInfoBySubmitAndUserMap">
-		SELECT
-		r.resumeNo, r.title, r.payType, r.pay, r.introduce,
-		r.saveType, r.userUid, r.profileBase64,
-
-		reg.registrationNo, reg.status,
-		reg.recruitmentNoticePk AS regRecruitmentNoticePk,
-		reg.regDate,
-		reg.resumePk AS regResumePk,
-		reg.recruitmentNoticePk AS recruitmentNoticePk,
-
-		jf.jobFormNo, jf.form AS jobForm,
-		m.meritNo, m.meritContent,
-		e.educationNo, e.educationLevel,
-		e.educationStatus, e.graduationDate, e.customInput,
-		h.historyNo,
-		h.companyName, h.position, h.jobDescription, h.startDate, h.endDate,
-		l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
-		s.sigunguNo, s.name AS sigunguName, s.regionNo,
-		sc.subcategoryNo,
-		sc.jobName, sc.refMajorcategoryNo,
-
-		u.userName, u.mobile, u.email,
-		u.gender, u.age, u.militaryService, u.nationality,
-		u.disability, u.addr
-
-		FROM registration reg
-		JOIN resume r ON reg.resumePk = r.resumeNo
-		LEFT
-		JOIN
-		users u ON r.userUid = u.uid
-		LEFT JOIN jobform jf ON r.resumeNo =
-		jf.resumeNo
-		LEFT
-		JOIN merit m ON r.resumeNo = m.resumeNo
-		LEFT JOIN
-		education e ON
-		r.resumeNo = e.resumeNo
-		LEFT JOIN
-		personalhistory h ON
-		r.resumeNo =
-		h.resumeNo
-		LEFT JOIN license l ON
-		r.resumeNo = l.resumeNo
-		LEFT JOIN
-		where_resume_sigungu sr ON r.resumeNo
-		= sr.refResumeNo
-		LEFT
-		JOIN sigungu
-		s ON sr.refSigunguNo = s.sigunguNo
-		LEFT JOIN
-		jobtype_resume_sub jrs ON
-		r.resumeNo = jrs.refResumeNo
-		LEFT
-		JOIN
-		subcategory sc ON jrs.refSubNo =
-		sc.subcategoryNo
-
-		WHERE
-		reg.registrationNo = #{registrationNo}
+	<!-- 1. 기본 이력서 및 유저 정보 -->
+	<select id="selectResumeBasicByRegistrationNo"
+	        resultType="com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser">
+	  SELECT
+	    r.resumeNo, r.title, r.payType, r.pay, r.introduce, r.saveType,
+	    r.userUid, r.profileBase64,
+	    reg.registrationNo, reg.recruitmentNoticePk,
+	    u.userName, u.mobile, u.email, u.gender, u.age,
+	    u.militaryService, u.nationality, u.disability, u.addr
+	  FROM registration reg
+	  JOIN resume r ON reg.resumePk = r.resumeNo
+	  LEFT JOIN users u ON r.userUid = u.uid
+	  WHERE reg.registrationNo = #{registrationNo}
 	</select>
+	
+	<!-- 2. 고용 형태 -->
+	<select id="selectJobFormsByResumeNo" resultType="com.jobhunter.model.resume.JobFormDTO">
+	  SELECT jobFormNo, form
+	  FROM jobform
+	  WHERE resumeNo = #{resumeNo}
+	</select>
+	
+	<!-- 3. 성격 및 강점 -->
+	<select id="selectMeritsByResumeNo" resultType="com.jobhunter.model.resume.MeritDTO">
+	  SELECT meritNo, meritContent
+	  FROM merit
+	  WHERE resumeNo = #{resumeNo}
+	</select>
+	
+	<!-- 4. 학력 -->
+	<select id="selectEducationsByResumeNo" resultType="com.jobhunter.model.resume.EducationDTO">
+	  SELECT educationNo, educationLevel, educationStatus, graduationDate, customInput
+	  FROM education
+	  WHERE resumeNo = #{resumeNo}
+	</select>
+	
+	<!-- 5. 경력 -->
+	<select id="selectHistoriesByResumeNo" resultType="com.jobhunter.model.resume.PersonalHistoryDTO">
+	  SELECT historyNo, companyName, position, jobDescription, startDate, endDate
+	  FROM personalhistory
+	  WHERE resumeNo = #{resumeNo}
+	</select>
+	
+	<!-- 6. 자격증 -->
+	<select id="selectLicensesByResumeNo" resultType="com.jobhunter.model.resume.LicenseDTO">
+	  SELECT licenseNo, licenseName, acquisitionDate, institution
+	  FROM license
+	  WHERE resumeNo = #{resumeNo}
+	</select>
+	
+	<!-- 7. 시군구 -->
+	<select id="selectSigunguByResumeNo" resultType="com.jobhunter.model.region.Sigungu">
+	  SELECT
+	    s.sigunguNo, s.code, s.name, s.regionNo
+	  FROM where_resume_sigungu sr
+	  JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
+	  WHERE sr.refResumeNo = #{resumeNo}
+	</select>
+	
+	
+	<!-- 8. 직업군 -->
+	<select id="selectSubcategoriesByResumeNo" resultType="com.jobhunter.model.category.SubCategory">
+	  SELECT sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo
+	  FROM jobtype_resume_sub jrs
+	  JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
+	  WHERE jrs.refResumeNo = #{resumeNo}
+	</select>
+
 	
 	<select id="getCompanyUidByRegistrationNo" resultType="int">
 		SELECT

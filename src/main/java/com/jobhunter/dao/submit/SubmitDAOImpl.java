@@ -252,8 +252,21 @@ public class SubmitDAOImpl implements SubmitDAO {
 	 *
 	 */
     @Override
-    public ResumeDetailInfoBySubmitAndUser selectSubmitAndResumeDetailInfo(int registrationNo) throws Exception {
-        return ses.selectOne(NS + ".selectOneResumeByRegistrationNo", registrationNo);
+    public ResumeDetailInfoBySubmitAndUser selectSubmitAndResumeDetailInfo(int registrationNo) {
+        ResumeDetailInfoBySubmitAndUser dto = ses.selectOne(NS + ".selectResumeBasicByRegistrationNo", registrationNo);
+        if (dto == null) return null;
+
+        int resumeNo = dto.getResumeNo();
+
+        dto.setJobForms(ses.selectList(NS + ".selectJobFormsByResumeNo", resumeNo));
+        dto.setMerits(ses.selectList(NS + ".selectMeritsByResumeNo", resumeNo));
+        dto.setEducations(ses.selectList(NS + ".selectEducationsByResumeNo", resumeNo));
+        dto.setHistories(ses.selectList(NS + ".selectHistoriesByResumeNo", resumeNo));
+        dto.setLicenses(ses.selectList(NS + ".selectLicensesByResumeNo", resumeNo));
+        dto.setSigunguList(ses.selectList(NS + ".selectSigunguByResumeNo", resumeNo));
+        dto.setSubcategoryList(ses.selectList(NS + ".selectSubcategoriesByResumeNo", resumeNo));
+
+        return dto;
     }
     
     /**
