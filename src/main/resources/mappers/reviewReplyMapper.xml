@@ -79,6 +79,7 @@
 		rr.replyNo,
 		rr.boardNo,
 		rr.userId,
+		u.uid AS uid,
 		u.userId AS writerId,
 		rr.content,
 		rr.likes,

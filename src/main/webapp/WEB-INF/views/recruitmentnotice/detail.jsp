@@ -642,7 +642,7 @@ button.btn-resume {
 											<div class="author-details">
 												<!-- 이미지 있으면 이미지 넣을 것 -->
 												<div class="info">
-													<h4>${RecruitmentDetailInfo.companyName}</h4>
+													<h4>${RecruitmentDetailInfo.companyName}<i class="flagAccBtn" data-uid="${RecruitmentDetailInfo.refCompany}" data-type="company"></i></h4>
 													<span class="role">${RecruitmentDetailInfo.subcategory.jobName}</span>
 												</div>
 											</div>

@@ -21,6 +21,7 @@ public class ReviewReplyDTO {
 		private int replyNo;
 		private int boardNo;
 		private int userId;
+		private int uid;
 		private String writerId; // users 테이블의 userId
 		private String content;
 		private int likes;

@@ -126,7 +126,7 @@
   <h2 class="pr-title">${prBoard.title}</h2>
   
   <div class="pr-info">
-    <p><strong>작성자:</strong> ${prBoard.writer}</i></p>
+    <p><strong>작성자:</strong> ${prBoard.writer}<i class="flagAccBtn" data-uid="${prBoard.useruid}" data-type="user"></i></i></p>
     <p><strong>아이디:</strong> ${prBoard.userId}</p>
     <p><strong>작성일:</strong> ${prBoard.formattedPostDate}</p>
   </div>

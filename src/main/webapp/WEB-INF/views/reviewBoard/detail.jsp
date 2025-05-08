@@ -313,7 +313,7 @@
 			<tbody>
 				<tr>
 					<th>작성자 ID</th>
-					<td>${detail.userId}</td>
+					<td>${detail.userId}<i class="flagAccBtn" data-uid="${detail.writerUid}" data-type="user"></i></td>
 				</tr>
 				<tr>
 					<th>이력서 제목</th>
@@ -757,7 +757,7 @@ function loadReplies(page = 1) {
 		    let replyHtml = '<li class="list-group-item d-flex justify-content-between align-items-start">';
 			
 		    replyHtml += '<div class="reply-left" style="flex: 1;">';
-		    replyHtml += '<strong>' + writer + '</strong> (' + date + ')<br>';
+		    replyHtml += '<strong>' + writer + `<i class="flagAccBtn" data-uid="\${reply.uid}" data-type="user"></i>` + '</strong> (' + date + ')<br>';
 		    replyHtml += '<div class="reply-content mt-2 mb-2">' + reply.content + '</div>';
 
 		    if ((reply.userId.toString() === loginUserUid.toString()) && (isCompanyAccount === false || isCompanyAccount === 'false')) {
@@ -814,6 +814,7 @@ function loadReplies(page = 1) {
         }
       }
       bindReplyLikeEvents(); 
+	  setReportBtn()
     },
     error: function () {
       alert('댓글 로딩 중 오류 발생');
