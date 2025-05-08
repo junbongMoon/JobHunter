@@ -86,7 +86,7 @@
 													<input type="text" class="form-control" value="여성" readonly />
 												</c:when>
 												<c:otherwise>
-													<input type="text" class="form-control" value="" readonly />
+													<input type="text" class="form-control" value="미선택" readonly />
 												</c:otherwise>
 											</c:choose>
 										</div>
