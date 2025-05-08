@@ -70,8 +70,8 @@
                         <div class="login-info-button" onclick="showLoginInfo('mentor')"
                             style="text-align: center; cursor: pointer;">
                             <div class="login-icon"
-                                style="width: 50px; height: 50px; background-color: #28a745; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                                <i class="fas fa-building"></i>
+                                style="width: 50px; height: 50px; background-color: #e2d73a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                <i class="fas fa-user"></i>
                             </div>
                             <div style="margin-top: 5px; font-size: 12px;">멘토유저</div>
                         </div>
@@ -125,30 +125,30 @@
             switch (type) {
                 case 'admin':
                     title = '관리자 로그인 정보';
-                    id = 'tester1234';
-                    // id = 'jobAdmin19';
-                    password = 'test1234!';
-                    // password = 'jobAdmin**19';
+                    // id = 'tester1234';
+                    id = 'jobAdmin19';
+                    // password = 'test1234!';
+                    password = 'jobAdmin**19';
                     break;
                 case 'user':
                     title = '일반 유저 로그인 정보';
-                    id = 'tester123';
-                    // id = 'jobHunter19';
-                    password = 'tester1234';
-                    // password = 'jobHunter**19';
+                    // id = 'tester123';
+                    id = 'jobHunter19';
+                    // password = 'tester1234';
+                    password = 'jobHunter**19';
                     break;
                 case 'company':
                     title = '기업 유저 로그인 정보';
-                    id = 'koreaaisol1';
-                    // id = 'jobHunter19';
-                    password = '1234';
-                    // password = 'jobHunter**19';
+                    // id = 'koreaaisol1';
+                    id = 'jobHunter19';
+                    // password = '1234';
+                    password = 'jobHunter**19';
                     break;
-//                case 'mentor':
-//                    title = '멘토 유저 로그인 정보';
-//                    id = 'jobMentor19';
-//                    password = 'jobMentor**19';
-//                    break;
+               case 'mentor':
+                   title = '멘토 유저 로그인 정보';
+                   id = 'jobMentor19';
+                   password = 'jobMentor**19';
+                   break;
             }
 
             loginInfoContent.innerHTML = `
