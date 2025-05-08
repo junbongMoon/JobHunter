@@ -78,8 +78,17 @@
 										</div>
 										<div class="col-md-4">
 											<label class="form-label">성별</label>
-											<input type="text" class="form-control"
-												value="${user.gender == 'MALE' ? '남성' : '여성'}" readonly />
+											<c:choose>
+												<c:when test="${user.gender eq 'MALE'}">
+													<input type="text" class="form-control" value="남성" readonly />
+												</c:when>
+												<c:when test="${user.gender eq 'FEMALE'}">
+													<input type="text" class="form-control" value="여성" readonly />
+												</c:when>
+												<c:otherwise>
+													<input type="text" class="form-control" value="미선택" readonly />
+												</c:otherwise>
+											</c:choose>
 										</div>
 										<div class="col-md-4">
 											<label class="form-label">이메일</label>
