@@ -50,11 +50,8 @@ public class ReviewReplyDAOImpl implements ReviewReplyDAO {
 	}
 
 	@Override
-	public List<ReviewReplyDTO> selectRepliesWithPaging(int boardNo, int offset, int size) throws Exception {
-	    Map<String, Object> param = new HashMap<>();
-        param.put("boardNo", boardNo);
-        param.put("offset", offset);
-        param.put("size", size);
+	public List<ReviewReplyDTO> selectRepliesWithPaging(Map<String, Object> param) throws Exception {
+	
         return ses.selectList(NS + ".selectRepliesWithPaging", param);
     }
 
@@ -92,5 +89,6 @@ public class ReviewReplyDAOImpl implements ReviewReplyDAO {
     public int decreaseReplyLikes(int replyNo) throws Exception {
         return ses.update(NS + ".decrementReplyLikes", replyNo);
     }
+
 }
 

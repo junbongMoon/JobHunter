@@ -748,9 +748,14 @@ function loadReplies(page = 1) {
 		    const replyContent = (reply.content ?? '').replace(/"/g, '&quot;');
 		    const date = (reply.postDate ?? '').substring(0, 10);
 		    const writer = reply.writerId ?? '익명';
+		    const isReplyLike = reply.replyLike === true || reply.replyLike === 'true' || reply.replyLike === 1;
 
+		   
+		    console.log("댓글번호:", replyNo, "| isReplyLike 값:", reply.replyLike, "| 타입:", typeof reply.replyLike);
+
+		    
 		    let replyHtml = '<li class="list-group-item d-flex justify-content-between align-items-start">';
-
+			
 		    replyHtml += '<div class="reply-left" style="flex: 1;">';
 		    replyHtml += '<strong>' + writer + '</strong> (' + date + ')<br>';
 		    replyHtml += '<div class="reply-content mt-2 mb-2">' + reply.content + '</div>';
@@ -769,8 +774,8 @@ function loadReplies(page = 1) {
 		    if (isCompanyAccount === false || isCompanyAccount === 'false') {
 		        replyHtml += '<div class="reply-right text-end ms-3" style="min-width: 80px;">';
 		        replyHtml += '<div class="reply-like-section" data-replyno="' + replyNo + '">' +
-		            '<button class="btn btn-outline-primary btn-sm like-reply-btn"' + (reply.isLiked ? ' style="display:none;"' : '') + '>👍</button>' +
-		            '<button class="btn btn-outline-danger btn-sm unlike-reply-btn"' + (reply.isLiked ? '' : ' style="display:none;"') + '>❌</button>' +
+		            '<button class="btn btn-outline-primary btn-sm like-reply-btn"' + (isReplyLike ? ' style="display:none;"' : '') + '>👍</button>' +
+		            '<button class="btn btn-outline-danger btn-sm unlike-reply-btn"' + (isReplyLike ? '' : ' style="display:none;"') + '>❌</button>' +
 		            '<br><span class="like-count small">' + (reply.likes ?? 0) + '</span>' +
 		            '</div>';
 		        replyHtml += '</div>';

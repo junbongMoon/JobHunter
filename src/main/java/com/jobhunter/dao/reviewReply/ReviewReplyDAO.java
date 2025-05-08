@@ -1,6 +1,7 @@
 package com.jobhunter.dao.reviewReply;
 
 import java.util.List;
+import java.util.Map;
 
 import com.jobhunter.model.reviewReply.ReviewReplyDTO;
 import com.jobhunter.model.reviewboard.Likes;
@@ -14,9 +15,6 @@ public interface ReviewReplyDAO {
     int updateReplyDao(ReviewReplyDTO dto) throws Exception;
     
     int deleteReplyDao(int replyNo, int userId) throws Exception;
-
-
-	List<ReviewReplyDTO> selectRepliesWithPaging(int boardNo, int offset, int size) throws Exception;
 
 
 	int countRepliesByBoardNo(int boardNo) throws Exception;
@@ -35,6 +33,9 @@ public interface ReviewReplyDAO {
 
 
 	int decreaseReplyLikes(int replyNo) throws Exception;
+
+
+	List<ReviewReplyDTO> selectRepliesWithPaging(Map<String, Object> param) throws Exception;
 	
 
 	

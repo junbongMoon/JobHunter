@@ -12,19 +12,24 @@
 		rr.replyNo,
 		rr.boardNo,
 		rr.userId,
-		u.userId AS
-		writerId,
+		u.userId AS writerId,
 		rr.content,
 		rr.likes,
 		rr.postDate,
 		rr.updatedAt,
-		rr.isDeleted
-		FROM reviewReply rr
-		JOIN users u ON rr.userId = u.uid
-		WHERE rr.boardNo =
-		#{boardNo}
-		AND rr.isDeleted = 'N'
-		ORDER BY rr.postDate DESC
+		rr.isDeleted,
+		EXISTS (
+			SELECT 1 FROM LikesLog l
+			WHERE l.userId = #{loginUserId}
+			  AND l.boardNo = rr.replyNo
+			  AND l.LikeType = 'REPLY'
+		) AS isReplyLike
+	FROM reviewReply rr
+	JOIN users u ON rr.userId = u.uid
+	WHERE rr.boardNo = #{boardNo}
+	AND rr.isDeleted = 'N'
+	ORDER BY rr.postDate DESC
+	LIMIT #{size} OFFSET #{offset}
 	</select>
 
 
@@ -67,7 +72,9 @@
 
 
 	<!-- 댓글 페이징 조회 -->
-	<select id="selectRepliesWithPaging" resultMap="ReplyResultMap">
+	<select id="selectRepliesWithPaging" 
+        resultType="com.jobhunter.model.reviewReply.ReviewReplyDTO"
+        parameterType="map">
 		SELECT
 		rr.replyNo,
 		rr.boardNo,
@@ -77,13 +84,19 @@
 		rr.likes,
 		rr.postDate,
 		rr.updatedAt,
-		rr.isDeleted
-		FROM reviewReply rr
-		JOIN users u ON rr.userId = u.uid
-		WHERE rr.boardNo = #{boardNo}
-		AND rr.isDeleted = 'N'
-		ORDER BY rr.postDate DESC
-		LIMIT #{size} OFFSET #{offset}
+		rr.isDeleted,
+		EXISTS (
+			SELECT 1 FROM LikesLog l
+			WHERE l.userId = #{loginUserId}
+			  AND l.boardNo = rr.replyNo
+			  AND l.LikeType = 'REPLY'
+		) AS isReplyLike
+	FROM reviewReply rr
+	JOIN users u ON rr.userId = u.uid
+	WHERE rr.boardNo = #{boardNo}
+	AND rr.isDeleted = 'N'
+	ORDER BY rr.postDate DESC
+	LIMIT #{size} OFFSET #{offset}
 	</select>
 
 	<!-- 댓글 총 개수 조회 (페이징용) -->
@@ -106,6 +119,7 @@
 		<result property="postDate" column="postDate" />
 		<result property="updatedAt" column="updatedAt" />
 		<result property="isDeleted" column="isDeleted" />
+		<result property="isReplyLike" column="isReplyLike" />
 	</resultMap>
 
 	<!-- 1. 좋아요 추가 -->

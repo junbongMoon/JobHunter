@@ -1,6 +1,8 @@
 package com.jobhunter.service.reviewReply;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,8 +57,16 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
 	}
 
 	@Override
-    public List<ReviewReplyDTO> getRepliesByBoardNoWithPaging(int boardNo, RPageRequestDTO dto) throws Exception {
-        return replyDAO.selectRepliesWithPaging(boardNo, dto.getOffset(), dto.getSize());
+    public List<ReviewReplyDTO> getRepliesByBoardNoWithPaging(int boardNo, int loginUserId,
+			RPageRequestDTO pageRequestDTO) throws Exception {
+		Map<String, Object> param = new HashMap<>();
+	    param.put("boardNo", boardNo);
+	    param.put("offset", pageRequestDTO.getOffset());
+	    param.put("size", pageRequestDTO.getSize());
+	    param.put("loginUserId", loginUserId);  
+		
+		
+		return replyDAO.selectRepliesWithPaging(param);
     }
 
     @Override
@@ -107,6 +117,8 @@ public class ReviewReplyServiceImpl implements ReviewReplyService {
 
         return deleteResult > 0 && updateResult > 0;
     }
+
+
 
 
 }
