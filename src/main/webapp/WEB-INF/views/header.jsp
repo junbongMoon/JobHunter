@@ -417,7 +417,9 @@
 									<li><a href="/employment/list">공공기관 제공 채용정보</a></li>
 								</ul>
 							</li>
-							<li><a href="/prboard/list">취업 도우미</a></li>
+							<c:if test="${sessionScope.account.accountType != 'COMPANY'}">
+								<li><a href="/prboard/list">취업 도우미</a></li>
+							</c:if>
 							<li><a href="/reviewBoard/allBoard">면접후기</a></li>
 							<li>
 								<c:if test="${not empty sessionScope.account}">
