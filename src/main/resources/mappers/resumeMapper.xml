@@ -2,7 +2,556 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.testoracle.mapper.resumemapper">
-	
+<mapper namespace="com.jobhunter.mapper.resumemapper">
 
+    <!-- 이력서 저장 -->
+    <insert id="insertResumeFinal" parameterType="com.jobhunter.model.resume.ResumeDTO" useGeneratedKeys="true" keyProperty="resumeNo">
+        INSERT INTO resume (title, payType, pay, introduce, userUid, profileBase64, saveType, regDate)
+        VALUES (#{title}, #{payType}, #{pay}, #{introduce}, #{userUid}, #{profileBase64}, 'FINAL', NOW());
+    </insert>
+
+    <!-- 고용 형태 저장 -->
+    <insert id="insertJobForm" parameterType="com.jobhunter.model.resume.JobFormDTO">
+        INSERT INTO jobform (Form, resumeNo)
+        VALUES (#{form}, #{resumeNo});
+    </insert>
+
+    <!-- 지역 저장 -->
+    <insert id="insertSigungu" parameterType="map">
+        INSERT INTO where_resume_sigungu (refResumeNo, refSigunguNo)
+        VALUES (#{resumeNo}, #{sigunguNo});
+    </insert>
+
+    <!-- 시/도 리스트 -->
+    <select id="selectAllRegions" resultType="com.jobhunter.model.resume.RegionDTO">
+        SELECT regionNo, code, name FROM region
+    </select>
+
+    <!-- 시/군/구 리스트 -->
+    <select id="selectSigunguByRegion" parameterType="int" resultType="com.jobhunter.model.resume.SigunguDTO">
+        SELECT sigunguNo, code, name, regionNo
+        FROM sigungu
+        WHERE regionNo = #{regionNo}
+    </select>
+
+    <!-- 업직종 대분류 리스트 -->
+    <select id="selectAllMajorCategories" resultType="com.jobhunter.model.resume.MajorCategoryDTO">
+        SELECT MajorcategoryNo as majorcategoryNo, jobName
+        FROM majorcategory
+        ORDER BY MajorcategoryNo
+    </select>
+
+    <!-- 업직종 소분류 리스트 -->
+    <select id="selectSubCategoriesByMajor" parameterType="int" resultType="com.jobhunter.model.resume.SubCategoryDTO">
+        SELECT subcategoryNo, jobName, refMajorcategoryNo as majorcategoryNo
+        FROM subcategory
+        WHERE refMajorcategoryNo = #{majorcategoryNo}
+        ORDER BY subcategoryNo
+    </select>
+
+    <!-- 업직종 저장 -->
+    <insert id="insertSubCategory" parameterType="map">
+        INSERT INTO jobtype_resume_sub (refResumeNo, refSubNo)
+        VALUES (#{resumeNo}, #{subcategoryNo});
+    </insert>
+    
+    <!-- 성격 및 장점 저장 -->
+	<insert id="insertMerit" parameterType="com.jobhunter.model.resume.MeritDTO">
+        INSERT INTO merit (meritContent, resumeNo)
+        VALUES (#{meritContent}, #{resumeNo});
+    </insert>
+
+    <!-- 학력 저장 -->
+    <insert id="insertEducation" parameterType="com.jobhunter.model.resume.EducationDTO">
+        INSERT INTO education (educationLevel, educationStatus, graduationDate, customInput, resumeNo)
+        VALUES (#{educationLevel}, #{educationStatus}, #{graduationDate}, #{customInput}, #{resumeNo});
+    </insert>
+
+    <!-- 경력 저장 -->
+    <insert id="insertHistory" parameterType="com.jobhunter.model.resume.PersonalHistoryDTO">
+        INSERT INTO personalhistory (companyName, position, jobDescription, startDate, endDate, resumeNo)
+        VALUES (#{companyName}, #{position}, #{jobDescription}, #{startDate}, #{endDate}, #{resumeNo});
+    </insert>
+
+    <!-- 자격증 저장 -->
+    <insert id="insertLicense" parameterType="com.jobhunter.model.resume.LicenseDTO">
+        INSERT INTO license (licenseName, acquisitionDate, institution, resumeNo)
+        VALUES (#{licenseName}, #{acquisitionDate}, #{institution}, #{resumeNo});
+    </insert>
+
+    <!-- 파일 저장 -->
+    <insert id="insertResumeUpfile" parameterType="com.jobhunter.model.resume.ResumeUpfileDTO">
+        INSERT INTO resumeupfiles (originalFileName, newFileName, ext, size, base64Image, resumeNo)
+        VALUES (#{originalFileName}, #{newFileName}, #{ext}, #{size}, #{base64Image}, #{resumeNo});
+    </insert>
+
+    <!-- 이력서 기본 정보 조회 -->
+    <select id="selectResumeList" parameterType="map" resultType="com.jobhunter.model.resume.ResumeVO">
+        SELECT 
+            resumeNo,
+            title,
+            userUid,
+            saveType,
+            regDate
+        FROM resume
+        WHERE userUid = #{userUid}
+        <if test="searchTitle != null and searchTitle != ''">
+            AND title LIKE CONCAT('%', #{searchTitle}, '%')
+        </if>
+        ORDER BY regDate DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 전체 이력서 수 조회 -->
+    <select id="selectTotalResumes" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM resume
+        WHERE userUid = #{userUid}
+        <if test="searchTitle != null and searchTitle != ''">
+            AND title LIKE CONCAT('%', #{searchTitle}, '%')
+        </if>
+    </select>
+
+    <!-- 이력서별 시군구 정보 조회 -->
+    <select id="selectResumeSigungu" parameterType="int" resultType="com.jobhunter.model.resume.SigunguVO">
+        SELECT 
+            sg.sigunguNo,
+            sg.name,
+            r.name as regionName,
+            r.regionNo
+        FROM where_resume_sigungu wrs
+        JOIN sigungu sg ON wrs.refSigunguNo = sg.sigunguNo
+        JOIN region r ON sg.regionNo = r.regionNo
+        WHERE wrs.refResumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서별 업직종 정보 조회 -->
+    <select id="selectResumeSubCategory" parameterType="int" resultType="com.jobhunter.model.resume.SubCategoryVO">
+        SELECT 
+            sc.subcategoryNo,
+            sc.jobName,
+            sc.refMajorcategoryNo as majorCategoryNo,
+            mc.jobName as majorCategoryName
+        FROM jobtype_resume_sub jrs
+        JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
+        JOIN majorcategory mc ON sc.refMajorcategoryNo = mc.majorcategoryNo
+        WHERE jrs.refResumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 삭제 -->
+    <delete id="deleteResume" parameterType="int">
+        DELETE FROM resume
+        WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 이력서 파일 조회 -->
+    <select id="selectResumeUpfile" parameterType="int" resultType="com.jobhunter.model.resume.ResumeUpfileDTO">
+        SELECT *
+        FROM resumeupfiles
+        WHERE resumeNo = #{resumeNo}
+    </select>
+    
+    <!-- 이력서 상세 정보 조회 -->
+    <select id="selectResumeDetail" parameterType="int" resultType="com.jobhunter.model.resume.ResumeDTO">
+        SELECT 
+            r.resumeNo,
+            r.title,
+            r.payType,
+            r.pay,
+            r.introduce,
+            r.userUid,
+            r.saveType,
+            r.profileBase64
+        FROM resume r
+        WHERE r.resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 고용형태 조회 -->
+    <select id="selectResumeJobForms" parameterType="int" resultType="com.jobhunter.model.resume.JobFormDTO">
+        SELECT form
+        FROM jobform
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 성격 및 장점 조회 -->
+    <select id="selectResumeMerits" parameterType="int" resultType="com.jobhunter.model.resume.MeritDTO">
+        SELECT meritContent
+        FROM merit
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 학력 조회 -->
+    <select id="selectResumeEducations" parameterType="int" resultType="com.jobhunter.model.resume.EducationDTO">
+        SELECT educationLevel, educationStatus, graduationDate, customInput
+        FROM education
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 경력 조회 -->
+    <select id="selectResumeHistories" parameterType="int" resultType="com.jobhunter.model.resume.PersonalHistoryDTO">
+        SELECT companyName, position, jobDescription, startDate, endDate
+        FROM personalhistory
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 자격증 조회 -->
+    <select id="selectResumeLicenses" parameterType="int" resultType="com.jobhunter.model.resume.LicenseDTO">
+        SELECT licenseName, acquisitionDate, institution
+        FROM license
+        WHERE resumeNo = #{resumeNo}
+    </select>
+
+    <!-- 이력서 기본 정보 수정 -->
+    <update id="updateResume" parameterType="com.jobhunter.model.resume.ResumeDTO">
+        UPDATE resume 
+        SET title = #{title},
+            payType = #{payType},
+            pay = #{pay},
+            introduce = #{introduce},
+            regDate = NOW(),
+            profileBase64 = #{profileBase64}
+        WHERE resumeNo = #{resumeNo}
+    </update>
+
+    <!-- 고용형태 삭제 -->
+    <delete id="deleteJobForms" parameterType="int">
+        DELETE FROM jobform WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 성격 및 장점 삭제 -->
+    <delete id="deleteMerits" parameterType="int">
+        DELETE FROM merit WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 지역 정보 삭제 -->
+    <delete id="deleteResumeSigungu" parameterType="int">
+        DELETE FROM where_resume_sigungu WHERE refResumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 업직종 정보 삭제 -->
+    <delete id="deleteResumeSubCategory" parameterType="int">
+        DELETE FROM jobtype_resume_sub WHERE refResumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 학력 정보 삭제 -->
+    <delete id="deleteEducations" parameterType="int">
+        DELETE FROM education WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 경력 정보 삭제 -->
+    <delete id="deleteHistories" parameterType="int">
+        DELETE FROM personalhistory WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 자격증 정보 삭제 -->
+    <delete id="deleteLicenses" parameterType="int">
+        DELETE FROM license WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 파일 정보 삭제 -->
+    <delete id="deleteResumeUpfiles" parameterType="int">
+        DELETE FROM resumeupfiles WHERE resumeNo = #{resumeNo}
+    </delete>
+
+    <!-- 유저정보 조회 -->
+    <select id="selectUserInfo" parameterType="int" resultType="com.jobhunter.model.user.UserVO">
+        SELECT *
+        FROM users
+        WHERE uid = #{userUid}
+    </select>
+    
+    <!-- 이력서 제출 -->
+    <insert id="insertRegistration" parameterType="map">
+        INSERT INTO registration (status, recruitmentNoticePk, resumePk, regDate)
+        VALUES ('WAITING', #{recruitmentNo}, #{resumeNo}, NOW())
+    </insert>
+    
+    <!-- 이력서 중복 제출 확인 -->
+    <select id="checkExistingRegistration" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM registration r
+        JOIN resume res ON r.resumePk = res.resumeNo
+        WHERE r.recruitmentNoticePk = #{recruitmentNo}
+        AND res.userUid = #{userUid}
+    </select>
+    
+    <!-- 이력서 상태 확인 -->
+    <select id="checkResumeStatus" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM registration
+        WHERE resumePk = #{resumeNo}
+        AND status = 'CHECKED'
+    </select>
+
+    <!-- 이력서 첨삭 내용 저장 -->
+	<insert id="insertAdvice" parameterType="com.jobhunter.model.resume.ResumeAdviceDTO" useGeneratedKeys="true" keyProperty="adviceNo">
+		INSERT INTO resume_advice (resumeNo, adviceContent, mentorUid)
+		VALUES (#{resumeNo}, #{adviceContent}, #{mentorUid})
+	</insert>
+
+    <!-- 첨삭 번호 업데이트 -->
+    <update id="updateAdviceNo" parameterType="map">
+        UPDATE registration_advice
+        SET adviceNo = #{adviceNo}
+        WHERE resumeNo = #{resumeNo}
+        AND mentorUid = #{mentorUid}
+        AND status = 'CHECKING'
+    </update>
+
+	<!-- 기존 첨삭 내용 삭제 -->
+	<delete id="deleteExistingAdvice" parameterType="map">
+		DELETE FROM resume_advice 
+		WHERE resumeNo = #{resumeNo} AND mentorUid = #{mentorUid} AND status = 'CHECKING'
+	</delete>
+
+	<!-- 이력서 첨삭 파일 정보 저장 -->
+	<insert id="insertAdviceFile" parameterType="com.jobhunter.model.resume.ResumeAdviceUpfileDTO">
+		INSERT INTO resume_advice_upfiles (adviceNo, originalFileName, newFileName, ext, size, base64Image, status)
+		VALUES (#{adviceNo}, #{originalFileName}, #{newFileName}, #{ext}, #{size}, #{base64Image}, #{status})
+	</insert> 
+
+    <!-- 첨삭 내용 조회 -->
+    <select id="getAdvice" parameterType="map" resultType="com.jobhunter.model.resume.ResumeAdviceDTO">
+        SELECT *
+        FROM resume_advice
+        WHERE adviceNo = #{adviceNo}
+    </select>
+
+    <!-- 첨삭 신청 멘토UID 조회 -->
+    <select id="getRegistrationAdviceForMentorUid" parameterType="map" resultType="int">
+        SELECT mentorUid
+        FROM registration_advice
+        WHERE resumeNo = #{resumeNo}
+        AND adviceNo = #{adviceNo}
+        AND status = 'CHECKING'
+    </select>
+
+    <!-- 첨삭 파일 조회 -->
+    <select id="getAdviceFiles" parameterType="int" resultType="com.jobhunter.model.resume.ResumeAdviceUpfileDTO">
+        SELECT 
+            adviceUpfileNo,
+            originalFileName,
+            newFileName,
+            ext,
+            size,
+            base64Image,
+            status,
+            adviceNo
+        FROM resume_advice_upfiles
+        WHERE adviceNo = #{adviceNo}
+    </select>
+
+    <!-- 이력서 첨삭 신청 저장 -->
+	<insert id="insertRegistrationAdvice" parameterType="map">
+		INSERT INTO registration_advice (regDate, status, mentorUid, resumeNo, dueDate)
+		VALUES (NOW(), 'WAITING', #{mentorUid}, #{resumeNo}, #{dueDate})
+	</insert>
+	
+	<!-- 이력서 첨삭 신청 중복 확인 -->
+	<select id="checkDuplicateAdvice" parameterType="map" resultType="int">
+		SELECT COUNT(*) FROM registration_advice 
+		WHERE resumeNo = #{resumeNo}
+        AND (status = 'WAITING' OR status = 'CHECKING')
+        <!-- AND mentorUid = #{mentorUid} -->
+	</select>
+
+	<!-- 이력서 첨삭 상태 확인 -->
+	<select id="checkResumeAdvice" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM registration_advice
+		WHERE resumeNo = #{resumeNo} AND (status = 'CHECKING' OR status = 'WAITING')
+	</select>
+
+    <!-- 첨삭 신청 번호 조회 -->
+    <select id="getRegistrationAdviceNo" parameterType="map" resultType="int">
+        SELECT rgAdviceNo
+        FROM registration_advice
+        WHERE mentorUid = #{mentorUid}
+        AND resumeNo = #{resumeNo}
+        ORDER BY regDate DESC
+        LIMIT 1
+    </select>
+    
+    <!-- 유저 한명의 관련된 유효기간 만료 신청들 상태 갱신 -->
+    <update id="changeAdviceStatus">
+        UPDATE registration_advice
+        SET status = #{status}
+        WHERE resumeNo = #{resumeNo}
+        AND mentorUid = #{userUid}
+        <if test="mode != null and mode == 'endAdvice'">
+        AND status = 'CHECKING'
+        </if>
+        <if test="mode == null or mode != 'endAdvice'">
+        AND status = 'WAITING'
+        </if>
+    </update>
+    
+    <select id="selectRegistrationAdviceByMentorWithPaging" resultType="com.jobhunter.model.resume.RegistrationAdviceVO">
+	  SELECT 
+	    ra.rgAdviceNo,
+	    ra.regDate,
+	    ra.status,
+	    ra.mentorUid,
+	    ra.resumeNo,
+	    ra.adviceNo,
+	    r.title AS title,
+	    mentee.uid AS menteeUid
+	  FROM registration_advice ra
+	  JOIN resume r ON ra.resumeNo = r.resumeNo
+	  JOIN users mentee ON r.userUid = mentee.uid
+	  WHERE 1=1
+	  <if test="type == 'mentor'">
+	    AND mentorUid = #{uid}
+	  </if>
+	  <if test="type == 'mentee'">
+	    AND mentee.uid = #{uid}
+	  </if>
+	  <if test="type == null">
+	    AND 1 = 0
+	  </if>
+		<if test="statusName != null">
+		  <choose>
+		    <when test="statusName == 'LIVE'">
+		      AND status IN ('WAITING', 'CHECKING')
+		    </when>
+		    <otherwise>
+		      AND status = #{statusName}
+		    </otherwise>
+		  </choose>
+		</if>
+	  ORDER BY regDate DESC
+	  LIMIT 5 OFFSET #{offset}
+	</select>
+	
+	<select id="countRegistrationAdviceByMentor" resultType="int">
+	  SELECT COUNT(rgAdviceNo)
+	  FROM registration_advice ra
+	  JOIN resume r ON ra.resumeNo = r.resumeNo
+	  JOIN users mentee ON r.userUid = mentee.uid
+	  WHERE
+		(
+		  <choose>
+		    <when test="type == 'mentor'">
+		      mentorUid = #{uid}
+		    </when>
+		    <when test="type == 'mentee'">
+		      mentee.uid = #{uid}
+		    </when>
+		    <otherwise>
+		      1 = 0
+		    </otherwise>
+		  </choose>
+		)
+		<if test="statusName != null">
+		  <if test="statusName == 'LIVE'">
+		    AND status IN ('WAITING', 'CHECKING')
+		  </if>
+		  <if test="statusName != 'LIVE'">
+		    AND status = #{statusName}
+		  </if>
+		</if>
+	</select>
+	
+	<select id="selectResumeAdviceByUserUid" resultType="com.jobhunter.model.resume.ResumeAdviceVO">
+	  SELECT
+	    ra.adviceNo,
+	    ra.resumeNo,
+	    ra.regDate,
+	    ra.mentorUid,
+	    r.title AS title,
+	    u.userName AS mentorName,
+	    mentee.uid AS menteeUid
+	  FROM resume_advice ra
+	  JOIN resume r ON ra.resumeNo = r.resumeNo
+	  JOIN users u ON ra.mentorUid = u.uid
+	  JOIN users mentee ON r.userUid = mentee.uid
+	  WHERE r.userUid = #{userUid}
+	  ORDER BY ra.regDate DESC
+	  LIMIT 5 OFFSET #{offset}
+	</select>
+	
+	<select id="countResumeAdviceByUserUid" resultType="int">
+	  SELECT COUNT(adviceNo)
+	  FROM resume_advice ra
+	  JOIN resume r ON ra.resumeNo = r.resumeNo
+	  WHERE r.userUid = #{userUid}
+	</select>
+
+    <!-- 첨삭 내용 상태 변경 -->
+    <update id="updateAdviceStatus" parameterType="map">
+        UPDATE resume_advice
+        SET status = #{status}
+        WHERE resumeNo = #{resumeNo}
+    </update>
+
+    <!-- 첨삭 코멘트 저장 -->
+    <insert id="insertAdviceComment" parameterType="com.jobhunter.model.resume.ResumeAdviceCommentDTO">
+        INSERT INTO resume_advice_comment (adviceNo, commentText, mentorUid, resumeNo, lineNo)
+        VALUES (#{adviceNo}, #{commentText}, #{mentorUid}, #{resumeNo}, #{lineNo})
+    </insert>
+
+    <!-- 첨삭 코멘트 조회 -->
+    <select id="getAdviceComments" parameterType="int" resultType="com.jobhunter.model.resume.ResumeAdviceCommentDTO">
+        SELECT * FROM resume_advice_comment
+        WHERE adviceNo = #{adviceNo}
+    </select>
+    
+    <!-- 유저 한명에 대해 관련된 만료 첨삭 신청글 검색 -->
+    <select id="findOverdueRegistrationAdviceNos" parameterType="map" resultType="int">
+	    SELECT ra.rgAdviceNo
+	    FROM registration_advice ra
+	    JOIN resume r ON ra.resumeNo = r.resumeNo
+	    WHERE (
+	        ra.mentorUid = #{uid}
+	        OR r.userUid = #{uid}
+	    )
+	    AND ra.status IN ('WAITING', 'CHECKING')
+	    AND ra.dueDate &lt; NOW()
+	    AND ra.dueDate > #{lastLoginDate}
+	</select>
+
+	<!-- 글번호로 취소상태로 변경 -->
+	<update id="cancelRegistrationAdvice" parameterType="int">
+	    UPDATE registration_advice
+	    SET status = 'CANCEL'
+	    WHERE rgAdviceNo = #{rgAdviceNo}
+	</update>
+	
+	<!-- 신청글번호로 첨삭글번호 검색(파일처리 및 삭제에 여러번 사용해서 조인대신 분리) -->
+	<select id="findAdviceNoByRgAdviceNo" parameterType="int" resultType="int">
+	    SELECT adviceNo
+	    FROM registration_advice
+	    WHERE rgAdviceNo = #{rgAdviceNo}
+	</select>
+	
+	<!-- 첨삭글번호로 파일리스트 가져오기 -->
+	<select id="findResumeUpfilesByAdviceNo" parameterType="int" resultType="com.jobhunter.model.resume.ResumeUpfileDTO">
+	    SELECT
+	        adviceUpfileNo AS boardUpFileNo,
+	        originalFileName,
+	        newFileName,
+	        ext,
+	        size,
+	        base64Image,
+	        (SELECT resumeNo FROM resume_advice WHERE adviceNo = #{adviceNo}) AS resumeNo
+	    FROM resume_advice_upfiles
+	    WHERE adviceNo = #{adviceNo}
+	</select>
+	
+	<!-- 첨삭글 삭제 -->
+	<delete id="deleteResumeAdviceByAdviceNo" parameterType="int">
+	    DELETE FROM resume_advice
+	    WHERE adviceNo = #{adviceNo}
+	</delete>
+	
+	<!-- 신청글번호로 포인트로그 취소상태로 변경 및 유저 포인트 복구 -->
+	<update id="cancelPointLogAndRestoreUserPointByRgAdviceNo" parameterType="int">
+	    UPDATE users u
+	    JOIN pointLog p ON u.uid = p.toUid
+	    SET 
+	        u.point = u.point + (p.point * -1),
+	        p.finalDate = NOW(),
+	        p.status = 'CANCEL'
+	    WHERE p.rgAdviceNo = #{rgAdviceNo}
+	</update>
+    
 </mapper>

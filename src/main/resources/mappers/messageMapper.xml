@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jobhunter.mapper.messagemapper">
+
+	<insert id="saveMessage"
+		parameterType="com.jobhunter.model.message.MessageDTO">
+		INSERT INTO message
+		(toWho, fromWho, toUserType, fromUserType, title, content)
+		VALUES
+		(#{toWho}, #{fromWho}, #{toUserType}, #{fromUserType}, #{title}, #{content})
+	</insert>
+	
+	<select id="getAllMessages" parameterType="map" resultType="com.jobhunter.model.message.MessageDTO">
+		SELECT 
+			messageNo, toWho, fromWho, toUserType, fromUserType, 
+			title, content, isRead, regDate
+		FROM 
+			message
+		WHERE
+			toWho = #{uid} AND toUserType = #{accountType}
+		ORDER BY 
+			regDate DESC
+	</select>
+	
+	<select id="getMessagesByUserId" parameterType="com.jobhunter.model.message.MessageDTO" 
+		resultType="com.jobhunter.model.message.MessageDTO">
+		SELECT 
+			messageNo, toWho, fromWho, toUserType, fromUserType, 
+			title, content, isRead, regDate
+		FROM 
+			message
+		WHERE 
+			toWho = #{toWho} AND toUserType = #{toUserType}
+		ORDER BY 
+			regDate DESC
+	</select>
+	
+	<update id="updateMessageReadStatus" parameterType="com.jobhunter.model.message.MessageRequest">
+		UPDATE 
+			message
+		SET 
+			isRead = 'Y'
+		WHERE 
+			messageNo = #{messageNo} AND toUserType = #{accountType} AND toWho = #{uid}
+	</update>
+	
+	<update id="updateAllMessagesReadStatus" parameterType="com.jobhunter.model.message.MessageRequest">
+		UPDATE 
+			message
+		SET 
+			isRead = 'Y'
+		WHERE 
+			toUserType = #{accountType} AND toWho = #{uid}
+	</update>
+	
+	<delete id="deleteMessage" parameterType="int">
+		DELETE FROM 
+			message
+		WHERE 
+			messageNo = #{messageNo}
+	</delete>
+
+	<select id="getUnreadCount" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM message
+		WHERE isRead = 'N' AND toWho = #{uid} AND toUserType = #{accountType}
+	</select>
+
+	<select id="getMessagesWithPaging" parameterType="map" resultType="com.jobhunter.model.message.MessageDTO">
+		SELECT 
+			messageNo, toWho, fromWho, toUserType, fromUserType, 
+			title, content, isRead, regDate
+		FROM 
+			message
+		WHERE
+			toWho = #{uid} AND toUserType = #{accountType}
+		ORDER BY 
+			regDate DESC
+		LIMIT #{offset}, #{pageSize}
+	</select>
+	
+	<select id="getTotalMessageCount" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM message
+		WHERE toWho = #{uid} AND toUserType = #{accountType}
+	</select>
+
+</mapper>

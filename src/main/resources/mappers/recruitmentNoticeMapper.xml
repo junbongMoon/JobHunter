@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jobhunter.mapper.recruitmentNoticeMapper">
+
+	<insert id="insertRecruitmentnotice">
+		insert into recruitmentnotice
+		(title, workType,
+		payType, pay, period, personalHistory, militaryService,
+		detail,
+		manager, miniTitle, dueDate, status, refCompany)
+		values
+		(#{title},
+		#{workType}, #{payType}, #{pay}, #{period}, #{personalHistory},
+		#{militaryService}, #{detail}, #{manager}, #{miniTitle}, #{dueDate,
+		jdbcType=TIMESTAMP}, 'Y', #{refCompany})
+	</insert>
+
+
+	<insert id="insertApplicationWithRecruitmentnotice">
+		insert into application
+		(method,
+		detail,recruitmentNoticeUid)
+		values
+		(#{method},#{detail},
+		#{recruitmentNoticeUid})
+	</insert>
+
+	<insert id="insertAdvantageWithRecruitmentnotice">
+		insert into advantage
+		(advantageType,
+		recruitmentNoticeUid)
+		values
+		(#{advantageType},
+		#{recruitmentNoticeUid})
+	</insert>
+
+	<insert id="insertFileWithRecruitmentnotice">
+		insert into recruitmentnoticeboardupfiles
+		(originalFileName, newFileName, thumbFileName, fileType, ext, size,
+		base64Image, status,
+		refrecruitmentnoticeNo)
+		values
+		(#{originalFileName},#{newFileName}, #{thumbFileName}, #{fileType},
+		#{ext}, #{size}, #{base64Image},
+		#{status}, #{refrecruitmentnoticeNo})
+
+	</insert>
+
+	<!-- application 조회 -->
+	<select id="getApplications"
+		resultType="com.jobhunter.model.recruitmentnotice.Application">
+		SELECT
+		applicationNo,
+		method,
+		detail,
+		recruitmentNoticeUid
+		FROM
+		application
+		WHERE
+		recruitmentNoticeUid = #{recruitmentNoticeUid}
+	</select>
+
+	<!-- advantage 조회 -->
+	<select id="getAdvantages"
+		resultType="com.jobhunter.model.recruitmentnotice.Advantage">
+		SELECT
+		advantageNo,
+		advantageType,
+		recruitmentNoticeUid
+		FROM
+		advantage
+		WHERE
+		recruitmentNoticeUid = #{recruitmentNoticeUid}
+	</select>
+
+	<select id="selectMostRecentRecruitmentnoticeByrefCompany"
+		resultType="int">
+		select r.uid from recruitmentnotice r where refCompany =
+		#{companyUid} order by uid
+		desc limit 1;
+	</select>
+
+
+	<!-- selectRecruitmentWithPaging -->
+	<select id="selectRecruitmentWithPaging"
+		resultMap="RecruitmentDetailMap">
+		SELECT
+		r.*, c.companyName, c.addr AS companyAddr,
+		rg.regionNo, rg.name
+		AS regionName, rg.code,
+		sg.sigunguNo, sg.name AS sigunguName,
+		sg.regionNo,
+		mj.majorcategoryNo
+		AS majorNo, mj.jobName AS majorJobName,
+		sj.subcategoryNo AS subNo,
+		sj.jobName AS subJobName,
+		sj.refMajorcategoryNo
+		FROM recruitmentnotice
+		r
+		LEFT JOIN
+		where_recruit_region rr ON r.uid = rr.refRecNo
+		LEFT JOIN
+		region rg ON
+		rr.refRegion = rg.regionNo
+		LEFT JOIN where_recruit_sigungu
+		rs ON r.uid =
+		rs.refRecNo
+		LEFT JOIN sigungu sg ON rs.refSigungu =
+		sg.sigunguNo
+		LEFT
+		JOIN jobtype_recruit_major rm ON r.uid = rm.refRecNo
+		LEFT JOIN
+		majorcategory mj ON rm.refMajorNo = mj.majorcategoryNo
+		LEFT
+		JOIN
+		jobtype_recruit_sub rsb ON r.uid = rsb.refRecNo
+		LEFT JOIN
+		subcategory sj
+		ON rsb.refSubNo = sj.subcategoryNo
+		LEFT JOIN company c
+		ON c.uid =
+		r.refCompany
+
+		<where>
+			r.status = 'Y' AND r.dueDate > now()
+
+			<!-- 검색 조건은 그대로 유지 -->
+			<if test="searchType != null and searchType != ''">
+				<choose>
+					<when
+						test="searchType == 'region' and searchWord != null and searchWord != ''">
+						AND (
+						rg.name LIKE CONCAT('%', #{searchWord}, '%')
+						OR sg.name
+						LIKE CONCAT('%', #{searchWord}, '%')
+						)
+					</when>
+					<when
+						test="searchType == 'jobType' and searchWord != null and searchWord != ''">
+						AND (
+						mj.jobName LIKE CONCAT('%', #{searchWord}, '%')
+						OR
+						sj.jobName LIKE CONCAT('%', #{searchWord}, '%')
+						)
+					</when>
+
+					<when
+						test="searchType == 'advantage' and searchWord != null and searchWord != ''">
+						AND EXISTS (
+						SELECT 1 FROM advantage a
+						WHERE
+						a.recruitmentNoticeUid = r.uid
+						AND a.advantageType LIKE CONCAT('%',
+						#{searchWord}, '%')
+						)
+					</when>
+
+				</choose>
+			</if>
+		</where>
+
+		<choose>
+			<when test="sortOption == 'highPay'">
+				ORDER BY CASE r.payType
+				WHEN 'HOUR' THEN r.pay * 8 *
+				22
+				WHEN 'DATE' THEN r.pay * 22
+				WHEN 'WEEK' THEN r.pay * 4
+				WHEN 'MONTH'
+				THEN r.pay
+				WHEN 'YEAR' THEN r.pay / 12
+				ELSE 0
+				END DESC
+			</when>
+			<when test="sortOption == 'lowPay'">
+				ORDER BY CASE r.payType
+				WHEN 'HOUR' THEN r.pay * 8 *
+				22
+				WHEN 'DATE' THEN r.pay * 22
+				WHEN 'WEEK' THEN r.pay * 4
+				WHEN 'MONTH'
+				THEN r.pay
+				WHEN 'YEAR' THEN r.pay / 12
+				ELSE 0
+				END ASC
+			</when>
+			<when test="sortOption == 'deadlineSoon'">
+				ORDER BY r.dueDate ASC
+			</when>
+
+			<otherwise>
+				ORDER BY r.uid DESC
+			</otherwise>
+		</choose>
+
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
+	</select>
+
+
+	<resultMap id="RecruitmentDetailMap"
+		type="com.jobhunter.model.recruitmentnotice.RecruitmentDetailInfo">
+
+		<!-- RecruitmentDetailInfo -->
+
+		<id property="uid" column="uid" />
+		<result property="title" column="title" />
+		<result property="workType" column="workType" />
+		<result property="payType" column="payType" />
+		<result property="pay" column="pay" />
+		<result property="period" column="period" />
+		<result property="personalHistory" column="personalHistory" />
+		<result property="militaryService" column="militaryService"
+			javaType="com.jobhunter.model.customenum.MilitaryServe" />
+		<result property="detail" column="detail" />
+		<result property="manager" column="manager" />
+		<result property="miniTitle" column="miniTitle" />
+		<result property="dueDate" column="dueDate" />
+		<result property="status" column="status" />
+		<result property="count" column="count" />
+		<result property="regDate" column="regDate" />
+		<result property="refCompany" column="refCompany" />
+		<result property="companyName" column="companyName" />
+		<result property="companyAddr" column="companyAddr" />
+
+		<!-- Region (도시) -->
+		<association property="region"
+			javaType="com.jobhunter.model.region.Region">
+			<id property="regionNo" column="regionNo" />
+			<result property="name" column="regionName" />
+		</association>
+
+		<!-- Sigungu (시군구) -->
+		<association property="sigungu"
+			javaType="com.jobhunter.model.region.Sigungu">
+			<id property="sigunguNo" column="sigunguNo" />
+			<result property="name" column="sigunguName" />
+		</association>
+
+		<!-- MajorCategory (산업군) -->
+		<association property="majorCategory"
+			javaType="com.jobhunter.model.category.MajorCategory">
+			<id property="majorcategoryNo" column="majorNo" />
+			<result property="jobName" column="majorJobName" />
+		</association>
+
+		<!-- SubCategory (직종) -->
+		<association property="subcategory"
+			javaType="com.jobhunter.model.category.SubCategory">
+			<id property="subcategoryNo" column="subNo" />
+			<result property="jobName" column="subJobName" />
+		</association>
+
+	</resultMap>
+
+	<select id="selectAdvantageByRecruitmentNoticeUid"
+		resultType="com.jobhunter.model.recruitmentnotice.Advantage">
+		SELECT advantageNo, advantageType, recruitmentNoticeUid
+		FROM advantage
+		WHERE recruitmentNoticeUid = #{uid}
+	</select>
+
+	<select id="getTotalCountRow" resultType="int">
+		select count(*) from
+		recruitmentnotice
+		where status = 'Y' AND dueDate > now()
+	</select>
+
+	<select id="getSearchResultCountRow" resultType="int">
+		SELECT COUNT(*)
+		FROM recruitmentnotice r
+		LEFT JOIN where_recruit_region
+		rr ON r.uid = rr.refRecNo
+		LEFT JOIN region rg ON rr.refRegion =
+		rg.regionNo
+		LEFT JOIN where_recruit_sigungu rs ON r.uid = rs.refRecNo
+		LEFT JOIN sigungu sg ON rs.refSigungu = sg.sigunguNo
+		LEFT JOIN
+		jobtype_recruit_major rm ON r.uid = rm.refRecNo
+		LEFT JOIN majorcategory
+		mj ON rm.refMajorNo = mj.majorcategoryNo
+		LEFT JOIN jobtype_recruit_sub
+		rsb ON r.uid = rsb.refRecNo
+		LEFT JOIN subcategory sj ON rsb.refSubNo =
+		sj.subcategoryNo
+		LEFT JOIN advantage a ON a.recruitmentNoticeUid =
+		r.uid
+
+		<where>
+			r.status = 'Y' AND r.dueDate > now()
+
+			<if
+				test="searchType != null and searchWord != null and searchWord != ''">
+				<choose>
+					<when test="searchType == 'region'">
+						AND (
+						rg.name LIKE CONCAT('%', #{searchWord}, '%')
+						OR sg.name LIKE CONCAT('%', #{searchWord}, '%')
+						)
+					</when>
+
+					<when test="searchType == 'jobType'">
+						AND (
+						mj.jobName LIKE CONCAT('%', #{searchWord},
+						'%')
+						OR sj.jobName LIKE CONCAT('%', #{searchWord}, '%')
+						)
+					</when>
+
+					<when test="searchType == 'advantage'">
+						AND EXISTS (
+						SELECT 1 FROM advantage a
+						WHERE
+						a.recruitmentNoticeUid = r.uid
+						AND a.advantageType LIKE CONCAT('%',
+						#{searchWord}, '%')
+						)
+					</when>
+
+					<when test="searchType == 'jobform'">
+						AND r.worktype LIKE CONCAT('%', #{searchWord}, '%')
+					</when>
+				</choose>
+			</if>
+		</where>
+	</select>
+
+	<select id="getFileWithRecruitment"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles">
+		select *
+		from recruitmentnoticeboardupfiles
+		where
+		refrecruitmentnoticeNo = #{uid}
+	</select>
+
+	<select id="getBoardDetailInfoByUid"
+		resultMap="RecruitmentDetailMap">
+		SELECT
+		r.*, c.companyName, c.addr AS companyAddr,
+
+		rg.regionNo,
+		rg.name AS regionName,
+		rg.code,
+		sg.sigunguNo, sg.name AS
+		sigunguName, sg.regionNo,
+
+		mj.majorcategoryNo AS majorNo, mj.jobName AS
+		majorJobName,
+		sj.subcategoryNo AS subNo, sj.jobName AS subJobName,
+		sj.refMajorcategoryNo
+
+		FROM
+		recruitmentnotice r
+		LEFT JOIN
+		where_recruit_region rr ON r.uid =
+		rr.refRecNo
+		LEFT JOIN region rg ON
+		rr.refRegion = rg.regionNo
+
+		LEFT JOIN
+		where_recruit_sigungu rs ON r.uid =
+		rs.refRecNo
+		LEFT JOIN sigungu sg ON
+		rs.refSigungu = sg.sigunguNo
+
+		LEFT
+		JOIN jobtype_recruit_major rm ON
+		r.uid = rm.refRecNo
+		LEFT JOIN
+		majorcategory mj ON rm.refMajorNo =
+		mj.majorcategoryNo
+
+		LEFT JOIN
+		jobtype_recruit_sub rsb ON r.uid =
+		rsb.refRecNo
+		LEFT JOIN subcategory sj
+		ON rsb.refSubNo =
+		sj.subcategoryNo
+
+		LEFT JOIN company c ON c.uid =
+		r.refCompany
+
+		where r.uid = #{uid}
+	</select>
+
+	<delete id="removeRecruitmentByUid">
+		delete from recruitmentnotice
+		where uid = #{uid}
+	</delete>
+
+	<update id="modifyRecruitmentByUid">
+		UPDATE recruitmentnotice
+		SET
+		title = #{title},
+		workType
+		= #{workType},
+		payType = #{payType},
+		pay = #{pay},
+		period = #{period},
+		personalHistory = #{personalHistory},
+		militaryService =
+		#{militaryService},
+		detail = #{detail},
+		manager = #{manager},
+		miniTitle =
+		#{miniTitle},
+		dueDate = #{dueDate, jdbcType=TIMESTAMP},
+		refCompany =
+		#{refCompany}
+		WHERE uid = #{uid}
+	</update>
+
+	<delete id="removeAdvantageByRecruitmentUid">
+		DELETE FROM advantage
+		WHERE recruitmentNoticeUid =
+		#{uid}
+		AND advantageType = #{advantageType}
+	</delete>
+
+	<!-- 실제로 접수 방식(application)을 삭제하는 쿼리 -->
+	<delete id="removeApplicationByRecruitmentUid">
+		DELETE FROM application
+		WHERE recruitmentNoticeUid =
+		#{uid}
+		AND method = #{method}
+	</delete>
+
+	<delete id="deleteFileFromDatabase">
+		delete from recruitmentnoticeboardupfiles
+		where
+		boardUpFileNo = #{boardUpFileNo}
+	</delete>
+
+	<select id="getTotalCountRowByCompanyUid" resultType="int">
+		SELECT
+		COUNT(*)
+		FROM recruitmentnotice
+		WHERE refCompany = #{companyUid}
+	</select>
+
+	<select id="selectRecruitmentByCompanyUid"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentNotice">
+		SELECT *
+		FROM recruitmentnotice
+		WHERE refCompany =
+		#{companyUid}
+		ORDER BY uid DESC
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
+	</select>
+
+	<!-- 이전 글 -->
+	<select id="selectPreviousPost"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentNotice">
+		SELECT uid, title, regDate
+		FROM recruitmentnotice
+		WHERE uid
+		&lt; #{uid} AND status = 'Y'
+		and duedate > now()
+		ORDER BY uid DESC
+		LIMIT
+		1
+	</select>
+
+	<!-- 다음 글 -->
+	<select id="selectNextPost"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentNotice">
+		SELECT uid, title, regDate
+		FROM recruitmentnotice
+		WHERE uid
+		&gt; #{uid} AND status = 'Y'
+		and duedate > now()
+		ORDER BY uid ASC
+		LIMIT 1
+	</select>
+
+	<select id="countByCreatedDateBetweenAndRole"
+		parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM recruitmentnotice
+		WHERE
+		regDate BETWEEN #{start} AND #{end}
+	</select>
+
+	<insert id="insertCreateRecruitmentLog">
+		insert into CDLog
+		(targetId, targetType, logType)
+		values
+		(#{recNo}, 'RECRUITMENT', 'CREATE')
+	</insert>
+
+	<insert id="insertDeleteRecruitmentLog">
+		insert into CDLog
+		(targetId, targetType, logType)
+		values
+		(#{recNo}, 'RECRUITMENT', 'DELETE')
+	</insert>
+
+	<update id="ExpiredDueDateByUid">
+		update recruitmentnotice
+		set dueDate = now()
+		WHERE uid
+		= #{uid}
+	</update>
+
+	<insert id="insertViewsLog" parameterType="map">
+		INSERT INTO ViewsLog
+		(userId, boardNo, viewType)
+		VALUES (#{userId}, #{boardNo}, #{viewType})
+	</insert>
+
+	<select id="isRecentlyViewed" parameterType="map"
+		resultType="boolean">
+		SELECT EXISTS (
+		SELECT 1
+		FROM ViewsLog
+		WHERE userId =
+		#{userId}
+		AND boardNo = #{boardNo}
+		AND viewType = #{viewType}
+		AND
+		viewedAt >= NOW() - INTERVAL 24 HOUR
+		)
+	</select>
+
+	<update id="increaseRecruitmentViewCnt" parameterType="int">
+		UPDATE
+		recruitmentnotice
+		SET count = count + 1
+		WHERE uid = #{boardNo}
+	</update>
+
+	<select id="searchRecruitments"
+		resultType="com.jobhunter.model.recruitmentnotice.RecruitmentWithResume">
+		SELECT
+		rn.*,
+		COUNT(DISTINCT r.registrationNo) AS registrationCount,
+		EXISTS (
+		SELECT 1 FROM registration r2
+		WHERE r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
+		) AS hasUnreadApplications,
+		EXISTS (
+		SELECT 1 FROM application a
+		WHERE a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
+		) AS isApplyViaSite
+		FROM recruitmentnotice rn
+		LEFT JOIN registration r ON rn.uid = r.recruitmentNoticePk
+		WHERE rn.status = 'Y'
+		AND rn.refCompany = #{uid} <!-- 작성자(기업 UID) 조건 고정 -->
+
+		<if
+			test="searchKeywordType == 'title' and searchKeyword != null and searchKeyword != ''">
+			AND (rn.title LIKE CONCAT('%', #{searchKeyword}, '%')
+			OR rn.miniTitle LIKE CONCAT('%', #{searchKeyword}, '%'))
+		</if>
+
+		<if
+			test="searchKeywordType == 'manager' and searchKeyword != null and searchKeyword != ''">
+			AND rn.manager LIKE CONCAT('%', #{searchKeyword}, '%')
+		</if>
+
+		<if test="isNotClosing">
+			AND rn.dueDate > NOW()
+		</if>
+
+		<if test="isNoRead">
+			AND EXISTS (
+			SELECT 1 FROM registration r2
+			WHERE r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
+			)
+		</if>
+
+		<if test="isApplyViaSite">
+			AND EXISTS (
+			SELECT 1 FROM application a
+			WHERE a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
+			)
+		</if>
+
+		GROUP BY rn.uid
+
+		<choose>
+			<when test="sortBy == 'LATEST'">
+				ORDER BY rn.regDate DESC
+			</when>
+			<when test="sortBy == 'DUE_SOON'">
+				ORDER BY rn.dueDate ASC
+			</when>
+			<when test="sortBy == 'REG_COUNT'">
+				ORDER BY registrationCount DESC
+			</when>
+		</choose>
+
+		LIMIT #{offset}, 5
+	</select>
+
+
+	<select id="countRecruitments" resultType="int">
+		SELECT COUNT(DISTINCT rn.uid)
+		FROM recruitmentnotice rn
+		LEFT JOIN
+		registration r ON rn.uid = r.recruitmentNoticePk
+		LEFT JOIN company c ON
+		rn.refCompany = c.uid
+		WHERE rn.status = 'Y'
+		AND rn.refCompany = #{uid} <!-- 
+			작성자(회사) UID 필수 조건 -->
+
+		<if
+			test="searchKeywordType == 'title' and searchKeyword != null and searchKeyword != ''">
+			AND (rn.title LIKE CONCAT('%', #{searchKeyword}, '%')
+			OR
+			rn.miniTitle LIKE CONCAT('%', #{searchKeyword}, '%'))
+		</if>
+
+		<if
+			test="searchKeywordType == 'manager' and searchKeyword != null and searchKeyword != ''">
+			AND rn.manager LIKE CONCAT('%', #{searchKeyword}, '%')
+		</if>
+
+		<if
+			test="searchKeywordType == 'company' and searchKeyword != null and searchKeyword != ''">
+			AND c.companyName LIKE CONCAT('%', #{searchKeyword}, '%')
+		</if>
+
+		<if test="isNotClosing">
+			AND rn.dueDate > NOW()
+		</if>
+
+		<if test="isNoRead">
+			AND EXISTS (
+			SELECT 1 FROM registration r2
+			WHERE
+			r2.recruitmentNoticePk = rn.uid AND r2.status = 'WAITING'
+			)
+		</if>
+
+		<if test="isApplyViaSite">
+			AND EXISTS (
+			SELECT 1 FROM application a
+			WHERE
+			a.recruitmentNoticeUid = rn.uid AND a.method = 'ONLINE'
+			)
+		</if>
+	</select>
+
+	<!-- 좋아요 증가 -->
+	<update id="increaseRecruitmentLikeCnt" parameterType="int">
+		UPDATE
+		recruitmentnotice
+		SET likeCnt = likeCnt + 1
+		WHERE uid = #{uid}
+	</update>
+
+	<!-- 좋아요 감소 -->
+	<update id="decreaseRecruitmentLikeCnt" parameterType="int">
+		UPDATE
+		recruitmentnotice
+		SET likeCnt = CASE
+		WHEN likeCnt > 0 THEN likeCnt - 1
+		ELSE 0
+		END
+		WHERE uid = #{uid}
+	</update>
+
+</mapper>

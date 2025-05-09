@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.jobhunter.dao.user.UserDAO;
+import com.jobhunter.dao.account.AccountLoginDAO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,18 +16,6 @@ import lombok.RequiredArgsConstructor;
 
 public class UserServiceTests {
 	
-	@Autowired
-	private UserDAO udao;
-
-	@Test
-	public void testUserInsert() {
-		
-		try {
-			udao.insertUser();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	
 	
 }

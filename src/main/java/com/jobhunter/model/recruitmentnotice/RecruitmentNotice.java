@@ -1,5 +1,37 @@
 package com.jobhunter.model.recruitmentnotice;
 
-public class RecruitmentNotice {
+import java.sql.Timestamp;
 
+import com.jobhunter.model.customenum.JobForm;
+import com.jobhunter.model.customenum.MilitaryServe;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+// 일단 Setter와 builder는 만들어 놓지 않는다.
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@ToString
+public class RecruitmentNotice {
+	private int uid;
+	private String title;
+	private JobForm workType;
+	private String payType;
+	private int pay;
+	private String period;
+	private String personalHistory;
+	private MilitaryServe militaryService;
+	private String detail;
+	private String manager;
+	private String miniTitle;
+	private Timestamp dueDate;
+	private String status;
+	private int count;
+	private Timestamp regDate;
+	private int likeCnt;
+	private int refCompany;
 }

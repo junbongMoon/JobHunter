@@ -19,9 +19,13 @@ public class PropertiesTask {
 	 */
 	public static String getPropertiesValue(String propertiesFileName, String key) throws IOException {
 		Properties prop = new Properties();
+		
+		System.out.println(propertiesFileName);
 
 		Reader reader = Resources.getResourceAsReader(propertiesFileName);
 		prop.load(reader);
+		
+		System.out.println(reader);
 
 		return (String) prop.get(key);
 	}

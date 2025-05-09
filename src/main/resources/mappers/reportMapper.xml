@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jobhunter.mapper.reportmapper">
+
+
+
+<!-- 계정 신고 관련 매퍼 -->
+	<insert id="insertAccountReport" parameterType="com.jobhunter.model.report.AccountReportDTO">
+		INSERT INTO reportMessage (
+			reportType,
+			reportTargetPK,
+			targetAccountUid,
+			targetAccountType,
+			reporterAccountUid,
+			reporterAccountType,
+			reportCategory,
+			reportMessage
+		)
+		VALUES (
+			#{reportType},
+			#{reportTargetPK},
+			#{targetAccountUid},
+			#{targetAccountType},
+			#{reporterAccountUid},
+			#{reporterAccountType},
+			#{reportCategory},
+			#{reportMessage}
+		)
+	</insert>
+<!-- 계정 신고 관련 매퍼 -->
+
+
+
+<!-- 게시글  신고 관련 매퍼 -->
+<insert id="insertBoardReport" parameterType="com.jobhunter.model.report.BoardReportDTO">
+  INSERT INTO reportMessage (
+    reportType,
+    targetAccountUid,
+    reportTargetPK,
+    targetAccountType,
+    reporterAccountUid,
+    reporterAccountType,
+    reportCategory,
+    reportMessage,
+    reportTargetURL
+
+  ) VALUES (
+    #{reportType},
+    #{targetAccountUid},
+    #{reportTargetPK},
+    #{targetAccountType},
+    #{reporterAccountUid},
+    #{reporterAccountType},
+    #{reportCategory},
+    #{reportMessage},
+    #{reportTargetURL}
+    
+  )
+</insert>
+
+<!-- 게시글  신고 관련 매퍼 -->
+
+<!-- reporterAccountType이 USER인 신고 데이터 조회 -->
+	<select id="getReportsByUserReporter" resultType="com.jobhunter.model.report.ReportMessageVO">
+		SELECT *
+		FROM 
+			reportMessage
+		WHERE 
+			reporterAccountType = 'USER'
+		ORDER BY 
+			regDate DESC
+	</select>
+<!-- reporterAccountType이 USER인 신고 데이터 조회 -->
+
+</mapper>

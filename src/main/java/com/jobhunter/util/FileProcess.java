@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jobhunter.model.recruitmentnotice.RecruitmentnoticeBoardUpfiles;
 import com.jobhunter.model.util.BoardUpFilesVODTO;
 
 /**
@@ -41,6 +42,7 @@ public class FileProcess {
 	public FileProcess() {
 		this.os = System.getProperty("os.name").toLowerCase();
 	}
+	
 
 	/**
 	 * @author Administrator
@@ -74,6 +76,31 @@ public class FileProcess {
 
 		}
 	}
+	
+	// 오버로딩: RecruitmentnoticeBoardUpfiles용 removeFile
+	public void removeFile(RecruitmentnoticeBoardUpfiles removeFile) {
+	    String tmpNewFileName = null;
+	    String tmpThubFileName = null;
+
+	    // 현재 시스템의 os가 windows냐 linux냐에 따라...
+	    if (this.os.contains("windows")) {
+	        tmpNewFileName = removeFile.getNewFileName().replace("/", "\\");
+	        tmpThubFileName = removeFile.getThumbFileName().replace("/", "\\");
+	    } else if (this.os.contains("linux")) {
+	        tmpNewFileName = removeFile.getNewFileName();
+	        tmpThubFileName = removeFile.getThumbFileName();
+	    }
+
+	    // 실제 물리 파일 삭제
+	    File tmp = new File(this.realPath + tmpNewFileName);
+	    tmp.delete();
+
+	    if (ImageMimeType.isImage(removeFile.getExt())) {
+	        File tmpThumb = new File(this.realPath + tmpThubFileName);
+	        tmpThumb.delete();
+	    }
+	}
+
 
 	/**
 	 * @author Administrator

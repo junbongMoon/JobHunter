@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jobhunter.mapper.categorymapper">
+
+	<select id="selectAllMajorCategory" resultType="com.jobhunter.model.category.MajorCategory">
+		select * from majorcategory
+	</select>
+	
+	<select id="selectSubCategoryByRefmajorcategoryNo" resultType="com.jobhunter.model.category.SubCategory">
+		select * from subcategory where refMajorcategoryNo = #{refMajorcategoryNo}
+	</select>
+	
+	<insert id="insertMajorCategoryWithRecruitmentNotice">
+		insert into jobtype_recruit_major
+		(refRecNo, refMajorNo)
+		values
+		(#{refRecNo}, #{refMajorNo})
+	</insert>
+	
+	<insert id="insertSubCategoryWithRecruitmentNotice">
+		insert into jobtype_recruit_sub
+		(refRecNo, refSubNo)
+		values
+		(#{refRecNo}, #{refSubNo})
+	</insert>
+	
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jobhunter.mapper.pointmapper">
+
+    <!-- 첨삭 포인트 로그 저장 -->
+    <insert id="submitAdvicePointLog" parameterType="map">
+        INSERT INTO pointLog (
+            regDate,
+            finalDate,
+            dueDate,
+            point,
+            toUid,
+            fromUid,
+            rgAdviceNo,
+            status
+        )
+        VALUES (
+            NOW(),
+            NULL,
+            #{dueDate},
+            #{point},
+            #{sessionUid},
+            #{mentorUid},
+            #{rgAdviceNo},
+            'WAITING'
+        )
+    </insert>
+
+    <!-- 포인트 로그 업데이트 -->
+    <update id="updatePointLog" parameterType="map">
+        UPDATE pointLog
+        SET status = #{status},
+            finalDate = NOW()
+        WHERE rgAdviceNo = #{rgAdviceNo}
+        AND status = 'WAITING'
+    </update>
+
+
+</mapper>

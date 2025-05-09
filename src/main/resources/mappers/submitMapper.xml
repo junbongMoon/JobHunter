@@ -1,0 +1,599 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jobhunter.mapper.submitmapper">
+
+	<!-- 이력서 리스트 조회 (공고에 제출된 전체 이력서 조회) -->
+	<select id="selectRecruitmentsByRecruitmentUid"
+		resultMap="ResumeDetailInfoBySubmitMap">
+		SELECT
+		r.resumeNo, r.title, r.payType, r.pay, r.introduce,
+		r.saveType, r.userUid,
+
+		reg.registrationNo, reg.status,
+		reg.recruitmentNoticePk AS regRecruitmentNoticePk,
+		reg.regDate,
+		reg.resumePk AS regResumePk,
+
+		jf.jobFormNo, jf.form AS jobForm,
+		m.meritNo, m.meritContent,
+		e.educationNo, e.educationLevel,
+		e.educationStatus, e.graduationDate, e.customInput,
+		h.historyNo,
+		h.companyName, h.position, h.jobDescription, h.startDate, h.endDate,
+		l.licenseNo, l.licenseName, l.acquisitionDate, l.institution,
+		s.sigunguNo, s.name AS sigunguName, s.regionNo,
+		sc.subcategoryNo,
+		sc.jobName, sc.refMajorcategoryNo
+
+		FROM (
+		SELECT r.resumeNo
+		FROM
+		registration reg
+		JOIN resume r ON reg.resumePk = r.resumeNo
+		WHERE
+		reg.recruitmentNoticePk = #{recruitmentUid}
+		ORDER BY r.resumeNo DESC
+		LIMIT #{startRowIndex}, #{rowCntPerPage}
+		) AS pageResume
+
+		JOIN resume r
+		ON pageResume.resumeNo = r.resumeNo
+		JOIN registration reg ON
+		reg.resumePk = r.resumeNo AND
+		reg.recruitmentNoticePk =
+		#{recruitmentUid}
+		LEFT JOIN jobform jf ON r.resumeNo = jf.resumeNo
+		LEFT
+		JOIN merit m ON r.resumeNo = m.resumeNo
+		LEFT JOIN education e ON
+		r.resumeNo = e.resumeNo
+		LEFT JOIN personalhistory h ON r.resumeNo =
+		h.resumeNo
+		LEFT JOIN license l ON r.resumeNo = l.resumeNo
+		LEFT JOIN
+		where_resume_sigungu sr ON r.resumeNo = sr.refResumeNo
+		LEFT JOIN
+		sigungu s ON sr.refSigunguNo = s.sigunguNo
+		LEFT JOIN jobtype_resume_sub
+		jrs ON r.resumeNo = jrs.refResumeNo
+		LEFT JOIN subcategory sc ON
+		jrs.refSubNo = sc.subcategoryNo
+
+		ORDER BY r.resumeNo DESC
+	</select>
+
+	<!-- 전체 개수 -->
+	<select id="getTotalCountRowOfRecruitmentByUid" resultType="int">
+		SELECT COUNT(registrationNo)
+		FROM registration
+		WHERE recruitmentNoticePk = #{uid}
+	</select>
+
+	<!-- resultMap -->
+	<resultMap id="ResumeDetailInfoBySubmitMap"
+		type="com.jobhunter.model.submit.ResumeDetailInfoBySubmit">
+		<id property="resumeNo" column="resumeNo" />
+		<id property="registrationNo" column="registrationNo" />
+		<result property="title" column="title" />
+		<result property="payType" column="payType" />
+		<result property="pay" column="pay" />
+		<result property="introduce" column="introduce" />
+		<result property="saveType" column="saveType" />
+		<result property="userUid" column="userUid" />
+		<result property="profileBase64" column="profileBase64" />
+
+		<association property="registrationVO"
+			javaType="com.jobhunter.model.submit.RegistrationVO">
+			<id property="registrationNo" column="registrationNo" />
+			<result property="status" column="status" />
+			<result property="recruitmentNoticePk"
+				column="regRecruitmentNoticePk" />
+			<result property="regDate" column="regDate" />
+			<result property="resumePk" column="regResumePk" />
+
+		</association>
+
+		<collection property="jobForms"
+			ofType="com.jobhunter.model.resume.JobFormDTO">
+			<id property="jobFormNo" column="jobFormNo" />
+			<result property="form" column="jobForm" />
+		</collection>
+
+		<collection property="merits"
+			ofType="com.jobhunter.model.resume.MeritDTO">
+			<id property="meritNo" column="meritNo" />
+			<result property="meritContent" column="meritContent" />
+		</collection>
+
+		<collection property="educations"
+			ofType="com.jobhunter.model.resume.EducationDTO">
+			<id property="educationNo" column="educationNo" />
+			<result property="educationLevel" column="educationLevel" />
+			<result property="educationStatus" column="educationStatus" />
+			<result property="graduationDate" column="graduationDate" />
+			<result property="customInput" column="customInput" />
+		</collection>
+
+		<collection property="histories"
+			ofType="com.jobhunter.model.resume.PersonalHistoryDTO">
+			<id property="historyNo" column="historyNo" />
+			<result property="companyName" column="companyName" />
+			<result property="position" column="position" />
+			<result property="jobDescription" column="jobDescription" />
+			<result property="startDate" column="startDate" />
+			<result property="endDate" column="endDate" />
+		</collection>
+
+		<collection property="licenses"
+			ofType="com.jobhunter.model.resume.LicenseDTO">
+			<id property="licenseNo" column="licenseNo" />
+			<result property="licenseName" column="licenseName" />
+			<result property="acquisitionDate" column="acquisitionDate" />
+			<result property="institution" column="institution" />
+		</collection>
+
+		<collection property="sigunguList"
+			ofType="com.jobhunter.model.region.Sigungu">
+			<id property="sigunguNo" column="sigunguNo" />
+			<result property="name" column="sigunguName" />
+			<result property="regionNo" column="regionNo" />
+		</collection>
+
+		<collection property="subcategoryList"
+			ofType="com.jobhunter.model.category.SubCategory">
+			<id property="subcategoryNo" column="subcategoryNo" />
+			<result property="jobName" column="jobName" />
+			<result property="refMajorcategoryNo"
+				column="refMajorcategoryNo" />
+		</collection>
+
+	</resultMap>
+
+	<select id="getFileListByResumeUid"
+		resultType="com.jobhunter.model.resume.ResumeUpfileDTO">
+		select * from resumeupfiles
+		where resumeNo = #{uid}
+	</select>
+
+	<update id="modifyStatus">
+		update registration
+		set status = #{status}
+		where
+		recruitmentNoticePk = #{recruitmentNoticePk} and resumePk =
+		#{resumePk}
+	</update>
+
+	<update id="updateStatusToExpired">
+		UPDATE registration
+		SET status = 'EXPIRED'
+		WHERE status
+		= 'WAITING'
+		AND recruitmentNoticePk IN (
+		SELECT uid
+		FROM
+		recruitmentnotice
+		WHERE due_date = #{yesterDayStr}
+		)
+	</update>
+
+	<select id="countByCreatedDateBetweenAndRole"
+		parameterType="map" resultType="int">
+		SELECT COUNT(registrationNo)
+		FROM registration
+		WHERE
+		regDate BETWEEN #{start} AND #{end}
+	</select>
+
+
+	<update id="updateStatusToExpiredBetween" parameterType="map">
+		UPDATE
+		registration
+		SET status = 'EXPIRED'
+		WHERE status = 'WAITING'
+		AND
+		recruitmentNoticePk IN (
+		SELECT uid
+		FROM recruitmentnotice
+		WHERE duedate
+		BETWEEN #{start} AND #{end}
+		)
+	</update>
+
+	<select id="selectExpiredSubmitUserMessageInfoBetween"
+		parameterType="map" resultType="map">
+		SELECT
+		u.uid AS userNo,
+		c.uid AS
+		companyNo,
+		c.companyName,
+		r.title AS noticeTitle
+		FROM registration rg
+		JOIN recruitmentnotice r ON rg.recruitmentNoticePk = r.uid
+		JOIN resume
+		rs ON rg.resumePk = rs.resumeNo
+		JOIN users u ON rs.userUid = u.uid
+		JOIN
+		company c ON r.refCompany = c.uid
+		WHERE rg.status = 'EXPIRED'
+		AND
+		r.dueDate BETWEEN #{start} AND #{end}
+	</select>
+
+
+	<select id="selectMessageTargetInfo"
+		resultType="com.jobhunter.model.message.MessageTargetInfoDTO">
+		SELECT
+		r.userUid AS userNo,
+		c.uid AS companyNo,
+		c.companyName,
+		rc.title AS noticeTitle
+		FROM registration rg
+		JOIN resume r
+		ON rg.resumePk = r.resumeNo
+		JOIN recruitmentnotice rc ON
+		rg.recruitmentNoticePk = rc.uid
+		JOIN company c ON rc.refCompany = c.uid
+		WHERE rg.resumePk = #{resumePk}
+		AND rg.recruitmentNoticePk =
+		#{recruitmentNoticePk}
+	</select>
+
+	<update id="ExpiredByEntireWatingRegistration">
+		update registration
+		SET status = 'EXPIRED'
+		WHERE status
+		= 'WAITING'
+		AND recruitmentNoticePk = ${uid}
+	</update>
+
+	<select id="getRegistrationVOLisByUidAndStatus"
+		parameterType="map"
+		resultType="com.jobhunter.model.submit.RegistrationVO">
+		SELECT
+		registrationNo,
+		status,
+		recruitmentNoticePk,
+		regDate,
+		resumePk
+		FROM registration
+		WHERE recruitmentNoticePk = #{uid}
+		AND status
+		= #{status}
+	</select>
+
+	<!-- 육근우_검색조건달린 리스트 가져오려고 만듬 -->
+	<!-- 육근우_신청서 리스트 조회 (공고에 제출된 (if)읽지않은 신청서 조회) -->
+	<select id="selectResumesByRecruitmentUid"
+		resultMap="ResumeListMap">
+		SELECT
+		reg.registrationNo,
+		reg.status,
+		reg.regDate,
+		r.resumeNo,
+		r.title,
+		u.userName
+
+		FROM registration reg
+		JOIN resume r ON reg.resumePk =
+		r.resumeNo
+		JOIN users
+		u ON r.userUid = u.uid
+
+		WHERE
+		reg.recruitmentNoticePk = #{recruitmentUid}
+
+		<if test="onlyUnread">
+			AND reg.status = 'WAITING'
+		</if>
+
+		ORDER BY
+		<choose>
+			<when test="prioritizeUnread">
+				CASE WHEN reg.status = 'WAITING' THEN 0 ELSE 1 END,
+				reg.registrationNo DESC
+			</when>
+			<otherwise>
+				reg.registrationNo DESC
+			</otherwise>
+		</choose>
+
+		LIMIT #{offset}, 5
+	</select>
+	<!-- 육근우_신청서 리스트 조회(공고에 제출된 (if)읽지않은 신청서 조회)용 매퍼 -->
+	<resultMap id="ResumeListMap"
+		type="com.jobhunter.model.submit.SubmitFromRecruitVO">
+		<result property="registrationNo" column="registrationNo" />
+		<result property="status" column="status" />
+		<result property="regDate" column="regDate" />
+
+		<result property="resumeNo" column="resumeNo" />
+		<result property="title" column="title" />
+
+		<result property="userName" column="userName" />
+	</resultMap>
+	<!-- 육근우_공고에 제출된 (if)읽지않은 신청서 총 갯수 -->
+	<select id="countResumesByRecruitmentUid" resultType="int">
+		SELECT COUNT(registrationNo)
+		FROM registration reg
+		WHERE reg.recruitmentNoticePk =
+		#{recruitmentUid}
+		<if test="onlyUnread">
+			AND reg.status = 'WAITING'
+		</if>
+	</select>
+	<!-- 육근우_단일 신청서 하나만 상세조회 -->
+	<!-- resultMap -->
+	<resultMap id="ResumeDetailInfoBySubmitAndUserMap"
+		type="com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser">
+		<id property="resumeNo" column="resumeNo" />
+		<id property="registrationNo" column="registrationNo" />
+		<result property="title" column="title" />
+		<result property="payType" column="payType" />
+		<result property="pay" column="pay" />
+		<result property="introduce" column="introduce" />
+		<result property="saveType" column="saveType" />
+		<result property="userUid" column="userUid" />
+		<result property="profileBase64" column="profileBase64" />
+		<result property="recruitmentNoticePk" column="recruitmentNoticePk"/>
+
+		<result property="userName" column="userName" />
+		<result property="mobile" column="mobile" />
+		<result property="email" column="email" />
+		<result property="gender" column="gender" />
+		<result property="age" column="age" />
+		<result property="addr" column="addr" />
+		<result property="militaryService" column="militaryService" />
+		<result property="nationality" column="nationality" />
+		<result property="disability" column="disability" />
+
+		<association property="registrationVO"
+			javaType="com.jobhunter.model.submit.RegistrationVO">
+			<id property="registrationNo" column="registrationNo" />
+			<result property="status" column="status" />
+			<result property="regDate" column="regDate" />
+			<result property="resumePk" column="regResumePk" />
+		</association>
+
+		<collection property="jobForms"
+			ofType="com.jobhunter.model.resume.JobFormDTO">
+			<id property="jobFormNo" column="jobFormNo" />
+			<result property="form" column="jobForm" />
+		</collection>
+
+		<collection property="merits"
+			ofType="com.jobhunter.model.resume.MeritDTO">
+			<id property="meritNo" column="meritNo" />
+			<result property="meritContent" column="meritContent" />
+		</collection>
+
+		<collection property="educations"
+			ofType="com.jobhunter.model.resume.EducationDTO">
+			<id property="educationNo" column="educationNo" />
+			<result property="educationLevel" column="educationLevel" />
+			<result property="educationStatus" column="educationStatus" />
+			<result property="graduationDate" column="graduationDate" />
+			<result property="customInput" column="customInput" />
+		</collection>
+
+		<collection property="histories"
+			ofType="com.jobhunter.model.resume.PersonalHistoryDTO">
+			<id property="historyNo" column="historyNo" />
+			<result property="companyName" column="companyName" />
+			<result property="position" column="position" />
+			<result property="jobDescription" column="jobDescription" />
+			<result property="startDate" column="startDate" />
+			<result property="endDate" column="endDate" />
+		</collection>
+
+		<collection property="licenses"
+			ofType="com.jobhunter.model.resume.LicenseDTO">
+			<id property="licenseNo" column="licenseNo" />
+			<result property="licenseName" column="licenseName" />
+			<result property="acquisitionDate" column="acquisitionDate" />
+			<result property="institution" column="institution" />
+		</collection>
+
+		<collection property="sigunguList"
+			ofType="com.jobhunter.model.region.Sigungu">
+			<id property="sigunguNo" column="sigunguNo" />
+			<result property="name" column="sigunguName" />
+			<result property="regionNo" column="regionNo" />
+		</collection>
+
+		<collection property="subcategoryList"
+			ofType="com.jobhunter.model.category.SubCategory">
+			<id property="subcategoryNo" column="subcategoryNo" />
+			<result property="jobName" column="jobName" />
+			<result property="refMajorcategoryNo"
+				column="refMajorcategoryNo" />
+		</collection>
+	</resultMap>
+
+	<!-- 육근우_단일 신청서 하나만 상세조회 -->
+	<!-- 1. 기본 이력서 및 유저 정보 -->
+	<select id="selectResumeBasicByRegistrationNo"
+	        resultType="com.jobhunter.model.submit.ResumeDetailInfoBySubmitAndUser">
+	  SELECT
+	    r.resumeNo, r.title, r.payType, r.pay, r.introduce, r.saveType,
+	    r.userUid, r.profileBase64,
+	    reg.registrationNo, reg.recruitmentNoticePk,
+	    u.userName, u.mobile, u.email, u.gender, u.age,
+	    u.militaryService, u.nationality, u.disability, u.addr
+	  FROM registration reg
+	  JOIN resume r ON reg.resumePk = r.resumeNo
+	  LEFT JOIN users u ON r.userUid = u.uid
+	  WHERE reg.registrationNo = #{registrationNo}
+	</select>
+	
+	<!-- 2. 고용 형태 -->
+	<select id="selectJobFormsByResumeNo" resultType="com.jobhunter.model.resume.JobFormDTO">
+	  SELECT jobFormNo, form
+	  FROM jobform
+	  WHERE resumeNo = #{resumeNo}
+	</select>
+	
+	<!-- 3. 성격 및 강점 -->
+	<select id="selectMeritsByResumeNo" resultType="com.jobhunter.model.resume.MeritDTO">
+	  SELECT meritNo, meritContent
+	  FROM merit
+	  WHERE resumeNo = #{resumeNo}
+	</select>
+	
+	<!-- 4. 학력 -->
+	<select id="selectEducationsByResumeNo" resultType="com.jobhunter.model.resume.EducationDTO">
+	  SELECT educationNo, educationLevel, educationStatus, graduationDate, customInput
+	  FROM education
+	  WHERE resumeNo = #{resumeNo}
+	</select>
+	
+	<!-- 5. 경력 -->
+	<select id="selectHistoriesByResumeNo" resultType="com.jobhunter.model.resume.PersonalHistoryDTO">
+	  SELECT historyNo, companyName, position, jobDescription, startDate, endDate
+	  FROM personalhistory
+	  WHERE resumeNo = #{resumeNo}
+	</select>
+	
+	<!-- 6. 자격증 -->
+	<select id="selectLicensesByResumeNo" resultType="com.jobhunter.model.resume.LicenseDTO">
+	  SELECT licenseNo, licenseName, acquisitionDate, institution
+	  FROM license
+	  WHERE resumeNo = #{resumeNo}
+	</select>
+	
+	<!-- 7. 시군구 -->
+	<select id="selectSigunguByResumeNo" resultType="com.jobhunter.model.region.Sigungu">
+	  SELECT
+	    s.sigunguNo, s.code, s.name, s.regionNo
+	  FROM where_resume_sigungu sr
+	  JOIN sigungu s ON sr.refSigunguNo = s.sigunguNo
+	  WHERE sr.refResumeNo = #{resumeNo}
+	</select>
+	
+	
+	<!-- 8. 직업군 -->
+	<select id="selectSubcategoriesByResumeNo" resultType="com.jobhunter.model.category.SubCategory">
+	  SELECT sc.subcategoryNo, sc.jobName, sc.refMajorcategoryNo
+	  FROM jobtype_resume_sub jrs
+	  JOIN subcategory sc ON jrs.refSubNo = sc.subcategoryNo
+	  WHERE jrs.refResumeNo = #{resumeNo}
+	</select>
+
+	
+	<select id="getCompanyUidByRegistrationNo" resultType="int">
+		SELECT
+		rn.refCompany
+		FROM registration reg
+		JOIN recruitmentnotice rn ON
+		reg.recruitmentNoticePk = rn.uid
+		WHERE reg.registrationNo =
+		#{registrationNo}
+	</select>
+
+	<select id="selectUsersWhoApplied"
+		resultType="com.jobhunter.model.user.UserVO" parameterType="int">
+		SELECT u.*
+		FROM registration r
+		JOIN resume res ON r.resumePk = res.resumeNo
+		JOIN
+		users u ON res.userUid = u.uid
+		WHERE r.recruitmentNoticePk =
+		#{recruitmentUid}
+		AND r.status != 'EXPIRED'
+	</select>
+
+
+	<select id="selectSubmitFromUser"
+		resultType="com.jobhunter.model.submit.SubmitFromUserVO">
+		SELECT
+		reg.registrationNo,
+		reg.status,
+		reg.regDate,
+		res.resumeNo,
+		res.title AS resumeTitle,
+		rec.uid AS recruitNo,
+		rec.title AS
+		recruitTitle
+		FROM registration reg
+		JOIN resume res ON reg.resumePk =
+		res.resumeNo
+		JOIN users u ON res.userUid = u.uid
+		JOIN recruitmentnotice
+		rec ON reg.recruitmentNoticePk = rec.uid
+		<where>
+			u.uid = #{uid}
+			<if test="onlyUnread">
+				AND reg.status NOT IN ('WAITING', 'EXPIRED')
+			</if>
+		</where>
+		<choose>
+			<when test="prioritizeUnread">
+				ORDER BY
+				FIELD(reg.status, 'PASS', 'FAILURE',
+				'CHECKED', 'WAITING', 'EXPIRED'),
+				reg.regDate DESC
+			</when>
+			<otherwise>
+				ORDER BY reg.regDate DESC
+			</otherwise>
+		</choose>
+		LIMIT 5 OFFSET #{offset}
+	</select>
+
+	<select id="countSubmitFromUser" resultType="int">
+		SELECT COUNT(registrationNo)
+		FROM registration reg
+		JOIN resume res ON reg.resumePk =
+		res.resumeNo
+		JOIN users u ON res.userUid = u.uid
+		JOIN recruitmentnotice
+		rec ON reg.recruitmentNoticePk = rec.uid
+		<where>
+			u.uid = #{uid}
+			<if test="onlyUnread">
+				AND reg.status NOT IN ('WAITING', 'EXPIRED')
+			</if>
+		</where>
+	</select>
+
+	<!-- 지원자 페이징 조회 -->
+	<select id="selectUsersWhoAppliedPaged" parameterType="map"
+		resultType="com.jobhunter.model.user.UserVO">
+		SELECT
+		u.*
+		FROM
+		registration reg
+		JOIN
+		resume res ON reg.resumePk = res.resumeNo
+		JOIN
+		users u ON res.userUid = u.uid
+		WHERE
+		reg.recruitmentNoticePk = #{uid}
+		ORDER BY
+		reg.regDate DESC
+		LIMIT #{pageIndex}, #{pageSize}
+	</select>
+	
+	<update id="updateSubmitStatus">
+	    UPDATE registration
+	    SET status = #{status}
+	    WHERE registrationNo = #{registrationNo}
+	      AND status = 'WAITING'
+	</update>
+	
+	<select id="selectResumeUpfilesByRegistrationNo" resultType="com.jobhunter.model.resume.ResumeUpfileDTO">
+	    SELECT 
+	        f.boardUpFileNo,
+	        f.originalFileName,
+	        f.newFileName,
+	        f.ext,
+	        f.size,
+	        f.base64Image,
+	        f.resumeNo
+	    FROM registration r
+	    JOIN resumeupfiles f ON r.resumePk = f.resumeNo
+	    WHERE r.registrationNo = #{registrationNo}
+	</select>
+
+</mapper>

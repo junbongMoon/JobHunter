@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jobhunter.mapper.adminmapper">
+
+	<select id="findExpiredUsersUids" resultType="int">
+	    <![CDATA[
+	    SELECT uid
+	    FROM users
+	    WHERE deleteDeadline IS NOT NULL
+	      AND deleteDeadline <= NOW()
+	      AND (blockDeadline IS NULL OR blockDeadline <= NOW())
+	    ORDER BY deleteDeadline ASC
+	    LIMIT
+	    ]]>
+	    #{limit}
+	</select>
+	<delete id="deleteUserByUid">
+	    DELETE FROM users
+	    WHERE uid = #{uid}
+	</delete>
+	<insert id="insertDeleteUserLogByUid">
+		insert into CDLog 
+		(targetId, targetType, logType) 
+		values 
+		(#{uid}, 'USER', 'DELETE')
+	</insert>
+	
+	<select id="findExpiredCompanyUids" resultType="int">
+	    <![CDATA[
+	    SELECT uid
+	    FROM company
+	    WHERE deleteDeadline IS NOT NULL
+	      AND deleteDeadline <= NOW()
+	      AND (blockDeadline IS NULL OR blockDeadline <= NOW())
+	    ORDER BY deleteDeadline ASC
+	    LIMIT
+	    ]]>
+	    #{limit}
+	</select>
+	<delete id="deleteCompanyByUid">
+	    DELETE FROM company
+	    WHERE uid = #{uid}
+	</delete>
+	<insert id="insertDeleteCompanyLogByUid">
+		insert into CDLog 
+		(targetId, targetType, logType) 
+		values 
+		(#{uid}, 'COMPANY', 'DELETE')
+	</insert>
+	
+
+</mapper>

@@ -4,9 +4,285 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jobhunter.mapper.usermapper">
 
-	
-	<select id="now" resultType="String">
-		select now()
+	<resultMap id="accountMap"
+		type="com.jobhunter.model.account.AccountVO">
+		<result column="userId" property="accountId" />
+		<result column="userName" property="accountName" />
+		<result column="userImg" property="profileImg" />
+		<!-- 나머지는 동일 컬럼이므로 자동 매핑 -->
+	</resultMap>
+
+	<update id="setVerificationFalse">
+		UPDATE users
+		SET requiresVerification = 'N'
+		WHERE
+		uid =
+		#{uid}
+	</update>
+
+	<select id="isAuthVerifi" resultType="String">
+		select requiresVerification
+		from users where userId = #{id}
 	</select>
+
+	<select id="loginAccount" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where userId = #{id} and
+		password = sha1(md5(#{password}))
+	</select>
+	
+	<select id="findByKakaoId" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where socialId = #{kakaoId}
+	</select>
+
+	<update id="setLastLoginDate">
+		UPDATE users
+		SET lastLoginDate = NOW(), loginCnt = 0
+		where uid = #{uid}
+	</update>
+
+	<update id="setAutoLogin">
+		UPDATE users SET autoLogin = #{autoLogin}
+		where userId
+		= #{id} and
+		password = sha1(md5(#{password}))
+	</update>
+
+	<select id="existsAccountId" parameterType="String"
+		resultType="boolean">
+		SELECT EXISTS (SELECT 1 FROM users WHERE userId = #{id})
+	</select>
+
+	<update id="increaseFailCount" parameterType="String">
+		UPDATE users SET
+		loginCnt = loginCnt + 1 WHERE userId = #{id}
+	</update>
+
+	<select id="getFailCount" parameterType="String"
+		resultType="int">
+		SELECT loginCnt FROM users WHERE userId = #{id}
+	</select>
+
+	<update id="setRequiresVerification" parameterType="String">
+		UPDATE users
+		SET requiresVerification = 'Y' WHERE userId = #{id}
+	</update>
+
+	<update id="resetFailCount" parameterType="String">
+		UPDATE users SET
+		loginCnt = 0 WHERE userId = #{id}
+	</update>
+
+	<select id="getAccountByUid" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where uid = #{uid}
+	</select>
+
+	<select id="getAccountByAutoLogin" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where autoLogin =
+		#{sessionId}
+	</select>
+
+	<!-- 여기까진 로그인용 -->
+
+	<select id="getUserInfo" resultType="com.jobhunter.model.user.UserVO">
+		SELECT * FROM users where uid = #{uid};
+	</select>
+
+	<select id="checkPassword" parameterType="map"
+		resultMap="accountMap">
+		SELECT *
+		FROM users
+		WHERE uid = #{uid}
+		AND password
+		=
+		SHA1(MD5(#{password}))
+	</select>
+
+	<update id="updatePassword" parameterType="map">
+		UPDATE users SET
+		password = SHA1(MD5(#{password}))
+		WHERE uid = #{uid}
+		<choose>
+			<when test="contactType == 'email'">
+			AND email = #{contact}
+			</when>
+			<when test="contactType == 'mobile'">
+			AND mobile = #{contact}
+			</when>
+		</choose>
+	</update>
+
+	<update id="updateContact">
+		UPDATE users
+		<choose>
+			<when test="type == 'email'">
+			SET email = #{value}
+			</when>
+			<when test="type == 'mobile'">
+			SET mobile = #{value}
+			</when>
+		</choose>
+		WHERE uid = #{uid}
+	</update>
+
+	<update id="updateMobile" parameterType="map">
+		UPDATE users SET mobile
+		= #{mobile} WHERE uid = #{uid}
+	</update>
+
+	<update id="updateUserInfo"
+		parameterType="com.jobhunter.model.user.UserInfoDTO">
+		UPDATE users
+		SET
+		addr = #{addr},
+		detailAddr =
+		#{detailAddr},
+		gender = #{gender},
+		age = #{age},
+		payType = #{payType},
+		pay = #{pay},
+		introduce = #{introduce},
+		militaryService =
+		#{militaryService},
+		nationality = #{nationality},
+		disability =
+		#{disability}
+		WHERE uid = #{uid}
+	</update>
+
+	<select id="findByKakao" resultType="java.lang.Integer">
+		SELECT uid FROM users WHERE
+		socialId = #{kakaoId}
+	</select>
+
+	<insert id="registKakao" useGeneratedKeys="true"
+		keyProperty="uid">
+		INSERT INTO `users` (`userName`, `socialId`, `email`,
+		`accountType`, `isSocial`)
+		VALUES (#{nickname}, #{kakaoId}, #{email}, 'USER', 'Y');
+	</insert>
+
+	<select id="loginByKakaoId" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where socialId =
+		#{kakaoId}
+	</select>
+
+	<select id="findIsUserById" resultType="boolean"
+		parameterType="string">
+		SELECT EXISTS (
+		SELECT 1 FROM users WHERE userId = #{userId}
+		)
+	</select>
+
+	
+	<select id="findByContact" resultMap="accountMap">
+		select *, userId as
+		accountId, userName as accountName
+		from users
+		where
+		<choose>
+			<when test="targetType == 'email'">
+				email = #{targetValue}
+			</when>
+			<when test="targetType == 'mobile'">
+				mobile = #{targetValue}
+			</when>
+			<otherwise>
+				1 = 0 <!-- 예외 처리용, 조건이 없으면 무조건 실패하게 -->
+			</otherwise>
+		</choose>
+		<if test="targetId != null and targetId != ''">
+			AND userId = #{targetId}
+		</if>
+	</select>
+	
+	<update id="linkToKakao" parameterType="com.jobhunter.model.user.KakaoUserInfoDTO">
+		UPDATE users SET socialId = #{kakaoId}, email = #{email}, isSocial = 'Y' WHERE (uid = #{uid})
+	</update>
+	
+
+	<update id="deleteEmail">
+		UPDATE users
+		SET email = NULL
+		WHERE uid = #{uid}
+		AND mobile IS NOT NULL
+		AND mobile != ''
+	</update>
+	
+	<update id="deleteMobile">
+		UPDATE users
+		SET mobile = NULL
+		WHERE uid = #{uid}
+		AND email IS NOT NULL
+		AND email != ''
+	</update>
+	
+	<update id="setDeleteAccount">
+		UPDATE users
+		SET deleteDeadline = NOW() + INTERVAL 3 DAY 
+		WHERE uid = #{uid}
+	</update>
+	<select id="getDeleteDeadline" resultType="java.sql.Timestamp">
+		SELECT deleteDeadline FROM users WHERE uid = #{uid}
+	</select>
+	<update id="cancelDeleteAccount">
+		UPDATE users
+		SET deleteDeadline = NULL 
+		WHERE uid = #{uid}
+	</update>
+	
+	<update id="updateProfileImg">
+		UPDATE users
+		SET userImg = #{img}
+		WHERE uid = #{uid}
+	</update>
+	
+	<insert id="registUser"
+		parameterType="com.jobhunter.model.user.UserRegisterDTO"
+		useGeneratedKeys="true" keyProperty="uid">
+		INSERT INTO `users`
+		(`userName`, `userId`, `password`, `mobile`, `email`, `accountType`,
+		`requiresVerification`, `isSocial`, `nationality`)
+		VALUES
+		(#{name}, #{id}, sha1(md5(#{password})), #{mobile}, #{email}, 'USER', 'N', 'N',
+		#{nationality});
+	</insert>
+	
+
+	<update id="updateName">
+		UPDATE users
+		SET userName = #{name}
+		WHERE uid = #{uid}
+	</update>
+
+	<update id="modifyUserPoint">
+		update users
+		set point = point + #{point}
+		where uid = #{userUid}
+	</update>
+	
+	<update id="setUserMentorFlagByAdvancementNo">
+	    UPDATE users
+	    SET isMentor = 'Y'
+	    WHERE uid = (
+	        SELECT refUser
+	        FROM advancement
+	        WHERE advancementNo = #{advancementNo}
+	    )
+	</update>
 
 </mapper>
